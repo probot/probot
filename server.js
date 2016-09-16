@@ -22,7 +22,7 @@ http.createServer(function (req, res) {
       res.end('no such location');
     }
   });
-}).listen(3000);
+}).listen(process.env.PORT || 3000);
 
 function register(behavior) {
   webhook.on(behavior.webhook, function (event) {

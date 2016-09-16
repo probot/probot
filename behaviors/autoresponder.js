@@ -8,6 +8,8 @@
 //     Hello there, @{{sender.author}}! Thanks for opening an issue. We'll
 //     review this as soon as we can.
 //
+// TODO: add config option to only post for first-time contributors
+// TODO: add support for Pull Requests (and PULL_REQUEST_REPLY_TEMPLATE.md)
 
 module.exports = {webhook: 'issues', action: autorespond};
 

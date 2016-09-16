@@ -1,10 +1,11 @@
 {
-  "name": "probot",
+  "name": "hubbot",
   "version": "1.0.0",
   "description": "a trainable robot that responds to activity on GitHub",
   "main": "index.js",
   "scripts": {
     "run": "node server.js",
+    "lint": "xo",
     "test": "mocha"
   },
   "author": "Brandon Keepers",
@@ -16,6 +17,13 @@
     "handlebars": "^4.0.5"
   },
   "devDependencies": {
-    "mocha": "^3.0.2"
+    "mocha": "^3.0.2",
+    "xo": "^0.16.0"
+  },
+  "xo": {
+    "space": true,
+    "rules": {},
+    "ignores": [],
+    "envs": ["node", "mocha"]
   }
 }

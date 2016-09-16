@@ -1,0 +1,18 @@
+{
+  "name": "probot",
+  "version": "1.0.0",
+  "description": "a trainable robot that responds to activity on GitHub",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "Brandon Keepers",
+  "license": "ISC",
+  "dependencies": {
+    "github": "^3.1.0",
+    "github-webhook-handler": "^0.6.0"
+  },
+  "devDependencies": {
+    "mocha": "^3.0.2"
+  }
+}

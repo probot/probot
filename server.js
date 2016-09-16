@@ -18,6 +18,7 @@ http.createServer(function (req, res) {
 }).listen(3000);
 
 // Auto-responder behavior
+let handlebars = require('handlebars');
 
 webhook.on('issues', function (event) {
   var payload = event['payload'],
@@ -30,14 +31,14 @@ webhook.on('issues', function (event) {
     repo: repo,
     path: '.github/ISSUE_REPLY_TEMPLATE.md'
   }, function(err, data) {
-    var template = new Buffer(data['content'], 'base64').toString();
+    var template = handlebars.compile(new Buffer(data['content'], 'base64').toString());
 
     // Post issue comment
     github.issues.createComment({
       user: user,
       repo: repo,
       number: payload['issue']['number'],
-      body: template
+      body: template(payload)
     }, function(err, res) {
       if(err) {
         console.log('ERROR', err, res);

@@ -11,7 +11,8 @@
   "license": "ISC",
   "dependencies": {
     "github": "^3.1.0",
-    "github-webhook-handler": "^0.6.0"
+    "github-webhook-handler": "^0.6.0",
+    "handlebars": "^4.0.5"
   },
   "devDependencies": {
     "mocha": "^3.0.2"

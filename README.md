@@ -1,6 +1,8 @@
 # HubBot
 
-HubBot is a trainable robot that responds to activity on GitHub. Welcome first-time contributors, close stale pull requests, or require a :+1: from at least 2 maintainers with pre-built behaviors to your project, or add whatever behavior write your own.
+_NOTE: this REAME is aspirational, and the project name is guaranteed to change._
+
+HubBot is a trainable robot that responds to activity on GitHub. Pre-built behaviors let you automatically welcome first-time contributors, @mention previous authors, or close stale pull requests. Write your own behaviors to add whatever behavior your project needs.
 
 ## Behaviors
 

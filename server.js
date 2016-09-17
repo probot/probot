@@ -3,7 +3,7 @@ let http = require('http');
 let createHandler = require('github-webhook-handler');
 let GitHubApi = require('github');
 
-let webhook = createHandler({path: '/', secret: 'secret'});
+let webhook = createHandler({path: '/', secret: process.env.WEBHOOK_SECRET || 'secret'});
 let github = new GitHubApi();
 
 github.authenticate({

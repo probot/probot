@@ -46,5 +46,5 @@ robot.on('pull', function(event) {
 - [ ] Write a few more behaviors
 - [ ] extract behaviors to separate packages
 - [ ] support multiple repositories in same org
-- [ ] doc all the things
+- [ ] Document explicit extension API
 - [ ] release v0.1

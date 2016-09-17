@@ -6,8 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "lint": "xo",
-    "test": "mocha",
-    "ci": "npm test && npm run lint"
+    "test": "mocha"
   },
   "author": "Brandon Keepers",
   "license": "ISC",

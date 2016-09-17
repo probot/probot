@@ -6,6 +6,8 @@ let GitHubApi = require('github');
 let webhook = createHandler({path: '/', secret: process.env.WEBHOOK_SECRET || 'secret'});
 let github = new GitHubApi();
 
+let PORT = process.env.PORT || 3000;
+
 github.authenticate({
   type: 'oauth',
   token: process.env.GITHUB_TOKEN
@@ -22,7 +24,9 @@ http.createServer(function (req, res) {
       res.end('no such location');
     }
   });
-}).listen(process.env.PORT || 3000);
+}).listen(PORT);
+
+console.log("Listening on http://localhost:" + PORT);
 
 function register(behavior) {
   webhook.on(behavior.webhook, function (event) {

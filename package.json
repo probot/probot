@@ -26,5 +26,8 @@
     "rules": {},
     "ignores": [],
     "envs": ["node", "mocha"]
+  },
+  "engines": {
+    "node": "6.6.0"
   }
 }

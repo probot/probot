@@ -48,4 +48,6 @@ robot.on('pull', function(event) {
 - [ ] extract behaviors to separate packages
 - [ ] support multiple repositories in same org
 - [ ] Document explicit extension API
+  - [ ] convenience wrapper for common actions (e.g. `robot.comment`, `robot.status`)
 - [ ] release v0.1
+- [ ] script/simulate to simulate events on a GitHub repo

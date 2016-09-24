@@ -13,6 +13,8 @@ The functionality of all of these awesome bots could be ported to [behaviors](#c
 - [highfive](https://github.com/servo/highfive) - GitHub hooks to provide an encouraging atmosphere for new contributors
 - [Homu](https://github.com/barosl/homu) - A bot that integrates with GitHub and your favorite continuous integration service
 - [mention-bot](https://github.com/facebook/mention-bot) - Automatically mention potential reviewers on pull requests.
+- [PullAprove](http://pullapprove.com/)
+- [LGTM](https://lgtm.co)
 - Know of other examples? [Add them here…](../../edit/master/README.md)
 
 Here are some behaviors that we plan to implement:

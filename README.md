@@ -1,8 +1,8 @@
-# HubBot
+# PRobot
 
 _NOTE: this REAME is aspirational, and the project name is guaranteed to change._
 
-HubBot is a trainable robot that responds to activity on GitHub. Pre-built behaviors let you automatically welcome first-time contributors, @mention previous authors, or close stale pull requests. Write your own behaviors to add whatever behavior your project needs.
+PRobot is a trainable robot that responds to activity on GitHub. Pre-built behaviors let you automatically welcome first-time contributors, @mention previous authors, or close stale pull requests. Write your own behaviors to add whatever behavior your project needs.
 
 ## Why?
 
@@ -43,8 +43,11 @@ robot.on('pull', function(event) {
 - [x] tests
   - [x] linting
 - [ ] Proper use of GitHub Integrations
+  - [ ] one integration, multiple installations
+  - [ ] per-org installation
 - [ ] Configure Travis CI
-- [ ] deploy to heroku
+- [x] deploy to heroku
+- [ ] deploy to heroku button
 - [ ] proper error handling
 - [ ] Write a few more behaviors
 - [ ] extract behaviors to separate packages

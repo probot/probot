@@ -2,11 +2,13 @@
 
 _NOTE: this REAME is aspirational, and the project name is guaranteed to change._
 
-PRobot is a trainable robot that responds to activity on GitHub. Pre-built behaviors let you automatically welcome first-time contributors, @mention previous authors, or close stale pull requests. Write your own behaviors to add whatever behavior your project needs.
+PRobot is a trainable robot that responds to activity on GitHub. It's like [Hubot](https://hubot.github.com/), but for GitHub events instead of chat messages.
+
+Automatically welcome first-time contributors, @mention previous authors, or close stale pull requests with pre-built behaviors. Write your own behaviors to implement whatever workflow your project needs.
 
 ## Why?
 
-Almost any workflow or process you can imagine can be added to GitHub with [webhooks](https://developer.github.com/webhooks/), the [API](https://developer.github.com/v3/), and now [Integrations](https://developer.github.com/early-access/integrations/). But adding that workflow usually involves writing a lot of code to integrate with GitHub, and a tiny bit of code to implement the behavior you want. This project aims to be a generic bot for building integrations with GitHub. Think [Hubot](https://hubot.github.com/), but for GitHub webhooks instead of chat.
+Almost any workflow or process you can imagine can be added to GitHub with [webhooks](https://developer.github.com/webhooks/), the [API](https://developer.github.com/v3/), and now [Integrations](https://developer.github.com/early-access/integrations/). But adding that workflow usually involves writing a lot of code to integrate with GitHub, and a tiny bit of code to implement the behavior you want. This project aims to be a generic bot for building integrations with GitHub.
 
 The functionality of all of these awesome bots could be ported to [behaviors](#creating-a-behavior):
 

@@ -34,27 +34,3 @@ robot.on('pull', function(event) {
   robot.comment("Thanks for the pull request! We'll review it within 72 hours!");
 });
 ```
-
-## TODO
-
-- [x] receive webhook
-- [x] issue autoresponder
-  - [x] respond with comment
-  - [x] configurable message
-  - [x] message template
-- [x] tests
-  - [x] linting
-- [ ] Proper use of GitHub Integrations
-  - [ ] one integration, multiple installations
-  - [ ] per-org installation
-- [ ] Configure Travis CI
-- [x] deploy to heroku
-- [ ] deploy to heroku button
-- [ ] proper error handling
-- [ ] Write a few more behaviors
-- [ ] extract behaviors to separate packages
-- [ ] support multiple repositories in same org
-- [ ] Document explicit extension API
-  - [ ] convenience wrapper for common actions (e.g. `robot.comment`, `robot.status`)
-- [ ] release v0.1
-- [ ] script/simulate to simulate events on a GitHub repo

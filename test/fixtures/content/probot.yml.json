@@ -1,0 +1,27 @@
+{
+   "html_url" : "https://github.com/bkeepers-inc/test/blob/master/.probot.yml",
+   "download_url" : "https://raw.githubusercontent.com/bkeepers-inc/test/master/.probot.yml?token=AAAArRMI0DVZEDq18BF3H-X8nNDRTNP-ks5X-s-gwA%3D%3D",
+   "name" : ".probot.yml",
+   "size" : 66,
+   "path" : ".probot.yml",
+   "meta" : {
+      "x-ratelimit-reset" : "1476056969",
+      "status" : "200 OK",
+      "x-ratelimit-remaining" : "4992",
+      "last-modified" : "Sun, 09 Oct 2016 19:50:14 GMT",
+      "etag" : "\"7874497831ebbee627c6b8fcf942f8e1\"",
+      "x-ratelimit-limit" : "5000",
+      "x-oauth-scopes" : "gist, repo, user"
+   },
+   "git_url" : "https://api.github.com/repos/bkeepers-inc/test/git/blobs/4e5daf83386202d6f507f3b8cb94ec7b574857e3",
+   "url" : "https://api.github.com/repos/bkeepers-inc/test/contents/.probot.yml?ref=master",
+   "type" : "file",
+   "content" : "cnVsZXM6CiAgLSBvbjogaXNzdWVzCiAgICB0aGVuOgogICAgICBjb21tZW50\nOiAiSGVsbG8gTmV3IFdvcmxkISIK\n",
+   "sha" : "4e5daf83386202d6f507f3b8cb94ec7b574857e3",
+   "_links" : {
+      "html" : "https://github.com/bkeepers-inc/test/blob/master/.probot.yml",
+      "self" : "https://api.github.com/repos/bkeepers-inc/test/contents/.probot.yml?ref=master",
+      "git" : "https://api.github.com/repos/bkeepers-inc/test/git/blobs/4e5daf83386202d6f507f3b8cb94ec7b574857e3"
+   },
+   "encoding" : "base64"
+}

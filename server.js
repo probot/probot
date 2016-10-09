@@ -39,4 +39,4 @@ webhook.on('*', function (event) {
   dispatch(github, event);
 });
 
-register(require('./behaviors/autoresponder.js'));
+// register(require('./behaviors/autoresponder.js'));

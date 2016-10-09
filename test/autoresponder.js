@@ -1,13 +1,13 @@
-var expect = require('expect');
-var autoresponder = require('../behaviors/autoresponder');
-var issueEvent = require('./fixtures/issues.json');
-var issueReplyTemplate = require('./fixtures/content/issue_reply_template.json');
+const expect = require('expect');
+const autoresponder = require('../behaviors/autoresponder');
+const issueEvent = require('./fixtures/issues.json');
+const issueReplyTemplate = require('./fixtures/content/issue_reply_template.json');
 
-var createSpy = expect.createSpy;
+const createSpy = expect.createSpy;
 
-var github = {
+const github = {
   repos: {
-    getContent: createSpy().andCall(function (data, callback) {
+    getContent: createSpy().andCall((data, callback) => {
       callback(null, issueReplyTemplate);
     })
   },
@@ -16,8 +16,8 @@ var github = {
   }
 };
 
-describe('autoresponder', function () {
-  it('gets reply template from the repo', function () {
+describe('autoresponder', () => {
+  it('gets reply template from the repo', () => {
     autoresponder.action(issueEvent, github);
 
     expect(github.repos.getContent.calls[0].arguments[0]).toEqual({
@@ -27,7 +27,7 @@ describe('autoresponder', function () {
     });
   });
 
-  it('posts a comment based on the template', function () {
+  it('posts a comment based on the template', () => {
     autoresponder.action(issueEvent, github);
 
     expect(github.issues.createComment.calls[0].arguments[0]).toEqual({

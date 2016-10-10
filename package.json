@@ -22,6 +22,7 @@
     "xo": "^0.16.0"
   },
   "xo": {
+    "esnext": true,
     "space": true,
     "rules": {},
     "ignores": [],

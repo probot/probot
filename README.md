@@ -28,10 +28,56 @@ Here are some behaviors that we plan to implement:
 - @mention `OWNERS` based on modified files
 - "Based on recent activity, expect a response in X days"
 
-## Creating a behavior
+## Installing
 
-```javascript
-robot.on('pull', function(event) {
-  robot.comment("Thanks for the pull request! We'll review it within 72 hours!");
-});
+TODO: install the hosted integration into your organization / account
+
+TODO: deploy your own bot
+
+## Configuring
+
+Behaviors are configured in the `.probot.yml`. They are composed of 3 parts:
+
+- `on` - webhook events to listen to
+- `when` (optional) - conditions to determine if the actions should be performed
+- `then` - actions to take in response to the event
+
+Here are a few examples:
+
+```yml
+behaviors:
+
+# Post welcome message for new contributors
+- on:
+    # These are the webhook event and the "action"
+    # https://developer.github.com/webhooks/#events
+    - issues.created
+    - pull_request.created
+  when:
+    first_time_contributor: true # plugins could implement conditions like this
+  then:
+    # Post a comment on the issue or pull request with the template, which can
+    # use variables from the webhook event.
+    comment:
+      from_file: .github/NEW_CONTRIBUTOR_TEMPLATE.md
+
+# Tweet when a new release is created
+- on: release.published
+  then:
+    tweet: "Get it while it's hot! {{ repository.name }} {{ release.name }} was just released! {{ release.html_url }}"
+
+# Assign a reviewer issues or pull requests with a label
+- on:
+    - issues.created
+    - pull_request.created
+    - issues.labeled
+    - pull_request.labeled
+  when:
+    label: security
+  then:
+    assign:
+      random:
+        from_team: security-first-responders
 ```
+
+See [Configuration](docs/configuration.md) for more information on what behaviors can be built.

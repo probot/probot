@@ -31,13 +31,13 @@ Behaviors are composed of:
 
 ### `on`
 
-Specifies the type of GitHub [webhook event](https://developer.github.com/webhooks/#events) that this rule applies to.
+Specifies the type of GitHub [webhook event](https://developer.github.com/webhooks/#events) that this behavior applies to.
 
 ```yml
 - on: issue.create
 ```
 
-Specifying multiple events will run this rule for any that matches:
+Specifying multiple events will trigger this behavior:
 
 ```yml
 - on:

@@ -5,7 +5,9 @@ let GitHubApi = require('github');
 
 let webhook = createHandler({path: '/', secret: process.env.WEBHOOK_SECRET || 'secret'});
 let github = new GitHubApi();
-let dispatch = require('./lib/dispatch');
+
+const Configuration = require('./lib/configuration');
+const Dispatcher = require('./lib/dispatcher');
 
 let PORT = process.env.PORT || 3000;
 
@@ -36,7 +38,11 @@ function register(behavior) {
 }
 
 webhook.on('*', function (event) {
-  dispatch(github, event);
+  if (event.payload.repository) {
+    const config = new Configuration(github, event.payload.repository);
+    const dispatcher = new Dispatcher(github, event);
+    return config.load().then(config => dispatcher.call(config));
+  }
 });
 
 // register(require('./behaviors/autoresponder.js'));

@@ -29,7 +29,7 @@ describe('action.unlabel', () => {
       number: 6,
       name: 'hello'
     });
-    
+
     expect(github.issues.removeLabel).toHaveBeenCalledWith({
       user: 'bkeepers-inc',
       repo: 'test',
@@ -37,5 +37,4 @@ describe('action.unlabel', () => {
       name: 'goodbye'
     });
   });
-
 });

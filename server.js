@@ -5,17 +5,17 @@ const GitHubApi = require('github');
 const Configuration = require('./lib/configuration');
 const Dispatcher = require('./lib/dispatcher');
 
-let PORT = process.env.PORT || 3000;
-let webhook = createHandler({path: '/', secret: process.env.WEBHOOK_SECRET || 'secret'});
+const PORT = process.env.PORT || 3000;
+const webhook = createHandler({path: '/', secret: process.env.WEBHOOK_SECRET || 'secret'});
 
-let github = new GitHubApi();
+const github = new GitHubApi();
 github.authenticate({
   type: 'oauth',
   token: process.env.GITHUB_TOKEN
 });
 
-http.createServer(function (req, res) {
-  webhook(req, res, function (err) {
+http.createServer((req, res) => {
+  webhook(req, res, err => {
     if (err) {
       console.log('ERROR', err);
       res.statusCode = 500;
@@ -27,7 +27,7 @@ http.createServer(function (req, res) {
   });
 }).listen(PORT);
 
-webhook.on('*', function (event) {
+webhook.on('*', event => {
   if (event.payload.repository) {
     const dispatcher = new Dispatcher(github, event);
     return Configuration.load(github, event.payload.repository).then(
@@ -36,4 +36,4 @@ webhook.on('*', function (event) {
   }
 });
 
-console.log("Listening on http://localhost:" + PORT);
+console.log('Listening on http://localhost:' + PORT);

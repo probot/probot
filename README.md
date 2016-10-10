@@ -36,7 +36,7 @@ TODO: deploy your own bot
 
 ## Configuring
 
-Behaviors are configured in the `.probot.yml`. They are composed of 3 parts:
+Behaviors are configured in a file called `.probot.yml` in the repository. They are composed of 3 parts:
 
 - `on` - webhook events to listen to
 - `when` (optional) - conditions to determine if the actions should be performed
@@ -80,4 +80,4 @@ behaviors:
         from_team: security-first-responders
 ```
 
-See [Configuration](docs/configuration.md) for more information on what behaviors can be built.
+Any conceivable condition (`when`) or action (`then`) could be implemented by plugins. See [Configuration](docs/configuration.md) for more information on what behaviors can be built.

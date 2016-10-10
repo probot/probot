@@ -17,6 +17,7 @@ The functionality of all of these awesome bots could be ported to [behaviors](#c
 - [mention-bot](https://github.com/facebook/mention-bot) - Automatically mention potential reviewers on pull requests.
 - [PullAprove](http://pullapprove.com/)
 - [LGTM](https://lgtm.co)
+- [Auto-reply](https://github.com/parkr/auto-reply)
 - Know of other examples? [Add them here…](../../edit/master/README.md)
 
 Here are some behaviors that we plan to implement:

@@ -1,19 +1,19 @@
 const expect = require('expect');
 const Configuration = require('../lib/configuration');
-const config = require ('./fixtures/content/probot.yml.json');
+const config = require('./fixtures/content/probot.yml.json');
 
 const createSpy = expect.createSpy;
 
-describe('Configuration', function () {
-  describe('load', function() {
+describe('Configuration', () => {
+  describe('load', () => {
     let github;
 
     const repo = {
       owner: {login: 'bkeepers'},
       name: 'test'
-    }
+    };
 
-    beforeEach(function() {
+    beforeEach(() => {
       github = {
         repos: {
           getContent: createSpy().andReturn(Promise.resolve(config))
@@ -21,38 +21,38 @@ describe('Configuration', function () {
       };
     });
 
-    it('loads from the repo', function(done) {
+    it('loads from the repo', done => {
       Configuration.load(github, repo).then(config => {
         expect(github.repos.getContent).toHaveBeenCalledWith({
           user: 'bkeepers',
           repo: 'test',
           path: '.probot.yml'
-        })
+        });
 
-        expect(config.behaviors.length).toEqual(1)
+        expect(config.behaviors.length).toEqual(1);
 
         done();
       });
     });
   });
 
-  describe('behaviorsFor', function() {
+  describe('behaviorsFor', () => {
     const config = new Configuration({behaviors: [
       {on: 'issues', then: {comment: ''}},
       {on: 'issues.created', then: {comment: ''}},
-      {on: 'pull_request.labeled', then: {comment: ''}},
+      {on: 'pull_request.labeled', then: {comment: ''}}
     ]});
 
-    it('returns behaviors for event', function () {
+    it('returns behaviors for event', () => {
       expect(config.behaviorsFor({event: 'issues', payload: {}})).toEqual([
         config.behaviors[0]
-      ])
+      ]);
     });
 
-    it('returns behaviors for event and action', function () {
+    it('returns behaviors for event and action', () => {
       expect(config.behaviorsFor({event: 'issues', payload: {action: 'created'}})).toEqual([
         config.behaviors[0], config.behaviors[1]
-      ])
+      ]);
     });
   });
 });

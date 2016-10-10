@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
-    "lint": "xo",
-    "test": "mocha"
+    "test": "mocha && xo"
   },
   "author": "Brandon Keepers",
   "license": "ISC",
@@ -22,6 +21,7 @@
     "xo": "^0.16.0"
   },
   "xo": {
+    "esnext": true,
     "space": true,
     "rules": {},
     "ignores": [],

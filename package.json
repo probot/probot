@@ -12,9 +12,10 @@
   "license": "ISC",
   "dependencies": {
     "expect": "^1.20.2",
-    "github": "^3.1.0",
+    "github": "^4.0.0",
     "github-webhook-handler": "^0.6.0",
-    "handlebars": "^4.0.5"
+    "handlebars": "^4.0.5",
+    "js-yaml": "^3.6.1"
   },
   "devDependencies": {
     "mocha": "^3.0.2",
@@ -24,7 +25,10 @@
     "space": true,
     "rules": {},
     "ignores": [],
-    "envs": ["node", "mocha"]
+    "envs": [
+      "node",
+      "mocha"
+    ]
   },
   "engines": {
     "node": "6.6.0"

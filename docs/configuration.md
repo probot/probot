@@ -1,11 +1,11 @@
 # Configuration
 
-_Heads up! these docs are aspirational and not implemented yet. Ideally these rules represent an abstract syntax tree that can eventually be turned into a propper grammar._
+_Heads up! these docs are aspirational and not implemented yet. Ideally these behaviors represent an abstract syntax tree that can eventually be turned into a propper grammar._
 
 PRobot reads the configuration from `.probot.yml` in your repository.
 
 ```yml
-rules:
+behaviors:
   # Auto-respond to new issues and pull requests
   - on:
       - issue.created
@@ -21,9 +21,9 @@ rules:
       close: true
 ```
 
-## `rules`
+## `behaviors`
 
-Rules are composed of:
+Behaviors are composed of:
 
 - [`on`](#on) - webhook events to listen to
 - [`when`](#when) (optional) - conditions to determine if the actions should be performed.
@@ -180,8 +180,8 @@ Inherit configuration from another repository.
 
 ```yml
 inherit_from: kubernetes/probot
-rules:
-  # other rules
+behaviors:
+  # other behaviors
 ```
 
 Inherit from multiple repositories:
@@ -194,10 +194,10 @@ inherit_from:
 
 ## Examples
 
-Here are some examples of interesting things you can do by combining these rules.
+Here are some examples of interesting things you can do by combining these components.
 
 ```yml
-rules:
+behaviors:
   # Post welcome message for new contributors
   - on:
       - issue.created

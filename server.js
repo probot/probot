@@ -39,9 +39,10 @@ function register(behavior) {
 
 webhook.on('*', function (event) {
   if (event.payload.repository) {
-    const config = new Configuration(github, event.payload.repository);
     const dispatcher = new Dispatcher(github, event);
-    return config.load().then(config => dispatcher.call(config));
+    return Configuration.load(github, event.payload.repository).then(
+      config => dispatcher.call(config)
+    );
   }
 });
 

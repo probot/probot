@@ -233,12 +233,39 @@ behaviors:
         message: "Hey {{ mentions }}, you wanted to know when the `{{ payload.label.name }}` label was added."
 
   # Assign a reviewer for new bugs
+  - on: pull_request.labeled
   - when:
       - labeled: bug
     then:
       - assign:
           random:
             from_file: OWNERS
+
+  # Perform actions based on content of comments
+  - on: issue_comment.created
+    when:
+      payload:
+        issue.body:
+          matches: /^@probot assign @(\w+)$/
+    then:
+      assign: {{ matches[0] }}
+  - on: issue_comment.created
+    when:
+      payload:
+        issue.body:
+          matches: /^@probot label @(\w+)$/
+    then:
+      label: {{ matches[0] }}
+
+  # Close stale issues and pull requests
+  - on: *.labeled
+    when:
+      label: needs-work
+      state: open
+    then:
+      delay:
+        after: 7 days
+        close: true
 
   # Label state transitions
   # TODO

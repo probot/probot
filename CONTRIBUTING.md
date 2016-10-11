@@ -17,4 +17,9 @@ To test with a real GitHub repository, you'll need to create a test repository a
   - **Which events would you like to trigger this webhook?:** Choose **Send me everything**.
 0. Until this gets built into a proper [Integration](https://developer.github.com/early-access/integrations/), the bot will need a valid GitHub API token to be able to do anything useful. Create a new [Personal access token](https://github.com/settings/tokens/new) and select the `repo` scope.
 0. Re-start the local server with the token by running: `$ GITHUB_TOKEN=xxx script/server`
-0. To test it out, make sure your test repository has a `.github/ISSUE_REPLY_TEMPLATE.md` with content in it, then open a new issue. Your bot should autorespond (you may need to refresh to see it). 
+0. Create a `.probot.yml` in your repo with:
+        behaviors:
+          - on: issues.opened
+            then:
+              comment: "Hello World! Your bot is working!"
+0. Open a new issue. Your bot should post a comment (you may need to refresh to see it).

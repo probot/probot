@@ -1,6 +1,7 @@
 const expect = require('expect');
 const action = require('../../lib/actions/unlabel');
-const payload = require('../fixtures/webhook/comment.created.json');
+const Payload = require('../../lib/payload');
+const payload = new Payload(require('../fixtures/webhook/comment.created.json'));
 
 const createSpy = expect.createSpy;
 

@@ -6,7 +6,7 @@ const Configuration = require('./lib/configuration');
 const Dispatcher = require('./lib/dispatcher');
 
 const PORT = process.env.PORT || 3000;
-const webhook = createHandler({path: '/', secret: process.env.WEBHOOK_SECRET || 'secret'});
+const webhook = createHandler({path: '/', secret: process.env.WEBHOOK_SECRET || 'development'});
 
 const github = new GitHubApi();
 github.authenticate({

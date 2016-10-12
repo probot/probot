@@ -8,7 +8,9 @@ const Dispatcher = require('./lib/dispatcher');
 const PORT = process.env.PORT || 3000;
 const webhook = createHandler({path: '/', secret: process.env.WEBHOOK_SECRET || 'development'});
 
-const github = new GitHubApi();
+const github = new GitHubApi({
+  debug: true
+});
 github.authenticate({
   type: 'oauth',
   token: process.env.GITHUB_TOKEN

@@ -14,7 +14,7 @@ describe('action.unassign', () => {
   it('unassigns a user', () => {
     action(github, payload, 'bkeepers');
     expect(github.issues.removeAssigneesFromIssue).toHaveBeenCalledWith({
-      user: 'bkeepers-inc',
+      owner: 'bkeepers-inc',
       repo: 'test',
       number: 6,
       body: ['bkeepers']
@@ -24,7 +24,7 @@ describe('action.unassign', () => {
   it('unassigns multiple users', () => {
     action(github, payload, ['hello', 'world']);
     expect(github.issues.removeAssigneesFromIssue).toHaveBeenCalledWith({
-      user: 'bkeepers-inc',
+      owner: 'bkeepers-inc',
       repo: 'test',
       number: 6,
       body: ['hello', 'world']

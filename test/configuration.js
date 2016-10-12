@@ -8,10 +8,7 @@ describe('Configuration', () => {
   describe('load', () => {
     let github;
 
-    const repo = {
-      owner: {login: 'bkeepers'},
-      name: 'test'
-    };
+    const repo = JSON.parse('{"full_name": "bkeepers/test"}');
 
     beforeEach(() => {
       github = {

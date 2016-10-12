@@ -8,10 +8,7 @@ describe('Configuration', () => {
   describe('load', () => {
     let github;
 
-    const repo = {
-      owner: {login: 'bkeepers'},
-      name: 'test'
-    };
+    const repo = JSON.parse('{"full_name": "bkeepers/test"}');
 
     beforeEach(() => {
       github = {
@@ -24,7 +21,7 @@ describe('Configuration', () => {
     it('loads from the repo', done => {
       Configuration.load(github, repo).then(config => {
         expect(github.repos.getContent).toHaveBeenCalledWith({
-          user: 'bkeepers',
+          owner: 'bkeepers',
           repo: 'test',
           path: '.probot.yml'
         });

@@ -8,14 +8,14 @@ PRobot reads the configuration from `.probot.yml` in your repository.
 behaviors:
   # Auto-respond to new issues and pull requests
   - on:
-      - issue.created
-      - pull_request.created
+      - issues.opened
+      - pull_request.opened
     then:
       comment: "Thanks for your contribution! Expect a reply within 48 hours."
       label: triage
 
   # Auto-close new pull requests
-  - on: pull_request.created
+  - on: pull_request.opened
     then:
       comment: "Sorry @{{ user.login }}, pull requests are not accepted on this repository."
       close: true
@@ -31,17 +31,17 @@ Behaviors are composed of:
 
 ### `on`
 
-Specifies the type of GitHub [webhook event](https://developer.github.com/webhooks/#events) that this behavior applies to.
+Specifies the type of GitHub [webhook event](https://developer.github.com/webhooks/#events) that this behavior applies to:
 
 ```yml
-- on: issue.create
+- on: issues
 ```
 
 Specifying multiple events will trigger this behavior:
 
 ```yml
 - on:
-  - issue
+  - issues
   - pull_request
 ```
 
@@ -49,9 +49,36 @@ Many events also have an `action` (e.g. `created` for the `issue` event), which 
 
 ```yml
 - on:
-  - issue.labeled
-  - issue.unlabeled
+  - issues.labeled
+  - issues.unlabeled
 ```
+
+[Webhook events](https://developer.github.com/webhooks/#events) include:
+
+- [commit_comment](https://developer.github.com/v3/activity/events/types/#commitcommentevent) - Any time a Commit is commented on.
+- [create](https://developer.github.com/v3/activity/events/types/#createevent) - Any time a Branch or Tag is created.
+- [delete](https://developer.github.com/v3/activity/events/types/#deleteevent) - Any time a Branch or Tag is deleted.
+- [deployment](https://developer.github.com/v3/activity/events/types/#deploymentevent) - Any time a Repository has a new deployment created from the API.
+- [deployment_status](https://developer.github.com/v3/activity/events/types/#deploymentstatusevent) - Any time a deployment for a Repository has a status update from the API.
+- [fork](https://developer.github.com/v3/activity/events/types/#forkevent) - Any time a Repository is forked.
+- [gollum](https://developer.github.com/v3/activity/events/types/#gollumevent) - Any time a Wiki page is updated.
+- [issue_comment](https://developer.github.com/v3/activity/events/types/#issuecommentevent) - Any time a [comment on an issue](https://developer.github.com/v3/issues/comments/) is created, edited, or deleted.
+- [issues](https://developer.github.com/v3/activity/events/types/#issuesevent) - Any time an Issue is assigned, unassigned, labeled, unlabeled, opened, edited, closed, or reopened.
+- [member](https://developer.github.com/v3/activity/events/types/#memberevent) - Any time a User is added as a collaborator to a Repository.
+- [membership](https://developer.github.com/v3/activity/events/types/#membershipevent) - Any time a User is added or removed from a team.Organization hooks only.
+- [page_build](https://developer.github.com/v3/activity/events/types/#pagebuildevent) - Any time a Pages site is built or results in a failed build.
+- [public](https://developer.github.com/v3/activity/events/types/#publicevent) - Any time a Repository changes from private to public.
+- [pull_request_review_comment](https://developer.github.com/v3/activity/events/types/#pullrequestreviewcommentevent) - Any time a [comment on a Pull Request's unified diff](https://developer.github.com/v3/pulls/comments) is created, edited, or deleted (in the Files Changed tab).
+- [pull_request_review](https://developer.github.com/v3/activity/events/types/#pullrequestreviewevent) - Any time a Pull Request Review is submitted.
+- [pull_request](https://developer.github.com/v3/activity/events/types/#pullrequestevent) - Any time a Pull Request is assigned, unassigned, labeled, unlabeled, opened, edited, closed, reopened, or synchronized (updated due to a new push in the branch that the pull request is tracking).
+- [push](https://developer.github.com/v3/activity/events/types/#pushevent) - Any Git push to a Repository, including editing tags or branches. Commits via API actions that update references are also counted. This is the default event.
+- [repository](https://developer.github.com/v3/activity/events/types/#repositoryevent) - Any time a Repository is created, deleted, made public, or made private.
+- [release](https://developer.github.com/v3/activity/events/types/#releaseevent) - Any time a Release is published in a Repository.
+- [status](https://developer.github.com/v3/activity/events/types/#statusevent) - Any time a Repository has a status update from the API
+- [team_add](https://developer.github.com/v3/activity/events/types/#teamaddevent) - Any time a team is added or modified on a Repository.
+- [watch](https://developer.github.com/v3/activity/events/types/#watchevent) - Any time a User stars a Repository.
+
+TODO: document actions
 
 ### `when`
 
@@ -200,8 +227,8 @@ Here are some examples of interesting things you can do by combining these compo
 behaviors:
   # Post welcome message for new contributors
   - on:
-      - issue.created
-      - pull_request.created
+      - issues.opened
+      - pull_request.opened
     when:
       first_time_contributor: true # plugins could implement conditions like this
     then:
@@ -210,14 +237,14 @@ behaviors:
 
   # Auto-close new pull requests
   - on:
-      - pull_request.created
+      - pull_request.opened
     then:
       comment: "Sorry @{{ user.login }}, pull requests are not accepted on this repository."
       close: true
 
   # Close issues with no body
   - on:
-      - issue.created
+      - issues.opened
     when:
       payload:
         body:
@@ -242,14 +269,14 @@ behaviors:
             from_file: OWNERS
 
   # Perform actions based on content of comments
-  - on: issue_comment.created
+  - on: issue_comment.opened
     when:
       payload:
         issue.body:
           matches: /^@probot assign @(\w+)$/
     then:
       assign: {{ matches[0] }}
-  - on: issue_comment.created
+  - on: issue_comment.opened
     when:
       payload:
         issue.body:

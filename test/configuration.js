@@ -21,7 +21,7 @@ describe('Configuration', () => {
     it('loads from the repo', done => {
       Configuration.load(github, repo).then(config => {
         expect(github.repos.getContent).toHaveBeenCalledWith({
-          user: 'bkeepers',
+          owner: 'bkeepers',
           repo: 'test',
           path: '.probot.yml'
         });

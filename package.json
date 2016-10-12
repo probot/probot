@@ -1,5 +1,5 @@
 {
-  "name": "github-proobot",
+  "name": "github-probot",
   "version": "1.0.0",
   "description": "a trainable robot that responds to activity on GitHub",
   "main": "index.js",

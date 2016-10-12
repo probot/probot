@@ -15,7 +15,7 @@ describe('action.comment', () => {
   it('creates a comment', () => {
     action(github, payload, 'Hello @{{ sender.login }}!');
     expect(github.issues.createComment).toHaveBeenCalledWith({
-      user: 'bkeepers-inc',
+      owner: 'bkeepers-inc',
       repo: 'test',
       number: 6,
       body: 'Hello @bkeepers!'

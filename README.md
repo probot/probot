@@ -51,8 +51,8 @@ behaviors:
 - on:
     # These are the webhook event and the "action"
     # https://developer.github.com/webhooks/#events
-    - issues.created
-    - pull_request.created
+    - issues.opened
+    - pull_request.opened
   when:
     first_time_contributor: true # plugins could implement conditions like this
   then:
@@ -68,8 +68,8 @@ behaviors:
 
 # Assign a reviewer issues or pull requests with a label
 - on:
-    - issues.created
-    - pull_request.created
+    - issues.opened
+    - pull_request.opened
     - issues.labeled
     - pull_request.labeled
   when:

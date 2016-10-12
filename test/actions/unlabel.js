@@ -15,7 +15,7 @@ describe('action.unlabel', () => {
   it('removes a single label', () => {
     action(github, payload, 'hello');
     expect(github.issues.removeLabel).toHaveBeenCalledWith({
-      user: 'bkeepers-inc',
+      owner: 'bkeepers-inc',
       repo: 'test',
       number: 6,
       name: 'hello'
@@ -25,14 +25,14 @@ describe('action.unlabel', () => {
   it('removes a multiple labels', () => {
     action(github, payload, ['hello', 'goodbye']);
     expect(github.issues.removeLabel).toHaveBeenCalledWith({
-      user: 'bkeepers-inc',
+      owner: 'bkeepers-inc',
       repo: 'test',
       number: 6,
       name: 'hello'
     });
 
     expect(github.issues.removeLabel).toHaveBeenCalledWith({
-      user: 'bkeepers-inc',
+      owner: 'bkeepers-inc',
       repo: 'test',
       number: 6,
       name: 'goodbye'

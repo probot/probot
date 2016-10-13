@@ -40,11 +40,11 @@ http.createServer((req, res) => {
 
 webhook.on('*', event => {
   if (event.payload.repository) {
-    var installation = installations.for(event.payload.repository.owner.login);
+    const installation = installations.for(event.payload.repository.owner.login);
     installations.authAs(installation).then(github => {
       const dispatcher = new Dispatcher(github, event);
       return Configuration.load(github, event.payload.repository).then(config => {
-        dispatcher.call(config)
+        dispatcher.call(config);
       });
     });
   }

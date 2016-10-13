@@ -8,6 +8,11 @@ const Dispatcher = require('./lib/dispatcher');
 const PORT = process.env.PORT || 3000;
 const webhook = createHandler({path: '/', secret: process.env.WEBHOOK_SECRET || 'development'});
 
+var debug = require('debug')('http')
+  , name = 'PRobot';
+
+debug('Starting %s', name);
+
 const github = new GitHubApi({
   debug: false
 });
@@ -19,7 +24,7 @@ github.authenticate({
 http.createServer((req, res) => {
   webhook(req, res, err => {
     if (err) {
-      console.log('ERROR', err);
+      debug('ERROR', err);
       res.statusCode = 500;
       res.end('Something has gone terribly wrong.');
     } else {
@@ -38,4 +43,5 @@ webhook.on('*', event => {
   }
 });
 
+debug('Listening on http://localhost:' + PORT);
 console.log('Listening on http://localhost:' + PORT);

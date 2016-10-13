@@ -3,7 +3,6 @@ require('dotenv').config({silent: true});
 const process = require('process');
 const http = require('http');
 const createHandler = require('github-webhook-handler');
-const GitHubApi = require('github');
 const Configuration = require('./lib/configuration');
 const Dispatcher = require('./lib/dispatcher');
 const installations = require('./lib/installations');
@@ -15,15 +14,6 @@ const webhook = createHandler({path: '/', secret: process.env.WEBHOOK_SECRET || 
 installations.load();
 // Listen for new installations
 installations.listen(webhook);
-
-const github = new GitHubApi({
-  debug: true
-});
-
-github.authenticate({
-  type: 'oauth',
-  token: process.env.GITHUB_TOKEN
-});
 
 http.createServer((req, res) => {
   webhook(req, res, err => {

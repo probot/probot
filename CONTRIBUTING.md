@@ -32,4 +32,4 @@ To test with a real GitHub repository, you'll need to create a test repository a
         const github = new GitHubApi({
           debug: true
         });
- 
+0. Always run `$ script/bootstrap` and restart the server if package.json has changed.

@@ -10,6 +10,7 @@
 0. Download [ngrok](https://ngrok.com/download) (`$ brew cask install ngrok` on a mac), which will expose a local server to the internet.
 0. With the server still running, open a new terminal tab and run `ngrok http 3000`, which should output something like `Forwarding http://4397efc6.ngrok.io -> localhost:3000`.
 
+## Testing
 To test with a real GitHub repository, you'll need to create a test repository and configure a new webhook:
 
 0. Head over to the **Settings** page of your repository, and click on **Webhooks & services**. Then, click on **Add webhook**. Configure it with:

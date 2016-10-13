@@ -4,3 +4,5 @@ node_js:
   - "6"
 notifications:
   disabled: true
+env:
+  - PRIVATE_KEY=ssssshhh

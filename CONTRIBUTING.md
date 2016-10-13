@@ -1,6 +1,6 @@
 # Contributing
 
-## Developing locally
+## Setup
 
 0. Clone the repo
 0. Make sure you have the latest version of [Node.js](https://nodejs.org/) to develop locally.

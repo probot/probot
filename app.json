@@ -12,8 +12,7 @@
       "description": "the ID of your GitHub Integration"
     },
     "WEBHOOK_SECRET": {
-      "description": "the secret configured for your GitHub Integration",
-      "generator": "secret"
+      "description": "the secret configured for your GitHub Integration"
     }
   }
 }

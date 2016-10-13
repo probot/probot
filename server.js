@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 3000;
 const webhook = createHandler({path: '/', secret: process.env.WEBHOOK_SECRET || 'development'});
 
 const github = new GitHubApi({
-  debug: true
+  debug: false
 });
 github.authenticate({
   type: 'oauth',

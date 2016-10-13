@@ -22,3 +22,9 @@ To test with a real GitHub repository, you'll need to create a test repository a
             then:
               comment: "Hello World! Your bot is working!"
 0. Open a new issue. Your bot should post a comment (you may need to refresh to see it).
+
+## Debugging
+0. To see what requests are going out, enable debugging mode for  GitHub client in /server.js:
+        const github = new GitHubApi({
+          debug: true
+        });

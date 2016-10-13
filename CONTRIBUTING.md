@@ -22,7 +22,7 @@ To test with a real GitHub repository, you'll need to create a test repository a
         behaviors:
         - on: issues.opened
           then:
-          comment: "Hello World! Your bot is working!"
+            comment: "Hello World! Your bot is working!"
         
 0. Open a new issue. Your bot should post a comment (you may need to refresh to see it).
 

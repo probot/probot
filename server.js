@@ -8,7 +8,7 @@ const Dispatcher = require('./lib/dispatcher');
 const PORT = process.env.PORT || 3000;
 const webhook = createHandler({path: '/', secret: process.env.WEBHOOK_SECRET || 'development'});
 
-GLOBAL.debug = require('debug')('PRobot')
+global.debug = require('debug')('PRobot')
   , name = 'PRobot';
 
 debug('Starting %s', name);

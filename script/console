@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 
+require('dotenv').config();
+
 const repl = require('repl').start('> ');
-let GitHubApi = require('github');
-let github = new GitHubApi();
+const GitHubApi = require('github');
+const github = new GitHubApi();
 
 github.authenticate({
   type: 'oauth',

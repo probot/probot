@@ -15,7 +15,7 @@
     "github-webhook-handler": "^0.6.0",
     "handlebars": "^4.0.5",
     "js-yaml": "^3.6.1",
-    "debug": ""
+    "debug": "2.2.0"
   },
   "devDependencies": {
     "mocha": "^3.0.2",

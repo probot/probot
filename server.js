@@ -21,7 +21,7 @@ github.authenticate({
 http.createServer((req, res) => {
   webhook(req, res, err => {
     if (err) {
-      debug('ERROR', err);
+      console.error(err);
       res.statusCode = 500;
       res.end('Something has gone terribly wrong.');
     } else {
@@ -32,6 +32,8 @@ http.createServer((req, res) => {
 }).listen(PORT);
 
 webhook.on('*', event => {
+  debug('webhook', event);
+
   if (event.payload.repository) {
     const dispatcher = new Dispatcher(github, event);
     return Configuration.load(github, event.payload.repository).then(
@@ -40,5 +42,4 @@ webhook.on('*', event => {
   }
 });
 
-debug('Listening on http://localhost:' + PORT);
 console.log('Listening on http://localhost:' + PORT);

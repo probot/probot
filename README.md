@@ -32,9 +32,21 @@ Here are some behaviors that we plan to implement:
 
 ## Installing
 
-TODO: install the hosted integration into your organization / account
+0. **[Install the demo integration](https://github.com/integration/probot-demo)** - note that this is very likely to go away at some point soon. It will suffice for experimenting for now, but it is for demo purposes only.
+0. Add @probot as a collaborator with write access on your repository.
+0. Create a `.probot.yml` file in your repository with the following contents. See [Configuring](#configuring) for more information.
 
-TODO: deploy your own bot
+        behaviors:
+          - on: issues.opened
+            then:
+              comment: >
+                Hello @{{ sender.login }}. Thanks for inviting me to your project. Read
+                more about [all the things I can help you with][config]. I can't wait to
+                get started!
+
+                [config]: https://github.com/bkeepers/PRobot/blob/master/docs/configuration.md
+
+0. Open a new issue. @probot should post a comment (you may need to refresh to see it).
 
 ## Configuring
 

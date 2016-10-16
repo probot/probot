@@ -14,7 +14,7 @@ debug('Starting');
 const github = new GitHubApi({debug: false});
 
 github.authenticate({
-  type: 'oauth',
+  type: 'token',
   token: process.env.GITHUB_TOKEN
 });
 
@@ -41,5 +41,29 @@ webhook.on('*', event => {
     );
   }
 });
+
+// Check for and accept any repository invitations
+function checkForInvites() {
+  debug('Checking for repository invites');
+  github.users.getRepoInvites({}).then(invites => {
+    invites.forEach(invite => {
+      debug('Accepting repository invite', invite.full_name);
+      github.users.acceptRepoInvite(invite);
+    });
+  });
+
+  debug('Checking for organization invites');
+  github.orgs.getOrganizationMemberships({state: 'pending'}).then(invites => {
+    invites.forEach(invite => {
+      debug('Accepting organization invite', invite.organization.login);
+      github.users.editOrganizationMembership({
+        org: invite.organization.login,
+        state: 'active'
+      });
+    });
+  });
+}
+checkForInvites();
+setInterval(checkForInvites, Number(process.env.INVITE_CHECK_INTERVAL || 60) * 1000);
 
 console.log('Listening on http://localhost:' + PORT);

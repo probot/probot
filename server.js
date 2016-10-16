@@ -59,7 +59,7 @@ function checkForInvites() {
       github.users.editOrganizationMembership({
         org: invite.organization.login,
         state: 'active'
-      })
+      });
     });
   });
 }

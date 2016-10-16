@@ -2,7 +2,7 @@
 
 [![Join the chat at https://gitter.im/bkeepers/PRobot](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/bkeepers/PRobot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-_NOTE: this README is aspirational, and the project name is guaranteed to change._
+_**Heads up!** this README is aspirational, and the project name is guaranteed to change._
 
 PRobot is a trainable robot that responds to activity on GitHub. It's like [Hubot](https://hubot.github.com/), but for GitHub events instead of chat messages.
 
@@ -32,7 +32,9 @@ Here are some behaviors that we plan to implement:
 
 ## Installing
 
-0. **[Install the demo integration](https://github.com/integration/probot-demo)** - note that this is very likely to go away at some point soon. It will suffice for experimenting for now, but it is for demo purposes only.
+_**Heads up!** The [demo integration](https://github.com/integration/probot-demo) is for demo purposes only. It is very likely to go away at some point, so please don't use it for production purposes._
+
+0. Go to the **[demo integration](https://github.com/integration/probot-demo)**, click **Install**, and then select an organization.
 0. Add @probot as a collaborator with write access on your repository.
 0. Create a `.probot.yml` file in your repository with the following contents. See [Configuring](#configuring) for more information.
 

@@ -45,4 +45,9 @@ webhook.on('*', event => {
   }
 });
 
+// Show trace for any unhandled rejections
+process.on('unhandledRejection', reason => {
+  console.error(reason);
+});
+
 console.log('Listening on http://localhost:' + PORT);

@@ -84,25 +84,7 @@ TODO: document actions
 
 Only preform the actions if theses conditions are met.
 
-#### `payload`
-
-Filter by attributes of the payload.
-
-```
-- when:
-    payload:
-      "sender.login": "bkeepers"
-      "issue.title":
-        contains: "[WIP]"
-      "issue.body":
-        matches: /^$/
-      "issue.labels"
-        contains: "bug"
-```
-
-#### Extensions
-
-Conditions can be added via extensions.
+_Heads up! There are not any `when` conditions implemented yet. _
 
 ### `then`
 

@@ -94,15 +94,8 @@ Comments can be posted in response to any event performed on an Issue or Pull Re
 
 ```yml
 - then:
-    comment: "Hey @{{ user.login }}, thanks for the contribution!"
-```
-
-The content of the comment can come from a file in the repository.
-
-```yml
-- then:
-    comment:
-      from_file: ".github/REPLY_TEMPLATE.md"
+    comment: >
+      Hey @{{ user.login }}, thanks for the contribution!
 ```
 
 #### `close`

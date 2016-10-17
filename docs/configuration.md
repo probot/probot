@@ -116,15 +116,6 @@ Reopen an issue or pull request.
     open: true
 ```
 
-#### `merge`
-
-Close an issue or pull request.
-
-```yml
-- then:
-    close: true
-```
-
 #### `lock`
 
 Lock conversation on an issue or pull request.

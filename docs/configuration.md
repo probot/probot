@@ -93,7 +93,7 @@ _Heads up! There are not any `when` conditions implemented yet. _
 Comments can be posted in response to any event performed on an Issue or Pull Request. Comments use [mustache](https://mustache.github.io/) for templates and can use any data from the event payload.
 
 ```yml
-- then:
+  then:
     comment: >
       Hey @{{ user.login }}, thanks for the contribution!
 ```
@@ -103,7 +103,7 @@ Comments can be posted in response to any event performed on an Issue or Pull Re
 Close an issue or pull request.
 
 ```yml
-- then:
+  then:
     close: true
 ```
 
@@ -112,7 +112,7 @@ Close an issue or pull request.
 Reopen an issue or pull request.
 
 ```yml
-- then:
+  then:
     open: true
 ```
 
@@ -121,7 +121,7 @@ Reopen an issue or pull request.
 Lock conversation on an issue or pull request.
 
 ```yml
-- then:
+  then:
     lock: true
 ```
 
@@ -130,7 +130,7 @@ Lock conversation on an issue or pull request.
 Unlock conversation on an issue or pull request.
 
 ```yml
-- then:
+  then:
     unlock: true
 ```
 
@@ -139,7 +139,7 @@ Unlock conversation on an issue or pull request.
 Add labels
 
 ```yml
-- then:
+  then:
     label: bug
 ```
 
@@ -148,7 +148,7 @@ Add labels
 Add labels
 
 ```yml
-- then:
+  then:
     unlabel: needs-work
     label: waiting-for-review
 ```

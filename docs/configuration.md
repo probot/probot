@@ -2,7 +2,7 @@
 
 _**Heads up!** This yaml-based configuration syntax is not great. Ideally it will be replaced by a [proper grammar](https://github.com/bkeepers/PRobot/issues/35)._
 
-PRobot reads the configuration from `.probot.yml` in your repository.
+Behaviors are configured in a file called `.probot.yml` in your repository.
 
 ```yml
 behaviors:

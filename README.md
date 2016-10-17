@@ -36,7 +36,7 @@ _**Heads up!** The [demo integration](https://github.com/integration/probot-demo
 
 0. Go to the **[demo integration](https://github.com/integration/probot-demo)**, click **Install**, and then select an organization.
 0. Add @probot as a collaborator with write access on your repository.
-0. Create a `.probot.yml` file in your repository with the following contents. See [Configuring](#configuring) for more information.
+0. Create a `.probot.yml` file in your repository with the following contents. See [Configuration](docs/configuration.md) for more information on what behaviors can be built.
 
         behaviors:
           - on: issues.opened
@@ -49,51 +49,3 @@ _**Heads up!** The [demo integration](https://github.com/integration/probot-demo
                 [config]: https://github.com/bkeepers/PRobot/blob/master/docs/configuration.md
 
 0. Open a new issue. @probot should post a comment (you may need to refresh to see it).
-
-## Configuring
-
-Behaviors are configured in a file called `.probot.yml` in the repository. They are composed of 3 parts:
-
-- `on` - webhook events to listen to
-- `when` (optional) - conditions to determine if the actions should be performed
-- `then` - actions to take in response to the event
-
-Here are a few examples:
-
-```yml
-behaviors:
-
-# Post welcome message for new contributors
-- on:
-    # These are the webhook event and the "action"
-    # https://developer.github.com/webhooks/#events
-    - issues.opened
-    - pull_request.opened
-  when:
-    first_time_contributor: true # plugins could implement conditions like this
-  then:
-    # Post a comment on the issue or pull request with the template, which can
-    # use variables from the webhook event.
-    comment:
-      from_file: .github/NEW_CONTRIBUTOR_TEMPLATE.md
-
-# Tweet when a new release is created
-- on: release.published
-  then:
-    tweet: "Get it while it's hot! {{ repository.name }} {{ release.name }} was just released! {{ release.html_url }}"
-
-# Assign a reviewer issues or pull requests with a label
-- on:
-    - issues.opened
-    - pull_request.opened
-    - issues.labeled
-    - pull_request.labeled
-  when:
-    label: security
-  then:
-    assign:
-      random:
-        from_team: security-first-responders
-```
-
-Any conceivable condition (`when`) or action (`then`) could be implemented by plugins. See [Configuration](docs/configuration.md) for more information on what behaviors can be built.

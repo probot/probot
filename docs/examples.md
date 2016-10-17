@@ -75,6 +75,24 @@ behaviors:
         after: 7 days
         close: true
 
+  # Tweet when a new release is created
+  - on: release.published
+    then:
+      tweet: "Get it while it's hot! {{ repository.name }} {{ release.name }} was just released! {{ release.html_url }}"
+
+  # Assign a reviewer issues or pull requests with a label
+  - on:
+      - issues.opened
+      - pull_request.opened
+      - issues.labeled
+      - pull_request.labeled
+    when:
+      label: security
+    then:
+      assign:
+        random:
+          from_team: security-first-responders
+
   # Label state transitions
   # TODO
 

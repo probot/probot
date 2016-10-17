@@ -1,14 +1,15 @@
-const expect = require('expect');
 const fs = require('fs');
-var peg = require('pegjs');
-var parser = peg.generate(fs.readFileSync('./lib/parser.pegjs').toString());
+const expect = require('expect');
+const peg = require('pegjs');
+
+const parser = peg.generate(fs.readFileSync('./lib/parser.pegjs').toString());
 
 describe('parser', () => {
   it('parses multiple statements', () => {
     expect(parser.parse(`
       on issues.opened then close;
       on pull_requests.open then assign(bkeepers);
-    `)).toEqual({'behaviors': [
+    `)).toEqual({behaviors: [
       {
         on: [{action: 'opened', name: 'issues'}],
         then: [{name: 'close'}]

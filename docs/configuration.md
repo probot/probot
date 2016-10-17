@@ -201,24 +201,6 @@ Add labels
     unassign: defunkt
 ```
 
-### `inherit_from`
-
-Inherit configuration from another repository.
-
-```yml
-inherit_from: kubernetes/probot
-behaviors:
-  # other behaviors
-```
-
-Inherit from multiple repositories:
-
-```yml
-inherit_from:
-  - kubernetes/probot
-  - github/probot
-```
-
 ## Examples
 
 Here are some examples of interesting things you can do by combining these components.

@@ -1,6 +1,6 @@
 # Configuration
 
-_Heads up! these docs are aspirational and not implemented yet. Ideally these behaviors represent an abstract syntax tree that can eventually be turned into a propper grammar._
+_**Heads up!** This yaml-based configuration syntax is not great. Ideally it will be replaced by a [proper grammar](https://github.com/bkeepers/PRobot/issues/35)._
 
 PRobot reads the configuration from `.probot.yml` in your repository.
 

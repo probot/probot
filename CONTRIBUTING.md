@@ -17,13 +17,10 @@ To test with a real GitHub repository, you'll need to create a test repository a
   - **Payload URL:** Use the full `*.ngrok.io`
   - **Secret:** `development`
   - **Which events would you like to trigger this webhook?:** Choose **Send me everything**.
-0. Create a `.probot.yml` in your repo with:
+0. Create a `.probot` in your repo with:
 
-        behaviors:
-        - on: issues.opened
-          then:
-            comment: "Hello World! Your bot is working!"
-        
+        on issues.opened then comment("Hello World! Your bot is working!");
+
 0. Open a new issue. Your bot should post a comment (you may need to refresh to see it).
 
 ## Debugging

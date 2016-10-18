@@ -1,0 +1,18 @@
+{
+  "name": ".probot",
+  "path": ".probot",
+  "sha": "c0736435c3f35dc5702d5024ed00d399b99623af",
+  "size": 127,
+  "url": "https://api.github.com/repos/bkeepers-inc/test/contents/.probot?ref=master",
+  "html_url": "https://github.com/bkeepers-inc/test/blob/master/.probot",
+  "git_url": "https://api.github.com/repos/bkeepers-inc/test/git/blobs/c0736435c3f35dc5702d5024ed00d399b99623af",
+  "download_url": "https://raw.githubusercontent.com/bkeepers-inc/test/master/.probot?token=AVvMVIL7kvcrgJYZEipG9eAgUPcGHBnxks5YBayLwA%3D%3D",
+  "type": "file",
+  "content": "b24gaXNzdWVzLm9wZW5lZCB0aGVuIGNvbW1lbnQoIkhlbGxvIHdvcmxkISIp\nIGFuZCBhc3NpZ24oYmtlZXBlcnMpIGFuZCByZWFjdChoZWFydCk7Cm9uIGlz\nc3Vlcy5jbG9zZWQgdGhlbiB1bmFzc2lnbihia2VlcGVycyk7Cg==\n",
+  "encoding": "base64",
+  "_links": {
+    "self": "https://api.github.com/repos/bkeepers-inc/test/contents/.probot?ref=master",
+    "git": "https://api.github.com/repos/bkeepers-inc/test/git/blobs/c0736435c3f35dc5702d5024ed00d399b99623af",
+    "html": "https://github.com/bkeepers-inc/test/blob/master/.probot"
+  }
+}

@@ -1,8 +1,8 @@
 # Configuration
 
-_Heads up! these docs are aspirational and not implemented yet. Ideally these behaviors represent an abstract syntax tree that can eventually be turned into a propper grammar._
+_**Heads up!** This yaml-based configuration syntax is not great. Ideally it will be replaced by a [proper grammar](https://github.com/bkeepers/PRobot/issues/35)._
 
-PRobot reads the configuration from `.probot.yml` in your repository.
+Behaviors are configured in a file called `.probot.yml` in your repository.
 
 ```yml
 behaviors:
@@ -84,25 +84,7 @@ TODO: document actions
 
 Only preform the actions if theses conditions are met.
 
-#### `payload`
-
-Filter by attributes of the payload.
-
-```
-- when:
-    payload:
-      "sender.login": "bkeepers"
-      "issue.title":
-        contains: "[WIP]"
-      "issue.body":
-        matches: /^$/
-      "issue.labels"
-        contains: "bug"
-```
-
-#### Extensions
-
-Conditions can be added via extensions.
+_Heads up! There are not any `when` conditions implemented yet. _
 
 ### `then`
 
@@ -111,16 +93,9 @@ Conditions can be added via extensions.
 Comments can be posted in response to any event performed on an Issue or Pull Request. Comments use [mustache](https://mustache.github.io/) for templates and can use any data from the event payload.
 
 ```yml
-- then:
-    comment: "Hey @{{ user.login }}, thanks for the contribution!"
-```
-
-The content of the comment can come from a file in the repository.
-
-```yml
-- then:
-    comment:
-      from_file: ".github/REPLY_TEMPLATE.md"
+  then:
+    comment: >
+      Hey @{{ user.login }}, thanks for the contribution!
 ```
 
 #### `close`
@@ -128,7 +103,7 @@ The content of the comment can come from a file in the repository.
 Close an issue or pull request.
 
 ```yml
-- then:
+  then:
     close: true
 ```
 
@@ -137,17 +112,8 @@ Close an issue or pull request.
 Reopen an issue or pull request.
 
 ```yml
-- then:
+  then:
     open: true
-```
-
-#### `merge`
-
-Close an issue or pull request.
-
-```yml
-- then:
-    close: true
 ```
 
 #### `lock`
@@ -155,7 +121,7 @@ Close an issue or pull request.
 Lock conversation on an issue or pull request.
 
 ```yml
-- then:
+  then:
     lock: true
 ```
 
@@ -164,7 +130,7 @@ Lock conversation on an issue or pull request.
 Unlock conversation on an issue or pull request.
 
 ```yml
-- then:
+  then:
     unlock: true
 ```
 
@@ -173,7 +139,7 @@ Unlock conversation on an issue or pull request.
 Add labels
 
 ```yml
-- then:
+  then:
     label: bug
 ```
 
@@ -182,7 +148,7 @@ Add labels
 Add labels
 
 ```yml
-- then:
+  then:
     unlabel: needs-work
     label: waiting-for-review
 ```
@@ -190,113 +156,24 @@ Add labels
 #### `assign`
 
 ```yml
-- then:
+  then:
     assign: hubot
 ```
 
 #### `unassign`
 
 ```yml
-- then:
+  then:
     unassign: defunkt
 ```
 
-### `inherit_from`
-
-Inherit configuration from another repository.
+#### `react`
 
 ```yml
-inherit_from: kubernetes/probot
-behaviors:
-  # other behaviors
+  then:
+    react: heart # or +1, -1, laugh, confused, heart, hooray
 ```
 
-Inherit from multiple repositories:
+---
 
-```yml
-inherit_from:
-  - kubernetes/probot
-  - github/probot
-```
-
-## Examples
-
-Here are some examples of interesting things you can do by combining these components.
-
-```yml
-behaviors:
-  # Post welcome message for new contributors
-  - on:
-      - issues.opened
-      - pull_request.opened
-    when:
-      first_time_contributor: true # plugins could implement conditions like this
-    then:
-      comment:
-        from_file: .github/NEW_CONTRIBUTOR_TEMPLATE.md
-
-  # Auto-close new pull requests
-  - on:
-      - pull_request.opened
-    then:
-      comment: "Sorry @{{ user.login }}, pull requests are not accepted on this repository."
-      close: true
-
-  # Close issues with no body
-  - on:
-      - issues.opened
-    when:
-      payload:
-        body:
-          matches: /^$/
-    then:
-      comment: "Hey @{{ user.login }}, you didn't include a description of the problem, so we're closing this issue."
-
-  # @mention watchers when label added
-  - on: *.labeled
-    then:
-      comment:
-        # TODO: figure out syntax for loading watchers from file
-        message: "Hey {{ mentions }}, you wanted to know when the `{{ payload.label.name }}` label was added."
-
-  # Assign a reviewer for new bugs
-  - on: pull_request.labeled
-  - when:
-      - labeled: bug
-    then:
-      - assign:
-          random:
-            from_file: OWNERS
-
-  # Perform actions based on content of comments
-  - on: issue_comment.opened
-    when:
-      payload:
-        issue.body:
-          matches: /^@probot assign @(\w+)$/
-    then:
-      assign: {{ matches[0] }}
-  - on: issue_comment.opened
-    when:
-      payload:
-        issue.body:
-          matches: /^@probot label @(\w+)$/
-    then:
-      label: {{ matches[0] }}
-
-  # Close stale issues and pull requests
-  - on: *.labeled
-    when:
-      label: needs-work
-      state: open
-    then:
-      delay:
-        after: 7 days
-        close: true
-
-  # Label state transitions
-  # TODO
-
-  # Apply label based on changed files
-  # TODO
-```
+See [examples](examples.md) for ideas of behaviors you can implement by combining these configuration options.

@@ -15,7 +15,6 @@
     "github-webhook-handler": "^0.6.0",
     "github": "^5.2.0",
     "handlebars": "^4.0.5",
-    "js-yaml": "^3.6.1",
     "jsdoc": "^3.4.2"
   },
   "devDependencies": {

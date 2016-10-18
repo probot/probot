@@ -38,7 +38,7 @@ describe('Configuration', () => {
       on issues then label(active);
       on issues.created then close;
       on pull_request.labeled then lock;
-    `)
+    `);
 
     it('returns behaviors for event', () => {
       expect(

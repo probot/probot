@@ -27,9 +27,11 @@ To test with a real GitHub repository, you'll need to create a test repository a
 0. Open a new issue. Your bot should post a comment (you may need to refresh to see it).
 
 ## Debugging
+0. Always run `$ script/bootstrap` and restart the server if package.json has changed.
+0. To turn on verbose logging, start server by running ` $ DEBUG=Probot GITHUB_TOKEN=xxx script/server` 
 0. To see what requests are going out, enable debugging mode for  GitHub client in `/server.js`:
 
         const github = new GitHubApi({
           debug: true
         });
-0. Always run `$ script/bootstrap` and restart the server if package.json has changed.
+

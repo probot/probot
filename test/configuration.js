@@ -1,6 +1,6 @@
 const expect = require('expect');
 const Configuration = require('../lib/configuration');
-const config = require('./fixtures/content/probot.yml.json');
+const config = require('./fixtures/content/probot.json');
 
 const createSpy = expect.createSpy;
 
@@ -23,10 +23,10 @@ describe('Configuration', () => {
         expect(github.repos.getContent).toHaveBeenCalledWith({
           owner: 'bkeepers',
           repo: 'test',
-          path: '.probot.yml'
+          path: '.probot'
         });
 
-        expect(config.behaviors.length).toEqual(1);
+        expect(config.behaviors.length).toEqual(2);
 
         done();
       });
@@ -34,22 +34,22 @@ describe('Configuration', () => {
   });
 
   describe('behaviorsFor', () => {
-    const config = new Configuration({behaviors: [
-      {on: 'issues', then: {comment: ''}},
-      {on: 'issues.created', then: {comment: ''}},
-      {on: 'pull_request.labeled', then: {comment: ''}}
-    ]});
+    const config = Configuration.parse(`
+      on issues then label(active);
+      on issues.created then close;
+      on pull_request.labeled then lock;
+    `);
 
     it('returns behaviors for event', () => {
-      expect(config.behaviorsFor({event: 'issues', payload: {}})).toEqual([
-        config.behaviors[0]
-      ]);
+      expect(
+        config.behaviorsFor({event: 'issues', payload: {}}).length
+      ).toEqual(1);
     });
 
     it('returns behaviors for event and action', () => {
-      expect(config.behaviorsFor({event: 'issues', payload: {action: 'created'}})).toEqual([
-        config.behaviors[0], config.behaviors[1]
-      ]);
+      expect(
+        config.behaviorsFor({event: 'issues', payload: {action: 'created'}}).length
+      ).toEqual(2);
     });
   });
 });

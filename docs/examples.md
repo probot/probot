@@ -4,9 +4,9 @@ _**Heads up!** these examples include configuration options that are aspirationa
 
 Here are some examples of interesting things you can do by combining these components.
 
-```yml
+```
 # Post welcome message for new contributors
-on issues.opened and pull_request.opened
+on issues.opened or pull_request.opened
 when first_time_contributor # plugins could implement conditions like this
 then comment(file(".github/NEW_CONTRIBUTOR_TEMPLATE.md"));
 
@@ -32,12 +32,12 @@ then assign(random(file(OWNERS)));
 
 # Perform actions based on content of comments
 on issue_comment.opened
-when payloadissue.body matches /^@probot assign @(\w+)$/
+when payload.issue.body matches /^@probot assign @(\w+)$/
 then assign({{ matches[0] }})
 
 on issue_comment.opened
 when payload.issue.body matches /^@probot label @(\w+)$/
-then label({{ matches[0] }})
+then label($1)
 
 # Close stale issues and pull requests
 on *.labeled

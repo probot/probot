@@ -6,7 +6,7 @@ Behaviors are configured in a file called `.probot` in your repository.
 
 ```
 # Auto-respond to new issues and pull requests
-on issues.opened and pull_request.opened
+on issues.opened or pull_request.opened
 then comment("Thanks for your contribution! Expect a reply within 48 hours.")
 and label(triage);
 
@@ -35,13 +35,13 @@ on issues then…
 You can also specify multiple events to trigger this behavior:
 
 ```
-on issues and pull_request then…
+on issues or pull_request then…
 ```
 
 Many events also have an `action` (e.g. `created` for the `issue` event), which can be referenced with dot notation:
 
 ```
-on issues.labeled and issues.unlabeled then…
+on issues.labeled or issues.unlabeled then…
 ```
 
 [Webhook events](https://developer.github.com/webhooks/#events) include:

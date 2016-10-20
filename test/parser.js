@@ -21,6 +21,10 @@ describe('parser', () => {
     ]});
   });
 
+  it('parses a blank doc', () => {
+    expect(parser.parse('\n\n\n')).toEqual({behaviors: []});
+  });
+
   describe('on', () => {
     it('parses an event', () => {
       expect(parser.parse('on issues then close;')).toEqual({behaviors: [{
@@ -30,10 +34,12 @@ describe('parser', () => {
     });
 
     it('parses an event and action', () => {
-      expect(parser.parse('on issues.opened then close;')).toEqual({behaviors: [{
-        on: [{name: 'issues', action: 'opened'}],
-        then: [{name: 'close'}]
-      }]});
+      expect(parser.parse('on issues.opened then close;')).toEqual({
+        behaviors: [{
+          on: [{name: 'issues', action: 'opened'}],
+          then: [{name: 'close'}]
+        }]
+      });
     });
 
     it('parses multiple events', () => {
@@ -94,5 +100,26 @@ describe('parser', () => {
         ]
       }]});
     });
+  });
+
+  describe('comments', () => {
+    it('ignores lines that start with comments', () => {
+      expect(parser.parse(`
+        # This could literally be anything.
+        on issues then close;
+      `)).toEqual(
+        {behaviors: [{on: [{name: 'issues'}], then: [{name: 'close'}]}]}
+      );
+    });
+
+    it('ignores trailing comments on lines', () => {
+      expect(parser.parse(`
+        on issues # Ignore this
+        then close;
+      `)).toEqual(
+        {behaviors: [{on: [{name: 'issues'}], then: [{name: 'close'}]}]}
+      );
+    });
+
   });
 });

@@ -3,4 +3,3 @@
 set -e
 
 npm test
-npm run lint

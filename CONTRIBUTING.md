@@ -22,7 +22,6 @@ Whenever you com back to work on the app after you've already had it running onc
 0. Run `$ ngrok http 3000`
 0. `ngrok` will use a different URL every time it is restarted, so you will have to go into the [settings for your Integration](https://github.com/settings/installations) and update all the URLs
 
-
 ## Testing
 
 To test with a real GitHub repository, you'll need to create a test repository and install the integration you created above:
@@ -37,9 +36,10 @@ To test with a real GitHub repository, you'll need to create a test repository a
 
 ## Debugging
 
+0. Always run `$ script/bootstrap` and restart the server if package.json has changed.
+0. To turn on verbose logging, start server by running ` $ DEBUG=Probot GITHUB_TOKEN=xxx script/server`
 0. To see what requests are going out, enable debugging mode for  GitHub client in `/server.js`:
 
         const github = new GitHubApi({
           debug: true
         });
-0. Always run `$ script/bootstrap` and restart the server if package.json has changed.

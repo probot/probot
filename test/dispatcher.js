@@ -20,7 +20,7 @@ describe('dispatch', () => {
   });
 
   describe('reply to new issue with a comment', () => {
-    const config = new Configuration({behaviors: [{on: 'issues', then: {comment: 'Hello World!'}}]});
+    const config = Configuration.parse('on issues then comment("Hello World!");');
 
     it('posts a coment', () => {
       return dispatcher.call(config).then(() => {
@@ -30,7 +30,7 @@ describe('dispatch', () => {
   });
 
   describe('reply to new issue with a comment', () => {
-    const config = new Configuration({behaviors: [{on: 'issues.created', then: {comment: 'Hello World!'}}]});
+    const config = Configuration.parse('on issues.created then comment("Hello World!");');
 
     it('calls the action', () => {
       return dispatcher.call(config).then(() => {
@@ -40,7 +40,7 @@ describe('dispatch', () => {
   });
 
   describe('on an event with a different action', () => {
-    const config = new Configuration({behaviors: [{on: 'issues.labeled', then: {comment: 'Hello World!'}}]});
+    const config = Configuration.parse('on issues.labeled then comment("Hello World!");');
 
     it('does not perform behavior', () => {
       return dispatcher.call(config).then(() => {

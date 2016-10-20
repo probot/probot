@@ -38,7 +38,7 @@ describe('parser', () => {
 
     it('parses multiple events', () => {
       expect(parser.parse(
-        'on issues.opened and pull_request.opened then close;'
+        'on issues.opened or pull_request.opened then close;'
       )).toEqual({behaviors: [{
         on: [
           {name: 'issues', action: 'opened'},

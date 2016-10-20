@@ -120,6 +120,5 @@ describe('parser', () => {
         {behaviors: [{on: [{name: 'issues'}], then: [{name: 'close'}]}]}
       );
     });
-
   });
 });

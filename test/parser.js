@@ -25,9 +25,9 @@ describe('parser', () => {
     expect(parser.parse('\n\n\n')).toEqual({behaviors: []});
   });
 
-  // it('fails on junk', () => {
-  //   expect(parser.parse('onnope thennope;')).toEqual({behaviors: []});
-  // });
+  it.skip('fails on junk', () => {
+    expect(parser.parse('onnope thennope;')).toEqual({behaviors: []});
+  });
 
   describe('on', () => {
     it('parses an event', () => {
@@ -67,18 +67,6 @@ describe('parser', () => {
         behaviors: [{
           on: [{name: 'issues'}],
           conditions: [{name: 'labeled', value: 'enhancement'}],
-          then: [{name: 'close'}]
-        }]
-      });
-    });
-
-    it('parses expressions', () => {
-      expect(
-        parser.parse('on issues if a contains b then close;')
-      ).toEqual({
-        behaviors: [{
-          on: [{name: 'issues'}],
-          conditions: [{type: 'expression', left: 'a', operand: 'contains', right: 'b'}],
           then: [{name: 'close'}]
         }]
       });

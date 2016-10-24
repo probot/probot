@@ -1,7 +1,5 @@
 # Configuration
 
-_**Heads up!** This yaml-based configuration syntax is not great. Ideally it will be replaced by a [proper grammar](https://github.com/bkeepers/PRobot/issues/35)._
-
 Behaviors are configured in a file called `.probot` in your repository.
 
 ```

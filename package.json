@@ -12,10 +12,11 @@
   "dependencies": {
     "debug": "2.2.0",
     "expect": "^1.20.2",
-    "github-webhook-handler": "^0.6.0",
     "github": "^5.2.0",
+    "github-webhook-handler": "^0.6.0",
     "handlebars": "^4.0.5",
-    "jsdoc": "^3.4.2"
+    "jsdoc": "^3.4.2",
+    "tree-walk": "^0.4.0"
   },
   "devDependencies": {
     "mocha": "^3.0.2",

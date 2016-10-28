@@ -9,53 +9,56 @@ describe('parser', () => {
     expect(parser.parse(`
       on issues.opened then close;
       on pull_requests.open then assign(bkeepers);
-    `)).toEqual({behaviors: [
+    `)).toEqual([
       {
-        on: [{action: 'opened', name: 'issues'}],
-        then: [{name: 'close'}]
+        type: 'behavior',
+        on: [{type: 'event', action: 'opened', name: 'issues'}],
+        then: [{type: 'action', name: 'close'}]
       },
       {
-        on: [{action: 'open', name: 'pull_requests'}],
-        then: [{name: 'assign', value: 'bkeepers'}]
+        type: 'behavior',
+        on: [{type: 'event', action: 'open', name: 'pull_requests'}],
+        then: [{type: 'action', name: 'assign', value: 'bkeepers'}]
       }
-    ]});
+    ]);
   });
 
   it('parses a blank doc', () => {
-    expect(parser.parse('\n\n\n')).toEqual({behaviors: []});
+    expect(parser.parse('\n\n\n')).toEqual([]);
   });
 
   it.skip('fails on junk', () => {
-    expect(parser.parse('onnope thennope;')).toEqual({behaviors: []});
+    expect(parser.parse('onnope thennope;')).toEqual([]);
   });
 
   describe('on', () => {
     it('parses an event', () => {
-      expect(parser.parse('on issues then close;')).toEqual({behaviors: [{
-        on: [{name: 'issues'}],
-        then: [{name: 'close'}]
-      }]});
+      expect(parser.parse('on issues then close;')).toEqual([{
+        type: 'behavior',
+        on: [{type: 'event', name: 'issues'}],
+        then: [{type: 'action', name: 'close'}]
+      }]);
     });
 
     it('parses an event and action', () => {
-      expect(parser.parse('on issues.opened then close;')).toEqual({
-        behaviors: [{
-          on: [{name: 'issues', action: 'opened'}],
-          then: [{name: 'close'}]
-        }]
-      });
+      expect(parser.parse('on issues.opened then close;')).toEqual([{
+          type: 'behavior',
+          on: [{type: 'event', name: 'issues', action: 'opened'}],
+          then: [{type: 'action', name: 'close'}]
+      }]);
     });
 
     it('parses multiple events', () => {
       expect(parser.parse(
         'on issues.opened or pull_request.opened then close;'
-      )).toEqual({behaviors: [{
+      )).toEqual([{
+        type: 'behavior',
         on: [
-          {name: 'issues', action: 'opened'},
-          {name: 'pull_request', action: 'opened'}
+          {type: 'event', name: 'issues', action: 'opened'},
+          {type: 'event', name: 'pull_request', action: 'opened'}
         ],
-        then: [{name: 'close'}]
-      }]});
+        then: [{type: 'action', name: 'close'}]
+      }]);
     });
   });
 
@@ -63,13 +66,12 @@ describe('parser', () => {
     it('parses simple conditionals', () => {
       expect(
         parser.parse('on issues if labeled(enhancement) then close;')
-      ).toEqual({
-        behaviors: [{
-          on: [{name: 'issues'}],
-          conditions: [{name: 'labeled', value: 'enhancement'}],
-          then: [{name: 'close'}]
-        }]
-      });
+      ).toEqual([{
+        type: 'behavior',
+        on: [{type: 'event', name: 'issues'}],
+        conditions: [{name: 'labeled', value: 'enhancement'}],
+        then: [{type: 'action', name: 'close'}]
+      }]);
     });
   });
 
@@ -77,46 +79,50 @@ describe('parser', () => {
     it('parses multiple words', () => {
       expect(parser.parse(
         'on issues then close and lock;'
-      )).toEqual({behaviors: [{
-        on: [{name: 'issues'}],
+      )).toEqual([{
+        type: 'behavior',
+        on: [{type: 'event', name: 'issues'}],
         then: [
-          {name: 'close'},
-          {name: 'lock'}
+          {type: 'action', name: 'close'},
+          {type: 'action', name: 'lock'}
         ]
-      }]});
+      }]);
     });
 
     it('parses string arguments', () => {
       expect(parser.parse(
         'on issues then comment("Hello World!");'
-      )).toEqual({behaviors: [{
-        on: [{name: 'issues'}],
+      )).toEqual([{
+        type: 'behavior',
+        on: [{type: 'event', name: 'issues'}],
         then: [
-          {name: 'comment', value: 'Hello World!'}
+          {type: 'action', name: 'comment', value: 'Hello World!'}
         ]
-      }]});
+      }]);
     });
 
     it('parses word arguments', () => {
       expect(parser.parse(
         'on issues then assign(bkeepers);'
-      )).toEqual({behaviors: [{
-        on: [{name: 'issues'}],
+      )).toEqual([{
+        type: 'behavior',
+        on: [{type: 'event', name: 'issues'}],
         then: [
-          {name: 'assign', value: 'bkeepers'}
+          {type: 'action', name: 'assign', value: 'bkeepers'}
         ]
-      }]});
+      }]);
     });
 
     it('parses multiple word arguments', () => {
       expect(parser.parse(
         'on issues then assign(bkeepers, hubot);'
-      )).toEqual({behaviors: [{
-        on: [{name: 'issues'}],
+      )).toEqual([{
+        type: 'behavior',
+        on: [{type: 'event', name: 'issues'}],
         then: [
-          {name: 'assign', value: ['bkeepers', 'hubot']}
+          {type: 'action', name: 'assign', value: ['bkeepers', 'hubot']}
         ]
-      }]});
+      }]);
     });
   });
 
@@ -126,7 +132,9 @@ describe('parser', () => {
         # This could literally be anything.
         on issues then close;
       `)).toEqual(
-        {behaviors: [{on: [{name: 'issues'}], then: [{name: 'close'}]}]}
+        [{type: 'behavior',
+        on: [{type: 'event', name: 'issues'}],
+        then: [{type: 'action', name: 'close'}]}]
       );
     });
 
@@ -134,9 +142,11 @@ describe('parser', () => {
       expect(parser.parse(`
         on issues # Ignore this
         then close;
-      `)).toEqual(
-        {behaviors: [{on: [{name: 'issues'}], then: [{name: 'close'}]}]}
-      );
+      `)).toEqual([{
+          type: 'behavior',
+          on: [{type: 'event', name: 'issues'}],
+          then: [{type: 'action', name: 'close'}]
+      }]);
     });
   });
 });

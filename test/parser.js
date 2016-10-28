@@ -42,9 +42,9 @@ describe('parser', () => {
 
     it('parses an event and action', () => {
       expect(parser.parse('on issues.opened then close;')).toEqual([{
-          type: 'behavior',
-          events: [{type: 'event', name: 'issues', action: 'opened'}],
-          then: [{type: 'action', name: 'close'}]
+        type: 'behavior',
+        events: [{type: 'event', name: 'issues', action: 'opened'}],
+        then: [{type: 'action', name: 'close'}]
       }]);
     });
 
@@ -143,9 +143,9 @@ describe('parser', () => {
         on issues # Ignore this
         then close;
       `)).toEqual([{
-          type: 'behavior',
-          events: [{type: 'event', name: 'issues'}],
-          then: [{type: 'action', name: 'close'}]
+        type: 'behavior',
+        events: [{type: 'event', name: 'issues'}],
+        then: [{type: 'action', name: 'close'}]
       }]);
     });
   });

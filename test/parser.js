@@ -69,7 +69,7 @@ describe('parser', () => {
       ).toEqual([{
         type: 'behavior',
         events: [{type: 'event', name: 'issues'}],
-        conditions: [{name: 'labeled', value: 'enhancement'}],
+        conditions: [{type: 'condition', name: 'labeled', value: 'enhancement'}],
         actions: [{type: 'action', name: 'close'}]
       }]);
     });

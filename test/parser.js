@@ -13,12 +13,12 @@ describe('parser', () => {
       {
         type: 'behavior',
         events: [{type: 'event', action: 'opened', name: 'issues'}],
-        then: [{type: 'action', name: 'close'}]
+        actions: [{type: 'action', name: 'close'}]
       },
       {
         type: 'behavior',
         events: [{type: 'event', action: 'open', name: 'pull_requests'}],
-        then: [{type: 'action', name: 'assign', value: 'bkeepers'}]
+        actions: [{type: 'action', name: 'assign', value: 'bkeepers'}]
       }
     ]);
   });
@@ -36,7 +36,7 @@ describe('parser', () => {
       expect(parser.parse('on issues then close;')).toEqual([{
         type: 'behavior',
         events: [{type: 'event', name: 'issues'}],
-        then: [{type: 'action', name: 'close'}]
+        actions: [{type: 'action', name: 'close'}]
       }]);
     });
 
@@ -44,7 +44,7 @@ describe('parser', () => {
       expect(parser.parse('on issues.opened then close;')).toEqual([{
         type: 'behavior',
         events: [{type: 'event', name: 'issues', action: 'opened'}],
-        then: [{type: 'action', name: 'close'}]
+        actions: [{type: 'action', name: 'close'}]
       }]);
     });
 
@@ -57,7 +57,7 @@ describe('parser', () => {
           {type: 'event', name: 'issues', action: 'opened'},
           {type: 'event', name: 'pull_request', action: 'opened'}
         ],
-        then: [{type: 'action', name: 'close'}]
+        actions: [{type: 'action', name: 'close'}]
       }]);
     });
   });
@@ -70,7 +70,7 @@ describe('parser', () => {
         type: 'behavior',
         events: [{type: 'event', name: 'issues'}],
         conditions: [{name: 'labeled', value: 'enhancement'}],
-        then: [{type: 'action', name: 'close'}]
+        actions: [{type: 'action', name: 'close'}]
       }]);
     });
   });
@@ -82,7 +82,7 @@ describe('parser', () => {
       )).toEqual([{
         type: 'behavior',
         events: [{type: 'event', name: 'issues'}],
-        then: [
+        actions: [
           {type: 'action', name: 'close'},
           {type: 'action', name: 'lock'}
         ]
@@ -95,7 +95,7 @@ describe('parser', () => {
       )).toEqual([{
         type: 'behavior',
         events: [{type: 'event', name: 'issues'}],
-        then: [
+        actions: [
           {type: 'action', name: 'comment', value: 'Hello World!'}
         ]
       }]);
@@ -107,7 +107,7 @@ describe('parser', () => {
       )).toEqual([{
         type: 'behavior',
         events: [{type: 'event', name: 'issues'}],
-        then: [
+        actions: [
           {type: 'action', name: 'assign', value: 'bkeepers'}
         ]
       }]);
@@ -119,7 +119,7 @@ describe('parser', () => {
       )).toEqual([{
         type: 'behavior',
         events: [{type: 'event', name: 'issues'}],
-        then: [
+        actions: [
           {type: 'action', name: 'assign', value: ['bkeepers', 'hubot']}
         ]
       }]);
@@ -134,7 +134,7 @@ describe('parser', () => {
       `)).toEqual(
         [{type: 'behavior',
         events: [{type: 'event', name: 'issues'}],
-        then: [{type: 'action', name: 'close'}]}]
+        actions: [{type: 'action', name: 'close'}]}]
       );
     });
 
@@ -145,7 +145,7 @@ describe('parser', () => {
       `)).toEqual([{
         type: 'behavior',
         events: [{type: 'event', name: 'issues'}],
-        then: [{type: 'action', name: 'close'}]
+        actions: [{type: 'action', name: 'close'}]
       }]);
     });
   });

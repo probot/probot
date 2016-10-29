@@ -12,7 +12,8 @@ const parser = peg.generate(fs.readFileSync('./lib/parser.pegjs').toString(),
 
 function test(string) {
   const ast = parser.parse(string, {startRule: 'if'});
-  return new Transformer(ast).transform()[0](context);
+  const condition = new Transformer(ast).transform();
+  return typeof condition === 'function' ? condition(context) : condition;
 }
 
 describe('conditions', () => {

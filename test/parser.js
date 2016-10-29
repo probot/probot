@@ -73,6 +73,24 @@ describe('parser', () => {
         actions: [{type: 'action', name: 'close'}]
       }]);
     });
+
+    it('parses logical conditions', () => {
+      expect(
+        parser.parse('on issues if labeled(enhancement) or labeled(design) then close;')
+      ).toEqual([{
+        type: 'behavior',
+        events: [{type: 'event', name: 'issues'}],
+        conditions: [
+          {
+            type: 'LogicalExpression',
+            operator: 'or',
+            left: {type: 'condition', name: 'labeled', value: 'enhancement'},
+            right: {type: 'condition', name: 'labeled', value: 'design'}
+          }
+        ],
+        actions: [{type: 'action', name: 'close'}]
+      }]);
+    });
   });
 
   describe('then', () => {

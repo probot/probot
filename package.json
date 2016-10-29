@@ -17,6 +17,7 @@
     "handlebars": "^4.0.5",
     "jsdoc": "^3.4.2",
     "pegjs": "^0.10.0",
+    "pegjs-util": "^1.4.0",
     "tree-walk": "^0.4.0"
   },
   "devDependencies": {

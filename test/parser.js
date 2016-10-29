@@ -1,13 +1,14 @@
 const fs = require('fs');
 const expect = require('expect');
-const peg = require('pegjs');
-
-const parser = peg.generate(fs.readFileSync('./lib/parser.pegjs').toString(),
-  {allowedStartRules: ['start', 'if']});
+const parser = require('../lib/parser');
 
 describe('parser', () => {
   it('successfully parses a bunch of examples', () => {
     parser.parse(fs.readFileSync('./test/fixtures/behaviors').toString());
+  });
+
+  it('reports syntax errors', () => {
+    expect(() => parser.parse('lolwut?').toThrow(/parse error/));
   });
 
   it('parses multiple statements', () => {

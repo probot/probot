@@ -10,6 +10,7 @@
   "author": "Brandon Keepers",
   "license": "ISC",
   "dependencies": {
+    "asty": "^1.4.7",
     "debug": "2.2.0",
     "expect": "^1.20.2",
     "github": "^5.2.0",
@@ -17,6 +18,7 @@
     "handlebars": "^4.0.5",
     "jsdoc": "^3.4.2",
     "pegjs": "^0.10.0",
+    "pegjs-util": "^1.4.0",
     "tree-walk": "^0.4.0"
   },
   "devDependencies": {

@@ -1,14 +1,10 @@
-const fs = require('fs');
 const expect = require('expect');
-const peg = require('pegjs');
 const Transformer = require('../lib/transformer');
 const Context = require('../lib/context');
+const parser = require('../lib/parser');
 const payload = require('./fixtures/webhook/issues.labeled.json');
 
 const context = new Context({}, {}, {payload});
-
-const parser = peg.generate(fs.readFileSync('./lib/parser.pegjs').toString(),
-  {allowedStartRules: ['if']});
 
 function test(string) {
   const ast = parser.parse(string, {startRule: 'if'});

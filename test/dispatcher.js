@@ -88,5 +88,17 @@ describe('dispatch', () => {
         expect(github.issues.edit).toHaveBeenCalled();
       });
     });
+
+    it('supports logical expressions', () => {
+      const config = Configuration.parse(`
+        on issues.labeled
+        if labeled(bug) and labeled(feature)
+        then close;
+      `);
+
+      return dispatcher.call(config).then(() => {
+        expect(github.issues.edit).toNotHaveBeenCalled();
+      });
+    });
   });
 });

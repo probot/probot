@@ -12,3 +12,7 @@ then close and comment("nope!");
 on issues.opened
 if @issue.user.login matches "bot$"
 then comment("No bots allowed!") and close;
+
+on issues.opened if @sender.login is "bkeepers" then close;
+on issues.opened if @sender.login is not "bkeepers" then close;
+on issues.opened if @issue.body contains "- [ ]" then label(wip);

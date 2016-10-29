@@ -16,11 +16,11 @@
     "github-webhook-handler": "^0.6.0",
     "handlebars": "^4.0.5",
     "jsdoc": "^3.4.2",
+    "pegjs": "^0.10.0",
     "tree-walk": "^0.4.0"
   },
   "devDependencies": {
     "mocha": "^3.0.2",
-    "pegjs": "^0.10.0",
     "xo": "^0.16.0"
   },
   "xo": {

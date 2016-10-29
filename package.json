@@ -10,7 +10,6 @@
   "author": "Brandon Keepers",
   "license": "ISC",
   "dependencies": {
-    "asty": "^1.4.7",
     "debug": "2.2.0",
     "expect": "^1.20.2",
     "github": "^5.2.0",

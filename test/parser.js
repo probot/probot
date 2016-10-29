@@ -92,6 +92,31 @@ describe('parser', () => {
       }]);
     });
 
+    it('parses multiple logical conditions', () => {
+      expect(parser.parse(`
+        on issues
+        if labeled(enhancement) or labeled(design) or labeled(bug)
+        then close;
+      `)).toEqual([{
+        type: 'behavior',
+        events: [{type: 'event', name: 'issues'}],
+        conditions: [
+          {
+            type: 'LogicalExpression',
+            operator: 'or',
+            left: {
+              type: 'LogicalExpression',
+              left: {type: 'condition', name: 'labeled', value: 'enhancement'},
+              operator: 'or',
+              right: {type: 'condition', name: 'labeled', value: 'design'}
+            },
+            right: {type: 'condition', name: 'labeled', value: 'bug'}
+          }
+        ],
+        actions: [{type: 'action', name: 'close'}]
+      }]);
+    });
+
     it('parses logical and conditions', () => {
       expect(
         parser.parse('on issues if labeled(enhancement) and labeled(design) then close;')

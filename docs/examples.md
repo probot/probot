@@ -7,7 +7,7 @@ Here are some examples of interesting things you can do by combining these compo
 ```
 # Post welcome message for new contributors
 on issues.opened or pull_request.opened
-when first_time_contributor # plugins could implement conditions like this
+if first_time_contributor # plugins could implement conditions like this
 then comment(file(".github/NEW_CONTRIBUTOR_TEMPLATE.md"));
 
 # Auto-close new pull requests
@@ -17,7 +17,7 @@ and close;
 
 # Close issues with no body
 on issues.opened
-when payload.body matches /^$/
+if @issue.body matches /^$/
 then comment("Hey @{{ user.login }}, you didn't include a description of the problem, so we're closing this issue.");
 
 # @mention watchers when label added
@@ -27,21 +27,21 @@ comment("Hey {{ mentions }}, you wanted to know when the `{{ payload.label.name 
 
 # Assign a reviewer for new bugs
 on pull_request.labeled
-when labeled(bug)
+if labeled(bug)
 then assign(random(file(OWNERS)));
 
 # Perform actions based on content of comments
 on issue_comment.opened
-when payload.issue.body matches /^@probot assign @(\w+)$/
+if @issue.body matches /^@probot assign @(\w+)$/
 then assign({{ matches[0] }})
 
 on issue_comment.opened
-when payload.issue.body matches /^@probot label @(\w+)$/
+if @issue.body matches /^@probot label @(\w+)$/
 then label($1)
 
 # Close stale issues and pull requests
 on *.labeled
-when labeled("needs-work") and state("open")
+if labeled("needs-work") and state("open")
 then delay(7 days) and close
 
 # Tweet when a new release is created
@@ -50,7 +50,7 @@ then tweet("Get it while it's hot! {{ repository.name }} {{ release.name }} was 
 
 # Assign a reviewer issues or pull requests with a label
 on issues.opened and pull_request.opened and issues.labeled and pull_request.labeled
-when labeled(security)
+if labeled(security)
 then assign(random(members(security-first-responders));
 
 # Label state transitions

@@ -77,11 +77,9 @@ describe('dispatch', () => {
       });
     });
 
-    it('supports logical expressions', () => {
+    it('supports logical or expressions', () => {
       const config = Configuration.parse(`
-        on issues.labeled
-        if labeled(bug) or labeled(feature)
-        then close;
+        on issues.labeled if labeled(bug) or labeled(feature) then close;
       `);
 
       return dispatcher.call(config).then(() => {
@@ -89,11 +87,29 @@ describe('dispatch', () => {
       });
     });
 
-    it('supports logical expressions', () => {
+    it('supports logical and expressions', () => {
       const config = Configuration.parse(`
-        on issues.labeled
-        if labeled(bug) and labeled(feature)
-        then close;
+        on issues.labeled if labeled(bug) and labeled(feature) then close;
+      `);
+
+      return dispatcher.call(config).then(() => {
+        expect(github.issues.edit).toNotHaveBeenCalled();
+      });
+    });
+
+    it('passes match expressions', () => {
+      const config = Configuration.parse(`
+        on issues.labeled if @sender.login matches "ke+" then close;
+      `);
+
+      return dispatcher.call(config).then(() => {
+        expect(github.issues.edit).toHaveBeenCalled();
+      });
+    });
+
+    it('failes match expressions', () => {
+      const config = Configuration.parse(`
+        on issues.labeled if @sender.login matches "nope" then close;
       `);
 
       return dispatcher.call(config).then(() => {

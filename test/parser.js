@@ -2,9 +2,14 @@ const fs = require('fs');
 const expect = require('expect');
 const peg = require('pegjs');
 
-const parser = peg.generate(fs.readFileSync('./lib/parser.pegjs').toString());
+const parser = peg.generate(fs.readFileSync('./lib/parser.pegjs').toString(),
+  {allowedStartRules: ['start', 'if']});
 
 describe('parser', () => {
+  it('successfully parses a bunch of examples', () => {
+    parser.parse(fs.readFileSync('./test/fixtures/behaviors').toString());
+  });
+
   it('parses multiple statements', () => {
     expect(parser.parse(`
       on issues.opened then close;
@@ -76,62 +81,51 @@ describe('parser', () => {
 
     it('parses logical or conditions', () => {
       expect(
-        parser.parse('on issues if labeled(enhancement) or labeled(design) then close;')
+        parser.parse('if labeled(enhancement) or labeled(design)', {startRule: 'if'})
       ).toEqual([{
-        type: 'behavior',
-        events: [{type: 'event', name: 'issues'}],
-        conditions: [
-          {
-            type: 'LogicalExpression',
-            operator: 'or',
-            left: {type: 'condition', name: 'labeled', value: 'enhancement'},
-            right: {type: 'condition', name: 'labeled', value: 'design'}
-          }
-        ],
-        actions: [{type: 'action', name: 'close'}]
+        type: 'LogicalExpression',
+        operator: 'or',
+        left: {type: 'condition', name: 'labeled', value: 'enhancement'},
+        right: {type: 'condition', name: 'labeled', value: 'design'}
       }]);
     });
 
     it('parses multiple logical conditions', () => {
-      expect(parser.parse(`
-        on issues
-        if labeled(enhancement) or labeled(design) or labeled(bug)
-        then close;
-      `)).toEqual([{
-        type: 'behavior',
-        events: [{type: 'event', name: 'issues'}],
-        conditions: [
-          {
-            type: 'LogicalExpression',
-            operator: 'or',
-            left: {
-              type: 'LogicalExpression',
-              left: {type: 'condition', name: 'labeled', value: 'enhancement'},
-              operator: 'or',
-              right: {type: 'condition', name: 'labeled', value: 'design'}
-            },
-            right: {type: 'condition', name: 'labeled', value: 'bug'}
-          }
-        ],
-        actions: [{type: 'action', name: 'close'}]
+      expect(parser.parse(
+        'if labeled(enhancement) or labeled(design) or labeled(bug)',
+        {startRule: 'if'})
+      ).toEqual([{
+        type: 'LogicalExpression',
+        operator: 'or',
+        left: {
+          type: 'LogicalExpression',
+          left: {type: 'condition', name: 'labeled', value: 'enhancement'},
+          operator: 'or',
+          right: {type: 'condition', name: 'labeled', value: 'design'}
+        },
+        right: {type: 'condition', name: 'labeled', value: 'bug'}
       }]);
     });
 
     it('parses logical and conditions', () => {
       expect(
-        parser.parse('on issues if labeled(enhancement) and labeled(design) then close;')
+        parser.parse('if labeled(enhancement) and labeled(design)', {startRule: 'if'})
       ).toEqual([{
-        type: 'behavior',
-        events: [{type: 'event', name: 'issues'}],
-        conditions: [
-          {
-            type: 'LogicalExpression',
-            operator: 'and',
-            left: {type: 'condition', name: 'labeled', value: 'enhancement'},
-            right: {type: 'condition', name: 'labeled', value: 'design'}
-          }
-        ],
-        actions: [{type: 'action', name: 'close'}]
+        type: 'LogicalExpression',
+        operator: 'and',
+        left: {type: 'condition', name: 'labeled', value: 'enhancement'},
+        right: {type: 'condition', name: 'labeled', value: 'design'}
+      }]);
+    });
+
+    it('parses attributes, matches, and regexps', () => {
+      expect(
+        parser.parse('if @issue.user.login matches "bot$"', {startRule: 'if'})
+      ).toEqual([{
+        type: 'LogicalExpression',
+        operator: 'matches',
+        left: {type: 'attribute', name: ['issue', 'user', 'login']},
+        right: 'bot$'
       }]);
     });
   });

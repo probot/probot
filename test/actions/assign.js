@@ -1,7 +1,7 @@
 const expect = require('expect');
 const action = require('../../lib/actions/assign');
-const Payload = require('../../lib/payload');
-const payload = new Payload(require('../fixtures/webhook/comment.created.json'));
+const Context = require('../../lib/context');
+const payload = require('../fixtures/webhook/comment.created.json');
 
 const createSpy = expect.createSpy;
 
@@ -11,9 +11,11 @@ const github = {
   }
 };
 
+const context = new Context(github, {}, {payload});
+
 describe('action.assign', () => {
   it('assigns a user', () => {
-    action(github, payload, 'bkeepers');
+    action(context, 'bkeepers');
     expect(github.issues.addAssigneesToIssue).toHaveBeenCalledWith({
       owner: 'bkeepers-inc',
       repo: 'test',
@@ -23,7 +25,7 @@ describe('action.assign', () => {
   });
 
   it('assigns multiple users', () => {
-    action(github, payload, ['hello', 'world']);
+    action(context, ['hello', 'world']);
     expect(github.issues.addAssigneesToIssue).toHaveBeenCalledWith({
       owner: 'bkeepers-inc',
       repo: 'test',

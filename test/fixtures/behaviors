@@ -1,0 +1,14 @@
+# Integration test
+
+on issues # ignore this
+then close;
+
+on issues then assign(hubot, probot);
+
+on issues.assign
+if labeled(foo) and labeled(bar) or labeled(baz)
+then close and comment("nope!");
+
+on issues.opened
+if @issue.user.login matches "bot$"
+then comment("No bots allowed!") and close;

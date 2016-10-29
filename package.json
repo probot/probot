@@ -27,7 +27,8 @@
     "esnext": true,
     "space": true,
     "rules": {
-      "no-else-return": 0
+      "no-else-return": 0,
+      "key-spacing": 0
     },
     "ignores": [],
     "envs": [

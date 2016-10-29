@@ -14,12 +14,12 @@ then comment("Sorry @{{ user.login }}, pull requests are not accepted on this re
 and close;
 ```
 
-## `behaviors`
+## Behaviors
 
 Behaviors are composed of:
 
 - [`on`](#on) - webhook events to listen to
-- [`when`](#when) (optional) - conditions to determine if the actions should be performed.
+- [`if`](#if) (optional) - conditions to determine if the actions should be performed.
 - [`then`](#then) - actions to take in response to the event
 
 ### `on`
@@ -69,11 +69,36 @@ on issues.labeled or issues.unlabeled then…
 
 TODO: document actions
 
-### `when`
+### `if`
 
-Only preform the actions if theses conditions are met.
+Only preform the actions if theses conditions are met. Conditions can be [operations](#operations) or [functions](#functions)
 
-_Heads up! There are not any `when` conditions implemented yet._
+Attributes of the [webhook payload](https://developer.github.com/webhooks/#events) can be used in conditions using the `@` syntax.
+
+```
+if @issue.body contains "- [ ]"
+```
+
+#### Operations
+
+Operator    | Description                   | Example
+------------|-------------------------------|-----------------------------------
+`is`        | equal                         | `@sender.login is "hubot"`
+`is not`    | not equal                     | `@sender.login is not "hubot"`
+`contains`  | string contains a substring   | `@issue.body contains "- [ ]"`
+`matches`   | matches a regular expression  | `@issue.title matches "^\[?WIP\]?"`
+`and`       | logical and                   | `labeled(bug) and @sender.login is "hubot"`
+`or`        | logical or                    | `labeled(bug) or labeled(defect)`
+
+#### Functions
+
+##### `labeled`
+
+Test if the label was added.
+
+```
+if labeled(bug)
+```
 
 ### `then`
 

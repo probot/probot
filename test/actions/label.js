@@ -1,7 +1,7 @@
 const expect = require('expect');
 const action = require('../../lib/actions/label');
-const Payload = require('../../lib/payload');
-const payload = new Payload(require('../fixtures/webhook/comment.created.json'));
+const Context = require('../../lib/context');
+const payload = require('../fixtures/webhook/comment.created.json');
 
 const createSpy = expect.createSpy;
 
@@ -10,10 +10,11 @@ const github = {
     addLabels: createSpy()
   }
 };
+const context = new Context(github, {}, {payload});
 
 describe('action.label', () => {
   it('adds a label', () => {
-    action(github, payload, 'hello');
+    action(context, 'hello');
     expect(github.issues.addLabels).toHaveBeenCalledWith({
       owner: 'bkeepers-inc',
       repo: 'test',
@@ -23,7 +24,7 @@ describe('action.label', () => {
   });
 
   it('adds multiple labels', () => {
-    action(github, payload, ['hello', 'world']);
+    action(context, ['hello', 'world']);
     expect(github.issues.addLabels).toHaveBeenCalledWith({
       owner: 'bkeepers-inc',
       repo: 'test',

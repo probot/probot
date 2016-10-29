@@ -1,7 +1,7 @@
 const expect = require('expect');
 const action = require('../../lib/actions/unassign');
-const Payload = require('../../lib/payload');
-const payload = new Payload(require('../fixtures/webhook/comment.created.json'));
+const Context = require('../../lib/context');
+const payload = require('../fixtures/webhook/comment.created.json');
 
 const createSpy = expect.createSpy;
 
@@ -10,10 +10,11 @@ const github = {
     removeAssigneesFromIssue: createSpy()
   }
 };
+const context = new Context(github, {}, {payload});
 
 describe('action.unassign', () => {
   it('unassigns a user', () => {
-    action(github, payload, 'bkeepers');
+    action(context, 'bkeepers');
     expect(github.issues.removeAssigneesFromIssue).toHaveBeenCalledWith({
       owner: 'bkeepers-inc',
       repo: 'test',
@@ -23,7 +24,7 @@ describe('action.unassign', () => {
   });
 
   it('unassigns multiple users', () => {
-    action(github, payload, ['hello', 'world']);
+    action(context, ['hello', 'world']);
     expect(github.issues.removeAssigneesFromIssue).toHaveBeenCalledWith({
       owner: 'bkeepers-inc',
       repo: 'test',

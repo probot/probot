@@ -52,7 +52,7 @@ Here are some examples of interesting things you can do by combining these compo
     if labeled(bug)
     then assign(random(file(OWNERS)));
 
-# Perform actions based on content of comments
+### Perform actions based on content of comments
 
     on issue_comment.opened
     if @issue.body matches /^@probot assign @(\w+)$/
@@ -73,7 +73,7 @@ Here are some examples of interesting things you can do by combining these compo
     on release.published
     then tweet("Get it while it's hot! {{ repository.name }} {{ release.name }} was just released! {{ release.html_url }}")
 
-# Assign a reviewer issues or pull requests with a label
+### Assign a reviewer issues or pull requests with a label
 
     on issues.opened and pull_request.opened and issues.labeled and pull_request.labeled
     if labeled(security)

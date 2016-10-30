@@ -44,9 +44,9 @@ then
 ;
 ```
 
-These actions are defined in [`lib/actions/label.js`](../lib/actions/label.js) and [`lib/actions/close.js`](../lib/actions/close.js).
+These actions are defined in [`lib/actions/label.js`](lib/actions/label.js) and [`lib/actions/close.js`](lib/actions/close.js).
 
-Implementing new actions is relatively straight forward. Create a file in `lib/actions/{name}.js`, replacing `name` with the name of the action, and add the new action in [lib/actions.js](../lib/actions.js). An action is a function that takes two arguments and returns a [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise):
+Implementing new actions is relatively straight forward. Create a file in `lib/actions/{name}.js`, replacing `name` with the name of the action, and add the new action in [lib/actions.js](lib/actions.js). An action is a function that takes two arguments and returns a [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise):
 
 ```javascript
 module.exports = function (context, args) {
@@ -56,7 +56,7 @@ module.exports = function (context, args) {
 
 The two arguments are:
 
-- The aptly named [`context`](../lib/context.js) argument provides context for the current webhook. There are two properties that will likely be most helpful:
+- The aptly named [`context`](lib/context.js) argument provides context for the current webhook. There are two properties that will likely be most helpful:
   - `context.github` is an authenticated instance of the GitHub API client. See the [node-github documentation](http://mikedeboer.github.io/node-github/) for more information.
   - `context.payload` is the webhook payload. Depending on the type of event, the payload will be slightly different. See the [GitHub webhook docs](https://developer.github.com/webhooks/#payloads) for more information.
 - `args` is any arguments passed to the action. For the `label` action called in the example above, `args` will be the string `"triage"`.
@@ -85,9 +85,9 @@ if labeled("wontfix")  # <-- `labeled` is a condition
 then close;
 ```
 
-This condition is defined in [`lib/conditions/labeled.js`](../lib/conditions/labeled.js).
+This condition is defined in [`lib/conditions/labeled.js`](lib/conditions/labeled.js).
 
-Like [adding an action](#actions), adding a new condition is straight forward. Create a file in `lib/conditions/{name}.js`, replacing `name` with the name of the condition, and add the new condition in [lib/conditions.js](../lib/conditions.js). A condition is a function that takes two arguments and returns `true` or `false`:
+Like [adding an action](#actions), adding a new condition is straight forward. Create a file in `lib/conditions/{name}.js`, replacing `name` with the name of the condition, and add the new condition in [lib/conditions.js](lib/conditions.js). A condition is a function that takes two arguments and returns `true` or `false`:
 
 ```javascript
 module.exports = function (context, args) {

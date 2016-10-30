@@ -1,5 +1,5 @@
 const expect = require('expect');
-const attribute = require('../../lib/conditions/attribute');
+const attribute = require('../lib/attribute');
 
 describe('attribute', () => {
   it('fetches the attribute from the payload', () => {

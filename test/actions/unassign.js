@@ -24,7 +24,7 @@ describe('action.unassign', () => {
   });
 
   it('unassigns multiple users', () => {
-    action(context, ['hello', 'world']);
+    action(context, 'hello', 'world');
     expect(github.issues.removeAssigneesFromIssue).toHaveBeenCalledWith({
       owner: 'bkeepers-inc',
       repo: 'test',

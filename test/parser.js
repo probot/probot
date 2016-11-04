@@ -24,7 +24,7 @@ describe('parser', () => {
       {
         type: 'behavior',
         events: [{type: 'event', action: 'open', name: 'pull_requests'}],
-        actions: [{type: 'action', name: 'assign', value: 'bkeepers'}]
+        actions: [{type: 'action', name: 'assign', args: ['bkeepers']}]
       }
     ]);
   });
@@ -33,8 +33,9 @@ describe('parser', () => {
     expect(parser.parse('\n\n\n')).toEqual([]);
   });
 
-  it.skip('fails on junk', () => {
-    expect(parser.parse('onnope thennope;')).toEqual([]);
+  it('fails on junk', () => {
+    expect(() => parser.parse('onnope then nope;')).toThrow();
+    expect(() => parser.parse('on nope thennope;')).toThrow();
   });
 
   describe('on', () => {
@@ -79,7 +80,7 @@ describe('parser', () => {
       ).toEqual([{
         type: 'behavior',
         events: [{type: 'event', name: 'issues'}],
-        conditions: {type: 'condition', name: 'labeled', value: 'enhancement'},
+        conditions: {type: 'condition', name: 'labeled', args: ['enhancement']},
         actions: [{type: 'action', name: 'close'}]
       }]);
     });
@@ -88,8 +89,8 @@ describe('parser', () => {
       expect(parse('if labeled(enhancement) or labeled(design)')).toEqual({
         type: 'BinaryExpression',
         operator: 'or',
-        left: {type: 'condition', name: 'labeled', value: 'enhancement'},
-        right: {type: 'condition', name: 'labeled', value: 'design'}
+        left: {type: 'condition', name: 'labeled', args: ['enhancement']},
+        right: {type: 'condition', name: 'labeled', args: ['design']}
       });
     });
 
@@ -101,11 +102,11 @@ describe('parser', () => {
         operator: 'or',
         left: {
           type: 'BinaryExpression',
-          left: {type: 'condition', name: 'labeled', value: 'enhancement'},
+          left: {type: 'condition', name: 'labeled', args: ['enhancement']},
           operator: 'or',
-          right: {type: 'condition', name: 'labeled', value: 'design'}
+          right: {type: 'condition', name: 'labeled', args: ['design']}
         },
-        right: {type: 'condition', name: 'labeled', value: 'bug'}
+        right: {type: 'condition', name: 'labeled', args: ['bug']}
       });
     });
 
@@ -113,8 +114,8 @@ describe('parser', () => {
       expect(parse('if labeled(enhancement) and labeled(design)')).toEqual({
         type: 'BinaryExpression',
         operator: 'and',
-        left: {type: 'condition', name: 'labeled', value: 'enhancement'},
-        right: {type: 'condition', name: 'labeled', value: 'design'}
+        left: {type: 'condition', name: 'labeled', args: ['enhancement']},
+        right: {type: 'condition', name: 'labeled', args: ['design']}
       });
     });
 
@@ -132,7 +133,7 @@ describe('parser', () => {
         expect(parse('if not labeled(bug)')).toEqual({
           type: 'UnaryExpression',
           operator: 'not',
-          argument: {type: 'condition', name: 'labeled', value: 'bug'}
+          argument: {type: 'condition', name: 'labeled', args: ['bug']}
         });
       });
     });
@@ -204,7 +205,7 @@ describe('parser', () => {
         type: 'behavior',
         events: [{type: 'event', name: 'issues'}],
         actions: [
-          {type: 'action', name: 'comment', value: 'Hello World!'}
+          {type: 'action', name: 'comment', args: ['Hello World!']}
         ]
       }]);
     });
@@ -216,7 +217,7 @@ describe('parser', () => {
         type: 'behavior',
         events: [{type: 'event', name: 'issues'}],
         actions: [
-          {type: 'action', name: 'assign', value: 'bkeepers'}
+          {type: 'action', name: 'assign', args: ['bkeepers']}
         ]
       }]);
     });
@@ -228,7 +229,7 @@ describe('parser', () => {
         type: 'behavior',
         events: [{type: 'event', name: 'issues'}],
         actions: [
-          {type: 'action', name: 'assign', value: ['bkeepers', 'hubot']}
+          {type: 'action', name: 'assign', args: ['bkeepers', 'hubot']}
         ]
       }]);
     });

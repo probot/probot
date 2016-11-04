@@ -33,8 +33,9 @@ describe('parser', () => {
     expect(parser.parse('\n\n\n')).toEqual([]);
   });
 
-  it.skip('fails on junk', () => {
-    expect(parser.parse('onnope thennope;')).toEqual([]);
+  it('fails on junk', () => {
+    expect(() => parser.parse('onnope then nope;')).toThrow();
+    expect(() => parser.parse('on nope thennope;')).toThrow();
   });
 
   describe('on', () => {

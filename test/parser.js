@@ -86,7 +86,7 @@ describe('parser', () => {
 
     it('parses logical or conditions', () => {
       expect(parse('if labeled(enhancement) or labeled(design)')).toEqual({
-        type: 'LogicalExpression',
+        type: 'BinaryExpression',
         operator: 'or',
         left: {type: 'condition', name: 'labeled', value: 'enhancement'},
         right: {type: 'condition', name: 'labeled', value: 'design'}
@@ -97,10 +97,10 @@ describe('parser', () => {
       expect(
         parse('if labeled(enhancement) or labeled(design) or labeled(bug)')
       ).toEqual({
-        type: 'LogicalExpression',
+        type: 'BinaryExpression',
         operator: 'or',
         left: {
-          type: 'LogicalExpression',
+          type: 'BinaryExpression',
           left: {type: 'condition', name: 'labeled', value: 'enhancement'},
           operator: 'or',
           right: {type: 'condition', name: 'labeled', value: 'design'}
@@ -111,7 +111,7 @@ describe('parser', () => {
 
     it('parses logical and conditions', () => {
       expect(parse('if labeled(enhancement) and labeled(design)')).toEqual({
-        type: 'LogicalExpression',
+        type: 'BinaryExpression',
         operator: 'and',
         left: {type: 'condition', name: 'labeled', value: 'enhancement'},
         right: {type: 'condition', name: 'labeled', value: 'design'}
@@ -120,7 +120,7 @@ describe('parser', () => {
 
     it('parses attributes, matches, and regexps', () => {
       expect(parse('if @issue.user.login matches "bot$"')).toEqual({
-        type: 'LogicalExpression',
+        type: 'BinaryExpression',
         operator: 'matches',
         left: {type: 'attribute', name: ['issue', 'user', 'login']},
         right: 'bot$'
@@ -140,9 +140,9 @@ describe('parser', () => {
     describe('precedence', () => {
       it('orders "and" over "or"', () => {
         expect(parse('if true and false or true')).toEqual({
-          type: 'LogicalExpression',
+          type: 'BinaryExpression',
           left: {
-            type: 'LogicalExpression',
+            type: 'BinaryExpression',
             left: true,
             operator: 'and',
             right: false
@@ -152,11 +152,11 @@ describe('parser', () => {
         });
 
         expect(parse('if false or true and true')).toEqual({
-          type: 'LogicalExpression',
+          type: 'BinaryExpression',
           left: false,
           operator: 'or',
           right: {
-            type: 'LogicalExpression',
+            type: 'BinaryExpression',
             left: true,
             operator: 'and',
             right: true
@@ -164,16 +164,16 @@ describe('parser', () => {
         });
 
         expect(parse('if true and true or false and false')).toEqual({
-          type: 'LogicalExpression',
+          type: 'BinaryExpression',
           left: {
-            type: 'LogicalExpression',
+            type: 'BinaryExpression',
             left: true,
             operator: 'and',
             right: true
           },
           operator: 'or',
           right: {
-            type: 'LogicalExpression',
+            type: 'BinaryExpression',
             left: false,
             operator: 'and',
             right: false

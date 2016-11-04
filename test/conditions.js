@@ -43,6 +43,16 @@ describe('conditions', () => {
     });
   });
 
+  describe('does not contain', () => {
+    it('fails when operand contains substring', () => {
+      expect(test('if @issue.title does not contain "bug"')).toBeFalsy();
+    });
+
+    it('passes when operand does not contain substring', () => {
+      expect(test('if @issue.title does not contain "nope"')).toBeTruthy();
+    });
+  });
+
   describe('matches', () => {
     it('passes when operand matches regexp', () => {
       expect(test('if @sender.login matches "ke+"')).toBeTruthy();
@@ -50,6 +60,16 @@ describe('conditions', () => {
 
     it('fails when operand does not match regexp', () => {
       expect(test('if @issue.title matches "nope"')).toBeFalsy();
+    });
+  });
+
+  describe('does not match', () => {
+    it('fails when operand matches regexp', () => {
+      expect(test('if @sender.login does not match "ke+"')).toBeFalsy();
+    });
+
+    it('passes when operand does not match regexp', () => {
+      expect(test('if @issue.title does not match "nope"')).toBeTruthy();
     });
   });
 
@@ -70,6 +90,16 @@ describe('conditions', () => {
 
     it('fails if one operand is not truthy', () => {
       expect(test('if labeled(bug) and labeled(nope)')).toBeFalsy();
+    });
+  });
+
+  describe('not', () => {
+    it('passes if condition is not truthy', () => {
+      expect(test('if not labeled(something)')).toBeTruthy();
+    });
+
+    it('fails if condition is truthy', () => {
+      expect(test('if not labeled(bug)')).toBeFalsy();
     });
   });
 });

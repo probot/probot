@@ -81,14 +81,17 @@ if @issue.body contains "- [ ]"
 
 #### Operations
 
-Operator    | Description                   | Example
-------------|-------------------------------|-----------------------------------
-`is`        | equal                         | `@sender.login is "hubot"`
-`is not`    | not equal                     | `@sender.login is not "hubot"`
-`contains`  | string contains a substring   | `@issue.body contains "- [ ]"`
-`matches`   | matches a regular expression  | `@issue.title matches "^\[?WIP\]?"`
-`and`       | logical and                   | `labeled(bug) and @sender.login is "hubot"`
-`or`        | logical or                    | `labeled(bug) or labeled(defect)`
+Operator            | Description                         | Example
+--------------------|-------------------------------------|-----------------------------------
+`is`                | equal                               | `@sender.login is "hubot"`
+`is not`            | not equal                           | `@sender.login is not "hubot"`
+`contains`          | string contains a substring         | `@issue.body contains "- [ ]"`
+`does not contain`  | string does not contain a substring | `@issue.body does not contain "- [x]"`
+`matches`           | matches a regular expression        | `@issue.title matches "^\[?WIP\]?"`
+`does not match`    | does not match a regular expression | `@issue.title does not match "v\d+\.\d+"`
+`and`               | logical and                         | `labeled(bug) and @sender.login is "hubot"`
+`or`                | logical or                          | `labeled(bug) or labeled(defect)`
+`not`               | negate a condition                  | `not labeled(bug)`
 
 #### Functions
 

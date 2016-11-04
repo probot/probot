@@ -25,7 +25,7 @@ describe('action.assign', () => {
   });
 
   it('assigns multiple users', () => {
-    action(context, ['hello', 'world']);
+    action(context, 'hello', 'world');
     expect(github.issues.addAssigneesToIssue).toHaveBeenCalledWith({
       owner: 'bkeepers-inc',
       repo: 'test',

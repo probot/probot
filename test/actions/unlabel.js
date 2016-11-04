@@ -24,7 +24,7 @@ describe('action.unlabel', () => {
   });
 
   it('removes a multiple labels', () => {
-    action(context, ['hello', 'goodbye']);
+    action(context, 'hello', 'goodbye');
     expect(github.issues.removeLabel).toHaveBeenCalledWith({
       owner: 'bkeepers-inc',
       repo: 'test',

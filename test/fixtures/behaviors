@@ -16,3 +16,14 @@ then comment("No bots allowed!") and close;
 on issues.opened if @sender.login is "bkeepers" then close;
 on issues.opened if @sender.login is not "bkeepers" then close;
 on issues.opened if @issue.body contains "- [ ]" then label(wip);
+
+on issues.opened
+if not labeled(bug)
+then close;
+
+on issues.opened
+if @issue.body does not match "### Prerequisites.*### Description.*### Steps to Reproduce.*### Versions"
+  or @issue.body.body contains "- [ ]"
+then
+  label("insufficient-info")
+  and close;

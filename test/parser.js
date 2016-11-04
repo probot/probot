@@ -127,6 +127,16 @@ describe('parser', () => {
       });
     });
 
+    describe('not', () => {
+      it('negates conditions', () => {
+        expect(parse('if not labeled(bug)')).toEqual({
+          type: 'UnaryExpression',
+          operator: 'not',
+          argument: {type: 'condition', name: 'labeled', value: 'bug'}
+        });
+      });
+    });
+
     describe('precedence', () => {
       it('orders "and" over "or"', () => {
         expect(parse('if true and false or true')).toEqual({

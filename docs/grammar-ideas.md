@@ -33,7 +33,7 @@ description = non-white-space-char, [ { any-char }, non-white-space-char ] ;
 action-statement = white-space, { any-char }, end-of-line ;
 
 # Behavior blocks
-behavior-block = behavior-title, [ schedule ], given-statement, when-list, then-list ;
+behavior-block = behavior-title, [ schedule ], given-statement, [ when-list ], then-list ;
 
 schedule = "every", white-space, interval, end-of-line ;
 
@@ -47,7 +47,7 @@ behavior-title = "Behavior:", op-white-space, description, end-of-line ;
 
 given-statement = white-space, "given", white-space, description, end-of-line ;
 
-when-list = [ when-statement, { when-statement | or-statement }] ;
+when-list = when-statement, { when-statement | or-statement } ;
 
 then-list = then-statement, { then-statement } ;
 

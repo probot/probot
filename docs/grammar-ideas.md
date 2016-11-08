@@ -6,6 +6,8 @@ The grammar's design is based on [Gherkin](https://github.com/cucumber/cucumber/
 
 * A script consists of zero or more blocks
 * A block consists of a title and one or more statements
+    * A block's title is _not_ indented
+    * A block's statements _are_ indented
 * There are two types of blocks: action and behavior
 * Lines consisting only of whitespace are ignored
 

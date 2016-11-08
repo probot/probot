@@ -42,7 +42,11 @@ end-of-line = op-white-space, "\n" ;
 
 action-statement = white-space, { any-char }, end-of-line ;
 
-behavior-block = behavior-title, given-statement, when-list, then-list ;
+behavior-block = behavior-title, [ schedule ], given-statement, when-list, then-list ;
+
+schedule = "every", white-space, interval, end-of-line ;
+
+interval = "hour" | "day" | "week" | "month" | "year" ;
 
 behavior-title = "Behavior:", op-white-space, description, end-of-line ;
 

@@ -13,68 +13,91 @@ Here are some examples of interesting things you can do by combining these compo
     # all the information from the template and it will make it easier for us to
     # help you.
 
-    on issues.opened
-    if
-      payload.body !matches /### Prerequisites.*### Description.*### Steps to Reproduce.*### Versions/
-      or payload.body matches /- [ ]/
-    then
-      comment(from_file(".github/MISSING_ISSUE_TEMPLATE_AUTOREPLY.md")
-      and label("insufficient-info")
-      and close;
+    Behavior: Require use of issue template
+      given issues.opened
+      when @issue.body matches /### Prerequisites.*### Description.*### Steps to Reproduce.*### Versions/
+      or @issue.body contains "- [ ]"
+      then comment from https://github.com/atom/issue-triage/blob/master/.github/MISSING_ISSUE_TEMPLATE_AUTOREPLY.md
+      and label "insufficient-info"
+      and close
 
 ### Post welcome message for new contributors
 
-    on issues.opened or pull_request.opened
-    if first_time_contributor # plugins could implement conditions like this
-    then comment(file(".github/NEW_CONTRIBUTOR_TEMPLATE.md"));
+    Behavior: Post welcome message for new contributors
+      given issues.opened
+      or pull_request.opened
+      when first time contributor
+      then comment from https://github.com/atom/issue-triage/blob/master/.github/MISSING_ISSUE_TEMPLATE_AUTOREPLY.md;\
 
 ### Auto-close new pull requests
 
-    on pull_request.opened
-    then comment("Sorry @{{ user.login }}, pull requests are not accepted on this repository.")
-    and close;
+    Behavior: Auto-close new pull requests
+      given pull_request.opened
+      then comment with "Sorry @{{ user.login }}, pull requests are not accepted on this repository."
+      and close
 
 ### Close issues with no body
 
-    on issues.opened
-    if @issue.body matches /^$/
-    then comment("Hey @{{ user.login }}, you didn't include a description of the problem, so we're closing this issue.");
+    Behavior: Close issues with no body
+      given issues.opened
+      when payload issue.body matches /^$/
+      then comment with "Hey @{{ user.login }}, you didn't include a description of the problem, so we're closing this issue."
 
 ### @mention watchers when label added
 
-    on *.labeled then
-    # TODO: figure out syntax for loading watchers from file
-    comment("Hey {{ mentions }}, you wanted to know when the `{{ payload.label.name }}` label was added.");
+    Behavior: Close issues with no body
+      given *.labeled
+      # TODO: figure out syntax for loading watchers from file
+      then comment with "Hey {{ mentions }}, you wanted to know when the `{{ payload.label.name }}` label was added."
 
 ### Assign a reviewer for new bugs
 
-    on pull_request.labeled
-    if labeled(bug)
-    then assign(random(file(OWNERS)));
+    Behavior: Assign a reviewer for new bugs
+      given pull_request.labeled
+      when labeled "bug"
+      then assign random from "OWNERS"
 
 ### Perform actions based on content of comments
 
-    on issue_comment.opened
-    if @issue.body matches /^@probot assign @(\w+)$/
-    then assign({{ matches[0] }})
+    Behavior: assign mentioned
+      given issue_comment.opened
+      when @issue.body matches /^@probot assign @(\w+)$/
+      then assign "{{ matches[0] }}"
 
-    on issue_comment.opened
-    if @issue.body matches /^@probot label @(\w+)$/
-    then label($1)
+    Behavior: assign mentioned
+      given issue_comment.opened
+      when @issue.body matches /^@probot label @(\w+)$/
+      then label "{{ matches[0]}}"
 
 ### Close stale issues and pull requests
 
-    on *.labeled
-    if labeled("needs-work") and state("open")
-    then delay(7 days) and close
+    Behavior: Close stale pull requests
+      every day
+      given open pull requests
+      when labeled "needs-work"
+      and last active more than 7 days ago
+      then comment from ".github/STALE_PULL_REQUEST_TEMPLATE.md"
+      and close
+
+    Behavior: Close stale issues
+      every day
+      given open issues
+      and last active more than 2 months ago
+      then comment from ".github/STALE_ISSUE_TEMPLATE.md"
+      and close
 
 ### Tweet when a new release is created
 
-    on release.published
-    then tweet("Get it while it's hot! {{ repository.name }} {{ release.name }} was just released! {{ release.html_url }}")
+    Behavior: Tweet when a new release is created
+      given release.published
+      then tweet with "Get it while it's hot! {{ repository.name }} {{ release.name }} was just released! {{ release.html_url }}"
 
 ### Assign a reviewer issues or pull requests with a label
 
-    on issues.opened and pull_request.opened and issues.labeled and pull_request.labeled
-    if labeled(security)
-    then assign(random(members(security-first-responders));
+    Behavior: Assign a reviewer issues or pull requests with a label
+      given issues.opened
+      or pull_request.opened
+      or issues.labeled
+      or pull_request.labeled
+      if labeled "security"
+      then assign random from @github/security-first-responders

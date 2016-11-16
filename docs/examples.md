@@ -6,75 +6,96 @@ Here are some examples of interesting things you can do by combining these compo
 
 ### Require use of issue template
 
-    # .github/MISSING_ISSUE_TEMPLATE_AUTOREPLY.md
-    #
-    # Hey @{{ sender.login }}, thanks for opening an issue. Unfortunately, you
-    # are missing information from the issue template. Please open a new issue with
-    # all the information from the template and it will make it easier for us to
-    # help you.
+```js
+// .github/MISSING_ISSUE_TEMPLATE_AUTOREPLY.md
+//
+// Hey @{{ sender.login }}, thanks for opening an issue. Unfortunately, you
+// are missing information from the issue template. Please open a new issue with
+// all the information from the template and it will make it easier for us to
+// help you.
 
-    on issues.opened
-    if
-      payload.body !matches /### Prerequisites.*### Description.*### Steps to Reproduce.*### Versions/
-      or payload.body matches /- [ ]/
-    then
-      comment(from_file(".github/MISSING_ISSUE_TEMPLATE_AUTOREPLY.md")
-      and label("insufficient-info")
-      and close;
+on("issues.opened")
+  .filter(() => {
+      return !this.issue.body.match(/### Steps to Reproduce/)
+       || this.issue.body.includes("- [ ]")
+    })
+  .comment.contents(".github/MISSING_ISSUE_TEMPLATE_AUTOREPLY.md")
+  .label("insufficient-info")
+  .close();
+```
 
 ### Post welcome message for new contributors
 
-    on issues.opened or pull_request.opened
-    if first_time_contributor # plugins could implement conditions like this
-    then comment(file(".github/NEW_CONTRIBUTOR_TEMPLATE.md"));
+```js
+on("issues.opened", "pull_request.opened")
+  .filter.firstTimeContributor() // plugins could implement conditions like this
+  .comment.contents(".github/NEW_CONTRIBUTOR_TEMPLATE.md");
+```
 
 ### Auto-close new pull requests
 
-    on pull_request.opened
-    then comment("Sorry @{{ user.login }}, pull requests are not accepted on this repository.")
-    and close;
+```js
+on("pull_request.opened")
+  .comment("Sorry @{{ user.login }}, pull requests are not accepted on this repository.")
+  .close();
+```
 
 ### Close issues with no body
 
-    on issues.opened
-    if @issue.body matches /^$/
-    then comment("Hey @{{ user.login }}, you didn't include a description of the problem, so we're closing this issue.");
+```js
+on("issues.opened")
+  .filter(() => this.issue.body.match(/^$/))
+  .comment("Hey @{{ user.login }}, you didn't include a description of the problem, so we're closing this issue.");
+```
 
 ### @mention watchers when label added
 
-    on *.labeled then
-    # TODO: figure out syntax for loading watchers from file
-    comment("Hey {{ mentions }}, you wanted to know when the `{{ payload.label.name }}` label was added.");
+```js
+on("*.labeled")
+  // TODO: figure out syntax for loading watchers from file
+  .comment("Hey {{ mentions }}, you wanted to know when the `{{ payload.label.name }}` label was added.");
+```
 
 ### Assign a reviewer for new bugs
 
-    on pull_request.labeled
-    if labeled(bug)
-    then assign(random(file(OWNERS)));
+```js
+on("pull_request.labeled")
+  .filter(() => this.labeled(bug))
+  .assign(random(file(OWNERS)));
+```
 
 ### Perform actions based on content of comments
 
-    on issue_comment.opened
-    if @issue.body matches /^@probot assign @(\w+)$/
-    then assign({{ matches[0] }})
+```js
+on("issue_comment.opened")
+  .filter(() => this.issue.body.match(/^@probot assign @(\w+)$/))
+  .assign({{ matches[0] }});
 
-    on issue_comment.opened
-    if @issue.body matches /^@probot label @(\w+)$/
-    then label($1)
+on("issue_comment.opened")
+  .filter(() => this.issue.body.match(/^@probot label @(\w+)$/))
+  .label($1);
+```
 
 ### Close stale issues and pull requests
 
-    on *.labeled
-    if labeled("needs-work") and state("open")
-    then delay(7 days) and close
+```js
+every("day")
+  .find.issues({state: "open", label: "needs-work"})
+  .filter.lastActive(7, "days")
+  .close();
+```
 
 ### Tweet when a new release is created
 
-    on release.published
-    then tweet("Get it while it's hot! {{ repository.name }} {{ release.name }} was just released! {{ release.html_url }}")
+```js
+on("release.published")
+  .tweet("Get it while it's hot! {{ repository.name }} {{ release.name }} was just released! {{ release.html_url }}");
+```
 
 ### Assign a reviewer issues or pull requests with a label
 
-    on issues.opened and pull_request.opened and issues.labeled and pull_request.labeled
-    if labeled(security)
-    then assign(random(members(security-first-responders));
+```js
+on("issues.opened", "pull_request.opened", "issues.labeled", "pull_request.labeled")
+  .filter.labeled("security")
+  .assign(team("security-first-responders").random());
+```

@@ -22,7 +22,7 @@ describe('dispatch', () => {
 
   describe('reply to new issue with a comment', () => {
     it('posts a coment', () => {
-      const config = Configuration.parse('on issues then comment("Hello World!");');
+      const config = Configuration.parse('workflows.push(on("issues").comment("Hello World!"))')
       return dispatcher.call(config).then(() => {
         expect(github.issues.createComment).toHaveBeenCalled();
       });
@@ -31,7 +31,7 @@ describe('dispatch', () => {
 
   describe('reply to new issue with a comment', () => {
     it('calls the action', () => {
-      const config = Configuration.parse('on issues.created then comment("Hello World!");');
+      const config = Configuration.parse('workflows.push(on("issues.created").comment("Hello World!"))')
 
       return dispatcher.call(config).then(() => {
         expect(github.issues.createComment).toHaveBeenCalled();
@@ -41,7 +41,7 @@ describe('dispatch', () => {
 
   describe('on an event with a different action', () => {
     it('does not perform behavior', () => {
-      const config = Configuration.parse('on issues.labeled then comment("Hello World!");');
+      const config = Configuration.parse('workflows.push(on("issues.labeled").comment("Hello World!"))')
 
       return dispatcher.call(config).then(() => {
         expect(github.issues.createComment).toNotHaveBeenCalled();
@@ -49,7 +49,7 @@ describe('dispatch', () => {
     });
   });
 
-  describe('conditions', () => {
+  describe('filter', () => {
     beforeEach(() => {
       const labeled = require('./fixtures/webhook/issues.labeled.json');
 
@@ -58,20 +58,15 @@ describe('dispatch', () => {
       dispatcher = new Dispatcher(github, event);
     });
 
-    it('fails for unknown conditions', () => {
-      const config = Configuration.parse(`on issues.labeled if failwhale(bug) then close;`);
-      expect(() => dispatcher.call(config)).toThrow(/unknown condition/i);
-    });
-
     it('calls action when condition matches', () => {
-      const config = Configuration.parse(`on issues.labeled if labeled(bug) then close;`);
+      const config = Configuration.parse('workflows.push(on("issues.labeled").filter((e) => e.payload.label.name == "bug").close())')
       return dispatcher.call(config).then(() => {
         expect(github.issues.edit).toHaveBeenCalled();
       });
     });
 
     it('does not call action when conditions do not match', () => {
-      const config = Configuration.parse(`on issues.labeled if labeled(foobar) then close;`);
+      const config = Configuration.parse('workflows.push(on("issues.labeled").filter((e) => e.payload.label.name == "foobar").close())')
       return dispatcher.call(config).then(() => {
         expect(github.issues.edit).toNotHaveBeenCalled();
       });

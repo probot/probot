@@ -26,29 +26,29 @@ describe('Configuration', () => {
           path: '.probot'
         });
 
-        expect(config.behaviors.length).toEqual(2);
+        expect(config.workflows.length).toEqual(2);
 
         done();
       });
     });
   });
 
-  describe('behaviorsFor', () => {
+  describe('workflowsFor', () => {
     const config = Configuration.parse(`
-      on issues then label(active);
-      on issues.created then close;
-      on pull_request.labeled then lock;
+      workflows.push(on("issues").label("active"));
+      workflows.push(on("issues.created").close());
+      workflows.push(on("pull_request.labeled").lock());
     `);
 
     it('returns behaviors for event', () => {
       expect(
-        config.behaviorsFor({event: 'issues', payload: {}}).length
+        config.workflowsFor({event: 'issues', payload: {}}).length
       ).toEqual(1);
     });
 
     it('returns behaviors for event and action', () => {
       expect(
-        config.behaviorsFor({event: 'issues', payload: {action: 'created'}}).length
+        config.workflowsFor({event: 'issues', payload: {action: 'created'}}).length
       ).toEqual(2);
     });
   });

@@ -14,6 +14,7 @@ const github = {
     createComment: createSpy(),
     addAssigneesToIssue: createSpy(),
     removeAssigneesFromIssue: createSpy(),
+    removeLabel: createSpy(),
   }
 };
 const context = new Context(github, {}, {payload});
@@ -59,6 +60,37 @@ describe('issues plugin', () => {
         repo: 'test',
         number: 6,
         body: ['hello', 'world']
+      });
+    });
+
+    it('removes a single label', () => {
+      w.unlabel('hello');
+
+      Promise.all(evaluator.evaluate(w, context));
+      expect(github.issues.removeLabel).toHaveBeenCalledWith({
+        owner: 'bkeepers-inc',
+        repo: 'test',
+        number: 6,
+        name: 'hello'
+      });
+    });
+
+    it('removes a multiple labels', () => {
+      w.unlabel('hello', 'goodbye');
+
+      Promise.all(evaluator.evaluate(w, context));
+      expect(github.issues.removeLabel).toHaveBeenCalledWith({
+        owner: 'bkeepers-inc',
+        repo: 'test',
+        number: 6,
+        name: 'hello'
+      });
+
+      expect(github.issues.removeLabel).toHaveBeenCalledWith({
+        owner: 'bkeepers-inc',
+        repo: 'test',
+        number: 6,
+        name: 'goodbye'
       });
     });
   });

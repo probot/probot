@@ -12,6 +12,8 @@ const github = {
     edit: createSpy(),
     addLabels: createSpy(),
     createComment: createSpy(),
+    addAssigneesToIssue: createSpy(),
+    removeAssigneesFromIssue: createSpy(),
   }
 };
 const context = new Context(github, {}, {payload});
@@ -71,6 +73,56 @@ describe('issues plugin', () => {
         repo: 'test',
         number: 6,
         body: 'Hello world!'
+      });
+    });
+  });
+
+  describe('assignment', () => {
+    it('assigns a user', () => {
+      w.assign('bkeepers');
+
+      Promise.all(evaluator.evaluate(w, context));
+      expect(github.issues.addAssigneesToIssue).toHaveBeenCalledWith({
+        owner: 'bkeepers-inc',
+        repo: 'test',
+        number: 6,
+        assignees: ['bkeepers']
+      });
+    });
+
+    it('assigns multiple users', () => {
+      w.assign('hello', 'world');
+
+      Promise.all(evaluator.evaluate(w, context));
+      expect(github.issues.addAssigneesToIssue).toHaveBeenCalledWith({
+        owner: 'bkeepers-inc',
+        repo: 'test',
+        number: 6,
+        assignees: ['hello', 'world']
+      });
+    });
+
+    it('unassigns a user', () => {
+      w.unassign('bkeepers');
+
+      Promise.all(evaluator.evaluate(w, context));
+      expect(github.issues.removeAssigneesFromIssue).toHaveBeenCalledWith({
+        owner: 'bkeepers-inc',
+        repo: 'test',
+        number: 6,
+        body: {assignees: ['bkeepers']}
+      });
+    });
+
+    it('unassigns multiple users', () => {
+      w.unassign('hello', 'world');
+
+      Promise.all(evaluator.evaluate(w, context));
+      expect(github.issues.removeAssigneesFromIssue).toHaveBeenCalledWith({
+        owner: 'bkeepers-inc',
+        repo: 'test',
+        number: 6,
+        body: {assignees: ['hello', 'world']}
       });
     });
   });

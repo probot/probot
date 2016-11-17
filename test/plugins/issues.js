@@ -9,7 +9,7 @@ const createSpy = expect.createSpy;
 
 const github = {
   reactions: {
-    createForIssue: createSpy(),
+    createForIssue: createSpy()
   },
   issues: {
     lock: createSpy(),
@@ -19,65 +19,65 @@ const github = {
     createComment: createSpy(),
     addAssigneesToIssue: createSpy(),
     removeAssigneesFromIssue: createSpy(),
-    removeLabel: createSpy(),
+    removeLabel: createSpy()
   }
 };
 const context = new Context(github, {}, {payload});
 
 describe('issues plugin', () => {
-  before( () => {
+  before(() => {
     w = new workflow.Workflow();
     evaluator = new issues.Evaluator;
-  })
+  });
 
   describe('locking', () => {
     it('locks', () => {
-      w.lock()
+      w.lock();
 
       Promise.all(evaluator.evaluate(w, context));
       expect(github.issues.lock).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
-        number: 6,
+        number: 6
       });
     });
 
     it('unlocks', () => {
-      w.unlock()
+      w.unlock();
 
       Promise.all(evaluator.evaluate(w, context));
       expect(github.issues.unlock).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
-        number: 6,
+        number: 6
       });
     });
   });
 
   describe('state', () => {
     it('opens an issue', () => {
-      w.open()
+      w.open();
 
       Promise.all(evaluator.evaluate(w, context));
       expect(github.issues.edit).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
         number: 6,
-        state: 'open',
+        state: 'open'
       });
     });
     it('closes an issue', () => {
-      w.close()
+      w.close();
 
       Promise.all(evaluator.evaluate(w, context));
       expect(github.issues.edit).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
         number: 6,
-        state: 'closed',
+        state: 'closed'
       });
     });
-  })
+  });
 
   describe('labels', () => {
     it('adds a label', () => {
@@ -202,15 +202,15 @@ describe('issues plugin', () => {
 
   describe('reactions', () => {
     it('react', () => {
-      w.react("heart")
+      w.react('heart');
 
       Promise.all(evaluator.evaluate(w, context));
       expect(github.reactions.createForIssue).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
         number: 6,
-        content: 'heart',
+        content: 'heart'
       });
     });
   });
-})
+});

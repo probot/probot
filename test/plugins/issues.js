@@ -11,6 +11,7 @@ const github = {
   issues: {
     edit: createSpy(),
     addLabels: createSpy(),
+    createComment: createSpy(),
   }
 };
 const context = new Context(github, {}, {payload});
@@ -56,6 +57,20 @@ describe('issues plugin', () => {
         repo: 'test',
         number: 6,
         body: ['hello', 'world']
+      });
+    });
+  });
+
+  describe('comments', () => {
+    it('creates a comment', () => {
+      w.comment('Hello world!');
+
+      Promise.all(evaluator.evaluate(w, context));
+      expect(github.issues.createComment).toHaveBeenCalledWith({
+        owner: 'bkeepers-inc',
+        repo: 'test',
+        number: 6,
+        body: 'Hello world!'
       });
     });
   });

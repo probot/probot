@@ -10,6 +10,7 @@ const createSpy = expect.createSpy;
 const github = {
   issues: {
     lock: createSpy(),
+    unlock: createSpy(),
     edit: createSpy(),
     addLabels: createSpy(),
     createComment: createSpy(),
@@ -32,6 +33,17 @@ describe('issues plugin', () => {
 
       Promise.all(evaluator.evaluate(w, context));
       expect(github.issues.lock).toHaveBeenCalledWith({
+        owner: 'bkeepers-inc',
+        repo: 'test',
+        number: 6,
+      });
+    });
+
+    it('unlocks', () => {
+      w.unlock()
+
+      Promise.all(evaluator.evaluate(w, context));
+      expect(github.issues.unlock).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
         number: 6,

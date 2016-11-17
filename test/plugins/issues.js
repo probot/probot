@@ -24,7 +24,18 @@ describe('issues plugin', () => {
     w = new workflow.Workflow();
     evaluator = new issues.Evaluator;
   })
-  describe('closing', () => {
+  describe('state', () => {
+    it('opens an issue', () => {
+      w.open()
+
+      Promise.all(evaluator.evaluate(w, context));
+      expect(github.issues.edit).toHaveBeenCalledWith({
+        owner: 'bkeepers-inc',
+        repo: 'test',
+        number: 6,
+        state: 'open',
+      });
+    });
     it('closes an issue', () => {
       w.close()
 

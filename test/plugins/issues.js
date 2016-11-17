@@ -1,7 +1,6 @@
 const expect = require('expect');
 const issues = require('../../lib/plugins/issues');
 const workflow = require('../../lib/workflow');
-const dispatcher = require('../../lib/dispatcher');
 const Context = require('../../lib/context');
 const payload = require('../fixtures/webhook/comment.created.json');
 
@@ -26,15 +25,15 @@ const context = new Context(github, {}, {payload});
 
 describe('issues plugin', () => {
   before(() => {
-    w = new workflow.Workflow();
-    evaluator = new issues.Evaluator;
+    this.w = new workflow.Workflow();
+    this.evaluator = new issues.Evaluator();
   });
 
   describe('locking', () => {
     it('locks', () => {
-      w.lock();
+      this.w.lock();
 
-      Promise.all(evaluator.evaluate(w, context));
+      Promise.all(this.evaluator.evaluate(this.w, context));
       expect(github.issues.lock).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
@@ -43,9 +42,9 @@ describe('issues plugin', () => {
     });
 
     it('unlocks', () => {
-      w.unlock();
+      this.w.unlock();
 
-      Promise.all(evaluator.evaluate(w, context));
+      Promise.all(this.evaluator.evaluate(this.w, context));
       expect(github.issues.unlock).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
@@ -56,9 +55,9 @@ describe('issues plugin', () => {
 
   describe('state', () => {
     it('opens an issue', () => {
-      w.open();
+      this.w.open();
 
-      Promise.all(evaluator.evaluate(w, context));
+      Promise.all(this.evaluator.evaluate(this.w, context));
       expect(github.issues.edit).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
@@ -67,9 +66,9 @@ describe('issues plugin', () => {
       });
     });
     it('closes an issue', () => {
-      w.close();
+      this.w.close();
 
-      Promise.all(evaluator.evaluate(w, context));
+      Promise.all(this.evaluator.evaluate(this.w, context));
       expect(github.issues.edit).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
@@ -81,9 +80,9 @@ describe('issues plugin', () => {
 
   describe('labels', () => {
     it('adds a label', () => {
-      w.label('hello');
+      this.w.label('hello');
 
-      Promise.all(evaluator.evaluate(w, context));
+      Promise.all(this.evaluator.evaluate(this.w, context));
       expect(github.issues.addLabels).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
@@ -93,9 +92,9 @@ describe('issues plugin', () => {
     });
 
     it('adds multiple labels', () => {
-      w.label('hello', 'world');
+      this.w.label('hello', 'world');
 
-      Promise.all(evaluator.evaluate(w, context));
+      Promise.all(this.evaluator.evaluate(this.w, context));
       expect(github.issues.addLabels).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
@@ -105,9 +104,9 @@ describe('issues plugin', () => {
     });
 
     it('removes a single label', () => {
-      w.unlabel('hello');
+      this.w.unlabel('hello');
 
-      Promise.all(evaluator.evaluate(w, context));
+      Promise.all(this.evaluator.evaluate(this.w, context));
       expect(github.issues.removeLabel).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
@@ -117,9 +116,9 @@ describe('issues plugin', () => {
     });
 
     it('removes a multiple labels', () => {
-      w.unlabel('hello', 'goodbye');
+      this.w.unlabel('hello', 'goodbye');
 
-      Promise.all(evaluator.evaluate(w, context));
+      Promise.all(this.evaluator.evaluate(this.w, context));
       expect(github.issues.removeLabel).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
@@ -138,9 +137,9 @@ describe('issues plugin', () => {
 
   describe('comments', () => {
     it('creates a comment', () => {
-      w.comment('Hello world!');
+      this.w.comment('Hello world!');
 
-      Promise.all(evaluator.evaluate(w, context));
+      Promise.all(this.evaluator.evaluate(this.w, context));
       expect(github.issues.createComment).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
@@ -152,9 +151,9 @@ describe('issues plugin', () => {
 
   describe('assignment', () => {
     it('assigns a user', () => {
-      w.assign('bkeepers');
+      this.w.assign('bkeepers');
 
-      Promise.all(evaluator.evaluate(w, context));
+      Promise.all(this.evaluator.evaluate(this.w, context));
       expect(github.issues.addAssigneesToIssue).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
@@ -164,9 +163,9 @@ describe('issues plugin', () => {
     });
 
     it('assigns multiple users', () => {
-      w.assign('hello', 'world');
+      this.w.assign('hello', 'world');
 
-      Promise.all(evaluator.evaluate(w, context));
+      Promise.all(this.evaluator.evaluate(this.w, context));
       expect(github.issues.addAssigneesToIssue).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
@@ -176,9 +175,9 @@ describe('issues plugin', () => {
     });
 
     it('unassigns a user', () => {
-      w.unassign('bkeepers');
+      this.w.unassign('bkeepers');
 
-      Promise.all(evaluator.evaluate(w, context));
+      Promise.all(this.evaluator.evaluate(this.w, context));
       expect(github.issues.removeAssigneesFromIssue).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
@@ -188,9 +187,9 @@ describe('issues plugin', () => {
     });
 
     it('unassigns multiple users', () => {
-      w.unassign('hello', 'world');
+      this.w.unassign('hello', 'world');
 
-      Promise.all(evaluator.evaluate(w, context));
+      Promise.all(this.evaluator.evaluate(this.w, context));
       expect(github.issues.removeAssigneesFromIssue).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
@@ -202,9 +201,9 @@ describe('issues plugin', () => {
 
   describe('reactions', () => {
     it('react', () => {
-      w.react('heart');
+      this.w.react('heart');
 
-      Promise.all(evaluator.evaluate(w, context));
+      Promise.all(this.evaluator.evaluate(this.w, context));
       expect(github.reactions.createForIssue).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',

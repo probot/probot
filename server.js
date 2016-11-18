@@ -4,7 +4,6 @@ const process = require('process');
 const http = require('http');
 const createHandler = require('github-webhook-handler');
 const debug = require('debug')('PRobot');
-const GitHubApi = require('github');
 const Configuration = require('./lib/configuration');
 const Dispatcher = require('./lib/dispatcher');
 const installations = require('./lib/installations');
@@ -50,36 +49,5 @@ webhook.on('*', event => {
 process.on('unhandledRejection', reason => {
   console.error(reason);
 });
-
-const github = new GitHubApi({debug: false});
-
-github.authenticate({
-  type: 'oauth',
-  token: process.env.GITHUB_TOKEN
-});
-
-// Check for and accept any repository invitations
-function checkForInvites() {
-  debug('Checking for repository invites');
-  github.users.getRepoInvites({}).then(invites => {
-    invites.forEach(invite => {
-      debug('Accepting repository invite', invite.full_name);
-      github.users.acceptRepoInvite(invite);
-    });
-  });
-
-  debug('Checking for organization invites');
-  github.orgs.getOrganizationMemberships({state: 'pending'}).then(invites => {
-    invites.forEach(invite => {
-      debug('Accepting organization invite', invite.organization.login);
-      github.users.editOrganizationMembership({
-        org: invite.organization.login,
-        state: 'active'
-      });
-    });
-  });
-}
-checkForInvites();
-setInterval(checkForInvites, Number(process.env.INVITE_CHECK_INTERVAL || 60) * 1000);
 
 console.log('Listening on http://localhost:' + PORT);

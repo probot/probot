@@ -33,7 +33,7 @@ describe('Configuration', () => {
         expect(github.repos.getContent).toHaveBeenCalledWith({
           owner: 'bkeepers',
           repo: 'test',
-          path: '.probot'
+          path: '.probot.js'
         });
 
         expect(config.workflows.length).toEqual(2);

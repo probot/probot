@@ -1,6 +1,6 @@
 {
-  "name": ".probot",
-  "path": ".probot",
+  "name": ".probot.js",
+  "path": ".probot.js",
   "sha": "c0736435c3f35dc5702d5024ed00d399b99623af",
   "size": 127,
   "url": "https://api.github.com/repos/bkeepers-inc/test/contents/.probot?ref=master",

@@ -147,6 +147,18 @@ describe('issues plugin', () => {
         body: 'Hello world!'
       });
     });
+
+    it('evaluates templates with handlebars', () => {
+      this.w.comment('Hello @{{ sender.login }}!');
+
+      Promise.all(this.evaluator.evaluate(this.w, context));
+      expect(github.issues.createComment).toHaveBeenCalledWith({
+        owner: 'bkeepers-inc',
+        repo: 'test',
+        number: 6,
+        body: 'Hello @bkeepers!'
+      });
+    });
   });
 
   describe('assignment', () => {

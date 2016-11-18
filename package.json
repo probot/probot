@@ -13,22 +13,22 @@
     "debug": "2.2.0",
     "dotenv": "^2.0.0",
     "expect": "^1.20.2",
-    "github-webhook-handler": "^0.6.0",
     "github": "^5.2.0",
+    "github-webhook-handler": "^0.6.0",
     "handlebars": "^4.0.5",
-    "jsdoc": "^3.4.2",
     "jsonwebtoken": "^7.1.9"
   },
   "devDependencies": {
     "mocha": "^3.0.2",
-    "pegjs": "^0.10.0",
     "xo": "^0.16.0"
   },
   "xo": {
     "esnext": true,
     "space": true,
     "rules": {
-      "camelcase": 1
+      "camelcase": 1,
+      "no-else-return": 0,
+      "key-spacing": 0
     },
     "ignores": [],
     "envs": [

@@ -12,10 +12,15 @@ _**Heads up!** The [demo integration](https://github.com/integration/probot-demo
 
 0. Go to the **[demo integration](https://github.com/integration/probot-demo)**, click **Install**, and then select an organization.
 0. Add @probot as a collaborator with write access on your repository.
-0. Create a `.probot` file in your repository with the following contents. See [Configuration](docs/configuration.md) for more information on what behaviors can be built.
+0. Create a `.probot.js` file in your repository with the following contents. See [Configuration](docs/configuration.md) for more information on what behaviors can be built.
 
-        on issues.opened
-        then comment("Hello @{{ sender.login }}. Thanks for inviting me to your project. Read more about [all the things I can help you with][config]. I can't wait to get started!\\n[config]: https://github.com/bkeepers/PRobot/blob/master/docs/configuration.md");
+        on("issues.opened").comment(`
+          Hello @{{ sender.login }}. Thanks for inviting me to your project.
+          Read more about [all the things I can help you with][config]. I can't
+          wait to get started!
+
+          [config]: https://github.com/bkeepers/PRobot/blob/master/docs/configuration.md
+        `);
 
 0. Open a new issue. @probot should post a comment (you may need to refresh to see it).
 

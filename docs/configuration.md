@@ -1,27 +1,25 @@
 # Configuration
 
-_**Heads up!** This yaml-based configuration syntax is not great. Ideally it will be replaced by a [proper grammar](https://github.com/bkeepers/PRobot/issues/35)._
-
-Behaviors are configured in a file called `.probot` in your repository.
+Workflows are configured in a file called `.probot.js` in your repository.
 
 ```
-# Auto-respond to new issues and pull requests
-on issues.opened or pull_request.opened
-then comment("Thanks for your contribution! Expect a reply within 48 hours.")
-and label(triage);
+// Auto-respond to new issues and pull requests
+on('issues.opened', 'pull_request.opened')
+  .comment('Thanks for your contribution! Expect a reply within 48 hours.')
+  .label('triage');
 
-# Auto-close new pull requests
-on pull_request.opened
-then comment("Sorry @{{ user.login }}, pull requests are not accepted on this repository.")
-and close;
+// Auto-close new pull requests
+on('pull_request.opened')
+  .comment('Sorry @{{ user.login }}, pull requests are not accepted on this repository.')
+  .close();
 ```
 
-## `behaviors`
+## Workflows
 
-Behaviors are composed of:
+Workflows are composed of:
 
 - [`on`](#on) - webhook events to listen to
-- [`when`](#when) (optional) - conditions to determine if the actions should be performed.
+- [`filter`](#filter) (optional) - conditions to determine if the actions should be performed.
 - [`then`](#then) - actions to take in response to the event
 
 ### `on`
@@ -29,19 +27,19 @@ Behaviors are composed of:
 Specifies the type of GitHub [webhook event](https://developer.github.com/webhooks/#events) that this behavior applies to:
 
 ```
-on issues then…
+on('issues')
 ```
 
 You can also specify multiple events to trigger this behavior:
 
 ```
-on issues or pull_request then…
+on('issues', 'pull_request')
 ```
 
 Many events also have an `action` (e.g. `created` for the `issue` event), which can be referenced with dot notation:
 
 ```
-on issues.labeled or issues.unlabeled then…
+on('issues.labeled', 'issues.unlabeled')
 ```
 
 [Webhook events](https://developer.github.com/webhooks/#events) include:
@@ -71,20 +69,20 @@ on issues.labeled or issues.unlabeled then…
 
 TODO: document actions
 
-### `when`
+### `filter`
 
-Only preform the actions if theses conditions are met.
+Only preform the actions if the function returns `true`. The `event` is passed as an argument to the function and attributes of the [webhook payload](https://developer.github.com/webhooks/#events).
 
-_Heads up! There are not any `when` conditions implemented yet._
-
-### `then`
+```
+.filter(event => event.payload.issue.body.includes("- [ ]"))
+```
 
 #### `comment`
 
 Comments can be posted in response to any event performed on an Issue or Pull Request. Comments use [mustache](https://mustache.github.io/) for templates and can use any data from the event payload.
 
 ```
-… then comment("Hey @{{ user.login }}, thanks for the contribution!");
+.comment("Hey @{{ user.login }}, thanks for the contribution!");
 ```
 
 #### `close`
@@ -92,7 +90,7 @@ Comments can be posted in response to any event performed on an Issue or Pull Re
 Close an issue or pull request.
 
 ```
-… then close;
+.close();
 ```
 
 #### `open`
@@ -100,7 +98,7 @@ Close an issue or pull request.
 Reopen an issue or pull request.
 
 ```
-… then open;
+.open();
 ```
 
 #### `lock`
@@ -108,7 +106,7 @@ Reopen an issue or pull request.
 Lock conversation on an issue or pull request.
 
 ```
-… then lock;
+.lock();
 ```
 
 #### `unlock`
@@ -116,7 +114,7 @@ Lock conversation on an issue or pull request.
 Unlock conversation on an issue or pull request.
 
 ```
-… then unlock;
+.unlock();
 ```
 
 #### `label`
@@ -124,7 +122,7 @@ Unlock conversation on an issue or pull request.
 Add labels
 
 ```
-… then label(bug);
+.label('bug');
 ```
 
 #### `unlabel`
@@ -132,25 +130,25 @@ Add labels
 Add labels
 
 ```
-… then unlabel("needs-work") and label("waiting-for-review");
+.unlabel('needs-work').label('waiting-for-review');
 ```
 
 #### `assign`
 
 ```
-… then assign(hubot);
+.assign('hubot');
 ```
 
 #### `unassign`
 
 ```
-… then unassign(defunkt);
+.unassign('defunkt');
 ```
 
 #### `react`
 
 ```
-… then react(heart); # or +1, -1, laugh, confused, heart, hooray
+.react('heart'); # or +1, -1, laugh, confused, heart, hooray
 ```
 
 ---

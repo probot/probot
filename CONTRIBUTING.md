@@ -17,9 +17,9 @@ To test with a real GitHub repository, you'll need to create a test repository a
   - **Payload URL:** Use the full `*.ngrok.io`
   - **Secret:** `development`
   - **Which events would you like to trigger this webhook?:** Choose **Send me everything**.
-0. Create a `.probot` in your repo with:
+0. Create a `.probot.js` in your repo with:
 
-        on issues.opened then comment("Hello World! Your bot is working!");
+        on("issues.opened").comment("Hello World! Your bot is working!");
 
 0. Open a new issue. Your bot should post a comment (you may need to refresh to see it).
 
@@ -33,6 +33,8 @@ To test with a real GitHub repository, you'll need to create a test repository a
         });
 
 ## Adding an action
+
+_**TODO:** This is out of date and will be updated after plugin API is settled._
 
 [Actions](docs/configuration.md#then) are called when a webhook is delivered and any conditions are met. For example, this configuration in `.probot` calls two actions when a new issue is opened:
 
@@ -76,6 +78,8 @@ Note that `context.payload.toIssue()` will extract the `owner`, `repo`, and `num
 That's it! You now have everything you need to implement an action. If you're looking for ideas of new actions to add, check out this [tracking issue for unimplemented GitHub actions](https://github.com/bkeepers/PRobot/issues/21).
 
 ## Adding a condition
+
+_**TODO:** This is out of date and will be updated after plugin API is settled._
 
 [Conditions](docs/configuration.md#then) are called when a webhook is delivered and are used to determine if the actions should be called. For example, this configuration in `.probot` checks if an issue or pull request has a label before closing it:
 

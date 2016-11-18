@@ -4,6 +4,16 @@ const config = require('./fixtures/content/probot.json');
 
 const createSpy = expect.createSpy;
 
+config.content = new Buffer(`
+  on("issues.opened")
+    .comment("Hello World!")
+    .assign("bkeepers")
+    .react("heart");
+
+  on("issues.closed")
+    .unassign("bkeepers");
+`).toString('base64');
+
 describe('Configuration', () => {
   describe('load', () => {
     let github;
@@ -23,32 +33,32 @@ describe('Configuration', () => {
         expect(github.repos.getContent).toHaveBeenCalledWith({
           owner: 'bkeepers',
           repo: 'test',
-          path: '.probot'
+          path: '.probot.js'
         });
 
-        expect(config.behaviors.length).toEqual(2);
+        expect(config.workflows.length).toEqual(2);
 
         done();
       });
     });
   });
 
-  describe('behaviorsFor', () => {
+  describe('workflowsFor', () => {
     const config = Configuration.parse(`
-      on issues then label(active);
-      on issues.created then close;
-      on pull_request.labeled then lock;
+      on("issues").label("active");
+      on("issues.created").close();
+      on("pull_request.labeled").lock();
     `);
 
     it('returns behaviors for event', () => {
       expect(
-        config.behaviorsFor({event: 'issues', payload: {}}).length
+        config.workflowsFor({event: 'issues', payload: {}}).length
       ).toEqual(1);
     });
 
     it('returns behaviors for event and action', () => {
       expect(
-        config.behaviorsFor({event: 'issues', payload: {action: 'created'}}).length
+        config.workflowsFor({event: 'issues', payload: {action: 'created'}}).length
       ).toEqual(2);
     });
   });

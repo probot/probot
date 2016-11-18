@@ -14,52 +14,52 @@ Here are some examples of interesting things you can do by combining these compo
 // all the information from the template and it will make it easier for us to
 // help you.
 
-on("issues.opened")
+on('issues.opened')
   .filter((event) => {
       return !event.issue.body.match(/### Steps to Reproduce/)
-       || event.issue.body.includes("- [ ]")
+       || event.issue.body.includes('- [ ]')
     })
-  .comment.contents(".github/MISSING_ISSUE_TEMPLATE_AUTOREPLY.md")
-  .label("insufficient-info")
+  .comment.contents('.github/MISSING_ISSUE_TEMPLATE_AUTOREPLY.md')
+  .label('insufficient-info')
   .close();
 ```
 
 ### Post welcome message for new contributors
 
 ```js
-on("issues.opened", "pull_request.opened")
+on('issues.opened', 'pull_request.opened')
   .filter.firstTimeContributor() // plugins could implement conditions like this
-  .comment.contents(".github/NEW_CONTRIBUTOR_TEMPLATE.md");
+  .comment.contents('.github/NEW_CONTRIBUTOR_TEMPLATE.md');
 ```
 
 ### Auto-close new pull requests
 
 ```js
-on("pull_request.opened")
-  .comment("Sorry @{{ user.login }}, pull requests are not accepted on this repository.")
+on('pull_request.opened')
+  .comment('Sorry @{{ user.login }}, pull requests are not accepted on this repository.')
   .close();
 ```
 
 ### Close issues with no body
 
 ```js
-on("issues.opened")
+on('issues.opened')
   .filter((event) => event.issue.body.match(/^$/))
-  .comment("Hey @{{ user.login }}, you didn't include a description of the problem, so we're closing this issue.");
+  .comment('Hey @{{ user.login }}, you didn't include a description of the problem, so we're closing this issue.');
 ```
 
 ### @mention watchers when label added
 
 ```js
-on("*.labeled")
+on('*.labeled')
   // TODO: figure out syntax for loading watchers from file
-  .comment("Hey {{ mentions }}, you wanted to know when the `{{ payload.label.name }}` label was added.");
+  .comment('Hey {{ mentions }}, you wanted to know when the `{{ payload.label.name }}` label was added.');
 ```
 
 ### Assign a reviewer for new bugs
 
 ```js
-on("pull_request.labeled")
+on('pull_request.labeled')
   .filter((event) => event.labeled(bug))
   .assign(random(file(OWNERS)));
 ```
@@ -67,11 +67,11 @@ on("pull_request.labeled")
 ### Perform actions based on content of comments
 
 ```js
-on("issue_comment.opened")
+on('issue_comment.opened')
   .filter((event) => event.issue.body.match(/^@probot assign @(\w+)$/))
   .assign({{ matches[0] }});
 
-on("issue_comment.opened")
+on('issue_comment.opened')
   .filter((event) => event.issue.body.match(/^@probot label @(\w+)$/))
   .label($1);
 ```
@@ -79,23 +79,23 @@ on("issue_comment.opened")
 ### Close stale issues and pull requests
 
 ```js
-every("day")
-  .find.issues({state: "open", label: "needs-work"})
-  .filter.lastActive(7, "days")
+every('day')
+  .find.issues({state: 'open', label: 'needs-work'})
+  .filter.lastActive(7, 'days')
   .close();
 ```
 
 ### Tweet when a new release is created
 
 ```js
-on("release.published")
+on('release.published')
   .tweet("Get it while it's hot! {{ repository.name }} {{ release.name }} was just released! {{ release.html_url }}");
 ```
 
 ### Assign a reviewer issues or pull requests with a label
 
 ```js
-on("issues.opened", "pull_request.opened", "issues.labeled", "pull_request.labeled")
-  .filter.labeled("security")
-  .assign(team("security-first-responders").random());
+on('issues.opened', 'pull_request.opened', 'issues.labeled', 'pull_request.labeled')
+  .filter.labeled('security')
+  .assign(team('security-first-responders').random());
 ```

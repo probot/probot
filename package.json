@@ -14,11 +14,7 @@
     "expect": "^1.20.2",
     "github": "^5.2.0",
     "github-webhook-handler": "^0.6.0",
-    "handlebars": "^4.0.5",
-    "jsdoc": "^3.4.2",
-    "pegjs": "^0.10.0",
-    "pegjs-util": "^1.4.0",
-    "tree-walk": "^0.4.0"
+    "handlebars": "^4.0.5"
   },
   "devDependencies": {
     "mocha": "^3.0.2",

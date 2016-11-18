@@ -4,6 +4,16 @@ const config = require('./fixtures/content/probot.json');
 
 const createSpy = expect.createSpy;
 
+config.content = new Buffer(`
+  on("issues.opened")
+    .comment("Hello World!")
+    .assign("bkeepers")
+    .react("heart");
+
+  on("issues.closed")
+    .unassign("bkeepers");
+`).toString('base64');
+
 describe('Configuration', () => {
   describe('load', () => {
     let github;
@@ -35,9 +45,9 @@ describe('Configuration', () => {
 
   describe('workflowsFor', () => {
     const config = Configuration.parse(`
-      workflows.push(on("issues").label("active"));
-      workflows.push(on("issues.created").close());
-      workflows.push(on("pull_request.labeled").lock());
+      on("issues").label("active");
+      on("issues.created").close();
+      on("pull_request.labeled").lock();
     `);
 
     it('returns behaviors for event', () => {

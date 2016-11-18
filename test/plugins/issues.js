@@ -1,6 +1,6 @@
 const expect = require('expect');
 const issues = require('../../lib/plugins/issues');
-const workflow = require('../../lib/workflow');
+const Workflow = require('../../lib/workflow');
 const Context = require('../../lib/context');
 const payload = require('../fixtures/webhook/comment.created.json');
 
@@ -25,7 +25,7 @@ const context = new Context(github, {}, {payload});
 
 describe('issues plugin', () => {
   before(() => {
-    this.w = new workflow.Workflow();
+    this.w = new Workflow();
     this.evaluator = new issues.Evaluator();
   });
 

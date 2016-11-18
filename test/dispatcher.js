@@ -10,7 +10,7 @@ describe('dispatch', () => {
   let github;
 
   beforeEach(() => {
-    const event = {event: 'issues', payload};
+    const event = {event: 'issues', payload, issue: {}};
     github = {
       issues: {
         createComment: createSpy().andReturn(Promise.resolve()),
@@ -53,7 +53,7 @@ describe('dispatch', () => {
     beforeEach(() => {
       const labeled = require('./fixtures/webhook/issues.labeled.json');
 
-      const event = {event: 'issues', payload: labeled};
+      const event = {event: 'issues', payload: labeled, issue: {}};
 
       dispatcher = new Dispatcher(github, event);
     });

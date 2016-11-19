@@ -4,19 +4,12 @@ const process = require('process');
 const http = require('http');
 const createHandler = require('github-webhook-handler');
 const debug = require('debug')('PRobot');
-const Configuration = require('./lib/configuration');
-const Dispatcher = require('./lib/dispatcher');
-const installations = require('./lib/installations');
+const robot = require('./lib/robot');
 
 const PORT = process.env.PORT || 3000;
 const webhook = createHandler({path: '/', secret: process.env.WEBHOOK_SECRET || 'development'});
 
 debug('Starting');
-
-// Cache installations
-installations.load();
-// Listen for new installations
-installations.listen(webhook);
 
 http.createServer((req, res) => {
   webhook(req, res, err => {
@@ -31,19 +24,7 @@ http.createServer((req, res) => {
   });
 }).listen(PORT);
 
-webhook.on('*', event => {
-  debug('webhook', event);
-
-  if (event.payload.repository) {
-    const account = event.payload.repository.owner.login;
-    installations.auth(account).then(github => {
-      const dispatcher = new Dispatcher(github, event);
-      return Configuration.load(github, event.payload.repository).then(config => {
-        dispatcher.call(config);
-      });
-    });
-  }
-});
+robot.listen(webhook);
 
 // Show trace for any unhandled rejections
 process.on('unhandledRejection', reason => {

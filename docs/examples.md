@@ -24,6 +24,14 @@ on('issues.opened')
   .close();
 ```
 
+### Mention a team when a label is applied
+
+```js
+on('issues.labeled')
+  .filter(event => event.payload.label.name == 'plugins')
+  .comment('Hey @jekyll/plugins, the `plugins` label was added');
+```
+
 ### Post welcome message for new contributors
 
 ```js

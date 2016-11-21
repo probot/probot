@@ -7,8 +7,7 @@ const createSpy = expect.createSpy;
 config.content = new Buffer(`
   on("issues.opened")
     .comment("Hello World!")
-    .assign("bkeepers")
-    .react("heart");
+    .assign("bkeepers");
 
   on("issues.closed")
     .unassign("bkeepers");

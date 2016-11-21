@@ -1,0 +1,46 @@
+{
+  "action": "deleted",
+  "installation": {
+    "id": 1729,
+    "account": {
+      "login": "bkeepers-inc",
+      "id": 11724939,
+      "avatar_url": "https://avatars.githubusercontent.com/u/11724939?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/bkeepers-inc",
+      "html_url": "https://github.com/bkeepers-inc",
+      "followers_url": "https://api.github.com/users/bkeepers-inc/followers",
+      "following_url": "https://api.github.com/users/bkeepers-inc/following{/other_user}",
+      "gists_url": "https://api.github.com/users/bkeepers-inc/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/bkeepers-inc/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/bkeepers-inc/subscriptions",
+      "organizations_url": "https://api.github.com/users/bkeepers-inc/orgs",
+      "repos_url": "https://api.github.com/users/bkeepers-inc/repos",
+      "events_url": "https://api.github.com/users/bkeepers-inc/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/bkeepers-inc/received_events",
+      "type": "Organization",
+      "site_admin": false
+    },
+    "access_tokens_url": "https://api.github.com/installations/1729/access_tokens",
+    "repositories_url": "https://api.github.com/installation/repositories"
+  },
+  "sender": {
+    "login": "bkeepers",
+    "id": 173,
+    "avatar_url": "https://avatars.githubusercontent.com/u/173?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/bkeepers",
+    "html_url": "https://github.com/bkeepers",
+    "followers_url": "https://api.github.com/users/bkeepers/followers",
+    "following_url": "https://api.github.com/users/bkeepers/following{/other_user}",
+    "gists_url": "https://api.github.com/users/bkeepers/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/bkeepers/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/bkeepers/subscriptions",
+    "organizations_url": "https://api.github.com/users/bkeepers/orgs",
+    "repos_url": "https://api.github.com/users/bkeepers/repos",
+    "events_url": "https://api.github.com/users/bkeepers/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/bkeepers/received_events",
+    "type": "User",
+    "site_admin": true
+  }
+}

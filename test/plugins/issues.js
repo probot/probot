@@ -1,36 +1,34 @@
 const expect = require('expect');
-const issues = require('../../lib/plugins/issues');
-const Workflow = require('../../lib/workflow');
+const Issues = require('../../lib/plugins/issues');
 const Context = require('../../lib/context');
 const payload = require('../fixtures/webhook/comment.created.json');
 
 const createSpy = expect.createSpy;
 
-const github = {
-  issues: {
-    lock: createSpy(),
-    unlock: createSpy(),
-    edit: createSpy(),
-    addLabels: createSpy(),
-    createComment: createSpy(),
-    addAssigneesToIssue: createSpy(),
-    removeAssigneesFromIssue: createSpy(),
-    removeLabel: createSpy()
-  }
-};
-const context = new Context(github, {}, {payload});
-
 describe('issues plugin', () => {
+  const github = {
+    issues: {
+      lock: createSpy().andReturn(Promise.resolve()),
+      unlock: createSpy().andReturn(Promise.resolve()),
+      edit: createSpy().andReturn(Promise.resolve()),
+      addLabels: createSpy().andReturn(Promise.resolve()),
+      createComment: createSpy().andReturn(Promise.resolve()),
+      addAssigneesToIssue: createSpy().andReturn(Promise.resolve()),
+      removeAssigneesFromIssue: createSpy().andReturn(Promise.resolve()),
+      removeLabel: createSpy().andReturn(Promise.resolve())
+    }
+  };
+
+  const context = new Context(github, {}, {payload});
+
   before(() => {
-    this.w = new Workflow();
-    this.evaluator = new issues.Evaluator();
+    this.issues = new Issues();
   });
 
   describe('locking', () => {
     it('locks', () => {
-      this.w.lock();
+      this.issues.lock(context);
 
-      Promise.all(this.evaluator.evaluate(this.w, context));
       expect(github.issues.lock).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
@@ -39,9 +37,8 @@ describe('issues plugin', () => {
     });
 
     it('unlocks', () => {
-      this.w.unlock();
+      this.issues.unlock(context);
 
-      Promise.all(this.evaluator.evaluate(this.w, context));
       expect(github.issues.unlock).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
@@ -52,9 +49,8 @@ describe('issues plugin', () => {
 
   describe('state', () => {
     it('opens an issue', () => {
-      this.w.open();
+      this.issues.open(context);
 
-      Promise.all(this.evaluator.evaluate(this.w, context));
       expect(github.issues.edit).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
@@ -63,9 +59,8 @@ describe('issues plugin', () => {
       });
     });
     it('closes an issue', () => {
-      this.w.close();
+      this.issues.close(context);
 
-      Promise.all(this.evaluator.evaluate(this.w, context));
       expect(github.issues.edit).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
@@ -77,9 +72,8 @@ describe('issues plugin', () => {
 
   describe('labels', () => {
     it('adds a label', () => {
-      this.w.label('hello');
+      this.issues.label(context, 'hello');
 
-      Promise.all(this.evaluator.evaluate(this.w, context));
       expect(github.issues.addLabels).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
@@ -89,9 +83,8 @@ describe('issues plugin', () => {
     });
 
     it('adds multiple labels', () => {
-      this.w.label('hello', 'world');
+      this.issues.label(context, 'hello', 'world');
 
-      Promise.all(this.evaluator.evaluate(this.w, context));
       expect(github.issues.addLabels).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
@@ -101,9 +94,8 @@ describe('issues plugin', () => {
     });
 
     it('removes a single label', () => {
-      this.w.unlabel('hello');
+      this.issues.unlabel(context, 'hello');
 
-      Promise.all(this.evaluator.evaluate(this.w, context));
       expect(github.issues.removeLabel).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
@@ -113,9 +105,8 @@ describe('issues plugin', () => {
     });
 
     it('removes a multiple labels', () => {
-      this.w.unlabel('hello', 'goodbye');
+      this.issues.unlabel(context, 'hello', 'goodbye');
 
-      Promise.all(this.evaluator.evaluate(this.w, context));
       expect(github.issues.removeLabel).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
@@ -134,9 +125,8 @@ describe('issues plugin', () => {
 
   describe('comments', () => {
     it('creates a comment', () => {
-      this.w.comment('Hello world!');
+      this.issues.comment(context, 'Hello world!');
 
-      Promise.all(this.evaluator.evaluate(this.w, context));
       expect(github.issues.createComment).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
@@ -146,9 +136,8 @@ describe('issues plugin', () => {
     });
 
     it('evaluates templates with handlebars', () => {
-      this.w.comment('Hello @{{ sender.login }}!');
+      this.issues.comment(context, 'Hello @{{ sender.login }}!');
 
-      Promise.all(this.evaluator.evaluate(this.w, context));
       expect(github.issues.createComment).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
@@ -160,9 +149,8 @@ describe('issues plugin', () => {
 
   describe('assignment', () => {
     it('assigns a user', () => {
-      this.w.assign('bkeepers');
+      this.issues.assign(context, 'bkeepers');
 
-      Promise.all(this.evaluator.evaluate(this.w, context));
       expect(github.issues.addAssigneesToIssue).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
@@ -172,9 +160,8 @@ describe('issues plugin', () => {
     });
 
     it('assigns multiple users', () => {
-      this.w.assign('hello', 'world');
+      this.issues.assign(context, 'hello', 'world');
 
-      Promise.all(this.evaluator.evaluate(this.w, context));
       expect(github.issues.addAssigneesToIssue).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
@@ -184,9 +171,8 @@ describe('issues plugin', () => {
     });
 
     it('unassigns a user', () => {
-      this.w.unassign('bkeepers');
+      this.issues.unassign(context, 'bkeepers');
 
-      Promise.all(this.evaluator.evaluate(this.w, context));
       expect(github.issues.removeAssigneesFromIssue).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
@@ -196,9 +182,8 @@ describe('issues plugin', () => {
     });
 
     it('unassigns multiple users', () => {
-      this.w.unassign('hello', 'world');
+      this.issues.unassign(context, 'hello', 'world');
 
-      Promise.all(this.evaluator.evaluate(this.w, context));
       expect(github.issues.removeAssigneesFromIssue).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',

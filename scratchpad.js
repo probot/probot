@@ -40,7 +40,7 @@ class Workflow {
     this.stack = [];
     this.api = {};
 
-    for(const plugin of PLUGINS) {
+    for (const plugin of PLUGINS) {
       // Get all the property names of the plugin
       for (const method of Object.getOwnPropertyNames(plugin.constructor.prototype)) {
         if (method !== 'constructor') {

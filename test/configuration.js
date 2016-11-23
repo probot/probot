@@ -41,24 +41,4 @@ describe('Configuration', () => {
       });
     });
   });
-
-  describe('workflowsFor', () => {
-    const config = Configuration.parse(`
-      on("issues").label("active");
-      on("issues.created").close();
-      on("pull_request.labeled").lock();
-    `);
-
-    it('returns behaviors for event', () => {
-      expect(
-        config.workflowsFor({event: 'issues', payload: {}}).length
-      ).toEqual(1);
-    });
-
-    it('returns behaviors for event and action', () => {
-      expect(
-        config.workflowsFor({event: 'issues', payload: {action: 'created'}}).length
-      ).toEqual(2);
-    });
-  });
 });

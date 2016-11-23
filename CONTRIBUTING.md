@@ -1,29 +1,37 @@
 # Contributing
 
-## Setup
+## Running Locally
 
-0. Clone the repo
-0. Make sure you have the latest version of [Node.js](https://nodejs.org/) to develop locally.
+0. Clone the repository with `git clone https://github.com/bkeepers/PRobot.git`
+0. Make sure you have a recent version of [Node.js](https://nodejs.org/) installed
 0. Run `$ script/bootstrap` to install all the project dependencies
-0. Until this gets built into a proper [Integration](https://developer.github.com/early-access/integrations/), the bot will need a valid GitHub API token to be able to do anything useful. Create a new [Personal access token](https://github.com/settings/tokens/new) and select the `repo` scope.
-0. Re-start the local server with the token by running: `$ GITHUB_TOKEN=xxx script/server` to run the server on http://localhost:3000
-0. Download [ngrok](https://ngrok.com/download) (`$ brew cask install ngrok` on a mac), which will expose a local server to the internet.
-0. With the server still running, open a new terminal tab and run `ngrok http 3000`, which should output something like `Forwarding http://4397efc6.ngrok.io -> localhost:3000`.
+0. Install [ngrok](https://ngrok.com/download) (`$ brew cask install ngrok` on a mac), which will expose the local server to the internet so GitHub can send webhooks
+0. Run `$ ngrok http 3000`, which should output something like `Forwarding https://4397efc6.ngrok.io -> localhost:3000`
+0. [Register an integration](https://developer.github.com/early-access/integrations/creating-an-integration/) on GitHub with:
+  - **Homepage URL**, **Callback URL**, and **Webhook URL**: The full ngrok url above. For example: `https://4397efc6.ngrok.io/`
+  - **Secret:** `development`
+  - **Permissions & events** needed will depend on how you use the bot, but for development it may be easiest to enable everything.
+0. Download the private key and move it to `private-key.pem` in the project directory
+0. Edit `.env` and fill in all the environment variables
+0. With `ngrok` still running, open another terminal and run `$ script/server` to start the server on http://localhost:3000
+
+Whenever you com back to work on the app after you've already had it running once, then you need to:
+
+0. Run `$ script/server`
+0. Run `$ ngrok http 3000`
+0. `ngrok` will use a different URL every time it is restarted, so you will have to go into the [settings for your Integration](https://github.com/settings/installations) and update all the URLs.
 
 ## Testing
-To test with a real GitHub repository, you'll need to create a test repository and configure a new webhook:
 
-0. Head over to the **Settings** page of your repository, and click on **Webhooks & services**. Then, click on **Add webhook**. Configure it with:
-  - **Payload URL:** Use the full `*.ngrok.io`
-  - **Secret:** `development`
-  - **Which events would you like to trigger this webhook?:** Choose **Send me everything**.
-0. Create a `.probot.js` in your repo with:
+To test with a real GitHub repository, you'll need to create a test repository and install the integration you created above:
 
+0. Open up the settings for your installation and click "Install"
+0. Create a `.probot.js` in your repository with:
         on("issues.opened").comment("Hello World! Your bot is working!");
-
 0. Open a new issue. Your bot should post a comment (you may need to refresh to see it).
 
 ## Debugging
+
 0. Always run `$ script/bootstrap` and restart the server if package.json has changed.
 0. To turn on verbose logging, start server by running ` $ DEBUG=Probot GITHUB_TOKEN=xxx script/server`
 0. To see what requests are going out, enable debugging mode for  GitHub client in `/server.js`:

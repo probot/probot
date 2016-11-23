@@ -7,9 +7,6 @@ const payload = require('../fixtures/webhook/comment.created.json');
 const createSpy = expect.createSpy;
 
 const github = {
-  reactions: {
-    createForIssue: createSpy()
-  },
   issues: {
     lock: createSpy(),
     unlock: createSpy(),
@@ -207,20 +204,6 @@ describe('issues plugin', () => {
         repo: 'test',
         number: 6,
         body: {assignees: ['hello', 'world']}
-      });
-    });
-  });
-
-  describe('reactions', () => {
-    it('react', () => {
-      this.w.react('heart');
-
-      Promise.all(this.evaluator.evaluate(this.w, context));
-      expect(github.reactions.createForIssue).toHaveBeenCalledWith({
-        owner: 'bkeepers-inc',
-        repo: 'test',
-        number: 6,
-        content: 'heart'
       });
     });
   });

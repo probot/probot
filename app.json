@@ -1,0 +1,18 @@
+{
+  "name": "PRobot",
+  "description": "a trainable robot that responds to activity on GitHub",
+  "keywords": ["PRobot", "node", "github"],
+  "repository": "https://github.com/bkeepers/PRobot",
+  "logo": "https://github.com/probot.png",
+  "env": {
+    "PRIVATE_KEY": {
+      "description": "the private key you downloaded when creating the GitHub Integration"
+    },
+    "INTEGRATION_ID": {
+      "description": "the ID of your GitHub Integration"
+    },
+    "WEBHOOK_SECRET": {
+      "description": "the secret configured for your GitHub Integration"
+    }
+  }
+}

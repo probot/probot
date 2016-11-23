@@ -145,12 +145,6 @@ Add labels
 .unassign('defunkt');
 ```
 
-#### `react`
-
-```
-.react('heart'); # or +1, -1, laugh, confused, heart, hooray
-```
-
 ---
 
 See [examples](examples.md) for ideas of behaviors you can implement by combining these configuration options.

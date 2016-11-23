@@ -11,7 +11,7 @@ class IssuesPlugin {
     // Methods that make network calls should return a promise
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        console.log("comment:", message, this.state, context);
+        console.log("comment:", message, {state: this.state, context});
         resolve();
       }, 1000);
     });
@@ -20,10 +20,14 @@ class IssuesPlugin {
   close(context) {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        console.log("close");
+        console.log("close", {context});
         resolve();
       }, 1000);
     });
+  }
+
+  fail(context) {
+    return Promise.reject("Rejecting a promise stops the chain");
   }
 }
 
@@ -49,8 +53,9 @@ class Workflow {
   }
 
   proxy(plugin, method) {
+    // This function is what gets exposed to the sandbox
     return (...args) => {
-      // When this method is called, push new function on the stack that
+      // Push new function on the stack that calls the plugin method with a context.
       this.stack.push((context) => {
         return plugin[method].call(plugin, context, ...args);
       });
@@ -60,18 +65,18 @@ class Workflow {
     }
   }
 
-  // Execute the stack for this workflow with the given context
   execute(context) {
+    // Reduce the stack to a chain of promises, each called with the given context
     this.stack.reduce((promise, func) => {
       return promise.then(func.bind(func, context));
-    }, Promise.resolve(context));
+    }, Promise.resolve());
   }
 }
 
 workflow = new Workflow();
 
 // workflow.api would be passed into a sandbox
-workflow.api.comment("Hello").close();
+workflow.api.comment("Hello").close().fail().comment("this won't get called");
 
 // Execute the workflow with the given context
-w.execute({name: 'Brandon'});
+workflow.execute({name: 'Brandon'});

@@ -8,14 +8,14 @@ const createSpy = expect.createSpy;
 describe('issues plugin', () => {
   const github = {
     issues: {
-      lock: createSpy().andReturn(Promise.resolve()),
-      unlock: createSpy().andReturn(Promise.resolve()),
-      edit: createSpy().andReturn(Promise.resolve()),
-      addLabels: createSpy().andReturn(Promise.resolve()),
-      createComment: createSpy().andReturn(Promise.resolve()),
-      addAssigneesToIssue: createSpy().andReturn(Promise.resolve()),
-      removeAssigneesFromIssue: createSpy().andReturn(Promise.resolve()),
-      removeLabel: createSpy().andReturn(Promise.resolve())
+      lock: createSpy(),
+      unlock: createSpy(),
+      edit: createSpy(),
+      addLabels: createSpy(),
+      createComment: createSpy(),
+      addAssigneesToIssue: createSpy(),
+      removeAssigneesFromIssue: createSpy(),
+      removeLabel: createSpy()
     }
   };
 

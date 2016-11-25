@@ -51,9 +51,9 @@ describe('dispatch', () => {
   });
 
   describe('every', () => {
-    it('posts a coment', () => {
+    it.skip('posts a coment', () => {
       const config = Configuration.parse(`
-        every("day").issues({labels: 'stale'}).close();
+        every('day').issues({labels: 'stale'}).close();
       `);
 
       return dispatcher.call(config).then(() => {

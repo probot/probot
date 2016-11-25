@@ -53,7 +53,7 @@ describe('dispatch', () => {
   describe('every', () => {
     it('posts a coment', () => {
       const config = Configuration.parse(`
-        every("day", find => find.issues({labels: 'stale'}).close());
+        every("day").issues({labels: 'stale'}).close();
       `);
 
       return dispatcher.call(config).then(() => {
@@ -61,8 +61,6 @@ describe('dispatch', () => {
       });
     });
   });
-
-
 
   describe('filter', () => {
     beforeEach(() => {

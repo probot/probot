@@ -14,7 +14,8 @@ describe('dispatch', () => {
     github = {
       issues: {
         createComment: createSpy().andReturn(Promise.resolve()),
-        edit: createSpy().andReturn(Promise.resolve())
+        edit: createSpy().andReturn(Promise.resolve()),
+        getAll: createSpy().andReturn(Promise.resolve())
       }
     };
     dispatcher = new Dispatcher(github, event);
@@ -45,6 +46,18 @@ describe('dispatch', () => {
 
       return dispatcher.call(config).then(() => {
         expect(github.issues.createComment).toNotHaveBeenCalled();
+      });
+    });
+  });
+
+  describe('every', () => {
+    it('posts a coment', () => {
+      const config = Configuration.parse(`
+        every("day").issues({labels: 'stale'}).close();
+      `);
+
+      return dispatcher.call(config).then(() => {
+        expect(github.issues.getAll).toHaveBeenCalled();
       });
     });
   });

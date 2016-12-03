@@ -1,10 +1,12 @@
 const expect = require('expect');
 const Configuration = require('../lib/configuration');
-const config = require('./fixtures/content/probot.json');
+const Context = require('../lib/context');
+const content = require('./fixtures/content/probot.json');
+const payload = require('./fixtures/webhook/comment.created');
 
 const createSpy = expect.createSpy;
 
-config.content = new Buffer(`
+content.content = new Buffer(`
   on("issues.opened")
     .comment("Hello World!")
     .assign("bkeepers");
@@ -14,30 +16,29 @@ config.content = new Buffer(`
 `).toString('base64');
 
 describe('Configuration', () => {
-  describe('load', () => {
+  describe('require', () => {
     let github;
-
-    const repo = JSON.parse('{"full_name": "bkeepers/test"}');
+    let context;
 
     beforeEach(() => {
       github = {
         repos: {
-          getContent: createSpy().andReturn(Promise.resolve(config))
+          getContent: createSpy().andReturn(Promise.resolve(content))
         }
       };
+      context = new Context(github, {payload});
     });
 
-    it('loads from the repo', done => {
-      Configuration.load(github, repo).then(config => {
+    it('loads from the repo', () => {
+      const config = new Configuration(context);
+      return config.require('.probot.js').then(() => {
         expect(github.repos.getContent).toHaveBeenCalledWith({
-          owner: 'bkeepers',
+          owner: 'bkeepers-inc',
           repo: 'test',
           path: '.probot.js'
         });
 
         expect(config.workflows.length).toEqual(2);
-
-        done();
       });
     });
   });

@@ -3,7 +3,6 @@ const Context = require('../lib/context');
 
 describe('Context', () => {
   const github = {};
-  const config = {};
   const event = {
     payload: {
       repository: {
@@ -13,7 +12,7 @@ describe('Context', () => {
       issue: {number: 4}
     }
   };
-  const context = new Context(github, config, event);
+  const context = new Context(github, event);
 
   describe('toRepo', () => {
     it('returns attributes from repository payload', () => {

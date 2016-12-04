@@ -1,12 +1,12 @@
 const expect = require('expect');
-const Dispatcher = require('../lib/dispatcher');
 const Configuration = require('../lib/configuration');
+const Context = require('../lib/context');
 const payload = require('./fixtures/webhook/comment.created.json');
 
 const createSpy = expect.createSpy;
 
 describe('dispatch', () => {
-  let dispatcher;
+  let context;
   let github;
 
   beforeEach(() => {
@@ -17,13 +17,14 @@ describe('dispatch', () => {
         edit: createSpy().andReturn(Promise.resolve())
       }
     };
-    dispatcher = new Dispatcher(github, event);
+
+    context = new Context(github, event);
   });
 
   describe('reply to new issue with a comment', () => {
     it('posts a coment', () => {
       const config = Configuration.parse('on("issues").comment("Hello World!")');
-      return dispatcher.call(config).then(() => {
+      return config.execute(context).then(() => {
         expect(github.issues.createComment).toHaveBeenCalled();
       });
     });
@@ -33,7 +34,7 @@ describe('dispatch', () => {
     it('calls the action', () => {
       const config = Configuration.parse('on("issues.created").comment("Hello World!")');
 
-      return dispatcher.call(config).then(() => {
+      return config.execute(context).then(() => {
         expect(github.issues.createComment).toHaveBeenCalled();
       });
     });
@@ -43,7 +44,7 @@ describe('dispatch', () => {
     it('does not perform behavior', () => {
       const config = Configuration.parse('on("issues.labeled").comment("Hello World!")');
 
-      return dispatcher.call(config).then(() => {
+      return config.execute(context).then(() => {
         expect(github.issues.createComment).toNotHaveBeenCalled();
       });
     });
@@ -54,20 +55,19 @@ describe('dispatch', () => {
       const labeled = require('./fixtures/webhook/issues.labeled.json');
 
       const event = {event: 'issues', payload: labeled, issue: {}};
-
-      dispatcher = new Dispatcher(github, event);
+      context = new Context(github, event);
     });
 
     it('calls action when condition matches', () => {
       const config = Configuration.parse('on("issues.labeled").filter((e) => e.payload.label.name == "bug").close()');
-      return dispatcher.call(config).then(() => {
+      return config.execute(context).then(() => {
         expect(github.issues.edit).toHaveBeenCalled();
       });
     });
 
     it('does not call action when conditions do not match', () => {
       const config = Configuration.parse('on("issues.labeled").filter((e) => e.payload.label.name == "foobar").close()');
-      return dispatcher.call(config).then(() => {
+      return config.execute(context).then(() => {
         expect(github.issues.edit).toNotHaveBeenCalled();
       });
     });

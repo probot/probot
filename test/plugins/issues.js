@@ -19,7 +19,7 @@ describe('issues plugin', () => {
     }
   };
 
-  const context = new Context(github, {}, {payload});
+  const context = new Context(github, {payload});
 
   before(() => {
     this.issues = new Issues();

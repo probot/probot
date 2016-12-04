@@ -77,7 +77,7 @@ Only preform the actions if the function returns `true`. The `event` is passed a
 .filter(event => event.payload.issue.body.includes("- [ ]"))
 ```
 
-#### `comment`
+### `comment`
 
 Comments can be posted in response to any event performed on an Issue or Pull Request. Comments use [mustache](https://mustache.github.io/) for templates and can use any data from the event payload.
 
@@ -85,7 +85,7 @@ Comments can be posted in response to any event performed on an Issue or Pull Re
 .comment("Hey @{{ user.login }}, thanks for the contribution!");
 ```
 
-#### `close`
+### `close`
 
 Close an issue or pull request.
 
@@ -93,7 +93,7 @@ Close an issue or pull request.
 .close();
 ```
 
-#### `open`
+### `open`
 
 Reopen an issue or pull request.
 
@@ -101,7 +101,7 @@ Reopen an issue or pull request.
 .open();
 ```
 
-#### `lock`
+### `lock`
 
 Lock conversation on an issue or pull request.
 
@@ -109,7 +109,7 @@ Lock conversation on an issue or pull request.
 .lock();
 ```
 
-#### `unlock`
+### `unlock`
 
 Unlock conversation on an issue or pull request.
 
@@ -117,7 +117,7 @@ Unlock conversation on an issue or pull request.
 .unlock();
 ```
 
-#### `label`
+### `label`
 
 Add labels
 
@@ -125,7 +125,7 @@ Add labels
 .label('bug');
 ```
 
-#### `unlabel`
+### `unlabel`
 
 Add labels
 
@@ -133,16 +133,31 @@ Add labels
 .unlabel('needs-work').label('waiting-for-review');
 ```
 
-#### `assign`
+### `assign`
 
 ```
 .assign('hubot');
 ```
 
-#### `unassign`
+### `unassign`
 
 ```
 .unassign('defunkt');
+```
+
+## include
+
+Loads a configuration from another file.
+
+```js
+include('.github/bot/issues.js');
+include('.github/bot/releases.js');
+```
+
+You can also include configuration from another repository.
+
+```js
+include('user/repo:path.js#branch');
 ```
 
 ---

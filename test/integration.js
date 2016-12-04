@@ -5,12 +5,12 @@ const payload = require('./fixtures/webhook/comment.created.json');
 
 const createSpy = expect.createSpy;
 
-describe('dispatch', () => {
+describe('integration', () => {
+  const event = {event: 'issues', payload, issue: {}};
   let context;
   let github;
 
   beforeEach(() => {
-    const event = {event: 'issues', payload, issue: {}};
     github = {
       issues: {
         createComment: createSpy().andReturn(Promise.resolve()),
@@ -21,9 +21,13 @@ describe('dispatch', () => {
     context = new Context(github, event);
   });
 
+  function configure(content) {
+    return new Configuration(context).parse(content);
+  }
+
   describe('reply to new issue with a comment', () => {
     it('posts a coment', () => {
-      const config = Configuration.parse('on("issues").comment("Hello World!")');
+      const config = configure('on("issues").comment("Hello World!")');
       return config.execute(context).then(() => {
         expect(github.issues.createComment).toHaveBeenCalled();
       });
@@ -32,7 +36,7 @@ describe('dispatch', () => {
 
   describe('reply to new issue with a comment', () => {
     it('calls the action', () => {
-      const config = Configuration.parse('on("issues.created").comment("Hello World!")');
+      const config = configure('on("issues.created").comment("Hello World!")');
 
       return config.execute(context).then(() => {
         expect(github.issues.createComment).toHaveBeenCalled();
@@ -42,7 +46,7 @@ describe('dispatch', () => {
 
   describe('on an event with a different action', () => {
     it('does not perform behavior', () => {
-      const config = Configuration.parse('on("issues.labeled").comment("Hello World!")');
+      const config = configure('on("issues.labeled").comment("Hello World!")');
 
       return config.execute(context).then(() => {
         expect(github.issues.createComment).toNotHaveBeenCalled();
@@ -59,16 +63,50 @@ describe('dispatch', () => {
     });
 
     it('calls action when condition matches', () => {
-      const config = Configuration.parse('on("issues.labeled").filter((e) => e.payload.label.name == "bug").close()');
+      const config = configure('on("issues.labeled").filter((e) => e.payload.label.name == "bug").close()');
       return config.execute(context).then(() => {
         expect(github.issues.edit).toHaveBeenCalled();
       });
     });
 
     it('does not call action when conditions do not match', () => {
-      const config = Configuration.parse('on("issues.labeled").filter((e) => e.payload.label.name == "foobar").close()');
+      const config = configure('on("issues.labeled").filter((e) => e.payload.label.name == "foobar").close()');
       return config.execute(context).then(() => {
         expect(github.issues.edit).toNotHaveBeenCalled();
+      });
+    });
+  });
+
+  describe('include', () => {
+    beforeEach(() => {
+      const content = require('./fixtures/content/probot.json');
+
+      content.content = new Buffer('on("issues").comment("Hello!");').toString('base64');
+
+      github = {
+        repos: {
+          getContent: createSpy().andReturn(Promise.resolve(content))
+        },
+        issues: {
+          createComment: createSpy()
+        }
+      };
+      context = new Context(github, event);
+    });
+
+    it('includes a file in the local repository', () => {
+      configure('include(".github/triage.js");');
+      expect(github.repos.getContent).toHaveBeenCalledWith({
+        owner: 'bkeepers-inc',
+        repo: 'test',
+        path: '.github/triage.js'
+      });
+    });
+
+    it('executes included rules', done => {
+      configure('include(".github/triage.js");').execute().then(() => {
+        expect(github.issues.createComment).toHaveBeenCalled();
+        done();
       });
     });
   });

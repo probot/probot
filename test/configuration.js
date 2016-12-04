@@ -1,10 +1,12 @@
 const expect = require('expect');
 const Configuration = require('../lib/configuration');
-const config = require('./fixtures/content/probot.json');
+const Context = require('../lib/context');
+const content = require('./fixtures/content/probot.json');
+const payload = require('./fixtures/webhook/comment.created');
 
 const createSpy = expect.createSpy;
 
-config.content = new Buffer(`
+content.content = new Buffer(`
   on("issues.opened")
     .comment("Hello World!")
     .assign("bkeepers");
@@ -14,30 +16,41 @@ config.content = new Buffer(`
 `).toString('base64');
 
 describe('Configuration', () => {
-  describe('load', () => {
+  describe('include', () => {
     let github;
-
-    const repo = JSON.parse('{"full_name": "bkeepers/test"}');
+    let context;
+    let config;
 
     beforeEach(() => {
       github = {
         repos: {
-          getContent: createSpy().andReturn(Promise.resolve(config))
+          getContent: createSpy().andReturn(Promise.resolve(content))
         }
       };
+      context = new Context(github, {payload});
+      config = new Configuration(context);
     });
 
-    it('loads from the repo', done => {
-      Configuration.load(github, repo).then(config => {
-        expect(github.repos.getContent).toHaveBeenCalledWith({
-          owner: 'bkeepers',
-          repo: 'test',
-          path: '.probot.js'
-        });
+    it('includes from the repo', () => {
+      config.include('foo.js');
+      expect(github.repos.getContent).toHaveBeenCalledWith({
+        owner: 'bkeepers-inc',
+        repo: 'test',
+        path: 'foo.js'
+      });
+    });
 
-        expect(config.workflows.length).toEqual(2);
+    it('returns undefined', () => {
+      expect(config.include('foo.js')).toBe(undefined);
+    });
 
-        done();
+    it('includes from another repository', () => {
+      config.include('atom/configs:foo.js#branch');
+      expect(github.repos.getContent).toHaveBeenCalledWith({
+        owner: 'atom',
+        repo: 'configs',
+        path: 'foo.js',
+        ref: 'branch'
       });
     });
   });

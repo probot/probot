@@ -145,6 +145,21 @@ Add labels
 .unassign('defunkt');
 ```
 
+## load
+
+Loads a configuration from another file.
+
+```js
+load('.github/bot/issues.js');
+load('.github/bot/releases.js');
+```
+
+You can also load configuration from another repository.
+
+```js
+load('user/repo:path.js#branch');
+```
+
 ---
 
 See [examples](examples.md) for ideas of behaviors you can implement by combining these configuration options.

@@ -16,9 +16,10 @@ content.content = new Buffer(`
 `).toString('base64');
 
 describe('Configuration', () => {
-  describe('require', () => {
+  describe('load', () => {
     let github;
     let context;
+    let config;
 
     beforeEach(() => {
       github = {
@@ -27,19 +28,20 @@ describe('Configuration', () => {
         }
       };
       context = new Context(github, {payload});
+      config = new Configuration(context);
     });
 
     it('loads from the repo', () => {
-      const config = new Configuration(context);
-      return config.require('.probot.js').then(() => {
-        expect(github.repos.getContent).toHaveBeenCalledWith({
-          owner: 'bkeepers-inc',
-          repo: 'test',
-          path: '.probot.js'
-        });
-
-        expect(config.workflows.length).toEqual(2);
+      config.load('foo.js');
+      expect(github.repos.getContent).toHaveBeenCalledWith({
+        owner: 'bkeepers-inc',
+        repo: 'test',
+        path: 'foo.js'
       });
+    });
+
+    it('returns undefined', () => {
+      expect(config.load('foo.js')).toBe(undefined);
     });
   });
 });

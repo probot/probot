@@ -6,11 +6,11 @@ const payload = require('./fixtures/webhook/comment.created.json');
 const createSpy = expect.createSpy;
 
 describe('integration', () => {
+  const event = {event: 'issues', payload, issue: {}};
   let context;
   let github;
 
   beforeEach(() => {
-    const event = {event: 'issues', payload, issue: {}};
     github = {
       issues: {
         createComment: createSpy().andReturn(Promise.resolve()),
@@ -73,6 +73,40 @@ describe('integration', () => {
       const config = configure('on("issues.labeled").filter((e) => e.payload.label.name == "foobar").close()');
       return config.execute(context).then(() => {
         expect(github.issues.edit).toNotHaveBeenCalled();
+      });
+    });
+  });
+
+  describe('load', () => {
+    beforeEach(() => {
+      const content = require('./fixtures/content/probot.json');
+
+      content.content = new Buffer('on("issues").comment("Hello!");').toString('base64');
+
+      github = {
+        repos: {
+          getContent: createSpy().andReturn(Promise.resolve(content))
+        },
+        issues: {
+          createComment: createSpy()
+        }
+      };
+      context = new Context(github, event);
+    });
+
+    it('loads a file in the local repository', () => {
+      configure('load(".github/triage.js");');
+      expect(github.repos.getContent).toHaveBeenCalledWith({
+        owner: 'bkeepers-inc',
+        repo: 'test',
+        path: '.github/triage.js'
+      });
+    });
+
+    it('executes loaded rules', done => {
+      configure('load(".github/triage.js");').execute().then(() => {
+        expect(github.issues.createComment).toHaveBeenCalled();
+        done();
       });
     });
   });

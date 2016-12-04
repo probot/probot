@@ -43,5 +43,15 @@ describe('Configuration', () => {
     it('returns undefined', () => {
       expect(config.load('foo.js')).toBe(undefined);
     });
+
+    it('loads from another repository', () => {
+      config.load('atom/configs:foo.js#branch');
+      expect(github.repos.getContent).toHaveBeenCalledWith({
+        owner: 'atom',
+        repo: 'configs',
+        path: 'foo.js',
+        ref: 'branch'
+      });
+    });
   });
 });

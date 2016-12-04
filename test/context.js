@@ -25,9 +25,9 @@ describe('Context', () => {
       });
     });
 
-    it('does not override repo attributes', () => {
+    it('overrides repo attributes', () => {
       expect(context.toRepo({owner: 'muahaha'})).toEqual({
-        owner: 'bkeepers', repo:'probot'
+        owner: 'muahaha', repo:'probot'
       });
     });
   });
@@ -43,9 +43,9 @@ describe('Context', () => {
       });
     });
 
-    it('does not override repo attributes', () => {
+    it('overrides repo attributes', () => {
       expect(context.toIssue({owner: 'muahaha', number: 5})).toEqual({
-        owner: 'bkeepers', repo:'probot', number: 4
+        owner: 'muahaha', repo:'probot', number: 5
       });
     });
   });

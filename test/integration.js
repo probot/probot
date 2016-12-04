@@ -77,7 +77,7 @@ describe('integration', () => {
     });
   });
 
-  describe('load', () => {
+  describe('include', () => {
     beforeEach(() => {
       const content = require('./fixtures/content/probot.json');
 
@@ -94,8 +94,8 @@ describe('integration', () => {
       context = new Context(github, event);
     });
 
-    it('loads a file in the local repository', () => {
-      configure('load(".github/triage.js");');
+    it('includes a file in the local repository', () => {
+      configure('include(".github/triage.js");');
       expect(github.repos.getContent).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
@@ -103,8 +103,8 @@ describe('integration', () => {
       });
     });
 
-    it('executes loaded rules', done => {
-      configure('load(".github/triage.js");').execute().then(() => {
+    it('executes included rules', done => {
+      configure('include(".github/triage.js");').execute().then(() => {
         expect(github.issues.createComment).toHaveBeenCalled();
         done();
       });

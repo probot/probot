@@ -145,19 +145,19 @@ Add labels
 .unassign('defunkt');
 ```
 
-## load
+## include
 
 Loads a configuration from another file.
 
 ```js
-load('.github/bot/issues.js');
-load('.github/bot/releases.js');
+include('.github/bot/issues.js');
+include('.github/bot/releases.js');
 ```
 
-You can also load configuration from another repository.
+You can also include configuration from another repository.
 
 ```js
-load('user/repo:path.js#branch');
+include('user/repo:path.js#branch');
 ```
 
 ---

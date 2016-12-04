@@ -16,7 +16,7 @@ content.content = new Buffer(`
 `).toString('base64');
 
 describe('Configuration', () => {
-  describe('load', () => {
+  describe('include', () => {
     let github;
     let context;
     let config;
@@ -31,8 +31,8 @@ describe('Configuration', () => {
       config = new Configuration(context);
     });
 
-    it('loads from the repo', () => {
-      config.load('foo.js');
+    it('includes from the repo', () => {
+      config.include('foo.js');
       expect(github.repos.getContent).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
@@ -41,11 +41,11 @@ describe('Configuration', () => {
     });
 
     it('returns undefined', () => {
-      expect(config.load('foo.js')).toBe(undefined);
+      expect(config.include('foo.js')).toBe(undefined);
     });
 
-    it('loads from another repository', () => {
-      config.load('atom/configs:foo.js#branch');
+    it('includes from another repository', () => {
+      config.include('atom/configs:foo.js#branch');
       expect(github.repos.getContent).toHaveBeenCalledWith({
         owner: 'atom',
         repo: 'configs',

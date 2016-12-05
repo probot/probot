@@ -24,6 +24,9 @@ describe('issues plugin', () => {
       },
       repos: {
         deleteCommitComment: createSpy()
+      },
+      pullRequests: {
+        deleteComment: createSpy()
       }
     };
     context = new Context(github, {payload});
@@ -219,6 +222,19 @@ describe('issues plugin', () => {
         owner: 'bkeepers-inc',
         repo: 'test',
         id: 20067099
+      });
+    });
+
+    it('deletes a PR comment', () => {
+      const payload = require('../fixtures/webhook/pull_request_review_comment.created');
+
+      context = new Context(github, {payload});
+      this.issues.deleteComment(context);
+
+      expect(github.pullRequests.deleteComment).toHaveBeenCalledWith({
+        owner: 'bkeepers-inc',
+        repo: 'test',
+        id: 90805181
       });
     });
   });

@@ -85,6 +85,14 @@ Comments can be posted in response to any event performed on an Issue or Pull Re
 .comment("Hey @{{ user.login }}, thanks for the contribution!");
 ```
 
+### `deleteComment`
+
+Deletes the comment for the `issue_comment`, `commit_comment`, and `pull_request_review_comment` events.
+
+```
+.deleteComment();
+```
+
 ### `close`
 
 Close an issue or pull request.

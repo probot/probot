@@ -15,7 +15,8 @@ describe('issues plugin', () => {
       createComment: createSpy(),
       addAssigneesToIssue: createSpy(),
       removeAssigneesFromIssue: createSpy(),
-      removeLabel: createSpy()
+      removeLabel: createSpy(),
+      deleteComment: createSpy()
     }
   };
 
@@ -189,6 +190,18 @@ describe('issues plugin', () => {
         repo: 'test',
         number: 6,
         body: {assignees: ['hello', 'world']}
+      });
+    });
+  });
+
+  describe('deleteComment', () => {
+    it('deletes the comment', () => {
+      this.issues.deleteComment(context);
+
+      expect(github.issues.deleteComment).toHaveBeenCalledWith({
+        owner: 'bkeepers-inc',
+        repo: 'test',
+        id: 252508381
       });
     });
   });

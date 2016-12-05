@@ -6,7 +6,7 @@ const payload = require('./fixtures/webhook/comment.created.json');
 const createSpy = expect.createSpy;
 
 describe('integration', () => {
-  const event = {event: 'issues', payload, issue: {}};
+  const event = {event: 'issues', payload};
   let context;
   let github;
 
@@ -15,6 +15,9 @@ describe('integration', () => {
       issues: {
         createComment: createSpy().andReturn(Promise.resolve()),
         edit: createSpy().andReturn(Promise.resolve())
+      },
+      repos: {
+        getContent: createSpy()
       }
     };
 
@@ -28,16 +31,6 @@ describe('integration', () => {
   describe('reply to new issue with a comment', () => {
     it('posts a coment', () => {
       const config = configure('on("issues").comment("Hello World!")');
-      return config.execute(context).then(() => {
-        expect(github.issues.createComment).toHaveBeenCalled();
-      });
-    });
-  });
-
-  describe('reply to new issue with a comment', () => {
-    it('calls the action', () => {
-      const config = configure('on("issues.created").comment("Hello World!")');
-
       return config.execute(context).then(() => {
         expect(github.issues.createComment).toHaveBeenCalled();
       });
@@ -82,15 +75,8 @@ describe('integration', () => {
       const content = require('./fixtures/content/probot.json');
 
       content.content = new Buffer('on("issues").comment("Hello!");').toString('base64');
+      github.repos.getContent.andReturn(Promise.resolve(content));
 
-      github = {
-        repos: {
-          getContent: createSpy().andReturn(Promise.resolve(content))
-        },
-        issues: {
-          createComment: createSpy()
-        }
-      };
       context = new Context(github, event);
     });
 
@@ -107,6 +93,26 @@ describe('integration', () => {
       configure('include(".github/triage.js");').execute().then(() => {
         expect(github.issues.createComment).toHaveBeenCalled();
         done();
+      });
+    });
+  });
+
+  describe('contents', () => {
+    it('gets content from repo', () => {
+      const content = {content: new Buffer('file contents').toString('base64')};
+      github.repos.getContent.andReturn(Promise.resolve(content));
+
+      const config = configure(`
+        on("issues").comment(contents(".github/ISSUE_REPLY_TEMPLATE"));
+      `);
+
+      return config.execute().then(() => {
+        expect(github.issues.createComment).toHaveBeenCalledWith({
+          owner: 'bkeepers-inc',
+          repo: 'test',
+          number: event.payload.issue.number,
+          body: 'file contents'
+        });
       });
     });
   });

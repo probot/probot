@@ -6,23 +6,27 @@ const payload = require('../fixtures/webhook/comment.created.json');
 const createSpy = expect.createSpy;
 
 describe('issues plugin', () => {
-  const github = {
-    issues: {
-      lock: createSpy(),
-      unlock: createSpy(),
-      edit: createSpy(),
-      addLabels: createSpy(),
-      createComment: createSpy(),
-      addAssigneesToIssue: createSpy(),
-      removeAssigneesFromIssue: createSpy(),
-      removeLabel: createSpy(),
-      deleteComment: createSpy()
-    }
-  };
-
-  const context = new Context(github, {payload});
+  let context;
+  let github;
 
   before(() => {
+    github = {
+      issues: {
+        lock: createSpy(),
+        unlock: createSpy(),
+        edit: createSpy(),
+        addLabels: createSpy(),
+        createComment: createSpy(),
+        addAssigneesToIssue: createSpy(),
+        removeAssigneesFromIssue: createSpy(),
+        removeLabel: createSpy(),
+        deleteComment: createSpy()
+      },
+      repos: {
+        deleteCommitComment: createSpy()
+      }
+    };
+    context = new Context(github, {payload});
     this.issues = new Issues();
   });
 
@@ -195,13 +199,26 @@ describe('issues plugin', () => {
   });
 
   describe('deleteComment', () => {
-    it('deletes the comment', () => {
+    it('deletes an issue comment', () => {
       this.issues.deleteComment(context);
 
       expect(github.issues.deleteComment).toHaveBeenCalledWith({
         owner: 'bkeepers-inc',
         repo: 'test',
         id: 252508381
+      });
+    });
+
+    it('deletes a commit comment', () => {
+      const payload = require('../fixtures/webhook/commit_comment.created');
+
+      context = new Context(github, {payload});
+      this.issues.deleteComment(context);
+
+      expect(github.repos.deleteCommitComment).toHaveBeenCalledWith({
+        owner: 'bkeepers-inc',
+        repo: 'test',
+        id: 20067099
       });
     });
   });

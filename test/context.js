@@ -3,16 +3,21 @@ const Context = require('../lib/context');
 
 describe('Context', () => {
   const github = {};
-  const event = {
-    payload: {
-      repository: {
-        owner: {login: 'bkeepers'},
-        name: 'probot'
-      },
-      issue: {number: 4}
-    }
-  };
-  const context = new Context(github, event);
+  let event;
+  let context;
+
+  beforeEach(() => {
+    event = {
+      payload: {
+        repository: {
+          owner: {login: 'bkeepers'},
+          name: 'probot'
+        },
+        issue: {number: 4}
+      }
+    };
+    context = new Context(github, event);
+  });
 
   describe('toRepo', () => {
     it('returns attributes from repository payload', () => {
@@ -29,6 +34,15 @@ describe('Context', () => {
       expect(context.toRepo({owner: 'muahaha'})).toEqual({
         owner: 'muahaha', repo:'probot'
       });
+    });
+
+    // The `repository` object on the push event has a different format than the other events
+    // https://developer.github.com/v3/activity/events/types/#pushevent
+    it('properly handles the push event', () => {
+      event.payload = require('./fixtures/webhook/push');
+
+      context = new Context(github, event);
+      expect(context.toRepo()).toEqual({owner: 'bkeepers-inc', repo:'test'});
     });
   });
 

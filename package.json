@@ -34,7 +34,8 @@
     "envs": [
       "node",
       "mocha"
-    ]
+    ],
+    "globals": ["on", "include", "contents"]
   },
   "engines": {
     "node": "6.6.0"

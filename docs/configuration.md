@@ -20,7 +20,7 @@ Workflows are composed of:
 
 - [`on`](#on) - webhook events to listen to
 - [`filter`](#filter) (optional) - conditions to determine if the actions should be performed.
-- [`then`](#then) - actions to take in response to the event
+- actions to take in response to the event
 
 ### `on`
 

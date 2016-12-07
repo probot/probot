@@ -19,7 +19,7 @@ on('issues.opened')
       return !event.issue.body.match(/### Steps to Reproduce/)
        || event.issue.body.includes('- [ ]')
     })
-  .comment.contents('.github/MISSING_ISSUE_TEMPLATE_AUTOREPLY.md')
+  .comment(contents('.github/MISSING_ISSUE_TEMPLATE_AUTOREPLY.md'))
   .label('insufficient-info')
   .close();
 ```
@@ -37,7 +37,7 @@ on('issues.labeled')
 ```js
 on('issues.opened', 'pull_request.opened')
   .filter.firstTimeContributor() // plugins could implement conditions like this
-  .comment.contents('.github/NEW_CONTRIBUTOR_TEMPLATE.md');
+  .comment(contents('.github/NEW_CONTRIBUTOR_TEMPLATE.md'));
 ```
 
 ### Auto-close new pull requests

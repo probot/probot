@@ -71,8 +71,10 @@ describe('integration', () => {
   });
 
   describe('include', () => {
+    let content;
+
     beforeEach(() => {
-      const content = require('./fixtures/content/probot.json');
+      content = require('./fixtures/content/probot.json');
 
       content.content = new Buffer('on("issues").comment("Hello!");').toString('base64');
       github.repos.getContent.andReturn(Promise.resolve(content));
@@ -93,6 +95,28 @@ describe('integration', () => {
       configure('include(".github/triage.js");').execute().then(() => {
         expect(github.issues.createComment).toHaveBeenCalled();
         done();
+      });
+    });
+
+    it('includes files relative to included repository', () => {
+      github.repos.getContent.andCall(params => {
+        if (params.path === 'script-a.js') {
+          return Promise.resolve({
+            content: new Buffer('include("script-b.js")').toString('base64')
+          });
+        } else {
+          return Promise.resolve({content: ''});
+        }
+      });
+
+      const config = configure('include("other/repo:script-a.js");');
+
+      return config.execute().then(() => {
+        expect(github.repos.getContent).toHaveBeenCalledWith({
+          owner: 'other',
+          repo: 'repo',
+          path: 'script-b.js'
+        });
       });
     });
   });

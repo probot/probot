@@ -139,5 +139,29 @@ describe('integration', () => {
         });
       });
     });
+
+    it('gets contents relative to included repository', () => {
+      github.repos.getContent.andCall(params => {
+        if (params.path === 'script-a.js') {
+          return Promise.resolve({
+            content: new Buffer(`
+              on("issues").comment(contents("content.md"));
+            `).toString('base64')
+          });
+        } else {
+          return Promise.resolve({content: ''});
+        }
+      });
+
+      const config = configure('include("other/repo:script-a.js");');
+
+      return config.execute().then(() => {
+        expect(github.repos.getContent).toHaveBeenCalledWith({
+          owner: 'other',
+          repo: 'repo',
+          path: 'content.md'
+        });
+      });
+    });
   });
 });

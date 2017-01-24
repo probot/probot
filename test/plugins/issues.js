@@ -241,13 +241,15 @@ describe('issues plugin', () => {
   });
 
   describe('createIssue', () => {
-    it('creates an issues', () => {
+    it('creates an issue', () => {
       return this.issues.createIssue(context, {title: 'testing', body: 'body'}).then(() => {
         expect(github.issues.create).toHaveBeenCalledWith({
           owner: 'bkeepers-inc',
           repo: 'test',
           title: 'testing',
-          body: 'body'
+          body: 'body',
+          assignees: undefined,
+          labels: undefined
         });
       });
     });
@@ -258,7 +260,22 @@ describe('issues plugin', () => {
           owner: 'bkeepers-inc',
           repo: 'test',
           title: 'testing',
-          body: 'body'
+          body: 'body',
+          assignees: undefined,
+          labels: undefined
+        });
+      });
+    });
+
+    it('sets optional parameters', () => {
+      return this.issues.createIssue(context, {title: 'testing', body: 'body', assignees: ['bkeepers'], labels: ['hello']}).then(() => {
+        expect(github.issues.create).toHaveBeenCalledWith({
+          owner: 'bkeepers-inc',
+          repo: 'test',
+          title: 'testing',
+          body: 'body',
+          assignees: ['bkeepers'],
+          labels: ['hello']
         });
       });
     });

@@ -153,6 +153,20 @@ Add labels
 .unassign('defunkt');
 ```
 
+### `createIssue`
+
+Create a new issue defined as a JSON Object. The `title` and `body` fields are required.
+
+```js
+.createIssue({"title": "Issue Title", "body": "Issue Body", "assignees": ["bkeepers"], "labels": ["question"]});
+```
+
+The `body` of the issue can be generated from the contents of a template file within the repository by invoking the `contents` function.
+
+```js
+.createIssue({"title": "Issue Title", "body": contents(".github/NEW_ISSUE_TEMPLATE.md"), "assignees": ["bkeepers"], "labels": ["question"]});
+```
+
 ## include
 
 Loads a configuration from another file.
@@ -167,6 +181,21 @@ You can also include configuration from another repository.
 ```js
 include('user/repo:path.js#branch');
 ```
+
+## contents
+
+Retrieves the contents of the repository and passes them to any plugin method.
+
+```js
+on('issues.opened').comment(contents(".github/NEW_ISSUE_TEMPLATE.md"));
+```
+This also supports fetching contents from another repository
+
+```js
+on('issues.opened').comment(contents("atom/configs:.github/NEW_ISSUE_TEMPLATE.md"));
+```
+
+
 
 ---
 

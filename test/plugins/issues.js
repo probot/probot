@@ -20,7 +20,8 @@ describe('issues plugin', () => {
         addAssigneesToIssue: createSpy(),
         removeAssigneesFromIssue: createSpy(),
         removeLabel: createSpy(),
-        deleteComment: createSpy()
+        deleteComment: createSpy(),
+        create: createSpy()
       },
       repos: {
         deleteCommitComment: createSpy()
@@ -235,6 +236,47 @@ describe('issues plugin', () => {
         owner: 'bkeepers-inc',
         repo: 'test',
         id: 90805181
+      });
+    });
+  });
+
+  describe('createIssue', () => {
+    it('creates an issue', () => {
+      return this.issues.createIssue(context, {title: 'testing', body: 'body'}).then(() => {
+        expect(github.issues.create).toHaveBeenCalledWith({
+          owner: 'bkeepers-inc',
+          repo: 'test',
+          title: 'testing',
+          body: 'body',
+          assignees: undefined,
+          labels: undefined
+        });
+      });
+    });
+
+    it('resolves body content', () => {
+      return this.issues.createIssue(context, {title: 'testing', body: Promise.resolve('body')}).then(() => {
+        expect(github.issues.create).toHaveBeenCalledWith({
+          owner: 'bkeepers-inc',
+          repo: 'test',
+          title: 'testing',
+          body: 'body',
+          assignees: undefined,
+          labels: undefined
+        });
+      });
+    });
+
+    it('sets optional parameters', () => {
+      return this.issues.createIssue(context, {title: 'testing', body: 'body', assignees: ['bkeepers'], labels: ['hello']}).then(() => {
+        expect(github.issues.create).toHaveBeenCalledWith({
+          owner: 'bkeepers-inc',
+          repo: 'test',
+          title: 'testing',
+          body: 'body',
+          assignees: ['bkeepers'],
+          labels: ['hello']
+        });
       });
     });
   });

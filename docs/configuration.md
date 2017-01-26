@@ -71,7 +71,7 @@ TODO: document actions
 
 ### `filter`
 
-Only preform the actions if the function returns `true`. The `event` is passed as an argument to the function and attributes of the [webhook payload](https://developer.github.com/webhooks/#events).
+Only perform the actions if the function returns `true`. The `event` is passed as an argument to the function and attributes of the [webhook payload](https://developer.github.com/webhooks/#events).
 
 ```js
 .filter(event => event.payload.issue.body.includes('- [ ]'))

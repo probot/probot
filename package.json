@@ -4,7 +4,7 @@
   "description": "a trainable robot that responds to activity on GitHub",
   "main": "index.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node index.js",
     "test": "mocha && xo"
   },
   "author": "Brandon Keepers",

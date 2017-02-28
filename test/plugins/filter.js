@@ -50,4 +50,78 @@ describe('filter plugin', () => {
       expect(filter.then(context, fn)).toBe('bazinga!');
     });
   });
+
+  describe('on', () => {
+    describe('matching only the event name', () => {
+      it('matches on a single event', () => {
+        event.event = 'issues';
+
+        return filter.on(context, 'issues').then(result => {
+          expect(result).toEqual('issues');
+        });
+      });
+
+      it('fails to match on a single event', () => {
+        event.event = 'issues';
+
+        return filter.on(context, 'foo').catch(err => {
+          expect(err.message).toBe('halted');
+        });
+      });
+
+      it('matches any of the event names', () => {
+        event.event = 'foo';
+
+        return filter.on(context, 'issues', 'foo').then(result => {
+          expect(result).toEqual('foo');
+        });
+      });
+
+      it('fails to match if none of the event names match', () => {
+        event.event = 'bar';
+
+        return filter.on(context, 'issues', 'foo').catch(err => {
+          expect(err.message).toBe('halted');
+        });
+      });
+    });
+
+    describe('matching the event and action', () => {
+      it('matches on a single event', () => {
+        event.event = 'issues';
+        event.payload = {action: 'opened'};
+
+        return filter.on(context, 'issues.opened').then(result => {
+          expect(result).toBe('issues.opened');
+        });
+      });
+
+      it('fails to match on a single event', () => {
+        event.event = 'issues';
+        event.payload = {action: 'foo'};
+
+        return filter.on(context, 'issues.opened').catch(err => {
+          expect(err.message).toBe('halted');
+        });
+      });
+
+      it('matches any of the event descriptors', () => {
+        event.event = 'issues';
+        event.payload = {action: 'closed'};
+
+        return filter.on(context, 'issues.opened', 'issues.closed').then(result => {
+          expect(result).toBe('issues.closed');
+        });
+      });
+
+      it('fails to match if none of the event descriptors match', () => {
+        event.event = 'issues';
+        event.payload = {action: 'foo'};
+
+        return filter.on(context, 'issues.opened', 'issues.closed').catch(err => {
+          expect(err.message).toBe('halted');
+        });
+      });
+    });
+  });
 });

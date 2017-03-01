@@ -25,10 +25,11 @@ class TestPlugin extends Plugin {
 }
 
 describe('Workflow', () => {
-  const context = {};
+  let context;
   let workflow;
 
   beforeEach(() => {
+    context = {};
     workflow = new Workflow([new TestPlugin()]);
   });
 

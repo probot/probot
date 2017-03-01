@@ -78,12 +78,21 @@ describe('Workflow', () => {
       });
     });
 
+    it('calls each chained function even if a falsy value is returned', () => {
+      workflow.api.doSomething('bar', 'baz').returnUndefined().doSomething('baz', 'quux');
+
+      return workflow.execute(context).then(() => {
+        expect(context.bar).toBe('baz');
+        expect(context.baz).toBe('quux');
+      });
+    });
+
     it('calls each chained function until a promise is rejected', () => {
       workflow.api.doSomething('bar', 'baz').rejectPromise().doSomething('baz', 'quux');
 
       return workflow.execute(context).then(() => {
         throw new Error('Should not happen');
-      }).catch(err => {
+      }, err => {
         expect(err.message).toBe('HALT AND CATCH FIRE!!!');
         expect(context.bar).toBe('baz');
         expect(context.baz).toNotExist();
@@ -95,7 +104,7 @@ describe('Workflow', () => {
 
       return workflow.execute(context).then(() => {
         throw new Error('Should not happen');
-      }).catch(err => {
+      }, err => {
         expect(err.message).toBe('Nothing to see here, move along');
         expect(context.bar).toBe('baz');
         expect(context.baz).toNotExist();

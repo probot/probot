@@ -5,7 +5,10 @@ const createSpy = expect.createSpy;
 
 describe('filter plugin', () => {
   const event = {};
-  const context = {event};
+  const context = {
+    event,
+    halt: createSpy().andReturn(Promise.reject(new Error('halted')))
+  };
 
   let filter;
 

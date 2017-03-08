@@ -41,7 +41,7 @@ describe('integration', () => {
     it('does not perform behavior', () => {
       const config = configure('on("issues.labeled").comment("Hello World!")');
 
-      return config.execute(context).then(() => {
+      return config.execute(context).catch(() => {
         expect(github.issues.createComment).toNotHaveBeenCalled();
       });
     });
@@ -64,7 +64,8 @@ describe('integration', () => {
 
     it('does not call action when conditions do not match', () => {
       const config = configure('on("issues.labeled").filter((e) => e.payload.label.name == "foobar").close()');
-      return config.execute(context).then(() => {
+
+      return config.execute(context).catch(() => {
         expect(github.issues.edit).toNotHaveBeenCalled();
       });
     });

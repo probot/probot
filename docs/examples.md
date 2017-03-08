@@ -36,7 +36,7 @@ on('issues.labeled')
 
 ```js
 on('issues.opened', 'pull_request.opened')
-  .filter.firstTimeContributor() // plugins could implement conditions like this
+  .ifFirstTimeContributor() // plugins could implement conditions like this
   .comment(contents('.github/NEW_CONTRIBUTOR_TEMPLATE.md'));
 ```
 
@@ -53,7 +53,7 @@ on('pull_request.opened')
 ```js
 on('issues.opened')
   .filter((event) => event.issue.body.match(/^$/))
-  .comment('Hey @{{ user.login }}, you didn't include a description of the problem, so we're closing this issue.');
+  .comment("Hey @{{ user.login }}, you didn't include a description of the problem, so we're closing this issue.");
 ```
 
 ### @mention watchers when label added

@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "a trainable robot that responds to activity on GitHub",
   "main": "index.js",
+  "bin": {
+    "probot": "./bin/probot"
+  },
   "scripts": {
     "start": "node index.js",
     "test": "mocha && xo"
@@ -12,12 +15,11 @@
   "dependencies": {
     "bunyan": "^1.8.5",
     "dotenv-safe": "^4.0.3",
-    "expect": "^1.20.2",
     "github-integration": "^1.0.0",
-    "github-webhook-handler": "^0.6.0",
-    "handlebars": "^4.0.5"
+    "github-webhook-handler": "^0.6.0"
   },
   "devDependencies": {
+    "expect": "^1.20.2",
     "mocha": "^3.0.2",
     "xo": "^0.16.0"
   },
@@ -49,6 +51,6 @@
     ]
   },
   "engines": {
-    "node": "6.6.0"
+    "node": "~7.7.0"
   }
 }

@@ -33,12 +33,8 @@ To test with a real GitHub repository, you'll need to create a test repository a
 ## Debugging
 
 0. Always run `$ script/bootstrap` and restart the server if package.json has changed.
-0. To turn on verbose logging, start server by running ` $ LOG_LEVEL=debug GITHUB_TOKEN=xxx script/server`
-0. To see what requests are going out, enable debugging mode for  GitHub client in `/server.js`:
-
-        const github = new GitHubApi({
-          debug: true
-        });
+0. To turn on verbose logging, start server by running: `$ LOG_LEVEL=debug script/server`
+0. To see what requests are going out, start the server by running: `$ LOG_LEVEL=trace script/server`
 
 ## Adding an action
 

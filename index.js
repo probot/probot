@@ -1,6 +1,5 @@
-require('dotenv').config({silent: true});
+require('dotenv-safe').load();
 
-const process = require('process');
 const fs = require('fs');
 const createWebhook = require('github-webhook-handler');
 const createIntegration = require('github-integration');

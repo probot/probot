@@ -11,7 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "bunyan": "^1.8.5",
-    "dotenv": "^2.0.0",
+    "dotenv-safe": "^4.0.3",
     "expect": "^1.20.2",
     "github-integration": "^1.0.0",
     "github-webhook-handler": "^0.6.0",
@@ -34,7 +34,11 @@
       "node",
       "mocha"
     ],
-    "globals": ["on", "include", "contents"],
+    "globals": [
+      "on",
+      "include",
+      "contents"
+    ],
     "overrides": [
       {
         "files": "test/**/*.js",

@@ -34,6 +34,7 @@
       "node",
       "mocha"
     ],
+    "globals": ["on", "include", "contents"],
     "overrides": [
       {
         "files": "test/**/*.js",

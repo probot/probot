@@ -6,3 +6,5 @@ notifications:
   disabled: true
 env:
   - PRIVATE_KEY=ssssshhh
+  - INTEGRATION_ID=1
+  - WEBHOOK_SECRET=test

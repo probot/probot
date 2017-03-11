@@ -6,7 +6,7 @@ on('issue_comment.created')
 
 function isDeleted(event) {
   return event.payload.action === 'deleted' &&
-  event.payload.sender.login !== 'probot-demo[bot]';
+  event.payload.sender.type !== 'Bot';
 }
 
 // restore deleted comments but the one deleted by PRobot

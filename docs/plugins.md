@@ -47,7 +47,7 @@ Probot uses [GitHub Integrations](https://developer.github.com/early-access/inte
 
 An integration is a first-class actor on GitHub, like a user (e.g. [@defunkt](https://github/defunkt)) or a organization (e.g. [@github](https://github.com/github)). That means it can be given access to repositories and perform actions through the API like [commenting on an issue](https://developer.github.com/v3/issues/comments/#create-a-comment) or [creating a status](https://developer.github.com/v3/repos/statuses/#create-a-status). The integration is given access to a repository or repositories by being "installed" on a user or organization account.
 
-Each event delivered includes an ID of the installation that triggered it, which can be used to authenticate. `robot.auth(id)` will give your plugin an authenticated GitHub client that can be used to make GitHub API calls.
+Each event delivered includes an ID of the installation that triggered it, which can be used to authenticate. `robot.auth(id)` will give your plugin an authenticated GitHub client that can be used to make API calls.
 
 ```js
 module.exports = function(robot) {
@@ -60,7 +60,7 @@ module.exports = function(robot) {
 
 > Note: `robot.auth` is asynchronous, so it needs to be prefixed with a [`await`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await) to wait for the magic to happen.
 
-The `github` value returned from authenticating is an instance of the [github Node.js module](https://github.com/mikedeboer/node-github), which swraps the [GitHub API](https://developer.github.com/v3/) and allows you to do almost anything programmatically that you can do through a web browser.
+The `github` object returned from authenticating is an instance of the [github Node.js module](https://github.com/mikedeboer/node-github), which wraps the [GitHub API](https://developer.github.com/v3/) and allows you to do almost anything programmatically that you can do through a web browser.
 
 Here is an example of an autoresponder plugin that comments on opened issues:
 
@@ -84,12 +84,12 @@ See the [full API docs](https://mikedeboer.github.io/node-github/) to see all th
 
 ### Running plugins
 
+TODO: link to docs on getting running in development
+
 ```
 $ probot autoresponder.js
 Listening on http://localhost:3000
 ```
-
-script loading
 
 ### Distributing
 

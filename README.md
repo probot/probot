@@ -1,67 +1,10 @@
-# PRobot
+# Probot
 
 [![Join the chat at https://gitter.im/bkeepers/PRobot](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/bkeepers/PRobot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 _**Heads up!** "PRobot" is a codename that is almost guaranteed to change._
 
-PRobot is a trainable robot that responds to activity on GitHub. It's like [Hubot](https://hubot.github.com/), but for GitHub events instead of chat messages.
-
-## Plugins
-
-Here is an autoresponder module that comments on opened issues:
-
-```js
-// Export a function that takes `robot` as an argument
-module.exports = function(robot) {
-  // `robot.on` will listen for any GitHub webhook events
-  robot.on('issues.opened', async function(event, context) {
-    // Authenticate and get an instance of the NodeJS wrapper for the GitHub API
-    // https://mikedeboer.github.io/node-github/
-    const github = await robot.integration.asInstallation(event.payload.installation.id);
-
-    // `context` extracts information from the event, which can be passed to
-    // GitHub API calls. This will return:
-    //   {owner: 'yourname', repo: 'yourrepo', number: 123, body: 'Hello World!}
-    const params = context.issue({body: 'Hello World!'})
-
-    // Post a comment on the issue
-    return github.issues.createComment(params);
-  });
-}
-```
-
-```
-$ probot autoresponder.js
-Listening on http://localhost:5000
-```
-
-### As Modules
-
-These examples can be published as behaviors in NPM modules and deployed as stand-alone bots, or combined into one instance.
-
-For example, if you wanted to deploy a bot for your project that included multiple plugins, you could just create a new app that has them both listed as dependencies in `package.json`:
-
-```json
-{
-  "name": "my-probot",
-  "priate": true,
-  "dependencies": {
-    "probot-autoresponder": "~1.0",
-    "probot-configurer": "~1.0",
-  },
-  "scripts": {
-    "start": "probot"
- },
- "probot": {
-   "plugins": [
-     "probot-autoresponder",
-     "probot-configurer"
-   ]
- }
-}
-```
-
-Running the `$ npm start` on this app would start up a bot that included both of these behaviors.
+Probot is a trainable robot that responds to activity on GitHub. It's like [Hubot](https://hubot.github.com/), but for GitHub instead of chat.
 
 ## Installing
 

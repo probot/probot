@@ -10,7 +10,7 @@ function loadPlugins(plugins) {
       if (err) {
         throw err;
       } else {
-        probot.log.trace('loading plugin %s', path);
+        probot.log.debug('loading plugin %s', path);
         require(path)(probot);
         return path;
       }

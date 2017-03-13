@@ -87,34 +87,19 @@ See the [full API docs](https://mikedeboer.github.io/node-github/) to see all th
 TODO: link to docs on getting running in development
 
 ```
+$ npm install -g https://github.com/probot/probot#wild-wild-west
+
 $ probot autoresponder.js
 Listening on http://localhost:3000
 ```
 
 ### Distributing
 
-These examples can be published as behaviors in NPM modules and deployed as stand-alone bots, or combined into one instance.
+Plugins can be published in NPM modules, which can either be deployed as stand-alone bots, or combined with other plugins.
 
-For example, if you wanted to deploy a bot for your project that included multiple plugins, you could just create a new app that has them both listed as dependencies in `package.json`:
+Use the [plugin-template](https://github.com/probot/plugin-template) repository to get started building your plugin as a node module.
 
-```json
-{
-  "name": "my-probot",
-  "priate": true,
-  "dependencies": {
-    "probot-autoresponder": "~1.0",
-    "probot-configurer": "~1.0",
-  },
-  "scripts": {
-    "start": "probot"
- },
- "probot": {
-   "plugins": [
-     "probot-autoresponder",
-     "probot-configurer"
-   ]
- }
-}
 ```
-
-Running the `$ npm start` on this app would start up a bot that included both of these behaviors.
+$ curl -L https://github.com/probot/plugin-template/archive/master.tar.gz | tar xvz
+$ mv plugin-template probot-myplugin && cd probot-myplugin
+```

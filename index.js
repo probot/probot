@@ -1,5 +1,3 @@
-require('dotenv-safe').load();
-
 const fs = require('fs');
 const createWebhook = require('github-webhook-handler');
 const createIntegration = require('github-integration');
@@ -22,10 +20,5 @@ const robot = createRobot(integration, webhook);
 server.listen(PORT);
 
 console.log('Listening on http://localhost:' + PORT);
-
-// Show trace for any unhandled rejections
-process.on('unhandledRejection', reason => {
-  robot.log.error(reason);
-});
 
 module.exports = robot;

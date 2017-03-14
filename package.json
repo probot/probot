@@ -8,7 +8,7 @@
     "probot": "./bin/probot.js"
   },
   "scripts": {
-    "start": "node index.js",
+    "start": "probot",
     "test": "mocha && xo"
   },
   "author": "Brandon Keepers",

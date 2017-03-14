@@ -2,7 +2,6 @@ const expect = require('expect');
 const Context = require('../lib/context');
 
 describe('Context', () => {
-  const github = {};
   let event;
   let context;
 
@@ -16,22 +15,22 @@ describe('Context', () => {
         issue: {number: 4}
       }
     };
-    context = new Context(github, event);
+    context = new Context(event);
   });
 
-  describe('toRepo', () => {
+  describe('repo', () => {
     it('returns attributes from repository payload', () => {
-      expect(context.toRepo()).toEqual({owner: 'bkeepers', repo:'probot'});
+      expect(context.repo()).toEqual({owner: 'bkeepers', repo:'probot'});
     });
 
     it('merges attributes', () => {
-      expect(context.toRepo({foo: 1, bar: 2})).toEqual({
+      expect(context.repo({foo: 1, bar: 2})).toEqual({
         owner: 'bkeepers', repo:'probot', foo: 1, bar: 2
       });
     });
 
     it('overrides repo attributes', () => {
-      expect(context.toRepo({owner: 'muahaha'})).toEqual({
+      expect(context.repo({owner: 'muahaha'})).toEqual({
         owner: 'muahaha', repo:'probot'
       });
     });
@@ -41,24 +40,24 @@ describe('Context', () => {
     it('properly handles the push event', () => {
       event.payload = require('./fixtures/webhook/push');
 
-      context = new Context(github, event);
-      expect(context.toRepo()).toEqual({owner: 'bkeepers-inc', repo:'test'});
+      context = new Context(event);
+      expect(context.repo()).toEqual({owner: 'bkeepers-inc', repo:'test'});
     });
   });
 
-  describe('toIssue', () => {
+  describe('issue', () => {
     it('returns attributes from repository payload', () => {
-      expect(context.toIssue()).toEqual({owner: 'bkeepers', repo:'probot', number: 4});
+      expect(context.issue()).toEqual({owner: 'bkeepers', repo:'probot', number: 4});
     });
 
     it('merges attributes', () => {
-      expect(context.toIssue({foo: 1, bar: 2})).toEqual({
+      expect(context.issue({foo: 1, bar: 2})).toEqual({
         owner: 'bkeepers', repo:'probot', number: 4, foo: 1, bar: 2
       });
     });
 
     it('overrides repo attributes', () => {
-      expect(context.toIssue({owner: 'muahaha', number: 5})).toEqual({
+      expect(context.issue({owner: 'muahaha', number: 5})).toEqual({
         owner: 'muahaha', repo:'probot', number: 5
       });
     });

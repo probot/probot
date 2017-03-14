@@ -2,7 +2,7 @@
   "name": "PRobot",
   "description": "a trainable robot that responds to activity on GitHub",
   "keywords": ["PRobot", "node", "github"],
-  "repository": "https://github.com/bkeepers/PRobot",
+  "repository": "https://github.com/probot/probot",
   "logo": "https://github.com/probot.png",
   "env": {
     "PRIVATE_KEY": {
@@ -13,6 +13,11 @@
     },
     "WEBHOOK_SECRET": {
       "description": "the secret configured for your GitHub Integration"
+    },
+    "LOG_LEVEL": {
+      "required": false,
+      "value": "info",
+      "description": "trace, debug, info, warn, error, or fatal; default: info"
     }
   }
 }

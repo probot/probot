@@ -1,5 +1,3 @@
-require('dotenv-safe').load();
-
 const fs = require('fs');
 const createWebhook = require('github-webhook-handler');
 const createIntegration = require('github-integration');
@@ -28,6 +26,7 @@ process.on('unhandledRejection', reason => {
   robot.log.error(reason);
 });
 
+// Handle case when webhook creation fails
 webhook.on('error', err => {
   robot.log.error(err);
 });

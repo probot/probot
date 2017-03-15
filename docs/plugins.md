@@ -20,7 +20,7 @@ Many robots will spend their entire day responding to these actions. `robot.on` 
 module.exports = robot => {
   robot.on('push', event => {
     // Code was pushed to the repo, what should we do with it?
-    console.log(event);
+    robot.log(event);
   });
 };
 ```
@@ -87,7 +87,7 @@ See the [full API docs](https://mikedeboer.github.io/node-github/) to see all th
 TODO: link to docs on getting running in development
 
 ```
-$ npm install -g https://github.com/probot/probot#wild-wild-west
+$ npm install -g https://github.com/probot/probot
 
 $ probot autoresponder.js
 Listening on http://localhost:3000
@@ -103,3 +103,19 @@ Use the [plugin-template](https://github.com/probot/plugin-template) repository 
 $ curl -L https://github.com/probot/plugin-template/archive/master.tar.gz | tar xvz
 $ mv plugin-template probot-myplugin && cd probot-myplugin
 ```
+
+### Logging
+
+Probot uses [bunyan](https://github.com/trentm/node-bunyan) for logging. You can call it with `robot.log`.
+
+```js
+robot.log("This is a debug message");
+robot.log.debug("…so is this");
+robot.log.trace("Now we're talking");
+robot.log.info("I thought you should know…");
+robot.log.warn("Woah there");
+robot.log.error("ETOOMANYLOGS");
+robot.log.fatal("Goodbye, cruel world!");
+```
+
+The default log level is `debug`, but you can change it by setting the `LOG_LEVEL` environment variable to `trace`, `info`, `warn`, `error`, or `fatal`.

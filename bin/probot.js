@@ -1,5 +1,12 @@
 #!/usr/bin/env node
 
+try {
+  require('dotenv-safe').load();
+} catch (err) {
+  console.log(err.message);
+  process.exit(1);
+}
+
 const resolve = require('resolve');
 const pkgConf = require('pkg-conf');
 const probot = require('../index.js');

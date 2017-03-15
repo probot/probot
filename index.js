@@ -28,4 +28,7 @@ process.on('unhandledRejection', reason => {
   robot.log.error(reason);
 });
 
+webhook.on('error', err => {
+  robot.log.error(err);
+});
 module.exports = robot;

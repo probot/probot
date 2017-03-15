@@ -21,4 +21,13 @@ server.listen(PORT);
 
 console.log('Listening on http://localhost:' + PORT);
 
+// Show trace for any unhandled rejections
+process.on('unhandledRejection', reason => {
+  robot.log.error(reason);
+});
+
+// Handle case when webhook creation fails
+webhook.on('error', err => {
+  robot.log.error(err);
+});
 module.exports = robot;

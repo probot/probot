@@ -1,0 +1,57 @@
+#!/usr/bin/env node
+
+require('dotenv').config();
+
+const program = require('commander');
+
+program
+  .usage('[options] <plugins...>')
+  .option('-i, --integration <id>', 'ID of the GitHub Integration', process.env.INTEGRATION_ID)
+  .option('-s, --secret <secret>', 'Webhook secret of the GitHub Integration', process.env.WEBHOOK_SECRET || 'development')
+  .option('-p, --port <n>', 'Port to start the server on', process.env.PORT || 3000)
+  .option('-c, --cert <file>', 'Path to certificate of the GitHub Integration', readCert, process.env.CERT)
+  .parse(process.argv);
+
+function readCert(path) {
+  try {
+    return require('fs').readFileSync(path);
+  } catch (err) {
+    console.warn(err.message);
+    process.exit(1);
+  }
+}
+
+const pkgConf = require('pkg-conf');
+const resolve = require('resolve').sync;
+const createProbot = require('../');
+
+if(!program.integration) {
+  console.warn("Missing GitHub Integration ID.\nUse --integration flag or set INTEGRATION_ID environment variable.");
+  process.exit(1);
+}
+
+if(!program.cert) {
+  console.warn("Missing GitHub Integration certificate.\nUse --cert flag or set CERT environment variable.");
+  process.exit(1);
+}
+
+const probot = createProbot({
+  id: program.integration,
+  secret: program.secret,
+  cert: program.cert,
+  port: program.port
+});
+
+pkgConf('probot').then(pkg => {
+  program.args.concat(pkg.plugins || []).map(plugin => {
+    try {
+      const path = resolve(plugin, {basedir: process.cwd()});
+      probot.load(require(path))
+    } catch(err) {
+      console.warn(err.message);
+      process.exit(1);
+    }
+  });
+
+  probot.start();
+});

@@ -89,7 +89,7 @@ TODO: link to docs on getting running in development
 ```
 $ npm install -g https://github.com/probot/probot
 
-$ probot autoresponder.js
+$ probot run ./autoresponder.js
 Listening on http://localhost:3000
 ```
 

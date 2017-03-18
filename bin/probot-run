@@ -9,7 +9,7 @@ program
   .option('-i, --integration <id>', 'ID of the GitHub Integration', process.env.INTEGRATION_ID)
   .option('-s, --secret <secret>', 'Webhook secret of the GitHub Integration', process.env.WEBHOOK_SECRET || 'development')
   .option('-p, --port <n>', 'Port to start the server on', process.env.PORT || 3000)
-  .option('-c, --cert <file>', 'Path to certificate of the GitHub Integration', readCert, process.env.CERT)
+  .option('-c, --cert <file>', 'Path to certificate of the GitHub Integration', readCert, process.env.CERT || process.env.PRIVATE_KEY)
   .parse(process.argv);
 
 function readCert(path) {

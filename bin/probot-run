@@ -9,14 +9,14 @@ program
   .option('-i, --integration <id>', 'ID of the GitHub Integration', process.env.INTEGRATION_ID)
   .option('-s, --secret <secret>', 'Webhook secret of the GitHub Integration', process.env.WEBHOOK_SECRET || 'development')
   .option('-p, --port <n>', 'Port to start the server on', process.env.PORT || 3000)
-  .option('-c, --cert <file>', 'Path to certificate of the GitHub Integration', path => {
+  .option('-P, --private-key <file>', 'Path to certificate of the GitHub Integration', path => {
     try {
       return require('fs').readFileSync(path);
     } catch (err) {
       console.warn(err.message);
       process.exit(1);
     }
-  }, process.env.CERT || process.env.PRIVATE_KEY)
+  }, process.env.PRIVATE_KEY)
   .parse(process.argv);
 
 if(!program.integration) {
@@ -24,11 +24,11 @@ if(!program.integration) {
   program.help();
 }
 
-if(!program.cert) {
+if(!program.privateKey) {
   try {
-    program.cert = require('fs').readFileSync('private-key.pem');
+    program.privateKey = require('fs').readFileSync('private-key.pem');
   } catch (err) {
-    console.warn("Missing GitHub Integration certificate.\nUse --cert flag or set CERT environment variable.");
+    console.warn("Missing GitHub Integration private key.\nUse --private-key flag or set PRIVATE_KEY environment variable.");
     process.exit(1);
   }
 }
@@ -40,7 +40,7 @@ const createProbot = require('../');
 const probot = createProbot({
   id: program.integration,
   secret: program.secret,
-  cert: program.cert,
+  cert: program.privateKey,
   port: program.port
 });
 

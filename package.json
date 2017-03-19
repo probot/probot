@@ -5,17 +5,19 @@
   "repository": "https://github.com/probot/probot",
   "main": "index.js",
   "bin": {
-    "probot": "./bin/probot.js"
+    "probot": "./bin/probot"
   },
   "scripts": {
-    "start": "probot",
+    "start": "probot run",
     "test": "mocha && xo"
   },
   "author": "Brandon Keepers",
   "license": "ISC",
   "dependencies": {
     "bunyan": "^1.8.5",
-    "dotenv-safe": "^4.0.3",
+    "bunyan-format": "^0.2.1",
+    "commander": "^2.9.0",
+    "dotenv": "~4.0.0",
     "github-integration": "^1.0.0",
     "github-webhook-handler": "^0.6.0",
     "pkg-conf": "^2.0.0",

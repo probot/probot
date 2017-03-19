@@ -1,33 +1,39 @@
-const fs = require('fs');
 const createWebhook = require('github-webhook-handler');
 const createIntegration = require('github-integration');
-
 const createRobot = require('./lib/robot');
 const createServer = require('./lib/server');
 
-const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET || 'development';
-const PORT = process.env.PORT || 3000;
+module.exports = options => {
+  const webhook = createWebhook({path: '/', secret: options.secret});
+  const integration = createIntegration({
+    id: options.id,
+    cert: options.cert,
+    debug: process.env.LOG_LEVEL === 'trace'
+  });
+  const server = createServer(webhook);
+  const robot = createRobot(integration, webhook);
 
-const webhook = createWebhook({path: '/', secret: WEBHOOK_SECRET});
-const integration = createIntegration({
-  id: process.env.INTEGRATION_ID,
-  cert: process.env.PRIVATE_KEY || fs.readFileSync('private-key.pem'),
-  debug: process.env.LOG_LEVEL === 'trace'
-});
-const server = createServer(webhook);
-const robot = createRobot(integration, webhook);
+  // Show trace for any unhandled rejections
+  process.on('unhandledRejection', reason => {
+    robot.log.error(reason);
+  });
 
-server.listen(PORT);
+  // Handle case when webhook creation fails
+  webhook.on('error', err => {
+    robot.log.error(err);
+  });
 
-console.log('Listening on http://localhost:' + PORT);
+  return {
+    server,
+    robot,
 
-// Show trace for any unhandled rejections
-process.on('unhandledRejection', reason => {
-  robot.log.error(reason);
-});
+    start() {
+      server.listen(options.port);
+      console.log('Listening on http://localhost:' + options.port);
+    },
 
-// Handle case when webhook creation fails
-webhook.on('error', err => {
-  robot.log.error(err);
-});
-module.exports = robot;
+    load(plugin) {
+      plugin(robot);
+    }
+  };
+};

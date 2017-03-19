@@ -15,6 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "bunyan": "^1.8.5",
+    "bunyan-format": "^0.2.1",
     "commander": "^2.9.0",
     "dotenv": "~4.0.0",
     "github-integration": "^1.0.0",

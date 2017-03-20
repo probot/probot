@@ -1,0 +1,9 @@
+{
+  "opts": {
+    "template": "node_modules/minami"
+  },
+  "source": {
+    "include": ["README.md", "package.json", "lib"]
+  },
+  "plugins": ["plugins/markdown"]
+}

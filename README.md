@@ -8,19 +8,18 @@ If you've ever thought, "wouldn't it be cool if GitHub could…"; imma stop you 
 >
 > –Documentation on [GitHub Integrations](https://developer.github.com/early-access/integrations/)
 
-Some companies provide [hosted integrations](https://github.com/integrations) that you can install, but there's also a bunch of really cool things you can build yourself, and Probot aims to make that easy.
+There are some great services that offer [hosted integrations](https://github.com/integrations), but you can build a bunch of really cool things yourself. Probot aims to make that easy.
 
-Here are a few examples of things you can build:
+## Plugins
 
-- [autoresponder](https://github.com/probot/autoresponder) replies to opened issues with the contents of `.github/ISSUE_REPLY_TEMPLATE.md`
-- [stale](https://github.com/probot/stale) closes abandoned issues after a period of inactivity.
+Bots are implemented as plugins, which are easy to write, deploy, and share. Here are just a few examples of things probot can do:
 
-Browse all [probot plugins](https://github.com/search?q=topic%3Aprobot-plugin+org%3Aprobot&type=Repositories).
+- [stale](https://github.com/probot/stale) - closes abandoned issues after a period of inactivity.
+- [owners](https://github.com/probot/owners) - @mentions people in Pull Requests based on contents of the OWNERS file
+- [configurer](https://github.com/probot/configurer) - syncs repository settings defined in `.github/config.yml` to GitHub, enabling Pull Requests for repository settings.
+
+Check out [all probot plugins](https://github.com/search?q=topic%3Aprobot-plugin&type=Repositories).
 
 ## Contributing
 
-Most of the interesting things are built with [plugins](docs/plugins.md), so consider starting by writing a new plugin or improving one of the [existing ones](https://github.com/search?q=topic%3Aprobot-plugin+org%3Aprobot&type=Repositories).
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for other ways to contribute.
-
-[![Join the chat at https://gitter.im/bkeepers/PRobot](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/bkeepers/PRobot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+Most of the interesting things are built with plugins, so consider starting by [writing a new plugin](docs/plugins.md) or improving one of the [existing ones](https://github.com/search?q=topic%3Aprobot-plugin&type=Repositories).

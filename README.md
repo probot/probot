@@ -1,6 +1,6 @@
 # Probot
 
-Probot is bot framework for GitHub. It's like [Hubot](https://hubot.github.com/), but for GitHub instead of chat.
+Probot is a bot framework for GitHub. It's like [Hubot](https://hubot.github.com/), but for GitHub instead of chat.
 
 If you've ever thought, "wouldn't it be cool if GitHub could…"; imma stop you right there. Most features can actually be added via [GitHub Integrations](https://developer.github.com/early-access/integrations/):
 

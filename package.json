@@ -14,6 +14,7 @@
   "author": "Brandon Keepers",
   "license": "ISC",
   "dependencies": {
+    "bottleneck": "^1.15.1",
     "bunyan": "^1.8.5",
     "bunyan-format": "^0.2.1",
     "cache-manager": "^2.4.0",

@@ -76,6 +76,20 @@ module.exports = robot => {
 
 See the [full API docs](https://mikedeboer.github.io/node-github/) to see all the ways you can interact with GitHub. Some API endpoints are not available on GitHub Integrations yet, so check [which ones are available](https://developer.github.com/early-access/integrations/available-endpoints/) first.
 
+### Pagination
+
+Many GitHub API endpoints are paginated. The `github.paginate` method can be used to get each page of the results.
+
+```js
+const github = await robot.auth(event.payload.installation.id);
+
+github.paginate(github.issues.getAll(context.repo()), issues => {
+  issues.forEach(issue => {
+    robot.console.log('Issue: %s', issue.title);
+  });
+});
+```
+
 ## Running plugins
 
 Before you can run your plugin against GitHub, you'll need to set up your [development environment](development.md) and configure a GitHub Integration for testing. You will the the ID and private key of a GitHub Integration to run the bot.

@@ -21,7 +21,9 @@ module.exports = options => {
   const robot = createRobot(integration, webhook, cache);
 
   if (process.env.SENTRY_URL) {
-    Raven.config(process.env.SENTRY_URL).install();
+    Raven.config(process.env.SENTRY_URL, {
+      captureUnhandledRejections: true
+    }).install({});
   }
 
   // Show trace for any unhandled rejections

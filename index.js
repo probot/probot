@@ -3,6 +3,7 @@ const createWebhook = require('github-webhook-handler');
 const createIntegration = require('github-integration');
 const createRobot = require('./lib/robot');
 const createServer = require('./lib/server');
+const Raven = require('raven');
 
 module.exports = options => {
   const cache = cacheManager.caching({
@@ -18,6 +19,10 @@ module.exports = options => {
   });
   const server = createServer(webhook);
   const robot = createRobot(integration, webhook, cache);
+
+  if(process.env.SENTRY_URL) {
+    Raven.config(process.env.SENTRY_URL).install();
+  }
 
   // Show trace for any unhandled rejections
   process.on('unhandledRejection', reason => {

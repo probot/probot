@@ -24,6 +24,7 @@
     "github-integration": "^1.0.0",
     "github-webhook-handler": "^0.6.0",
     "pkg-conf": "^2.0.0",
+    "raven": "^1.2.0",
     "resolve": "^1.3.2"
   },
   "devDependencies": {

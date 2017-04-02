@@ -1,6 +1,7 @@
 const cacheManager = require('cache-manager');
 const createWebhook = require('github-webhook-handler');
 const createIntegration = require('github-integration');
+const Raven = require('raven');
 const createRobot = require('./lib/robot');
 const createServer = require('./lib/server');
 
@@ -18,6 +19,12 @@ module.exports = options => {
   });
   const server = createServer(webhook);
   const robot = createRobot(integration, webhook, cache);
+
+  if (process.env.SENTRY_URL) {
+    Raven.config(process.env.SENTRY_URL, {
+      captureUnhandledRejections: true
+    }).install({});
+  }
 
   // Show trace for any unhandled rejections
   process.on('unhandledRejection', reason => {

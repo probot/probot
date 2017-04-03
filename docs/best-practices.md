@@ -8,6 +8,12 @@ Being installed on an account is sufficient permission for actions in response t
 
 For example, the [stale](https://github.com/probot/stale) plugin will only scan a repository for stale issues and pull requests if `.github/stale.yml` exists in the repository.
 
+### Include "dry run" functionality
+
+A dry run is when a plugin, instead of actually taking an action, only logs what actions it would have taken if it wasn't a dry run. A plugin _must_ offer a dry run feature if it does anything destructive and _should_ offer a dry run feature in all cases.
+
+For example, the [stale](https://github.com/probot/stale) plugin will perform a dry run if there is no `.github/stale.yml` file in the repository.
+
 ## Configuration
 
 ### Require minimal configuration

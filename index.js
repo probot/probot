@@ -26,13 +26,9 @@ module.exports = options => {
     }).install({});
   }
 
-  // Show trace for any unhandled rejections
-  process.on('unhandledRejection', reason => {
-    robot.log.error(reason);
-  });
-
   // Handle case when webhook creation fails
   webhook.on('error', err => {
+    Raven.captureException(err);
     robot.log.error(err);
   });
 

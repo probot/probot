@@ -31,6 +31,7 @@ module.exports = options => {
   const robot = createRobot({integration, webhook, cache, logger});
 
   if (process.env.SENTRY_URL) {
+    Raven.disableConsoleAlerts();
     Raven.config(process.env.SENTRY_URL, {
       captureUnhandledRejections: true,
       autoBreadcrumbs: true

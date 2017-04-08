@@ -1,5 +1,6 @@
 const bunyan = require('bunyan');
 const bunyanFormat = require('bunyan-format');
+const sentryStream = require('bunyan-sentry-stream');
 const cacheManager = require('cache-manager');
 const createIntegration = require('github-integration');
 const createWebhook = require('github-webhook-handler');
@@ -33,11 +34,12 @@ module.exports = options => {
     Raven.config(process.env.SENTRY_URL, {
       captureUnhandledRejections: true
     }).install({});
+
+    logger.addStream(sentryStream(Raven));
   }
 
   // Handle case when webhook creation fails
   webhook.on('error', err => {
-    Raven.captureException(err);
     robot.log.error(err);
   });
 

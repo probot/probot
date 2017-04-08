@@ -107,8 +107,6 @@ $ probot run -i 9999 -P private-key.pem ./autoresponder.js
 Listening on http://localhost:3000
 ```
 
-Once your bot is running, you'll need to use `ngrok` to receive GitHub webhooks as described in the [development](development.md) documentation.
-
 ## Publishing your bot
 
 Plugins can be published in NPM modules, which can either be deployed as stand-alone bots, or combined with other plugins.

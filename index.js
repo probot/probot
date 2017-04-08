@@ -38,7 +38,7 @@ module.exports = options => {
 
     start() {
       server.listen(options.port);
-      console.log('Listening on http://localhost:' + options.port);
+      robot.log.trace('Listening on http://localhost:' + options.port);
     },
 
     load(plugin) {

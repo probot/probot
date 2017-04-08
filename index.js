@@ -32,7 +32,8 @@ module.exports = options => {
 
   if (process.env.SENTRY_URL) {
     Raven.config(process.env.SENTRY_URL, {
-      captureUnhandledRejections: true
+      captureUnhandledRejections: true,
+      autoBreadcrumbs: true
     }).install({});
 
     logger.addStream(sentryStream(Raven));

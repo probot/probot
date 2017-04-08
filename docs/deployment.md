@@ -11,13 +11,13 @@ To deploy a bot that includes multiple plugins, create a new app that has the pl
 ```json
 {
   "name": "my-probot",
-  "priate": true,
+  "private": true,
   "dependencies": {
-    "probot-autoresponder": "~1.0",
-    "probot-configurer": "~1.0",
+    "probot-autoresponder": "probot/autoresponder",
+    "probot-configurer": "probot/configurer"
   },
   "scripts": {
-    "run": "probot run"
+    "start": "probot run"
  },
  "probot": {
    "plugins": [

@@ -1,7 +1,11 @@
+const bunyan = require('bunyan');
+const bunyanFormat = require('bunyan-format');
+const sentryStream = require('bunyan-sentry-stream');
 const cacheManager = require('cache-manager');
-const createWebhook = require('github-webhook-handler');
 const createIntegration = require('github-integration');
+const createWebhook = require('github-webhook-handler');
 const Raven = require('raven');
+
 const createRobot = require('./lib/robot');
 const createServer = require('./lib/server');
 
@@ -11,6 +15,12 @@ module.exports = options => {
     ttl: 60 * 60 // 1 hour
   });
 
+  const logger = bunyan.createLogger({
+    name: 'PRobot',
+    level: process.env.LOG_LEVEL || 'debug',
+    stream: bunyanFormat({outputMode: process.env.LOG_FORMAT || 'short'})
+  });
+
   const webhook = createWebhook({path: '/', secret: options.secret});
   const integration = createIntegration({
     id: options.id,
@@ -18,18 +28,20 @@ module.exports = options => {
     debug: process.env.LOG_LEVEL === 'trace'
   });
   const server = createServer(webhook);
-  const robot = createRobot(integration, webhook, cache);
+  const robot = createRobot({integration, webhook, cache, logger});
 
   if (process.env.SENTRY_URL) {
     Raven.config(process.env.SENTRY_URL, {
-      captureUnhandledRejections: true
+      captureUnhandledRejections: true,
+      autoBreadcrumbs: true
     }).install({});
+
+    logger.addStream(sentryStream(Raven));
   }
 
   // Handle case when webhook creation fails
   webhook.on('error', err => {
-    Raven.captureException(err);
-    robot.log.error(err);
+    logger.error(err);
   });
 
   return {
@@ -38,7 +50,7 @@ module.exports = options => {
 
     start() {
       server.listen(options.port);
-      robot.log.trace('Listening on http://localhost:' + options.port);
+      logger.trace('Listening on http://localhost:' + options.port);
     },
 
     load(plugin) {

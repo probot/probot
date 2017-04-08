@@ -40,7 +40,7 @@ module.exports = options => {
 
   // Handle case when webhook creation fails
   webhook.on('error', err => {
-    robot.log.error(err);
+    logger.error(err);
   });
 
   return {
@@ -49,7 +49,7 @@ module.exports = options => {
 
     start() {
       server.listen(options.port);
-      console.log('Listening on http://localhost:' + options.port);
+      logger.info('Listening on http://localhost:' + options.port);
     },
 
     load(plugin) {

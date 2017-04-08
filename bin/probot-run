@@ -17,7 +17,7 @@ program
       process.exit(1);
     }
   }, process.env.PRIVATE_KEY)
-  .option('-t, --tunnel <subdomain>', 'Expose your local bot to the internet', process.env.NODE_ENV != 'production')
+  .option('-t, --tunnel <subdomain>', 'Expose your local bot to the internet', process.env.SUBDOMAIN || process.env.NODE_ENV != 'production')
   .parse(process.argv);
 
 if(!program.integration) {
@@ -49,7 +49,7 @@ function setupTunnel() {
   const localtunnel = require('localtunnel');
   const subdomain = typeof program.tunnel == 'string' ?
     program.tunnel :
-    process.env.SUBDOMAIN || require('os').userInfo().username;
+    require('os').userInfo().username;
 
   const tunnel = localtunnel(program.port, {subdomain}, function (err, tunnel) {
     if (err) {

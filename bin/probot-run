@@ -17,6 +17,7 @@ program
       process.exit(1);
     }
   }, process.env.PRIVATE_KEY)
+  .option('-t, --tunnel <subdomain>', 'Expose your local bot to the internet', process.env.SUBDOMAIN || process.env.NODE_ENV != 'production')
   .parse(process.argv);
 
 if(!program.integration) {
@@ -34,6 +35,34 @@ if(!program.privateKey) {
     console.warn("Missing GitHub Integration private key.\nUse --private-key flag or set PRIVATE_KEY environment variable.");
     process.exit(1);
   }
+}
+
+if(program.tunnel) {
+  try {
+    setupTunnel();
+  } catch(err) {
+    console.warn('Run `npm install --save-dev localtunnel` to enable localtunnel.');
+  }
+}
+
+function setupTunnel() {
+  const localtunnel = require('localtunnel');
+  const subdomain = typeof program.tunnel == 'string' ?
+    program.tunnel :
+    require('os').userInfo().username;
+
+  const tunnel = localtunnel(program.port, {subdomain}, function (err, tunnel) {
+    if (err) {
+      console.warn('Could not open tunnel: ', err.message);
+    } else {
+      console.log('Listening on ' + tunnel.url);
+      tunnel.url;
+    }
+  });
+
+  tunnel.on('close', function() {
+    console.warn('Local tunnel closed');
+  });
 }
 
 const pkgConf = require('pkg-conf');

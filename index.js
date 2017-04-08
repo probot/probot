@@ -50,7 +50,7 @@ module.exports = options => {
 
     start() {
       server.listen(options.port);
-      logger.info('Listening on http://localhost:' + options.port);
+      logger.trace('Listening on http://localhost:' + options.port);
     },
 
     load(plugin) {

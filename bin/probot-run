@@ -25,9 +25,12 @@ if(!program.integration) {
 }
 
 if(!program.privateKey) {
-  try {
-    program.privateKey = require('fs').readFileSync('private-key.pem');
-  } catch (err) {
+  const fs = require('fs');
+  const key = fs.readdirSync(process.cwd()).find(path => path.endsWith('.pem'));
+
+  if (key) {
+    program.privateKey = fs.readFileSync(key);
+  } else {
     console.warn("Missing GitHub Integration private key.\nUse --private-key flag or set PRIVATE_KEY environment variable.");
     process.exit(1);
   }

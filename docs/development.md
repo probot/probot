@@ -9,7 +9,7 @@ To run a plugin locally, you'll need to create a GitHub Integration and configur
     - **Callback URL** and **Webhook URL**: The full ngrok url above. For example: `https://4397efc6.ngrok.io/`
     - **Webhook Secret:** `development`
     - **Permissions & events** needed will depend on how you use the bot, but for development it may be easiest to enable everything.
-1. Download the private key and move it to `private-key.pem` in the project directory
+1. Download the private key and move it to the project directory
 1. Edit `.env` and set `INTEGRATION_ID` to the ID of the integration you just created.
 1. With `ngrok` still running, open another terminal and run `$ npm start` to start the server on http://localhost:3000
 

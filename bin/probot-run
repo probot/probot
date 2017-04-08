@@ -49,7 +49,7 @@ function setupTunnel() {
   const localtunnel = require('localtunnel');
   const subdomain = typeof program.tunnel == 'string' ?
     program.tunnel :
-    require('os').userInfo().username;
+    process.env.SUBDOMAIN || require('os').userInfo().username;
 
   const tunnel = localtunnel(program.port, {subdomain}, function (err, tunnel) {
     if (err) {

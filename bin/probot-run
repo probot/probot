@@ -30,7 +30,6 @@ if(!program.privateKey) {
 
   if (key) {
     program.privateKey = fs.readFileSync(key);
-    console.log(program.privateKey);
   } else {
     console.warn("Missing GitHub Integration private key.\nUse --private-key flag or set PRIVATE_KEY environment variable.");
     process.exit(1);

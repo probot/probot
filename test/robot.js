@@ -3,13 +3,18 @@ const expect = require('expect');
 const Context = require('../lib/context');
 const createRobot = require('../lib/robot');
 
+const nullLogger = {};
+['trace', 'debug', 'info', 'warn', 'error', 'fatal'].forEach(level => {
+  nullLogger[level] = function () { };
+});
+
 describe('Robot', () => {
   let webhook;
   let robot;
 
   beforeEach(() => {
     webhook = new EventEmitter();
-    robot = createRobot({}, webhook);
+    robot = createRobot({webhook, logger: nullLogger});
   });
 
   describe('on', () => {

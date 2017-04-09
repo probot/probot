@@ -1,6 +1,6 @@
 {
   "name": "probot",
-  "version": "0.3.0",
+  "version": "0.4.1",
   "description": "a trainable robot that responds to activity on GitHub",
   "repository": "https://github.com/probot/probot",
   "main": "index.js",
@@ -17,6 +17,7 @@
     "bottleneck": "^1.15.1",
     "bunyan": "^1.8.5",
     "bunyan-format": "^0.2.1",
+    "bunyan-sentry-stream": "^1.1.0",
     "cache-manager": "^2.4.0",
     "commander": "^2.9.0",
     "dotenv": "~4.0.0",
@@ -60,6 +61,6 @@
     ]
   },
   "engines": {
-    "node": "~7.7.0"
+    "node": "^7.7"
   }
 }

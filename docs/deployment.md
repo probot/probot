@@ -14,7 +14,7 @@ Every plugin can either be deployed as a stand-alone bot, or combined with other
 
 ## Create the GitHub Integration
 
-Every deployment will need a an [Integration](https://developer.github.com/early-access/integrations/).
+Every deployment will need an [Integration](https://developer.github.com/early-access/integrations/).
 
 1. [Create a new GitHub Integration](https://github.com/settings/integrations/new) with:
     - **Homepage URL**: the URL to the GitHub repository for your plugin
@@ -78,7 +78,7 @@ Zeit [Now](http://zeit.co/now) is a great service for running Probot plugins. Af
 
 1. Run `now` to deploy, replacing the `INTEGRATION_ID` and `WEBHOOK_SECRET` with the values for those variables, and setting the path for the `PRIVATE_KEY`:
 
-        now -e INTEGRATION_ID=aaa \
+        $ now -e INTEGRATION_ID=aaa \
             -e WEBHOOK_SECRET=bbb \
             -e PRIVATE_KEY="$(cat ~/Downloads/*.private-key.pem)"
 

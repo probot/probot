@@ -4,6 +4,14 @@ Every plugin can either be deployed as a stand-alone bot, or combined with other
 
 > **Heads up!** Note that most [plugins in the @probot organization](https://github.com/search?q=topic%3Aprobot-plugin+org%3Aprobot&type=Repositories) have an official hosted integration that you can use for your open source project. Use the hosted instance if you don't want to deploy your own.
 
+**Contents:**
+
+1. [Create the GitHub Integration](#create-the-github-integration)
+1. [Deploy the plugin](#deploy-the-plugin)
+  1. [Heroku](#heroku)
+  1. [Now](#now)
+1. [Combining plugins](#combining-plugins)
+
 ## Create the GitHub Integration
 
 Every deployment will need a an [Integration](https://developer.github.com/early-access/integrations/).

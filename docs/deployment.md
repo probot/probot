@@ -8,8 +8,8 @@ Every plugin can either be deployed as a stand-alone bot, or combined with other
 
 1. [Create the GitHub Integration](#create-the-github-integration)
 1. [Deploy the plugin](#deploy-the-plugin)
-  1. [Heroku](#heroku)
-  1. [Now](#now)
+    1. [Heroku](#heroku)
+    1. [Now](#now)
 1. [Combining plugins](#combining-plugins)
 
 ## Create the GitHub Integration

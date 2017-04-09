@@ -20,7 +20,7 @@ Every deployment will need an [Integration](https://developer.github.com/early-a
     - **Homepage URL**: the URL to the GitHub repository for your plugin
     - **Webhook URL**: Use `https://example.com/` for now, we'll come back in a minute to update this with the URL of your deployed plugin.
     - **Webhook Secret**: Generate a unique secret with `openssl rand -base64 32` and save it because you'll need it in a minute to configure your deployed plugin.
-    - **Permissions & events**: See `docs/permissions.md` in the plugin for a list of the permissions and events that it needs access to.
+    - **Permissions & events**: See `docs/deploy.md` in the plugin for a list of the permissions and events that it needs access to.
 
 1. Download the private key from the Integration.
 

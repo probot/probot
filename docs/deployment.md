@@ -6,13 +6,15 @@ Every plugin can either be deployed as a stand-alone bot, or combined with other
 
 ## Create the GitHub Integration
 
+Every deployment will need a an [Integration](https://developer.github.com/early-access/integrations/).
+
 1. [Create a new GitHub Integration](https://github.com/settings/integrations/new) with:
     - **Homepage URL**: the URL to the GitHub repository for your plugin
-    - **Callback URL** and **Webhook URL**: Use `https://example.com/` for now, we'll come back in a minute to update this with the URL of your deployed plugin.
+    - **Webhook URL**: Use `https://example.com/` for now, we'll come back in a minute to update this with the URL of your deployed plugin.
     - **Webhook Secret**: Generate a unique secret with `openssl rand -base64 32` and save it because you'll need it in a minute to configure your deployed plugin.
     - **Permissions & events**: See `docs/permissions.md` in the plugin for a list of the permissions and events that it needs access to.
 
-1. Download the private key from the Integration
+1. Download the private key from the Integration.
 
 1. Make sure that you click the green **Install** button on the top left of the integration page. This gives you an option of installing the integration on all or a subset of your repositories.
 
@@ -32,7 +34,7 @@ TODO: Generic docs for deploying a plugin to Heroku
 
 Zeit [Now](http://zeit.co/now) is a great service for running Probot plugins. After [creating the GitHub Integration](#create-the-github-integration):
 
-1. Make sure you have a local clone of the plugin that you want to deploy. e.g. `git clone https://github.com/probot/stale`
+1. Clone the plugin that you want to deploy. e.g. `git clone https://github.com/probot/stale`
 
 1. Install the now CLI with `npm i -g now`
 
@@ -42,7 +44,7 @@ Zeit [Now](http://zeit.co/now) is a great service for running Probot plugins. Af
             -e WEBHOOK_SECRET=bbb \
             -e PRIVATE_KEY="$(cat ~/Downloads/*.private-key.pem)"
 
-1. Once the deploy is started, go back to your [integration settings page](https://github.com/settings/integrations) and update the **Callback URL** and **Webhook URL** to the URL of your deployment (which `now` has kindly copied to your clipboard).
+1. Once the deploy is started, go back to your [integration settings page](https://github.com/settings/integrations) and update the **Webhook URL** to the URL of your deployment (which `now` has kindly copied to your clipboard).
 
 Your plugin should be up and running!
 

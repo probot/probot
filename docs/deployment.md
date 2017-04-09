@@ -28,15 +28,45 @@ To deploy a plugin to any cloud provider, you will need 3 environment variables:
 
 ### Heroku
 
-TODO: Generic docs for deploying a plugin to Heroku
+Probot runs like [any other Node app](https://devcenter.heroku.com/articles/deploying-nodejs) on Heroku. After [creating the GitHub Integration](#create-the-github-integration):
+
+1. Make sure you have the [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli) client installed.
+
+1. Clone the plugin that you want to deploy. e.g. `git clone https://github.com/probot/stale`
+
+1. Create the Heroku app with the `heroku create` command:
+
+        $ heroku create
+        Creating arcane-lowlands-8408... done, stack is cedar
+        http://arcane-lowlands-8408.herokuapp.com/ | git@heroku.com:arcane-lowlands-8408.git
+        Git remote heroku added
+
+1. Go back to your [integration settings page](https://github.com/settings/integrations) and update the **Webhook URL** to the URL of your deployment, e.g. `http://arcane-lowlands-8408.herokuapp.com/`.
+
+1. Configure the Heroku app, replacing the `INTEGRATION_ID` and `WEBHOOK_SECRET` with the values for those variables, and setting the path for the `PRIVATE_KEY`:
+
+        $ heroku config:set INTEGRATION_ID=aaa \
+            WEBHOOK_SECRET=bbb \
+            PRIVATE_KEY="$(cat ~/Downloads/*.private-key.pem)"
+
+1. Deploy the plugin to heroku with `git push`:
+
+        $ git push heroku master
+        ...
+        -----> Node.js app detected
+        ...
+        -----> Launching... done
+              http://arcane-lowlands-8408.herokuapp.com deployed to Heroku
+
+Your plugin should be up and running!
 
 ### Now
 
 Zeit [Now](http://zeit.co/now) is a great service for running Probot plugins. After [creating the GitHub Integration](#create-the-github-integration):
 
-1. Clone the plugin that you want to deploy. e.g. `git clone https://github.com/probot/stale`
-
 1. Install the now CLI with `npm i -g now`
+
+1. Clone the plugin that you want to deploy. e.g. `git clone https://github.com/probot/stale`
 
 1. Run `now` to deploy, replacing the `INTEGRATION_ID` and `WEBHOOK_SECRET` with the values for those variables, and setting the path for the `PRIVATE_KEY`:
 

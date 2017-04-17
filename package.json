@@ -55,7 +55,8 @@
       {
         "files": "test/**/*.js",
         "rules": {
-          "max-nested-callbacks": "off"
+          "max-nested-callbacks": "off",
+          "prefer-arrow-callback": "off"
         }
       }
     ]

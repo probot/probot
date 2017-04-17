@@ -8,17 +8,17 @@ const nullLogger = {};
   nullLogger[level] = function () { };
 });
 
-describe('Robot', () => {
+describe('Robot', function () {
   let webhook;
   let robot;
 
-  beforeEach(() => {
+  beforeEach(function () {
     webhook = new EventEmitter();
     robot = createRobot({webhook, logger: nullLogger});
   });
 
-  describe('on', () => {
-    it('calls the callback', () => {
+  describe('on', function () {
+    it('calls the callback', function () {
       const spy = expect.createSpy();
       const event = {};
 
@@ -30,7 +30,7 @@ describe('Robot', () => {
       expect(spy.calls[0].arguments[1]).toBeA(Context);
     });
 
-    it('emits event with acton', () => {
+    it('emits event with acton', function () {
       const spy = expect.createSpy();
 
       robot.on('test.bar', spy);

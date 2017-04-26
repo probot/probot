@@ -12,4 +12,4 @@ require('commander')
   .version(require('../package').version)
   .usage('<command> [options]')
   .command('run', 'run the bot')
-  .parse(process.argv)
+  .parse(process.argv);

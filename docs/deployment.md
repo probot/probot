@@ -32,7 +32,13 @@ To deploy a plugin to any cloud provider, you will need 3 environment variables:
 
 - `INTEGRATION_ID`: the ID of the integration, which you can get from the [integration settings page](https://github.com/settings/integrations).
 - `WEBHOOK_SECRET`: the **Webhook Secret** that you generated when you created the integration.
-- `PRIVATE_KEY`: the contents of the private key you downloaded after creating the integration.
+
+And one of:
+
+- `PRIVATE_KEY`: the contents of the private key you downloaded after creating the integration, OR...
+- `PRIVATE_KEY_PATH`: the path to a private key file.
+
+`PRIVATE_KEY` takes precedence over `PRIVATE_KEY_PATH`.
 
 ### Heroku
 

@@ -2,7 +2,9 @@
 
 require('dotenv').config();
 
+const pkgConf = require('pkg-conf');
 const program = require('commander');
+
 const {findPrivateKey} = require('../lib/private-key');
 
 program
@@ -11,43 +13,42 @@ program
   .option('-s, --secret <secret>', 'Webhook secret of the GitHub Integration', process.env.WEBHOOK_SECRET || 'development')
   .option('-p, --port <n>', 'Port to start the server on', process.env.PORT || 3000)
   .option('-P, --private-key <file>', 'Path to certificate of the GitHub Integration', findPrivateKey)
-  .option('-t, --tunnel <subdomain>', 'Expose your local bot to the internet', process.env.SUBDOMAIN || process.env.NODE_ENV != 'production')
+  .option('-t, --tunnel <subdomain>', 'Expose your local bot to the internet', process.env.SUBDOMAIN || process.env.NODE_ENV !== 'production')
   .parse(process.argv);
 
-if(!program.integration) {
-  console.warn("Missing GitHub Integration ID.\nUse --integration flag or set INTEGRATION_ID environment variable.");
+if (!program.integration) {
+  console.warn('Missing GitHub Integration ID.\nUse --integration flag or set INTEGRATION_ID environment variable.');
   program.help();
 }
 
-if(program.tunnel) {
+if (program.tunnel) {
   try {
     setupTunnel();
-  } catch(err) {
+  } catch (err) {
     console.warn('Run `npm install --save-dev localtunnel` to enable localtunnel.');
   }
 }
 
 function setupTunnel() {
+  // eslint-disable-next-line import/no-extraneous-dependencies, import/no-unresolved
   const localtunnel = require('localtunnel');
-  const subdomain = typeof program.tunnel == 'string' ?
+  const subdomain = typeof program.tunnel === 'string' ?
     program.tunnel :
     require('os').userInfo().username;
 
-  const tunnel = localtunnel(program.port, {subdomain}, function (err, tunnel) {
+  const tunnel = localtunnel(program.port, {subdomain}, (err, tunnel) => {
     if (err) {
       console.warn('Could not open tunnel: ', err.message);
     } else {
       console.log('Listening on ' + tunnel.url);
-      tunnel.url;
     }
   });
 
-  tunnel.on('close', function() {
+  tunnel.on('close', () => {
     console.warn('Local tunnel closed');
   });
 }
 
-const pkgConf = require('pkg-conf');
 const createProbot = require('../');
 
 const probot = createProbot({
@@ -61,8 +62,8 @@ pkgConf('probot').then(pkg => {
   const plugins = require('../lib/plugin')(probot);
   const requestedPlugins = program.args.concat(pkg.plugins || []);
 
-  // if we have explicitly requested plugins, load them; otherwise use autoloading
-  if (requestedPlugins.length) {
+  // If we have explicitly requested plugins, load them; otherwise use autoloading
+  if (requestedPlugins.length > 0) {
     plugins.load(requestedPlugins);
   } else {
     plugins.autoload();

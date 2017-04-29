@@ -21,6 +21,10 @@ if (!program.integration) {
   program.help();
 }
 
+if (!program.privateKey) {
+  program.privateKey = findPrivateKey();
+}
+
 if (program.tunnel) {
   try {
     setupTunnel();

@@ -1,0 +1,31 @@
+#!/bin/sh
+
+set -e
+
+# Checkout the gh-pages branch into the "out" directory
+[ -d ./out ] || git worktree add out origin/gh-pages
+
+# Update checkout
+cd out
+git pull origin gh-pages
+cd ..
+
+# Store the versions
+VERSION=$(npm view probot version)
+
+# Generate docs
+npm run doc
+
+cd out
+
+# Delete previously generated docs for this version
+rm -rf $VERSION
+mv probot/$VERSION .
+rmdir probot
+
+ln -sf $VERSION latest
+
+# Commit and publish
+git add .
+git commit -m "Update docs for v$VERSION"
+git push origin gh-pages

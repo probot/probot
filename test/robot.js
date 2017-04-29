@@ -1,4 +1,3 @@
-const EventEmitter = require('events').EventEmitter;
 const expect = require('expect');
 const Context = require('../lib/context');
 const createRobot = require('../lib/robot');
@@ -11,33 +10,57 @@ const nullLogger = {};
 describe('Robot', function () {
   let webhook;
   let robot;
+  let event;
+  let callbacks;
+  let spy;
 
   beforeEach(function () {
-    webhook = new EventEmitter();
+    callbacks = {};
+    webhook = {
+      on: (name, callback) => {
+        callbacks[name] = callback;
+      },
+      emit: (name, event) => {
+        return callbacks[name](event);
+      }
+    };
+
     robot = createRobot({webhook, logger: nullLogger});
+    robot.auth = () => {};
+
+    event = {
+      payload: {
+        action: 'foo',
+        installation: {id: 1}
+      }
+    };
+
+    spy = expect.createSpy();
   });
 
   describe('on', function () {
-    it('calls the callback', function () {
-      const spy = expect.createSpy();
-      const event = {};
-
+    it('calls callback when no action is specified', async function () {
       robot.on('test', spy);
+
       expect(spy).toNotHaveBeenCalled();
-      webhook.emit('test', event);
+      await webhook.emit('test', event);
       expect(spy).toHaveBeenCalled();
       expect(spy.calls[0].arguments[0]).toBe(event);
       expect(spy.calls[0].arguments[1]).toBeA(Context);
     });
 
-    it('emits event with acton', function () {
-      const spy = expect.createSpy();
+    it('calls callback with same action', async function () {
+      robot.on('test.foo', spy);
 
-      robot.on('test.bar', spy);
-      webhook.emit('test', {payload: {action: 'foo'}});
-      expect(spy).toNotHaveBeenCalled();
-      webhook.emit('test', {payload: {action: 'bar'}});
+      await webhook.emit('test', event);
       expect(spy).toHaveBeenCalled();
+    });
+
+    it('does not call callback with different action', async function () {
+      robot.on('test.nope', spy);
+
+      await webhook.emit('test', event);
+      expect(spy).toNotHaveBeenCalled();
     });
   });
 });

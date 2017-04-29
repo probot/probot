@@ -38,22 +38,6 @@ module.exports = robot => {
 };
 ```
 
-### auth
-
-`robot.auth(id)` will return an authenticated GitHub client that can be used to make API calls. It takes the ID of the installation, which can be extracted from an event:
-
-```js
-module.exports = function(robot) {
-  robot.on('issues.opened', async (event, context) => {
-    const github = await robot.auth(event.payload.installation.id);
-  });
-};
-```
-
-> Note: `robot.auth` is asynchronous, so it needs to be prefixed with a [`await`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await) to wait for the magic to happen.
-
-The `github` object returned from authenticating is an instance of the [github Node.js module](https://github.com/mikedeboer/node-github), which wraps the [GitHub API](https://developer.github.com/v3/) and allows you to do almost anything programmatically that you can do through a web browser.
-
 ### log
 
 `robot.log` is a logger backed by [bunyan](https://github.com/trentm/node-bunyan).
@@ -72,7 +56,11 @@ The default log level is `debug`, but you can change it by setting the `LOG_LEVE
 
 ## Context
 
-[Context](/lib/context.js) has helpers for extracting information from the webhook event, which can be passed to GitHub API calls.
+[Context](/lib/context.js) has an authenticated GitHub client, and helpers for extracting information from the webhook event, which can be passed to GitHub API calls.
+
+### github
+
+Return an authenticated GitHub client that can be used to make API calls. It is an instance of the [github Node.js module](https://github.com/mikedeboer/node-github), which wraps the [GitHub API](https://developer.github.com/v3/) and allows you to do almost anything programmatically that you can do through a web browser.
 
 ### `repo`
 

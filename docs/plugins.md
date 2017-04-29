@@ -41,35 +41,20 @@ module.exports = robot => {
 
 Probot uses [GitHub Integrations](https://developer.github.com/early-access/integrations/). An integration is a first-class actor on GitHub, like a user (e.g. [@defunkt](https://github/defunkt)) or a organization (e.g. [@github](https://github.com/github)). The integration is given access to a repository or repositories by being "installed" on a user or organization account and can perform actions through the API like [commenting on an issue](https://developer.github.com/v3/issues/comments/#create-a-comment) or [creating a status](https://developer.github.com/v3/repos/statuses/#create-a-status).
 
-Each event delivered includes an ID of the installation that triggered it, which can be used to authenticate. `robot.auth(id)` will give your plugin an authenticated GitHub client that can be used to make API calls.
-
-```js
-module.exports = robot => {
-  robot.on('issues.opened', async (event, context) => {
-    const github = await robot.auth(event.payload.installation.id);
-    // do something useful with the github client
-  });
-};
-```
-
-> Note: `robot.auth` is asynchronous, so it needs to be prefixed with a [`await`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await) to wait for the magic to happen.
-
-The `github` object returned from authenticating is an instance of the [github Node.js module](https://github.com/mikedeboer/node-github), which wraps the [GitHub API](https://developer.github.com/v3/) and allows you to do almost anything programmatically that you can do through a web browser.
+`context.github` is an authenticated GitHub client that can be used to make API calls. It is an instance of the [github Node.js module](https://github.com/mikedeboer/node-github), which wraps the [GitHub API](https://developer.github.com/v3/) and allows you to do almost anything programmatically that you can do through a web browser.
 
 Here is an example of an autoresponder plugin that comments on opened issues:
 
 ```js
 module.exports = robot => {
   robot.on('issues.opened', async (event, context) => {
-    const github = await robot.auth(event.payload.installation.id);
-
     // `context` extracts information from the event, which can be passed to
     // GitHub API calls. This will return:
     //   {owner: 'yourname', repo: 'yourrepo', number: 123, body: 'Hello World!}
     const params = context.issue({body: 'Hello World!'})
 
     // Post a comment on the issue
-    return github.issues.createComment(params);
+    return context.github.issues.createComment(params);
   });
 }
 ```
@@ -81,9 +66,7 @@ See the [full API docs](https://mikedeboer.github.io/node-github/) to see all th
 Many GitHub API endpoints are paginated. The `github.paginate` method can be used to get each page of the results.
 
 ```js
-const github = await robot.auth(event.payload.installation.id);
-
-github.paginate(github.issues.getAll(context.repo()), issues => {
+context.github.paginate(context.github.issues.getAll(context.repo()), issues => {
   issues.forEach(issue => {
     robot.console.log('Issue: %s', issue.title);
   });

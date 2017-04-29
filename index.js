@@ -38,6 +38,10 @@ module.exports = options => {
     }).install({});
 
     logger.addStream(sentryStream(Raven));
+  } else {
+    process.on('unhandledRejection', reason => {
+      robot.log.error(reason);
+    });
   }
 
   // Handle case when webhook creation fails

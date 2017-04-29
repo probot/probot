@@ -103,6 +103,6 @@ $ mv plugin-template probot-myplugin && cd probot-myplugin
 
 ## Next
 
-- [See the full Probot API](api.md)
+- [See the full Probot API](https://probot.github.io/probot/latest/)
 - [Tips for development](development.md)
 - [Deploy your plugin](deployment.md)

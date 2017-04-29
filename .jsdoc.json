@@ -5,5 +5,8 @@
   "source": {
     "include": ["README.md", "package.json", "lib"]
   },
-  "plugins": ["plugins/markdown"]
+  "plugins": [
+    "plugins/markdown",
+    "node_modules/jsdoc-strip-async-await"
+  ]
 }

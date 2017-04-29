@@ -1,4 +1,3 @@
-const EventEmitter = require('events').EventEmitter;
 const expect = require('expect');
 const Context = require('../lib/context');
 const createRobot = require('../lib/robot');
@@ -18,10 +17,14 @@ describe('Robot', function () {
   beforeEach(function () {
     callbacks = {};
     webhook = {
-      on: (name, callback) => callbacks[name] = callback,
-      emit: (name, event) => callbacks[name](event)
+      on: (name, callback) => {
+        callbacks[name] = callback;
+      },
+      emit: (name, event) => {
+        return callbacks[name](event);
+      }
     };
-    
+
     robot = createRobot({webhook, logger: nullLogger});
     robot.auth = () => {};
 
@@ -30,7 +33,7 @@ describe('Robot', function () {
         action: 'foo',
         installation: {id: 1}
       }
-    }
+    };
 
     spy = expect.createSpy();
   });

@@ -98,7 +98,7 @@ Use the [plugin-template](https://github.com/probot/plugin-template) repository 
 
 ```
 $ curl -L https://github.com/probot/plugin-template/archive/master.tar.gz | tar xvz
-$ mv plugin-template probot-myplugin && cd probot-myplugin
+$ mv plugin-template-master probot-myplugin && cd probot-myplugin
 ```
 
 ## Next

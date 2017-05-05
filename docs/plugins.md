@@ -10,6 +10,22 @@ module.exports = robot => {
 
 The `robot` parameter is an instance of [`Robot`](/lib/robot.js) and gives you access to all of the bot goodness.
 
+## Creating a plugin
+
+Use the `probot init` command to scaffold a new plugin.
+
+Probot will ask you some questions about your plugin, then create files in the directory of your choosing (the current working directory, unless otherwise specified).  Providing this information is optional, but reduces some boilerplate.
+
+If you don't wish to interact with the prompts, you can provide command-line options instead.  See the output of `probot init --help` for the full list.
+
+### Custom Plugin Template
+
+By default, Probot will use the official [plugin template](https://github.com/probot/plugin-template), but this can be customized via `--template`.
+
+### Overwriting Files
+
+By default, Probot will **not** overwrite files which already exist.  Use the `--overwrite` flag to enable this behavior.
+
 ## Receiving GitHub webhooks
 
 [GitHub webhooks](https://developer.github.com/webhooks/) are fired for almost every significant action that users take on GitHub, whether it's pushes to code, opening or closing issues, opening or merging pull requests, or commenting on a discussion.

@@ -12,4 +12,5 @@ require('commander')
   .version(require('../package').version)
   .usage('<command> [options]')
   .command('run', 'run the bot')
+  .command('init', 'initialize a new plugin')
   .parse(process.argv);

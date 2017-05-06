@@ -2,7 +2,7 @@
   "name": "probot",
   "version": "0.5.0",
   "description": "a trainable robot that responds to activity on GitHub",
-  "repository": "https://github.com/probot/probot",
+  "repository": "probot/probot",
   "main": "index.js",
   "bin": {
     "probot": "./bin/probot.js"
@@ -10,7 +10,9 @@
   "scripts": {
     "start": "node ./bin/probot run",
     "test": "mocha && xo",
-    "doc": "jsdoc -c .jsdoc.json"
+    "doc": "jsdoc -c .jsdoc.json",
+    "generate-changelog": "github-changes -k \"$GITHUB_TOKEN\" -o probot -r probot -n ${npm_package_version} --only-pulls --use-commit-body -m '(YYYY-MM-DD)' --for-tag v${npm_package_version}",
+    "version": "npm run generate-changelog && $EDITOR CHANGELOG.md && git add CHANGELOG.md"
   },
   "author": "Brandon Keepers",
   "license": "ISC",
@@ -33,6 +35,7 @@
   },
   "devDependencies": {
     "expect": "^1.20.2",
+    "github-changes": "^1.1.0",
     "jsdoc": "^3.4.3",
     "jsdoc-strip-async-await": "^0.1.0",
     "minami": "^1.1.1",

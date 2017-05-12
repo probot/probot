@@ -25,6 +25,7 @@
     "github": "^8.1.0",
     "github-integration": "^1.0.0",
     "github-webhook-handler": "^0.6.0",
+    "js-yaml": "^3.8.4",
     "load-plugins": "^2.1.2",
     "pkg-conf": "^2.0.0",
     "raven": "^1.2.0",

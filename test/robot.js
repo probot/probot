@@ -106,7 +106,7 @@ describe('Robot', function () {
       let e;
       let contents;
       try {
-        await robot.getPluginConfig(github, 'owner', 'repo', 'test-file.yml');
+        contents = await robot.getPluginConfig(github, 'owner', 'repo', 'test-file.yml');
       } catch (err) {
         e = err;
       }

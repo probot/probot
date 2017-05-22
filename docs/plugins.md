@@ -75,7 +75,7 @@ context.github.paginate(context.github.issues.getAll(context.repo()), issues => 
 
 ## Running plugins
 
-Before you can run your plugin against GitHub, you'll need to set up your [development environment](development.md) and configure a GitHub Integration for testing. You will the the ID and private key of a GitHub Integration to run the bot.
+Before you can run your plugin against GitHub, you'll need to set up your [development environment](development.md) and configure a GitHub Integration for testing. You will need the ID and private key of a GitHub Integration to run the bot.
 
 Once you have an integration created, install `probot`:
 

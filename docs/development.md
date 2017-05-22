@@ -12,7 +12,7 @@ To run a plugin locally, you'll need to create a GitHub Integration and configur
 1. Run `$ npm start` to start the server, which will output `Listening on https://yourname.localtunnel.me`;
 1. Update the **Webhook URL** in the [integration settings](https://github.com/settings/integrations) to use the `localtunnel.me` URL.
 
-You'll need to create a test repository and install your Integration by clicking the "Install" button on the settings page.
+You'll need to create a test repository and install your Integration by clicking the "Install" button on the settings page of your integration.
 
 Whenever you come back to work on the app after you've already had it running once, you should only need to run `$ npm start`.
 

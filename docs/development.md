@@ -14,7 +14,7 @@ To run a plugin locally, you'll need to create a GitHub Integration and configur
 
 You'll need to create a test repository and install your Integration by clicking the "Install" button on the settings page.
 
-Whenever you com back to work on the app after you've already had it running once, you should only need to run `$ npm start`.
+Whenever you come back to work on the app after you've already had it running once, you should only need to run `$ npm start`.
 
 ## Debugging
 

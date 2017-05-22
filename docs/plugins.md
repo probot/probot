@@ -83,10 +83,10 @@ Once you have an integration created, install `probot`:
 $ npm install -g probot
 ```
 
-and run your bot, replacing `9999` and `private-key.pem` below with the ID and path to the private key of your integration.
+and run your bot from your plugin's directory, replacing `9999` and `private-key.pem` below with the ID and path to the private key of your integration.
 
 ```
-$ probot run -i 9999 -P private-key.pem ./autoresponder.js
+$ probot run -i 9999 -P private-key.pem ./index.js
 Listening on http://localhost:3000
 ```
 

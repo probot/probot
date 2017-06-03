@@ -23,7 +23,7 @@
     "commander": "^2.9.0",
     "dotenv": "~4.0.0",
     "github": "^8.1.0",
-    "github-integration": "^1.0.0",
+    "github-integration": "^2.0.0",
     "github-webhook-handler": "^0.6.0",
     "load-plugins": "^2.1.2",
     "pkg-conf": "^2.0.0",

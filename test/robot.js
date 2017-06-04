@@ -2,10 +2,15 @@ const expect = require('expect');
 const Context = require('../lib/context');
 const createRobot = require('../lib/robot');
 
-const nullLogger = {};
-['trace', 'debug', 'info', 'warn', 'error', 'fatal'].forEach(level => {
-  nullLogger[level] = function () { };
-});
+function createNullLogger() {
+  const logger = expect.createSpy();
+
+  ['trace', 'debug', 'info', 'warn', 'error', 'fatal'].forEach(level => {
+    logger[level] = expect.createSpy();
+  });
+
+  return logger;
+}
 
 describe('Robot', function () {
   let webhook;
@@ -13,6 +18,7 @@ describe('Robot', function () {
   let event;
   let callbacks;
   let spy;
+  let logger;
 
   beforeEach(function () {
     callbacks = {};
@@ -21,11 +27,14 @@ describe('Robot', function () {
         callbacks[name] = callback;
       },
       emit: (name, event) => {
-        return callbacks[name](event);
+        if (callbacks[name]) {
+          return callbacks[name](event);
+        }
       }
     };
 
-    robot = createRobot({webhook, logger: nullLogger});
+    logger = createNullLogger();
+    robot = createRobot({webhook, logger});
     robot.auth = () => {};
 
     event = {
@@ -61,6 +70,20 @@ describe('Robot', function () {
 
       await webhook.emit('test', event);
       expect(spy).toNotHaveBeenCalled();
+    });
+  });
+
+  describe('error handling', () => {
+    it('logs errors throw from handlers', async () => {
+      const error = new Error('testing');
+
+      robot.on('test', () => {
+        throw error;
+      });
+
+      await webhook.emit('test', event);
+
+      expect(logger.error).toHaveBeenCalledWith(error);
     });
   });
 });

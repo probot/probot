@@ -30,24 +30,21 @@ module.exports = options => {
   const server = createServer(webhook);
   const robot = createRobot({integration, webhook, cache, logger});
 
+  // Log all webhook errors
+  webhook.on('error', logger.error.bind(logger));
+
+  // Log all unhandled rejections
+  process.on('unhandledRejection', logger.error.bind(logger));
+
+  // If sentry is configured, report all logged errors
   if (process.env.SENTRY_URL) {
     Raven.disableConsoleAlerts();
     Raven.config(process.env.SENTRY_URL, {
-      captureUnhandledRejections: true,
       autoBreadcrumbs: true
     }).install({});
 
     logger.addStream(sentryStream(Raven));
-  } else {
-    process.on('unhandledRejection', reason => {
-      robot.log.error(reason);
-    });
   }
-
-  // Handle case when webhook creation fails
-  webhook.on('error', err => {
-    logger.error(err);
-  });
 
   return {
     server,

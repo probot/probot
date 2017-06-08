@@ -99,7 +99,7 @@ describe('private-key', function () {
 
         it('should throw an error', function () {
           expect(findPrivateKey)
-            .toThrow(Error, /missing private key for github integrationy/i);
+            .toThrow(Error, /missing private key for GitHub App/i);
         });
       });
     });

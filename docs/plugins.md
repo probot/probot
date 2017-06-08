@@ -39,7 +39,7 @@ module.exports = robot => {
 
 ## Interacting with GitHub
 
-Probot uses [GitHub Integrations](https://developer.github.com/early-access/integrations/). An integration is a first-class actor on GitHub, like a user (e.g. [@defunkt](https://github/defunkt)) or a organization (e.g. [@github](https://github.com/github)). The integration is given access to a repository or repositories by being "installed" on a user or organization account and can perform actions through the API like [commenting on an issue](https://developer.github.com/v3/issues/comments/#create-a-comment) or [creating a status](https://developer.github.com/v3/repos/statuses/#create-a-status).
+Probot uses [GitHub Apps](https://developer.github.com/apps/). An app is a first-class actor on GitHub, like a user (e.g. [@defunkt](https://github/defunkt)) or a organization (e.g. [@github](https://github.com/github)). The app is given access to a repository or repositories by being "installed" on a user or organization account and can perform actions through the API like [commenting on an issue](https://developer.github.com/v3/issues/comments/#create-a-comment) or [creating a status](https://developer.github.com/v3/repos/statuses/#create-a-status).
 
 `context.github` is an authenticated GitHub client that can be used to make API calls. It is an instance of the [github Node.js module](https://github.com/mikedeboer/node-github), which wraps the [GitHub API](https://developer.github.com/v3/) and allows you to do almost anything programmatically that you can do through a web browser.
 
@@ -59,7 +59,7 @@ module.exports = robot => {
 }
 ```
 
-See the [full API docs](https://mikedeboer.github.io/node-github/) to see all the ways you can interact with GitHub. Some API endpoints are not available on GitHub Integrations yet, so check [which ones are available](https://developer.github.com/early-access/integrations/available-endpoints/) first.
+See the [full API docs](https://mikedeboer.github.io/node-github/) to see all the ways you can interact with GitHub. Some API endpoints are not available on GitHub Apps yet, so check [which ones are available](https://developer.github.com/v3/apps/available-endpoints/) first.
 
 ### Pagination
 
@@ -75,15 +75,15 @@ context.github.paginate(context.github.issues.getAll(context.repo()), res => {
 
 ## Running plugins
 
-Before you can run your plugin against GitHub, you'll need to set up your [development environment](development.md) and configure a GitHub Integration for testing. You will need the ID and private key of a GitHub Integration to run the bot.
+Before you can run your plugin against GitHub, you'll need to set up your [development environment](development.md) and configure a GitHub App for testing. You will need the ID and private key of a GitHub App to run the bot.
 
-Once you have an integration created, install `probot`:
+Once you have an app created, install `probot`:
 
 ```
 $ npm install -g probot
 ```
 
-and run your bot from your plugin's directory, replacing `9999` and `private-key.pem` below with the ID and path to the private key of your integration.
+and run your bot from your plugin's directory, replacing `9999` and `private-key.pem` below with the ID and path to the private key of your app.
 
 ```
 $ probot run -i 9999 -P private-key.pem ./index.js

@@ -1,4 +1,6 @@
-## v0.6.0
+# Changelog
+
+## v0.6.0 (2017-06-09)
 
 Breaking Changes:
 
@@ -24,6 +26,5 @@ Enhancements:
 
 - Errors thrown in handlers from plugins were being silently ignored. That's not cool. Now, they're being caught and logged.
  ([#152](https://github.com/probot/probot/pull/152))
-
 
 [View full changelog](https://github.com/probot/probot/compare/v0.5.0...v0.6.0)

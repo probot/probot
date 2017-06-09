@@ -18,7 +18,10 @@ module.exports = options => {
   const logger = bunyan.createLogger({
     name: 'PRobot',
     level: process.env.LOG_LEVEL || 'debug',
-    stream: bunyanFormat({outputMode: process.env.LOG_FORMAT || 'short'})
+    stream: bunyanFormat({outputMode: process.env.LOG_FORMAT || 'short'}),
+    serializers: {
+      repository: repository => repository.full_name
+    }
   });
 
   const webhook = createWebhook({path: '/', secret: options.secret});

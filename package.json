@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "node ./bin/probot run",
-    "test": "mocha && xo",
+    "test": "mocha && xo --extend eslint-config-probot",
     "doc": "jsdoc -c .jsdoc.json"
   },
   "author": "Brandon Keepers",
@@ -32,6 +32,7 @@
     "semver": "^5.3.0"
   },
   "devDependencies": {
+    "eslint-config-probot": "^0.1.0",
     "expect": "^1.20.2",
     "jsdoc": "^3.4.3",
     "jsdoc-strip-async-await": "^0.1.0",
@@ -40,23 +41,6 @@
     "xo": "^0.19.0"
   },
   "xo": {
-    "esnext": true,
-    "space": true,
-    "rules": {
-      "camelcase": 1,
-      "no-else-return": 0,
-      "key-spacing": 0
-    },
-    "ignores": [],
-    "envs": [
-      "node",
-      "mocha"
-    ],
-    "globals": [
-      "on",
-      "include",
-      "contents"
-    ],
     "overrides": [
       {
         "files": "test/**/*.js",

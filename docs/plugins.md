@@ -18,9 +18,9 @@ Many robots will spend their entire day responding to these actions. `robot.on` 
 
 ```js
 module.exports = robot => {
-  robot.on('push', async (event, context) => {
+  robot.on('push', async context => {
     // Code was pushed to the repo, what should we do with it?
-    robot.log(event);
+    robot.log(context);
   });
 };
 ```
@@ -31,7 +31,7 @@ Most events also include an "action". For example, the [`issues`](https://develo
 
 ```js
 module.exports = robot => {
-  robot.on('issues.opened', async (event, context) => {
+  robot.on('issues.opened', async context => {
     // An issue was just opened.
   });
 };
@@ -47,7 +47,7 @@ Here is an example of an autoresponder plugin that comments on opened issues:
 
 ```js
 module.exports = robot => {
-  robot.on('issues.opened', async (event, context) => {
+  robot.on('issues.opened', async context => {
     // `context` extracts information from the event, which can be passed to
     // GitHub API calls. This will return:
     //   {owner: 'yourname', repo: 'yourrepo', number: 123, body: 'Hello World!}

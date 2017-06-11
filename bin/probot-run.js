@@ -36,9 +36,13 @@ if (!program.privateKey) {
 }
 
 if (program.tunnel) {
-  const setupTunnel = require('../lib/tunnel');
   try {
-    setupTunnel(program.tunnel, program.port);
+    const setupTunnel = require('../lib/tunnel');
+    setupTunnel(program.tunnel, program.port).then(tunnel => {
+      console.log('Listening on ' + tunnel.url);
+    }).catch(err => {
+      console.warn('Could not open tunnel: ', err.message);
+    });
   } catch (err) {
     console.warn('Run `npm install --save-dev localtunnel` to enable localtunnel.');
   }

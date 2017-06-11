@@ -36,31 +36,12 @@ if (!program.privateKey) {
 }
 
 if (program.tunnel) {
+  const setupTunnel = require('../lib/tunnel');
   try {
-    setupTunnel();
+    setupTunnel(program.tunnel, program.port);
   } catch (err) {
     console.warn('Run `npm install --save-dev localtunnel` to enable localtunnel.');
   }
-}
-
-function setupTunnel() {
-  // eslint-disable-next-line import/no-extraneous-dependencies, import/no-unresolved
-  const localtunnel = require('localtunnel');
-  const subdomain = typeof program.tunnel === 'string' ?
-    program.tunnel :
-    require('os').userInfo().username;
-
-  const tunnel = localtunnel(program.port, {subdomain}, (err, tunnel) => {
-    if (err) {
-      console.warn('Could not open tunnel: ', err.message);
-    } else {
-      console.log('Listening on ' + tunnel.url);
-    }
-  });
-
-  tunnel.on('close', () => {
-    console.warn('Local tunnel closed');
-  });
 }
 
 const createProbot = require('../');

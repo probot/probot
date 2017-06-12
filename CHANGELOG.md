@@ -2,7 +2,12 @@
 
 ## Unreleased
 
-- Callbacks passed to `robot.on` used to take two arguments—`event` and `context`. The second was pretty much just a fancy version of the first, and you really need the second to do anything useful, so the first argument has been dropped. (Technically, the second is passed as both arguments for now to preserve backward compatibility, but this won't be the case forever, so go update your plugins).
+- Callbacks passed to `robot.on` used to take two arguments—`event` and `context`. The second was pretty much just a fancy version of the first, and you really need the second to do anything useful, so the first argument has been dropped. (Technically, the second is passed as both arguments for now to preserve backward compatibility, but this won't be the case forever, so go update your plugins). You will see this warning when loading plugins:
+
+    ```
+    DEPRECATED: Event callbacks now only take a single `context` argument.
+    at module.exports.robot (/path/to/your/plugin.js:3:9)
+    ```
 
     Before:
 

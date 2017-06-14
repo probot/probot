@@ -18,6 +18,10 @@ describe('Context', function () {
     context = new Context(event);
   });
 
+  it('inherits the payload', () => {
+    expect(context.payload).toBe(event.payload);
+  });
+
   describe('repo', function () {
     it('returns attributes from repository payload', function () {
       expect(context.repo()).toEqual({owner: 'bkeepers', repo:'probot'});

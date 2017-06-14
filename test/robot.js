@@ -54,8 +54,8 @@ describe('Robot', function () {
       expect(spy).toNotHaveBeenCalled();
       await webhook.emit('test', event);
       expect(spy).toHaveBeenCalled();
-      expect(spy.calls[0].arguments[0]).toBe(event);
-      expect(spy.calls[0].arguments[1]).toBeA(Context);
+      expect(spy.calls[0].arguments[0]).toBeA(Context);
+      expect(spy.calls[0].arguments[0].payload).toBe(event.payload);
     });
 
     it('calls callback with same action', async function () {

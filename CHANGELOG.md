@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 7.7.0
+
+Breaking Changes:
 
 - Callbacks passed to `robot.on` used to take two arguments—`event` and `context`. The second was pretty much just a fancy version of the first, and you really need the second to do anything useful, so the first argument has been dropped. (Technically, the second is passed as both arguments for now to preserve backward compatibility, but this won't be the case forever, so go update your plugins). You will see this warning when loading plugins:
 
@@ -24,6 +26,13 @@
       log('Sweet, just one arg', context, context.payload);
     });
     ```
+
+Enhancements:
+
+- Fix issue where localtunnel would often not reconnect when you restart the probot process. ([#157](https://github.com/probot/probot/pull/157))
+
+
+[View full changelog](https://github.com/probot/probot/compare/v0.6.0...v0.7.0)
 
 ## v0.6.0 (2017-06-09)
 

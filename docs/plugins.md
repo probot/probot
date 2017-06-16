@@ -25,7 +25,7 @@ module.exports = robot => {
 };
 ```
 
-The robot can listen to any of the [GitHub webhook events](https://developer.github.com/webhooks/#events). `event` object includes all of the information about the event that was triggered, and `event.payload` has the payload delivered by GitHub.
+The robot can listen to any of the [GitHub webhook events](https://developer.github.com/webhooks/#events). The `context` object includes all of the information about the event that was triggered, and `context.payload` has the payload delivered by GitHub.
 
 Most events also include an "action". For example, the [`issues`](https://developer.github.com/v3/activity/events/types/#issuesevent) event has actions of `assigned`, `unassigned`, `labeled`, `unlabeled`, `opened`, `edited`, `milestoned`, `demilestoned`, `closed`, and `reopened`. Often, your bot will only care about one type of action, so you can append it to the event name with a `.`:
 

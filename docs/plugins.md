@@ -83,10 +83,10 @@ Once you have an app created, install `probot`:
 $ npm install -g probot
 ```
 
-and run your bot from your plugin's directory, replacing `9999` and `private-key.pem` below with the ID and path to the private key of your app.
+and run your bot from your plugin's directory, replacing `APP_ID` and `private-key.pem` below with your App's ID and the path to the private key of your app.
 
 ```
-$ probot run -i 9999 -P private-key.pem ./index.js
+$ probot run -a APP_ID -P private-key.pem ./index.js
 Listening on http://localhost:3000
 ```
 

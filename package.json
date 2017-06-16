@@ -1,6 +1,6 @@
 {
   "name": "probot",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "a trainable robot that responds to activity on GitHub",
   "repository": "https://github.com/probot/probot",
   "main": "index.js",

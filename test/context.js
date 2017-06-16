@@ -7,6 +7,7 @@ describe('Context', function () {
 
   beforeEach(function () {
     event = {
+      event: 'push',
       payload: {
         repository: {
           owner: {login: 'bkeepers'},

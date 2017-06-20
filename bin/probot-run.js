@@ -20,7 +20,7 @@ program
 if (program.integration) {
   // FIXME: remove in v0.7.0
   console.warn(
-    `DEPRECATION: The --integration flag and APP_ID environment variable are\n` +
+    `DEPRECATION: The --integration flag and INTEGRATION_ID environment variable are\n` +
     `deprecated. Use the --app flag or set APP_ID environment variable instead.`
   );
   program.app = program.integration;

@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.7.1
+## 0.7.1 (2017-06-16)
 
 Fixes:
 
@@ -8,7 +8,7 @@ Fixes:
 
 [View full changelog](https://github.com/probot/probot/compare/v0.7.0...v0.7.1)
 
-## 0.7.0
+## 0.7.0 (2017-06-15)
 
 Breaking Changes:
 

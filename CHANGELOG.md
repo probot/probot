@@ -4,7 +4,7 @@
 
 Fixes:
 
-- Fix error introduced in 0.7.0 that was preventing events from being received.
+- Fix error introduced in 0.7.0 that was preventing events from being received. ([#161](https://github.com/probot/probot/pull/161))
 
 [View full changelog](https://github.com/probot/probot/compare/v0.7.0...v0.7.1)
 

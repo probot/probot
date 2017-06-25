@@ -2,7 +2,7 @@ const bunyan = require('bunyan');
 const bunyanFormat = require('bunyan-format');
 const sentryStream = require('bunyan-sentry-stream');
 const cacheManager = require('cache-manager');
-const createIntegration = require('github-integration');
+const createApp = require('github-app');
 const createWebhook = require('github-webhook-handler');
 const Raven = require('raven');
 
@@ -25,13 +25,13 @@ module.exports = options => {
   });
 
   const webhook = createWebhook({path: '/', secret: options.secret});
-  const integration = createIntegration({
+  const app = createApp({
     id: options.id,
     cert: options.cert,
     debug: process.env.LOG_LEVEL === 'trace'
   });
   const server = createServer(webhook);
-  const robot = createRobot({integration, webhook, cache, logger});
+  const robot = createRobot({app, webhook, cache, logger});
 
   // Log all webhook errors
   webhook.on('error', logger.error.bind(logger));

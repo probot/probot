@@ -60,6 +60,10 @@ module.exports = options => {
 
     load(plugin) {
       plugin(robot);
+    },
+
+    receive(event) {
+      return webhook.emit(event.event, event);
     }
   };
 };

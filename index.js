@@ -9,7 +9,7 @@ const Raven = require('raven');
 const createRobot = require('./lib/robot');
 const createServer = require('./lib/server');
 
-module.exports = options => {
+module.exports = (options = {}) => {
   const cache = cacheManager.caching({
     store: 'memory',
     ttl: 60 * 60 // 1 hour
@@ -24,7 +24,7 @@ module.exports = options => {
     }
   });
 
-  const webhook = createWebhook({path: '/', secret: options.secret});
+  const webhook = createWebhook({path: '/', secret: options.secret || 'development'});
   const app = createApp({
     id: options.id,
     cert: options.cert,

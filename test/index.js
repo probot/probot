@@ -1,13 +1,14 @@
 const expect = require('expect');
-const {createRobot} = require('..');
+const createProbot = require('..');
 
-describe('Robot', () => {
-  let robot;
+describe('Probot', () => {
+  let probot;
   let event;
 
   beforeEach(() => {
-    robot = createRobot();
-    robot.auth = () => Promise.resolve({});
+    probot = createProbot();
+    // Mock out GitHub App authentication
+    probot.robot.auth = () => Promise.resolve({});
 
     event = {
       event: 'push',
@@ -15,27 +16,11 @@ describe('Robot', () => {
     };
   });
 
-  describe('receive', () => {
-    it('delivers the event', async () => {
-      const spy = expect.createSpy();
-      robot.on('push', spy);
-
-      await robot.receive(event);
-
-      expect(spy).toHaveBeenCalled();
-    });
-
-    it('returns a reject errors thrown in plugins', async () => {
-      robot.on('push', () => {
-        throw new Error('error from plugin');
-      });
-
-      try {
-        await robot.receive(event);
-        throw new Error('expected error to be raised from plugin');
-      } catch (err) {
-        expect(err.message).toEqual('error from plugin');
-      }
+  describe('webhook delivery', () => {
+    it('forwards webhooks to the robot', async () => {
+      probot.robot.receive = expect.createSpy();
+      probot.webhook.emit('*', event);
+      expect(probot.robot.receive).toHaveBeenCalledWith(event);
     });
   });
 });

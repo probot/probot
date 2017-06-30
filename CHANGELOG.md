@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.7.4 (2017-06-30)
+
+Fixes:
+
+- This fixes a bug introduced in [#165](https://github.com/probot/probot/pull/165) and adds a test to show that webhook delivery is happening. ([#168](https://github.com/probot/probot/pull/168))
+
+[View full changelog](https://github.com/probot/probot/compare/v0.7.3...v0.7.4)
+
 ## 0.7.3 (2017-06-30)
 
 Enhancements:

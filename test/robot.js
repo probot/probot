@@ -82,7 +82,7 @@ describe('Robot', function () {
             spy();
             resolve();
           }, 1);
-        })
+        });
       });
 
       await robot.receive(event);

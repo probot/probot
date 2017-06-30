@@ -33,6 +33,12 @@ module.exports = (options = {}) => {
   const server = createServer(webhook);
   const robot = createRobot({app, webhook, cache, logger});
 
+  // Forward webhooks to robot
+  webhook.on('*', event => {
+    this.log.trace(event, 'webhook received');
+    robot.receive(event);
+  });
+
   // Log all webhook errors
   webhook.on('error', logger.error.bind(logger));
 
@@ -63,7 +69,7 @@ module.exports = (options = {}) => {
     },
 
     receive(event) {
-      return webhook.emit(event.event, event);
+      return robot.receive(event);
     }
   };
 };

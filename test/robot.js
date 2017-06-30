@@ -3,29 +3,16 @@ const Context = require('../lib/context');
 const createRobot = require('../lib/robot');
 
 describe('Robot', function () {
-  let webhook;
   let robot;
   let event;
-  let callbacks;
   let spy;
 
   beforeEach(function () {
-    callbacks = {};
-    webhook = {
-      on: (name, callback) => {
-        callbacks[name] = callback;
-      },
-      emit: (name, event) => {
-        if (callbacks[name]) {
-          return callbacks[name](event);
-        }
-      }
-    };
-
-    robot = createRobot({webhook});
+    robot = createRobot({});
     robot.auth = () => {};
 
     event = {
+      event: 'test',
       payload: {
         action: 'foo',
         installation: {id: 1}
@@ -40,7 +27,7 @@ describe('Robot', function () {
       robot.on('test', spy);
 
       expect(spy).toNotHaveBeenCalled();
-      await webhook.emit('test', event);
+      await robot.receive(event);
       expect(spy).toHaveBeenCalled();
       expect(spy.calls[0].arguments[0]).toBeA(Context);
       expect(spy.calls[0].arguments[0].payload).toBe(event.payload);
@@ -49,14 +36,21 @@ describe('Robot', function () {
     it('calls callback with same action', async function () {
       robot.on('test.foo', spy);
 
-      await webhook.emit('test', event);
+      await robot.receive(event);
       expect(spy).toHaveBeenCalled();
     });
 
     it('does not call callback with different action', async function () {
       robot.on('test.nope', spy);
 
-      await webhook.emit('test', event);
+      await robot.receive(event);
+      expect(spy).toNotHaveBeenCalled();
+    });
+
+    it('calls callback with *', async function () {
+      robot.on('*', spy);
+
+      await robot.receive(event);
       expect(spy).toNotHaveBeenCalled();
     });
   });
@@ -70,7 +64,7 @@ describe('Robot', function () {
         throw error;
       });
 
-      await webhook.emit('test', event);
+      await robot.receive(event);
 
       expect(robot.log.error).toHaveBeenCalledWith(error);
     });

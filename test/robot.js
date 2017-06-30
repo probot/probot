@@ -72,6 +72,25 @@ describe('Robot', function () {
     });
   });
 
+  describe('receive', () => {
+    it('waits for async events to resolve', async () => {
+      const spy = expect.createSpy();
+
+      robot.on('test', () => {
+        return new Promise(resolve => {
+          setTimeout(() => {
+            spy();
+            resolve();
+          }, 1);
+        })
+      });
+
+      await robot.receive(event);
+
+      expect(spy).toHaveBeenCalled();
+    });
+  });
+
   describe('error handling', () => {
     it('logs errors throw from handlers', async () => {
       const error = new Error('testing');

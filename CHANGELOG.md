@@ -1,10 +1,18 @@
 # Changelog
 
-## 0.7.2 (2017-06-30)
+## 0.7.3 (2017-06-30)
 
 Enhancements:
 
 - Refactor some internals to improve the testability of plugins. Docs coming soon after building out tests for several of the plugins.
+
+[View full changelog](https://github.com/probot/probot/compare/v0.7.2...v0.7.3)
+
+## 0.7.2 (2017-06-27)
+
+- Internal: update from `github-integration` to renamed `github-app` for handling GitHub App authentication.
+
+[View full changelog](https://github.com/probot/probot/compare/v0.7.1...v0.7.2)
 
 ## 0.7.1 (2017-06-16)
 

@@ -6,7 +6,7 @@ describe('Robot', () => {
   let event;
 
   beforeEach(() => {
-    robot = createRobot({throwErrors: true});
+    robot = createRobot();
     robot.auth = () => Promise.resolve({});
 
     event = {

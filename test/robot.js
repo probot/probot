@@ -100,7 +100,11 @@ describe('Robot', function () {
         throw error;
       });
 
-      await robot.receive(event);
+      try {
+        await robot.receive(event);
+      } catch (err) {
+        // Expected
+      }
 
       expect(robot.log.error).toHaveBeenCalledWith(error);
     });

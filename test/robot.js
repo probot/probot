@@ -8,7 +8,7 @@ describe('Robot', function () {
   let spy;
 
   beforeEach(function () {
-    robot = createRobot({});
+    robot = createRobot();
     robot.auth = () => {};
 
     event = {
@@ -20,6 +20,23 @@ describe('Robot', function () {
     };
 
     spy = expect.createSpy();
+  });
+
+  describe('constructor', () => {
+    it('takes a logger', () => {
+      const logger = {
+        trace: expect.createSpy(),
+        debug: expect.createSpy(),
+        info: expect.createSpy(),
+        warn: expect.createSpy(),
+        error: expect.createSpy(),
+        fatal: expect.createSpy()
+      };
+      robot = createRobot({logger});
+
+      robot.log('hello world');
+      expect(logger.debug).toHaveBeenCalledWith('hello world');
+    });
   });
 
   describe('on', function () {

@@ -73,3 +73,5 @@ module.exports = (options = {}) => {
     }
   };
 };
+
+module.exports.createRobot = createRobot;

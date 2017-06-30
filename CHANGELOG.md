@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.2 (2017-06-30)
+
+Enhancements:
+
+- Refactor some internals to improve the testability of plugins. Docs coming soon after building out tests for several of the plugins.
+
 ## 0.7.1 (2017-06-16)
 
 Fixes:

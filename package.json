@@ -1,6 +1,6 @@
 {
   "name": "probot",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "a trainable robot that responds to activity on GitHub",
   "repository": "https://github.com/probot/probot",
   "main": "index.js",
@@ -27,6 +27,7 @@
     "github-webhook-handler": "^0.6.0",
     "load-plugins": "^2.1.2",
     "pkg-conf": "^2.0.0",
+    "promise-events": "^0.1.3",
     "raven": "^2.1.0",
     "resolve": "^1.3.2",
     "semver": "^5.3.0"

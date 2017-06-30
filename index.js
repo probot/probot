@@ -9,7 +9,7 @@ const Raven = require('raven');
 const createRobot = require('./lib/robot');
 const createServer = require('./lib/server');
 
-module.exports = options => {
+module.exports = (options = {}) => {
   const cache = cacheManager.caching({
     store: 'memory',
     ttl: 60 * 60 // 1 hour
@@ -24,14 +24,20 @@ module.exports = options => {
     }
   });
 
-  const webhook = createWebhook({path: '/', secret: options.secret});
+  const webhook = createWebhook({path: '/', secret: options.secret || 'development'});
   const app = createApp({
     id: options.id,
     cert: options.cert,
     debug: process.env.LOG_LEVEL === 'trace'
   });
   const server = createServer(webhook);
-  const robot = createRobot({app, webhook, cache, logger});
+  const robot = createRobot({app, webhook, cache, logger, catchErrors: true});
+
+  // Forward webhooks to robot
+  webhook.on('*', event => {
+    this.log.trace(event, 'webhook received');
+    robot.receive(event);
+  });
 
   // Log all webhook errors
   webhook.on('error', logger.error.bind(logger));
@@ -60,6 +66,12 @@ module.exports = options => {
 
     load(plugin) {
       plugin(robot);
+    },
+
+    receive(event) {
+      return robot.receive(event);
     }
   };
 };
+
+module.exports.createRobot = createRobot;

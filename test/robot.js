@@ -51,7 +51,7 @@ describe('Robot', function () {
       robot.on('*', spy);
 
       await robot.receive(event);
-      expect(spy).toNotHaveBeenCalled();
+      expect(spy).toHaveBeenCalled();
     });
   });
 

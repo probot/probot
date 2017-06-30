@@ -17,7 +17,7 @@ describe('Probot', () => {
 
   describe('receive', () => {
     it('delivers the event', async () => {
-      spy = expect.createSpy();
+      const spy = expect.createSpy();
       probot.load(robot => robot.on('push', spy));
 
       await probot.receive(event);
@@ -26,8 +26,6 @@ describe('Probot', () => {
     });
 
     it('raises errors thrown in plugins', async () => {
-      spy = expect.createSpy();
-
       probot.load(robot => robot.on('push', () => {
         throw new Error('something happened');
       }));

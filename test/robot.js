@@ -73,6 +73,15 @@ describe('Robot', function () {
   });
 
   describe('receive', () => {
+    it('delivers the event', async () => {
+      const spy = expect.createSpy();
+      robot.on('test', spy);
+
+      await robot.receive(event);
+
+      expect(spy).toHaveBeenCalled();
+    });
+
     it('waits for async events to resolve', async () => {
       const spy = expect.createSpy();
 
@@ -89,7 +98,21 @@ describe('Robot', function () {
 
       expect(spy).toHaveBeenCalled();
     });
+
+    it('returns a reject errors thrown in plugins', async () => {
+      robot.on('test', () => {
+        throw new Error('error from plugin');
+      });
+
+      try {
+        await robot.receive(event);
+        throw new Error('expected error to be raised from plugin');
+      } catch (err) {
+        expect(err.message).toEqual('error from plugin');
+      }
+    });
   });
+
 
   describe('error handling', () => {
     it('logs errors throw from handlers', async () => {

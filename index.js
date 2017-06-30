@@ -35,7 +35,7 @@ module.exports = (options = {}) => {
 
   // Forward webhooks to robot
   webhook.on('*', event => {
-    this.log.trace(event, 'webhook received');
+    logger.trace(event, 'webhook received');
     robot.receive(event);
   });
 
@@ -58,6 +58,7 @@ module.exports = (options = {}) => {
   return {
     server,
     robot,
+    webhook,
 
     start() {
       server.listen(options.port);

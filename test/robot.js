@@ -113,7 +113,6 @@ describe('Robot', function () {
     });
   });
 
-
   describe('error handling', () => {
     it('logs errors throw from handlers', async () => {
       const error = new Error('testing');

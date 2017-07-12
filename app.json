@@ -12,7 +12,7 @@
       "description": "the ID of your GitHub Integration"
     },
     "WEBHOOK_SECRET": {
-      "description": "the secret configured for your GitHub Integration"
+      "description": "noodles"
     },
     "LOG_LEVEL": {
       "required": false,

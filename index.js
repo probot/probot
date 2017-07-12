@@ -2,7 +2,7 @@ const bunyan = require('bunyan');
 const bunyanFormat = require('bunyan-format');
 const sentryStream = require('bunyan-sentry-stream');
 const cacheManager = require('cache-manager');
-const createIntegration = require('github-integration');
+//const createIntegration = require('github-integration');
 const createWebhook = require('github-webhook-handler');
 const Raven = require('raven');
 
@@ -21,14 +21,17 @@ module.exports = options => {
     stream: bunyanFormat({outputMode: process.env.LOG_FORMAT || 'short'})
   });
 
-  const webhook = createWebhook({path: '/', secret: options.secret});
+  const webhook = createWebhook({path: '/', secret: /*options.secret*/"development"});
+
+/*
   const integration = createIntegration({
     id: options.id,
     cert: options.cert,
     debug: process.env.LOG_LEVEL === 'trace'
   });
+*/
   const server = createServer(webhook);
-  const robot = createRobot({integration, webhook, cache, logger});
+  const robot = createRobot({webhook, cache, logger});
 
   if (process.env.SENTRY_URL) {
     Raven.disableConsoleAlerts();

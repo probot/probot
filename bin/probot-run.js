@@ -5,17 +5,18 @@ require('dotenv').config();
 const pkgConf = require('pkg-conf');
 const program = require('commander');
 
-const {findPrivateKey} = require('../lib/private-key');
+//const {findPrivateKey} = require('../lib/private-key');
 
 program
   .usage('[options] <plugins...>')
-  .option('-i, --integration <id>', 'ID of the GitHub Integration', process.env.INTEGRATION_ID)
+  // .option('-i, --integration <id>', 'ID of the GitHub Integration', process.env.INTEGRATION_ID)
   .option('-s, --secret <secret>', 'Webhook secret of the GitHub Integration', process.env.WEBHOOK_SECRET || 'development')
   .option('-p, --port <n>', 'Port to start the server on', process.env.PORT || 3000)
-  .option('-P, --private-key <file>', 'Path to certificate of the GitHub Integration', findPrivateKey)
+  // .option('-P, --private-key <file>', 'Path to certificate of the GitHub Integration', findPrivateKey)
   .option('-t, --tunnel <subdomain>', 'Expose your local bot to the internet', process.env.SUBDOMAIN || process.env.NODE_ENV !== 'production')
   .parse(process.argv);
 
+/*
 if (!program.integration) {
   console.warn('Missing GitHub Integration ID.\nUse --integration flag or set INTEGRATION_ID environment variable.');
   program.help();
@@ -24,7 +25,7 @@ if (!program.integration) {
 if (!program.privateKey) {
   program.privateKey = findPrivateKey();
 }
-
+*/
 if (program.tunnel) {
   try {
     setupTunnel();
@@ -56,9 +57,9 @@ function setupTunnel() {
 const createProbot = require('../');
 
 const probot = createProbot({
-  id: program.integration,
-  secret: program.secret,
-  cert: program.privateKey,
+  // id: program.integration,
+  // secret: program.secret,
+  // cert: program.privateKey,
   port: program.port
 });
 

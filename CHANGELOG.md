@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.7.5 (2017-07-13)
+
+Fixes:
+
+- Line breaks in the `PRIVATE_KEY` environment variable are now replaced.
+
+[View full changelog](https://github.com/probot/probot/compare/v0.7.4...v0.7.5)
+
 ## 0.7.4 (2017-06-30)
 
 Fixes:

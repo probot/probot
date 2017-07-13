@@ -92,7 +92,7 @@ Listening on http://localhost:3000
 
 ## Publishing your bot
 
-Plugins can be published in NPM modules, which can either be deployed as stand-alone bots, or combined with other plugins.
+Plugins can be published in npm modules, which can either be deployed as stand-alone bots, or combined with other plugins.
 
 Use the [plugin-template](https://github.com/probot/plugin-template) repository to get started building your plugin as a node module.
 

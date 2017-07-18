@@ -2,13 +2,9 @@
 
 Probot is a bot framework for GitHub. It's like [Hubot](https://hubot.github.com/), but for GitHub instead of chat.
 
-If you've ever thought, "wouldn't it be cool if GitHub could…"; imma stop you right there. Most features can actually be added via [GitHub Integrations](https://developer.github.com/early-access/integrations/):
+If you've ever thought, "wouldn't it be cool if GitHub could…"; imma stop you right there. Most features can actually be added via [GitHub Apps](https://developer.github.com/apps/), which extend GitHub and can be installed directly on organizations and user accounts and granted access to specific repositories. They come with granular permissions and built-in webhooks. Apps are first class actors within GitHub.
 
-> Integrations are a new way to extend GitHub. They can be installed directly on organizations and user accounts and granted access to specific repositories. They come with granular permissions and built-in webhooks. Integrations are first class actors within GitHub.
->
-> –Documentation on [GitHub Integrations](https://developer.github.com/early-access/integrations/)
-
-There are some great services that offer [hosted integrations](https://github.com/integrations), but you can build a bunch of really cool things yourself. Probot aims to make that easy.
+There are some great services that offer [apps in the GitHub Marketplace](https://github.com/marketplace), and you can build a bunch of really cool things yourself. Probot aims to make that easy.
 
 ## Plugins
 

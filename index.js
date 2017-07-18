@@ -2,14 +2,14 @@ const bunyan = require('bunyan');
 const bunyanFormat = require('bunyan-format');
 const sentryStream = require('bunyan-sentry-stream');
 const cacheManager = require('cache-manager');
-const createIntegration = require('github-integration');
+const createApp = require('github-app');
 const createWebhook = require('github-webhook-handler');
 const Raven = require('raven');
 
 const createRobot = require('./lib/robot');
 const createServer = require('./lib/server');
 
-module.exports = options => {
+module.exports = (options = {}) => {
   const cache = cacheManager.caching({
     store: 'memory',
     ttl: 60 * 60 // 1 hour
@@ -18,40 +18,47 @@ module.exports = options => {
   const logger = bunyan.createLogger({
     name: 'PRobot',
     level: process.env.LOG_LEVEL || 'debug',
-    stream: bunyanFormat({outputMode: process.env.LOG_FORMAT || 'short'})
+    stream: bunyanFormat({outputMode: process.env.LOG_FORMAT || 'short'}),
+    serializers: {
+      repository: repository => repository.full_name
+    }
   });
 
-  const webhook = createWebhook({path: '/', secret: options.secret});
-  const integration = createIntegration({
+  const webhook = createWebhook({path: '/', secret: options.secret || 'development'});
+  const app = createApp({
     id: options.id,
     cert: options.cert,
     debug: process.env.LOG_LEVEL === 'trace'
   });
   const server = createServer(webhook);
-  const robot = createRobot({integration, webhook, cache, logger});
+  const robot = createRobot({app, webhook, cache, logger, catchErrors: true});
 
+  // Forward webhooks to robot
+  webhook.on('*', event => {
+    logger.trace(event, 'webhook received');
+    robot.receive(event);
+  });
+
+  // Log all webhook errors
+  webhook.on('error', logger.error.bind(logger));
+
+  // Log all unhandled rejections
+  process.on('unhandledRejection', logger.error.bind(logger));
+
+  // If sentry is configured, report all logged errors
   if (process.env.SENTRY_URL) {
     Raven.disableConsoleAlerts();
     Raven.config(process.env.SENTRY_URL, {
-      captureUnhandledRejections: true,
       autoBreadcrumbs: true
     }).install({});
 
     logger.addStream(sentryStream(Raven));
-  } else {
-    process.on('unhandledRejection', reason => {
-      robot.log.error(reason);
-    });
   }
-
-  // Handle case when webhook creation fails
-  webhook.on('error', err => {
-    logger.error(err);
-  });
 
   return {
     server,
     robot,
+    webhook,
 
     start() {
       server.listen(options.port);
@@ -60,6 +67,12 @@ module.exports = options => {
 
     load(plugin) {
       plugin(robot);
+    },
+
+    receive(event) {
+      return robot.receive(event);
     }
   };
 };
+
+module.exports.createRobot = createRobot;

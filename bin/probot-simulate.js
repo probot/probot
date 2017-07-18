@@ -32,4 +32,4 @@ const plugins = require('../lib/plugin')(probot);
 plugins.load([pluginPath]);
 
 probot.robot.log('Simulating event', eventName);
-probot.robot.webhook.emit(eventName, {event: eventName, payload});
+probot.receive({event: eventName, payload});

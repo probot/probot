@@ -3,33 +3,35 @@
 
 require('dotenv').config({silent: true});
 
-const process = require('process');
 const path = require('path');
+const program = require('commander');
+const {findPrivateKey} = require('../lib/private-key');
 
-const eventName = process.argv[2];
-const payloadPath = process.argv[3];
-const pluginPath = process.argv[4];
+program
+  .usage('[options] <event-name> <path/to/payload.json> [path/to/plugin.js...]')
+  .option('-a, --app <id>', 'ID of the GitHub App', process.env.APP_ID)
+  .option('-P, --private-key <file>', 'Path to certificate of the GitHub App', findPrivateKey)
+  .parse(process.argv);
+
+const eventName = program.args[0];
+const payloadPath = program.args[1];
 
 if (!eventName || !payloadPath) {
-  console.log('Usage: bin/probot-simulate event-name path/to/payload.json');
-  process.exit(1);
+  program.help();
 }
 
 const payload = require(path.join(process.cwd(), payloadPath));
 
 const createProbot = require('../');
-const {findPrivateKey} = require('../lib/private-key');
 
 const probot = createProbot({
-  id: process.env.INTEGRATION_ID,
-  secret: process.env.WEBHOOK_SECRET,
-  cert: findPrivateKey(),
-  port: process.env.PORT
+  id: program.app,
+  cert: findPrivateKey()
 });
 
 const plugins = require('../lib/plugin')(probot);
 
-plugins.load([pluginPath]);
+plugins.load(program.args.slice(2));
 
 probot.robot.log('Simulating event', eventName);
 probot.receive({event: eventName, payload});

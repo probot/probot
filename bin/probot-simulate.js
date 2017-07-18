@@ -4,13 +4,13 @@
 require('dotenv').config({silent: true});
 
 const process = require('process');
-const path = require('path')
+const path = require('path');
 
 const eventName = process.argv[2];
 const payloadPath = process.argv[3];
 const pluginPath = process.argv[4];
 
-if(!eventName || !payloadPath) {
+if (!eventName || !payloadPath) {
   console.log('Usage: bin/probot-simulate event-name path/to/payload.json');
   process.exit(1);
 }
@@ -28,6 +28,7 @@ const probot = createProbot({
 });
 
 const plugins = require('../lib/plugin')(probot);
+
 plugins.load([pluginPath]);
 
 probot.robot.log('Simulating event', eventName);

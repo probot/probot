@@ -16,7 +16,7 @@ You'll need to create a test repository and install your app by clicking the "In
 
 Whenever you come back to work on the app after you've already had it running once, you should only need to run `$ npm start`.
 
-Optionally, you can also run your plguin through [nodemon](https://github.com/remy/nodemon#nodemon) which will listen on any files changes in your local development environment and automatically restart the server. After installing nodemon, you can run `nodemon --exec "npm start"` and from there the server will automatically restart upon file changes.
+Optionally, you can also run your plugin through [nodemon](https://github.com/remy/nodemon#nodemon) which will listen on any files changes in your local development environment and automatically restart the server. After installing nodemon, you can run `nodemon --exec "npm start"` and from there the server will automatically restart upon file changes.
 
 ## Debugging
 

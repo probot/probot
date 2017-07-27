@@ -3,12 +3,6 @@ const path = require('path');
 const expect = require('expect');
 const Context = require('../lib/context');
 
-function readConfig(fileName) {
-  const configPath = path.join(__dirname, 'fixtures', 'config', fileName);
-  const content = fs.readFileSync(configPath, {encoding: 'utf8'});
-  return {data: {content: Buffer.from(content).toString('base64')}};
-}
-
 describe('Context', function () {
   let event;
   let context;
@@ -78,6 +72,12 @@ describe('Context', function () {
 
   describe('config', function () {
     let github;
+
+    function readConfig(fileName) {
+      const configPath = path.join(__dirname, 'fixtures', 'config', fileName);
+      const content = fs.readFileSync(configPath, {encoding: 'utf8'});
+      return {data: {content: Buffer.from(content).toString('base64')}};
+    }
 
     beforeEach(function () {
       github = {

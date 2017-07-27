@@ -25,6 +25,7 @@
     "github": "^9.2.0",
     "github-app": "^3.0.0",
     "github-webhook-handler": "^0.6.0",
+    "js-yaml": "^3.8.4",
     "load-plugins": "^2.1.2",
     "pkg-conf": "^2.0.0",
     "promise-events": "^0.1.3",

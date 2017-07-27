@@ -57,6 +57,4 @@ Plugins _should_ allow all settings to customized for each installation.
 
 ### Store configuration in the repository
 
-Any configuration _should_ be stored in the repository. Unless the plugin is using files from an established convention, the configuration _should_ be stored in the `.github` directory.
-
-For example, the [owners](https://github.com/probot/owners) plugin reads from the `OWNERS` file, which is a convention that existed before the plugin was created, while the [configurer](https://github.com/probot/configurer) plugin reads from `.github/config.yml`.
+Any configuration _should_ be stored in the repository. Unless the plugin is using files from an established convention, the configuration _should_ be stored in the `.github` directory. See the [API docs for `context.config`](https://probot.github.io/probot/latest/Context.html#config).

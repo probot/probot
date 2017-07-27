@@ -6,7 +6,7 @@ const Context = require('../lib/context');
 function readConfig(fileName) {
   const configPath = path.join(__dirname, 'fixtures', 'config', fileName);
   const content = fs.readFileSync(configPath, {encoding: 'utf8'});
-  return {content: Buffer.from(content).toString('base64')};
+  return {data: {content: Buffer.from(content).toString('base64')}};
 }
 
 describe('Context', function () {

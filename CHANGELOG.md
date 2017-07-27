@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8.0 (2017-07-27)
+
+Enhancements:
+
+- Add helper for loading config from a repository ([#141](https://github.com/probot/probot/pull/141))
+- Add `probot simulate` command for simulating the delivery of a webhook ([#136](https://github.com/probot/probot/pull/136))
+
+[View full changelog](https://github.com/probot/probot/compare/v0.7.5...v0.8.0)
+
 ## 0.7.5 (2017-07-13)
 
 Fixes:

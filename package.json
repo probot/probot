@@ -10,7 +10,8 @@
   "scripts": {
     "start": "node ./bin/probot run",
     "test": "mocha && xo --extend eslint-config-probot",
-    "doc": "jsdoc -c .jsdoc.json"
+    "doc": "jsdoc -c .jsdoc.json",
+    "postpublish": "script/publish-docs"
   },
   "author": "Brandon Keepers",
   "license": "ISC",

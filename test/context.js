@@ -137,6 +137,22 @@ describe('Context', function () {
       expect(e.message).toMatch(/^end of the stream or a document separator/);
     });
 
+    it('throws when loading unsafe yaml', async function () {
+      github.repos.getContent.andReturn(readConfig('evil.yml'));
+
+      let e;
+      let config;
+      try {
+        config = await context.config('evil.yml');
+      } catch (err) {
+        e = err;
+      }
+
+      expect(config).toNotExist();
+      expect(e).toExist();
+      expect(e.message).toMatch(/unknown tag/);
+    });
+
     it('returns an empty object when the file is empty', async function () {
       github.repos.getContent.andReturn(readConfig('empty.yml'));
 

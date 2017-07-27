@@ -108,11 +108,14 @@ $ node_modules/.bin/probot simulate issues test/fixtures/issues.labeled.json ./i
 
 Plugins can be published in npm modules, which can either be deployed as stand-alone bots, or combined with other plugins.
 
-Use the [plugin-template](https://github.com/probot/plugin-template) repository to get started building your plugin as a node module.
+Use [create-probot-plugin](https://github.com/probot/create-probot-plugin) to get started building your plugin as a node module.
 
 ```
-$ curl -L https://github.com/probot/plugin-template/archive/master.tar.gz | tar xvz
-$ mv plugin-template-master probot-myplugin && cd probot-myplugin
+$ npm install -g create-probot-app
+
+$ create-probot-plugin my-plugin
+$ cd my-plugin
+$ npm install
 ```
 
 ## Next

@@ -7,6 +7,7 @@ describe('Context', function () {
 
   beforeEach(function () {
     event = {
+      event: 'push',
       payload: {
         repository: {
           owner: {login: 'bkeepers'},
@@ -16,6 +17,10 @@ describe('Context', function () {
       }
     };
     context = new Context(event);
+  });
+
+  it('inherits the payload', () => {
+    expect(context.payload).toBe(event.payload);
   });
 
   describe('repo', function () {

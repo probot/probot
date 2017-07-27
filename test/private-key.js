@@ -48,6 +48,21 @@ describe('private-key', function () {
       });
     });
 
+    describe('when a PRIVATE_KEY has line breaks', function () {
+      beforeEach(function () {
+        process.env.PRIVATE_KEY = 'line 1\\nline 2';
+      });
+
+      afterEach(function () {
+        delete process.env.PRIVATE_KEY;
+      });
+
+      it('should return the key', function () {
+        expect(findPrivateKey())
+          .toEqual('line 1\nline 2');
+      });
+    });
+
     describe('when a PRIVATE_KEY_PATH env var is provided', function () {
       beforeEach(function () {
         process.env.PRIVATE_KEY_PATH = keyfilePath;
@@ -99,7 +114,7 @@ describe('private-key', function () {
 
         it('should throw an error', function () {
           expect(findPrivateKey)
-            .toThrow(Error, /missing private key for github integrationy/i);
+            .toThrow(Error, /missing private key for GitHub App/i);
         });
       });
     });

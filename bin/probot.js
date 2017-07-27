@@ -12,4 +12,5 @@ require('commander')
   .version(require('../package').version)
   .usage('<command> [options]')
   .command('run', 'run the bot')
+  .command('simulate', 'simulate a webhook being delivered')
   .parse(process.argv);

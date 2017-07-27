@@ -1,5 +1,13 @@
+const fs = require('fs');
+const path = require('path');
 const expect = require('expect');
 const Context = require('../lib/context');
+
+function readConfig(fileName) {
+  const configPath = path.join(__dirname, 'fixtures', 'config', fileName);
+  const content = fs.readFileSync(configPath, {encoding: 'utf8'});
+  return {content: Buffer.from(content).toString('base64')};
+}
 
 describe('Context', function () {
   let event;
@@ -65,6 +73,76 @@ describe('Context', function () {
       expect(context.issue({owner: 'muahaha', number: 5})).toEqual({
         owner: 'muahaha', repo:'probot', number: 5
       });
+    });
+  });
+
+  describe('config', function () {
+    let github;
+
+    beforeEach(function () {
+      github = {
+        repos: {
+          getContent: expect.createSpy()
+        }
+      };
+
+      context = new Context(event, github);
+    });
+
+    it('gets a valid configuration', async function () {
+      github.repos.getContent.andReturn(Promise.resolve(readConfig('basic.yml')));
+      const config = await context.config('test-file.yml');
+
+      expect(github.repos.getContent).toHaveBeenCalledWith({
+        owner: 'bkeepers',
+        repo: 'probot',
+        path: '.github/test-file.yml'
+      });
+      expect(config).toEqual({
+        foo: 5,
+        bar: 7,
+        baz: 11
+      });
+    });
+
+    it('throws when the file is missing', async function () {
+      github.repos.getContent.andReturn(Promise.reject(new Error('An error occurred')));
+
+      let e;
+      let contents;
+      try {
+        contents = await context.config('test-file.yml');
+      } catch (err) {
+        e = err;
+      }
+
+      expect(contents).toNotExist();
+      expect(e).toExist();
+      expect(e.message).toEqual('An error occurred');
+    });
+
+    it('throws when the configuration file is malformed', async function () {
+      github.repos.getContent.andReturn(Promise.resolve(readConfig('malformed.yml')));
+
+      let e;
+      let contents;
+      try {
+        contents = await context.config('test-file.yml');
+      } catch (err) {
+        e = err;
+      }
+
+      expect(contents).toNotExist();
+      expect(e).toExist();
+      expect(e.message).toMatch(/^end of the stream or a document separator/);
+    });
+
+    it('returns an empty object when the file is empty', async function () {
+      github.repos.getContent.andReturn(readConfig('empty.yml'));
+
+      const contents = await context.config('test-file.yml');
+
+      expect(contents).toEqual({});
     });
   });
 });

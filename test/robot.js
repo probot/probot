@@ -1,14 +1,6 @@
-const fs = require('fs');
-const path = require('path');
 const expect = require('expect');
 const Context = require('../lib/context');
 const createRobot = require('../lib/robot');
-
-function readConfig(fileName) {
-  const configPath = path.join(__dirname, 'fixtures', 'config', fileName);
-  const content = fs.readFileSync(configPath, {encoding: 'utf8'});
-  return {content: Buffer.from(content).toString('base64')};
-}
 
 describe('Robot', function () {
   let robot;
@@ -137,75 +129,6 @@ describe('Robot', function () {
       }
 
       expect(robot.log.error).toHaveBeenCalledWith(error);
-    });
-  });
-
-  describe('getPluginConfig', function () {
-    let github;
-
-    beforeEach(function () {
-      github = {
-        repos: {
-          getContent: spy
-        }
-      };
-    });
-
-    it('gets a valid configuration', async function () {
-      spy.andReturn(Promise.resolve(readConfig('basic.yml')));
-      const config = await robot.getPluginConfig(github, 'owner', 'repo', 'test-file.yml');
-
-      expect(spy).toHaveBeenCalled();
-      expect(spy.calls[0].arguments[0]).toEqual({
-        owner: 'owner',
-        repo: 'repo',
-        path: '.github/test-file.yml'
-      });
-      expect(config).toEqual({
-        foo: 5,
-        bar: 7,
-        baz: 11
-      });
-    });
-
-    it('throws when the file is missing', async function () {
-      spy.andReturn(Promise.reject(new Error('An error occurred')));
-
-      let e;
-      let contents;
-      try {
-        contents = await robot.getPluginConfig(github, 'owner', 'repo', 'test-file.yml');
-      } catch (err) {
-        e = err;
-      }
-
-      expect(contents).toNotExist();
-      expect(e).toExist();
-      expect(e.message).toEqual('An error occurred');
-    });
-
-    it('throws when the configuration file is malformed', async function () {
-      spy.andReturn(Promise.resolve(readConfig('malformed.yml')));
-
-      let e;
-      let contents;
-      try {
-        contents = await robot.getPluginConfig(github, 'owner', 'repo', 'test-file.yml');
-      } catch (err) {
-        e = err;
-      }
-
-      expect(contents).toNotExist();
-      expect(e).toExist();
-      expect(e.message).toMatch(/^end of the stream or a document separator/);
-    });
-
-    it('returns an empty object when the file is empty', async function () {
-      spy.andReturn(readConfig('empty.yml'));
-
-      const contents = await robot.getPluginConfig(github, 'owner', 'repo', 'test-file.yml');
-
-      expect(contents).toEqual({});
     });
   });
 });

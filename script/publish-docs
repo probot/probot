@@ -23,7 +23,7 @@ rm -rf $VERSION
 mv probot/$VERSION .
 rmdir probot
 
-ln -sf $VERSION latest
+ln -sfn $VERSION latest
 
 # Commit and publish
 git add .

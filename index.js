@@ -73,9 +73,6 @@ module.exports = (options = {}) => {
     return robot;
   }
 
-  // Setup built-in stats plugin
-  load(require('./lib/plugins/stats'));
-
   return {
     server,
     webhook,
@@ -92,6 +89,9 @@ module.exports = (options = {}) => {
     },
 
     start() {
+      // Setup built-in stats plugin
+      load(require('./lib/plugins/stats'));
+
       server.listen(options.port);
       logger.trace('Listening on http://localhost:' + options.port);
     }

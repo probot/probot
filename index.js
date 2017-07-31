@@ -74,7 +74,7 @@ module.exports = (options = {}) => {
   }
 
   // Setup built-in stats plugin
-  load(require('./lib/stats'));
+  load(require('./lib/plugins/stats'));
 
   return {
     server,

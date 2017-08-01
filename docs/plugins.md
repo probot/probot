@@ -90,6 +90,28 @@ $ probot run -a APP_ID -P private-key.pem ./index.js
 Listening on http://localhost:3000
 ```
 
+## HTTP Routes
+
+`robot.router` is an [express](http://expressjs.com/) app that will serve HTTP requests.
+
+```js
+const express = require('express');
+
+module.exports = robot => {
+  // Use any express middleware
+  robot.router.use(express.static(__dirname + '/public'));
+
+  //
+  robot.router.get('/hello-world', (req, res) => {
+    res.end('Hello World');
+  });
+};
+```
+
+Visit https://localhost:3000/hello-world to see
+
+See the [express documentation](http://expressjs.com/en/guide/routing.html) for more information.
+
 ## Simulating webhooks
 
 As you are developing your plugin, you will likely want to test it by repeatedly trigging the same webhook. You can simulate a webhook being delivered by saving the payload to a file, and then calling `probot simulate` from the command line.

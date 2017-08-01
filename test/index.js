@@ -16,7 +16,7 @@ describe('Probot', () => {
 
   describe('webhook delivery', () => {
     it('forwards webhooks to the robot', async () => {
-      const robot = probot.load(robot => {});
+      const robot = probot.load(() => {});
       robot.receive = expect.createSpy();
       probot.webhook.emit('*', event);
       expect(robot.receive).toHaveBeenCalledWith(event);
@@ -26,12 +26,46 @@ describe('Probot', () => {
   describe('server', () => {
     const request = require('supertest');
 
-    it('adds routes from plugins', () => {
+    it('prefixes paths with route name', () => {
       probot.load(robot => {
-        robot.router.get('/foo', (req, res) => res.end('bar'));
+        const app = robot.route('/my-plugin');
+        app.get('/foo', (req, res) => res.end('foo'));
       });
 
-      return request(probot.server).get('/foo').expect(200, 'bar');
+      return request(probot.server).get('/my-plugin/foo').expect(200, 'foo');
+    });
+
+    it('allows routes with no path', () => {
+      probot.load(robot => {
+        const app = robot.route();
+        app.get('/foo', (req, res) => res.end('foo'));
+      });
+
+      return request(probot.server).get('/foo').expect(200, 'foo');
+    });
+
+    it('isolates plugins from affecting eachother', async () => {
+      ['foo', 'bar'].forEach(name => {
+        probot.load(robot => {
+          const app = robot.route('/' + name);
+          console.log(app);
+
+          app.use(function (req, res, next) {
+            res.append('X-Test', name);
+            next();
+          });
+
+          app.get('/hello', (req, res) => res.end(name));
+        });
+      });
+
+      await request(probot.server).get('/foo/hello')
+        .expect(200, 'foo')
+        .expect('X-Test', 'foo');
+
+      await request(probot.server).get('/bar/hello')
+        .expect(200, 'bar')
+        .expect('X-Test', 'bar');
     });
   });
 });

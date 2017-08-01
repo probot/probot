@@ -31,16 +31,9 @@ module.exports = (options = {}) => {
     debug: process.env.LOG_LEVEL === 'trace'
   });
   const server = createServer(webhook);
-  const robot = createRobot({app, cache, logger, catchErrors: true});
 
-  // Connect the router from the robot to the server
-  server.use(robot.router);
-
-  // Forward webhooks to robot
-  webhook.on('*', event => {
-    logger.trace(event, 'webhook received');
-    robot.receive(event);
-  });
+  // Log all received webhooks
+  webhook.on('*', event => logger.trace(event, 'webhook received'));
 
   // Log all webhook errors
   webhook.on('error', logger.error.bind(logger));
@@ -60,7 +53,6 @@ module.exports = (options = {}) => {
 
   return {
     server,
-    robot,
     webhook,
 
     start() {
@@ -69,7 +61,18 @@ module.exports = (options = {}) => {
     },
 
     load(plugin) {
+      const robot = createRobot({app, cache, logger, catchErrors: true});
+
+      // Connect the router from the robot to the server
+      server.use(robot.router);
+
+      // Forward webhooks to robot
+      webhook.on('*', event => robot.receive(event));
+
+      // Initialize the plugin
       plugin(robot);
+
+      return robot;
     },
 
     receive(event) {

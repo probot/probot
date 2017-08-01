@@ -7,8 +7,6 @@ describe('Probot', () => {
 
   beforeEach(() => {
     probot = createProbot();
-    // Mock out GitHub App authentication
-    probot.robot.auth = () => Promise.resolve({});
 
     event = {
       event: 'push',
@@ -18,9 +16,10 @@ describe('Probot', () => {
 
   describe('webhook delivery', () => {
     it('forwards webhooks to the robot', async () => {
-      probot.robot.receive = expect.createSpy();
+      const robot = probot.load(robot => {});
+      robot.receive = expect.createSpy();
       probot.webhook.emit('*', event);
-      expect(probot.robot.receive).toHaveBeenCalledWith(event);
+      expect(robot.receive).toHaveBeenCalledWith(event);
     });
   });
 

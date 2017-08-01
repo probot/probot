@@ -31,7 +31,10 @@ module.exports = (options = {}) => {
     debug: process.env.LOG_LEVEL === 'trace'
   });
   const server = createServer(webhook);
-  const robot = createRobot({app, cache, logger, router: server, catchErrors: true});
+  const robot = createRobot({app, cache, logger, catchErrors: true});
+
+  // Connect the router from the robot to the server
+  server.use(robot.router);
 
   // Forward webhooks to robot
   webhook.on('*', event => {

@@ -92,23 +92,29 @@ Listening on http://localhost:3000
 
 ## HTTP Routes
 
-`robot.router` is an [express](http://expressjs.com/) app that will serve HTTP requests.
+`robot.route` is an  app that will serve HTTP requests.
+
+Calling `robot.route('/my-plugin')` will return an [express](http://expressjs.com/) router that you can use to expose HTTP endpoints from your plugin.
 
 ```js
 const express = require('express');
 
 module.exports = robot => {
-  // Use any express middleware
-  robot.router.use(express.static(__dirname + '/public'));
+  const app = robot.route('/my-plugin');
+
+  // Use any middleware
+  app.use(express.static(__dirname + '/public'));
 
   //
-  robot.router.get('/hello-world', (req, res) => {
+  app.get('/hello-world', (req, res) => {
     res.end('Hello World');
   });
 };
 ```
 
-Visit https://localhost:3000/hello-world to see
+Visit https://localhost:3000/my-plugin/hello-world to access the endpoint.
+
+It is strongly encouraged to use the name of your package as the prefix so none of your routes or middleware conflict with other plugins. For example, if [`probot/owners`](https://github.com/probot/owners) exposed an endpoint, the plugin would call `robot.route('/owners')` to prefix all endpoints with `/owners`.
 
 See the [express documentation](http://expressjs.com/en/guide/routing.html) for more information.
 

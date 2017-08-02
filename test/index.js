@@ -48,7 +48,6 @@ describe('Probot', () => {
       ['foo', 'bar'].forEach(name => {
         probot.load(robot => {
           const app = robot.route('/' + name);
-          console.log(app);
 
           app.use(function (req, res, next) {
             res.append('X-Test', name);
@@ -66,6 +65,18 @@ describe('Probot', () => {
       await request(probot.server).get('/bar/hello')
         .expect(200, 'bar')
         .expect('X-Test', 'bar');
+    });
+  });
+
+  describe('receive', () => {
+    it('forwards events to each plugin', async () => {
+      const spy = expect.createSpy();
+      const robot = probot.load(robot => robot.on('push', spy));
+      robot.auth = expect.createSpy().andReturn(Promise.resolve({}));
+
+      await probot.receive(event);
+
+      expect(spy).toHaveBeenCalled();
     });
   });
 });

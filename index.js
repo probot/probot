@@ -33,7 +33,10 @@ module.exports = (options = {}) => {
   const server = createServer(webhook);
 
   // Log all received webhooks
-  webhook.on('*', event => logger.trace(event, 'webhook received'));
+  webhook.on('*', event => {
+    logger.trace(event, 'webhook received');
+    receive(event);
+  });
 
   // Log all webhook errors
   webhook.on('error', logger.error.bind(logger));
@@ -51,9 +54,16 @@ module.exports = (options = {}) => {
     logger.addStream(sentryStream(Raven));
   }
 
+  const robots = [];
+
+  function receive(event) {
+    return Promise.all(robots.map(robot => robot.receive(event)));
+  }
+
   return {
     server,
     webhook,
+    receive,
 
     start() {
       server.listen(options.port);
@@ -66,17 +76,11 @@ module.exports = (options = {}) => {
       // Connect the router from the robot to the server
       server.use(robot.router);
 
-      // Forward webhooks to robot
-      webhook.on('*', event => robot.receive(event));
-
       // Initialize the plugin
       plugin(robot);
+      robots.push(robot);
 
       return robot;
-    },
-
-    receive(event) {
-      return robot.receive(event);
     }
   };
 };

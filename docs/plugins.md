@@ -92,20 +92,17 @@ Listening on http://localhost:3000
 
 ## HTTP Routes
 
-`robot.route` is an  app that will serve HTTP requests.
-
 Calling `robot.route('/my-plugin')` will return an [express](http://expressjs.com/) router that you can use to expose HTTP endpoints from your plugin.
 
 ```js
-const express = require('express');
-
 module.exports = robot => {
+  // Get an express router to expose new HTTP endpoints
   const app = robot.route('/my-plugin');
 
   // Use any middleware
-  app.use(express.static(__dirname + '/public'));
+  app.use(require('express').static(__dirname + '/public'));
 
-  //
+  // Add a new route
   app.get('/hello-world', (req, res) => {
     res.end('Hello World');
   });

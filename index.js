@@ -64,6 +64,7 @@ module.exports = (options = {}) => {
     server,
     webhook,
     receive,
+    logger,
 
     // Return the first robot
     get robot() {

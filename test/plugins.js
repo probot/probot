@@ -20,9 +20,7 @@ describe('plugin loader', function () {
   beforeEach(function () {
     probot = {
       load: expect.createSpy(),
-      robot: {
-        log: nullLogger
-      }
+      logger: nullLogger,
     };
 
     autoplugins = {

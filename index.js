@@ -10,6 +10,7 @@ const createRobot = require('./lib/robot');
 const createServer = require('./lib/server');
 
 module.exports = (options = {}) => {
+  options.webhookPath = options.webhookPath || '/';
   const cache = cacheManager.caching({
     store: 'memory',
     ttl: 60 * 60 // 1 hour
@@ -24,13 +25,13 @@ module.exports = (options = {}) => {
     }
   });
 
-  const webhook = createWebhook({path: '/', secret: options.secret || 'development'});
+  const webhook = createWebhook({path: options.webhookPath, secret: options.secret || 'development'});
   const app = createApp({
     id: options.id,
     cert: options.cert,
     debug: process.env.LOG_LEVEL === 'trace'
   });
-  const server = createServer(webhook);
+  const server = createServer(webhook, options.handler);
   const robot = createRobot({app, webhook, cache, logger, catchErrors: true});
 
   // Forward webhooks to robot

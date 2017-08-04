@@ -79,4 +79,21 @@ describe('Probot', () => {
       expect(spy).toHaveBeenCalled();
     });
   });
+
+  describe('robot', () => {
+    it('will be removed in 0.10', () => {
+      const semver = require('semver');
+      const pkg = require('../package');
+      expect(semver.satisfies(pkg.version, '>=0.9')).toBe(false, 'remove in 0.10.0');
+    });
+
+    it('returns the first defined (for now)', () => {
+      const robot = probot.load(() => { });
+      expect(probot.robot).toBe(robot);
+    });
+
+    it('returns a robot if no plugins are loaded', () => {
+      expect(probot.robot).toExist();
+    });
+  });
 });

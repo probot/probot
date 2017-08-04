@@ -31,12 +31,11 @@ module.exports = (options = {}) => {
     debug: process.env.LOG_LEVEL === 'trace'
   });
   const server = createServer(webhook);
-  const robot = createRobot({app, webhook, cache, logger, catchErrors: true});
 
-  // Forward webhooks to robot
+  // Log all received webhooks
   webhook.on('*', event => {
     logger.trace(event, 'webhook received');
-    robot.receive(event);
+    receive(event);
   });
 
   // Log all webhook errors
@@ -55,10 +54,25 @@ module.exports = (options = {}) => {
     logger.addStream(sentryStream(Raven));
   }
 
+  const robots = [];
+
+  function receive(event) {
+    return Promise.all(robots.map(robot => robot.receive(event)));
+  }
+
   return {
     server,
-    robot,
     webhook,
+    receive,
+    logger,
+
+    // Return the first robot
+    get robot() {
+      const caller = (new Error()).stack.split('\n')[2];
+      console.warn('DEPRECATED: the `robot` property is deprecated and will be removed in 0.10.0');
+      console.warn(caller);
+      return robots[0] || createRobot({app, cache, logger, catchErrors: true});
+    },
 
     start() {
       server.listen(options.port);
@@ -66,11 +80,16 @@ module.exports = (options = {}) => {
     },
 
     load(plugin) {
-      plugin(robot);
-    },
+      const robot = createRobot({app, cache, logger, catchErrors: true});
 
-    receive(event) {
-      return robot.receive(event);
+      // Connect the router from the robot to the server
+      server.use(robot.router);
+
+      // Initialize the plugin
+      plugin(robot);
+      robots.push(robot);
+
+      return robot;
     }
   };
 };

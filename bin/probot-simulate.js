@@ -33,5 +33,5 @@ const plugins = require('../lib/plugin')(probot);
 
 plugins.load(program.args.slice(2));
 
-probot.robot.log('Simulating event', eventName);
+probot.logger.debug('Simulating event', eventName);
 probot.receive({event: eventName, payload});

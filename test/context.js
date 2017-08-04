@@ -160,5 +160,37 @@ describe('Context', function () {
 
       expect(contents).toEqual({});
     });
+
+    it('overwrites default config settings', async function () {
+      github.repos.getContent.andReturn(Promise.resolve(readConfig('basic.yml')));
+      const config = await context.config('test-file.yml', {foo: 10});
+
+      expect(github.repos.getContent).toHaveBeenCalledWith({
+        owner: 'bkeepers',
+        repo: 'probot',
+        path: '.github/test-file.yml'
+      });
+      expect(config).toEqual({
+        foo: 5,
+        bar: 7,
+        baz: 11
+      });
+    });
+
+    it('uses default settings to fill in missing options', async function () {
+      github.repos.getContent.andReturn(Promise.resolve(readConfig('missing.yml')));
+      const config = await context.config('test-file.yml', {bar: 7});
+
+      expect(github.repos.getContent).toHaveBeenCalledWith({
+        owner: 'bkeepers',
+        repo: 'probot',
+        path: '.github/test-file.yml'
+      });
+      expect(config).toEqual({
+        foo: 5,
+        bar: 7,
+        baz: 11
+      });
+    });
   });
 });

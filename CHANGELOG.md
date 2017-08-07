@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.9.0 (2017-08-06)
+
+Enhancements:
+
+- Use Express for the web server and allow plugins add routes. See the [docs for adding HTTP routes](https://github.com/probot/probot/blob/master/docs/plugins.md#http-routes). ([#183](https://github.com/probot/probot/pull/183))
+
+- Add second argument to `context.config` for defaults. ([#186](https://github.com/probot/probot/pull/186))
+
+- Published [create-probot-plugin](https://github.com/probot/create-probot-plugin) as the standard way of creating new Probot plugins.
+
+Breaking Changes:
+
+- The `INTEGRATION_ID` environment variable was deprecated in 0.6 and has been removed ([#189](https://github.com/probot/probot/pull/189))
+
+[View full changelog](https://github.com/probot/probot/compare/v0.8.0...v0.9.0)
+
 ## 0.8.0 (2017-07-27)
 
 Enhancements:

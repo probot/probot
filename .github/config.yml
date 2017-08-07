@@ -1,3 +1,16 @@
 firstPRMergeComment: >
   Thanks for your contribution to probot! :tada:
   ![Congrats!](https://media.giphy.com/media/o0vwzuFwCGAFO/giphy.gif)
+
+updateDocsWhiteList:
+  - bug
+  - update doc
+  - updates doc
+
+updateDocsComment: >
+  Thanks for opening this pull request! :sparkles: 
+  The maintainers of probot would appreciate it if you would update some of our documentation, found [here](https://github.com/probot/probot/tree/master/docs) based on your changes.
+
+firstIssueWelcomeComment: >
+  Thanks for opening this issue. 
+  If this issue is regarding feedback about your probot experience, such as things that you found frustrating or confusing, it would be great if you could close this out and open an issue in our [probot/friction](https://github.com/probot/friction) repo instead.

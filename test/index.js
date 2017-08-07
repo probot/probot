@@ -85,7 +85,7 @@ describe('Probot', () => {
       // This test will fail in version 0.10
       const semver = require('semver');
       const pkg = require('../package');
-      expect(semver.satisfies(pkg.version, '<=0.9')).toBe(true);
+      expect(semver.satisfies(pkg.version, '<0.10')).toBe(true);
     });
 
     it('returns the first defined (for now)', () => {

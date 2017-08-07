@@ -44,10 +44,16 @@ module.exports = (options = {}) => {
   // Log all unhandled rejections
   process.on('unhandledRejection', logger.error.bind(logger));
 
+  // Deprecate SENTRY_URL
+  if (process.env.SENTRY_URL && !process.env.SENTRY_DSN) {
+    process.env.SENTRY_DSN = process.env.SENTRY_URL;
+    console.warn('DEPRECATED: the `SENTRY_URL` key is now called `SENTRY_DSN`. Use of `SENTRY_URL` is deprecated and will be removed in 0.10.0');
+  }
+
   // If sentry is configured, report all logged errors
-  if (process.env.SENTRY_URL) {
+  if (process.env.SENTRY_DSN) {
     Raven.disableConsoleAlerts();
-    Raven.config(process.env.SENTRY_URL, {
+    Raven.config(process.env.SENTRY_DSN, {
       autoBreadcrumbs: true
     }).install({});
 

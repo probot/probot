@@ -20,7 +20,14 @@ module.exports = (options = {}) => {
     level: process.env.LOG_LEVEL || 'debug',
     stream: bunyanFormat({outputMode: process.env.LOG_FORMAT || 'short'}),
     serializers: {
-      repository: repository => repository.full_name
+      repository: repository => repository.full_name,
+      event: ({id, event, payload}) => {
+        return {
+          id, event,
+          action: payload.action,
+          repository: payload.repository && payload.repository.full_name
+        };
+      }
     }
   });
 

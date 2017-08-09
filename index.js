@@ -8,6 +8,7 @@ const Raven = require('raven');
 
 const createRobot = require('./lib/robot');
 const createServer = require('./lib/server');
+const serializers = require('./lib/serializers');
 
 module.exports = (options = {}) => {
   const cache = cacheManager.caching({
@@ -19,16 +20,7 @@ module.exports = (options = {}) => {
     name: 'PRobot',
     level: process.env.LOG_LEVEL || 'debug',
     stream: bunyanFormat({outputMode: process.env.LOG_FORMAT || 'short'}),
-    serializers: {
-      repository: repository => repository.full_name,
-      event: ({id, event, payload}) => {
-        return {
-          id, event,
-          action: payload.action,
-          repository: payload.repository && payload.repository.full_name
-        };
-      }
-    }
+    serializers
   });
 
   const webhook = createWebhook({path: '/', secret: options.secret || 'development'});

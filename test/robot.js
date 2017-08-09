@@ -114,10 +114,14 @@ describe('Robot', function () {
   });
 
   describe('error handling', () => {
-    it('logs errors throw from handlers', async () => {
-      const error = new Error('testing');
-      robot.log.error = expect.createSpy();
+    let error;
 
+    beforeEach(() => {
+      error = new Error('testing');
+      robot.log.error = expect.createSpy();
+    });
+
+    it('logs errors thrown from handlers', async () => {
       robot.on('test', () => {
         throw error;
       });
@@ -128,7 +132,24 @@ describe('Robot', function () {
         // Expected
       }
 
-      expect(robot.log.error).toHaveBeenCalledWith(error);
+      const arg = robot.log.error.calls[0].arguments[0];
+      expect(arg.err).toBe(error);
+      expect(arg.event).toBe(event);
+    });
+
+    it('logs errors from rejected promises', async () => {
+      robot.on('test', () => Promise.reject(error));
+
+      try {
+        await robot.receive(event);
+      } catch (err) {
+        // Expected
+      }
+
+      expect(robot.log.error).toHaveBeenCalled();
+      const arg = robot.log.error.calls[0].arguments[0];
+      expect(arg.err).toBe(error);
+      expect(arg.event).toBe(event);
     });
   });
 });

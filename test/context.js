@@ -113,6 +113,19 @@ describe('Context', function () {
       expect(await context.config('test-file.yml')).toBe(null);
     });
 
+    it('returns the default config when the file is missing and default config is passed', async function () {
+      const error = new Error('An error occurred');
+      error.code = 404;
+      github.repos.getContent.andReturn(Promise.reject(error));
+      const defaultConfig = {
+        foo: 5,
+        bar: 7,
+        baz: 11
+      };
+      const contents = await context.config('test-file.yml', defaultConfig);
+      expect(contents).toEqual(defaultConfig);
+    });
+
     it('throws when the configuration file is malformed', async function () {
       github.repos.getContent.andReturn(Promise.resolve(readConfig('malformed.yml')));
 

@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.9.1 (2017-08-09)
+
+Enhancements:
+
+- Log the event with errors to aid debugging ([#196](https://github.com/probot/probot/pull/196))
+
+- Reduce the ttl on the auth token cache to 1 min less than GitHub expiry ([#197](https://github.com/probot/probot/pull/197))
+
+[View full changelog](https://github.com/probot/probot/compare/v0.9.0...v0.9.1)
+
 ## 0.9.0 (2017-08-06)
 
 Enhancements:

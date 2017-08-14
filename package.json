@@ -26,7 +26,7 @@
     "express": "^4.15.3",
     "github": "^9.2.0",
     "github-app": "^3.0.0",
-    "github-webhook-handler": "^0.6.0",
+    "github-webhook-handler": "rvagg/github-webhook-handler#v0.6.1",
     "js-yaml": "^3.8.4",
     "load-plugins": "^2.1.2",
     "pkg-conf": "^2.0.0",

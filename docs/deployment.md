@@ -72,7 +72,7 @@ Probot runs like [any other Node app](https://devcenter.heroku.com/articles/depl
         -----> Launching... done
               http://arcane-lowlands-8408.herokuapp.com deployed to Heroku
 
-1. Your plugin should be up and running! To verify that your plugin 
+1. Your plugin should be up and running! To verify that your plugin
    is receiving webhook data, you can tail your app's logs:
 
       $ heroku config:set LOG_LEVEL=trace
@@ -122,7 +122,7 @@ To deploy a bot that includes multiple plugins, create a new app that has the pl
 
 ## Error tracking
 
-Error tracking in production is of critical importance especially given that there is currently no recommended channel for letting the end user know that an error occurred. (We're working on a solution for end user error reporting [here](https://github.com/probot/friction/issues/1)). Probot comes bundled with [Raven](https://github.com/getsentry/raven-node) a client for the [Sentry](https://github.com/getsentry/sentry) exception tracking platform. To enable Sentry follow the following steps:
+Probot comes bundled with [Raven](https://github.com/getsentry/raven-node) a client for the [Sentry](https://github.com/getsentry/sentry) exception tracking platform. To enable Sentry follow the following steps:
 
   1. [Create a Sentry.io Account](https://sentry.io/signup/) (with [10k events/month free](https://sentry.io/pricing/)) or [host your own instance](https://github.com/getsentry/sentry) (Students can [extra sentry credit](https://education.github.com/pack))
   2. Follow the setup instructions to find your DSN.

@@ -97,4 +97,35 @@ describe('Probot', () => {
       expect(probot.robot).toExist();
     });
   });
+
+  describe('sentry', () => {
+    afterEach(() => {
+      // Clean up env variables
+      delete process.env.SENTRY_URL;
+      delete process.env.SENTRY_DSN;
+    });
+    describe('SENTRY_URL', () => {
+      it('will be removed in 0.11', () => {
+        // This test will fail in version 0.11
+        const semver = require('semver');
+        const pkg = require('../package');
+        expect(semver.satisfies(pkg.version, '<0.11')).toBe(true);
+      });
+
+      it('configures sentry via the SENTRY_URL ', () => {
+        process.env.SENTRY_URL = '09290';
+        expect(() => {
+          createProbot();
+        }).toThrow(/Invalid Sentry DSN: 09290/);
+      });
+    });
+    describe('SENTRY_DSN', () => {
+      it('configures sentry via the SENTRY_DSN ', () => {
+        process.env.SENTRY_DSN = '1233';
+        expect(() => {
+          createProbot();
+        }).toThrow(/Invalid Sentry DSN: 1233/);
+      });
+    });
+  });
 });

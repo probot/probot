@@ -192,6 +192,10 @@ $ cd my-plugin
 $ npm install
 ```
 
+## API
+
+Currently our Probot API docs live [here](https://probot.github.io/probot/latest/).
+
 ## Next
 
 - [See the full Probot API](https://probot.github.io/probot/latest/)

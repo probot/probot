@@ -1,6 +1,5 @@
 {
   "opts": {
-    "readme": "docs/plugins.md",
     "template": "node_modules/minami"
   },
   "source": {

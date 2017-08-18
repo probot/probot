@@ -4,6 +4,7 @@ set -e
 
 # Store the versions
 VERSION=$(npm view probot version)
+HEAD=$(git rev-parse HEAD)
 
 # Generate docs
 npm run doc
@@ -24,10 +25,18 @@ rm -rf api/$VERSION
 # Copy over the new docs
 mv ../../out/probot/$VERSION api/$VERSION
 
+# Update the /api/latest link to point to this version
 ln -sfn $VERSION api/latest
+
+# Update the submodule
+git submodule update --init
+cd _submodules/probot
+git fetch
+git checkout $HEAD
+cd ../..
 
 # Commit and publish
 git add .
 git commit -m "Update docs for v$VERSION"
-git tag v$VERSION
+git tag -f v$VERSION
 git push --tags origin master

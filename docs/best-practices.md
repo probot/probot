@@ -1,4 +1,4 @@
-# Best practices for Probot plugins
+# Best Practices
 
 First and foremost, your plugin must obey the [The Three Laws of Robotics](https://en.wikipedia.org/wiki/Three_Laws_of_Robotics):
 

@@ -1,4 +1,8 @@
-# Deploy
+---
+next: docs/best-practices.md
+---
+
+# Deployment
 
 Every plugin can either be deployed as a stand-alone bot, or combined with other plugins in one deployment.
 
@@ -72,11 +76,11 @@ Probot runs like [any other Node app](https://devcenter.heroku.com/articles/depl
         -----> Launching... done
               http://arcane-lowlands-8408.herokuapp.com deployed to Heroku
 
-1. Your plugin should be up and running! To verify that your plugin 
+1. Your plugin should be up and running! To verify that your plugin
    is receiving webhook data, you can tail your app's logs:
 
-      $ heroku config:set LOG_LEVEL=trace
-      $ heroku logs --tail
+        $ heroku config:set LOG_LEVEL=trace
+        $ heroku logs --tail
 
 ### Now
 

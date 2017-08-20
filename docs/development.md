@@ -2,13 +2,13 @@
 next: docs/webhooks.md
 ---
 
-# Developing a Plugin
+# Developing an App
 
-To develop a Probot plugin, you will first need a recent version of [Node.js](https://nodejs.org/) installed. Probot uses the `async/await` keywords, so Node.js 7.6 is the minimum required version.
+To develop a Probot app, you will first need a recent version of [Node.js](https://nodejs.org/) installed. Probot uses the `async/await` keywords, so Node.js 7.6 is the minimum required version.
 
-## Generating a new plugin
+## Generating a new app
 
-[create-probot-plugin](https://github.com/probot/create-probot-plugin) is the best way to start building a new plugin. It will generate a new plugin with everything you need to get started and run your plugin in production.
+[create-probot-plugin](https://github.com/probot/create-probot-plugin) is the best way to start building a new app. It will generate a new app with everything you need to get started and run your app in production.
 
 To get started, install the module from npm:
 
@@ -22,7 +22,7 @@ Next, run the app:
 $ create-probot-plugin my-first-plugin
 ```
 
-This will ask you a series of questions about your plugin, which should look something like this:
+This will ask you a series of questions about your app, which should look something like this:
 
 ```
 Let's create a Probot plugin!
@@ -46,11 +46,11 @@ created file: my-first-plugin/docs/deploy.md
 Done!
 ```
 
-The most important files note here are `index.js`, which is where the code for your plugin will go, and `package.json`, which makes this a standard [npm module](https://docs.npmjs.com/files/package.json).
+The most important files note here are `index.js`, which is where the code for your app will go, and `package.json`, which makes this a standard [npm module](https://docs.npmjs.com/files/package.json).
 
 ## Configure a GitHub App
 
-To run your plugin in development, you will need to configure a GitHub App to deliver webhooks to your local machine.
+To run your app in development, you will need to configure a GitHub App to deliver webhooks to your local machine.
 
 1. [Create a new GitHub App](https://github.com/settings/apps/new) with:
     - **Webhook URL**: Set to `https://example.com/` and we'll update it in a minute.
@@ -63,9 +63,9 @@ To run your plugin in development, you will need to configure a GitHub App to de
 
 You'll need to create a test repository and install your app by clicking the "Install" button on the settings page of your app.
 
-## Running the plugin
+## Running the app
 
-Once you've set the `APP_ID` of your GitHub app in `.env` and downloaded the  private key, you're ready to run your bot.
+Once you've set the `APP_ID` of your GitHub App in `.env` and downloaded the  private key, you're ready to run your Probot app.
 
 ```
 $ npm start
@@ -76,7 +76,7 @@ Yay, the plugin was loaded!
 Listening on https://bkeepers.localtunnel.me
 ```
 
-Optionally, you can also run your plugin through [nodemon](https://github.com/remy/nodemon#nodemon) which will listen on any files changes in your local development environment and automatically restart the server. After installing nodemon, you can run `nodemon --exec "npm start"` and from there the server will automatically restart upon file changes.
+Optionally, you can also run your app through [nodemon](https://github.com/remy/nodemon#nodemon) which will listen on any files changes in your local development environment and automatically restart the server. After installing nodemon, you can run `nodemon --exec "npm start"` and from there the server will automatically restart upon file changes.
 
 ## Debugging
 

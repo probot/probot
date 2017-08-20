@@ -99,16 +99,16 @@ describe('Robot', function () {
       expect(spy).toHaveBeenCalled();
     });
 
-    it('returns a reject errors thrown in plugins', async () => {
+    it('returns a reject errors thrown in apps', async () => {
       robot.on('test', () => {
-        throw new Error('error from plugin');
+        throw new Error('error from app');
       });
 
       try {
         await robot.receive(event);
-        throw new Error('expected error to be raised from plugin');
+        throw new Error('expected error to be raised from app');
       } catch (err) {
-        expect(err.message).toEqual('error from plugin');
+        expect(err.message).toEqual('error from app');
       }
     });
   });

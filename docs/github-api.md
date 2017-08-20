@@ -8,7 +8,7 @@ Probot uses [GitHub Apps](https://developer.github.com/apps/). An app is a first
 
 `context.github` is an authenticated GitHub client that can be used to make API calls. It is an instance of the [github Node.js module](https://github.com/mikedeboer/node-github), which wraps the [GitHub API](https://developer.github.com/v3/) and allows you to do almost anything programmatically that you can do through a web browser.
 
-Here is an example of an autoresponder plugin that comments on opened issues:
+Here is an example of an autoresponder app that comments on opened issues:
 
 ```js
 module.exports = robot => {

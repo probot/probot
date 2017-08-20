@@ -14,6 +14,6 @@ Probot apps are easy to write, deploy, and share. Many of the most popular Probo
 - [stale](/apps/stale/) - closes abandoned issues after a period of inactivity.
 - [settings](/apps/settings/) - syncs repository settings defined in `.github/config.yml` to GitHub, enabling Pull Requests for repository settings.
 - [request-info](/apps/request-info/) - requests more info from newly opened Pull Requests and Issues that contain either default titles or whose description is left blank.
-- [Browse more examples](https://github.com/search?q=topic%3Aprobot-plugin&type=Repositories)
+- [Browse more examples](https://github.com/search?q=topic%3Aprobot-app&type=Repositories)
 
 Ready to get started?

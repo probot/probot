@@ -55,10 +55,11 @@ To run your plugin in development, you will need to configure a GitHub App to de
 1. [Create a new GitHub App](https://github.com/settings/apps/new) with:
     - **Webhook URL**: Set to `https://example.com/` and we'll update it in a minute.
     - **Webhook Secret:** `development`
-    - **Permissions & events** needed will depend on how you use the bot, but for development it may be easiest to enable everything.
-1. Download the private key and move it to the project directory
-1. Edit `.env` and set `APP_ID` to the ID of the app you just created.
-1. Run `$ npm start` to start the server, which will output `Listening on https://yourname.localtunnel.me`;
+    - **Permissions & events** can be found in the next tab over. What you need to choose will depend on what data you want the bot to have access to. Note: if, for example, you only enable issue events, you will not be able to listen on pull request webhooks with your bot. However, for development we recommend enabling everything.
+1. Download the private key and move it to your project's directory.
+1. Edit `.env` and set `APP_ID` to the ID of the app you just created. The App ID can be found in your app settings page here <img width="1048" alt="screen shot 2017-08-20 at 8 31 31 am" src="https://user-images.githubusercontent.com/13410355/29496168-044b9a48-8582-11e7-8be4-39cc75090647.png">
+
+1. Run `$ npm start` to start the server, which will output `Listening on https://yourname.localtunnel.me`.
 1. Update the **Webhook URL** in the [app settings](https://github.com/settings/apps) to use the `localtunnel.me` URL.
 
 You'll need to create a test repository and install your app by clicking the "Install" button on the settings page of your app.

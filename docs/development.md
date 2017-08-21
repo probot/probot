@@ -66,7 +66,7 @@ You'll need to create a test repository and install your app by clicking the "In
 
 ## Running the plugin
 
-Once you've set the `APP_ID` of your GitHub app in `.env` and downloaded the  private key, you're ready to run your app.
+Once you've set the `APP_ID` of your GitHub app in `.env` and downloaded the private key, you're ready to run your app.
 
 ```
 $ npm start

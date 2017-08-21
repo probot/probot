@@ -1,3 +1,3 @@
 module.exports = robot => {
-  console.log('laoded app');
+  console.log('loaded app');
 }

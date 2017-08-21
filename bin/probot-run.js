@@ -48,7 +48,7 @@ const probot = createProbot({
 });
 
 pkgConf('probot').then(pkg => {
-  const apps = require('../lib/plugin')(probot);
+  const plugins = require('../lib/plugin')(probot);
   const requestedPlugins = program.args.concat(pkg.plugins || []);
 
   // If we have explicitly requested plugins, load them; otherwise use autoloading

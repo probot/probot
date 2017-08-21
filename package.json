@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "node ./bin/probot run",
-    "test": "mocha && xo --extend eslint-config-probot",
+    "test": "mocha && xo",
     "doc": "jsdoc -c .jsdoc.json",
     "postpublish": "script/publish-docs"
   },
@@ -46,6 +46,7 @@
     "xo": "^0.19.0"
   },
   "xo": {
+    "extends": "eslint-config-probot",
     "overrides": [
       {
         "files": "test/**/*.js",

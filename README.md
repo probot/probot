@@ -8,7 +8,7 @@ There are some great services that offer [apps in the GitHub Marketplace](https:
 
 ## Apps
 
-Apps are easy to write, deploy, and share. Here are just a few examples of things that can be build with Probot:
+Apps are easy to write, deploy, and share. Here are just a few examples of things that can be built with Probot:
 
 - [stale](https://github.com/probot/stale) - closes abandoned issues after a period of inactivity.
 - [owners](https://github.com/probot/owners) - @mentions people in Pull Requests based on contents of the OWNERS file

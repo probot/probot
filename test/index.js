@@ -66,6 +66,33 @@ describe('Probot', () => {
         .expect(200, 'bar')
         .expect('X-Test', 'bar');
     });
+
+    it('allows users to configure webhook paths', async () => {
+      probot = createProbot({webhookPath: '/webhook'});
+      probot.load(robot => {
+        const app = robot.route();
+        app.get('/webhook', (req, res) => res.end('get-webhook'));
+        app.post('/webhook', (req, res) => res.end('post-webhook'));
+      });
+
+      // GET requests should succeed
+      await request(probot.server).get('/webhook')
+        .expect(200, 'get-webhook');
+
+      // POST requests should fail b/c webhook path has precedence
+      await request(probot.server).post('/webhook')
+        .expect(400);
+    });
+
+    it('defaults webhook path to `/`', async () => {
+      // GET requests to `/` should 404 at express level, not 400 at webhook level
+      await request(probot.server).get('/')
+        .expect(404);
+
+      // POST requests to `/` should 400 b/c webhook signature will fail
+      await request(probot.server).post('/')
+        .expect(400);
+    });
   });
 
   describe('receive', () => {

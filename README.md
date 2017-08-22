@@ -20,4 +20,4 @@ Check out [all probot plugins](https://github.com/search?q=topic%3Aprobot-plugin
 
 Most of the interesting things are built with plugins, so consider starting by [writing a new plugin](docs/plugins.md) or improving one of the [existing ones](https://github.com/search?q=topic%3Aprobot-plugin&type=Repositories).
 
-Want to chat with Probot users and contributors? Join us in the [Slack channel](https://probot-slackin.herokuapp.com/)!
+Want to chat with Probot users and contributors? [Join us in Slack](https://probot-slackin.herokuapp.com/)!

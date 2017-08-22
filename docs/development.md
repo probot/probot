@@ -8,42 +8,46 @@ To develop a Probot app, you will first need a recent version of [Node.js](https
 
 ## Generating a new app
 
-[create-probot-plugin](https://github.com/probot/create-probot-plugin) is the best way to start building a new app. It will generate a new app with everything you need to get started and run your app in production.
+[create-probot-app](https://github.com/probot/create-probot-app) is the best way to start building a new app. It will generate a new app with everything you need to get started and run your app in production.
 
 To get started, install the module from npm:
 
 ```
-$ npm install -g create-probot-plugin
+$ npm install -g create-probot-app
 ```
 
 Next, run the app:
 
 ```
-$ create-probot-plugin my-first-plugin
+$ create-probot-app my-first-app
 ```
 
 This will ask you a series of questions about your app, which should look something like this:
 
 ```
-Let's create a Probot plugin!
-? Plugin's package name: my-first-plugin
-? Description of plugin: A "Hello World" GitHub App built with Probot
-? Plugin author's full name: Brandon Keepers
-? Plugin author's email address: bkeepers@github.com
-? Plugin author's homepage:
-? Plugin's GitHub user or org name: bkeepers
-? Plugin's repo name: my-first-plugin
-created file: my-first-plugin/.env.example
-created file: my-first-plugin/.gitignore
-created file: my-first-plugin/.travis.yml
-created file: my-first-plugin/LICENSE
-created file: my-first-plugin/README.md
-created file: my-first-plugin/app.json
-created file: my-first-plugin/index.js
-created file: my-first-plugin/package-lock.json
-created file: my-first-plugin/package.json
-created file: my-first-plugin/docs/deploy.md
-Done!
+Let's create a Probot app!
+? Package name: my-first-app
+? Description of app: A "Hello World" GitHub App built with Probot
+? Author's full name: Brandon Keepers
+? Author's email address: bkeepers@github.com
+? Homepage:
+? GitHub user or org name: bkeepers
+? Repository name: my-first-app
+created file: my-first-app/.env.example
+created file: my-first-app/.gitignore
+created file: my-first-app/.travis.yml
+created file: my-first-app/LICENSE
+created file: my-first-app/README.md
+created file: my-first-app/app.json
+created file: my-first-app/index.js
+created file: my-first-app/package-lock.json
+created file: my-first-app/package.json
+created file: my-first-app/docs/deploy.md
+Finished scaffolding files!
+
+Installing Node dependencies!
+
+Done! Enjoy building your Probot app!
 ```
 
 The most important files note here are `index.js`, which is where the code for your app will go, and `package.json`, which makes this a standard [npm module](https://docs.npmjs.com/files/package.json).

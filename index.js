@@ -23,7 +23,7 @@ module.exports = (options = {}) => {
     serializers
   });
 
-  const webhook = createWebhook({path: '/', secret: options.secret || 'development'});
+  const webhook = createWebhook({path: options.webhookPath || '/', secret: options.secret || 'development'});
   const app = createApp({
     id: options.id,
     cert: options.cert,

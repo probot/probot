@@ -49,4 +49,4 @@ describe('your-app', () => {
 });
 ```
 
-A good testing example from [update-docs](github.com/behaviorbot/update-docs) can be found [here](https://github.com/behaviorbot/update-docs/blob/master/test/index.js), and another one from [owners](github.com/probot/owners) can be found  [here](https://github.com/probot/owners/blob/master/test/owner-notifier.js).
+A good testing example from [update-docs](https://github.com/behaviorbot/update-docs) can be found [here](https://github.com/behaviorbot/update-docs/blob/master/test/index.js), and another one from [owners](https://github.com/probot/owners) can be found  [here](https://github.com/probot/owners/blob/master/test/owner-notifier.js).

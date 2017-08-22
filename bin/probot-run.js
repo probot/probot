@@ -13,6 +13,7 @@ program
   .option('-s, --secret <secret>', 'Webhook secret of the GitHub App', process.env.WEBHOOK_SECRET)
   .option('-p, --port <n>', 'Port to start the server on', process.env.PORT || 3000)
   .option('-P, --private-key <file>', 'Path to certificate of the GitHub App', findPrivateKey)
+  .option('-w, --webhook-path <path>', 'URL path which receives webhooks. Ex: `/webhook`', process.env.WEBHOOK_PATH)
   .option('-t, --tunnel <subdomain>', 'Expose your local bot to the internet', process.env.SUBDOMAIN || process.env.NODE_ENV !== 'production')
   .parse(process.argv);
 
@@ -44,7 +45,8 @@ const probot = createProbot({
   id: program.app,
   secret: program.secret,
   cert: program.privateKey,
-  port: program.port
+  port: program.port,
+  webhookPath: program.webhookPath
 });
 
 pkgConf('probot').then(pkg => {

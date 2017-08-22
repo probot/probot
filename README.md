@@ -19,3 +19,5 @@ Check out [all Probot apps](https://github.com/search?q=topic%3Aprobot-app&type=
 ## Contributing
 
 Most of the interesting things are built with plugins, so consider starting by [writing a new app](docs/) or improving one of the [existing ones](https://github.com/search?q=topic%3Aprobot-app&type=Repositories).
+
+Want to chat with Probot users and contributors? [Join us in Slack](https://probot-slackin.herokuapp.com/)!

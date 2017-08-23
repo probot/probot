@@ -19,7 +19,7 @@ describe('server', function () {
 
   describe('webhook handler', () => {
     it('should 500 on a webhook error', () => {
-      webhook.andCall((req, res, callback) => callback('webhook error')) // eslint-disable-line standard/no-callback-literal
+      webhook.andCall((req, res, callback) => callback(new Error('webhook error')))
       return request(server).post('/').expect(500)
     })
   })

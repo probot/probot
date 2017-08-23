@@ -14,7 +14,7 @@ newPRWelcomeComment: >
 # Configuration for first-pr-merge - https://github.com/behaviorbot/first-pr-merge
 # Comment to be posted to on pull requests merged by a first time user
 firstPRMergeComment: >
-  Thanks for your contribution to probot! :tada:
+  Thanks for your contribution to probot! :tada: <br>
   ![Congrats!](https://media.giphy.com/media/o0vwzuFwCGAFO/giphy.gif)
 
 # Configuration for request-info - https://github.com/behaviorbot/request-info

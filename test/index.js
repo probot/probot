@@ -66,6 +66,33 @@ describe('Probot', () => {
         .expect(200, 'bar')
         .expect('X-Test', 'bar');
     });
+
+    it('allows users to configure webhook paths', async () => {
+      probot = createProbot({webhookPath: '/webhook'});
+      probot.load(robot => {
+        const app = robot.route();
+        app.get('/webhook', (req, res) => res.end('get-webhook'));
+        app.post('/webhook', (req, res) => res.end('post-webhook'));
+      });
+
+      // GET requests should succeed
+      await request(probot.server).get('/webhook')
+        .expect(200, 'get-webhook');
+
+      // POST requests should fail b/c webhook path has precedence
+      await request(probot.server).post('/webhook')
+        .expect(400);
+    });
+
+    it('defaults webhook path to `/`', async () => {
+      // GET requests to `/` should 404 at express level, not 400 at webhook level
+      await request(probot.server).get('/')
+        .expect(404);
+
+      // POST requests to `/` should 400 b/c webhook signature will fail
+      await request(probot.server).post('/')
+        .expect(400);
+    });
   });
 
   describe('receive', () => {
@@ -82,9 +109,10 @@ describe('Probot', () => {
 
   describe('robot', () => {
     it('will be removed in 0.10', () => {
+      // This test will fail in version 0.10
       const semver = require('semver');
       const pkg = require('../package');
-      expect(semver.satisfies(pkg.version, '>=0.9')).toBe(false, 'remove in 0.10.0');
+      expect(semver.satisfies(pkg.version, '<0.10')).toBe(true);
     });
 
     it('returns the first defined (for now)', () => {

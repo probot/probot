@@ -105,20 +105,25 @@ describe('Context', function () {
       });
     });
 
-    it('throws when the file is missing', async function () {
-      github.repos.getContent.andReturn(Promise.reject(new Error('An error occurred')));
+    it('returns null when the file is missing', async function () {
+      const error = new Error('An error occurred');
+      error.code = 404;
+      github.repos.getContent.andReturn(Promise.reject(error));
 
-      let e;
-      let contents;
-      try {
-        contents = await context.config('test-file.yml');
-      } catch (err) {
-        e = err;
-      }
+      expect(await context.config('test-file.yml')).toBe(null);
+    });
 
-      expect(contents).toNotExist();
-      expect(e).toExist();
-      expect(e.message).toEqual('An error occurred');
+    it('returns the default config when the file is missing and default config is passed', async function () {
+      const error = new Error('An error occurred');
+      error.code = 404;
+      github.repos.getContent.andReturn(Promise.reject(error));
+      const defaultConfig = {
+        foo: 5,
+        bar: 7,
+        baz: 11
+      };
+      const contents = await context.config('test-file.yml', defaultConfig);
+      expect(contents).toEqual(defaultConfig);
     });
 
     it('throws when the configuration file is malformed', async function () {

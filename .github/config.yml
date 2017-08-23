@@ -4,12 +4,13 @@
 # Comment to be posted to on first time issues
 newIssueWelcomeComment: >
   Thanks for opening this issue. 
-  If this issue is regarding feedback about your probot experience, such as things that you found frustrating or confusing, it would be great if you could close this out and open an issue in our [probot/friction](https://github.com/probot/friction) repo instead.
+  If this issue is regarding feedback about your probot experience, such as things that you found frustrating or confusing, it would be great if you could close this out and open an issue in our [probot/friction](https://github.com/probot/friction) repo instead. Otherwise a maintainer will get back to you shortly.
 
 # Configuration for new-pr-welcome - https://github.com/behaviorbot/new-pr-welcome
 # Comment to be posted to on PRs from first time contributors in your repository
 newPRWelcomeComment: >
-  Thanks for opening this pull request! Please check out our [contributing guidelines](https://github.com/probot/probot/blob/master/CONTRIBUTING.md).
+  Thanks for opening this pull request! Please check out our [contributing guidelines](https://github.com/probot/probot/blob/master/CONTRIBUTING.md). <br>
+  ![Woo!](https://media.giphy.com/media/t5J2yBFaM1464/giphy.gif)
 
 # Configuration for first-pr-merge - https://github.com/behaviorbot/first-pr-merge
 # Comment to be posted to on pull requests merged by a first time user

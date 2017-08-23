@@ -1,15 +1,15 @@
-const expect = require('expect');
-const Context = require('../lib/context');
-const createRobot = require('../lib/robot');
+const expect = require('expect')
+const Context = require('../lib/context')
+const createRobot = require('../lib/robot')
 
 describe('Robot', function () {
-  let robot;
-  let event;
-  let spy;
+  let robot
+  let event
+  let spy
 
   beforeEach(function () {
-    robot = createRobot();
-    robot.auth = () => {};
+    robot = createRobot()
+    robot.auth = () => {}
 
     event = {
       event: 'test',
@@ -17,10 +17,10 @@ describe('Robot', function () {
         action: 'foo',
         installation: {id: 1}
       }
-    };
+    }
 
-    spy = expect.createSpy();
-  });
+    spy = expect.createSpy()
+  })
 
   describe('constructor', () => {
     it('takes a logger', () => {
@@ -31,133 +31,133 @@ describe('Robot', function () {
         warn: expect.createSpy(),
         error: expect.createSpy(),
         fatal: expect.createSpy()
-      };
-      robot = createRobot({logger});
+      }
+      robot = createRobot({logger})
 
-      robot.log('hello world');
-      expect(logger.debug).toHaveBeenCalledWith('hello world');
-    });
-  });
+      robot.log('hello world')
+      expect(logger.debug).toHaveBeenCalledWith('hello world')
+    })
+  })
 
   describe('on', function () {
     it('calls callback when no action is specified', async function () {
-      robot.on('test', spy);
+      robot.on('test', spy)
 
-      expect(spy).toNotHaveBeenCalled();
-      await robot.receive(event);
-      expect(spy).toHaveBeenCalled();
-      expect(spy.calls[0].arguments[0]).toBeA(Context);
-      expect(spy.calls[0].arguments[0].payload).toBe(event.payload);
-    });
+      expect(spy).toNotHaveBeenCalled()
+      await robot.receive(event)
+      expect(spy).toHaveBeenCalled()
+      expect(spy.calls[0].arguments[0]).toBeA(Context)
+      expect(spy.calls[0].arguments[0].payload).toBe(event.payload)
+    })
 
     it('(context, event) will be removed in 0.10', () => {
       // This test will fail in version 0.10 to remind us to
       // remove the deprecated (context, event)
-      const semver = require('semver');
-      const pkg = require('../package');
-      expect(semver.satisfies(pkg.version, '< 0.10')).toBe(true);
-    });
+      const semver = require('semver')
+      const pkg = require('../package')
+      expect(semver.satisfies(pkg.version, '< 0.10')).toBe(true)
+    })
 
     it('calls callback with same action', async function () {
-      robot.on('test.foo', spy);
+      robot.on('test.foo', spy)
 
-      await robot.receive(event);
-      expect(spy).toHaveBeenCalled();
-    });
+      await robot.receive(event)
+      expect(spy).toHaveBeenCalled()
+    })
 
     it('does not call callback with different action', async function () {
-      robot.on('test.nope', spy);
+      robot.on('test.nope', spy)
 
-      await robot.receive(event);
-      expect(spy).toNotHaveBeenCalled();
-    });
+      await robot.receive(event)
+      expect(spy).toNotHaveBeenCalled()
+    })
 
     it('calls callback with *', async function () {
-      robot.on('*', spy);
+      robot.on('*', spy)
 
-      await robot.receive(event);
-      expect(spy).toHaveBeenCalled();
-    });
-  });
+      await robot.receive(event)
+      expect(spy).toHaveBeenCalled()
+    })
+  })
 
   describe('receive', () => {
     it('delivers the event', async () => {
-      const spy = expect.createSpy();
-      robot.on('test', spy);
+      const spy = expect.createSpy()
+      robot.on('test', spy)
 
-      await robot.receive(event);
+      await robot.receive(event)
 
-      expect(spy).toHaveBeenCalled();
-    });
+      expect(spy).toHaveBeenCalled()
+    })
 
     it('waits for async events to resolve', async () => {
-      const spy = expect.createSpy();
+      const spy = expect.createSpy()
 
       robot.on('test', () => {
         return new Promise(resolve => {
           setTimeout(() => {
-            spy();
-            resolve();
-          }, 1);
-        });
-      });
+            spy()
+            resolve()
+          }, 1)
+        })
+      })
 
-      await robot.receive(event);
+      await robot.receive(event)
 
-      expect(spy).toHaveBeenCalled();
-    });
+      expect(spy).toHaveBeenCalled()
+    })
 
     it('returns a reject errors thrown in plugins', async () => {
       robot.on('test', () => {
-        throw new Error('error from plugin');
-      });
+        throw new Error('error from plugin')
+      })
 
       try {
-        await robot.receive(event);
-        throw new Error('expected error to be raised from plugin');
+        await robot.receive(event)
+        throw new Error('expected error to be raised from plugin')
       } catch (err) {
-        expect(err.message).toEqual('error from plugin');
+        expect(err.message).toEqual('error from plugin')
       }
-    });
-  });
+    })
+  })
 
   describe('error handling', () => {
-    let error;
+    let error
 
     beforeEach(() => {
-      error = new Error('testing');
-      robot.log.error = expect.createSpy();
-    });
+      error = new Error('testing')
+      robot.log.error = expect.createSpy()
+    })
 
     it('logs errors thrown from handlers', async () => {
       robot.on('test', () => {
-        throw error;
-      });
+        throw error
+      })
 
       try {
-        await robot.receive(event);
+        await robot.receive(event)
       } catch (err) {
         // Expected
       }
 
-      const arg = robot.log.error.calls[0].arguments[0];
-      expect(arg.err).toBe(error);
-      expect(arg.event).toBe(event);
-    });
+      const arg = robot.log.error.calls[0].arguments[0]
+      expect(arg.err).toBe(error)
+      expect(arg.event).toBe(event)
+    })
 
     it('logs errors from rejected promises', async () => {
-      robot.on('test', () => Promise.reject(error));
+      robot.on('test', () => Promise.reject(error))
 
       try {
-        await robot.receive(event);
+        await robot.receive(event)
       } catch (err) {
         // Expected
       }
 
-      expect(robot.log.error).toHaveBeenCalled();
-      const arg = robot.log.error.calls[0].arguments[0];
-      expect(arg.err).toBe(error);
-      expect(arg.event).toBe(event);
-    });
-  });
-});
+      expect(robot.log.error).toHaveBeenCalled()
+      const arg = robot.log.error.calls[0].arguments[0]
+      expect(arg.err).toBe(error)
+      expect(arg.event).toBe(event)
+    })
+  })
+})

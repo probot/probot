@@ -197,5 +197,20 @@ describe('Context', function () {
         baz: 11
       });
     });
+    it('respects new line characters', async function () {
+      github.repos.getContent.andReturn(Promise.resolve(readConfig('multiline.yml')));
+      const config = await context.config('test-file.yml');
+
+      expect(github.repos.getContent).toHaveBeenCalledWith({
+        owner: 'bkeepers',
+        repo: 'probot',
+        path: '.github/test-file.yml'
+      });
+
+      expect(config).toEqual({
+        multiline: "Foo foo, foo foo\nbar bar bar",
+        singleline: "Foo foo, foo foo bar bar bar"
+      });
+    });
   });
 });

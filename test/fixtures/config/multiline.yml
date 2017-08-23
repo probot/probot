@@ -1,0 +1,7 @@
+multiline: |
+  Foo foo, foo foo
+  bar bar bar
+
+singleline: >
+  Foo foo, foo foo
+  bar bar bar

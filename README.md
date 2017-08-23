@@ -12,7 +12,7 @@ Apps are easy to write, deploy, and share. Here are just a few examples of thing
 
 - [stale](https://github.com/probot/stale) - closes abandoned issues after a period of inactivity.
 - [owners](https://github.com/probot/owners) - @mentions people in Pull Requests based on contents of the OWNERS file
-- [configurer](https://github.com/probot/configurer) - syncs repository settings defined in `.github/config.yml` to GitHub, enabling Pull Requests for repository settings.
+- [settings](https://github.com/probot/settings) - syncs repository settings defined in `.github/settings.yml` to GitHub, enabling Pull Requests for repository settings.
 
 Check out [all Probot apps](https://github.com/search?q=topic%3Aprobot-app&type=Repositories).
 

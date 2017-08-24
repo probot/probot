@@ -6,6 +6,14 @@ Enhancements:
 
 - Configure the path that the GitHub webhook handler listens on with `WEBHOOK_PATH` environment variable or the `--webhook-path` or `-w` command line options ([#203](https://github.com/probot/probot/pull/203))
 
+- `robot.on` can now take an array of events ([#212](https://github.com/probot/probot/pull/212)):
+
+    ```js
+    robot.on(['issues.opened', 'issues.closed'], async context => {
+      robot.log(context);
+    });
+    ```
+
 Breaking Changes:
 
 - Previously, `context.config(path, default)` would raise an error if the config file does not exist in the repository. Now, it will return the `default` from [`context.config`](https://probot.github.io/api/latest/Context.html#config) even if the file doesn't exist, or `null` if a default is not set. ([#198](https://github.com/probot/probot/pull/198), [#201](https://github.com/probot/probot/pull/201))

@@ -71,14 +71,6 @@ module.exports = (options = {}) => {
     receive,
     logger,
 
-    // Return the first robot
-    get robot () {
-      const caller = (new Error()).stack.split('\n')[2]
-      console.warn('DEPRECATED: the `robot` property is deprecated and will be removed in 0.10.0')
-      console.warn(caller)
-      return robots[0] || createRobot({app, cache, logger, catchErrors: true})
-    },
-
     start () {
       server.listen(options.port)
       logger.trace('Listening on http://localhost:' + options.port)

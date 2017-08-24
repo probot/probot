@@ -20,6 +20,10 @@ Breaking Changes:
 
 - Rename `SENTRY_URL` to `SENTRY_DSN`, because consistency ([#194](https://github.com/probot/probot/pull/194))
 
+- The second event argument to `robot.on` that was deprecated in 0.7.0 was removed. ([e9355539](https://github.com/probot/probot/commit/e93555397e21d23b0ec2fc56816a5337c3cf7bc4))
+
+- The `robot` property of the object returned from the Probot constructor (`const probot = require('probot')(); probot.robot`) was removed. ([dc33e4be](https://github.com/probot/probot/commit/dc33e4be6ffeafd36011ddefd5216bfe3bd508d3))
+
 Noteworthy Community Updates:
 
 - There's a new [Slack channel for Probot](https://probot-slackin.herokuapp.com/). Come chat with us! ([#217](https://github.com/probot/probot/pull/216))

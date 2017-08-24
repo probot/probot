@@ -50,14 +50,6 @@ describe('Robot', function () {
       expect(spy.calls[0].arguments[0].payload).toBe(event.payload)
     })
 
-    it('(context, event) will be removed in 0.10', () => {
-      // This test will fail in version 0.10 to remind us to
-      // remove the deprecated (context, event)
-      const semver = require('semver')
-      const pkg = require('../package')
-      expect(semver.satisfies(pkg.version, '< 0.10')).toBe(true)
-    })
-
     it('calls callback with same action', async function () {
       robot.on('test.foo', spy)
 

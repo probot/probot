@@ -78,6 +78,22 @@ describe('Robot', function () {
       await robot.receive(event)
       expect(spy).toHaveBeenCalled()
     })
+
+    it('calls callback x amount of times when an array of x actions is passed', async function () {
+      const event2 = {
+        event: 'arrayTest',
+        payload: {
+          action: 'bar',
+          installation: {id: 2}
+        }
+      }
+
+      robot.on(['test.foo', 'arrayTest.bar'], spy)
+
+      await robot.receive(event)
+      await robot.receive(event2)
+      expect(spy.calls.length).toEqual(2)
+    })
   })
 
   describe('receive', () => {

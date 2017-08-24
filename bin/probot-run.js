@@ -8,7 +8,7 @@ const program = require('commander')
 const {findPrivateKey} = require('../lib/private-key')
 
 program
-  .usage('[options] <plugins...>')
+  .usage('[options] <apps...>')
   .option('-a, --app <id>', 'ID of the GitHub App', process.env.APP_ID)
   .option('-s, --secret <secret>', 'Webhook secret of the GitHub App', process.env.WEBHOOK_SECRET)
   .option('-p, --port <n>', 'Port to start the server on', process.env.PORT || 3000)

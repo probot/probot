@@ -4,7 +4,7 @@ next: docs/pagination.md
 
 # Testing
 
-We highly recommend working in the style of [test-driven development](http://agiledata.org/essays/tdd.html) when creating probot plugins. It frustrating to constantly create real GitHub events in order to test a plugin. Redelivering webhooks is possible and can be accessed in your app's [settings](https://github.com/settings/apps) page under the **Advanced** tab. We do offer the above documented `simulate` method to help make this easier; however, by writing your tests first, you can avoid repeatedly recreating actual events from GitHub to check if your code is working.
+We highly recommend working in the style of [test-driven development](http://agiledata.org/essays/tdd.html) when creating probot apps. It frustrating to constantly create real GitHub events in order to test a app. Redelivering webhooks is possible and can be accessed in your app's [settings](https://github.com/settings/apps) page under the **Advanced** tab. We do offer the above documented `simulate` method to help make this easier; however, by writing your tests first, you can avoid repeatedly recreating actual events from GitHub to check if your code is working.
 
 For our testing examples, we use [mocha](https://mochajs.org/) and [expect](https://github.com/mjackson/expect), but there are other options that can perform similar operations. Here's an example of creating a robot instance and mocking out the GitHub API:
 
@@ -17,15 +17,15 @@ const {createRobot} = require('probot');
 // Then put any larger testing payloads in there
 const payload = require('./fixtures/payload');
 
-describe('your-plugin', () => {
+describe('your-app', () => {
   let robot;
   let github;
 
   beforeEach(() => {
     // Here we create a robot instance
     robot = createRobot();
-    // Here we initialize the plugin on the robot instance
-    plugin(robot);
+    // Here we initialize the app on the robot instance
+    app(robot);
     // This is an easy way to mock out the GitHub API
     github = {
       issues: {

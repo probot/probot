@@ -6,18 +6,18 @@ If you've ever thought, "wouldn't it be cool if GitHub could…"; imma stop you 
 
 There are some great services that offer [apps in the GitHub Marketplace](https://github.com/marketplace), and you can build a bunch of really cool things yourself. Probot aims to make that easy.
 
-## Plugins
+## Apps
 
-Bots are implemented as plugins, which are easy to write, deploy, and share. Here are just a few examples of things probot can do:
+Apps are easy to write, deploy, and share. Here are just a few examples of things that can be built with Probot:
 
 - [stale](https://github.com/probot/stale) - closes abandoned issues after a period of inactivity.
 - [owners](https://github.com/probot/owners) - @mentions people in Pull Requests based on contents of the OWNERS file
-- [configurer](https://github.com/probot/configurer) - syncs repository settings defined in `.github/config.yml` to GitHub, enabling Pull Requests for repository settings.
+- [settings](https://github.com/probot/settings) - syncs repository settings defined in `.github/settings.yml` to GitHub, enabling Pull Requests for repository settings.
 
-Check out [all probot plugins](https://github.com/search?q=topic%3Aprobot-plugin&type=Repositories).
+Check out [all Probot apps](https://github.com/search?q=topic%3Aprobot-app&type=Repositories).
 
 ## Contributing
 
-Most of the interesting things are built with plugins, so consider starting by [writing a new plugin](docs/plugins.md) or improving one of the [existing ones](https://github.com/search?q=topic%3Aprobot-plugin&type=Repositories).
+Most of the interesting things are built with plugins, so consider starting by [writing a new app](docs/) or improving one of the [existing ones](https://github.com/search?q=topic%3Aprobot-app&type=Repositories).
 
 Want to chat with Probot users and contributors? [Join us in Slack](https://probot-slackin.herokuapp.com/)!

@@ -4,7 +4,7 @@ next: docs/development.md
 
 # Hello World
 
-A Probot plugin is just a [Node.js module](https://nodejs.org/api/modules.html) that exports a function:
+A Probot app is just a [Node.js module](https://nodejs.org/api/modules.html) that exports a function:
 
 ```js
 module.exports = robot => {
@@ -14,7 +14,7 @@ module.exports = robot => {
 
 The `robot` parameter is an instance of [`Robot`](https://probot.github.io/probot/latest/Robot.html) and gives you access to all of the bot goodness.
 
-`robot.on` will listen for any [webhook events triggered by GitHub](./webhooks.md), which will notify you when anything interesting happens on GitHub that your plugin wants to know about.
+`robot.on` will listen for any [webhook events triggered by GitHub](./webhooks.md), which will notify you when anything interesting happens on GitHub that your app wants to know about.
 
 ```js
 module.exports = robot => {
@@ -27,7 +27,7 @@ module.exports = robot => {
 
 The `context` passed to the event handler includes everything about the event that was triggered, as well as some helpful properties for doing something useful in response to the event. `context.github` is an authenticated GitHub client that can be used to [make API calls](./github-api.md), and allows you to do almost anything programmatically that you can do through a web browser on GitHub.
 
-Here is an example of an autoresponder plugin that comments on opened issues:
+Here is an example of an autoresponder app that comments on opened issues:
 
 ```js
 module.exports = robot => {

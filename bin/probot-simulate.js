@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Usage: bin/simulate issues path/to/payload plugin.js
+// Usage: bin/simulate issues path/to/payload app.js
 
 require('dotenv').config({silent: true})
 
@@ -8,7 +8,7 @@ const program = require('commander')
 const {findPrivateKey} = require('../lib/private-key')
 
 program
-  .usage('[options] <event-name> <path/to/payload.json> [path/to/plugin.js...]')
+  .usage('[options] <event-name> <path/to/payload.json> [path/to/app.js...]')
   .option('-a, --app <id>', 'ID of the GitHub App', process.env.APP_ID)
   .option('-P, --private-key <file>', 'Path to certificate of the GitHub App', findPrivateKey)
   .parse(process.argv)

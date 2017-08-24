@@ -22,6 +22,8 @@ Noteworthy Community Updates:
 
 - Update terminology to use "Probot app" instead of "Probot plugin", and "Probot extension" instead of "Probot helper" ([#210](https://github.com/probot/probot/pull/210))
 
+[View full changelog](https://github.com/probot/probot/compare/v0.9.1...v0.10.0)
+
 ## 0.9.1 (2017-08-09)
 
 Enhancements:

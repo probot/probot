@@ -1,3 +1,34 @@
+# Configuration for welcome - https://github.com/behaviorbot/welcome
+
+# Configuration for new-issue-welcome - https://github.com/behaviorbot/new-issue-welcome
+# Comment to be posted to on first time issues
+newIssueWelcomeComment: >
+  Thanks for opening this issue. 
+  If this issue is regarding feedback about your probot experience, such as things that you found frustrating or confusing, it would be great if you could close this out and open an issue in our [probot/friction](https://github.com/probot/friction) repo instead. Otherwise a maintainer will get back to you shortly.
+
+# Configuration for new-pr-welcome - https://github.com/behaviorbot/new-pr-welcome
+# Comment to be posted to on PRs from first time contributors in your repository
+newPRWelcomeComment: >
+  Thanks for opening this pull request! Please check out our [contributing guidelines](https://github.com/probot/probot/blob/master/CONTRIBUTING.md). <br>
+  ![Woo!](https://media.giphy.com/media/t5J2yBFaM1464/giphy.gif)
+
+# Configuration for first-pr-merge - https://github.com/behaviorbot/first-pr-merge
+# Comment to be posted to on pull requests merged by a first time user
 firstPRMergeComment: >
   Thanks for your contribution to probot! :tada: <br>
   ![Congrats!](https://media.giphy.com/media/o0vwzuFwCGAFO/giphy.gif)
+
+# Configuration for request-info - https://github.com/behaviorbot/request-info
+# Comment to reply with
+requestInfoReplyComment: >
+  We would appreciate it if you could provide us with more info about this issue/pr!
+
+# Configuration for sentiment-bot - https://github.com/behaviorbot/sentiment-bot
+
+# *Required* toxicity threshold between 0 and .99 with the higher numbers being the most toxic
+# Anything higher than this threshold will be marked as toxic and commented on
+sentimentBotToxicityThreshold: .9
+
+# *Required* Comment to reply with
+sentimentBotReplyComment: >
+  Please be sure to review the code of conduct and be respectful of other users. cc/ @probot/maintainers

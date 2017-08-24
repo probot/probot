@@ -1,34 +1,38 @@
-# Deploy
+---
+next: docs/best-practices.md
+---
 
-Every plugin can either be deployed as a stand-alone bot, or combined with other plugins in one deployment.
+# Deployment
 
-> **Heads up!** Note that most [plugins in the @probot organization](https://github.com/search?q=topic%3Aprobot-plugin+org%3Aprobot&type=Repositories) have an official hosted app that you can use for your open source project. Use the hosted instance if you don't want to deploy your own.
+Every app can either be deployed stand-alone, or combined with other apps in one deployment.
+
+> **Heads up!** Note that most [apps in the @probot organization](https://github.com/search?q=topic%3Aprobot-app+org%3Aprobot&type=Repositories) have an official hosted app that you can use for your open source project. Use the hosted instance if you don't want to deploy your own.
 
 **Contents:**
 
 1. [Create the GitHub App](#create-the-github-app)
-1. [Deploy the plugin](#deploy-the-plugin)
+1. [Deploy the app](#deploy-the-app)
     1. [Heroku](#heroku)
     1. [Now](#now)
-1. [Combining plugins](#combining-plugins)
+1. [Combining apps](#combining-apps)
 
 ## Create the GitHub App
 
 Every deployment will need an [App](https://developer.github.com/apps/).
 
 1. [Create a new GitHub App](https://github.com/settings/apps/new) with:
-    - **Homepage URL**: the URL to the GitHub repository for your plugin
-    - **Webhook URL**: Use `https://example.com/` for now, we'll come back in a minute to update this with the URL of your deployed plugin.
-    - **Webhook Secret**: Generate a unique secret with `openssl rand -base64 32` and save it because you'll need it in a minute to configure your deployed plugin.
-    - **Permissions & events**: See `docs/deploy.md` in the plugin for a list of the permissions and events that it needs access to.
+    - **Homepage URL**: the URL to the GitHub repository for your app
+    - **Webhook URL**: Use `https://example.com/` for now, we'll come back in a minute to update this with the URL of your deployed app.
+    - **Webhook Secret**: Generate a unique secret with `openssl rand -base64 32` and save it because you'll need it in a minute to configure your deployed app.
+    - **Permissions & events**: See `docs/deploy.md` in the app for a list of the permissions and events that it needs access to.
 
 1. Download the private key from the app.
 
 1. Make sure that you click the green **Install** button on the top left of the app page. This gives you an option of installing the app on all or a subset of your repositories.
 
-## Deploy the plugin
+## Deploy the app
 
-To deploy a plugin to any cloud provider, you will need 3 environment variables:
+To deploy a app to any cloud provider, you will need 3 environment variables:
 
 - `APP_ID`: the ID of the app, which you can get from the [app settings page](https://github.com/settings/apps).
 - `WEBHOOK_SECRET`: the **Webhook Secret** that you generated when you created the app.
@@ -46,7 +50,7 @@ Probot runs like [any other Node app](https://devcenter.heroku.com/articles/depl
 
 1. Make sure you have the [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli) client installed.
 
-1. Clone the plugin that you want to deploy. e.g. `git clone https://github.com/probot/stale`
+1. Clone the app that you want to deploy. e.g. `git clone https://github.com/probot/stale`
 
 1. Create the Heroku app with the `heroku create` command:
 
@@ -63,7 +67,7 @@ Probot runs like [any other Node app](https://devcenter.heroku.com/articles/depl
             WEBHOOK_SECRET=bbb \
             PRIVATE_KEY="$(cat ~/Downloads/*.private-key.pem)"
 
-1. Deploy the plugin to heroku with `git push`:
+1. Deploy the app to heroku with `git push`:
 
         $ git push heroku master
         ...
@@ -72,19 +76,19 @@ Probot runs like [any other Node app](https://devcenter.heroku.com/articles/depl
         -----> Launching... done
               http://arcane-lowlands-8408.herokuapp.com deployed to Heroku
 
-1. Your plugin should be up and running! To verify that your plugin
+1. Your app should be up and running! To verify that your app
    is receiving webhook data, you can tail your app's logs:
 
-      $ heroku config:set LOG_LEVEL=trace
-      $ heroku logs --tail
+        $ heroku config:set LOG_LEVEL=trace
+        $ heroku logs --tail
 
 ### Now
 
-Zeit [Now](http://zeit.co/now) is a great service for running Probot plugins. After [creating the GitHub App](#create-the-github-app):
+Zeit [Now](http://zeit.co/now) is a great service for running Probot apps. After [creating the GitHub App](#create-the-github-app):
 
 1. Install the now CLI with `npm i -g now`
 
-1. Clone the plugin that you want to deploy. e.g. `git clone https://github.com/probot/stale`
+1. Clone the app that you want to deploy. e.g. `git clone https://github.com/probot/stale`
 
 1. Run `now` to deploy, replacing the `APP_ID` and `WEBHOOK_SECRET` with the values for those variables, and setting the path for the `PRIVATE_KEY`:
 
@@ -94,11 +98,11 @@ Zeit [Now](http://zeit.co/now) is a great service for running Probot plugins. Af
 
 1. Once the deploy is started, go back to your [app settings page](https://github.com/settings/apps) and update the **Webhook URL** to the URL of your deployment (which `now` has kindly copied to your clipboard).
 
-Your plugin should be up and running!
+Your app should be up and running!
 
-## Combining plugins
+## Combining apps
 
-To deploy a bot that includes multiple plugins, create a new app that has the plugins listed as dependencies in `package.json`:
+To deploy a bot that includes multiple apps, create a new app that has the apps listed as dependencies in `package.json`:
 
 ```json
 {

@@ -1,88 +1,88 @@
-const fs = require('fs');
+const fs = require('fs')
 
-const expect = require('expect');
+const expect = require('expect')
 
-const {findPrivateKey} = require('../lib/private-key');
+const {findPrivateKey} = require('../lib/private-key')
 
 describe('private-key', function () {
-  let privateKey;
-  let keyfilePath;
+  let privateKey
+  let keyfilePath
 
   beforeEach(function () {
-    privateKey = 'I AM PRIVET KEY!?!!~1!';
-    keyfilePath = '/some/path';
+    privateKey = 'I AM PRIVET KEY!?!!~1!'
+    keyfilePath = '/some/path'
     expect.spyOn(fs, 'readFileSync')
-      .andReturn(privateKey);
-  });
+      .andReturn(privateKey)
+  })
 
   afterEach(function () {
-    expect.restoreSpies();
-  });
+    expect.restoreSpies()
+  })
 
   describe('findPrivateKey()', function () {
     describe('when a filepath is provided', function () {
       it('should read the file at given filepath', function () {
-        findPrivateKey(keyfilePath);
+        findPrivateKey(keyfilePath)
         expect(fs.readFileSync)
-          .toHaveBeenCalledWith(keyfilePath);
-      });
+          .toHaveBeenCalledWith(keyfilePath)
+      })
 
       it('should return the key', function () {
         expect(findPrivateKey(keyfilePath))
-          .toEqual(privateKey);
-      });
-    });
+          .toEqual(privateKey)
+      })
+    })
 
     describe('when a PRIVATE_KEY env var is provided', function () {
       beforeEach(function () {
-        process.env.PRIVATE_KEY = privateKey;
-      });
+        process.env.PRIVATE_KEY = privateKey
+      })
 
       afterEach(function () {
-        delete process.env.PRIVATE_KEY;
-      });
+        delete process.env.PRIVATE_KEY
+      })
 
       it('should return the key', function () {
         expect(findPrivateKey())
-          .toEqual(privateKey);
-      });
-    });
+          .toEqual(privateKey)
+      })
+    })
 
     describe('when a PRIVATE_KEY has line breaks', function () {
       beforeEach(function () {
-        process.env.PRIVATE_KEY = 'line 1\\nline 2';
-      });
+        process.env.PRIVATE_KEY = 'line 1\\nline 2'
+      })
 
       afterEach(function () {
-        delete process.env.PRIVATE_KEY;
-      });
+        delete process.env.PRIVATE_KEY
+      })
 
       it('should return the key', function () {
         expect(findPrivateKey())
-          .toEqual('line 1\nline 2');
-      });
-    });
+          .toEqual('line 1\nline 2')
+      })
+    })
 
     describe('when a PRIVATE_KEY_PATH env var is provided', function () {
       beforeEach(function () {
-        process.env.PRIVATE_KEY_PATH = keyfilePath;
-      });
+        process.env.PRIVATE_KEY_PATH = keyfilePath
+      })
 
       afterEach(function () {
-        delete process.env.PRIVATE_KEY_PATH;
-      });
+        delete process.env.PRIVATE_KEY_PATH
+      })
 
       it('should read the file at given filepath', function () {
-        findPrivateKey();
+        findPrivateKey()
         expect(fs.readFileSync)
-          .toHaveBeenCalledWith(keyfilePath);
-      });
+          .toHaveBeenCalledWith(keyfilePath)
+      })
 
       it('should return the key', function () {
         expect(findPrivateKey())
-          .toEqual(privateKey);
-      });
-    });
+          .toEqual(privateKey)
+      })
+    })
 
     describe('when no private key is provided', function () {
       beforeEach(function () {
@@ -90,33 +90,33 @@ describe('private-key', function () {
           .andReturn([
             'foo.txt',
             'foo.pem'
-          ]);
-      });
+          ])
+      })
 
       it('should look for one in the current directory', function () {
-        findPrivateKey();
+        findPrivateKey()
         expect(fs.readdirSync)
-          .toHaveBeenCalledWith(process.cwd());
-      });
+          .toHaveBeenCalledWith(process.cwd())
+      })
 
       describe('and a key file is present', function () {
         it('should load the key file', function () {
-          findPrivateKey();
+          findPrivateKey()
           expect(fs.readFileSync)
-            .toHaveBeenCalledWith('foo.pem');
-        });
-      });
+            .toHaveBeenCalledWith('foo.pem')
+        })
+      })
 
       describe('and a key file is not present', function () {
         beforeEach(function () {
-          fs.readdirSync.restore();
-        });
+          fs.readdirSync.restore()
+        })
 
         it('should throw an error', function () {
           expect(findPrivateKey)
-            .toThrow(Error, /missing private key for GitHub App/i);
-        });
-      });
-    });
-  });
-});
+            .toThrow(Error, /missing private key for GitHub App/i)
+        })
+      })
+    })
+  })
+})

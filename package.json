@@ -1,6 +1,6 @@
 {
   "name": "probot",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "a trainable robot that responds to activity on GitHub",
   "repository": "https://github.com/probot/probot",
   "main": "index.js",
@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "node ./bin/probot run",
-    "test": "mocha && xo --extend eslint-config-probot",
+    "test": "mocha && standard",
     "doc": "jsdoc -c .jsdoc.json",
     "postpublish": "script/publish-docs"
   },
@@ -17,43 +17,36 @@
   "license": "ISC",
   "dependencies": {
     "bottleneck": "^1.16.0",
-    "bunyan": "^1.8.5",
+    "bunyan": "^1.8.12",
     "bunyan-format": "^0.2.1",
     "bunyan-sentry-stream": "^1.1.0",
     "cache-manager": "^2.4.0",
-    "commander": "^2.10.0",
+    "commander": "^2.11.0",
     "dotenv": "~4.0.0",
-    "express": "^4.15.3",
-    "github": "^9.2.0",
+    "express": "^4.15.4",
+    "github": "^9.3.1",
     "github-app": "^3.0.0",
-    "github-webhook-handler": "^0.6.0",
-    "js-yaml": "^3.8.4",
+    "github-webhook-handler": "github:rvagg/github-webhook-handler#v0.6.1",
+    "js-yaml": "^3.9.1",
     "load-plugins": "^2.1.2",
     "pkg-conf": "^2.0.0",
     "promise-events": "^0.1.3",
-    "raven": "^2.1.0",
-    "resolve": "^1.3.2",
-    "semver": "^5.3.0"
+    "raven": "^2.1.2",
+    "resolve": "^1.4.0",
+    "semver": "^5.4.1"
   },
   "devDependencies": {
-    "eslint-config-probot": "^0.1.0",
     "expect": "^1.20.2",
-    "jsdoc": "^3.4.3",
+    "jsdoc": "^3.5.4",
     "jsdoc-strip-async-await": "^0.1.0",
     "minami": "^1.1.1",
-    "mocha": "^3.0.2",
-    "supertest": "^3.0.0",
-    "xo": "^0.19.0"
+    "mocha": "^3.5.0",
+    "standard": "^10.0.3",
+    "supertest": "^3.0.0"
   },
-  "xo": {
-    "overrides": [
-      {
-        "files": "test/**/*.js",
-        "rules": {
-          "max-nested-callbacks": "off",
-          "prefer-arrow-callback": "off"
-        }
-      }
+  "standard": {
+    "env": [
+      "mocha"
     ]
   },
   "engines": {

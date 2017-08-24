@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.10.0 (2017-08-24)
+
+Enhancements:
+
+- Configure the path that the GitHub webhook handler listens on with `WEBHOOK_PATH` environment variable or the `--webhook-path` or `-w` command line options ([#203](https://github.com/probot/probot/pull/203))
+
+Breaking Changes:
+
+- Previously, `context.config(path, default)` would raise an error if the config file does not exist in the repository. Now, it will return the `default` from [`context.config`](https://probot.github.io/api/latest/Context.html#config) even if the file doesn't exist, or `null` if a default is not set. ([#198](https://github.com/probot/probot/pull/198), [#201](https://github.com/probot/probot/pull/201))
+
+- Rename `SENTRY_URL` to `SENTRY_DSN`, because consistency ([#194](https://github.com/probot/probot/pull/194))
+
+Noteworthy Community Updates:
+
+- There's a new [Slack channel for Probot](https://probot-slackin.herokuapp.com/). Come chat with us! ([#217](https://github.com/probot/probot/pull/216))
+
+- [Standard](https://standardjs.com/) is the new lint sheriff in town and recommended for all Probot apps. ([#219](https://github.com/probot/probot/pull/219))
+
+- Welcome to [@hiimbex](https://github.com/hiimbex), [@JasonEtco](https://github.com/JasonEtco), and [@anglinb](https://github.com/anglinb) as maintainers!
+
+- Update terminology to use "Probot app" instead of "Probot plugin", and "Probot extension" instead of "Probot helper" ([#210](https://github.com/probot/probot/pull/210))
+
 ## 0.9.1 (2017-08-09)
 
 Enhancements:

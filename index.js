@@ -45,8 +45,8 @@ module.exports = (options = {}) => {
 
   // Deprecate SENTRY_URL
   if (process.env.SENTRY_URL && !process.env.SENTRY_DSN) {
-    process.env.SENTRY_DSN = process.env.SENTRY_URL;
-    console.warn('DEPRECATED: the `SENTRY_URL` key is now called `SENTRY_DSN`. Use of `SENTRY_URL` is deprecated and will be removed in 0.11.0');
+    process.env.SENTRY_DSN = process.env.SENTRY_URL
+    console.warn('DEPRECATED: the `SENTRY_URL` key is now called `SENTRY_DSN`. Use of `SENTRY_URL` is deprecated and will be removed in 0.11.0')
   }
 
   // If sentry is configured, report all logged errors

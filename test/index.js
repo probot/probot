@@ -131,7 +131,7 @@ describe('Probot', () => {
       delete process.env.SENTRY_URL
       delete process.env.SENTRY_DSN
     })
-    
+
     describe('SENTRY_URL', () => {
       it('will be removed in 0.11', () => {
         // This test will fail in version 0.11
@@ -147,7 +147,7 @@ describe('Probot', () => {
         }).toThrow(/Invalid Sentry DSN: 09290/)
       })
     })
-    
+
     describe('SENTRY_DSN', () => {
       it('configures sentry via the SENTRY_DSN ', () => {
         process.env.SENTRY_DSN = '1233'

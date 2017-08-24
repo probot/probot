@@ -5,7 +5,6 @@ const createRobot = require('../lib/robot')
 describe('Robot', function () {
   let robot
   let event
-  let event2
   let spy
 
   beforeEach(function () {
@@ -17,14 +16,6 @@ describe('Robot', function () {
       payload: {
         action: 'foo',
         installation: {id: 1}
-      }
-    }
-
-    event2 = {
-      event: 'arrayTest',
-      payload: {
-        action: 'bar',
-        installation: {id: 2}
       }
     }
 
@@ -89,6 +80,14 @@ describe('Robot', function () {
     })
 
     it('calls callback x amount of times when an array of x actions is passed', async function () {
+      const event2 = {
+        event: 'arrayTest',
+        payload: {
+          action: 'bar',
+          installation: {id: 2}
+        }
+      }
+
       robot.on(['test.foo', 'arrayTest.bar'], spy)
 
       await robot.receive(event)

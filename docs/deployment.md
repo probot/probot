@@ -123,3 +123,11 @@ To deploy a bot that includes multiple apps, create a new app that has the apps 
  }
 }
 ```
+
+## Error tracking
+
+Probot comes bundled with a client for the [Sentry](https://github.com/getsentry/sentry) exception tracking platform. To enable Sentry:
+
+  1. [Create a Sentry.io Account](https://sentry.io/signup/) (with [10k events/month free](https://sentry.io/pricing/)) or [host your own instance](https://github.com/getsentry/sentry) (Students can get [extra Sentry credit](https://education.github.com/pack))
+  2. Follow the setup instructions to find your DSN.
+  3. Set the `SENTRY_DSN` environment variable with the DSN you retrieved.

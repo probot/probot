@@ -1,1 +1,2 @@
 --recursive
+--require ./test/setup

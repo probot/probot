@@ -9,6 +9,11 @@ describe('server', function () {
   beforeEach(() => {
     webhook = expect.createSpy().andCall((req, res, next) => next())
     server = createServer(webhook)
+
+    // Error handler to avoid printing logs
+    server.use(function (err, req, res, next) {
+      res.status(500).send(err.message)
+    })
   })
 
   describe('GET /ping', () => {

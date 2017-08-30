@@ -16,7 +16,7 @@ const cache = cacheManager.caching({
 })
 
 const logger = bunyan.createLogger({
-  name: 'PRobot',
+  name: 'Probot',
   level: process.env.LOG_LEVEL || 'debug',
   stream: bunyanFormat({outputMode: process.env.LOG_FORMAT || 'short'}),
   serializers

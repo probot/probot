@@ -1,8 +1,6 @@
 const expect = require('expect')
 const createProbot = require('..')
 
-process.env.LOG_LEVEL = 'fatal'
-
 describe('Probot', () => {
   let probot
   let event

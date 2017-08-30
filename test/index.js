@@ -1,6 +1,8 @@
 const expect = require('expect')
 const createProbot = require('..')
 
+process.env.LOG_LEVEL = 'fatal'
+
 describe('Probot', () => {
   let probot
   let event
@@ -69,6 +71,10 @@ describe('Probot', () => {
 
     it('allows users to configure webhook paths', async () => {
       probot = createProbot({webhookPath: '/webhook'})
+      // Error handler to avoid printing logs
+      // eslint-disable-next-line handle-callback-err
+      probot.server.use((err, req, res, next) => { })
+
       probot.load(robot => {
         const app = robot.route()
         app.get('/webhook', (req, res) => res.end('get-webhook'))
@@ -85,6 +91,10 @@ describe('Probot', () => {
     })
 
     it('defaults webhook path to `/`', async () => {
+      // Error handler to avoid printing logs
+      // eslint-disable-next-line handle-callback-err
+      probot.server.use((err, req, res, next) => { })
+
       // GET requests to `/` should 404 at express level, not 400 at webhook level
       await request(probot.server).get('/')
         .expect(404)

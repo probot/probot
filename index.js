@@ -10,19 +10,22 @@ const createRobot = require('./lib/robot')
 const createServer = require('./lib/server')
 const serializers = require('./lib/serializers')
 
+const cache = cacheManager.caching({
+  store: 'memory',
+  ttl: 60 * 60 // 1 hour
+})
+
+const logger = bunyan.createLogger({
+  name: 'PRobot',
+  level: process.env.LOG_LEVEL || 'debug',
+  stream: bunyanFormat({outputMode: process.env.LOG_FORMAT || 'short'}),
+  serializers
+})
+
+// Log all unhandled rejections
+process.on('unhandledRejection', logger.error.bind(logger))
+
 module.exports = (options = {}) => {
-  const cache = cacheManager.caching({
-    store: 'memory',
-    ttl: 60 * 60 // 1 hour
-  })
-
-  const logger = bunyan.createLogger({
-    name: 'PRobot',
-    level: process.env.LOG_LEVEL || 'debug',
-    stream: bunyanFormat({outputMode: process.env.LOG_FORMAT || 'short'}),
-    serializers
-  })
-
   const webhook = createWebhook({path: options.webhookPath || '/', secret: options.secret || 'development'})
   const app = createApp({
     id: options.id,
@@ -39,9 +42,6 @@ module.exports = (options = {}) => {
 
   // Log all webhook errors
   webhook.on('error', logger.error.bind(logger))
-
-  // Log all unhandled rejections
-  process.on('unhandledRejection', logger.error.bind(logger))
 
   // Deprecate SENTRY_URL
   if (process.env.SENTRY_URL && !process.env.SENTRY_DSN) {

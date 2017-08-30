@@ -22,7 +22,6 @@ const logger = bunyan.createLogger({
   serializers
 })
 
-
 // Log all unhandled rejections
 process.on('unhandledRejection', logger.error.bind(logger))
 

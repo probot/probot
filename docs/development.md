@@ -77,7 +77,7 @@ $ npm start
 > probot run ./index.js
 
 Yay, the plugin was loaded!
-18:11:55.838Z DEBUG PRobot: Loaded plugin: ./index.js
+18:11:55.838Z DEBUG Probot: Loaded plugin: ./index.js
 Listening on https://bkeepers.localtunnel.me
 ```
 

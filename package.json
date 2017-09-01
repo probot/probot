@@ -24,7 +24,7 @@
     "commander": "^2.11.0",
     "dotenv": "~4.0.0",
     "express": "^4.15.4",
-    "github": "^9.3.1",
+    "github": "^10.1.0",
     "github-app": "^3.0.0",
     "github-webhook-handler": "github:rvagg/github-webhook-handler#v0.6.1",
     "js-yaml": "^3.9.1",
@@ -36,6 +36,7 @@
     "semver": "^5.4.1"
   },
   "devDependencies": {
+    "eslint-plugin-standard": "^3.0.1",
     "expect": "^1.20.2",
     "jsdoc": "^3.5.4",
     "jsdoc-strip-async-await": "^0.1.0",

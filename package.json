@@ -37,7 +37,7 @@
   },
   "devDependencies": {
     "eslint-plugin-standard": "^3.0.1",
-    "expect": "^1.20.2",
+    "expect": "^21.0.0",
     "jsdoc": "^3.5.4",
     "jsdoc-strip-async-await": "^0.1.0",
     "minami": "^1.1.1",

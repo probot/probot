@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.11.0 (2017-09-05)
+
+- Update to [node-github 10.1.0](https://github.com/mikedeboer/node-github/blob/master/CHANGELOG.md#1010) ([#233](https://github.com/probot/probot/pull/233), [#199](https://github.com/probot/probot/pull/199))
+
+[View full changelog](https://github.com/probot/probot/compare/v0.10.0...v0.11.0)
+
 ## 0.10.0 (2017-08-24)
 
 Enhancements:

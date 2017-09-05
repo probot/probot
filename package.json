@@ -25,7 +25,7 @@
     "dotenv": "~4.0.0",
     "express": "^4.15.4",
     "github": "^10.1.0",
-    "github-app": "^3.0.0",
+    "github-app": "^3.2.0",
     "github-webhook-handler": "github:rvagg/github-webhook-handler#v0.6.1",
     "js-yaml": "^3.9.1",
     "load-plugins": "^2.1.2",

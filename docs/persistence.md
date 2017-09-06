@@ -2,9 +2,23 @@
 
 Generally speaking, adding database storage or persistence to your Probot App will greatly complicate your life. It's perfectly doable, but for most use-cases you'll be able to manage relevant data within GitHub issues, pull requests and your app's configuration file.
 
+## Using GitHub for persistent data
+
+Probot includes a wrapper for the GitHub API which can enable you to store and manipulate data in the GitHub environment. Since your Probot App will usually be running to supplement work done on GitHub, it makes sense to try to keep everything in one place and avoid extra complications.
+
+- *Comments:* The API can read, write and delete comments on issues and pull requests.
+- *Status:* The API can read and change the status of an issue or pull request.
+- *Search:* GitHub has a powerful search API that can be used
+- *Repository:* Built-in `context.config()` allows storing configuration in the repository.
+- *Labels:* The API can read labels, and add or remove them from issues and pull requests.
+
+There are even more APIs that you can use to increase the functionality of your Probot App. You can read about all of the ones available in Probot on the [`node-github` documentation](http://mikedeboer.github.io/node-github/).
+
+## Using a Database
+
 For when you absolutely do need external data storage, here are some examples using a few popular database solutions. Your needs will be slightly different from what any example can help with. Below are some code suggestions to help you get started.
 
-## MongoDB (with Mongoose)
+### MongoDB (with Mongoose)
 
 [MongoDB](https://mongodb.com) is a popular NoSQL database, and [Mongoose](http://mongoosejs.com) is a widely used Node.js wrapper for it.
 
@@ -63,11 +77,11 @@ module.exports = robot => {
 };
 ```
 
-## MySQL
+### MySQL
 
-## Redis
+### Redis
 
-## Firebase
+### Firebase
 
 [Firebase](https://firebase.google.com/) is Google's services-as-a-service that includes a simple JSON database. You can learn more about dealing with the Javascript API [here](https://firebase.google.com/docs/database/web/start). Note that for security purposes, you may also want to look into the [Admin API](https://firebase.google.com/docs/database/admin/start).
 

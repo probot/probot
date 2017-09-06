@@ -16,7 +16,7 @@ There are even more APIs that you can use to increase the functionality of your 
 
 ## Using a Database
 
-For when you absolutely do need external data storage, here are some examples using a few popular database solutions. Your needs will be slightly different from what any example can help with. Below are some code suggestions to help you get started.
+For when you absolutely do need external data storage, here are some examples using a few popular database solutions. Note that these are just suggestions, and that your implementation will vary.
 
 ### MongoDB (with Mongoose)
 

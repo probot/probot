@@ -69,3 +69,43 @@ module.exports = robot => {
 
 ## Firebase
 
+[Firebase](https://firebase.google.com/) is Google's services-as-a-service that includes a simple JSON database. You can learn more about dealing with the Javascript API [here](https://firebase.google.com/docs/database/web/start).
+
+```js
+// index.js
+
+const firebase = require('firebase');
+// Set the configuration for your app
+// TODO: Replace with your project's config object
+const config = {
+  apiKey: "apiKey",
+  authDomain: "projectId.firebaseapp.com",
+  databaseURL: "https://databaseName.firebaseio.com",
+  storageBucket: "bucket.appspot.com"
+};
+firebase.initializeApp(config);
+
+const database = firebase.database();
+
+module.exports = robot => {
+  robot.on('issues.opened', async context => {
+    // Find all the people in the database
+    const people = await database.ref('/people').once('value').then((snapshot) => {
+      return snapshot.val();
+    });
+
+    // Generate a string using all the peoples' names.
+    // It would look like: 'Jason, Jane, James, Jennifer'
+    const peoplesNames = Object.keys(people).map(person => person.name).join(', ');
+
+    // `context` extracts information from the event, which can be passed to
+    // GitHub API calls. This will return:
+    //   {owner: 'yourname', repo: 'yourrepo', number: 123, body: 'Hello World!}
+    const params = context.issue({body: `The following people are in the database: ${peoplesNames}`})
+
+    // Post a comment on the issue
+    return context.github.issues.createComment(params);
+  });
+};
+```
+

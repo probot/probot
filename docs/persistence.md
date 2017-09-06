@@ -54,7 +54,7 @@ module.exports = robot => {
 
     // `context` extracts information from the event, which can be passed to
     // GitHub API calls. This will return:
-    //   {owner: 'yourname', repo: 'yourrepo', number: 123, body: 'Hello World!}
+    //   {owner: 'yourname', repo: 'yourrepo', number: 123, body: 'The following people are in the database: Jason, Jane, James, Jennifer'}
     const params = context.issue({body: `The following people are in the database: ${peoplesNames}`})
 
     // Post a comment on the issue
@@ -69,7 +69,7 @@ module.exports = robot => {
 
 ## Firebase
 
-[Firebase](https://firebase.google.com/) is Google's services-as-a-service that includes a simple JSON database. You can learn more about dealing with the Javascript API [here](https://firebase.google.com/docs/database/web/start).
+[Firebase](https://firebase.google.com/) is Google's services-as-a-service that includes a simple JSON database. You can learn more about dealing with the Javascript API [here](https://firebase.google.com/docs/database/web/start). Note that for security purposes, you may also want to look into the [Admin API](https://firebase.google.com/docs/database/admin/start).
 
 ```js
 // index.js
@@ -81,7 +81,6 @@ const config = {
   apiKey: "apiKey",
   authDomain: "projectId.firebaseapp.com",
   databaseURL: "https://databaseName.firebaseio.com",
-  storageBucket: "bucket.appspot.com"
 };
 firebase.initializeApp(config);
 
@@ -96,11 +95,11 @@ module.exports = robot => {
 
     // Generate a string using all the peoples' names.
     // It would look like: 'Jason, Jane, James, Jennifer'
-    const peoplesNames = Object.keys(people).map(person => person.name).join(', ');
+    const peoplesNames = Object.keys(people).map(key => people[key].name).join(', ');
 
     // `context` extracts information from the event, which can be passed to
     // GitHub API calls. This will return:
-    //   {owner: 'yourname', repo: 'yourrepo', number: 123, body: 'Hello World!}
+    //   {owner: 'yourname', repo: 'yourrepo', number: 123, body: 'The following people are in the database: Jason, Jane, James, Jennifer'}
     const params = context.issue({body: `The following people are in the database: ${peoplesNames}`})
 
     // Post a comment on the issue

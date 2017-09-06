@@ -6,7 +6,7 @@ For when you absolutely do need external data storage, here are some examples us
 
 ## MongoDB (with Mongoose)
 
-[MongoDB](https://mongodb.com) is a popular NoSQL database, and [Mongoose](http://mongoosejs.com) is the de facto Node.js wrapper for it.
+[MongoDB](https://mongodb.com) is a popular NoSQL database, and [Mongoose](http://mongoosejs.com) is a widely used Node.js wrapper for it.
 
 ```js
 // PeopleSchema.js

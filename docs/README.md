@@ -14,6 +14,6 @@ Probot apps are easy to write, deploy, and share. Many of the most popular Probo
 - [stale](https://probot.github.io/apps/stale) - closes abandoned issues after a period of inactivity.
 - [settings](https://probot.github.io/apps/settings) - syncs repository settings defined in `.github/settings.yml` to GitHub, enabling Pull Requests for repository settings.
 - [request-info](https://probot.github.io/apps/request-info) - requests more info from newly opened Pull Requests and Issues that contain either default titles or whose description is left blank.
-- Check out the [featured apps](ttps://probot.github.io/apps/) or [browse more examples on GitHub](https://github.com/search?q=topic%3Aprobot-app&type=Repositories)
+- Check out the [featured apps](https://probot.github.io/apps/) or [browse more examples on GitHub](https://github.com/search?q=topic%3Aprobot-app&type=Repositories)
 
 Ready to get started?

@@ -32,7 +32,7 @@ Every deployment will need an [App](https://developer.github.com/apps/).
 
 ## Deploy the app
 
-To deploy a app to any cloud provider, you will need 3 environment variables:
+To deploy an app to any cloud provider, you will need 3 environment variables:
 
 - `APP_ID`: the ID of the app, which you can get from the [app settings page](https://github.com/settings/apps).
 - `WEBHOOK_SECRET`: the **Webhook Secret** that you generated when you created the app.

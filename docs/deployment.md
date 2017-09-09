@@ -49,7 +49,7 @@ And one of:
 
 Glitch lets you host node applications for free and edit them directly in your browser. It’s great for experimentation and entirely sufficient for simple apps.
 
-1. [Create a new on Glitch](https://glitch.com/edit/#!/new-project).
+1. [Create a new app on Glitch](https://glitch.com/edit/#!/new-project).
 2. Click on your app name on the top-right, press on advanced options and then on `Import from GitHub` (You will need to login with your GitHub account to enable that option). Enter the full repository name you want to import, e.g. for the [welcome bot](https://github.com/behaviorbot/new-issue-welcome) it would be `behaviorbot/new-issue-welcome`. The `new-issue-welcome` bot is a great template to get started with your own bot, too!
 3. Next open the `.env` file and replace its content with
    ```
@@ -58,8 +58,8 @@ Glitch lets you host node applications for free and edit them directly in your b
    PRIVATE_KEY_PATH=.data/private-key.pem
    NODE_ENV=production
    ```
-   Replace the two `<...>` placeholders with the values from your app. The `.env` file cannot be accessed or seen by others
-4. Press the `New File` button and enter `.data/private-key.pem`. Paste the content of your GitHub App’s `private-key.pem` in there and save it. Files in the `.data` folder cannot be seen or accessed by others, so your private key is safe
+   Replace the two `<...>` placeholders with the values from your app. The `.env` file cannot be accessed or seen by others.
+4. Press the `New File` button and enter `.data/private-key.pem`. Paste the content of your GitHub App’s `private-key.pem` in there and save it. Files in the `.data` folder cannot be seen or accessed by others, so your private key is safe.
 5. That’s it, your app should have already started :thumbsup: Press on the `Show` button on top and paste the URL as the value of `Webhook URL`.
 
 Enjoy!

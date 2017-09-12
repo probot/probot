@@ -6,23 +6,6 @@ next: docs/deployment.md
 
 While Probot doesn't have an official extension API (yet), there are a handful of reusable utilities that have been extracted from existing apps.
 
-## Scheduler
-
-[probot-scheduler](https://github.com/probot/scheduler) is an extension to trigger events on a periodic schedule. It triggers a `schedule.repository` event every hour for each repository it has access to.
-
-```js
-const createScheduler = require('probot-scheduler')
-
-module.exports = robot => {
-  createScheduler(robot)
-
-  robot.on('schedule.repository', context => {
-    // this event is triggered on an interval, which is 1 hr by default;
-  })
-}
-```
-
-Check out [stale](https://github.com/probot/stale) to see it in action.
 
 ## Commands
 
@@ -41,3 +24,45 @@ module.exports = robot => {
   })
 }
 ```
+
+## Metadata
+
+[probot-metadata](https://github.com/probot/metadata) is an extension that stores metadata on Issues and Pull Requests.
+
+For example, here is a contrived app that stores the number of times that comments were edited in a discussion and comments with the edit count when the issue is closed.
+
+```js
+const metadata = require('probot-metadata')
+
+module.exports = robot => {
+  robot.on(['issues.edited', 'issue_comment.edited'], async context => {
+    const kv = await metadata(context)
+    kv.set('edits', kv.get('edits') || 1)
+  })
+
+  robot.on('issues.closed', async context => {
+    const edits = await metadata(context).get('edits')
+    context.github.issues.createComment(context.issue({
+      body: `There were ${edits} edits to issues in this thread.`
+    }))
+  })
+}
+```
+
+## Scheduler
+
+[probot-scheduler](https://github.com/probot/scheduler) is an extension to trigger events on a periodic schedule. It triggers a `schedule.repository` event every hour for each repository it has access to.
+
+```js
+const createScheduler = require('probot-scheduler')
+
+module.exports = robot => {
+  createScheduler(robot)
+
+  robot.on('schedule.repository', context => {
+    // this event is triggered on an interval, which is 1 hr by default
+  })
+}
+```
+
+Check out [stale](https://github.com/probot/stale) to see it in action.

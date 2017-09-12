@@ -9,16 +9,16 @@ Calling `robot.route('/my-app')` will return an [express](http://expressjs.com/)
 ```js
 module.exports = robot => {
   // Get an express router to expose new HTTP endpoints
-  const app = robot.route('/my-app');
+  const app = robot.route('/my-app')
 
   // Use any middleware
-  app.use(require('express').static(__dirname + '/public'));
+  app.use(require('express').static('public'))
 
   // Add a new route
   app.get('/hello-world', (req, res) => {
-    res.end('Hello World');
-  });
-};
+    res.end('Hello World')
+  })
+}
 ```
 
 Visit https://localhost:3000/my-app/hello-world to access the endpoint.

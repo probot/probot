@@ -9,7 +9,8 @@
   },
   "scripts": {
     "start": "node ./bin/probot run",
-    "test": "mocha && standard",
+    "test": "mocha && standard && npm run doc-lint",
+    "doc-lint": "standard docs/**/*.md",
     "doc": "jsdoc -c .jsdoc.json",
     "postpublish": "script/publish-docs"
   },
@@ -36,7 +37,8 @@
     "semver": "^5.4.1"
   },
   "devDependencies": {
-    "eslint-plugin-standard": "^3.0.1",
+    "eslint": "^4.6.1",
+    "eslint-plugin-markdown": "^1.0.0-beta.6",
     "expect": "^1.20.2",
     "jsdoc": "^3.5.4",
     "jsdoc-strip-async-await": "^0.1.0",
@@ -48,6 +50,9 @@
   "standard": {
     "env": [
       "mocha"
+    ],
+    "plugins": [
+      "markdown"
     ]
   },
   "engines": {

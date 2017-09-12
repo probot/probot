@@ -14,7 +14,7 @@ While Probot doesn't have an official extension API (yet), there are a handful o
 const createScheduler = require('probot-scheduler')
 
 module.exports = robot => {
-  scheduler = createScheduler(robot)
+  createScheduler(robot)
 
   robot.on('schedule.repository', context => {
     // this event is triggered on an interval, which is 1 hr by default;
@@ -36,8 +36,8 @@ const commands = require('probot-commands')
 module.exports = robot => {
   // Type `/label foo, bar` in a comment box for an Issue or Pull Request
   commands(robot, 'label', (context, command) => {
-    const labels = command.arguments.split(/, */);
-    return context.github.issues.addLabels(context.issue({labels}));
-  });
+    const labels = command.arguments.split(/, */)
+    return context.github.issues.addLabels(context.issue({labels}))
+  })
 }
 ```

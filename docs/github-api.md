@@ -19,8 +19,8 @@ module.exports = robot => {
     const params = context.issue({body: 'Hello World!'})
 
     // Post a comment on the issue
-    return context.github.issues.createComment(params);
-  });
+    return context.github.issues.createComment(params)
+  })
 }
 ```
 

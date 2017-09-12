@@ -1,5 +1,5 @@
 ---
-next: docs/deployment.md
+next: docs/extensions.md
 ---
 
 # Pagination

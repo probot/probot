@@ -81,6 +81,56 @@ module.exports = robot => {
 
 ### MySQL
 
+Using the [`mysql`](https://github.com/mysqljs/mysql) module, we can connect to our MySQL database and perform queries.
+
+```js
+// connection.js
+const mysql = require('mysql');
+
+const connection = mysql.createConnection({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: proccess.env.DB_DATABASE,
+});
+
+connection.connect();
+return connection;
+```
+
+```js
+// index.js
+const connection = require('./connection');
+
+function performQuery(query) {
+  return new Promise((resolve, reject) => {
+    connection.query(query, function (error, results, fields) {
+      if (error) reject(new Error(error));
+      resolve(results);
+    });
+  })
+}
+
+module.exports = robot => {
+  robot.on('issues.opened', async context => {
+    // Find all the people in the database
+    const people = await performQuery('SELECT * FROM `people`');
+
+    // Generate a string using all the peoples' names.
+    // It would look like: 'Jason, Jane, James, Jennifer'
+    const peoplesNames = people.map(key => people[key].name).join(', ');
+
+    // `context` extracts information from the event, which can be passed to
+    // GitHub API calls. This will return:
+    //   {owner: 'yourname', repo: 'yourrepo', number: 123, body: 'The following people are in the database: Jason, Jane, James, Jennifer'}
+    const params = context.issue({body: `The following people are in the database: ${peoplesNames}`})
+
+    // Post a comment on the issue
+    return context.github.issues.createComment(params);
+  });
+};
+```
+
 ### Redis
 
 ### Firebase

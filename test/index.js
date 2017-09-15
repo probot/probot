@@ -44,6 +44,15 @@ describe('Probot', () => {
       return request(probot.server).get('/foo').expect(200, 'foo')
     })
 
+    it('allows you to overwrite the root path', () => {
+      probot.load(robot => {
+        const app = robot.route()
+        app.get('/', (req, res) => res.end('foo'))
+      })
+
+      return request(probot.server).get('/').expect(200, 'foo')
+    })
+
     it('isolates plugins from affecting eachother', async () => {
       ['foo', 'bar'].forEach(name => {
         probot.load(robot => {

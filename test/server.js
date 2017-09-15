@@ -16,6 +16,14 @@ describe('server', function () {
     })
   })
 
+  describe('GET / without x-hub-signature header', () => {
+    it('returns a 200 repsonse', () => {
+      return request(server).get('/').expect((res) => {
+        res.text = /probot/.test(res.text)
+      }).expect(200, true)
+    })
+  })
+
   describe('GET /ping', () => {
     it('returns a 200 repsonse', () => {
       return request(server).get('/ping').expect(200, 'PONG')

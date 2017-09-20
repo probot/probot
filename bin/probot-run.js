@@ -26,7 +26,7 @@ if (!program.privateKey) {
   program.privateKey = findPrivateKey()
 }
 
-if (program.tunnel) {
+if (program.tunnel && !process.env.DISABLE_TUNNEL) {
   try {
     const setupTunnel = require('../lib/tunnel')
     setupTunnel(program.tunnel, program.port).then(tunnel => {

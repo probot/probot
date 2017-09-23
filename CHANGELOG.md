@@ -1,5 +1,79 @@
 # Changelog
 
+## 0.11.0 (2017-09-05)
+
+Enhancements:
+
+- Update to [node-github 10.1.0](https://github.com/mikedeboer/node-github/blob/master/CHANGELOG.md#1010) ([#233](https://github.com/probot/probot/pull/233), [#199](https://github.com/probot/probot/pull/199))
+
+Breaking Changes:
+
+- Remove `SENTRY_URL` which was deprecated in 0.10.0
+
+[View full changelog](https://github.com/probot/probot/compare/v0.10.0...v0.11.0)
+
+## 0.10.0 (2017-08-24)
+
+Enhancements:
+
+- Configure the path that the GitHub webhook handler listens on with `WEBHOOK_PATH` environment variable or the `--webhook-path` or `-w` command line options ([#203](https://github.com/probot/probot/pull/203))
+
+- `robot.on` can now take an array of events ([#212](https://github.com/probot/probot/pull/212)):
+
+    ```js
+    robot.on(['issues.opened', 'issues.closed'], async context => {
+      robot.log(context);
+    });
+    ```
+
+Breaking Changes:
+
+- Previously, `context.config(path, default)` would raise an error if the config file does not exist in the repository. Now, it will return the `default` from [`context.config`](https://probot.github.io/api/latest/Context.html#config) even if the file doesn't exist, or `null` if a default is not set. ([#198](https://github.com/probot/probot/pull/198), [#201](https://github.com/probot/probot/pull/201))
+
+- Rename `SENTRY_URL` to `SENTRY_DSN`, because consistency ([#194](https://github.com/probot/probot/pull/194))
+
+- The second event argument to `robot.on` that was deprecated in 0.7.0 was removed. ([e9355539](https://github.com/probot/probot/commit/e93555397e21d23b0ec2fc56816a5337c3cf7bc4))
+
+- The `robot` property of the object returned from the Probot constructor (`const probot = require('probot')(); probot.robot`) was removed. ([dc33e4be](https://github.com/probot/probot/commit/dc33e4be6ffeafd36011ddefd5216bfe3bd508d3))
+
+Noteworthy Community Updates:
+
+- There's a new [Slack channel for Probot](https://probot-slackin.herokuapp.com/). Come chat with us! ([#217](https://github.com/probot/probot/pull/216))
+
+- [Standard](https://standardjs.com/) is the new lint sheriff in town and recommended for all Probot apps. ([#219](https://github.com/probot/probot/pull/219))
+
+- Welcome to [@hiimbex](https://github.com/hiimbex), [@JasonEtco](https://github.com/JasonEtco), and [@anglinb](https://github.com/anglinb) as maintainers!
+
+- Update terminology to use "Probot app" instead of "Probot plugin", and "Probot extension" instead of "Probot helper" ([#210](https://github.com/probot/probot/pull/210))
+
+[View full changelog](https://github.com/probot/probot/compare/v0.9.1...v0.10.0)
+
+## 0.9.1 (2017-08-09)
+
+Enhancements:
+
+- Log the event with errors to aid debugging ([#196](https://github.com/probot/probot/pull/196))
+
+- Reduce the ttl on the auth token cache to 1 min less than GitHub expiry ([#197](https://github.com/probot/probot/pull/197))
+
+[View full changelog](https://github.com/probot/probot/compare/v0.9.0...v0.9.1)
+
+## 0.9.0 (2017-08-06)
+
+Enhancements:
+
+- Use Express for the web server and allow plugins add routes. See the [docs for adding HTTP routes](https://github.com/probot/probot/blob/master/docs/plugins.md#http-routes). ([#183](https://github.com/probot/probot/pull/183))
+
+- Add second argument to `context.config` for defaults. ([#186](https://github.com/probot/probot/pull/186))
+
+- Published [create-probot-plugin](https://github.com/probot/create-probot-plugin) as the standard way of creating new Probot plugins.
+
+Breaking Changes:
+
+- The `INTEGRATION_ID` environment variable was deprecated in 0.6 and has been removed ([#189](https://github.com/probot/probot/pull/189))
+
+[View full changelog](https://github.com/probot/probot/compare/v0.8.0...v0.9.0)
+
 ## 0.8.0 (2017-07-27)
 
 Enhancements:

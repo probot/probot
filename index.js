@@ -3,12 +3,12 @@ const bunyanFormat = require('bunyan-format')
 const sentryStream = require('bunyan-sentry-stream')
 const cacheManager = require('cache-manager')
 const createApp = require('github-app')
-const createWebhook = require('github-webhook-handler')
 const Raven = require('raven')
 
 const createRobot = require('./lib/robot')
 const createServer = require('./lib/server')
 const serializers = require('./lib/serializers')
+const github = require('./lib/adapter/github')
 
 const cache = cacheManager.caching({
   store: 'memory',
@@ -26,22 +26,12 @@ const logger = bunyan.createLogger({
 process.on('unhandledRejection', logger.error.bind(logger))
 
 module.exports = (options = {}) => {
-  const webhook = createWebhook({path: options.webhookPath || '/', secret: options.secret || 'development'})
   const app = createApp({
     id: options.id,
     cert: options.cert,
     debug: process.env.LOG_LEVEL === 'trace'
   })
-  const server = createServer(webhook)
-
-  // Log all received webhooks
-  webhook.on('*', event => {
-    logger.trace(event, 'webhook received')
-    receive(event)
-  })
-
-  // Log all webhook errors
-  webhook.on('error', logger.error.bind(logger))
+  const server = createServer()
 
   // If sentry is configured, report all logged errors
   if (process.env.SENTRY_DSN) {
@@ -59,9 +49,8 @@ module.exports = (options = {}) => {
     return Promise.all(robots.map(robot => robot.receive(event)))
   }
 
-  return {
+  const probot = {
     server,
-    webhook,
     receive,
     logger,
 
@@ -83,6 +72,10 @@ module.exports = (options = {}) => {
       return robot
     }
   }
+
+  github(probot, options)
+
+  return probot
 }
 
 module.exports.createRobot = createRobot

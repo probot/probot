@@ -1,6 +1,6 @@
 # Probot
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/probot/probot.svg)](https://greenkeeper.io/)
+[![Build Status](https://travis-ci.org/probot/probot.svg?branch=master)](https://travis-ci.org/probot/probot) [![Greenkeeper badge](https://badges.greenkeeper.io/probot/probot.svg)](https://greenkeeper.io/)
 
 If you've ever thought, "wouldn't it be cool if GitHub could…"; imma stop you right there. Most features can actually be added via [GitHub Apps](https://developer.github.com/apps/), which extend GitHub and can be installed directly on organizations and user accounts and granted access to specific repositories. They come with granular permissions and built-in webhooks. Apps are first class actors within GitHub.
 

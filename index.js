@@ -1,19 +1,12 @@
 const bunyan = require('bunyan')
 const bunyanFormat = require('bunyan-format')
 const sentryStream = require('bunyan-sentry-stream')
-const cacheManager = require('cache-manager')
-const createApp = require('github-app')
 const Raven = require('raven')
 
 const createRobot = require('./lib/robot')
 const createServer = require('./lib/server')
 const serializers = require('./lib/serializers')
 const GitHubAdapter = require('./lib/adapter/github')
-
-const cache = cacheManager.caching({
-  store: 'memory',
-  ttl: 60 * 60 // 1 hour
-})
 
 const logger = bunyan.createLogger({
   name: 'Probot',
@@ -26,11 +19,6 @@ const logger = bunyan.createLogger({
 process.on('unhandledRejection', logger.error.bind(logger))
 
 module.exports = (options = {}) => {
-  const app = createApp({
-    id: options.id,
-    cert: options.cert,
-    debug: process.env.LOG_LEVEL === 'trace'
-  })
   const server = createServer()
 
   // If sentry is configured, report all logged errors
@@ -65,7 +53,7 @@ module.exports = (options = {}) => {
     },
 
     load (plugin) {
-      const robot = createRobot({app, cache, logger, catchErrors: true})
+      const robot = createRobot({logger, catchErrors: true})
 
       // Connect the router from the robot to the server
       server.use(robot.router)

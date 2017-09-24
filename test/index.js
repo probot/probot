@@ -2,6 +2,11 @@ const expect = require('expect')
 const request = require('supertest')
 const createProbot = require('..')
 
+const nock = require('nock')
+
+nock.disableNetConnect()
+nock.enableNetConnect(/127\.0\.0\.1/)
+
 describe('Probot', () => {
   let probot
   let event

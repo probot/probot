@@ -8,7 +8,7 @@ const Raven = require('raven')
 const createRobot = require('./lib/robot')
 const createServer = require('./lib/server')
 const serializers = require('./lib/serializers')
-const github = require('./lib/adapter/github')
+const GitHubAdapter = require('./lib/adapter/github')
 
 const cache = cacheManager.caching({
   store: 'memory',
@@ -43,6 +43,10 @@ module.exports = (options = {}) => {
     logger.addStream(sentryStream(Raven))
   }
 
+  const adapter = new GitHubAdapter({logger}, options)
+  adapter.listen(receive)
+  server.use(adapter.router)
+
   const robots = []
 
   function receive (event) {
@@ -50,6 +54,7 @@ module.exports = (options = {}) => {
   }
 
   const probot = {
+    adapter,
     server,
     receive,
     logger,
@@ -72,8 +77,6 @@ module.exports = (options = {}) => {
       return robot
     }
   }
-
-  github(probot, options)
 
   return probot
 }

@@ -1,4 +1,5 @@
 const expect = require('expect')
+const request = require('supertest')
 const createProbot = require('..')
 
 describe('Probot', () => {
@@ -16,10 +17,22 @@ describe('Probot', () => {
 
   describe('webhook delivery', () => {
     it('forwards webhooks to the robot', async () => {
+      const payload = JSON.stringify(event.payload)
+
       const robot = probot.load(() => {})
       robot.receive = expect.createSpy()
-      probot.webhook.emit('*', event)
-      expect(robot.receive).toHaveBeenCalledWith(event)
+
+      await request(probot.server).post('/')
+        .send(payload)
+        .set('Content-Type', 'application/json')
+        .set('X-GitHub-Delivery', '1')
+        .set('X-GitHub-Event', 'push')
+        .set('X-Hub-Signature', probot.adapter.webhook.sign(payload))
+        .expect(200)
+
+      expect(robot.receive).toHaveBeenCalled()
+      const arg = robot.receive.calls[0].arguments[0]
+      expect(arg.payload).toEqual(event.payload)
     })
   })
 

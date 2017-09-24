@@ -1,19 +1,14 @@
 const request = require('supertest')
 const createProbot = require('../..')
-const adapter = require('../../lib/adapter/github')
 
 const fixture = JSON.stringify(require('../fixtures/webhook/push'), null, 2)
 
 describe('github adapter', () => {
   let probot
-  let options
 
   beforeEach(() => {
-    options = {
-      secret: 'test'
-    }
-    probot = createProbot(options)
-    adapter(probot, options)
+    // FIXME: refactor tests to load adapter directly
+    probot = createProbot({secret: 'test'})
 
     // Error handler to avoid printing logs
     // eslint-disable-next-line handle-callback-err
@@ -27,7 +22,7 @@ describe('github adapter', () => {
         .set('Content-Type', 'application/json')
         .set('X-GitHub-Delivery', '1')
         .set('X-GitHub-Event', 'push')
-        .set('X-Hub-Signature', probot.webhook.sign(fixture))
+        .set('X-Hub-Signature', probot.adapter.webhook.sign(fixture))
         .expect(200)
     })
 
@@ -48,9 +43,7 @@ describe('github adapter', () => {
 
     describe('with a custom webhook path', () => {
       beforeEach(() => {
-        options.webhookPath = '/webhook'
-        probot = createProbot(options)
-        adapter(probot, options)
+        probot = createProbot({secret: 'test', webhookPath: '/webhook'})
       })
 
       it('allows users to configure webhook paths', async () => {
@@ -60,7 +53,7 @@ describe('github adapter', () => {
           .set('Content-Type', 'application/json')
           .set('X-GitHub-Delivery', 'b51f38f0-9fec-11e7-8359-02048d903941')
           .set('X-GitHub-Event', 'push')
-          .set('X-Hub-Signature', probot.webhook.sign(fixture))
+          .set('X-Hub-Signature', probot.adapter.webhook.sign(fixture))
           .expect(200, {'ok': true})
       })
     })

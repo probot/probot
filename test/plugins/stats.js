@@ -2,14 +2,13 @@ const request = require('supertest')
 const express = require('express')
 const {createRobot} = require('../..')
 const plugin = require('../../lib/plugins/stats')
-const nock = require('nock');
+const nock = require('nock')
 
-nock.disableNetConnect();
-nock.enableNetConnect(/127\.0\.0\.1/);
+nock.disableNetConnect()
+nock.enableNetConnect(/127\.0\.0\.1/)
 
 describe('stats', function () {
-  let robot
-  let server, github
+  let robot, server
 
   beforeEach(async () => {
     nock('https://api.github.com')
@@ -25,15 +24,15 @@ describe('stats', function () {
 
     const GitHubApi = require('github')
     const app = {
-      async asApp() {
+      async asApp () {
         return new GitHubApi()
       },
 
-      async asInstallation() {
+      async asInstallation () {
         return new GitHubApi()
       },
 
-      async createToken() {
+      async createToken () {
         return {data: {token: 'test'}}
       }
     }

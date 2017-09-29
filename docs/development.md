@@ -26,12 +26,12 @@ This will ask you a series of questions about your app, which should look someth
 
 ```
 Let's create a Probot app!
-? Package name: my-first-app
+? App name: my-first-app
 ? Description of app: A "Hello World" GitHub App built with Probot
-? Author's full name: Brandon Keepers
-? Author's email address: bkeepers@github.com
+? Author's full name: Katie Horne
+? Author's email address: katie@auth0.com
 ? Homepage:
-? GitHub user or org name: bkeepers
+? GitHub user or org name: khorne3
 ? Repository name: my-first-app
 created file: my-first-app/.env.example
 created file: my-first-app/.gitignore

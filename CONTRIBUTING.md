@@ -2,7 +2,7 @@
 
 [fork]: https://github.com/probot/probot/fork
 [pr]: https://github.com/probot/probot/compare
-[style]: https://github.com/probot/eslint-config-probot
+[style]: https://standardjs.com/
 [code-of-conduct]: CODE_OF_CONDUCT.md
 
 Hi there! We're thrilled that you'd like to contribute to this project. Your help is essential for keeping it great.
@@ -21,7 +21,7 @@ Please note that this project is released with a [Contributor Code of Conduct][c
 
 Here are a few things you can do that will increase the likelihood of your pull request being accepted:
 
-- Follow the [style guide][style] which is a custom eslint linter. Any linting errors should be shown when running `npm test`
+- Follow the [style guide][style] which is using standard. Any linting errors should be shown when running `npm test`
 - Write and update tests.
 - Keep your change as focused as possible. If there are multiple changes you would like to make that are not dependent upon each other, consider submitting them as separate pull requests.
 - Write a [good commit message](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html).

@@ -29,6 +29,19 @@ describe('server', function () {
     })
   })
 
+  describe('GET /', () => {
+    it('redirects to /probot', () => {
+      return request(server).get('/').expect(302).expect('location', '/probot')
+    })
+  })
+
+  describe('custom GET /', () => {
+    it('uses a user\'s custom / path', () => {
+      server.get('/', (req, res) => res.status(200).end('Custom path!'))
+      return request(server).get('/').expect(200, 'Custom path!')
+    })
+  })
+
   describe('webhook handler', () => {
     it('should 500 on a webhook error', () => {
       webhook.andCall((req, res, callback) => callback(new Error('webhook error')))

@@ -44,6 +44,15 @@ describe('Probot', () => {
       return request(probot.server).get('/foo').expect(200, 'foo')
     })
 
+    it('allows you to overwrite the root path', () => {
+      probot.load(robot => {
+        const app = robot.route()
+        app.get('/', (req, res) => res.end('foo'))
+      })
+
+      return request(probot.server).get('/').expect(200, 'foo')
+    })
+
     it('isolates plugins from affecting eachother', async () => {
       ['foo', 'bar'].forEach(name => {
         probot.load(robot => {
@@ -93,9 +102,9 @@ describe('Probot', () => {
       // eslint-disable-next-line handle-callback-err
       probot.server.use((err, req, res, next) => { })
 
-      // GET requests to `/` should 404 at express level, not 400 at webhook level
+      // GET requests to `/` should redirect to /probot at express level
       await request(probot.server).get('/')
-        .expect(404)
+        .expect(302).expect('location', '/probot')
 
       // POST requests to `/` should 400 b/c webhook signature will fail
       await request(probot.server).post('/')

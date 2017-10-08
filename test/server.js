@@ -1,7 +1,6 @@
 const expect = require('expect')
 const request = require('supertest')
 const createServer = require('../lib/server')
-const htmlString = require('../lib/probot-welcome')()
 const {routes} = require('../')
 
 describe('server', function () {
@@ -27,7 +26,7 @@ describe('server', function () {
 
   describe('GET /probot', () => {
     it('returns a 200 response', () => {
-      return request(server).get('/probot').expect(200, htmlString)
+      return request(server).get('/probot').expect(200)
     })
   })
 

@@ -1,6 +1,7 @@
 const expect = require('expect')
 const request = require('supertest')
 const createServer = require('../lib/server')
+const htmlString = require('../lib/probot-welcome')()
 
 describe('server', function () {
   let server
@@ -17,8 +18,14 @@ describe('server', function () {
   })
 
   describe('GET /ping', () => {
-    it('returns a 200 repsonse', () => {
+    it('returns a 200 response', () => {
       return request(server).get('/ping').expect(200, 'PONG')
+    })
+  })
+
+  describe('GET /probot', () => {
+    it('returns a 200 response', () => {
+      return request(server).get('/probot').expect(200, htmlString)
     })
   })
 

@@ -2,12 +2,14 @@ const expect = require('expect')
 const request = require('supertest')
 const createServer = require('../lib/server')
 const htmlString = require('../lib/probot-welcome')()
+const {routes} = require('../')
 
 describe('server', function () {
   let server
   let webhook
 
   beforeEach(() => {
+    routes.clear()
     webhook = expect.createSpy().andCall((req, res, next) => next())
     server = createServer(webhook)
 
@@ -33,9 +35,7 @@ describe('server', function () {
     it('redirects to /probot', () => {
       return request(server).get('/').expect(302).expect('location', '/probot')
     })
-  })
 
-  describe('custom GET /', () => {
     it('uses a user\'s custom / path', () => {
       server.get('/', (req, res) => res.status(200).end('Custom path!'))
       return request(server).get('/').expect(200, 'Custom path!')

@@ -22,6 +22,8 @@ const logger = bunyan.createLogger({
   serializers
 })
 
+const routes = new Set()
+
 // Log all unhandled rejections
 process.on('unhandledRejection', logger.error.bind(logger))
 
@@ -60,6 +62,7 @@ module.exports = (options = {}) => {
   }
 
   return {
+    routes,
     server,
     webhook,
     receive,
@@ -78,6 +81,10 @@ module.exports = (options = {}) => {
 
       // Initialize the plugin
       plugin(robot)
+      robot.router.stack.forEach(r => {
+        if (r.route && r.route.path) routes.add(r.route.path)
+      })
+
       robots.push(robot)
 
       return robot
@@ -86,3 +93,4 @@ module.exports = (options = {}) => {
 }
 
 module.exports.createRobot = createRobot
+module.exports.routes = routes

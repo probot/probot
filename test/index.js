@@ -44,6 +44,10 @@ describe('Probot', () => {
       return request(probot.server).get('/foo').expect(200, 'foo')
     })
 
+    it('redirects to /probot from /', () => {
+      return request(probot.server).get('/').expect(302).expect('location', '/probot')
+    })
+
     it('allows you to overwrite the root path', () => {
       probot.load(robot => {
         const app = robot.route()
@@ -101,10 +105,6 @@ describe('Probot', () => {
       // Error handler to avoid printing logs
       // eslint-disable-next-line handle-callback-err
       probot.server.use((err, req, res, next) => { })
-
-      // GET requests to `/` should redirect to /probot at express level
-      await request(probot.server).get('/')
-        .expect(302).expect('location', '/probot')
 
       // POST requests to `/` should 400 b/c webhook signature will fail
       await request(probot.server).post('/')

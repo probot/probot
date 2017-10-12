@@ -1,7 +1,7 @@
 /* eslint prefer-arrow-callback: off */
 
 const expect = require('expect')
-const pluginLoaderFactory = require('../lib/plugin')
+const createResolver = require('../lib/resolver')
 
 const stubPluginPath = require.resolve('./fixtures/plugin/stub-plugin')
 const basedir = process.cwd()
@@ -10,7 +10,7 @@ const nullLogger = {};
   nullLogger[level] = function () { }
 })
 
-describe('plugin loader', function () {
+describe('resolver', function () {
   let probot
   let pluginLoader
   let autoloader
@@ -35,19 +35,19 @@ describe('plugin loader', function () {
   describe('factory', function () {
     describe('when no robot provided', function () {
       it('should throw a TypeError', function () {
-        expect(pluginLoaderFactory).toThrow(TypeError)
+        expect(createResolver).toThrow(TypeError)
       })
     })
 
     describe('when robot provided', function () {
       it('should return an object', function () {
-        expect(pluginLoaderFactory(probot)).toBeA(Object)
+        expect(createResolver(probot)).toBeA(Object)
       })
     })
 
     describe('autoload()', function () {
       beforeEach(() => {
-        pluginLoader = pluginLoaderFactory(probot, {autoloader})
+        pluginLoader = createResolver(probot, {autoloader})
       })
 
       it('should ask the autoloader for probot-related plugins', function () {
@@ -63,7 +63,7 @@ describe('plugin loader', function () {
 
     describe('load()', function () {
       beforeEach(() => {
-        pluginLoader = pluginLoaderFactory(probot, {resolver})
+        pluginLoader = createResolver(probot, {resolver})
       })
 
       describe('when supplied no plugin names', function () {

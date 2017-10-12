@@ -41,23 +41,17 @@ if (program.tunnel && !process.env.DISABLE_TUNNEL) {
 
 const createProbot = require('../')
 
-const probot = createProbot({
-  id: program.app,
-  secret: program.secret,
-  cert: program.privateKey,
-  port: program.port,
-  webhookPath: program.webhookPath
-})
-
 pkgConf('probot').then(pkg => {
-  const plugins = require('../lib/plugin')(probot)
-  const requestedPlugins = program.args.concat(pkg.plugins || [])
+  const probot = createProbot({
+    id: program.app,
+    secret: program.secret,
+    cert: program.privateKey,
+    port: program.port,
+    webhookPath: program.webhookPath,
+    autoload: true
+  })
 
-  // If we have explicitly requested plugins, load them; otherwise use autoloading
-  if (requestedPlugins.length > 0) {
-    plugins.load(requestedPlugins)
-  } else {
-    plugins.autoload()
-  }
+  probot.setup(program.args.concat(pkg.plugins || []))
+
   probot.start()
 })

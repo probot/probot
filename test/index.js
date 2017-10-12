@@ -1,5 +1,11 @@
 const expect = require('expect')
+const request = require('supertest')
 const createProbot = require('..')
+
+const nock = require('nock')
+
+nock.disableNetConnect()
+nock.enableNetConnect(/127\.0\.0\.1/)
 
 describe('Probot', () => {
   let probot
@@ -16,10 +22,22 @@ describe('Probot', () => {
 
   describe('webhook delivery', () => {
     it('forwards webhooks to the robot', async () => {
+      const payload = JSON.stringify(event.payload)
+
       const robot = probot.load(() => {})
       robot.receive = expect.createSpy()
-      probot.webhook.emit('*', event)
-      expect(robot.receive).toHaveBeenCalledWith(event)
+
+      await request(probot.server).post('/')
+        .send(payload)
+        .set('Content-Type', 'application/json')
+        .set('X-GitHub-Delivery', '1')
+        .set('X-GitHub-Event', 'push')
+        .set('X-Hub-Signature', probot.adapter.webhook.sign(payload))
+        .expect(200)
+
+      expect(robot.receive).toHaveBeenCalled()
+      const arg = robot.receive.calls[0].arguments[0]
+      expect(arg.payload).toEqual(event.payload)
     })
   })
 
@@ -65,41 +83,6 @@ describe('Probot', () => {
       await request(probot.server).get('/bar/hello')
         .expect(200, 'bar')
         .expect('X-Test', 'bar')
-    })
-
-    it('allows users to configure webhook paths', async () => {
-      probot = createProbot({webhookPath: '/webhook'})
-      // Error handler to avoid printing logs
-      // eslint-disable-next-line handle-callback-err
-      probot.server.use((err, req, res, next) => { })
-
-      probot.load(robot => {
-        const app = robot.route()
-        app.get('/webhook', (req, res) => res.end('get-webhook'))
-        app.post('/webhook', (req, res) => res.end('post-webhook'))
-      })
-
-      // GET requests should succeed
-      await request(probot.server).get('/webhook')
-        .expect(200, 'get-webhook')
-
-      // POST requests should fail b/c webhook path has precedence
-      await request(probot.server).post('/webhook')
-        .expect(400)
-    })
-
-    it('defaults webhook path to `/`', async () => {
-      // Error handler to avoid printing logs
-      // eslint-disable-next-line handle-callback-err
-      probot.server.use((err, req, res, next) => { })
-
-      // GET requests to `/` should 404 at express level, not 400 at webhook level
-      await request(probot.server).get('/')
-        .expect(404)
-
-      // POST requests to `/` should 400 b/c webhook signature will fail
-      await request(probot.server).post('/')
-        .expect(400)
     })
   })
 

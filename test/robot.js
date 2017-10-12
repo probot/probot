@@ -1,5 +1,4 @@
 const expect = require('expect')
-const Context = require('../lib/context')
 const createRobot = require('../lib/robot')
 
 describe('Robot', function () {
@@ -45,9 +44,7 @@ describe('Robot', function () {
 
       expect(spy).toNotHaveBeenCalled()
       await robot.receive(event)
-      expect(spy).toHaveBeenCalled()
-      expect(spy.calls[0].arguments[0]).toBeA(Context)
-      expect(spy.calls[0].arguments[0].payload).toBe(event.payload)
+      expect(spy).toHaveBeenCalledWith(event)
     })
 
     it('calls callback with same action', async function () {

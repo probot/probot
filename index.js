@@ -89,23 +89,6 @@ module.exports = (options = {}) => {
     start () {
       server.listen(options.port)
       logger.trace('Listening on http://localhost:' + options.port)
-    },
-
-    load (plugin) {
-      const robot = createRobot({app, cache, logger, catchErrors: true})
-
-      // Connect the router from the robot to the server
-      server.use(robot.router)
-
-      // Initialize the plugin
-      plugin(robot)
-      robot.router.stack.forEach(r => {
-        if (r.route && r.route.path) routes.add(r.route.path)
-      })
-
-      robots.push(robot)
-
-      return robot
     }
   }
 }

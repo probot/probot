@@ -59,28 +59,32 @@ module.exports = (options = {}) => {
     return Promise.all(robots.map(robot => robot.receive(event)))
   }
 
+  function load (plugin) {
+    const robot = createRobot({app, cache, logger, catchErrors: true})
+
+    // Connect the router from the robot to the server
+    server.use(robot.router)
+
+    // Initialize the plugin
+    plugin(robot)
+    robots.push(robot)
+
+    return robot
+  }
+
+  // Setup built-in stats plugin
+  load(require('./lib/plugins/stats'))
+
   return {
     server,
     webhook,
     receive,
     logger,
+    load,
 
     start () {
       server.listen(options.port)
       logger.trace('Listening on http://localhost:' + options.port)
-    },
-
-    load (plugin) {
-      const robot = createRobot({app, cache, logger, catchErrors: true})
-
-      // Connect the router from the robot to the server
-      server.use(robot.router)
-
-      // Initialize the plugin
-      plugin(robot)
-      robots.push(robot)
-
-      return robot
     }
   }
 }

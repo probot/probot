@@ -45,6 +45,7 @@
     "jsdoc-strip-async-await": "^0.1.0",
     "minami": "^1.1.1",
     "mocha": "^3.5.0",
+    "nock": "^9.0.19",
     "semantic-release": "^8.0.3",
     "standard": "^10.0.3",
     "supertest": "^3.0.0"

@@ -4,6 +4,9 @@ const {createRobot} = require('../..')
 const plugin = require('../../lib/plugins/stats')
 const nock = require('nock')
 
+const cacheManager = require('cache-manager')
+const GitHubApi = require('github')
+
 nock.disableNetConnect()
 nock.enableNetConnect(/127\.0\.0\.1/)
 
@@ -19,10 +22,9 @@ describe('stats', function () {
        {private: false, stargazers_count: 2}
      ]})
 
-    const cacheManager = require('cache-manager')
+    // FIXME: move this and app setup below to a test harness
     const cache = cacheManager.caching({store: 'memory'})
 
-    const GitHubApi = require('github')
     const app = {
       async asApp () {
         return new GitHubApi()

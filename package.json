@@ -1,6 +1,6 @@
 {
   "name": "probot",
-  "version": "0.11.0",
+  "version": "0.0.0-development",
   "description": "a trainable robot that responds to activity on GitHub",
   "repository": "https://github.com/probot/probot",
   "main": "index.js",
@@ -12,7 +12,8 @@
     "test": "mocha && standard && npm run doc-lint",
     "doc-lint": "standard docs/**/*.md",
     "doc": "jsdoc -c .jsdoc.json",
-    "postpublish": "script/publish-docs"
+    "postpublish": "script/publish-docs",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "author": "Brandon Keepers",
   "license": "ISC",
@@ -45,7 +46,8 @@
     "minami": "^1.1.1",
     "mocha": "^3.5.0",
     "standard": "^10.0.3",
-    "supertest": "^3.0.0"
+    "supertest": "^3.0.0",
+    "semantic-release": "^8.0.3"
   },
   "standard": {
     "env": [

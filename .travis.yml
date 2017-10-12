@@ -9,6 +9,8 @@ before_install:
 - npm install -g greenkeeper-lockfile@1
 before_script: greenkeeper-lockfile-update
 after_script: greenkeeper-lockfile-upload
-env:
-  global:
-  - secure: "e92PjgzjwNXDhCNk8IYky6Lf1Wlh3Pj/ycWTqwtjYFTjUqhxzOmf+mj9sTCV6mOe7Xl2v7BjOqnDEh+QEiyf4ggASF2Iu76AbUkhFJvF5rMLdzc+eCaf7qqeTRgPaMGoSs/NVF0cDvSAP57GqNU3OV4w2MK3gdNhZGWnnOSvrscNCLRa4Ns7AQgyycyr9jvj0UaEWM34P5xIPtlsTGsIBA9Z7G44N16T/HTGLkp4jwErs+BqzTm+DllXuQsSk58CSnm7lrkxjB5VSrt2ZKMvHP/SJAOmoDOjkJhzIsxzAi1ym1qBtkIogcjRxcU6zueCEe9Rz18jQKvAm+04Kgu51dy3LGpaqmKh4fnDpTFLTeLTzDeWMmzzPx1Uh5DASqAlRkx60TNdRz5HqC2rDB24k3SEGzcqGn89/5UKtIfkm4Hcx/BEQt12MFBF8k0GlhOefH31Xpz0PI2+VXY0UhBNrSyZJ0WKYRO/3J5JoG6BibD0hYBAJTK2P41aItTlj1WBLuVdNJuI19PkCxgoWEz9u6sM2A/EH5F7ouHvzC1dJYOCD5Yqos9FJquu5BFin+1ceoKjzgl/WuGDbNNgvz61JgJ0a/zHh2iW25pp/FbWS9guD3Cz33aWprezjlMT8w1Jqc7Iw734fhvzmaiANjzOUP0rzfFFz7G8732fbDx2Wns="
+after_success:
+  - npm run semantic-release
+branches:
+  except:
+    - /^v\d+\.\d+\.\d+$/

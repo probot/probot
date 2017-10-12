@@ -44,9 +44,9 @@ describe('stats', function () {
     server.use(robot.router)
   })
 
-  describe('GET /stats', () => {
+  describe('GET /probot/stats', () => {
     it('returns installation count and popular accounts', () => {
-      return request(server).get('/stats')
+      return request(server).get('/probot/stats')
         .expect(200, {'installations': 1, 'popular': [{login: 'testing', stars: 2}]})
     })
   })

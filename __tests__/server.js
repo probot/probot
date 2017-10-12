@@ -23,7 +23,7 @@ describe('server', function () {
 
   describe('webhook handler', () => {
     it('should 500 on a webhook error', () => {
-      webhook = jest.fn((req, res, callback) => callback(new Error('webhook error')))
+      webhook.mockImplementation((req, res, callback) => callback(new Error('webhook error')))
       return request(server).post('/').expect(500)
     })
   })

@@ -41,13 +41,13 @@
     "eslint": "^4.6.1",
     "eslint-plugin-markdown": "^1.0.0-beta.6",
     "expect": "^1.20.2",
-    "jsdoc": "^3.5.4",
+    "jsdoc": "^3.5.5",
     "jsdoc-strip-async-await": "^0.1.0",
     "minami": "^1.1.1",
     "mocha": "^3.5.0",
+    "semantic-release": "^8.0.3",
     "standard": "^10.0.3",
-    "supertest": "^3.0.0",
-    "semantic-release": "^8.0.3"
+    "supertest": "^3.0.0"
   },
   "standard": {
     "env": [

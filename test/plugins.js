@@ -1,5 +1,3 @@
-/* eslint prefer-arrow-callback: off */
-
 const expect = require('expect')
 const pluginLoaderFactory = require('../lib/plugin')
 

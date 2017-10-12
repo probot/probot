@@ -1,6 +1,5 @@
 /* eslint prefer-arrow-callback: off */
 
-const expect = require('expect')
 const pluginLoaderFactory = require('../lib/plugin')
 
 const stubPluginPath = require.resolve('./fixtures/plugin/stub-plugin')
@@ -19,17 +18,17 @@ describe('plugin loader', function () {
 
   beforeEach(function () {
     probot = {
-      load: expect.createSpy(),
+      load: jest.fn(),
       logger: nullLogger
     }
 
     autoplugins = {
-      probotPlugin: expect.createSpy()
+      probotPlugin: jest.fn()
     }
 
-    autoloader = expect.createSpy().andReturn(autoplugins)
+    autoloader = jest.fn().mockReturnValue(autoplugins)
 
-    resolver = expect.createSpy().andReturn(stubPluginPath)
+    resolver = jest.fn().mockReturnValue(stubPluginPath)
   })
 
   describe('factory', function () {
@@ -41,7 +40,7 @@ describe('plugin loader', function () {
 
     describe('when robot provided', function () {
       it('should return an object', function () {
-        expect(pluginLoaderFactory(probot)).toBeA(Object)
+        expect(pluginLoaderFactory(probot)).toBeInstanceOf(Object)
       })
     })
 
@@ -69,8 +68,8 @@ describe('plugin loader', function () {
       describe('when supplied no plugin names', function () {
         it('should do nothing', function () {
           pluginLoader.load()
-          expect(resolver).toNotHaveBeenCalled()
-          expect(probot.load).toNotHaveBeenCalled()
+          expect(resolver).toHaveBeenCalledTimes(0)
+          expect(probot.load).toHaveBeenCalledTimes(0)
         })
       })
 
@@ -78,7 +77,7 @@ describe('plugin loader', function () {
         it('should attempt to resolve plugins by name and basedir', function () {
           pluginLoader.load(['foo', 'bar'])
           expect(resolver).toHaveBeenCalledWith('foo', {basedir})
-            .toHaveBeenCalledWith('bar', {basedir})
+          expect(resolver).toHaveBeenCalledWith('bar', {basedir})
         })
 
         it('should ask the robot to load a plugin at its resolved path', function () {

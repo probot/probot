@@ -9,8 +9,6 @@ We highly recommend working in the style of [test-driven development](http://agi
 For our testing examples, we use [mocha](https://mochajs.org/) and [expect](https://github.com/mjackson/expect), but there are other options that can perform similar operations. Here's an example of creating a robot instance and mocking out the GitHub API:
 
 ```js
-// Requiring our testing framework
-const expect = require('expect')
 // Requiring probot allows us to mock out a robot instance
 const {createRobot} = require('probot')
 // Requireing our app
@@ -31,7 +29,7 @@ describe('your-app', () => {
     // This is an easy way to mock out the GitHub API
     github = {
       issues: {
-        createComment: expect.createSpy().andReturn(Promise.resolve({
+        createComment: jest.fn().mockReturnValue(Promise.resolve({
           // Whatever the GitHub API should return
         }))
       }

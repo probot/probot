@@ -79,14 +79,7 @@ module.exports = (options = {}) => {
 
   function setup (apps) {
     const resolver = createResolver({logger, load})
-
-    // If we have explicitly requested plugins, load them; otherwise use autoloading
-    if (apps.length > 0) {
-      resolver.load(apps)
-    } else if (options.autoload) {
-      resolver.autoload()
-    }
-
+    resolver.load(apps)
     defaultApps.forEach(app => load(app))
   }
 

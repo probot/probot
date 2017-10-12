@@ -13,8 +13,6 @@ const nullLogger = {};
 describe('resolver', function () {
   let probot
   let pluginLoader
-  let autoloader
-  let autoplugins
   let resolver
 
   beforeEach(function () {
@@ -22,12 +20,6 @@ describe('resolver', function () {
       load: expect.createSpy(),
       logger: nullLogger
     }
-
-    autoplugins = {
-      probotPlugin: expect.createSpy()
-    }
-
-    autoloader = expect.createSpy().andReturn(autoplugins)
 
     resolver = expect.createSpy().andReturn(stubPluginPath)
   })
@@ -42,22 +34,6 @@ describe('resolver', function () {
     describe('when robot provided', function () {
       it('should return an object', function () {
         expect(createResolver(probot)).toBeA(Object)
-      })
-    })
-
-    describe('autoload()', function () {
-      beforeEach(() => {
-        pluginLoader = createResolver(probot, {autoloader})
-      })
-
-      it('should ask the autoloader for probot-related plugins', function () {
-        pluginLoader.autoload()
-        expect(autoloader).toHaveBeenCalledWith('probot-*')
-      })
-
-      it('should ask the robot to load the plugins', function () {
-        pluginLoader.autoload()
-        expect(probot.load).toHaveBeenCalledWith(autoplugins.probotPlugin)
       })
     })
 

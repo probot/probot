@@ -47,8 +47,7 @@ pkgConf('probot').then(pkg => {
     secret: program.secret,
     cert: program.privateKey,
     port: program.port,
-    webhookPath: program.webhookPath,
-    autoload: true
+    webhookPath: program.webhookPath
   })
 
   probot.setup(program.args.concat(pkg.plugins || []))

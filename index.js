@@ -76,6 +76,7 @@ module.exports = (options = {}) => {
 
   // Setup built-in stats plugin
   load(require('./lib/plugins/stats'))
+  load(require('./lib/plugins/default'))
 
   return {
     routes,

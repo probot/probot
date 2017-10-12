@@ -1,14 +1,9 @@
 const request = require('supertest')
 const express = require('express')
-const {createRobot} = require('../..')
-const plugin = require('../../lib/plugins/stats')
 const nock = require('nock')
+const plugin = require('../../lib/plugins/stats')
 
-const cacheManager = require('cache-manager')
-const GitHubApi = require('github')
-
-nock.disableNetConnect()
-nock.enableNetConnect(/127\.0\.0\.1/)
+const helper = require('./helper')
 
 describe('stats', function () {
   let robot, server
@@ -22,23 +17,7 @@ describe('stats', function () {
        {private: false, stargazers_count: 2}
      ]})
 
-    // FIXME: move this and app setup below to a test harness
-    const cache = cacheManager.caching({store: 'memory'})
-
-    const app = {
-      async asApp () {
-        return new GitHubApi()
-      },
-
-      async asInstallation () {
-        return new GitHubApi()
-      },
-
-      async createToken () {
-        return {data: {token: 'test'}}
-      }
-    }
-    robot = createRobot({app, cache})
+    robot = helper.createRobot()
 
     await plugin(robot)
 

@@ -3,7 +3,7 @@
 set -e
 
 # Store the versions
-VERSION=$(npm view probot version)
+VERSION=$(node -e "process.stdout.write(require('./package.json').version)")
 HEAD=$(git rev-parse HEAD)
 
 # Generate docs

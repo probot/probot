@@ -16,12 +16,13 @@
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "jest": {
+    "testMatch": [ "**/test/**/*.js?(x)", "**/?(*.)(spec|test).js?(x)" ],
     "modulePathIgnorePatterns": [
-      "<rootDir>/__tests__/fixtures/",
-      "<rootDir>/__tests__/setup.js"
+      "<rootDir>/test/fixtures/",
+      "<rootDir>/test/setup.js"
     ],
     "setupFiles": [
-      "<rootDir>/__tests__/setup.js"
+      "<rootDir>/test/setup.js"
     ]
   },
   "author": "Brandon Keepers",

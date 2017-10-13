@@ -45,6 +45,7 @@ describe('Probot', () => {
     })
 
     it('redirects to /probot from /', () => {
+      probot.setup([])
       return request(probot.server).get('/').expect(302).expect('location', '/probot')
     })
 

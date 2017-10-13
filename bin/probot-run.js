@@ -41,16 +41,15 @@ if (program.tunnel && !process.env.DISABLE_TUNNEL) {
 
 const createProbot = require('../')
 
+const probot = createProbot({
+  id: program.app,
+  secret: program.secret,
+  cert: program.privateKey,
+  port: program.port,
+  webhookPath: program.webhookPath
+})
+
 pkgConf('probot').then(pkg => {
-  const probot = createProbot({
-    id: program.app,
-    secret: program.secret,
-    cert: program.privateKey,
-    port: program.port,
-    webhookPath: program.webhookPath
-  })
-
   probot.setup(program.args.concat(pkg.plugins || []))
-
   probot.start()
 })

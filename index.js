@@ -8,7 +8,7 @@ const Raven = require('raven')
 
 const createRobot = require('./lib/robot')
 const createServer = require('./lib/server')
-const createResolver = require('./lib/resolver')
+const resolve = require('./lib/resolver')
 const serializers = require('./lib/serializers')
 
 const cache = cacheManager.caching({
@@ -65,6 +65,10 @@ module.exports = (options = {}) => {
   }
 
   function load (plugin) {
+    if (typeof plugin === 'string') {
+      plugin = resolve(plugin)
+    }
+
     const robot = createRobot({app, cache, logger, catchErrors: true})
 
     // Connect the router from the robot to the server
@@ -77,10 +81,8 @@ module.exports = (options = {}) => {
     return robot
   }
 
-  function setup (apps) {
-    const resolver = createResolver({logger, load})
-    resolver.load(apps)
-    defaultApps.forEach(app => load(app))
+  function setup (apps, opts = {}) {
+    apps.concat(defaultApps).forEach(app => load(app))
   }
 
   return {

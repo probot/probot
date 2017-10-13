@@ -28,10 +28,7 @@ const probot = createProbot({
   id: program.app,
   cert: findPrivateKey()
 })
-
-const plugins = require('../lib/plugin')(probot)
-
-plugins.load(program.args.slice(2))
+probot.setup(program.args.slice(2))
 
 probot.logger.debug('Simulating event', eventName)
 probot.receive({event: eventName, payload})

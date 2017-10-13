@@ -132,15 +132,15 @@ To deploy a bot that includes multiple apps, create a new app that has the apps 
   "private": true,
   "dependencies": {
     "probot-autoresponder": "probot/autoresponder",
-    "probot-configurer": "probot/configurer"
+    "probot-settings": "probot/settings"
   },
   "scripts": {
     "start": "probot run"
  },
  "probot": {
-   "plugins": [
+   "apps": [
      "probot-autoresponder",
-     "probot-configurer"
+     "probot-settings"
    ]
  }
 }

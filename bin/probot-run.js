@@ -50,6 +50,6 @@ const probot = createProbot({
 })
 
 pkgConf('probot').then(pkg => {
-  probot.setup(program.args.concat(pkg.plugins || []))
+  probot.setup(program.args.concat(pkg.apps || pkg.plugins || []))
   probot.start()
 })

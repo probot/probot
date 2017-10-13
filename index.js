@@ -23,11 +23,9 @@ const logger = bunyan.createLogger({
   serializers
 })
 
-const routes = new Set()
-
 const defaultApps = [
   require('./lib/plugins/stats'),
-  load(require('./lib/plugins/default'))
+  require('./lib/plugins/default')
 ]
 
 // Log all unhandled rejections
@@ -89,7 +87,6 @@ module.exports = (options = {}) => {
   }
 
   return {
-    routes,
     server,
     webhook,
     receive,
@@ -105,4 +102,3 @@ module.exports = (options = {}) => {
 }
 
 module.exports.createRobot = createRobot
-module.exports.routes = routes

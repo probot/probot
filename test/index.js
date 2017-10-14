@@ -94,7 +94,7 @@ describe('Probot', () => {
 
       // GET requests to `/` should 404 at express level, not 400 at webhook level
       await request(probot.server).get('/')
-        .expect(404)
+        .expect(200)
 
       // POST requests to `/` should 400 b/c webhook signature will fail
       await request(probot.server).post('/')

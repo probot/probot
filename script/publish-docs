@@ -11,8 +11,15 @@ npm run doc
 
 # Checkout the website into the tmp directory
 [ -d tmp/website ] || {
+  REPO=https://github.com/probot/probot.github.io
+
+  # If GH_TOKEN environment variable is present, use that to push.
+  if [[ -n "$GH_TOKEN" ]]; then
+    REPO=${REPO/https:\/\//https://${GH_TOKEN}@}
+  fi
+
   mkdir -p tmp
-  git clone https://github.com/probot/probot.github.io tmp/website
+  git clone $REPO tmp/website
 }
 
 # Update the website checkout

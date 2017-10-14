@@ -1,4 +1,3 @@
-const expect = require('expect')
 const createProbot = require('..')
 
 describe('Probot', () => {
@@ -17,7 +16,7 @@ describe('Probot', () => {
   describe('webhook delivery', () => {
     it('forwards webhooks to the robot', async () => {
       const robot = probot.load(() => {})
-      robot.receive = expect.createSpy()
+      robot.receive = jest.fn()
       probot.webhook.emit('*', event)
       expect(robot.receive).toHaveBeenCalledWith(event)
     })
@@ -105,9 +104,9 @@ describe('Probot', () => {
 
   describe('receive', () => {
     it('forwards events to each plugin', async () => {
-      const spy = expect.createSpy()
+      const spy = jest.fn()
       const robot = probot.load(robot => robot.on('push', spy))
-      robot.auth = expect.createSpy().andReturn(Promise.resolve({}))
+      robot.auth = jest.fn().mockReturnValue(Promise.resolve({}))
 
       await probot.receive(event)
 

@@ -6,11 +6,9 @@ next: docs/pagination.md
 
 We highly recommend working in the style of [test-driven development](http://agiledata.org/essays/tdd.html) when creating probot apps. It frustrating to constantly create real GitHub events in order to test a app. Redelivering webhooks is possible and can be accessed in your app's [settings](https://github.com/settings/apps) page under the **Advanced** tab. We do offer the above documented `simulate` method to help make this easier; however, by writing your tests first, you can avoid repeatedly recreating actual events from GitHub to check if your code is working.
 
-For our testing examples, we use [mocha](https://mochajs.org/) and [expect](https://github.com/mjackson/expect), but there are other options that can perform similar operations. Here's an example of creating a robot instance and mocking out the GitHub API:
+For our testing examples, we use [jest](https://facebook.github.io/jest/), but there are other options that can perform similar operations. Here's an example of creating a robot instance and mocking out the GitHub API:
 
 ```js
-// Requiring our testing framework
-const expect = require('expect')
 // Requiring probot allows us to mock out a robot instance
 const {createRobot} = require('probot')
 // Requireing our app
@@ -31,7 +29,7 @@ describe('your-app', () => {
     // This is an easy way to mock out the GitHub API
     github = {
       issues: {
-        createComment: expect.createSpy().andReturn(Promise.resolve({
+        createComment: jest.fn().mockReturnValue(Promise.resolve({
           // Whatever the GitHub API should return
         }))
       }

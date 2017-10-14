@@ -82,7 +82,7 @@ module.exports = (options = {}) => {
     return robot
   }
 
-  function setup (apps, opts = {}) {
+  function setup (apps) {
     apps.concat(defaultApps).forEach(app => load(app))
   }
 

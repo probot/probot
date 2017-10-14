@@ -8,6 +8,7 @@ const Raven = require('raven')
 
 const createRobot = require('./lib/robot')
 const createServer = require('./lib/server')
+const resolve = require('./lib/resolver')
 const serializers = require('./lib/serializers')
 
 const cache = cacheManager.caching({
@@ -21,6 +22,10 @@ const logger = bunyan.createLogger({
   stream: bunyanFormat({outputMode: process.env.LOG_FORMAT || 'short'}),
   serializers
 })
+
+const defaultApps = [
+  require('./lib/plugins/stats')
+]
 
 // Log all unhandled rejections
 process.on('unhandledRejection', logger.error.bind(logger))
@@ -60,6 +65,10 @@ module.exports = (options = {}) => {
   }
 
   function load (plugin) {
+    if (typeof plugin === 'string') {
+      plugin = resolve(plugin)
+    }
+
     const robot = createRobot({app, cache, logger, catchErrors: true})
 
     // Connect the router from the robot to the server
@@ -72,8 +81,9 @@ module.exports = (options = {}) => {
     return robot
   }
 
-  // Setup built-in stats plugin
-  load(require('./lib/plugins/stats'))
+  function setup (apps) {
+    apps.concat(defaultApps).forEach(app => load(app))
+  }
 
   return {
     server,
@@ -81,6 +91,7 @@ module.exports = (options = {}) => {
     receive,
     logger,
     load,
+    setup,
 
     start () {
       server.listen(options.port)

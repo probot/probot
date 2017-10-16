@@ -11,3 +11,7 @@ If you've ever thought, "wouldn't it be cool if GitHub could…"; imma stop you 
 Probot is built by people just like you! Most of the interesting things are built _with_ Probot, so consider starting by [writing a new app](https://probot.github.io/docs/) or improving one of the [existing ones](https://github.com/search?q=topic%3Aprobot-app&type=Repositories), and check out our [contributing docs](CONTRIBUTING.md) for other ways to get started.
 
 Want to chat with Probot users and contributors? [Join us in Slack](https://probot-slackin.herokuapp.com/)!
+
+## Ideas
+
+Have an idea for a cool new GitHub App (built with Probot)? That's great! If you want feedback, help, or just to share it with the world you can do so by [creating an issue in the `probot/ideas` repository](https://github.com/probot/ideas/issues/new)!

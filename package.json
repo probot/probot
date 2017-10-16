@@ -19,7 +19,8 @@
     "testMatch": [ "**/test/**/*.js?(x)", "**/?(*.)(spec|test).js?(x)" ],
     "modulePathIgnorePatterns": [
       "<rootDir>/test/fixtures/",
-      "<rootDir>/test/setup.js"
+      "<rootDir>/test/setup.js",
+      "<rootDir>/test/plugins/helper.js"
     ],
     "setupFiles": [
       "<rootDir>/test/setup.js"

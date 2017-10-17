@@ -1,4 +1,5 @@
 const createProbot = require('..')
+const request = require('supertest')
 
 describe('Probot', () => {
   let probot
@@ -23,8 +24,6 @@ describe('Probot', () => {
   })
 
   describe('server', () => {
-    const request = require('supertest')
-
     it('prefixes paths with route name', () => {
       probot.load(robot => {
         const app = robot.route('/my-plugin')

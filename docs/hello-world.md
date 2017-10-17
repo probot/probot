@@ -42,3 +42,5 @@ module.exports = robot => {
   })
 }
 ```
+
+Don't know what to build? Browse the [list of ideas](https://github.com/probot/ideas/issues) from the community for inspiration.

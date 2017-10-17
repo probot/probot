@@ -1,4 +1,5 @@
 const createProbot = require('..')
+const request = require('supertest')
 
 describe('Probot', () => {
   let probot
@@ -23,8 +24,6 @@ describe('Probot', () => {
   })
 
   describe('server', () => {
-    const request = require('supertest')
-
     it('prefixes paths with route name', () => {
       probot.load(robot => {
         const app = robot.route('/my-plugin')
@@ -41,6 +40,15 @@ describe('Probot', () => {
       })
 
       return request(probot.server).get('/foo').expect(200, 'foo')
+    })
+
+    it('allows you to overwrite the root path', () => {
+      probot.load(robot => {
+        const app = robot.route()
+        app.get('/', (req, res) => res.end('foo'))
+      })
+
+      return request(probot.server).get('/').expect(200, 'foo')
     })
 
     it('isolates plugins from affecting eachother', async () => {
@@ -91,10 +99,6 @@ describe('Probot', () => {
       // Error handler to avoid printing logs
       // eslint-disable-next-line handle-callback-err
       probot.server.use((err, req, res, next) => { })
-
-      // GET requests to `/` should 404 at express level, not 400 at webhook level
-      await request(probot.server).get('/')
-        .expect(404)
 
       // POST requests to `/` should 400 b/c webhook signature will fail
       await request(probot.server).post('/')

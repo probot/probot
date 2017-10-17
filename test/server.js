@@ -16,7 +16,7 @@ describe('server', function () {
   })
 
   describe('GET /ping', () => {
-    it('returns a 200 repsonse', () => {
+    it('returns a 200 response', () => {
       return request(server).get('/ping').expect(200, 'PONG')
     })
   })

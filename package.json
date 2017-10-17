@@ -19,7 +19,8 @@
     "testMatch": [ "**/test/**/*.js?(x)", "**/?(*.)(spec|test).js?(x)" ],
     "modulePathIgnorePatterns": [
       "<rootDir>/test/fixtures/",
-      "<rootDir>/test/setup.js"
+      "<rootDir>/test/setup.js",
+      "<rootDir>/test/plugins/helper.js"
     ],
     "setupFiles": [
       "<rootDir>/test/setup.js"
@@ -35,6 +36,7 @@
     "cache-manager": "^2.4.0",
     "commander": "^2.11.0",
     "dotenv": "~4.0.0",
+    "ejs": "^2.5.7",
     "express": "^4.15.4",
     "github": "^10.1.0",
     "github-app": "^3.2.0",

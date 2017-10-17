@@ -24,7 +24,8 @@ const logger = bunyan.createLogger({
 })
 
 const defaultApps = [
-  require('./lib/plugins/stats')
+  require('./lib/plugins/stats'),
+  require('./lib/plugins/default')
 ]
 
 // Log all unhandled rejections

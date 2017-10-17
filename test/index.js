@@ -42,11 +42,6 @@ describe('Probot', () => {
       return request(probot.server).get('/foo').expect(200, 'foo')
     })
 
-    it('redirects to /probot from /', () => {
-      probot.setup([])
-      return request(probot.server).get('/').expect(302).expect('location', '/probot')
-    })
-
     it('allows you to overwrite the root path', () => {
       probot.load(robot => {
         const app = robot.route()

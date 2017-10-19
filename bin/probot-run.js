@@ -50,14 +50,6 @@ const probot = createProbot({
 })
 
 pkgConf('probot').then(pkg => {
-  const plugins = require('../lib/plugin')(probot)
-  const requestedPlugins = program.args.concat(pkg.plugins || [])
-
-  // If we have explicitly requested plugins, load them; otherwise use autoloading
-  if (requestedPlugins.length > 0) {
-    plugins.load(requestedPlugins)
-  } else {
-    plugins.autoload()
-  }
+  probot.setup(program.args.concat(pkg.apps || pkg.plugins || []))
   probot.start()
 })

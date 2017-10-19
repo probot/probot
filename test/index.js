@@ -1,5 +1,5 @@
-const expect = require('expect')
 const createProbot = require('..')
+const request = require('supertest')
 
 describe('Probot', () => {
   let probot
@@ -17,15 +17,13 @@ describe('Probot', () => {
   describe('webhook delivery', () => {
     it('forwards webhooks to the robot', async () => {
       const robot = probot.load(() => {})
-      robot.receive = expect.createSpy()
+      robot.receive = jest.fn()
       probot.webhook.emit('*', event)
       expect(robot.receive).toHaveBeenCalledWith(event)
     })
   })
 
   describe('server', () => {
-    const request = require('supertest')
-
     it('prefixes paths with route name', () => {
       probot.load(robot => {
         const app = robot.route('/my-plugin')
@@ -42,6 +40,15 @@ describe('Probot', () => {
       })
 
       return request(probot.server).get('/foo').expect(200, 'foo')
+    })
+
+    it('allows you to overwrite the root path', () => {
+      probot.load(robot => {
+        const app = robot.route()
+        app.get('/', (req, res) => res.end('foo'))
+      })
+
+      return request(probot.server).get('/').expect(200, 'foo')
     })
 
     it('isolates plugins from affecting eachother', async () => {
@@ -93,10 +100,6 @@ describe('Probot', () => {
       // eslint-disable-next-line handle-callback-err
       probot.server.use((err, req, res, next) => { })
 
-      // GET requests to `/` should 404 at express level, not 400 at webhook level
-      await request(probot.server).get('/')
-        .expect(404)
-
       // POST requests to `/` should 400 b/c webhook signature will fail
       await request(probot.server).post('/')
         .expect(400)
@@ -105,9 +108,9 @@ describe('Probot', () => {
 
   describe('receive', () => {
     it('forwards events to each plugin', async () => {
-      const spy = expect.createSpy()
+      const spy = jest.fn()
       const robot = probot.load(robot => robot.on('push', spy))
-      robot.auth = expect.createSpy().andReturn(Promise.resolve({}))
+      robot.auth = jest.fn().mockReturnValue(Promise.resolve({}))
 
       await probot.receive(event)
 

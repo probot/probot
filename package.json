@@ -1,6 +1,6 @@
 {
   "name": "probot",
-  "version": "0.11.0",
+  "version": "0.0.0-development",
   "description": "a trainable robot that responds to activity on GitHub",
   "repository": "https://github.com/probot/probot",
   "main": "index.js",
@@ -9,10 +9,22 @@
   },
   "scripts": {
     "start": "node ./bin/probot run",
-    "test": "mocha && standard && npm run doc-lint",
+    "test": "jest && standard && npm run doc-lint",
     "doc-lint": "standard docs/**/*.md",
     "doc": "jsdoc -c .jsdoc.json",
-    "postpublish": "script/publish-docs"
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
+    "postsemantic-release": "script/publish-docs"
+  },
+  "jest": {
+    "testMatch": [ "**/test/**/*.js?(x)", "**/?(*.)(spec|test).js?(x)" ],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/test/fixtures/",
+      "<rootDir>/test/setup.js",
+      "<rootDir>/test/plugins/helper.js"
+    ],
+    "setupFiles": [
+      "<rootDir>/test/setup.js"
+    ]
   },
   "author": "Brandon Keepers",
   "license": "ISC",
@@ -24,12 +36,13 @@
     "cache-manager": "^2.4.0",
     "commander": "^2.11.0",
     "dotenv": "~4.0.0",
+    "ejs": "^2.5.7",
     "express": "^4.15.4",
     "github": "^10.1.0",
     "github-app": "^3.2.0",
     "github-webhook-handler": "github:rvagg/github-webhook-handler#v0.6.1",
+    "jest": "^21.2.1",
     "js-yaml": "^3.9.1",
-    "load-plugins": "^2.1.2",
     "pkg-conf": "^2.0.0",
     "promise-events": "^0.1.3",
     "raven": "^2.1.2",
@@ -39,17 +52,17 @@
   "devDependencies": {
     "eslint": "^4.6.1",
     "eslint-plugin-markdown": "^1.0.0-beta.6",
-    "expect": "^1.20.2",
-    "jsdoc": "^3.5.4",
+    "jsdoc": "^3.5.5",
     "jsdoc-strip-async-await": "^0.1.0",
     "minami": "^1.1.1",
-    "mocha": "^3.5.0",
+    "nock": "^9.0.19",
+    "semantic-release": "^8.0.3",
     "standard": "^10.0.3",
     "supertest": "^3.0.0"
   },
   "standard": {
     "env": [
-      "mocha"
+      "jest"
     ],
     "plugins": [
       "markdown"

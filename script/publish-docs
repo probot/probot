@@ -3,7 +3,7 @@
 set -e
 
 # Store the versions
-VERSION=$(npm view probot version)
+VERSION=$(node -e "process.stdout.write(require('./package.json').version)")
 HEAD=$(git rev-parse HEAD)
 
 # Generate docs
@@ -11,8 +11,15 @@ npm run doc
 
 # Checkout the website into the tmp directory
 [ -d tmp/website ] || {
+  REPO=https://github.com/probot/probot.github.io
+
+  # If GH_TOKEN environment variable is present, use that to push.
+  if [[ -n "$GH_TOKEN" ]]; then
+    REPO=${REPO/https:\/\//https://${GH_TOKEN}@}
+  fi
+
   mkdir -p tmp
-  git clone https://github.com/probot/probot.github.io tmp/website
+  git clone $REPO tmp/website
 }
 
 # Update the website checkout

@@ -1,4 +1,3 @@
-const expect = require('expect')
 const request = require('supertest')
 const createServer = require('../lib/server')
 
@@ -12,7 +11,7 @@ describe('server', function () {
       info: (data, msg) => { logger._info = {data, msg} },
       trace: (data, msg) => { logger._trace = {data, msg} }
     }
-    webhook = expect.createSpy().andCall((req, res, next) => next())
+    webhook = jest.fn((req, res, next) => next())
     server = createServer(webhook, logger)
 
     // Error handler to avoid printing logs
@@ -22,14 +21,14 @@ describe('server', function () {
   })
 
   describe('GET /ping', () => {
-    it('returns a 200 repsonse', () => {
+    it('returns a 200 response', () => {
       return request(server).get('/ping').expect(200, 'PONG')
     })
   })
 
   describe('webhook handler', () => {
     it('should 500 on a webhook error', () => {
-      webhook.andCall((req, res, callback) => callback(new Error('webhook error')))
+      webhook.mockImplementation((req, res, callback) => callback(new Error('webhook error')))
       return request(server).post('/').expect(500)
     })
   })

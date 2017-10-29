@@ -40,7 +40,7 @@ module.exports = (options = {}) => {
     debug: process.env.LOG_LEVEL === 'trace'
   })
   const server = createServer(webhook)
-  const httpServer = Server(server)
+  const http = Server(server)
 
   // Log all received webhooks
   webhook.on('*', event => {
@@ -72,7 +72,14 @@ module.exports = (options = {}) => {
       plugin = resolve(plugin)
     }
 
-    const robot = createRobot({app, cache, logger, catchErrors: true, server: httpServer})
+    const robot = createRobot({
+      app,
+      cache,
+      logger,
+      server,
+      http,
+      catchErrors: true
+    })
 
     // Connect the router from the robot to the server
     server.use(robot.router)
@@ -90,7 +97,7 @@ module.exports = (options = {}) => {
 
   return {
     server,
-    httpServer,
+    http,
     webhook,
     receive,
     logger,
@@ -98,7 +105,7 @@ module.exports = (options = {}) => {
     setup,
 
     start () {
-      httpServer.listen(options.port)
+      http.listen(options.port)
       logger.trace('Listening on http://localhost:' + options.port)
     }
   }

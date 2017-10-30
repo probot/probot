@@ -13,7 +13,7 @@ Please note that this project is released with a [Contributor Code of Conduct][c
 
 1. [Fork][fork] and clone the repository
 1. Configure and install the dependencies: `npm install`
-1. Make sure the tests pass on your machine: `npm test`, note: these tests also apply the linter, so no need to lint seperately
+1. Make sure the tests pass on your machine: `npm test`, note: these tests also apply the linter, so no need to lint separately
 1. Create a new branch: `git checkout -b my-branch-name`
 1. Make your change, add tests, and make sure the tests still pass
 1. Push to your fork and [submit a pull request][pr]
@@ -26,7 +26,7 @@ Here are a few things you can do that will increase the likelihood of your pull 
 - Keep your change as focused as possible. If there are multiple changes you would like to make that are not dependent upon each other, consider submitting them as separate pull requests.
 - Write a [good commit message](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html).
 
-Work in Progress pull request are also welcome to get feedback early on, or if there is something blocked you.
+Work in Progress pull requests are also welcome to get feedback early on, or if there is something that blocked you.
 
 ## Resources
 

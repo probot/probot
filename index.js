@@ -38,7 +38,7 @@ module.exports = (options = {}) => {
     cert: options.cert,
     debug: process.env.LOG_LEVEL === 'trace'
   })
-  const server = createServer(webhook)
+  const server = createServer(webhook, logger)
 
   // Log all received webhooks
   webhook.on('*', event => {

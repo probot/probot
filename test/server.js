@@ -4,10 +4,15 @@ const createServer = require('../lib/server')
 describe('server', function () {
   let server
   let webhook
+  let logger
 
   beforeEach(() => {
+    logger = {
+      info: (data, msg) => { logger._info = {data, msg} },
+      trace: (data, msg) => { logger._trace = {data, msg} }
+    }
     webhook = jest.fn((req, res, next) => next())
-    server = createServer(webhook)
+    server = createServer(webhook, logger)
 
     // Error handler to avoid printing logs
     server.use(function (err, req, res, next) {
@@ -31,6 +36,23 @@ describe('server', function () {
   describe('with an unknown url', () => {
     it('responds with 404', () => {
       return request(server).get('/lolnotfound').expect(404)
+    })
+  })
+
+  describe('logging', () => {
+    it('should log to info by default', () => {
+      return request(server).get('/loginfo').expect(() => {
+        if (!(logger._info.msg === 'request' && logger._info.data.path === '/loginfo')) throw new Error('Logging failed')
+        if (logger._trace) throw new Error('Logging to wrong level')
+      })
+    })
+
+    it('should log to trace when LOG_LEVEL=trace', () => {
+      process.env.LOG_LEVEL = 'trace'
+      return request(server).get('/logtrace').expect(() => {
+        if (!(logger._trace.msg === 'request' && logger._trace.data.path === '/logtrace')) throw new Error('Logging failed')
+        if (logger._info) throw new Error('Logging to wrong level')
+      })
     })
   })
 })

@@ -21,7 +21,13 @@ describe('server', function () {
     })
 
     it('includes X-Response-Time header', () => {
-      return request(server).get('/ping').expect('X-Response-Time', /^[\d\.]+ms$/)
+      return request(server).get('/ping').expect('X-Response-Time', /^[\d.]+ms$/)
+    })
+
+    it('does not include X-Powered-By header', () => {
+      return request(server).get('/ping').expect(res => {
+        expect(res.headers['x-powered-by']).toBe(undefined)
+      })
     })
   })
 

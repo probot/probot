@@ -31,7 +31,7 @@
     "commander": "^2.11.0",
     "dotenv": "~4.0.0",
     "ejs": "^2.5.7",
-    "express": "^4.15.4",
+    "express": "^4.16.2",
     "github": "^10.1.0",
     "github-app": "^3.2.0",
     "github-webhook-handler": "github:rvagg/github-webhook-handler#v0.6.1",

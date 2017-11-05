@@ -1,5 +1,7 @@
 const request = require('supertest')
 const createServer = require('../lib/server')
+const bunyan = require('bunyan')
+const logger = bunyan.createLogger({name: 'test', streams: []})
 
 describe('server', function () {
   let server
@@ -7,7 +9,7 @@ describe('server', function () {
 
   beforeEach(() => {
     webhook = jest.fn((req, res, next) => next())
-    server = createServer(webhook)
+    server = createServer({webhook, logger})
 
     // Error handler to avoid printing logs
     server.use(function (err, req, res, next) {

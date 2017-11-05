@@ -20,7 +20,7 @@ const logger = bunyan.createLogger({
   name: 'Probot',
   level: process.env.LOG_LEVEL || 'debug',
   stream: bunyanFormat({outputMode: process.env.LOG_FORMAT || 'short'}),
-  serializers
+  serializers: Object.assign(bunyan.stdSerializers, serializers)
 })
 
 const defaultApps = [
@@ -38,7 +38,7 @@ module.exports = (options = {}) => {
     cert: options.cert,
     debug: process.env.LOG_LEVEL === 'trace'
   })
-  const server = createServer(webhook)
+  const server = createServer({webhook, logger})
 
   // Log all received webhooks
   webhook.on('*', event => {

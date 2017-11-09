@@ -11,6 +11,7 @@ describe('Robot', function () {
     robot.auth = () => {}
 
     event = {
+      id: '123-456',
       event: 'test',
       payload: {
         action: 'foo',
@@ -88,7 +89,10 @@ describe('Robot', function () {
 
         expect(output[0]).toEqual(expect.objectContaining({
           msg: 'testing',
-          id: context.id
+          event: expect.objectContaining({
+            id: context.id,
+            installation: event.payload.installation.id
+          })
         }))
       })
 

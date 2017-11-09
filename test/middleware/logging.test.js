@@ -1,6 +1,7 @@
 const request = require('supertest')
 const express = require('express')
 const bunyan = require('bunyan')
+const serializers = require('../../lib/serializers')
 const logging = require('../../lib/middleware/logging')
 
 describe('logging', () => {
@@ -12,7 +13,8 @@ describe('logging', () => {
     logger = bunyan({
       name: 'test',
       level: 'trace',
-      streams: [{type: 'raw', stream: {write: msg => output.push(msg)}}]
+      streams: [{type: 'raw', stream: {write: msg => output.push(msg)}}],
+      serializers
     })
 
     server.use(express.json())

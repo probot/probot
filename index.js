@@ -1,5 +1,3 @@
-const bunyan = require('bunyan')
-const bunyanFormat = require('bunyan-format')
 const sentryStream = require('bunyan-sentry-stream')
 const cacheManager = require('cache-manager')
 const createApp = require('github-app')
@@ -9,18 +7,11 @@ const Raven = require('raven')
 const createRobot = require('./lib/robot')
 const createServer = require('./lib/server')
 const resolve = require('./lib/resolver')
-const serializers = require('./lib/serializers')
+const logger = require('./lib/logger')
 
 const cache = cacheManager.caching({
   store: 'memory',
   ttl: 60 * 60 // 1 hour
-})
-
-const logger = bunyan.createLogger({
-  name: 'Probot',
-  level: process.env.LOG_LEVEL || 'debug',
-  stream: bunyanFormat({outputMode: process.env.LOG_FORMAT || 'short'}),
-  serializers
 })
 
 const defaultApps = [

@@ -18,7 +18,7 @@ const cache = cacheManager.caching({
 
 const logger = bunyan.createLogger({
   name: 'Probot',
-  level: process.env.LOG_LEVEL || 'debug',
+  level: process.env.LOG_LEVEL || 'info',
   stream: bunyanFormat({outputMode: process.env.LOG_FORMAT || 'short'}),
   serializers: Object.assign(bunyan.stdSerializers, serializers)
 })
@@ -29,7 +29,7 @@ const defaultApps = [
 ]
 
 // Log all unhandled rejections
-process.on('unhandledRejection', logger.error.bind(logger))
+// process.on('unhandledRejection', logger.error.bind(logger))
 
 module.exports = (options = {}) => {
   const webhook = createWebhook({path: options.webhookPath || '/', secret: options.secret || 'development'})

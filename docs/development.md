@@ -6,8 +6,6 @@ next: docs/webhooks.md
 
 To develop a Probot app, you will first need a recent version of [Node.js](https://nodejs.org/) installed. Probot uses the `async/await` keywords, so Node.js 7.6 is the minimum required version. 
 
-Below are some instructions to build a Probot app locally. Alternatively, you can [build your Probot app on Glitch](https://glitch.com/edit/#!/remix/probot-hello-world).
-
 ## Generating a new app
 
 [create-probot-app](https://github.com/probot/create-probot-app) is the best way to start building a new app. It will generate a new app with everything you need to get started and run your app in production.

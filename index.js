@@ -5,6 +5,7 @@ const cacheManager = require('cache-manager')
 const createApp = require('github-app')
 const createWebhook = require('github-webhook-handler')
 const Raven = require('raven')
+const {Server} = require('http')
 
 const createRobot = require('./lib/robot')
 const createServer = require('./lib/server')
@@ -39,6 +40,7 @@ module.exports = (options = {}) => {
     debug: process.env.LOG_LEVEL === 'trace'
   })
   const server = createServer(webhook)
+  const http = Server(server)
 
   // Log all received webhooks
   webhook.on('*', event => {
@@ -70,7 +72,14 @@ module.exports = (options = {}) => {
       plugin = resolve(plugin)
     }
 
-    const robot = createRobot({app, cache, logger, catchErrors: true})
+    const robot = createRobot({
+      app,
+      cache,
+      logger,
+      server,
+      http,
+      catchErrors: true
+    })
 
     // Connect the router from the robot to the server
     server.use(robot.router)
@@ -88,6 +97,7 @@ module.exports = (options = {}) => {
 
   return {
     server,
+    http,
     webhook,
     receive,
     logger,
@@ -95,7 +105,7 @@ module.exports = (options = {}) => {
     setup,
 
     start () {
-      server.listen(options.port)
+      http.listen(options.port)
       logger.trace('Listening on http://localhost:' + options.port)
     }
   }

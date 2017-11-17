@@ -32,7 +32,7 @@
     "dotenv": "~4.0.0",
     "ejs": "^2.5.7",
     "express": "^4.15.4",
-    "github": "^10.1.0",
+    "github": "^12.0.3",
     "github-app": "^3.2.0",
     "github-webhook-handler": "github:rvagg/github-webhook-handler#v0.6.1",
     "jest": "^21.2.1",

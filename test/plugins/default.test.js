@@ -23,9 +23,13 @@ describe('default plugin', function () {
       return request(server).get('/probot').expect(200)
     })
 
-    describe('Package data collection', () => {
-      let cwd = process.cwd()
-      const pathTo = file => path.join(__dirname, '..', 'fixtures', 'plugin', file)
+    describe('get info from package.json', () => {
+      let cwd
+      beforeEach(() => {
+        cwd = process.cwd()
+      })
+
+      const pathTo = file => path.join(__dirname, '..', 'fixtures', 'plugins', file)
 
       it('returns the correct HTML with values', async () => {
         const expected = fs.readFileSync(pathTo('with-package.html'), 'utf8')
@@ -40,7 +44,7 @@ describe('default plugin', function () {
         expect(actual.text).toBe(expected)
       })
 
-      afterAll(() => {
+      afterEach(() => {
         process.chdir(cwd)
       })
     })

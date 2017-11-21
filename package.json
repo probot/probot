@@ -41,6 +41,7 @@
     "promise-events": "^0.1.3",
     "raven": "^2.1.2",
     "resolve": "^1.4.0",
+    "response-time": "^2.3.2",
     "semver": "^5.4.1"
   },
   "devDependencies": {

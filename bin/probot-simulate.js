@@ -28,6 +28,7 @@ const probot = createProbot({
   id: program.app,
   cert: findPrivateKey()
 })
+
 probot.setup(program.args.slice(2))
 
 probot.logger.debug('Simulating event', eventName)

@@ -217,10 +217,29 @@ describe('Robot', function () {
       expect(arg.event).toBe(event)
     })
 
-    it('does not call the callback if a middleware throws', async () => {
+    it('does not call the callback if a middleware sends an error', async () => {
       const fakeMiddleware = jest.fn().mockImplementation((context, next) => {
         next(error)
       })
+
+      const spy = jest.fn()
+      robot.on('test', fakeMiddleware, spy)
+
+      try {
+        await robot.receive(event)
+      } catch (err) {
+        // Expected
+      }
+
+      expect(robot.log.error).toHaveBeenCalled()
+      expect(fakeMiddleware).toHaveBeenCalled()
+      const arg = robot.log.error.mock.calls[0][0]
+      expect(arg.err).toBe(error)
+      expect(arg.event).toBe(event)
+    })
+
+    it('does not call the callback if a middleware throws', async () => {
+      const fakeMiddleware = jest.fn().mockImplementation(() => Promise.reject(error))
 
       const spy = jest.fn()
       robot.on('test', fakeMiddleware, spy)

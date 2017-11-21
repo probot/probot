@@ -20,7 +20,7 @@ The `robot` parameter is an instance of [`Robot`](https://probot.github.io/probo
 module.exports = robot => {
   robot.on('issues.opened', async context => {
     // A new issue was opened, what should we do with it?
-    robot.log(context)
+    context.log(context.payload)
   })
 }
 ```

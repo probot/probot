@@ -7,13 +7,28 @@ describe('serializers', () => {
         event: 'test',
         payload: {
           action: 'test',
-          repository: {full_name: 'probot/test'}
+          repository: {full_name: 'probot/test'},
+          installation: {id: 1}
         }}
       expect(serializers.event(event)).toEqual({
         id: 1,
         event: 'test',
         action: 'test',
-        repository: 'probot/test'
+        repository: 'probot/test',
+        installation: 1
+      })
+    })
+
+    it('works a malformed event', () => {
+      const event = {id: 1,
+        event: 'test',
+        payload: {}}
+      expect(serializers.event(event)).toEqual({
+        id: 1,
+        event: 'test',
+        action: undefined,
+        repository: undefined,
+        installation: undefined
       })
     })
 

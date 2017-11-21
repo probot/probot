@@ -12,9 +12,9 @@ Many robots will spend their entire day responding to these actions. `robot.on` 
 module.exports = robot => {
   robot.on('push', async context => {
     // Code was pushed to the repo, what should we do with it?
-    robot.log(context);
-  });
-};
+    robot.log(context)
+  })
+}
 ```
 
 The robot can listen to any of the [GitHub webhook events](https://developer.github.com/webhooks/#events). The `context` object includes everything about the event that was triggered, and `context.payload` has the payload delivered by GitHub.
@@ -25,6 +25,6 @@ Most events also include an "action". For example, the [`issues`](https://develo
 module.exports = robot => {
   robot.on('issues.opened', async context => {
     // An issue was just opened.
-  });
-};
+  })
+}
 ```

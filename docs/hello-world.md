@@ -9,7 +9,7 @@ A Probot app is just a [Node.js module](https://nodejs.org/api/modules.html) tha
 ```js
 module.exports = robot => {
   // your code here
-};
+}
 ```
 
 The `robot` parameter is an instance of [`Robot`](https://probot.github.io/probot/latest/Robot.html) and gives you access to all of the bot goodness.
@@ -20,9 +20,9 @@ The `robot` parameter is an instance of [`Robot`](https://probot.github.io/probo
 module.exports = robot => {
   robot.on('issues.opened', async context => {
     // A new issue was opened, what should we do with it?
-    robot.log(context);
-  });
-};
+    robot.log(context)
+  })
+}
 ```
 
 The `context` passed to the event handler includes everything about the event that was triggered, as well as some helpful properties for doing something useful in response to the event. `context.github` is an authenticated GitHub client that can be used to [make API calls](./github-api.md), and allows you to do almost anything programmatically that you can do through a web browser on GitHub.
@@ -38,7 +38,11 @@ module.exports = robot => {
     const params = context.issue({body: 'Hello World!'})
 
     // Post a comment on the issue
-    return context.github.issues.createComment(params);
-  });
+    return context.github.issues.createComment(params)
+  })
 }
 ```
+To get started, you can use the instructions for [Developing an App](https://probot.github.io/docs/development/) or remix this 'Hello World' project on Glitch.
+[![Remix on Glitch](https://cdn.glitch.com/2703baf2-b643-4da7-ab91-7ee2a2d00b5b%2Fremix-button.svg)](https://glitch.com/edit/#!/remix/https://glitch.com/edit/#!/remix/probot-hello-world)
+
+Don't know what to build? Browse the [list of ideas](https://github.com/probot/ideas/issues) from the community for inspiration.

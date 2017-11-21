@@ -1,4 +1,3 @@
-const expect = require('expect')
 const serializers = require('../lib/serializers')
 
 describe('serializers', () => {

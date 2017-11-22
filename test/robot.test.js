@@ -83,7 +83,7 @@ describe('Robot', function () {
         stream: {write: log => output.push(log)}
       })
 
-      const handler = jest.fn().mockImplementation(context => {
+      const handler = jest.fn(context => {
         expect(context.log).toBeDefined()
         context.log('testing')
 
@@ -102,7 +102,7 @@ describe('Robot', function () {
     })
 
     it('allows middleware', async () => {
-      const fakeMiddleware = jest.fn().mockImplementation((context, next) => next())
+      const fakeMiddleware = jest.fn((context, next) => next())
       const spy = jest.fn()
       robot.on('test', fakeMiddleware, spy)
 
@@ -112,8 +112,8 @@ describe('Robot', function () {
     })
 
     it('allows multiple middleware', async () => {
-      const fakeMiddleware = jest.fn().mockImplementation((context, next) => next())
-      const fakeMiddlewareTwo = jest.fn().mockImplementation((context, next) => next())
+      const fakeMiddleware = jest.fn((context, next) => next())
+      const fakeMiddlewareTwo = jest.fn((context, next) => next())
       const spy = jest.fn()
       robot.on('test', fakeMiddleware, fakeMiddlewareTwo, spy)
 
@@ -124,7 +124,7 @@ describe('Robot', function () {
     })
 
     it('allow middleware to modify the context object', async () => {
-      const fakeMiddleware = jest.fn().mockImplementation((context, next) => {
+      const fakeMiddleware = jest.fn((context, next) => {
         context.pizza = true
         next(null, context)
       })
@@ -218,7 +218,7 @@ describe('Robot', function () {
     })
 
     it('does not call the callback if a middleware sends an error', async () => {
-      const fakeMiddleware = jest.fn().mockImplementation((context, next) => {
+      const fakeMiddleware = jest.fn((context, next) => {
         next(error)
       })
 
@@ -239,7 +239,7 @@ describe('Robot', function () {
     })
 
     it('does not call the callback if a middleware throws', async () => {
-      const fakeMiddleware = jest.fn().mockImplementation(() => Promise.reject(error))
+      const fakeMiddleware = jest.fn(() => Promise.reject(error))
 
       const spy = jest.fn()
       robot.on('test', fakeMiddleware, spy)

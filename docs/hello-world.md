@@ -12,7 +12,7 @@ module.exports = robot => {
 }
 ```
 
-The `robot` parameter is an instance of [`Robot`](https://probot.github.io/probot/latest/Robot.html) and gives you access to all of the bot goodness.
+The `robot` parameter is an instance of [`Robot`](https://probot.github.io/api/latest/Robot.html) and gives you access to all of the bot goodness.
 
 `robot.on` will listen for any [webhook events triggered by GitHub](./webhooks.md), which will notify you when anything interesting happens on GitHub that your app wants to know about.
 

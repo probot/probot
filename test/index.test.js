@@ -11,8 +11,9 @@ describe('Probot', () => {
     probot = createProbot()
 
     event = {
-      event: 'push',
-      payload: require('./fixtures/webhook/push')
+      payload: require('./fixtures/webhook/push'),
+      id: '123',
+      name: 'push'
     }
   })
 
@@ -20,8 +21,11 @@ describe('Probot', () => {
     it('forwards webhooks to the robot', async () => {
       const robot = probot.load(() => {})
       robot.receive = jest.fn()
-      probot.webhook.emit('*', event)
-      expect(robot.receive).toHaveBeenCalledWith(event)
+      probot.webhook.receive(event)
+
+      .then(() => {
+        expect(robot.receive).toHaveBeenCalledWith(event)
+      })
     })
   })
 
@@ -42,6 +46,15 @@ describe('Probot', () => {
       })
 
       return request(probot.server).get('/foo').expect(200, 'foo')
+    })
+
+    it('allows custom POST routes', () => {
+      probot.load(robot => {
+        const app = robot.route()
+        app.post('/foo', (req, res) => res.end('foo'))
+      })
+
+      return request(probot.server).post('/foo').expect(200, 'foo')
     })
 
     it('allows you to overwrite the root path', () => {
@@ -117,6 +130,43 @@ describe('Probot', () => {
       await probot.receive(event)
 
       expect(spy).toHaveBeenCalled()
+    })
+
+    it('logs errors', async () => {
+      const spy = jest.fn()
+      const robot = probot.load(() => {})
+
+      robot.auth = jest.fn().mockReturnValue(Promise.resolve({}))
+      robot.log.error = jest.fn()
+
+      const error = new Error('testing')
+      robot.on('push', () => {
+        throw error
+      })
+
+      robot.on('error', spy)
+
+      try {
+        await probot.receive(event)
+      } catch (error) {
+        // expected
+      }
+
+      expect(spy).toHaveBeenCalled()
+    })
+
+    it('accepts deprecated event.event instead of event.name', async () => {
+      // const spy = jest.fn()
+      const robot = probot.load(() => {})
+
+      robot.auth = jest.fn().mockReturnValue(Promise.resolve({}))
+      robot.log.error = jest.fn()
+      console.log = jest.fn()
+
+      await robot.receive({
+        event: event.name,
+        payload: event.payload
+      })
     })
   })
 

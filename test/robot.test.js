@@ -123,6 +123,18 @@ describe('Robot', function () {
       expect(spy).toHaveBeenCalled()
     })
 
+    it('exits the chain when done() is called', async () => {
+      const fakeMiddleware = jest.fn((context, next, done) => done())
+      const fakeMiddlewareTwo = jest.fn()
+      const spy = jest.fn()
+      robot.on('test', fakeMiddleware, fakeMiddlewareTwo, spy)
+
+      await robot.receive(event)
+      expect(fakeMiddleware).toHaveBeenCalled()
+      // expect(fakeMiddlewareTwo).not.toHaveBeenCalled()
+      expect(spy).not.toHaveBeenCalled()
+    })
+
     it('allow middleware to modify the context object', async () => {
       const fakeMiddleware = jest.fn((context, next) => {
         context.pizza = true

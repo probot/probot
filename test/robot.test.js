@@ -123,7 +123,7 @@ describe('Robot', function () {
       expect(spy).toHaveBeenCalled()
     })
 
-    it('exits the chain when done() is called', async () => {
+    it.only('exits the chain when done() is called', async () => {
       const fakeMiddleware = jest.fn((context, next, done) => done())
       const fakeMiddlewareTwo = jest.fn()
       const spy = jest.fn()
@@ -131,7 +131,7 @@ describe('Robot', function () {
 
       await robot.receive(event)
       expect(fakeMiddleware).toHaveBeenCalled()
-      // expect(fakeMiddlewareTwo).not.toHaveBeenCalled()
+      expect(fakeMiddlewareTwo).not.toHaveBeenCalled()
       expect(spy).not.toHaveBeenCalled()
     })
 

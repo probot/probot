@@ -1,5 +1,6 @@
 const Context = require('../lib/context')
 const createRobot = require('../lib/robot')
+const logger = require('../lib/logger')
 
 describe('Robot', function () {
   let robot
@@ -10,29 +11,13 @@ describe('Robot', function () {
     robot.auth = () => {}
 
     event = {
+      id: '123-456',
       event: 'test',
       payload: {
         action: 'foo',
         installation: {id: 1}
       }
     }
-  })
-
-  describe('constructor', () => {
-    it('takes a logger', () => {
-      const logger = {
-        trace: jest.fn(),
-        debug: jest.fn(),
-        info: jest.fn(),
-        warn: jest.fn(),
-        error: jest.fn(),
-        fatal: jest.fn()
-      }
-      robot = createRobot({logger})
-
-      robot.log('hello world')
-      expect(logger.debug).toHaveBeenCalledWith('hello world')
-    })
   })
 
   describe('on', function () {
@@ -86,6 +71,34 @@ describe('Robot', function () {
       await robot.receive(event)
       await robot.receive(event2)
       expect(spy.mock.calls.length).toEqual(2)
+    })
+
+    it('adds a logger on the context', async () => {
+      // Add a new stream for testing the logginer
+      // https://github.com/trentm/node-bunyan#adding-a-stream
+      const output = []
+      logger.addStream({
+        level: 'trace',
+        type: 'raw',
+        stream: {write: log => output.push(log)}
+      })
+
+      const handler = jest.fn().mockImplementation(context => {
+        expect(context.log).toBeDefined()
+        context.log('testing')
+
+        expect(output[0]).toEqual(expect.objectContaining({
+          msg: 'testing',
+          event: expect.objectContaining({
+            id: context.id,
+            installation: event.payload.installation.id
+          })
+        }))
+      })
+
+      robot.on('test', handler)
+      await robot.receive(event)
+      expect(handler).toHaveBeenCalled()
     })
   })
 

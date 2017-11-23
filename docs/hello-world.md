@@ -12,7 +12,7 @@ module.exports = robot => {
 }
 ```
 
-The `robot` parameter is an instance of [`Robot`](https://probot.github.io/probot/latest/Robot.html) and gives you access to all of the bot goodness.
+The `robot` parameter is an instance of [`Robot`](https://probot.github.io/api/latest/Robot.html) and gives you access to all of the bot goodness.
 
 `robot.on` will listen for any [webhook events triggered by GitHub](./webhooks.md), which will notify you when anything interesting happens on GitHub that your app wants to know about.
 
@@ -20,7 +20,7 @@ The `robot` parameter is an instance of [`Robot`](https://probot.github.io/probo
 module.exports = robot => {
   robot.on('issues.opened', async context => {
     // A new issue was opened, what should we do with it?
-    robot.log(context)
+    context.log(context.payload)
   })
 }
 ```
@@ -42,5 +42,7 @@ module.exports = robot => {
   })
 }
 ```
+To get started, you can use the instructions for [Developing an App](https://probot.github.io/docs/development/) or remix this 'Hello World' project on Glitch.
+[![Remix on Glitch](https://cdn.glitch.com/2703baf2-b643-4da7-ab91-7ee2a2d00b5b%2Fremix-button.svg)](https://glitch.com/edit/#!/remix/https://glitch.com/edit/#!/remix/probot-hello-world)
 
 Don't know what to build? Browse the [list of ideas](https://github.com/probot/ideas/issues) from the community for inspiration.

@@ -20,6 +20,28 @@ describe('default plugin', function () {
     it('returns a 200 response', () => {
       return request(server).get('/probot').expect(200)
     })
+
+    describe('get info from package.json', () => {
+      let cwd
+      beforeEach(() => {
+        cwd = process.cwd()
+      })
+
+      it('returns the correct HTML with values', async () => {
+        const actual = await request(server).get('/probot').expect(200)
+        expect(actual.text).toMatchSnapshot()
+      })
+
+      it('returns the correct HTML without values', async () => {
+        process.chdir(__dirname)
+        const actual = await request(server).get('/probot').expect(200)
+        expect(actual.text).toMatchSnapshot()
+      })
+
+      afterEach(() => {
+        process.chdir(cwd)
+      })
+    })
   })
 
   describe('GET /', () => {

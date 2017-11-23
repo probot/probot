@@ -11,7 +11,7 @@ module.exports = robot => {
   robot.on('issues.opened', context => {
     context.github.paginate(context.github.issues.getAll(context.repo()), res => {
       res.data.issues.forEach(issue => {
-        robot.log('Issue: %s', issue.title)
+        context.log('Issue: %s', issue.title)
       })
     })
   })

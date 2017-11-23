@@ -6,8 +6,6 @@ notifications:
   disabled: true
 before_install:
 - npm install -g npm@5
-after_success:
-  - npm run semantic-release
 branches:
   except:
     - /^v\d+\.\d+\.\d+$/

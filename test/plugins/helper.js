@@ -6,22 +6,27 @@ const {createRobot} = require('../..')
 
 const cache = cacheManager.caching({store: 'memory'})
 
-const app = {
-  async asApp () {
-    return new GitHubApi()
-  },
-
-  async asInstallation () {
-    return new GitHubApi()
-  },
-
-  async createToken () {
-    return {data: {token: 'test'}}
-  }
-}
-
 module.exports = {
   createRobot () {
+    const githubOptions = {
+      host: process.env.GHE_URL || 'api.github.com',
+      pathPrefix: process.env.GHE_URL ? '/api/v3' : ''
+    }
+
+    const app = {
+      async asApp () {
+        return new GitHubApi(githubOptions)
+      },
+
+      async asInstallation () {
+        return new GitHubApi(githubOptions)
+      },
+
+      async createToken () {
+        return {data: {token: 'test'}}
+      }
+    }
+
     return createRobot({app, cache})
   }
 }

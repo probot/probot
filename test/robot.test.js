@@ -123,7 +123,7 @@ describe('Robot', function () {
       expect(spy).toHaveBeenCalled()
     })
 
-    it.only('exits the chain when done() is called', async () => {
+    it('exits the chain when done() is called', async () => {
       const fakeMiddleware = jest.fn((context, next, done) => done())
       const fakeMiddlewareTwo = jest.fn()
       const spy = jest.fn()

@@ -1,6 +1,7 @@
 const request = require('supertest')
 const express = require('express')
 const bunyan = require('bunyan')
+const serializers = require('../../lib/serializers')
 const logging = require('../../lib/middleware/logging')
 
 describe('logging', () => {
@@ -12,7 +13,8 @@ describe('logging', () => {
     logger = bunyan({
       name: 'test',
       level: 'trace',
-      streams: [{type: 'raw', stream: {write: msg => output.push(msg)}}]
+      streams: [{type: 'raw', stream: {write: msg => output.push(msg)}}],
+      serializers
     })
 
     server.use(express.json())
@@ -50,7 +52,7 @@ describe('logging', () => {
 
       expect(responseLog).toEqual(expect.objectContaining({
         id: requestLog.id,
-        msg: expect.stringMatching(/^GET \/ 200 - [\d.]+ ms$/),
+        msg: expect.stringMatching(/^GET \/ 200 - \d.\d\d+ ms$/),
         duration: expect.anything(),
         res: expect.objectContaining({
           headers: expect.objectContaining({
@@ -60,7 +62,7 @@ describe('logging', () => {
         })
       }))
 
-      expect(typeof responseLog.duration).toBe('number')
+      expect(responseLog.duration).toMatch(/^\d\.\d\d$/)
     })
   })
 

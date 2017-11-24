@@ -58,4 +58,4 @@ Apps _should_ allow all settings to customized for each installation.
 
 ### Store configuration in the repository
 
-Any configuration _should_ be stored in the repository. Unless the app is using files from an established convention, the configuration _should_ be stored in the `.github` directory. See the [API docs for `context.config`](https://probot.github.io/probot/latest/Context.html#config).
+Any configuration _should_ be stored in the repository. Unless the app is using files from an established convention, the configuration _should_ be stored in the `.github` directory. See the [API docs for `context.config`](https://probot.github.io/api/latest/Context.html#config).

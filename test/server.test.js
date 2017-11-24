@@ -1,7 +1,6 @@
 const request = require('supertest')
 const createServer = require('../lib/server')
-const bunyan = require('bunyan')
-const logger = bunyan.createLogger({name: 'test', streams: []})
+const logger = require('../lib/logger')
 
 describe('server', function () {
   let server

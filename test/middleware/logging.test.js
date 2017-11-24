@@ -52,7 +52,7 @@ describe('logging', () => {
 
       expect(responseLog).toEqual(expect.objectContaining({
         id: requestLog.id,
-        msg: expect.stringMatching(/^GET \/ 200 - \d.\d\d+ ms$/),
+        msg: expect.stringMatching(/^GET \/ 200 - \d+.\d\d+ ms$/),
         duration: expect.anything(),
         res: expect.objectContaining({
           headers: expect.objectContaining({

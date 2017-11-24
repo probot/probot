@@ -54,7 +54,7 @@ describe('logging', () => {
       expect(responseLog).toEqual(expect.objectContaining({
         id: requestLog.id,
         msg: expect.stringMatching(/^GET \/ 200 - \d+.\d\d+ ms$/),
-        duration: expect.anything(),
+        duration: expect.stringMatching(/^\d+\.\d\d$/),
         res: expect.objectContaining({
           headers: expect.objectContaining({
             'x-request-id': requestLog.id,
@@ -62,8 +62,6 @@ describe('logging', () => {
           })
         })
       }))
-
-      expect(responseLog.duration).toMatch(/^\d\.\d\d$/)
     })
   })
 

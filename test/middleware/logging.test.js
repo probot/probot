@@ -30,7 +30,7 @@ describe('logging', () => {
   test('logs requests and responses', () => {
     return request(server).get('/').expect(200).expect(res => {
       var requestLog = output[0]
-      var responseLog = output[1]
+      var responseLog = output[2]
 
       // logs id with request and response
       expect(requestLog.id).toBeTruthy()
@@ -53,9 +53,8 @@ describe('logging', () => {
 
       expect(responseLog).toEqual(expect.objectContaining({
         id: requestLog.id,
-        msg: expect.stringMatching(/^GET \/ 200 - \d+.\d\d+ ms$/),
-        duration: expect.stringMatching(/^\d+\.\d\d$/),
         res: expect.objectContaining({
+          duration: expect.stringMatching(/^\d+\.\d\d$/),
           headers: expect.objectContaining({
             'x-request-id': requestLog.id,
             'x-test-header': 'testing'
@@ -69,12 +68,6 @@ describe('logging', () => {
     return request(server).get('/').set('X-Request-ID', '42').expect(200).expect(res => {
       expect(res.header['x-request-id']).toEqual('42')
       expect(output[0].id).toEqual('42')
-    })
-  })
-
-  test('request body', () => {
-    return request(server).post('/').send({foo: 'bar'}).expect(200).expect(res => {
-      expect(output[0].req.body).toEqual({foo: 'bar'})
     })
   })
 })

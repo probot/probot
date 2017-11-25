@@ -12,7 +12,7 @@ module.exports = robot => {
     if (context.payload.issue.body.match(/bacon/)) {
       context.log('This issue is about bacon')
     } else {
-      context.log('Sadly, this issue is not about bacon')      
+      context.log('Sadly, this issue is not about bacon')
     }
   })
 
@@ -29,12 +29,17 @@ When you start up your app with `npm start`, You should see your log message app
 `robot.log` will log messages at the `info` level, which is what your app should use for most relevant messages. Occasionally will want to log more detailed information that is useful for debugging, but you might not want to see it all the time.
 
 ```js
-robot.log.trace('Really low-level logging');
-robot.log.debug({data}, 'End-line specs on the rotary girder');
-robot.log.info('Same as using `robot.log`');
-robot.log.warn(err, 'Uh-oh, this may not be good');
-robot.log.error(err, 'Yeah, it was bad');
-robot.log.fatal(err, 'Goodbye, cruel world!');
+module.exports = robot => {
+  // …
+  robot.log.trace('Really low-level logging')
+  robot.log.debug({data: 'here'}, 'End-line specs on the rotary girder')
+  robot.log.info('Same as using `robot.log`')
+
+  const err = new Error('Some error')
+  robot.log.warn(err, 'Uh-oh, this may not be good')
+  robot.log.error(err, 'Yeah, it was bad')
+  robot.log.fatal(err, 'Goodbye, cruel world!')
+}
 ```
 
 By default, messages that are `info` and above will show in your logs, but you can change it by setting the
@@ -53,7 +58,11 @@ Set `LOG_FORMAT=json` to show log messages as structured JSON, which can then be
 For example, given this log:
 
 ```js
-robot.log({event}, "Comment created")
+module.exports = robot => {
+  robot.on('issue_comment.created', context => {
+    context.log('Comment created')
+  })
+}
 ```
 
 You'll see this output:

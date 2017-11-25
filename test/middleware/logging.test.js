@@ -70,4 +70,11 @@ describe('logging', () => {
       expect(output[0].id).toEqual('42')
     })
   })
+
+  test('uses X-GitHub-Delivery', () => {
+    return request(server).get('/').set('X-GitHub-Delivery', 'a-b-c').expect(200).expect(res => {
+      expect(res.header['x-request-id']).toEqual('a-b-c')
+      expect(output[0].id).toEqual('a-b-c')
+    })
+  })
 })

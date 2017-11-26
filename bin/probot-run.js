@@ -26,19 +26,6 @@ if (!program.privateKey) {
   program.privateKey = findPrivateKey()
 }
 
-if (program.tunnel && !process.env.DISABLE_TUNNEL) {
-  try {
-    const setupTunnel = require('../lib/tunnel')
-    setupTunnel(program.tunnel, program.port).then(tunnel => {
-      console.log('Listening on ' + tunnel.url)
-    }).catch(err => {
-      console.warn('Could not open tunnel: ', err.message)
-    })
-  } catch (err) {
-    console.warn('Run `npm install --save-dev localtunnel` to enable localtunnel.')
-  }
-}
-
 const createProbot = require('../')
 
 const probot = createProbot({
@@ -48,6 +35,15 @@ const probot = createProbot({
   port: program.port,
   webhookPath: program.webhookPath
 })
+
+if (program.tunnel && !process.env.DISABLE_TUNNEL) {
+  try {
+    const setupTunnel = require('../lib/tunnel')
+    setupTunnel(program.tunnel, program.port)
+  } catch (err) {
+    probot.logger.debug('Run `npm install --save-dev localtunnel` to enable localtunnel.')
+  }
+}
 
 pkgConf('probot').then(pkg => {
   probot.setup(program.args.concat(pkg.apps || pkg.plugins || []))

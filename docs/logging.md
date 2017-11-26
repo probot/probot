@@ -1,3 +1,7 @@
+---
+next: docs/pagination.md
+---
+
 # Logging
 
 A good logger is a good developer's secret weapon. Probot comes with [bunyan](https://github.com/trentm/node-bunyan), which is a simple and fast logging library that supports some pretty sophisticated logging if you need it (hint: you will).

@@ -26,7 +26,7 @@ When you start up your app with `npm start`, You should see your log message app
 
 <img width="753" alt="" src="https://user-images.githubusercontent.com/173/33234904-d43e7f14-d1f3-11e7-8dcb-6c47e58bd56b.png">
 
-`robot.log` will log messages at the `info` level, which is what your app should use for most relevant messages. Occasionally will want to log more detailed information that is useful for debugging, but you might not want to see it all the time.
+`robot.log` will log messages at the `info` level, which is what your app should use for most relevant messages. Occasionally you will want to log more detailed information that is useful for debugging, but you might not want to see it all the time.
 
 ```js
 module.exports = robot => {

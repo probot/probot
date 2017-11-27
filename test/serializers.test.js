@@ -9,11 +9,11 @@ describe('serializers', () => {
           action: 'test',
           repository: {full_name: 'probot/test'},
           installation: {id: 1}
-        }}
+        }
+      }
       expect(serializers.event(event)).toEqual({
         id: 1,
-        event: 'test',
-        action: 'test',
+        event: 'test.test',
         repository: 'probot/test',
         installation: 1
       })
@@ -26,7 +26,6 @@ describe('serializers', () => {
       expect(serializers.event(event)).toEqual({
         id: 1,
         event: 'test',
-        action: undefined,
         repository: undefined,
         installation: undefined
       })

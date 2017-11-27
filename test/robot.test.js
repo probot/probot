@@ -89,10 +89,7 @@ describe('Robot', function () {
 
         expect(output[0]).toEqual(expect.objectContaining({
           msg: 'testing',
-          event: expect.objectContaining({
-            id: context.id,
-            installation: event.payload.installation.id
-          })
+          id: context.id
         }))
       })
 

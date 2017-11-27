@@ -1,5 +1,5 @@
 ---
-next: docs/pagination.md
+next: docs/logging.md
 ---
 
 # Testing

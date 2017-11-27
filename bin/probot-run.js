@@ -15,7 +15,7 @@ program
   .option('-a, --app <id>', 'ID of the GitHub App', process.env.APP_ID)
   .option('-s, --secret <secret>', 'Webhook secret of the GitHub App', process.env.WEBHOOK_SECRET)
   .option('-P, --private-key <file>', 'Path to certificate of the GitHub App', findPrivateKey)
- .parse(process.argv)
+  .parse(process.argv)
 
 if (!program.app) {
   console.warn('Missing GitHub App ID.\nUse --app flag or set APP_ID environment variable.')

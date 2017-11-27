@@ -6,19 +6,7 @@ const {createRobot} = require('../..')
 
 const cache = cacheManager.caching({store: 'memory'})
 
-const app = {
-  async asApp () {
-    return new GitHubApi()
-  },
-
-  async asInstallation () {
-    return new GitHubApi()
-  },
-
-  async createToken () {
-    return {data: {token: 'test'}}
-  }
-}
+const app = jest.fn().mockReturnValue('test')
 
 module.exports = {
   createRobot () {

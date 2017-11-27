@@ -9,13 +9,13 @@ const {findPrivateKey} = require('../lib/private-key')
 
 program
   .usage('[options] <apps...>')
-  .option('-a, --app <id>', 'ID of the GitHub App', process.env.APP_ID)
-  .option('-s, --secret <secret>', 'Webhook secret of the GitHub App', process.env.WEBHOOK_SECRET)
-  .option('-P, --private-key <file>', 'Path to certificate of the GitHub App', findPrivateKey)
   .option('-p, --port <n>', 'Port to start the server on', process.env.PORT || 3000)
   .option('-t, --tunnel <subdomain>', 'Expose your local bot to the internet', process.env.SUBDOMAIN || process.env.NODE_ENV !== 'production')
   .option('-w, --webhook-path <path>', 'URL path which receives webhooks. Ex: `/webhook`', process.env.WEBHOOK_PATH)
-  .parse(process.argv)
+  .option('-a, --app <id>', 'ID of the GitHub App', process.env.APP_ID)
+  .option('-s, --secret <secret>', 'Webhook secret of the GitHub App', process.env.WEBHOOK_SECRET)
+  .option('-P, --private-key <file>', 'Path to certificate of the GitHub App', findPrivateKey)
+ .parse(process.argv)
 
 if (!program.app) {
   console.warn('Missing GitHub App ID.\nUse --app flag or set APP_ID environment variable.')

@@ -5,8 +5,22 @@ const logger = require('../lib/logger')
 describe('Robot', function () {
   let robot
   let event
+  let output
+
+  beforeAll(() => {
+    // Add a new stream for testing the logger
+    // https://github.com/trentm/node-bunyan#adding-a-stream
+    logger.addStream({
+      level: 'trace',
+      type: 'raw',
+      stream: {write: log => output.push(log)}
+    })
+  })
 
   beforeEach(function () {
+    // Clear log output
+    output = []
+
     robot = createRobot()
     robot.auth = () => {}
 
@@ -74,15 +88,6 @@ describe('Robot', function () {
     })
 
     it('adds a logger on the context', async () => {
-      // Add a new stream for testing the logginer
-      // https://github.com/trentm/node-bunyan#adding-a-stream
-      const output = []
-      logger.addStream({
-        level: 'trace',
-        type: 'raw',
-        stream: {write: log => output.push(log)}
-      })
-
       const handler = jest.fn().mockImplementation(context => {
         expect(context.log).toBeDefined()
         context.log('testing')
@@ -159,9 +164,9 @@ describe('Robot', function () {
         // Expected
       }
 
-      const arg = robot.log.error.mock.calls[0][0]
-      expect(arg.err).toBe(error)
-      expect(arg.event).toBe(event)
+      expect(output.length).toBe(1)
+      expect(output[0].err.message).toEqual('testing')
+      expect(output[0].event.id).toEqual(event.id)
     })
 
     it('logs errors from rejected promises', async () => {
@@ -173,10 +178,9 @@ describe('Robot', function () {
         // Expected
       }
 
-      expect(robot.log.error).toHaveBeenCalled()
-      const arg = robot.log.error.mock.calls[0][0]
-      expect(arg.err).toBe(error)
-      expect(arg.event).toBe(event)
+      expect(output.length).toBe(1)
+      expect(output[0].err.message).toEqual('testing')
+      expect(output[0].event.id).toEqual(event.id)
     })
   })
 })

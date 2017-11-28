@@ -51,7 +51,6 @@ pkgConf('probot').then(defaults => {
     }
   }
 
-
   probot.setup(program.args.concat(defaults.apps || defaults.plugins || []))
   probot.start()
 })

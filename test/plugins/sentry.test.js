@@ -25,7 +25,7 @@ describe('sentry', () => {
     })
   })
 
-  describe('with an invalid SENTRY_DSN', () => {
+  describe('with a SENTRY_DSN', () => {
     beforeEach(() => {
       process.env.SENTRY_DSN = 'https://user:pw@sentry.io/123'
       plugin(robot)

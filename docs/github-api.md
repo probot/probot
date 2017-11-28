@@ -28,10 +28,10 @@ See the [full API docs](https://octokit.github.io/node-github/) to see all the w
 
 ## GitHub Enterprise
 
-If you want to run a Probot App against a GitHub Enterprise instance, you'll need to set the `GHE_URL` environment variable. Note that the below example does not include the HTTP protocol.
+If you want to run a Probot App against a GitHub Enterprise instance, you'll need to set the `GHE_HOST` environment variable.
 
 ```
-GHE_URL=fake.github-enterprise.com
+GHE_HOST=fake.github-enterprise.com
 ```
 
 > GitHub Apps are only enabled in Enterprise 2.12 and later!

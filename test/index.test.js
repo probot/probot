@@ -141,7 +141,7 @@ describe('Probot', () => {
     let robot
 
     beforeEach(() => {
-      process.env.GHE_URL = 'notreallygithub.com'
+      process.env.GHE_HOST = 'notreallygithub.com'
 
       nock('https://notreallygithub.com/api/v3')
        .defaultReplyHeaders({'Content-Type': 'application/json'})
@@ -151,7 +151,7 @@ describe('Probot', () => {
     })
 
     afterEach(() => {
-      delete process.env.GHE_URL
+      delete process.env.GHE_HOST
     })
 
     it('requests from the correct API URL', async () => {

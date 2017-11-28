@@ -117,21 +117,4 @@ describe('Probot', () => {
       expect(spy).toHaveBeenCalled()
     })
   })
-
-  describe('sentry', () => {
-    afterEach(() => {
-      // Clean up env variables
-      delete process.env.SENTRY_URL
-      delete process.env.SENTRY_DSN
-    })
-
-    describe('SENTRY_DSN', () => {
-      it('configures sentry via the SENTRY_DSN ', () => {
-        process.env.SENTRY_DSN = '1233'
-        expect(() => {
-          createProbot()
-        }).toThrow(/Invalid Sentry DSN: 1233/)
-      })
-    })
-  })
 })

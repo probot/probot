@@ -26,6 +26,9 @@ if (!program.oauthtoken) {
 const createProbot = require('../')
 
 const probot = createProbot({
+  port: program.port,
+  webhookPath: program.webhookPath,
+  secret: program.secret,
   clientid: program.clientid,
   clientsecret: program.clientsecret
 })

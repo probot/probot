@@ -31,11 +31,11 @@ if (!program.privateKey) {
 const createProbot = require('../')
 
 const probot = createProbot({
-  id: program.app,
-  secret: program.secret,
-  cert: program.privateKey,
   port: program.port,
-  webhookPath: program.webhookPath
+  webhookPath: program.webhookPath,
+  secret: program.secret,
+  id: program.app,
+  cert: program.privateKey
 })
 
 if (program.tunnel && !process.env.DISABLE_TUNNEL) {

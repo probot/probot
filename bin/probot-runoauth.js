@@ -15,6 +15,9 @@ program
   .option('-s, --secret <secret>', 'Webhook secret', process.env.WEBHOOK_SECRET)
   .option('-s, --clientsecret <secret>', 'OAuth token secert for your application', process.env.CLIENT_SECRET)
   .parse(process.argv)
+
+process.env.AUTH_METHOD = 'oauth'
+
 if (!program.oauthtoken) {
   console.warn('Missing GitHub OAuth Token.\nUse --oauthtoken flag or set TOKEN environment variable.')
   program.help()

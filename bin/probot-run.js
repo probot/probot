@@ -17,6 +17,8 @@ program
   .option('-P, --private-key <file>', 'Path to certificate of the GitHub App', findPrivateKey)
   .parse(process.argv)
 
+process.env.AUTH_METHOD = 'githubapp'
+
 if (!program.app) {
   console.warn('Missing GitHub App ID.\nUse --app flag or set APP_ID environment variable.')
   program.help()

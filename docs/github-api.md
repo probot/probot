@@ -25,3 +25,14 @@ module.exports = robot => {
 ```
 
 See the [full API docs](https://octokit.github.io/node-github/) to see all the ways you can interact with GitHub. Some API endpoints are not available on GitHub Apps yet, so check [which ones are available](https://developer.github.com/v3/apps/available-endpoints/) first.
+
+## GitHub Enterprise
+
+If you want to run a Probot App against a GitHub Enterprise instance, you'll need to set the `GHE_HOST` environment variable.
+
+```
+GHE_HOST=fake.github-enterprise.com
+```
+
+> GitHub Apps are only enabled in Enterprise 2.12 and later!
+

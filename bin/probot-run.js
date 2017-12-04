@@ -45,6 +45,8 @@ if (program.tunnel && !process.env.DISABLE_TUNNEL) {
   }
 }
 
+require('../lib/webhook-proxy')(probot)
+
 pkgConf('probot').then(pkg => {
   probot.setup(program.args.concat(pkg.apps || pkg.plugins || []))
   probot.start()

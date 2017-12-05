@@ -13,6 +13,7 @@ before_install:
 
 install:
 - npm install -g codecov
+- npm install
 
 branches:
   except:

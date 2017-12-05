@@ -1,11 +1,24 @@
 sudo: false
+
 language: node_js
+
 node_js:
   - "8"
+  
 notifications:
   disabled: true
+  
 before_install:
-- npm install -g npm@5
+  - npm install -g npm@5
+
+install:
+  - npm install -g codecov
+  - npm install
+
 branches:
   except:
     - /^v\d+\.\d+\.\d+$/
+    
+script:
+  - npm test
+  - codecov

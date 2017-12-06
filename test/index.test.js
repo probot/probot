@@ -136,7 +136,6 @@ describe('Probot', () => {
       const robot = probot.load(() => {})
 
       robot.auth = jest.fn().mockReturnValue(Promise.resolve({}))
-      robot.log.error = jest.fn()
 
       const error = new Error('testing')
       robot.on('push', () => {

@@ -70,5 +70,43 @@ describe('Robot', function () {
       await robot.receive(event)
       expect(handler).toHaveBeenCalled()
     })
+
+    it('logs errors raised from event', async () => {
+      const error = new Error('test error')
+
+      robot.on('push', () => {
+        throw error
+      })
+
+      try {
+        await robot.receive(event)
+      } catch (e) {
+        // expected
+      }
+
+      expect(output[0]).toEqual(expect.objectContaining({
+        id: event.id,
+        err: expect.objectContaining({
+          message: 'test error'
+        })
+      }))
+    })
+
+    it('logs when handler returns a rejected promise', async () => {
+      robot.on('push', () => Promise.reject('rejected promise'))
+
+      try {
+        await robot.receive(event)
+      } catch (e) {
+        // expected
+      }
+
+      expect(output[0]).toEqual(expect.objectContaining({
+        id: event.id,
+        err: expect.objectContaining({
+          message: 'rejected promise'
+        })
+      }))
+    })
   })
 })

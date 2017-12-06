@@ -21,11 +21,10 @@ describe('Probot', () => {
     it('forwards webhooks to the robot', async () => {
       const robot = probot.load(() => {})
       robot.receive = jest.fn()
-      probot.webhook.receive(event)
 
-      .then(() => {
-        expect(robot.receive).toHaveBeenCalledWith(event)
-      })
+      await probot.webhook.receive(event)
+
+      expect(robot.receive).toHaveBeenCalledWith(event)
     })
   })
 

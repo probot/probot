@@ -11,6 +11,7 @@ if (!semver.satisfies(process.version, version)) {
 require('commander')
   .version(require('../package').version)
   .usage('<command> [options]')
-  .command('run', 'run the bot')
+  .command('run', 'run the bot with GitHub App integration')
+  .command('runoauth', 'run the bot with OAuth App integration')
   .command('simulate', 'simulate a webhook being delivered')
   .parse(process.argv)

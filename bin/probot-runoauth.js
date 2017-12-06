@@ -5,27 +5,22 @@ require('dotenv').config()
 const pkgConf = require('pkg-conf')
 const program = require('commander')
 
-const {findPrivateKey} = require('../lib/private-key')
-
 program
   .usage('[options] <apps...>')
   .option('-p, --port <n>', 'Port to start the server on', process.env.PORT || 3000)
   .option('-t, --tunnel <subdomain>', 'Expose your local bot to the internet', process.env.SUBDOMAIN || process.env.NODE_ENV !== 'production')
   .option('-w, --webhook-path <path>', 'URL path which receives webhooks. Ex: `/webhook`', process.env.WEBHOOK_PATH)
-  .option('-a, --app <id>', 'ID of the GitHub App', process.env.APP_ID)
-  .option('-s, --secret <secret>', 'Webhook secret of the GitHub App', process.env.WEBHOOK_SECRET)
-  .option('-P, --private-key <file>', 'Path to certificate of the GitHub App', findPrivateKey)
+  .option('-o, --oauthtoken <token>', 'OAuth token for your application', process.env.TOKEN)
+  .option('-c, --clientid <id>', 'OAuth token id for your application', process.env.CLIENT_ID)
+  .option('-s, --secret <secret>', 'Webhook secret', process.env.WEBHOOK_SECRET)
+  .option('-s, --clientsecret <secret>', 'OAuth token secert for your application', process.env.CLIENT_SECRET)
   .parse(process.argv)
 
-process.env.AUTH_METHOD = 'githubapp'
+process.env.AUTH_METHOD = 'oauth'
 
-if (!program.app) {
-  console.warn('Missing GitHub App ID.\nUse --app flag or set APP_ID environment variable.')
+if (!program.oauthtoken) {
+  console.warn('Missing GitHub OAuth Token.\nUse --oauthtoken flag or set TOKEN environment variable.')
   program.help()
-}
-
-if (!program.privateKey) {
-  program.privateKey = findPrivateKey()
 }
 
 const createProbot = require('../')
@@ -34,8 +29,8 @@ const probot = createProbot({
   port: program.port,
   webhookPath: program.webhookPath,
   secret: program.secret,
-  id: program.app,
-  cert: program.privateKey
+  clientid: program.clientid,
+  clientsecret: program.clientsecret
 })
 
 if (program.tunnel && !process.env.DISABLE_TUNNEL) {

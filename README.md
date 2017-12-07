@@ -1,10 +1,22 @@
 # Probot
 
-[![npm version](https://img.shields.io/npm/v/probot.svg)](https://www.npmjs.com/package/probot) [![Build Status](https://travis-ci.org/probot/probot.svg?branch=master)](https://travis-ci.org/probot/probot) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/32r7s2skrgm9ubva?svg=true)](https://ci.appveyor.com/api/projects/status/32r7s2skrgm9ubva?svg=true) [![Greenkeeper badge](https://badges.greenkeeper.io/probot/probot.svg)](https://greenkeeper.io/) [![The Changelog #264](https://img.shields.io/badge/The%20Changelog-%23264-61c192.svg)](https://changelog.com/podcast/264)
+[![npm version](https://img.shields.io/npm/v/probot.svg)](https://www.npmjs.com/package/probot) [![Build Status](https://travis-ci.org/probot/probot.svg?branch=master)](https://travis-ci.org/probot/probot) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/32r7s2skrgm9ubva?svg=true)](https://ci.appveyor.com/api/projects/status/32r7s2skrgm9ubva?svg=true) [![Codecov](https://img.shields.io/codecov/c/github/probot/probot.svg)](https://codecov.io/gh/probot/probot/) [![Greenkeeper badge](https://badges.greenkeeper.io/probot/probot.svg)](https://greenkeeper.io/) [![The Changelog #264](https://img.shields.io/badge/The%20Changelog-%23264-61c192.svg)](https://changelog.com/podcast/264)
 
 If you've ever thought, "wouldn't it be cool if GitHub could…"; imma stop you right there. Most features can actually be added via [GitHub Apps](https://developer.github.com/apps/), which extend GitHub and can be installed directly on organizations and user accounts and granted access to specific repositories. They come with granular permissions and built-in webhooks. Apps are first class actors within GitHub.
 
-**Probot is a framework for building [GitHub Apps](http://developer.github.com/apps) in [Node.js](https://nodejs.org/)**. Check out some of the [featured apps](https://probot.github.io/apps) or [read the docs](https://probot.github.io/docs/) to learn more about writing a new app.
+## How it works
+
+**Probot is a framework for building [GitHub Apps](http://developer.github.com/apps) in [Node.js](https://nodejs.org/)**. GitHub Apps can listen to webhook events sent by a repository or organization. Probot uses its internal event emitter to perform actions based on those events. A simple Probot App might look like this:
+
+```js
+module.exports = robot => {
+  robot.on('issues.opened', async context => {
+    const issueComment = context.issue({ body: 'Thanks for opening this issue!' })
+    return context.github.issues.createComment(issueComment)
+  })
+}
+```
+Check out some of the [featured apps](https://probot.github.io/apps) or [read the docs](https://probot.github.io/docs/) to learn more about writing a new app.
 
 ## Contributing
 

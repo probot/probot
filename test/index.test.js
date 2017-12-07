@@ -1,5 +1,7 @@
 const createProbot = require('..')
 const request = require('supertest')
+const nock = require('nock')
+const helper = require('./plugins/helper')
 
 describe('Probot', () => {
   let probot
@@ -115,6 +117,38 @@ describe('Probot', () => {
       await probot.receive(event)
 
       expect(spy).toHaveBeenCalled()
+    })
+  })
+
+  describe('ghe support', function () {
+    let robot
+
+    beforeEach(() => {
+      process.env.GHE_HOST = 'notreallygithub.com'
+
+      nock('https://notreallygithub.com/api/v3')
+       .defaultReplyHeaders({'Content-Type': 'application/json'})
+       .get('/app/installations').reply(200, ['I work!'])
+
+      robot = helper.createRobot()
+    })
+
+    afterEach(() => {
+      delete process.env.GHE_HOST
+    })
+
+    it('requests from the correct API URL', async () => {
+      const spy = jest.fn()
+
+      const plugin = async robot => {
+        const github = await robot.auth()
+        const res = await github.apps.getInstallations({})
+        return spy(res)
+      }
+
+      await plugin(robot)
+      await robot.receive(event)
+      expect(spy.mock.calls[0][0].data[0]).toBe('I work!')
     })
   })
 })

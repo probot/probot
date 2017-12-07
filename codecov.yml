@@ -1,0 +1,3 @@
+comment:
+  # only post the comment if coverage changes
+  require_changes: true

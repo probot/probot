@@ -42,7 +42,6 @@ if (!program.webhookProxy && program.tunnel && !process.env.DISABLE_TUNNEL) {
   try {
     const setupTunnel = require('../lib/tunnel')
     setupTunnel(program.tunnel, program.port)
-    console.warn('[DEPRECATED] localtunnel support will removed in 5.0. TODO: LINK')
   } catch (err) {
     probot.logger.debug('Run `npm install --save-dev localtunnel` to enable localtunnel.')
   }

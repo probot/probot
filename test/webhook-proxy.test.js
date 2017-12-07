@@ -50,11 +50,10 @@ describe('webhook-proxy', () => {
       done()
     })
 
-    const body = {action: 'foo'}
-
     emit({
       'x-github-event': 'test',
-      body
+      'x-hub-signature': 'lolnope',
+      body: {action: 'foo'}
     })
   })
 })

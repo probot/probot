@@ -75,7 +75,7 @@ describe('webhook-proxy', () => {
 
     proxy.on('error', err => {
       expect(err.status).toBe(404)
-      expect(log.error).toHaveBeenCalledWith(err, 'Webhook proxy error')
+      expect(log.error).toHaveBeenCalledWith({err, url}, 'Webhook proxy error')
       done()
     })
   })

@@ -8,7 +8,7 @@ const logger = require('../lib/logger')
 const webhook = createWebhook({path: '/', secret: 'test'})
 
 describe('webhook-proxy', () => {
-  let app, server, proxy, url, emit
+  let app, server, proxy, url, emit, channel
 
   afterEach(() => {
     server && server.close()
@@ -25,8 +25,9 @@ describe('webhook-proxy', () => {
       })
 
       server = app.listen(0, () => {
-        url = `http://127.0.0.1:${server.address().port}/events`
-        proxy = createWebhookProxy({url, logger, webhook})
+        channel = 'events'
+        url = `http://127.0.0.1:${server.address().port}/`
+        proxy = createWebhookProxy({url, channel, logger, webhook})
 
         // Wait for proxy to be ready
         proxy.addEventListener('ready', () => done())
@@ -64,14 +65,14 @@ describe('webhook-proxy', () => {
     })
   })
 
-  test('logs an error when the proxy server that is not found', (done) => {
-    const url = 'http://bad.proxy/events'
-    nock('http://bad.proxy').get('/events').reply(404)
+  test('logs an error when the proxy server is not found', (done) => {
+    const url = 'https://bad.proxy/events'
+    nock('https://bad.proxy').get('/events').reply(404)
 
     const log = logger.child()
     log.error = jest.fn()
 
-    proxy = createWebhookProxy({url, webhook, logger: log})
+    proxy = createWebhookProxy({url: 'https://bad.proxy/', channel, webhook, logger: log})
 
     proxy.on('error', err => {
       expect(err.status).toBe(404)

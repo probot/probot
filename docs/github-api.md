@@ -34,5 +34,5 @@ If you want to run a Probot App against a GitHub Enterprise instance, you'll nee
 GHE_HOST=fake.github-enterprise.com
 ```
 
-> GitHub Apps are only enabled in Enterprise 2.12 and later!
+> GitHub Apps are enabled in GitHub Enterprise 2.12 as an [early access technical preview](https://developer.github.com/enterprise/2.12/apps/).
 

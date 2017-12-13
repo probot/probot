@@ -66,13 +66,13 @@ describe('webhook-proxy', () => {
   })
 
   test('logs an error when the proxy server is not found', (done) => {
-    const url = 'https://bad.proxy/events'
-    nock('https://bad.proxy').get('/events').reply(404)
+    const url = 'http://bad.proxy/events'
+    nock('http://bad.proxy').get('/events').reply(404)
 
     const log = logger.child()
     log.error = jest.fn()
 
-    proxy = createWebhookProxy({url: 'https://bad.proxy/', channel, webhook, logger: log})
+    proxy = createWebhookProxy({url: 'http://bad.proxy/', channel, webhook, logger: log})
 
     proxy.on('error', err => {
       expect(err.status).toBe(404)

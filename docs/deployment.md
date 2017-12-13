@@ -125,7 +125,13 @@ Zeit [Now](http://zeit.co/now) is a great service for running Probot apps. After
 
 1. Once the deploy is started, go back to your [app settings page](https://github.com/settings/apps) and update the **Webhook URL** to the URL of your deployment (which `now` has kindly copied to your clipboard).
 
-Your app should be up and running!
+1. Your app should be up and running! For long term use, create an alias for your robot. After making an alias, you can swap to new deploy URLs with no downtime.
+
+        $ now alias set https://your-generated-url.now.sh https://a-fancier-url.now.sh
+
+1. You can also keep your app running forever, with instant response to webhooks with:
+
+        $ now scale https://a-fancier-url.now.sh 1
 
 ## Combining apps
 

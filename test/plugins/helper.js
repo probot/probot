@@ -1,9 +1,9 @@
 // FIXME: move this to a test helper that can be used by other apps
 
-const cacheManager = require('cache-manager')
+const Keyv = require('keyv')
 const {createRobot} = require('../..')
 
-const cache = cacheManager.caching({store: 'memory'})
+const cache = new Keyv()
 
 const app = jest.fn().mockReturnValue('test')
 

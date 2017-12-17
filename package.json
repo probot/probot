@@ -45,6 +45,9 @@
     "semver": "^5.4.1"
   },
   "devDependencies": {
+    "@types/express": "^4.0.39",
+    "@types/jest": "^21.1.8",
+    "@types/node": "^8.5.1",
     "connect-sse": "^1.2.0",
     "eslint": "^4.6.1",
     "eslint-plugin-markdown": "^1.0.0-beta.6",

@@ -1,0 +1,26 @@
+{
+    "compilerOptions": {
+      "module": "commonjs",
+      "moduleResolution": "node",
+      "target": "es6",
+      "noImplicitReturns": true,
+      "noFallthroughCasesInSwitch": true,
+      "noUnusedLocals": true,
+      "strict": true,
+      "sourceMap": true,
+      "outDir": "./build",
+      "declaration": true,
+      "types" : [ "jest", "node" ],
+      "typeRoots": [ "./node_modules/@types" ]
+    },
+    "exclude": [
+        "node_modules",
+        "build"
+    ],
+    "include": [
+        "lib/**/*.ts",
+        "script/**/*.ts",
+        "test/**/*.ts"
+    ],
+    "compileOnSave": false
+}

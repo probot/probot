@@ -7,3 +7,4 @@ out
 tmp
 package-lock.json
 coverage
+build

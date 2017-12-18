@@ -5,7 +5,7 @@ require('dotenv').config()
 const pkgConf = require('pkg-conf')
 const program = require('commander')
 
-const {findPrivateKey} = require('../lib/private-key')
+const {findPrivateKey} = require('../src/private-key')
 
 program
   .usage('[options] <apps...>')
@@ -40,7 +40,7 @@ const probot = createProbot({
 
 if (!program.webhookProxy && program.tunnel && !process.env.DISABLE_TUNNEL) {
   try {
-    const setupTunnel = require('../lib/tunnel')
+    const setupTunnel = require('../src/tunnel')
     setupTunnel(program.tunnel, program.port)
   } catch (err) {
     probot.logger.debug('Run `npm install --save-dev localtunnel` to enable localtunnel.')

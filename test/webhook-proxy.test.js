@@ -2,8 +2,8 @@ const express = require('express')
 const sse = require('connect-sse')()
 const nock = require('nock')
 const createWebhook = require('github-webhook-handler')
-const createWebhookProxy = require('../lib/webhook-proxy')
-const logger = require('../lib/logger')
+const createWebhookProxy = require('../src/webhook-proxy')
+const logger = require('../src/logger')
 
 const webhook = createWebhook({path: '/', secret: 'test'})
 

@@ -1,16 +1,16 @@
 {
     "compilerOptions": {
+      "allowJs": true,
       "module": "commonjs",
       "moduleResolution": "node",
-      "target": "es6",
+      "target": "es5",
       "noImplicitReturns": true,
       "noFallthroughCasesInSwitch": true,
       "noUnusedLocals": true,
       "strict": true,
       "sourceMap": true,
       "outDir": "./build",
-      "declaration": true,
-      "types" : [ "jest", "node" ],
+      "types" : [ "jest", "node", "express" ],
       "typeRoots": [ "./node_modules/@types" ]
     },
     "exclude": [
@@ -18,9 +18,7 @@
         "build"
     ],
     "include": [
-        "lib/**/*.ts",
-        "script/**/*.ts",
-        "test/**/*.ts"
+        "lib/**/*"
     ],
     "compileOnSave": false
 }

@@ -3,7 +3,7 @@
   "version": "0.0.0-development",
   "description": "a trainable robot that responds to activity on GitHub",
   "repository": "https://github.com/probot/probot",
-  "main": "lib/index.js",
+  "main": "build/index.js",
   "bin": {
     "probot": "./bin/probot.js"
   },
@@ -18,7 +18,8 @@
   "jest": {
     "setupFiles": [
       "<rootDir>/test/setup.js"
-    ]
+    ],
+    "coveragePathIgnorePatterns": ["<rootDir>/build/"]
   },
   "author": "Brandon Keepers",
   "license": "ISC",

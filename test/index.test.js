@@ -106,10 +106,28 @@ describe('Probot', () => {
       await request(probot.server).post('/')
         .expect(400)
     })
+
+    it('can be disabled with option server set to false', async () => {
+      probot = createProbot({server: false})
+
+      expect(probot.server).toBeUndefined()
+    })
   })
 
   describe('receive', () => {
     it('forwards events to each plugin', async () => {
+      const spy = jest.fn()
+      const robot = probot.load(robot => robot.on('push', spy))
+      robot.auth = jest.fn().mockReturnValue(Promise.resolve({}))
+
+      await probot.receive(event)
+
+      expect(spy).toHaveBeenCalled()
+    })
+
+    it('should work if option server is set to false', async () => {
+      probot = createProbot({server: false})
+
       const spy = jest.fn()
       const robot = probot.load(robot => robot.on('push', spy))
       robot.auth = jest.fn().mockReturnValue(Promise.resolve({}))

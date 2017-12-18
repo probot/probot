@@ -12,6 +12,7 @@ before_install:
   - npm install -g npm@5
 
 install:
+  - npm install -g typescript
   - npm install -g codecov
   - npm install
 
@@ -20,5 +21,6 @@ branches:
     - /^v\d+\.\d+\.\d+$/
     
 script:
+  - tsc
   - npm test
   - codecov

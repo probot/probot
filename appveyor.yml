@@ -10,7 +10,7 @@ install:
   # install modules
   - npm install
   # compile typescript files
-  - tsc
+  - tsc -p tsconfig.json
 
 # Post-install test scripts.
 test_script:

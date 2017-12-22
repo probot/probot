@@ -11,7 +11,7 @@ To install node (Mac OS X)
  * `brew install node`
 
 After installing node:
- * `npm install node`
+ * `npm install probot`
 
 Integrate Probot into your awesome node application:
 

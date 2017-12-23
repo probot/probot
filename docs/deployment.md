@@ -133,30 +133,6 @@ Zeit [Now](http://zeit.co/now) is a great service for running Probot apps. After
 
         $ now scale https://a-fancier-url.now.sh 1
 
-## Combining apps
-
-To deploy a bot that includes multiple apps, create a new app that has the apps listed as dependencies in `package.json`:
-
-```json
-{
-  "name": "my-probot",
-  "private": true,
-  "dependencies": {
-    "probot-autoresponder": "probot/autoresponder",
-    "probot-settings": "probot/settings"
-  },
-  "scripts": {
-    "start": "probot run"
- },
- "probot": {
-   "apps": [
-     "probot-autoresponder",
-     "probot-settings"
-   ]
- }
-}
-```
-
 ## Error tracking
 
 Probot comes bundled with a client for the [Sentry](https://github.com/getsentry/sentry) exception tracking platform. To enable Sentry:

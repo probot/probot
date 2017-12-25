@@ -1,11 +1,13 @@
 const express = require('express')
 const sse = require('connect-sse')()
 const nock = require('nock')
-const createWebhook = require('github-webhook-handler')
+const WebhooksApi = require('@octokit/webhooks')
 const createWebhookProxy = require('../lib/webhook-proxy')
 const logger = require('../lib/logger')
 
-const webhook = createWebhook({path: '/', secret: 'test'})
+const webhook = new WebhooksApi({
+  secret: 'test'
+})
 
 describe('webhook-proxy', () => {
   let app, server, proxy, url, emit
@@ -33,17 +35,14 @@ describe('webhook-proxy', () => {
       })
     })
 
-    afterEach(() => {
-    })
-
     test('emits events with a valid signature', (done) => {
       // This test will be done when the webhook is emitted
-      webhook.on('test', () => done())
+      webhook.on('push', () => done())
 
       const body = {action: 'foo'}
 
       emit({
-        'x-github-event': 'test',
+        'x-github-event': 'push',
         'x-hub-signature': webhook.sign(JSON.stringify(body)),
         body
       })
@@ -52,7 +51,7 @@ describe('webhook-proxy', () => {
     test('does not emit events with an invalid signature', (done) => {
       // This test will be done when the webhook is emitted
       webhook.on('error', (err) => {
-        expect(err.message).toEqual('X-Hub-Signature does not match blob signature')
+        expect(err.message).toEqual('signature does not match event payload and secret')
         done()
       })
 

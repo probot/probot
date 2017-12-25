@@ -61,7 +61,9 @@ describe('Robot', function () {
         expect(output[0]).toEqual(
           expect.objectContaining({
             msg: 'testing',
-            id: context.id
+            event: expect.objectContaining({
+              id: '123'
+            })
           })
         )
       })
@@ -85,15 +87,17 @@ describe('Robot', function () {
       }
 
       expect(output[0]).toEqual(expect.objectContaining({
-        id: event.id,
         err: expect.objectContaining({
-          message: 'test error'
+          message: 'test error',
+          event: expect.objectContaining({
+            id: '123'
+          })
         })
       }))
     })
 
     it('logs when handler returns a rejected promise', async () => {
-      robot.on('push', () => Promise.reject('rejected promise'))
+      robot.on('push', () => Promise.reject(new Error('rejected promise')))
 
       try {
         await robot.receive(event)
@@ -102,9 +106,11 @@ describe('Robot', function () {
       }
 
       expect(output[0]).toEqual(expect.objectContaining({
-        id: event.id,
         err: expect.objectContaining({
-          message: 'rejected promise'
+          message: 'rejected promise',
+          event: expect.objectContaining({
+            id: '123'
+          })
         })
       }))
     })

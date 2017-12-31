@@ -1,24 +1,22 @@
 {
-    "compilerOptions": {
-      "allowJs": true,
-      "module": "commonjs",
-      "moduleResolution": "node",
-      "target": "es5",
-      "noImplicitReturns": true,
-      "noFallthroughCasesInSwitch": true,
-      "noUnusedLocals": true,
-      "strict": true,
-      "sourceMap": true,
-      "outDir": "./build",
-      "types" : [ "jest", "node", "express" ],
-      "typeRoots": [ "./node_modules/@types" ]
-    },
-    "exclude": [
-        "node_modules",
-        "build"
-    ],
-    "include": [
-        "lib/**/*"
-    ],
-    "compileOnSave": false
+  "compilerOptions": {
+    "allowJs": true,
+    "lib": ["es2017"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "es5",
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "strict": true,
+    "sourceMap": true,
+    "outDir": "./lib",
+    "skipLibCheck": true,
+    "noImplicitAny": false, // remove this once we've added all types
+    "declaration": false // enable this once all files are .ts and we can remove allowJs
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "compileOnSave": false
 }

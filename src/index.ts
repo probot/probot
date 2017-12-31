@@ -18,7 +18,7 @@ const defaultApps = [
   require('./plugins/default')
 ]
 
-module.exports = (options = {}) => {
+module.exports = (options: any = {}) => {
   const webhook = createWebhook({path: options.webhookPath || '/', secret: options.secret || 'development'})
   const app = createApp({
     id: options.id,
@@ -35,10 +35,10 @@ module.exports = (options = {}) => {
   // Log all webhook errors
   webhook.on('error', logger.error.bind(logger))
 
-  const robots = []
+  const robots: any = []
 
   function receive (event) {
-    return Promise.all(robots.map(robot => robot.receive(event)))
+    return Promise.all(robots.map((robot: any) => robot.receive(event)))
   }
 
   function load (plugin) {

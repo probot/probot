@@ -1,7 +1,7 @@
 const request = require('supertest')
 const express = require('express')
 const nock = require('nock')
-const plugin = require('../../lib/plugins/stats')
+const plugin = require('../../src/plugins/stats')
 
 const helper = require('./helper')
 

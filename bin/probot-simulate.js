@@ -5,7 +5,7 @@ require('dotenv').config({silent: true})
 
 const path = require('path')
 const program = require('commander')
-const {findPrivateKey} = require('../lib/private-key')
+const {findPrivateKey} = require('../src/private-key')
 
 program
   .usage('[options] <event-name> <path/to/payload.json> [path/to/app.js...]')

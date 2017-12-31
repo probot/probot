@@ -7,4 +7,6 @@ out
 tmp
 package-lock.json
 coverage
-build
+lib
+.idea
+yarn.lock

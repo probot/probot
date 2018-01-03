@@ -117,7 +117,7 @@ describe('Probot', () => {
 
     it('responds with 500 on async error', async() => {
       probot.server.get('/boom', () => {
-        return Promise.reject('boom')
+        return Promise.reject(new Error('boom'))
       })
 
       await request(probot.server).get('/boom').expect(500)

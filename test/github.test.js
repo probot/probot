@@ -1,5 +1,6 @@
 const EnhancedGitHubClient = require('../lib/github')
 const nock = require('nock')
+const Bottleneck = require('bottleneck')
 
 describe('EnhancedGitHubClient', () => {
   let github
@@ -11,6 +12,9 @@ describe('EnhancedGitHubClient', () => {
     }
 
     github = new EnhancedGitHubClient({ logger })
+
+    // Set a shorter limiter, otherwise tests are _slow_
+    github.limiter = new Bottleneck(1, 1)
   })
 
   describe('paginate', () => {
@@ -43,9 +47,11 @@ describe('EnhancedGitHubClient', () => {
     })
 
     it('returns an array of pages', async () => {
-      const res = await github.paginate(github.issues.getForRepo({ owner: 'JasonEtco', repo: 'pizza', per_page: 1 }))
+      const spy = jest.fn()
+      const res = await github.paginate(github.issues.getForRepo({ owner: 'JasonEtco', repo: 'pizza', per_page: 1 }), spy)
       expect(Array.isArray(res)).toBeTruthy()
       expect(res.length).toBe(5)
+      expect(spy).toHaveBeenCalledTimes(5)
     })
 
     it('stops iterating if the done() function is called in the callback', async () => {

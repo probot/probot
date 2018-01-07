@@ -6,14 +6,14 @@ next: docs/development.md
 
 A Probot app is just a [Node.js module](https://nodejs.org/api/modules.html) that exports a function:
 
-To install node (Mac OS X)
+To install Node.js (Mac OS X)
  * Install [homebrew](https://brew.sh/)
  * `brew install node`
 
-After installing node:
+After installing Node:
  * `npm install probot`
 
-Integrate Probot into your awesome node application:
+Integrate Probot into your awesome Node application:
 
 ```js
 module.exports = robot => {

@@ -3,6 +3,8 @@ coverage:
     project:
       # Fail the status if coverage drops by >= 3%
       threshold: 3
+    patch:
+      threshold: 3
 
 comment:
   layout: "diff"

@@ -37,7 +37,7 @@ describe('EnhancedGitHubClient', () => {
         .get('/repositories/123/issues?per_page=1&page=4').reply(200, issues[3], {
           link: '<https://api.github.com/repositories/123/issues?per_page=1&page=5>; rel="next"'
         })
-        .get('/repositories/123/issues?per_page=1&page=5').reply(200, issues[3], {
+        .get('/repositories/123/issues?per_page=1&page=5').reply(200, issues[4], {
           link: ''
         })
     })
@@ -48,10 +48,13 @@ describe('EnhancedGitHubClient', () => {
       expect(res.length).toBe(5)
     })
 
-    it('calls the callback every time', async () => {
-      const spy = jest.fn(() => Promise.resolve())
-      await github.paginate(github.issues.getForRepo({ owner: 'JasonEtco', repo: 'pizza', per_page: 1 }), spy)
-      expect(spy).toHaveBeenCalledTimes(5)
+    it('stops iterating if the done() function is called in the callback', async () => {
+      const spy = jest.fn((res, done) => {
+        if (res.data.id === 2) done()
+      })
+      const res = await github.paginate(github.issues.getForRepo({ owner: 'JasonEtco', repo: 'pizza', per_page: 1 }), spy)
+      expect(res.length).toBe(3)
+      expect(spy).toHaveBeenCalledTimes(3)
     })
   })
 })

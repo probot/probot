@@ -1,6 +1,6 @@
 {
   "name": "probot",
-  "version": "0.0.0-development",
+  "version": "4.0.0",
   "description": "a trainable robot that responds to activity on GitHub",
   "repository": "https://github.com/probot/probot",
   "main": "lib/index.js",
@@ -12,8 +12,7 @@
     "test": "jest --coverage && standard && npm run doc-lint",
     "doc-lint": "standard docs/**/*.md",
     "doc": "jsdoc -c .jsdoc.json",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
-    "postsemantic-release": "script/publish-docs"
+    "postpublish": "script/publish-docs"
   },
   "jest": {
     "setupFiles": [
@@ -52,7 +51,6 @@
     "jsdoc-strip-async-await": "^0.1.0",
     "minami": "^1.1.1",
     "nock": "^9.0.19",
-    "semantic-release": "^8.0.3",
     "standard": "^10.0.3",
     "supertest": "^3.0.0"
   },

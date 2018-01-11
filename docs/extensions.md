@@ -12,14 +12,16 @@ While Probot doesn't have an official extension API (yet), there are a handful o
 
 
 ```js
-const getConfig = require('probot-config');
+const getConfig = require('probot-config')
 
 module.exports = robot => {
   robot.on('push', context => {
     // Will look for 'test.yml' inside the '.github' folder
-    const config = getConfig(context, 'test.yml');
-  });
-};
+    const config = getConfig(context, 'test.yml')
+
+    context.log(config, 'Loaded config')
+  })
+}
 ```
 
 Use the `_extends` option in your configuration file to extend settings from another repository.

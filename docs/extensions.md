@@ -15,7 +15,7 @@ While Probot doesn't have an official extension API (yet), there are a handful o
 const getConfig = require('probot-config')
 
 module.exports = robot => {
-  robot.on('push', context => {
+  robot.on('push', async context => {
     // Will look for 'test.yml' inside the '.github' folder
     const config = await getConfig(context, 'test.yml')
 

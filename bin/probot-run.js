@@ -11,7 +11,7 @@ program
   .usage('[options] <apps...>')
   .option('-p, --port <n>', 'Port to start the server on', process.env.PORT || 3000)
   .option('-t, --tunnel <subdomain>', 'Expose your local bot to the internet', process.env.SUBDOMAIN || process.env.NODE_ENV !== 'production')
-  .option('-W, --webhook-proxy <url>', 'URL of the webhook proxy service.`', process.env.WEBHOOK_PROXY_URL)
+  .option('-c, --channel <channel>', 'Channel from smee.io', process.env.SMEE_CHANNEL)
   .option('-w, --webhook-path <path>', 'URL path which receives webhooks. Ex: `/webhook`', process.env.WEBHOOK_PATH)
   .option('-a, --app <id>', 'ID of the GitHub App', process.env.APP_ID)
   .option('-s, --secret <secret>', 'Webhook secret of the GitHub App', process.env.WEBHOOK_SECRET)
@@ -35,7 +35,7 @@ const probot = createProbot({
   cert: program.privateKey,
   port: program.port,
   webhookPath: program.webhookPath,
-  webhookProxy: program.webhookProxy
+  channel: program.channel
 })
 
 if (!program.webhookProxy && program.tunnel && !process.env.DISABLE_TUNNEL) {

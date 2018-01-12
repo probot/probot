@@ -6,6 +6,42 @@ next: docs/deployment.md
 
 While Probot doesn't have an official extension API (yet), there are a handful of reusable utilities that have been extracted from existing apps.
 
+## Config
+
+[probot-config](https://github.com/getsentry/probot-config) is an extension for sharing configs between between repositories.
+
+
+```js
+const getConfig = require('probot-config')
+
+module.exports = robot => {
+  robot.on('push', context => {
+    // Will look for 'test.yml' inside the '.github' folder
+    const config = await getConfig(context, 'test.yml')
+
+    context.log(config, 'Loaded config')
+  })
+}
+```
+
+Use the `_extends` option in your configuration file to extend settings from another repository.
+
+For example, given `.github/test.yml`:
+
+```yaml
+_extends: probot-settings
+# Override values from the extended config or define new values
+name: myrepo
+```
+
+This configuration will be merged with the `.github/test.yml` file from the `github-settings` repository, which might look like this:
+
+```yaml
+shared1: will be merged
+shared2: will also be merged
+```
+
+Just put common configuration keys in a repository within your organization. Then reference this repository from config files with the same name.
 
 ## Commands
 

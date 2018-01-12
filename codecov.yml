@@ -1,3 +1,13 @@
+coverage:
+  status:
+    project:
+      default:
+        # Fail the status if coverage drops by >= 3%
+        threshold: 3
+    patch:
+      default:
+        threshold: 3
+
 comment:
-  # only post the comment if coverage changes
-  require_changes: true
+  layout: diff
+  require_changes: yes

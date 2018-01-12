@@ -9,5 +9,5 @@ coverage:
         threshold: 3
 
 comment:
-  layout: "diff"
+  layout: diff
   require_changes: yes

@@ -40,7 +40,7 @@ const probot = createProbot({
 
 if (!program.webhookProxy && program.tunnel) {
   // TOOD: Remove for the 6.0.0 release
-  console.warn('[DEPRECATED] localtunnel support has been removed. See {URL}')
+  console.warn('[DEPRECATED] localtunnel support has been removed. See https://github.com/probot/probot/issues/391')
 }
 
 pkgConf('probot').then(pkg => {

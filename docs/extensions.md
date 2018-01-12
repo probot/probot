@@ -17,7 +17,7 @@ const getConfig = require('probot-config')
 module.exports = robot => {
   robot.on('push', context => {
     // Will look for 'test.yml' inside the '.github' folder
-    const config = getConfig(context, 'test.yml')
+    const config = await getConfig(context, 'test.yml')
 
     context.log(config, 'Loaded config')
   })

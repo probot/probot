@@ -64,7 +64,10 @@ Glitch lets you host node applications for free and edit them directly in your b
 
 Enjoy!
 
-**Bonus:** You can deploy your app using [glitch-deploy](https://github.com/gr2m/glitch-deploy) directly from your terminal or as [continuous deployment](https://github.com/gr2m/glitch-deploy#deploy-from-ci).
+**Bonus:** You can deploy your app using following modules:
+
+- [gr2m/glitch-deploy](https://github.com/gr2m/glitch-deploy) ... CLI to deploy a GitHub repository to glitch.com
+- [sotayamashita/sync-glitch-cli](https://github.com/sotayamashita/sync-glitch-cli) ... Sync changes in your GitHub repository to glitch.com
 
 ### Heroku
 

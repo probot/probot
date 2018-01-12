@@ -10,7 +10,7 @@ const {findPrivateKey} = require('../lib/private-key')
 program
   .usage('[options] <apps...>')
   .option('-p, --port <n>', 'Port to start the server on', process.env.PORT || 3000)
-  .option('-t, --tunnel <subdomain>', 'Deprecated: localtunnel is no longer supported', process.env.SUBDOMAIN)
+  .option('-t, --tunnel <subdomain>', 'Deprecated: localtunnel support has been removed', process.env.SUBDOMAIN)
   .option('-W, --webhook-proxy <url>', 'URL of the webhook proxy service.`', process.env.WEBHOOK_PROXY_URL)
   .option('-w, --webhook-path <path>', 'URL path which receives webhooks. Ex: `/webhook`', process.env.WEBHOOK_PATH)
   .option('-a, --app <id>', 'ID of the GitHub App', process.env.APP_ID)

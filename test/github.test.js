@@ -14,7 +14,7 @@ describe('EnhancedGitHubClient', () => {
     github = new EnhancedGitHubClient({ logger })
 
     // Set a shorter limiter, otherwise tests are _slow_
-    github.limiter = new Bottleneck(1, 1)
+    github.limiter = new Bottleneck({ maxConcurrent: 1, minTime: 1 })
   })
 
   describe('paginate', () => {

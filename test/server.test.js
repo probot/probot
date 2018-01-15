@@ -1,6 +1,7 @@
 const request = require('supertest')
-const createServer = require('../lib/server')
-const logger = require('../lib/logger')
+const { createServer, createLogger } = require('probot')
+
+const logger = createLogger()
 
 describe('server', function () {
   let server

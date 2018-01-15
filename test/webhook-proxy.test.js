@@ -1,9 +1,9 @@
 const express = require('express')
 const sse = require('connect-sse')()
 const nock = require('nock')
-const createWebhookProxy = require('../lib/webhook-proxy')
-const logger = require('../lib/logger')
+const { createWebhookProxy, createLogger } = require('probot')
 
+const logger = createLogger()
 const targetPort = 999999
 
 describe('webhook-proxy', () => {

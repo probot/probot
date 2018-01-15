@@ -1,9 +1,9 @@
 // Built-in plugin to expose stats about the deployment
-module.exports = async robot => {
+module.exports = async (robot: any): Promise<void> => {
   const REFRESH_INTERVAL = 60 * 60 * 1000
 
   // Cache of stats that get reported
-  const stats = {installations: 0, popular: []}
+  let stats = {installations: 0, popular: [{}]}
 
   // Refresh the stats when the plugin is loaded
   const initializing = refresh()
@@ -31,8 +31,8 @@ module.exports = async robot => {
     return github.paginate(req, res => res.data)
   }
 
-  async function popularInstallations (installations) {
-    let popular = await Promise.all(installations.map(async installation => {
+  async function popularInstallations (installations): Promise<Array<PopularType>> {
+    let popular: PopularType[] = await Promise.all<PopularType>(installations.map(async (installation) => {
       const github = await robot.auth(installation.id)
 
       const req = github.apps.getInstallationRepositories({per_page: 100})
@@ -51,4 +51,8 @@ module.exports = async robot => {
     popular = popular.filter(installation => installation.stars > 0)
     return popular.sort((a, b) => b.stars - a.stars).slice(0, 10)
   }
+}
+
+interface PopularType {
+  stars: number
 }

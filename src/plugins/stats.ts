@@ -3,7 +3,7 @@ module.exports = async (robot: any): Promise<void> => {
   const REFRESH_INTERVAL = 60 * 60 * 1000
 
   // Cache of stats that get reported
-  let stats = {installations: 0, popular: [{}]}
+  const stats = {installations: 0, popular: [{}]}
 
   // Refresh the stats when the plugin is loaded
   const initializing = refresh()
@@ -25,18 +25,18 @@ module.exports = async (robot: any): Promise<void> => {
     stats.popular = await popularInstallations(installations)
   }
 
-  async function getInstallations () {
+  async function getInstallations (): Promise<Installation[]> {
     const github = await robot.auth()
     const req = github.apps.getInstallations({per_page: 100})
     return github.paginate(req, res => res.data)
   }
 
-  async function popularInstallations (installations): Promise<Array<PopularType>> {
-    let popular: PopularType[] = await Promise.all<PopularType>(installations.map(async (installation) => {
+  async function popularInstallations (installations: Installation[]): Promise<Account[]> {
+    let popular = await Promise.all(installations.map(async (installation) => {
       const github = await robot.auth(installation.id)
 
       const req = github.apps.getInstallationRepositories({per_page: 100})
-      const repositories = await github.paginate(req, res => {
+      const repositories: Repository[] = await github.paginate(req, res => {
         return res.data.repositories.filter(repository => !repository.private)
       })
       const account = installation.account
@@ -53,6 +53,16 @@ module.exports = async (robot: any): Promise<void> => {
   }
 }
 
-interface PopularType {
+interface Installation {
+  id: number,
+  account: Account
+}
+
+interface Account {
   stars: number
+}
+
+interface Repository {
+  private: boolean,
+  stargazers_count: number
 }

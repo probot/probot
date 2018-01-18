@@ -4,6 +4,7 @@
 [pr]: https://github.com/probot/probot/compare
 [style]: https://standardjs.com/
 [code-of-conduct]: CODE_OF_CONDUCT.md
+[good-first-issue-search]: https://github.com/search?utf8=%E2%9C%93&q=topic%3Aprobot+topic%3Aprobot-app+good-first-issues%3A%3E0&type=
 
 Hi there! We're thrilled that you'd like to contribute to this project. Your help is essential for keeping it great.
 
@@ -27,6 +28,10 @@ Here are a few things you can do that will increase the likelihood of your pull 
 - Write a [good commit message](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html).
 
 Work in Progress pull requests are also welcome to get feedback early on, or if there is something that blocked you.
+
+### Just starting out? Looking for how to help?
+
+Use [this search][good-first-issue-search] to find Probot apps that have issues marked with the `good-first-issue` label.
 
 ## Resources
 

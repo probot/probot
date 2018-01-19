@@ -23,6 +23,7 @@
   "author": "Brandon Keepers",
   "license": "ISC",
   "dependencies": {
+    "@octokit/rest": "14.0.7",
     "bottleneck": "^1.16.0",
     "bunyan": "^1.8.12",
     "bunyan-format": "^0.2.1",
@@ -32,7 +33,6 @@
     "dotenv": "~4.0.0",
     "express": "^4.16.2",
     "express-async-errors": "^2.1.0",
-    "github": "^12.0.3",
     "github-webhook-handler": "^0.7.0",
     "hbs": "^4.0.1",
     "js-yaml": "^3.9.1",

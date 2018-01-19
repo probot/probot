@@ -19,7 +19,7 @@ describe('stats', function () {
        .defaultReplyHeaders({'Content-Type': 'application/json'})
        .post('/installations/1/access_tokens').reply(200, {token: 'test'})
        .get('/app/installations?per_page=100').reply(200, [{id: 1, account: {login: 'testing'}}])
-       .get('/installation/repositories').reply(200, {repositories: [
+       .get('/installation/repositories?per_page=100').reply(200, {repositories: [
          {private: true, stargazers_count: 1},
          {private: false, stargazers_count: 2}
        ]})

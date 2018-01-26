@@ -13,5 +13,5 @@ To save a copy of the payload, go to the  [settings](https://github.com/settings
 Next, simulate this event being delivered by running:
 
 ```
-$ node_modules/.bin/probot simulate issues test/fixtures/issues.labeled.json ./index.js
+$ node_modules/.bin/probot simulate pull_request test/fixtures/pull_request.labeled.json ./index.js
 ```

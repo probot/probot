@@ -9,8 +9,9 @@ newIssueWelcomeComment: >
 # Configuration for new-pr-welcome - https://github.com/behaviorbot/new-pr-welcome
 # Comment to be posted to on PRs from first time contributors in your repository
 newPRWelcomeComment: >
-  Thanks for opening this pull request! Please check out our [contributing guidelines](https://github.com/probot/probot/blob/master/CONTRIBUTING.md). <br>
-  ![Woo!](https://media.giphy.com/media/t5J2yBFaM1464/giphy.gif)
+  Thanks for opening this pull request! Please check out our [contributing guidelines](https://github.com/probot/probot/blob/master/CONTRIBUTING.md).
+  <br>
+  <img width="200" src="https://media.giphy.com/media/t5J2yBFaM1464/giphy.gif" />
 
 # Configuration for first-pr-merge - https://github.com/behaviorbot/first-pr-merge
 # Comment to be posted to on pull requests merged by a first time user

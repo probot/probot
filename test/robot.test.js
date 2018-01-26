@@ -1,56 +1,53 @@
-const expect = require('expect')
 const Context = require('../lib/context')
 const createRobot = require('../lib/robot')
+const logger = require('../lib/logger')
 
 describe('Robot', function () {
   let robot
   let event
-  let spy
+  let output
+
+  beforeAll(() => {
+    // Add a new stream for testing the logger
+    // https://github.com/trentm/node-bunyan#adding-a-stream
+    logger.addStream({
+      level: 'trace',
+      type: 'raw',
+      stream: {write: log => output.push(log)}
+    })
+  })
 
   beforeEach(function () {
+    // Clear log output
+    output = []
+
     robot = createRobot()
     robot.auth = () => {}
 
     event = {
+      id: '123-456',
       event: 'test',
       payload: {
         action: 'foo',
         installation: {id: 1}
       }
     }
-
-    spy = expect.createSpy()
-  })
-
-  describe('constructor', () => {
-    it('takes a logger', () => {
-      const logger = {
-        trace: expect.createSpy(),
-        debug: expect.createSpy(),
-        info: expect.createSpy(),
-        warn: expect.createSpy(),
-        error: expect.createSpy(),
-        fatal: expect.createSpy()
-      }
-      robot = createRobot({logger})
-
-      robot.log('hello world')
-      expect(logger.debug).toHaveBeenCalledWith('hello world')
-    })
   })
 
   describe('on', function () {
     it('calls callback when no action is specified', async function () {
+      const spy = jest.fn()
       robot.on('test', spy)
 
-      expect(spy).toNotHaveBeenCalled()
+      expect(spy).toHaveBeenCalledTimes(0)
       await robot.receive(event)
       expect(spy).toHaveBeenCalled()
-      expect(spy.calls[0].arguments[0]).toBeA(Context)
-      expect(spy.calls[0].arguments[0].payload).toBe(event.payload)
+      expect(spy.mock.calls[0][0]).toBeInstanceOf(Context)
+      expect(spy.mock.calls[0][0].payload).toBe(event.payload)
     })
 
     it('calls callback with same action', async function () {
+      const spy = jest.fn()
       robot.on('test.foo', spy)
 
       await robot.receive(event)
@@ -58,13 +55,15 @@ describe('Robot', function () {
     })
 
     it('does not call callback with different action', async function () {
+      const spy = jest.fn()
       robot.on('test.nope', spy)
 
       await robot.receive(event)
-      expect(spy).toNotHaveBeenCalled()
+      expect(spy).toHaveBeenCalledTimes(0)
     })
 
     it('calls callback with *', async function () {
+      const spy = jest.fn()
       robot.on('*', spy)
 
       await robot.receive(event)
@@ -80,17 +79,34 @@ describe('Robot', function () {
         }
       }
 
+      const spy = jest.fn()
       robot.on(['test.foo', 'arrayTest.bar'], spy)
 
       await robot.receive(event)
       await robot.receive(event2)
-      expect(spy.calls.length).toEqual(2)
+      expect(spy.mock.calls.length).toEqual(2)
+    })
+
+    it('adds a logger on the context', async () => {
+      const handler = jest.fn().mockImplementation(context => {
+        expect(context.log).toBeDefined()
+        context.log('testing')
+
+        expect(output[0]).toEqual(expect.objectContaining({
+          msg: 'testing',
+          id: context.id
+        }))
+      })
+
+      robot.on('test', handler)
+      await robot.receive(event)
+      expect(handler).toHaveBeenCalled()
     })
   })
 
   describe('receive', () => {
     it('delivers the event', async () => {
-      const spy = expect.createSpy()
+      const spy = jest.fn()
       robot.on('test', spy)
 
       await robot.receive(event)
@@ -99,7 +115,7 @@ describe('Robot', function () {
     })
 
     it('waits for async events to resolve', async () => {
-      const spy = expect.createSpy()
+      const spy = jest.fn()
 
       robot.on('test', () => {
         return new Promise(resolve => {
@@ -134,7 +150,7 @@ describe('Robot', function () {
 
     beforeEach(() => {
       error = new Error('testing')
-      robot.log.error = expect.createSpy()
+      robot.log.error = jest.fn()
     })
 
     it('logs errors thrown from handlers', async () => {
@@ -148,9 +164,9 @@ describe('Robot', function () {
         // Expected
       }
 
-      const arg = robot.log.error.calls[0].arguments[0]
-      expect(arg.err).toBe(error)
-      expect(arg.event).toBe(event)
+      expect(output.length).toBe(1)
+      expect(output[0].err.message).toEqual('testing')
+      expect(output[0].event.id).toEqual(event.id)
     })
 
     it('logs errors from rejected promises', async () => {
@@ -162,10 +178,9 @@ describe('Robot', function () {
         // Expected
       }
 
-      expect(robot.log.error).toHaveBeenCalled()
-      const arg = robot.log.error.calls[0].arguments[0]
-      expect(arg.err).toBe(error)
-      expect(arg.event).toBe(event)
+      expect(output.length).toBe(1)
+      expect(output[0].err.message).toEqual('testing')
+      expect(output[0].event.id).toEqual(event.id)
     })
   })
 })

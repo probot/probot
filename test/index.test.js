@@ -1,5 +1,7 @@
-const expect = require('expect')
 const createProbot = require('..')
+const request = require('supertest')
+const nock = require('nock')
+const helper = require('./plugins/helper')
 
 describe('Probot', () => {
   let probot
@@ -17,15 +19,13 @@ describe('Probot', () => {
   describe('webhook delivery', () => {
     it('forwards webhooks to the robot', async () => {
       const robot = probot.load(() => {})
-      robot.receive = expect.createSpy()
+      robot.receive = jest.fn()
       probot.webhook.emit('*', event)
       expect(robot.receive).toHaveBeenCalledWith(event)
     })
   })
 
   describe('server', () => {
-    const request = require('supertest')
-
     it('prefixes paths with route name', () => {
       probot.load(robot => {
         const app = robot.route('/my-plugin')
@@ -42,6 +42,15 @@ describe('Probot', () => {
       })
 
       return request(probot.server).get('/foo').expect(200, 'foo')
+    })
+
+    it('allows you to overwrite the root path', () => {
+      probot.load(robot => {
+        const app = robot.route()
+        app.get('/', (req, res) => res.end('foo'))
+      })
+
+      return request(probot.server).get('/').expect(200, 'foo')
     })
 
     it('isolates plugins from affecting eachother', async () => {
@@ -93,21 +102,33 @@ describe('Probot', () => {
       // eslint-disable-next-line handle-callback-err
       probot.server.use((err, req, res, next) => { })
 
-      // GET requests to `/` should 404 at express level, not 400 at webhook level
-      await request(probot.server).get('/')
-        .expect(404)
-
       // POST requests to `/` should 400 b/c webhook signature will fail
       await request(probot.server).post('/')
         .expect(400)
+    })
+
+    it('responds with 500 on error', async() => {
+      probot.server.get('/boom', () => {
+        throw new Error('boom')
+      })
+
+      await request(probot.server).get('/boom').expect(500)
+    })
+
+    it('responds with 500 on async error', async() => {
+      probot.server.get('/boom', () => {
+        return Promise.reject(new Error('boom'))
+      })
+
+      await request(probot.server).get('/boom').expect(500)
     })
   })
 
   describe('receive', () => {
     it('forwards events to each plugin', async () => {
-      const spy = expect.createSpy()
+      const spy = jest.fn()
       const robot = probot.load(robot => robot.on('push', spy))
-      robot.auth = expect.createSpy().andReturn(Promise.resolve({}))
+      robot.auth = jest.fn().mockReturnValue(Promise.resolve({}))
 
       await probot.receive(event)
 
@@ -115,20 +136,35 @@ describe('Probot', () => {
     })
   })
 
-  describe('sentry', () => {
-    afterEach(() => {
-      // Clean up env variables
-      delete process.env.SENTRY_URL
-      delete process.env.SENTRY_DSN
+  describe('ghe support', function () {
+    let robot
+
+    beforeEach(() => {
+      process.env.GHE_HOST = 'notreallygithub.com'
+
+      nock('https://notreallygithub.com/api/v3')
+       .defaultReplyHeaders({'Content-Type': 'application/json'})
+       .get('/app/installations').reply(200, ['I work!'])
+
+      robot = helper.createRobot()
     })
 
-    describe('SENTRY_DSN', () => {
-      it('configures sentry via the SENTRY_DSN ', () => {
-        process.env.SENTRY_DSN = '1233'
-        expect(() => {
-          createProbot()
-        }).toThrow(/Invalid Sentry DSN: 1233/)
-      })
+    afterEach(() => {
+      delete process.env.GHE_HOST
+    })
+
+    it('requests from the correct API URL', async () => {
+      const spy = jest.fn()
+
+      const plugin = async robot => {
+        const github = await robot.auth()
+        const res = await github.apps.getInstallations({})
+        return spy(res)
+      }
+
+      await plugin(robot)
+      await robot.receive(event)
+      expect(spy.mock.calls[0][0].data[0]).toBe('I work!')
     })
   })
 })

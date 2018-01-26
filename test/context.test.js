@@ -1,6 +1,5 @@
 const fs = require('fs')
 const path = require('path')
-const expect = require('expect')
 const Context = require('../lib/context')
 
 describe('Context', function () {
@@ -82,7 +81,7 @@ describe('Context', function () {
     beforeEach(function () {
       github = {
         repos: {
-          getContent: expect.createSpy()
+          getContent: jest.fn()
         }
       }
 
@@ -90,7 +89,7 @@ describe('Context', function () {
     })
 
     it('gets a valid configuration', async function () {
-      github.repos.getContent.andReturn(Promise.resolve(readConfig('basic.yml')))
+      github.repos.getContent = jest.fn().mockReturnValue(Promise.resolve(readConfig('basic.yml')))
       const config = await context.config('test-file.yml')
 
       expect(github.repos.getContent).toHaveBeenCalledWith({
@@ -108,7 +107,7 @@ describe('Context', function () {
     it('returns null when the file is missing', async function () {
       const error = new Error('An error occurred')
       error.code = 404
-      github.repos.getContent.andReturn(Promise.reject(error))
+      github.repos.getContent = jest.fn().mockReturnValue(Promise.reject(error))
 
       expect(await context.config('test-file.yml')).toBe(null)
     })
@@ -116,7 +115,7 @@ describe('Context', function () {
     it('returns the default config when the file is missing and default config is passed', async function () {
       const error = new Error('An error occurred')
       error.code = 404
-      github.repos.getContent.andReturn(Promise.reject(error))
+      github.repos.getContent = jest.fn().mockReturnValue(Promise.reject(error))
       const defaultConfig = {
         foo: 5,
         bar: 7,
@@ -127,7 +126,7 @@ describe('Context', function () {
     })
 
     it('throws when the configuration file is malformed', async function () {
-      github.repos.getContent.andReturn(Promise.resolve(readConfig('malformed.yml')))
+      github.repos.getContent = jest.fn().mockReturnValue(Promise.resolve(readConfig('malformed.yml')))
 
       let e
       let contents
@@ -137,13 +136,13 @@ describe('Context', function () {
         e = err
       }
 
-      expect(contents).toNotExist()
-      expect(e).toExist()
+      expect(contents).toBeUndefined()
+      expect(e).toBeDefined()
       expect(e.message).toMatch(/^end of the stream or a document separator/)
     })
 
     it('throws when loading unsafe yaml', async function () {
-      github.repos.getContent.andReturn(readConfig('evil.yml'))
+      github.repos.getContent = jest.fn().mockReturnValue(readConfig('evil.yml'))
 
       let e
       let config
@@ -153,13 +152,13 @@ describe('Context', function () {
         e = err
       }
 
-      expect(config).toNotExist()
-      expect(e).toExist()
+      expect(config).toBeUndefined()
+      expect(e).toBeDefined()
       expect(e.message).toMatch(/unknown tag/)
     })
 
     it('returns an empty object when the file is empty', async function () {
-      github.repos.getContent.andReturn(readConfig('empty.yml'))
+      github.repos.getContent = jest.fn().mockReturnValue(readConfig('empty.yml'))
 
       const contents = await context.config('test-file.yml')
 
@@ -167,7 +166,7 @@ describe('Context', function () {
     })
 
     it('overwrites default config settings', async function () {
-      github.repos.getContent.andReturn(Promise.resolve(readConfig('basic.yml')))
+      github.repos.getContent = jest.fn().mockReturnValue(Promise.resolve(readConfig('basic.yml')))
       const config = await context.config('test-file.yml', {foo: 10})
 
       expect(github.repos.getContent).toHaveBeenCalledWith({
@@ -183,7 +182,7 @@ describe('Context', function () {
     })
 
     it('uses default settings to fill in missing options', async function () {
-      github.repos.getContent.andReturn(Promise.resolve(readConfig('missing.yml')))
+      github.repos.getContent = jest.fn().mockReturnValue(Promise.resolve(readConfig('missing.yml')))
       const config = await context.config('test-file.yml', {bar: 7})
 
       expect(github.repos.getContent).toHaveBeenCalledWith({

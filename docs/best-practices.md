@@ -2,6 +2,7 @@
 
 First and foremost, your app must obey the [The Three Laws of Robotics](https://en.wikipedia.org/wiki/Three_Laws_of_Robotics):
 
+> 0. A robot may not harm humanity, or through inaction allow humanity to come to harm.
 > 1. A robot may not injure a human being or, through inaction, allow a human being to come to harm.
 > 2. A robot must obey the orders given it by human beings except where such orders would conflict with the First Law.
 > 3. A robot must protect its own existence as long as such protection does not conflict with the First or Second Laws.
@@ -57,4 +58,4 @@ Apps _should_ allow all settings to customized for each installation.
 
 ### Store configuration in the repository
 
-Any configuration _should_ be stored in the repository. Unless the app is using files from an established convention, the configuration _should_ be stored in the `.github` directory. See the [API docs for `context.config`](https://probot.github.io/probot/latest/Context.html#config).
+Any configuration _should_ be stored in the repository. Unless the app is using files from an established convention, the configuration _should_ be stored in the `.github` directory. See the [API docs for `context.config`](https://probot.github.io/api/latest/Context.html#config).

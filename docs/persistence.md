@@ -1,3 +1,7 @@
+---
+next: docs/best-practices.md
+---
+
 # Persistence
 
 Generally speaking, adding database storage or persistence to your Probot App will greatly complicate your life. It's perfectly doable, but for most use-cases you'll be able to manage relevant data within GitHub issues, pull requests and your app's configuration file.

@@ -27,46 +27,46 @@ For when you absolutely do need external data storage, here are some examples us
 ```js
 // PeopleSchema.js
 
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
-const Schema = mongoose.Schema;
+const Schema = mongoose.Schema
 
 const PeopleSchema = new Schema({
   name: {
     type: String,
-    required: true,
-  },
-});
+    required: true
+  }
+})
 
-module.exports = mongoose.model('People', PeopleSchema);
+module.exports = mongoose.model('People', PeopleSchema)
 ```
 
 ```js
 // index.js
 
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
 // Connect to the Mongo database using credentials
 // in your environment variables
-const mongoUri = `mongodb://${process.env.DB_HOST}`;
+const mongoUri = `mongodb://${process.env.DB_HOST}`
 
 mongoose.connect(mongoUri, {
   user: process.env.DB_USER,
   pass: process.env.DB_PASS,
-  useMongoClient: true,
-});
+  useMongoClient: true
+})
 
 // Register the mongoose model
-const People = require('./PeopleSchema');
+const People = require('./PeopleSchema')
 
 module.exports = robot => {
   robot.on('issues.opened', async context => {
     // Find all the people in the database
-    const people = await People.find().exec();
+    const people = await People.find().exec()
 
     // Generate a string using all the peoples' names.
     // It would look like: 'Jason, Jane, James, Jennifer'
-    const peoplesNames = people.map(person => person.name).join(', ');
+    const peoplesNames = people.map(person => person.name).join(', ')
 
     // `context` extracts information from the event, which can be passed to
     // GitHub API calls. This will return:
@@ -74,9 +74,9 @@ module.exports = robot => {
     const params = context.issue({body: `The following people are in the database: ${peoplesNames}`})
 
     // Post a comment on the issue
-    return context.github.issues.createComment(params);
-  });
-};
+    return context.github.issues.createComment(params)
+  })
+}
 ```
 
 ### MySQL
@@ -85,40 +85,40 @@ Using the [`mysql`](https://github.com/mysqljs/mysql) module, we can connect to 
 
 ```js
 // connection.js
-const mysql = require('mysql');
+const mysql = require('mysql')
 
 const connection = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
-  database: proccess.env.DB_DATABASE,
-});
+  database: process.env.DB_DATABASE
+})
 
-connection.connect();
-return connection;
+connection.connect()
+module.exports = connection
 ```
 
 ```js
 // index.js
-const connection = require('./connection');
+const connection = require('./connection')
 
-function performQuery(query) {
+function performQuery (query) {
   return new Promise((resolve, reject) => {
     connection.query(query, function (error, results, fields) {
-      if (error) reject(new Error(error));
-      resolve(results);
-    });
+      if (error) reject(new Error(error))
+      resolve(results)
+    })
   })
 }
 
 module.exports = robot => {
   robot.on('issues.opened', async context => {
     // Find all the people in the database
-    const people = await performQuery('SELECT * FROM `people`');
+    const people = await performQuery('SELECT * FROM `people`')
 
     // Generate a string using all the peoples' names.
     // It would look like: 'Jason, Jane, James, Jennifer'
-    const peoplesNames = people.map(key => people[key].name).join(', ');
+    const peoplesNames = people.map(key => people[key].name).join(', ')
 
     // `context` extracts information from the event, which can be passed to
     // GitHub API calls. This will return:
@@ -126,9 +126,9 @@ module.exports = robot => {
     const params = context.issue({body: `The following people are in the database: ${peoplesNames}`})
 
     // Post a comment on the issue
-    return context.github.issues.createComment(params);
-  });
-};
+    return context.github.issues.createComment(params)
+  })
+}
 ```
 
 ### Firebase
@@ -138,28 +138,28 @@ module.exports = robot => {
 ```js
 // index.js
 
-const firebase = require('firebase');
+const firebase = require('firebase')
 // Set the configuration for your app
 // TODO: Replace with your project's config object
 const config = {
-  apiKey: "apiKey",
-  authDomain: "projectId.firebaseapp.com",
-  databaseURL: "https://databaseName.firebaseio.com",
-};
-firebase.initializeApp(config);
+  apiKey: 'apiKey',
+  authDomain: 'projectId.firebaseapp.com',
+  databaseURL: 'https://databaseName.firebaseio.com'
+}
+firebase.initializeApp(config)
 
-const database = firebase.database();
+const database = firebase.database()
 
 module.exports = robot => {
   robot.on('issues.opened', async context => {
     // Find all the people in the database
     const people = await database.ref('/people').once('value').then((snapshot) => {
-      return snapshot.val();
-    });
+      return snapshot.val()
+    })
 
     // Generate a string using all the peoples' names.
     // It would look like: 'Jason, Jane, James, Jennifer'
-    const peoplesNames = Object.keys(people).map(key => people[key].name).join(', ');
+    const peoplesNames = Object.keys(people).map(key => people[key].name).join(', ')
 
     // `context` extracts information from the event, which can be passed to
     // GitHub API calls. This will return:
@@ -167,8 +167,8 @@ module.exports = robot => {
     const params = context.issue({body: `The following people are in the database: ${peoplesNames}`})
 
     // Post a comment on the issue
-    return context.github.issues.createComment(params);
-  });
-};
+    return context.github.issues.createComment(params)
+  })
+}
 ```
 

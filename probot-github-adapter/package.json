@@ -1,0 +1,33 @@
+{
+  "name": "@probot/github-adapter",
+  "version": "1.0.0",
+  "description": "A GitHub adapter for Probot",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest && standard"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/probot/github.git"
+  },
+  "keywords": [
+    "github",
+    "probot",
+    "probot-adapter"
+  ],
+  "author": "Brandon Keepers",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/probot/github/issues"
+  },
+  "homepage": "https://github.com/probot/github#readme",
+  "devDependencies": {
+    "jest": "^22.1.4",
+    "standard": "^10.0.3"
+  },
+  "standard": {
+    "env": [
+      "jest"
+    ]
+  }
+}

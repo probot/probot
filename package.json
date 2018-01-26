@@ -24,6 +24,7 @@
   "license": "ISC",
   "dependencies": {
     "@octokit/rest": "14.0.2",
+    "@probot/github-adapter": "./probot-github-adapter",
     "bottleneck": "^1.16.0",
     "bunyan": "^1.8.12",
     "bunyan-format": "^0.2.1",

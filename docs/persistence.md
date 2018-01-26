@@ -131,8 +131,6 @@ module.exports = robot => {
 };
 ```
 
-### Redis
-
 ### Firebase
 
 [Firebase](https://firebase.google.com/) is Google's services-as-a-service that includes a simple JSON database. You can learn more about dealing with the Javascript API [here](https://firebase.google.com/docs/database/web/start). Note that for security purposes, you may also want to look into the [Admin API](https://firebase.google.com/docs/database/admin/start).

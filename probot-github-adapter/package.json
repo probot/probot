@@ -23,7 +23,10 @@
   "homepage": "https://github.com/probot/github#readme",
   "devDependencies": {
     "jest": "^22.1.4",
-    "standard": "^10.0.3"
+    "nock": "^9.1.6",
+    "probot": "..",
+    "standard": "^10.0.3",
+    "supertest": "^3.0.0"
   },
   "standard": {
     "env": [

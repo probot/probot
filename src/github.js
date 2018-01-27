@@ -42,11 +42,16 @@ class EnhancedGitHubClient extends GitHubApi {
 
   async paginate (responsePromise, callback = defaultCallback) {
     let collection = []
+    let getNextPage = true
+    let done = () => {
+      getNextPage = false
+    }
     let response = await responsePromise
-    collection = collection.concat(await callback(response))
-    while (this.hasNextPage(response)) {
+    collection = collection.concat(await callback(response, done))
+    // eslint-disable-next-line no-unmodified-loop-condition
+    while (getNextPage && this.hasNextPage(response)) {
       response = await this.getNextPage(response)
-      collection = collection.concat(await callback(response))
+      collection = collection.concat(await callback(response, done))
     }
     return collection
   }

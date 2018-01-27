@@ -6,6 +6,7 @@ const createServer = require('./server')
 const createWebhookProxy = require('./webhook-proxy')
 const resolve = require('./resolver')
 const logger = require('./logger')
+const logRequestErrors = require('./middleware/log-request-errors')
 
 const cache = cacheManager.caching({
   store: 'memory',
@@ -18,8 +19,11 @@ const defaultApps = [
   require('./plugins/default')
 ]
 
-module.exports = (options: any = {}) => {
-  const webhook = createWebhook({path: options.webhookPath || '/', secret: options.secret || 'development'})
+module.exports = (options = {}) => {
+  options.webhookPath = options.webhookPath || '/'
+  options.secret = options.secret || 'development'
+
+  const webhook = createWebhook({path: options.webhookPath, secret: options.secret})
   const app = createApp({
     id: options.id,
     cert: options.cert
@@ -64,6 +68,9 @@ module.exports = (options: any = {}) => {
 
     // Load the given apps along with the default apps
     apps.concat(defaultApps).forEach(app => load(app))
+
+    // Register error handler as the last middleware
+    server.use(logRequestErrors)
   }
 
   return {
@@ -76,11 +83,16 @@ module.exports = (options: any = {}) => {
 
     start () {
       if (options.webhookProxy) {
-        createWebhookProxy({url: options.webhookProxy, webhook, logger})
+        createWebhookProxy({
+          url: options.webhookProxy,
+          port: options.port,
+          path: options.webhookPath,
+          logger
+        })
       }
 
       server.listen(options.port)
-      logger.trace('Listening on http://localhost:' + options.port)
+      logger.info('Listening on http://localhost:' + options.port)
     }
   }
 }

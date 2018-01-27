@@ -19,7 +19,7 @@ const defaultApps = [
   require('./plugins/default')
 ]
 
-module.exports = (options = {}) => {
+module.exports = (options: any = {}) => {
   options.webhookPath = options.webhookPath || '/'
   options.secret = options.secret || 'development'
 

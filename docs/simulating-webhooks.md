@@ -14,7 +14,7 @@ To save a copy of the payload, go to the  [settings](https://github.com/settings
 
 Next, simulate this event being delivered by running:
 
-     $ node_modules/.bin/probot simulate <event-name> <path-to-fixture> <path-to-app>
+    $ node_modules/.bin/probot simulate <event-name> <path-to-fixture> <path-to-app>
 
 Note that `event-name` here is just the name of the event (like pull_request or issues) and not the action (like labeled). For example, to simulate the pull_request.labeled event, run:
 

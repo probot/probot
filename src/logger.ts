@@ -26,8 +26,8 @@
  */
 
 const Logger = require('bunyan')
-const bunyanFormat = require('bunyan-format')
-const serializers = require('./serializers')
+import * as bunyanFormat from 'bunyan-format'
+import * as serializers from './serializers'
 
 // Return a function that defaults to "info" level, and has properties for
 // other levels:
@@ -52,10 +52,13 @@ Logger.prototype.wrap = function () {
   return fn
 }
 
+const LOG_LEVEL: 'info' | 'fatal' | 'debug' | 'error' | 'warn' | 'trace' | undefined = process.env.LOG_LEVEL
+const LOG_MODE: 'short' | 'long' | 'simple' | 'json' | 'bunyan' | undefined = process.env.LOG_MODE
+
 const logger = new Logger({
   name: 'probot',
-  level: process.env.LOG_LEVEL || 'info',
-  stream: bunyanFormat({outputMode: process.env.LOG_FORMAT || 'short'}),
+  level: LOG_LEVEL || 'info',
+  stream: new bunyanFormat({outputMode: LOG_MODE || 'short'}),
   serializers
 })
 

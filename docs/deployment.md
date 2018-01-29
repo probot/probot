@@ -1,5 +1,5 @@
 ---
-next: docs/best-practices.md
+next: docs/persistence.md
 ---
 
 # Deployment
@@ -112,15 +112,26 @@ Zeit [Now](http://zeit.co/now) is a great service for running Probot apps. After
 
 1. Clone the app that you want to deploy. e.g. `git clone https://github.com/probot/stale`
 
+1. Due to an [ongoing issue](https://github.com/zeit/now-cli/issues/749) in `now.sh`, a workaround must be applied to the private key before it can be used.
+    * You can [modify `package.json`](https://github.com/probot/probot/issues/318#issuecomment-343010573) and base64 encode your private key.
+    * You can concatenate a `\n` onto each line of the private key, and then merge the private key onto a single line. Then, you can follow the deploy script without modifying `package.json`.
+
 1. Run `now` to deploy, replacing the `APP_ID` and `WEBHOOK_SECRET` with the values for those variables, and setting the path for the `PRIVATE_KEY`:
 
         $ now -e APP_ID=aaa \
             -e WEBHOOK_SECRET=bbb \
+            -e NODE_ENV=production \
             -e PRIVATE_KEY="$(cat ~/Downloads/*.private-key.pem)"
 
 1. Once the deploy is started, go back to your [app settings page](https://github.com/settings/apps) and update the **Webhook URL** to the URL of your deployment (which `now` has kindly copied to your clipboard).
 
-Your app should be up and running!
+1. Your app should be up and running! For long term use, create an alias for your robot. After making an alias, you can swap to new deploy URLs with no downtime.
+
+        $ now alias set https://your-generated-url.now.sh https://a-fancier-url.now.sh
+
+1. You can also keep your app running forever, with instant response to webhooks with:
+
+        $ now scale https://a-fancier-url.now.sh 1
 
 ## Combining apps
 
@@ -150,6 +161,6 @@ To deploy a bot that includes multiple apps, create a new app that has the apps 
 
 Probot comes bundled with a client for the [Sentry](https://github.com/getsentry/sentry) exception tracking platform. To enable Sentry:
 
-  1. [Create a Sentry.io Account](https://sentry.io/signup/) (with [10k events/month free](https://sentry.io/pricing/)) or [host your own instance](https://github.com/getsentry/sentry) (Students can get [extra Sentry credit](https://education.github.com/pack))
+  1. [Install Sentry from Marketplace](https://github.com/marketplace/sentry) (with [10k events/month free](https://github.com/marketplace/sentry/plan/MDIyOk1hcmtldHBsYWNlTGlzdGluZ1BsYW40Nw==#pricing-and-setup)) or [host your own instance](https://github.com/getsentry/sentry) (Students can get [extra Sentry credit](https://education.github.com/pack))
   2. Follow the setup instructions to find your DSN.
   3. Set the `SENTRY_DSN` environment variable with the DSN you retrieved.

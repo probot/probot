@@ -1,12 +1,13 @@
 process.env.LOG_LEVEL = process.env.LOG_LEVEL || 'fatal'
 const request = require('supertest')
 const nock = require('nock')
+const path = require('path')
 
 const createProbot = require('probot')
 
 const payload = require('../test/fixtures/webhook/push')
 const fixture = JSON.stringify(payload, null, 2)
-const cert = require('fs').readFileSync('../test/fixtures/private-key.pem')
+const cert = require('fs').readFileSync(path.join(__dirname, '../test/fixtures/private-key.pem'))
 
 nock.enableNetConnect(/127\.0\.0\.1/)
 

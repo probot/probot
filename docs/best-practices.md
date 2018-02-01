@@ -38,13 +38,13 @@ Your bot should be empathetic, but it shouldn't pretend to be human. It is a bot
 
 Being installed on an account is sufficient permission for actions in response to a user action, like replying on a single issue. But a app _must_ have explicit permission before performing bulk actions, like labeling all open issues.
 
-For example, the [stale](https://github.com/probot/stale) app will only scan a repository for stale issues and pull requests if `.github/stale.yml` exists in the repository.
+For example, the [stale](https://github.com/probot/stale) app will only scan a target repository for stale issues and pull requests if `.github/stale.yml` exists in that target repository.
 
 ### Include "dry run" functionality
 
 A dry run is when a app, instead of actually taking an action, only logs what actions it would have taken if it wasn't a dry run. A app _must_ offer a dry run feature if it does anything destructive and _should_ offer a dry run feature in all cases.
 
-For example, the [stale](https://github.com/probot/stale) app will perform a dry run if there is no `.github/stale.yml` file in the repository.
+For example, the [stale](https://github.com/probot/stale) app will perform a dry run if there is no `.github/stale.yml` file in the target repository.
 
 ## Configuration
 

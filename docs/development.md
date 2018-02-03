@@ -56,7 +56,8 @@ The most important files note here are `index.js`, which is where the code for y
 
 To run your app in development, you will need to configure a GitHub App to deliver webhooks to your local machine.
 
-1. Go to [smee.io](https://smee.io) and click **Start a new channel**. Set `WEBHOOK_PROXY_URL` in your `.env` to the URL that you are redirected to.
+1. On your local machine, copy `.env.example` to `.env`.
+1. Go to [smee.io](https://smee.io) and click **Start a new channel**. Set `WEBHOOK_PROXY_URL` in `.env` to the URL that you are redirected to.
 1. [Create a new GitHub App](https://github.com/settings/apps/new) with:
     - **Webhook URL**: Use your `WEBHOOK_PROXY_URL` from the previous step.
     - **Webhook Secret:** `development`

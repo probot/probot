@@ -24,7 +24,7 @@
   "license": "ISC",
   "dependencies": {
     "@octokit/rest": "14.0.8",
-    "bottleneck": "^1.16.0",
+    "bottleneck": "^2.0.0",
     "bunyan": "^1.8.12",
     "bunyan-format": "^0.2.1",
     "bunyan-sentry-stream": "^1.1.0",

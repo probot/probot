@@ -1,5 +1,5 @@
 ---
-next: docs/best-practices.md
+next: docs/persistence.md
 ---
 
 # Deployment

@@ -63,4 +63,9 @@ describe('EnhancedGitHubClient', () => {
       expect(spy).toHaveBeenCalledTimes(3)
     })
   })
+
+  test('properly returns 404 responses', () => {
+    nock('https://api.github.com').get('/user').reply(404, {message: 'nope'})
+    return expect(github.users.get({})).rejects.toThrow('nope')
+  })
 })

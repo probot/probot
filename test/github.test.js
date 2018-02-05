@@ -11,10 +11,10 @@ describe('EnhancedGitHubClient', () => {
       trace: jest.fn()
     }
 
-    github = new EnhancedGitHubClient({ logger })
-
     // Set a shorter limiter, otherwise tests are _slow_
-    github.limiter = new Bottleneck({ maxConcurrent: 1, minTime: 1 })
+    const limiter = new Bottleneck({ maxConcurrent: 1, minTime: 1 })
+
+    github = new EnhancedGitHubClient({ logger, limiter })
   })
 
   describe('paginate', () => {
@@ -62,5 +62,10 @@ describe('EnhancedGitHubClient', () => {
       expect(res.length).toBe(3)
       expect(spy).toHaveBeenCalledTimes(3)
     })
+  })
+
+  test('properly returns 404 responses', () => {
+    nock('https://api.github.com').get('/user').reply(404, {message: 'nope'})
+    return expect(github.users.get({})).rejects.toThrow('nope')
   })
 })

@@ -60,7 +60,7 @@ Glitch lets you host node applications for free and edit them directly in your b
    ```
    Replace the two `<...>` placeholders with the values from your app. The `.env` file cannot be accessed or seen by others.
 4. Press the `New File` button and enter `.data/private-key.pem`. Paste the content of your GitHub App’s `private-key.pem` in there and save it. Files in the `.data` folder cannot be seen or accessed by others, so your private key is safe.
-5. That’s it, your app should have already started :thumbsup: Press on the `Show` button on top and paste the URL as the value of `Webhook URL`.
+5. That’s it, your app should have already started :thumbsup: Press on the `Show` button on top and paste the URL as the value of `Webhook URL`. Ensure that you remove `/probot` from the end of the `Webhook URL` that was just pasted. 
 
 Enjoy!
 

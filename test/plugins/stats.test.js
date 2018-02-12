@@ -8,6 +8,23 @@ const helper = require('./helper')
 describe('stats', function () {
   let robot, server
 
+  const query = `query ($query: String!) {
+          search(first: 10, type: REPOSITORY, query: $query) {
+            nodes {
+              ... on Repository {
+                name
+                stargazers {
+                  totalCount
+                }
+                owner {
+                  login
+                }
+              }
+            }
+          }
+        }`
+  const variables = {"query": "org:test sort:stars stars:>=1"}
+
   beforeEach(async () => {
     nock('https://api.github.com')
      .defaultReplyHeaders({'Content-Type': 'application/json'})
@@ -17,6 +34,21 @@ describe('stats', function () {
        {private: true, stargazers_count: 1},
        {private: false, stargazers_count: 2}
      ]})
+    .post('/graphql').reply(200, {
+      "data": {
+        "search": {
+          "nodes": [
+          {
+            "name": "test-repo",
+            "stargazers": {
+              "totalCount": 2
+            },
+            "owner": {
+              "login": "test"
+            }
+          }]
+        }}
+      })
 
     robot = helper.createRobot()
 
@@ -29,7 +61,7 @@ describe('stats', function () {
   describe('GET /probot/stats', () => {
     it('returns installation count and popular accounts', () => {
       return request(server).get('/probot/stats')
-        .expect(200, {'installations': 1, 'popular': [{login: 'testing', stars: 2}]})
+        .expect(200, {'installations': 1, 'popular': { test: { stars: 2 }}})
     })
   })
 })

@@ -23,7 +23,6 @@
   "author": "Brandon Keepers",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.17.1",
     "bottleneck": "^1.16.0",
     "bunyan": "^1.8.12",
     "bunyan-format": "^0.2.1",
@@ -35,6 +34,7 @@
     "express": "^4.16.2",
     "github": "^12.0.3",
     "github-webhook-handler": "^0.7.0",
+    "graphql-request": "^1.4.1",
     "hbs": "^4.0.1",
     "jest": "^22.0.3",
     "js-yaml": "^3.9.1",

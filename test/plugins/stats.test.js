@@ -8,28 +8,10 @@ const helper = require('./helper')
 describe('stats', function () {
   let robot, server
 
-
   beforeEach(() => {
     // Clean up env variable
     delete process.env.DISABLE_STATS
   })
-  
-  const query = `query ($query: String!) {
-          search(first: 10, type: REPOSITORY, query: $query) {
-            nodes {
-              ... on Repository {
-                name
-                stargazers {
-                  totalCount
-                }
-                owner {
-                  login
-                }
-              }
-            }
-          }
-        }`
-  const variables = {"query": "org:test sort:stars stars:>=1"}
 
   describe('GET /probot/stats', () => {
     beforeEach(async () => {
@@ -42,21 +24,20 @@ describe('stats', function () {
          {private: false, stargazers_count: 2}
        ]})
        .post('/graphql').reply(200, {
-         "data": {
-           "search": {
-             "nodes": [
-             {
-               "name": "test-repo",
-               "stargazers": {
-                 "totalCount": 2
-               },
-               "owner": {
-                 "login": "test"
-               }
-             }]
+         'data': {
+           'search': {
+             'nodes': [
+               {
+                 'name': 'test-repo',
+                 'stargazers': {
+                   'totalCount': 2
+                 },
+                 'owner': {
+                   'login': 'test'
+                 }
+               }]
            }}
-         })
-
+       })
 
       robot = helper.createRobot()
 
@@ -68,7 +49,7 @@ describe('stats', function () {
 
     it('returns installation count and popular accounts', () => {
       return request(server).get('/probot/stats')
-        .expect(200, {'installations': 1, 'popular': { test: { stars: 2 }}})
+        .expect(200, {'installations': 1, 'popular': {test: { stars: 2 }}})
     })
   })
 

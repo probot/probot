@@ -14,7 +14,7 @@ class Context {
   id?: string
   github: GitHubApi
   log: LoggerWithTarget
-  payload: WebhookPayloadWithRepository
+  payload!: WebhookPayloadWithRepository
 
   constructor (event:any, github:GitHubApi, log:LoggerWithTarget) {
     Object.assign(this, event)

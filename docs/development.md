@@ -10,17 +10,10 @@ To develop a Probot app, you will first need a recent version of [Node.js](https
 
 [create-probot-app](https://github.com/probot/create-probot-app) is the best way to start building a new app. It will generate a new app with everything you need to get started and run your app in production.
 
-To get started, install the module from npm:
+To get started, run one of these commands:
 
-```
-$ npm install -g create-probot-app
-```
-
-Next, run the app:
-
-```
-$ create-probot-app my-first-app
-```
+- If you're using npm: `$ npx create-probot-app my-first-app`
+- or, if you're using Yarn: `$ yarn create probot-app my-first-app`
 
 This will ask you a series of questions about your app, which should look something like this:
 
@@ -56,7 +49,8 @@ The most important files note here are `index.js`, which is where the code for y
 
 To run your app in development, you will need to configure a GitHub App to deliver webhooks to your local machine.
 
-1. Go to [smee.io](https://smee.io) and click **Start a new channel**. Set `WEBHOOK_PROXY_URL` in your `.env` to the URL that you are redirected to.
+1. On your local machine, copy `.env.example` to `.env`.
+1. Go to [smee.io](https://smee.io) and click **Start a new channel**. Set `WEBHOOK_PROXY_URL` in `.env` to the URL that you are redirected to.
 1. [Create a new GitHub App](https://github.com/settings/apps/new) with:
     - **Webhook URL**: Use your `WEBHOOK_PROXY_URL` from the previous step.
     - **Webhook Secret:** `development`

@@ -25,41 +25,44 @@
  * robot.log.fatal("Goodbye, cruel world!");
  */
 
-const Logger = require('bunyan')
+import * as Logger from 'bunyan'
 import * as bunyanFormat from 'bunyan-format'
-import * as serializers from './serializers'
+import serializers from './serializers'
 
-// Return a function that defaults to "info" level, and has properties for
-// other levels:
-//
-//     robot.log("info")
-//     robot.log.trace("verbose details");
-//
-Logger.prototype.wrap = function () {
-  const fn = this.info.bind(this);
-
-  // Add level methods on the logger
-  ['trace', 'debug', 'info', 'warn', 'error', 'fatal'].forEach(level => {
-    fn[level] = this[level].bind(this)
-  })
-
-  // Expose `child` method for creating new wrapped loggers
-  fn.child = (attrs) => this.child(attrs, true).wrap()
-
-  // Expose target logger
-  fn.target = logger
-
-  return fn
+function toBunyanLogLevel (level: string) {
+  switch (level) {
+    case 'info':
+    case 'trace':
+    case 'debug':
+    case 'warn':
+    case 'error':
+    case 'fatal':
+    case undefined:
+      return level
+    default:
+      throw new Error('Invalid log level')
+  }
 }
 
-const LOG_LEVEL: 'info' | 'fatal' | 'debug' | 'error' | 'warn' | 'trace' | undefined = process.env.LOG_LEVEL
-const LOG_MODE: 'short' | 'long' | 'simple' | 'json' | 'bunyan' | undefined = process.env.LOG_MODE
+function toBunyanFormat (format: string) {
+  switch (format) {
+    case 'short':
+    case 'long':
+    case 'simple':
+    case 'json':
+    case 'bunyan':
+    case undefined:
+      return format
+    default:
+      throw new Error('Invalid log format')
+  }
+}
 
 const logger = new Logger({
   name: 'probot',
-  level: LOG_LEVEL || 'info',
-  stream: new bunyanFormat({outputMode: LOG_MODE || 'short'}),
+  level: toBunyanLogLevel(process.env.LOG_LEVEL || 'info'),
+  stream: new bunyanFormat({outputMode: toBunyanFormat(process.env.LOG_FORMAT || 'short')}),
   serializers
 })
 
-module.exports = logger
+export default logger

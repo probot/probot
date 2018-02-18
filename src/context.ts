@@ -1,6 +1,7 @@
-const path = require('path')
-const yaml = require('js-yaml')
-
+import * as path from 'path'
+import * as yaml from 'js-yaml'
+import * as GitHubApi from '@octokit/rest'
+import {LoggerWithTarget} from './wrap-logger'
 /**
  * Helpers for extracting information from the webhook event, which can be
  * passed to GitHub API calls.
@@ -10,7 +11,12 @@ const yaml = require('js-yaml')
  * @property {logger} log - A logger
  */
 class Context {
-  constructor (event, github, log) {
+  id?: string
+  github: GitHubApi
+  log: LoggerWithTarget
+  payload: WebhookPayloadWithRepository
+
+  constructor (event:any, github:GitHubApi, log:LoggerWithTarget) {
     Object.assign(this, event)
     this.github = github
     this.log = log
@@ -28,7 +34,7 @@ class Context {
    * // Returns: {owner: 'username', repo: 'reponame', path: '.github/stale.yml'}
    *
    */
-  repo (object) {
+  repo<T> (object: T) {
     const repo = this.payload.repository
 
     return Object.assign({
@@ -49,11 +55,11 @@ class Context {
    *
    * @param {object} [object] - Params to be merged with the issue params.
    */
-  issue (object) {
+  issue<T> (object: T) {
     const payload = this.payload
     return Object.assign({
       number: (payload.issue || payload.pull_request || payload).number
-    }, this.repo(), object)
+    }, this.repo(object))
   }
 
   /**
@@ -97,7 +103,7 @@ class Context {
    * @param {object} [defaultConfig] - An object of default config options
    * @return {Promise<Object>} - Configuration object read from the file
    */
-  async config (fileName, defaultConfig) {
+  async config<T> (fileName: string, defaultConfig: T) {
     const params = this.repo({path: path.posix.join('.github', fileName)})
 
     try {
@@ -117,4 +123,31 @@ class Context {
   }
 }
 
-module.exports = Context
+export interface PayloadRepository {
+  full_name: string
+  name: string
+  owner: {
+    login: string
+    name: string
+  }
+}
+
+interface WebhookPayloadWithRepository {
+  repository: PayloadRepository
+  issue: {
+    number: number
+  }
+  pull_request: {
+    number: number
+  }
+  sender: {
+    type: string
+  }
+  action: string
+  installation: {
+    id: string
+  }
+
+}
+
+export default Context

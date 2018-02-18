@@ -1,22 +1,10 @@
 // Borrowed from https://github.com/vvo/bunyan-request
 // Copyright (c) Christian Tellnes <christian@tellnes.no>
-import * as uuid from 'uuid'
-
-import * as Express from 'express'
-import * as Bunyan from 'bunyan'
-
-namespace Logger {
-  export interface Request extends Express.Request {
-    id: string,
-    log: Bunyan
-  }
-  export interface Response extends Express.Response {
-    duration: string
-  }
-}
+var uuid = require('uuid')
+const wrapLogger = require('../wrap-logger').default
 
 module.exports = function logRequest ({logger}) {
-  return function (req: Logger.Request, res: Logger.Response, next: Express.NextFunction) {
+  return function (req, res, next) {
     // Use X-Request-ID from request if it is set, otherwise generate a uuid
     req.id = req.headers['x-request-id'] ||
       req.headers['x-github-delivery'] ||
@@ -24,7 +12,7 @@ module.exports = function logRequest ({logger}) {
     res.setHeader('x-request-id', req.id)
 
     // Make a logger available on the request
-    req.log = logger.wrap().child({id: req.id})
+    req.log = wrapLogger(logger, logger.target).child({name: 'http', id: req.id})
 
     // Request started
     req.log.trace({req}, `${req.method} ${req.url}`)

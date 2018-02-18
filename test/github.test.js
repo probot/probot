@@ -1,4 +1,4 @@
-const EnhancedGitHubClient = require('../lib/github')
+const EnhancedGitHubClient = require('../src/github')
 const nock = require('nock')
 const Bottleneck = require('bottleneck')
 
@@ -11,10 +11,10 @@ describe('EnhancedGitHubClient', () => {
       trace: jest.fn()
     }
 
-    github = new EnhancedGitHubClient({ logger })
-
     // Set a shorter limiter, otherwise tests are _slow_
-    github.limiter = new Bottleneck(1, 1)
+    const limiter = new Bottleneck({ maxConcurrent: 1, minTime: 1 })
+
+    github = new EnhancedGitHubClient({ logger, limiter })
   })
 
   describe('paginate', () => {

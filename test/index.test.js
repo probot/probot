@@ -8,7 +8,7 @@ describe('Probot', () => {
   let event
 
   beforeEach(() => {
-    probot = createProbot()
+    probot = createProbot({})
 
     event = {
       event: 'push',

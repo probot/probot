@@ -1,7 +1,8 @@
+import * as express from 'express'
+import Context from './context'
+import logger from './logger'
+import wrapLogger, {LoggerWithTarget} from './wrap-logger'
 const {EventEmitter} = require('promise-events')
-const express = require('express')
-const Context = require('./context')
-const logger = require('./logger')
 const GitHubApi = require('./github')
 
 /**
@@ -9,17 +10,24 @@ const GitHubApi = require('./github')
  *
  * @property {logger} log - A logger
  */
-class Robot {
-  constructor ({app, cache, router, catchErrors} = {}) {
+export class Robot {
+  events: any
+  app: () => string
+  cache: RobotCache
+  router: express.Router
+  catchErrors?: boolean
+  log: LoggerWithTarget
+
+  constructor (options: RobotOptions) {
     this.events = new EventEmitter()
-    this.app = app
-    this.cache = cache
-    this.router = router || new express.Router()
-    this.log = logger.wrap()
-    this.catchErrors = catchErrors
+    this.log = wrapLogger(logger, logger)
+    this.app = options.app
+    this.cache = options.cache
+    this.catchErrors = options.catchErrors
+    this.router = options.router || express.Router()
   }
 
-  async receive (event) {
+  async receive (event: EventWithEventField) {
     return this.events.emit('*', event).then(() => {
       return this.events.emit(event.event, event)
     })
@@ -46,9 +54,9 @@ class Robot {
    * @param {string} path - the prefix for the routes
    * @returns {@link http://expressjs.com/en/4x/api.html#router|express.Router}
    */
-  route (path) {
+  route (path?: string) {
     if (path) {
-      const router = new express.Router()
+      const router = express.Router()
       this.router.use(path, router)
       return router
     } else {
@@ -83,31 +91,31 @@ class Robot {
    *   // An issue was just opened.
    * });
    */
-  on (event, callback) {
-    if (event.constructor === Array) {
-      event.forEach(e => this.on(e, callback))
-      return
-    }
+  on (event: string | Array<string>, callback: (context: Context) => void) {
+    if (typeof event === 'string') {
 
-    const [name, action] = event.split('.')
+      const [name, action] = event.split('.')
 
-    return this.events.on(name, async event => {
-      if (!action || action === event.payload.action) {
-        const log = this.log.child({id: event.id})
+      return this.events.on(name, async (event: Context) => {
+        if (!action || action === event.payload.action) {
+          const log = this.log.child({name: 'event', id: event.id})
 
-        try {
-          const github = await this.auth(event.payload.installation.id, log)
-          const context = new Context(event, github, log)
+          try {
+            const github = await this.auth(event.payload.installation.id, log)
+            const context = new Context(event, github, log)
 
-          await callback(context)
-        } catch (err) {
-          log.error({err, event})
-          if (!this.catchErrors) {
-            throw err
+            await callback(context)
+          } catch (err) {
+            log.error({err, event})
+            if (!this.catchErrors) {
+              throw err
+            }
           }
         }
-      }
-    })
+      })
+    } else {
+      event.forEach(e => this.on(e, callback))
+    }
   }
 
   /**
@@ -136,12 +144,12 @@ class Robot {
    * @returns {Promise<github>} - An authenticated GitHub API client
    * @private
    */
-  async auth (id, log = this.log) {
+  async auth (id?: string, log = this.log) {
     const github = new GitHubApi({
       debug: process.env.LOG_LEVEL === 'trace',
       host: process.env.GHE_HOST || 'api.github.com',
       pathPrefix: process.env.GHE_HOST ? '/api/v3' : '',
-      logger: log.child({installation: id})
+      logger: log.child({name: 'github', installation: id})
     })
 
     if (id) {
@@ -161,7 +169,26 @@ class Robot {
   }
 }
 
-module.exports = (...args) => new Robot(...args)
+export default (options: RobotOptions) => new Robot(options)
+
+interface EventWithEventField {
+  event: string
+}
+
+// The TypeScript definition for cache-manager does not export the Cache interface so we recreate it here
+interface RobotCache {
+  wrap<T>(key: string, wrapper: (callback: (error: any, result: T) => void) => any, options: RobotCacheConfig): Promise<any>;
+}
+interface RobotCacheConfig {
+    ttl: number;
+}
+
+interface RobotOptions {
+  app: () => string
+  cache: RobotCache
+  router?: express.Router
+  catchErrors: boolean
+}
 
 /**
  * Do the thing

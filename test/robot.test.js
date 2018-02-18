@@ -1,6 +1,6 @@
-const Context = require('../src/context')
-const createRobot = require('../src/robot')
-const logger = require('../src/logger')
+const Context = require('../src/context').default
+const createRobot = require('../src/robot').default
+const logger = require('../src/logger').default
 
 describe('Robot', function () {
   let robot
@@ -21,7 +21,7 @@ describe('Robot', function () {
     // Clear log output
     output = []
 
-    robot = createRobot()
+    robot = createRobot({})
     robot.auth = () => {}
 
     event = {

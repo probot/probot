@@ -1,11 +1,11 @@
-const cacheManager = require('cache-manager')
+import * as cacheManager from 'cache-manager'
+import createApp from './github-app'
+import createRobot, {Robot} from './robot'
+import createServer from './server'
+import resolve from './resolver'
+import logger from './logger'
+import createWebhookProxy from './webhook-proxy'
 const createWebhook = require('github-webhook-handler')
-const createApp = require('./github-app')
-const createRobot = require('./robot')
-const createServer = require('./server')
-const createWebhookProxy = require('./webhook-proxy')
-const resolve = require('./resolver')
-const logger = require('./logger')
 const logRequestErrors = require('./middleware/log-request-errors')
 
 const cache = cacheManager.caching({
@@ -19,7 +19,7 @@ const defaultApps = [
   require('./plugins/default')
 ]
 
-module.exports = (options: any = {}) => {
+module.exports = (options: Options) => {
   options.webhookPath = options.webhookPath || '/'
   options.secret = options.secret || 'development'
 
@@ -31,7 +31,7 @@ module.exports = (options: any = {}) => {
   const server = createServer({webhook, logger})
 
   // Log all received webhooks
-  webhook.on('*', event => {
+  webhook.on('*', (event: any) => {
     logger.info({event}, 'Webhook received')
     receive(event)
   })
@@ -39,18 +39,18 @@ module.exports = (options: any = {}) => {
   // Log all webhook errors
   webhook.on('error', logger.error.bind(logger))
 
-  const robots: any = []
+  const robots: Array<Robot> = []
 
-  function receive (event) {
-    return Promise.all(robots.map((robot: any) => robot.receive(event)))
+  function receive (event: any) {
+    return Promise.all(robots.map(robot => robot.receive(event)))
   }
 
-  function load (plugin) {
+  function load (plugin: string | Plugin) {
     if (typeof plugin === 'string') {
-      plugin = resolve(plugin)
+      plugin = <Plugin> resolve(plugin)
     }
 
-    const robot = createRobot({app, cache, logger, catchErrors: true})
+    const robot = createRobot({app, cache, catchErrors: true})
 
     // Connect the router from the robot to the server
     server.use(robot.router)
@@ -62,7 +62,7 @@ module.exports = (options: any = {}) => {
     return robot
   }
 
-  function setup (apps) {
+  function setup (apps: Array<string | Plugin>) {
     // Log all unhandled rejections
     process.on('unhandledRejection', logger.error.bind(logger))
 
@@ -98,3 +98,14 @@ module.exports = (options: any = {}) => {
 }
 
 module.exports.createRobot = createRobot
+
+export interface Plugin { (robot: Robot): void }
+
+export interface Options {
+  webhookPath?: string
+  secret?: string,
+  id: string,
+  cert: string,
+  webhookProxy?: string,
+  port?: number
+}

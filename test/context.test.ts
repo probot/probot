@@ -1,6 +1,6 @@
 const fs = require('fs')
 const path = require('path')
-const Context = require('../src/context')
+import Context from '../src/context'
 
 describe('Context', function () {
   let event

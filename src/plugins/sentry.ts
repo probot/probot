@@ -1,13 +1,13 @@
-import * as sentryStream from 'bunyan-sentry-stream'
 import * as Raven from 'raven'
+import {Robot} from '../robot'
+const sentryStream = require('bunyan-sentry-stream')
 
-export = (robot: any): void => {
-  const SENTRY_DSN = process.env.SENTRY_DSN
+export = (robot: Robot) => {
   // If sentry is configured, report all logged errors
-  if (SENTRY_DSN) {
-    robot.log.debug(SENTRY_DSN, 'Errors will be reported to Sentry')
+  if (process.env.SENTRY_DSN) {
+    robot.log.debug(process.env.SENTRY_DSN, 'Errors will be reported to Sentry')
     Raven.disableConsoleAlerts()
-    Raven.config(SENTRY_DSN, {
+    Raven.config(process.env.SENTRY_DSN, {
       autoBreadcrumbs: true
     }).install({})
 

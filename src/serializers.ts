@@ -50,7 +50,7 @@ const serializers: bunyan.StdSerializers = {
   }
 }
 
-export = serializers
+export default serializers
 
 interface Installation {
   account: {

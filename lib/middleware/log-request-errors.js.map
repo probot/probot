@@ -1,0 +1,1 @@
+{"version":3,"file":"log-request-errors.js","sourceRoot":"","sources":["../../src/middleware/log-request-errors.js"],"names":[],"mappings":";AAAA,MAAM,CAAC,OAAO,GAAG,UAAC,GAAG,EAAE,GAAG,EAAE,GAAG,EAAE,IAAI;IACnC,GAAG,CAAC,GAAG,CAAC,KAAK,CAAC,GAAG,CAAC,CAAA;IAClB,IAAI,EAAE,CAAA;AACR,CAAC,CAAA"}

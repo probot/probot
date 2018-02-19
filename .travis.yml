@@ -3,17 +3,16 @@ sudo: false
 language: node_js
 
 node_js:
-  - "8"
+  - "9"
 
 notifications:
   disabled: true
 
 before_install:
-  - npm install -g npm@5
-
-install:
   - npm install -g typescript
   - npm install -g codecov
+
+install:
   - npm install
   - npm run build
 

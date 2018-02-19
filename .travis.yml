@@ -21,5 +21,6 @@ branches:
     - /^v\d+\.\d+\.\d+$/
 
 script:
+  - npm run build
   - npm test
   - codecov

@@ -34,6 +34,7 @@
     "express": "^4.16.2",
     "express-async-errors": "^2.1.0",
     "github-webhook-handler": "^0.7.0",
+    "graphql-request": "^1.4.1",
     "hbs": "^4.0.1",
     "js-yaml": "^3.9.1",
     "jsonwebtoken": "^8.1.0",

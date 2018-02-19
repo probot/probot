@@ -9,7 +9,6 @@ notifications:
   disabled: true
 
 before_install:
-  - npm install -g typescript
   - npm install -g codecov
 
 install:

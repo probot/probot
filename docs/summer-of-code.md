@@ -6,13 +6,13 @@ In 2018, Probot is participating in Google's Summer of Code and Rails Girls Summ
 
 #### How do I get started with Probot?
 
-We suggest that you build our ["Hello World" app](https://probot.github.io/docs/hello-world/) to get the hang of registering a GitHub App and the base setup of a Probot App.
+We suggest that you build our ["Hello World" app](https://probot.github.io/docs/hello-world/) to get the hang of registering a GitHub App and the base setup of a Probot App. In your application, include a link to a comment that your Hello World app created on a test repository.
 
 You can also [join our Slack](https://probot-slackin.herokuapp.com/) and join the **#summer-of-code** channel.
 
 #### Can I claim this cool idea?
 
-We're excited that you're excited, but the Summer of Code ideas in our [ideas repo](https://github.com/probot/ideas) are for the students that are accepted to work on Probot over the summer. Claims to those ideas will be ignored until applicants are officially accepted.
+We're excited that you're excited, but the Summer of Code ideas in our [ideas repo](https://github.com/probot/ideas) are for the students that are accepted to work on Probot over the summer. Claims to those ideas will be ignored until April (when the submission deadline has passed).
 
 #### Someone has claimed this idea, can I still have it in my application?
 

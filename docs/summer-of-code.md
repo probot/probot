@@ -53,3 +53,5 @@ Amazing! Be sure to include it in your application.
 </table>
 
 ## Application Requirements
+
+* You must have created the ["Hello World" app](https://probot.github.io/docs/hello-world/), and provided a link to a comment that it has posted.

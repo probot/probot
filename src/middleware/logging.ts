@@ -1,9 +1,10 @@
 // Borrowed from https://github.com/vvo/bunyan-request
 // Copyright (c) Christian Tellnes <christian@tellnes.no>
 var uuid = require('uuid')
-const wrapLogger = require('../wrap-logger').default
+import {wrapLogger} from '../wrap-logger'
+// const wrapLogger = require('../wrap-logger').default
 
-module.exports = function logRequest ({logger}) {
+export const logRequest = function ({logger}) {
   return function (req, res, next) {
     // Use X-Request-ID from request if it is set, otherwise generate a uuid
     req.id = req.headers['x-request-id'] ||

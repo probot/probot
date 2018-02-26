@@ -1,6 +1,6 @@
-const Context = require('../src/context').default
-const createRobot = require('../src/robot').default
-const logger = require('../src/logger').default
+const {Context} = require('../src/context')
+const {createRobot} = require('../src/robot')
+const {logger} = require('../src/logger')
 
 describe('Robot', function () {
   let robot

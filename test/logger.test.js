@@ -1,5 +1,5 @@
-const logger = require('../src/logger').default
-const wrapLogger = require('../src/wrap-logger').default
+const {logger} = require('../src/logger')
+const {wrapLogger} = require('../src/wrap-logger')
 
 describe('logger', () => {
   let output

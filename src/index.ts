@@ -1,10 +1,13 @@
 import * as cacheManager from 'cache-manager'
-import createApp from './github-app'
-import createRobot, {Robot} from './robot'
-import createServer from './server'
-import resolve from './resolver'
-import logger from './logger'
-import createWebhookProxy from './webhook-proxy'
+import {createApp} from './github-app'
+import {createRobot, Robot} from './robot'
+import {createServer} from './server'
+import {resolve} from './resolver'
+import {logger} from './logger'
+import {createWebhookProxy} from './webhook-proxy'
+import * as express from 'express'
+import * as Logger from 'bunyan'
+
 const createWebhook = require('github-webhook-handler')
 const logRequestErrors = require('./middleware/log-request-errors')
 
@@ -19,7 +22,7 @@ const defaultApps = [
   require('./plugins/default')
 ]
 
-module.exports = (options: Options) => {
+export const createProbot = (options: Options) => {
   options.webhookPath = options.webhookPath || '/'
   options.secret = options.secret || 'development'
 
@@ -28,7 +31,7 @@ module.exports = (options: Options) => {
     id: options.id,
     cert: options.cert
   })
-  const server = createServer({webhook, logger})
+  const server: express.Application = createServer({webhook, logger})
 
   // Log all received webhooks
   webhook.on('*', (event: any) => {
@@ -77,7 +80,7 @@ module.exports = (options: Options) => {
     server,
     webhook,
     receive,
-    logger,
+    logger: Logger,
     load,
     setup,
 

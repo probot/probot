@@ -2,7 +2,7 @@ import * as bunyan from 'bunyan'
 import * as express from 'express'
 import {PayloadRepository} from './context'
 
-const serializers: bunyan.StdSerializers = {
+export const serializers: bunyan.StdSerializers = {
 
   repository: (repository: PayloadRepository) => repository.full_name,
   event: (event: any) => {
@@ -49,8 +49,6 @@ const serializers: bunyan.StdSerializers = {
     }
   }
 }
-
-export default serializers
 
 interface Installation {
   account: {

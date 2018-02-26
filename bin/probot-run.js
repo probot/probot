@@ -27,7 +27,7 @@ if (!program.privateKey) {
   program.privateKey = findPrivateKey()
 }
 
-const createProbot = require('../')
+const {createProbot} = require('../')
 
 const probot = createProbot({
   id: program.app,

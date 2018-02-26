@@ -1,6 +1,6 @@
 import * as Logger from 'bunyan'
 
-export default (opts: WebhookProxyOptions) => {
+export const createWebhookProxy = (opts: WebhookProxyOptions) => {
   try {
     const SmeeClient = require('smee-client')
 
@@ -15,7 +15,7 @@ export default (opts: WebhookProxyOptions) => {
   }
 }
 
-interface WebhookProxyOptions {
+export interface WebhookProxyOptions {
   url?: string
   port?: number
   path?: string

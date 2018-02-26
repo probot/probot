@@ -1,4 +1,4 @@
-const EnhancedGitHubClient = require('../src/github')
+const {EnhancedGitHubClient} = require('../src/github')
 const nock = require('nock')
 const Bottleneck = require('bottleneck')
 

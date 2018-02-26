@@ -1,4 +1,5 @@
-const fs = require('fs')
+// const fs = require('fs')
+import * as fs from 'fs'
 
 /**
  * Finds a private key through various user-(un)specified methods.

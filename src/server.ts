@@ -1,16 +1,15 @@
 import * as path from 'path'
 import * as express from 'express'
 import * as Logger from 'bunyan'
-
 // Teach express to properly handle async errors
 require('express-async-errors')
 
-const logging = require('./middleware/logging')
+import {logRequest} from './middleware/logging'
 
-export default function (args: ServerArgs) {
-  const app = express()
+export const createServer = function (args: ServerArgs) {
+  const app:express.Application = express()
 
-  app.use(logging({logger: args.logger}))
+  app.use(logRequest({logger: args.logger}))
   app.use('/probot/static/', express.static(path.join(__dirname, '..', 'static')))
   app.use(args.webhook)
   app.set('view engine', 'hbs')
@@ -20,4 +19,4 @@ export default function (args: ServerArgs) {
   return app
 }
 
-interface ServerArgs {webhook: express.Application, logger: Logger}
+export interface ServerArgs {webhook: express.Application, logger: Logger}

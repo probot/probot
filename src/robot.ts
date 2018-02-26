@@ -1,9 +1,9 @@
 import * as express from 'express'
-import Context from './context'
-import logger from './logger'
-import wrapLogger, {LoggerWithTarget} from './wrap-logger'
+import {Context} from './context'
+import {logger} from './logger'
+import {wrapLogger, LoggerWithTarget} from './wrap-logger'
 const {EventEmitter} = require('promise-events')
-const GitHubApi = require('./github')
+import {OctokitWithPagination, EnhancedGitHubClient as GitHubApi} from './github'
 
 /**
  * The `robot` parameter available to apps
@@ -19,12 +19,13 @@ export class Robot {
   log: LoggerWithTarget
 
   constructor (options: RobotOptions) {
+    const opts = options || {}
     this.events = new EventEmitter()
     this.log = wrapLogger(logger, logger)
-    this.app = options.app
-    this.cache = options.cache
-    this.catchErrors = options.catchErrors
-    this.router = options.router || express.Router()
+    this.app = opts.app
+    this.cache = opts.cache
+    this.catchErrors = opts.catchErrors
+    this.router = opts.router || express.Router() // you can do this?
   }
 
   async receive (event: EventWithEventField) {
@@ -145,7 +146,7 @@ export class Robot {
    * @private
    */
   async auth (id?: string, log = this.log) {
-    const github = new GitHubApi({
+    const github: OctokitWithPagination = GitHubApi({
       debug: process.env.LOG_LEVEL === 'trace',
       host: process.env.GHE_HOST || 'api.github.com',
       pathPrefix: process.env.GHE_HOST ? '/api/v3' : '',
@@ -169,21 +170,21 @@ export class Robot {
   }
 }
 
-export default (options: RobotOptions) => new Robot(options)
+export const createRobot = (options: RobotOptions) => new Robot(options)
 
-interface EventWithEventField {
+export interface EventWithEventField {
   event: string
 }
 
 // The TypeScript definition for cache-manager does not export the Cache interface so we recreate it here
-interface RobotCache {
+export interface RobotCache {
   wrap<T>(key: string, wrapper: (callback: (error: any, result: T) => void) => any, options: RobotCacheConfig): Promise<any>;
 }
-interface RobotCacheConfig {
+export interface RobotCacheConfig {
     ttl: number;
 }
 
-interface RobotOptions {
+export interface RobotOptions {
   app: () => string
   cache: RobotCache
   router?: express.Router

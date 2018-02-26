@@ -1,4 +1,4 @@
-import serializers from '../src/serializers'
+const {serializers} = require('../src/serializers')
 
 describe('serializers', () => {
   describe('repository', () => {

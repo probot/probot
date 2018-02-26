@@ -1,6 +1,6 @@
 import * as jwt from 'jsonwebtoken'
 
-export default function (options: AppOptions) {
+export const createApp = function (options: AppOptions) {
   return function () {
     const payload = {
       iat: Math.floor(Date.now() / 1000),       // Issued at time
@@ -13,7 +13,7 @@ export default function (options: AppOptions) {
   }
 }
 
-interface AppOptions {
+export interface AppOptions {
   id: string
   cert: string
 }

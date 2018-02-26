@@ -29,7 +29,7 @@ async function paginate (octokit: OctokitWithPagination, responsePromise: Promis
   return collection
 }
 
-function EnhancedGitHubClient (options: Options) {
+export const EnhancedGitHubClient = function (options: Options) {
   const octokit = <OctokitWithPagination> new Octokit(options)
   const noop = () => Promise.resolve()
   const logger = options.logger
@@ -52,31 +52,30 @@ function EnhancedGitHubClient (options: Options) {
   return octokit
 }
 
-module.exports = EnhancedGitHubClient
-
-interface Options extends Octokit.Options {
+export interface Options extends Octokit.Options {
+  debug: boolean
   logger: Logger
   limiter?: any
 }
 
-interface OctokitRequestOptions {
+export interface OctokitRequestOptions {
   method: string
   url: string
   headers: any
 }
 
-interface OctokitResult {
+export interface OctokitResult {
   meta: {
     status: string
   }
 }
 
-interface OctokitError {
+export interface OctokitError {
   code: number
   status: string
 }
 
-interface OctokitWithPagination extends Octokit {
+export interface OctokitWithPagination extends Octokit {
   paginate: (res: Promise<Octokit.AnyResponse>, callback: (results: Octokit.AnyResponse) => void) => void
   // The following are added because Octokit does not expose the hook.error, hook.before, and hook.after methods
   hook: {

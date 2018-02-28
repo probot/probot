@@ -143,8 +143,8 @@ describe('Probot', () => {
       process.env.GHE_HOST = 'notreallygithub.com'
 
       nock('https://notreallygithub.com/api/v3')
-       .defaultReplyHeaders({'Content-Type': 'application/json'})
-       .get('/app/installations').reply(200, ['I work!'])
+        .defaultReplyHeaders({'Content-Type': 'application/json'})
+        .get('/app/installations').reply(200, ['I work!'])
 
       robot = helper.createRobot()
     })

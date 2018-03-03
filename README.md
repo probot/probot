@@ -30,4 +30,4 @@ Have an idea for a cool new GitHub App (built with Probot)? That's great! If you
 
 ## Summer of Code
 
-Probot is super excited to be participating in Rails Girls Summer of Code & Google Summer of Code! We've written [some documentation on how to get started](https://probot.github.io/docs/summmer-of-code) if you're part of one of these programs.
+Probot is super excited to be participating in Rails Girls Summer of Code & Google Summer of Code! We've written [some documentation on how to get started](https://probot.github.io/docs/summer-of-code) if you're part of one of these programs.

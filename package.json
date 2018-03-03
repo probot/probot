@@ -32,7 +32,7 @@
     "commander": "^2.11.0",
     "dotenv": "~5.0.0",
     "express": "^4.16.2",
-    "express-async-errors": "^2.1.0",
+    "express-async-errors": "2.1.1",
     "github-webhook-handler": "^0.7.0",
     "hbs": "^4.0.1",
     "js-yaml": "^3.9.1",
@@ -54,7 +54,7 @@
     "nock": "^9.0.19",
     "semantic-release": "^12.2.2",
     "smee-client": "^1.0.1",
-    "standard": "^10.0.3",
+    "standard": "^11.0.0",
     "supertest": "^3.0.0"
   },
   "standard": {

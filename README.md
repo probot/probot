@@ -27,3 +27,7 @@ Want to chat with Probot users and contributors? [Join us in Slack](https://prob
 ## Ideas
 
 Have an idea for a cool new GitHub App (built with Probot)? That's great! If you want feedback, help, or just to share it with the world you can do so by [creating an issue in the `probot/ideas` repository](https://github.com/probot/ideas/issues/new)!
+
+## Summer of Code
+
+Probot is super excited to be participating in Rails Girls Summer of Code & Google Summer of Code! We've written [some documentation on how to get started](https://probot.github.io/docs/summmer-of-code) if you're part of one of these programs.

@@ -23,7 +23,7 @@
   "author": "Brandon Keepers",
   "license": "ISC",
   "dependencies": {
-    "@octokit/rest": "14.0.9",
+    "@octokit/rest": "15.1.7",
     "bottleneck": "^2.0.0",
     "bunyan": "^1.8.12",
     "bunyan-format": "^0.2.1",

@@ -1,7 +1,7 @@
 {
-  "name": "probot",
-  "version": "0.0.0-development",
-  "description": "a trainable robot that responds to activity on GitHub",
+  "name": "probot-ts",
+  "version": "6.0.0-typescript",
+  "description": "a trainable robot that responds to activity on GitHub. in typescript!",
   "repository": "https://github.com/probot/probot",
   "main": "lib/index.js",
   "bin": {
@@ -43,8 +43,8 @@
   "author": "Brandon Keepers",
   "license": "ISC",
   "dependencies": {
-    "@octokit/rest": "14.0.9",
-    "bottleneck": "^2.0.0",
+    "@octokit/rest": "15.1.7",
+    "bottleneck": "^1.16.0",
     "bunyan": "^1.8.12",
     "bunyan-format": "^0.2.1",
     "bunyan-sentry-stream": "^1.1.0",
@@ -88,10 +88,10 @@
     "nock": "^9.0.19",
     "semantic-release": "^12.2.2",
     "smee-client": "^1.0.1",
-    "standard": "^10.0.3",
+    "standard": "^11.0.0",
     "supertest": "^3.0.0",
     "ts-jest": "^21.2.4",
-    "typescript": "^2.7.1"
+    "typescript": "^2.7.2"
   },
   "standard": {
     "env": [

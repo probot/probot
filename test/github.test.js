@@ -12,7 +12,7 @@ describe('EnhancedGitHubClient', () => {
     }
 
     // Set a shorter limiter, otherwise tests are _slow_
-    const limiter = new Bottleneck({ maxConcurrent: 1, minTime: 1 })
+    const limiter = new Bottleneck(1, 1)
 
     github = new EnhancedGitHubClient({ logger, limiter })
   })

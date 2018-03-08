@@ -34,7 +34,7 @@ export class Context {
    * // Returns: {owner: 'username', repo: 'reponame', path: '.github/stale.yml'}
    *
    */
-  repo<T> (object: T) {
+  repo<T> (object?: T) {
     const repo = this.payload.repository
 
     return Object.assign({
@@ -55,7 +55,7 @@ export class Context {
    *
    * @param {object} [object] - Params to be merged with the issue params.
    */
-  issue<T> (object: T) {
+  issue<T> (object?: T) {
     const payload = this.payload
     return Object.assign({
       number: (payload.issue || payload.pull_request || payload).number

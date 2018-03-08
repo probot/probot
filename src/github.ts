@@ -3,12 +3,12 @@ import * as Logger from 'bunyan'
 const Bottleneck = require('bottleneck')
 
 /**
- * the [github Node.js module](https://github.com/octokit/node-github),
+ * the [@octokit/rest Node.js module](https://github.com/octokit/rest.js),
  * which wraps the [GitHub API](https://developer.github.com/v3/) and allows
  * you to do almost anything programmatically that you can do through a web
  * browser.
  * @typedef github
- * @see {@link https://github.com/octokit/node-github}
+ * @see {@link https://github.com/octokit/rest.js}
  */
 
 const defaultCallback = (response: Octokit.AnyResponse, done: () => void) => response
@@ -21,7 +21,7 @@ async function paginate (octokit: OctokitWithPagination, responsePromise: Promis
   }
   let response = await responsePromise
   collection = collection.concat(await callback(response, done))
- // eslint-disable-next-line no-unmodified-loop-condition
+  // eslint-disable-next-line no-unmodified-loop-condition
   while (getNextPage && octokit.hasNextPage(response)) {
     response = await octokit.getNextPage(response)
     collection = collection.concat(await callback(response, done))
@@ -33,7 +33,7 @@ export const EnhancedGitHubClient = function (options: Options) {
   const octokit = <OctokitWithPagination> new Octokit(options)
   const noop = () => Promise.resolve()
   const logger = options.logger
-  const limiter = options.limiter || new Bottleneck({ maxConcurrent: 1, minTime: 1000 })
+  const limiter = options.limiter || new Bottleneck(1, 1000)
 
   octokit.hook.before('request', limiter.schedule.bind(limiter, noop))
   octokit.hook.error('request', (error, options) => {

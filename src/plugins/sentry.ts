@@ -9,7 +9,7 @@ export = (robot: Robot) => {
     Raven.disableConsoleAlerts()
     Raven.config(process.env.SENTRY_DSN, {
       autoBreadcrumbs: true
-    }).install({})
+    }).install()
 
     robot.log.target.addStream(sentryStream(Raven))
   }

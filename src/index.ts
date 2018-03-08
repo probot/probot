@@ -80,7 +80,7 @@ export const createProbot = (options: Options) => {
     server,
     webhook,
     receive,
-    logger: Logger,
+    logger,
     load,
     setup,
 
@@ -112,3 +112,5 @@ export interface Options {
   webhookProxy?: string,
   port?: number
 }
+
+export { Logger }

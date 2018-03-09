@@ -45,7 +45,7 @@
   },
   "devDependencies": {
     "connect-sse": "^1.2.0",
-    "eslint": "^4.6.1",
+    "eslint": "^4.18.2",
     "eslint-plugin-markdown": "^1.0.0-beta.6",
     "jest": "^22.0.3",
     "jsdoc": "^3.5.5",

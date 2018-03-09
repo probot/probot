@@ -16,6 +16,7 @@ Every app can either be deployed stand-alone, or combined with other apps in one
     1. [Heroku](#heroku)
     1. [Now](#now)
 1. [Combining apps](#combining-apps)
+1. [Error tracking](#error-tracking)
 
 ## Create the GitHub App
 

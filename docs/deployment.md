@@ -1,5 +1,5 @@
 ---
-next: docs/best-practices.md
+next: docs/persistence.md
 ---
 
 # Deployment
@@ -16,6 +16,7 @@ Every app can either be deployed stand-alone, or combined with other apps in one
     1. [Heroku](#heroku)
     1. [Now](#now)
 1. [Combining apps](#combining-apps)
+1. [Error tracking](#error-tracking)
 
 ## Create the GitHub App
 
@@ -60,7 +61,7 @@ Glitch lets you host node applications for free and edit them directly in your b
    ```
    Replace the two `<...>` placeholders with the values from your app. The `.env` file cannot be accessed or seen by others.
 4. Press the `New File` button and enter `.data/private-key.pem`. Paste the content of your GitHub App’s `private-key.pem` in there and save it. Files in the `.data` folder cannot be seen or accessed by others, so your private key is safe.
-5. That’s it, your app should have already started :thumbsup: Press on the `Show` button on top and paste the URL as the value of `Webhook URL`.
+5. That’s it, your app should have already started :thumbsup: Press on the `Show` button on top and paste the URL as the value of `Webhook URL`. Ensure that you remove `/probot` from the end of the `Webhook URL` that was just pasted. 
 
 Enjoy!
 
@@ -161,6 +162,6 @@ To deploy a bot that includes multiple apps, create a new app that has the apps 
 
 Probot comes bundled with a client for the [Sentry](https://github.com/getsentry/sentry) exception tracking platform. To enable Sentry:
 
-  1. [Create a Sentry.io Account](https://sentry.io/signup/) (with [10k events/month free](https://sentry.io/pricing/)) or [host your own instance](https://github.com/getsentry/sentry) (Students can get [extra Sentry credit](https://education.github.com/pack))
+  1. [Install Sentry from Marketplace](https://github.com/marketplace/sentry) (with [10k events/month free](https://github.com/marketplace/sentry/plan/MDIyOk1hcmtldHBsYWNlTGlzdGluZ1BsYW40Nw==#pricing-and-setup)) or [host your own instance](https://github.com/getsentry/sentry) (Students can get [extra Sentry credit](https://education.github.com/pack))
   2. Follow the setup instructions to find your DSN.
   3. Set the `SENTRY_DSN` environment variable with the DSN you retrieved.

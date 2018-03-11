@@ -118,6 +118,22 @@ describe('Probot', () => {
       await request(probot.server).post('/')
         .expect(400)
     })
+
+    it('responds with 500 on error', async () => {
+      probot.server.get('/boom', () => {
+        throw new Error('boom')
+      })
+
+      await request(probot.server).get('/boom').expect(500)
+    })
+
+    it('responds with 500 on async error', async () => {
+      probot.server.get('/boom', () => {
+        return Promise.reject(new Error('boom'))
+      })
+
+      await request(probot.server).get('/boom').expect(500)
+    })
   })
 
   describe('receive', () => {
@@ -175,8 +191,8 @@ describe('Probot', () => {
       process.env.GHE_HOST = 'notreallygithub.com'
 
       nock('https://notreallygithub.com/api/v3')
-       .defaultReplyHeaders({'Content-Type': 'application/json'})
-       .get('/app/installations').reply(200, ['I work!'])
+        .defaultReplyHeaders({'Content-Type': 'application/json'})
+        .get('/app/installations').reply(200, ['I work!'])
 
       robot = helper.createRobot()
     })

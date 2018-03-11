@@ -8,6 +8,7 @@ const logger = require('../lib/logger')
 const webhook = new WebhooksApi({
   secret: 'test'
 })
+const targetPort = 999999
 
 describe('webhook-proxy', () => {
   let app, server, proxy, url, emit
@@ -28,53 +29,52 @@ describe('webhook-proxy', () => {
 
       server = app.listen(0, () => {
         url = `http://127.0.0.1:${server.address().port}/events`
-        proxy = createWebhookProxy({url, logger, webhook})
+        proxy = createWebhookProxy({url, port: targetPort, path: '/test', logger})
 
         // Wait for proxy to be ready
         proxy.addEventListener('ready', () => done())
       })
     })
 
-    test('emits events with a valid signature', (done) => {
-      // This test will be done when the webhook is emitted
-      webhook.on('push', () => done())
+    test('forwards events to server', (done) => {
+      nock(`http://localhost:${targetPort}`).post('/test').reply(200, () => {
+        done()
+      })
 
       const body = {action: 'foo'}
 
       emit({
-        'x-github-event': 'push',
-        'x-hub-signature': webhook.sign(JSON.stringify(body)),
-        body
-      })
-    })
-
-    test('does not emit events with an invalid signature', (done) => {
-      // This test will be done when the webhook is emitted
-      webhook.on('error', (err) => {
-        expect(err.message).toEqual('signature does not match event payload and secret')
-        done()
-      })
-
-      emit({
         'x-github-event': 'test',
-        'x-hub-signature': 'lolnope',
-        body: {action: 'foo'}
+        body
       })
     })
   })
 
-  test('logs an error when the proxy server that is not found', (done) => {
+  test('emits events with a valid signature', (done) => {
+    // This test will be done when the webhook is emitted
+    webhook.on('push', () => done())
+
+    const body = {action: 'foo'}
+
+    emit({
+      'x-github-event': 'push',
+      'x-hub-signature': webhook.sign('test'),
+      body
+    })
+})
+
+  test('logs an error when the proxy server is not found', (done) => {
     const url = 'http://bad.proxy/events'
     nock('http://bad.proxy').get('/events').reply(404)
 
     const log = logger.child()
     log.error = jest.fn()
 
-    proxy = createWebhookProxy({url, webhook, logger: log})
+    proxy = createWebhookProxy({url, logger: log})
 
     proxy.on('error', err => {
       expect(err.status).toBe(404)
-      expect(log.error).toHaveBeenCalledWith({err, url}, 'Webhook proxy error')
+      expect(log.error).toHaveBeenCalledWith(err)
       done()
     })
   })

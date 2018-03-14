@@ -1,13 +1,8 @@
 const express = require('express')
 const sse = require('connect-sse')()
 const nock = require('nock')
-const WebhooksApi = require('@octokit/webhooks')
 const createWebhookProxy = require('../lib/webhook-proxy')
 const logger = require('../lib/logger')
-
-const webhook = new WebhooksApi({
-  secret: 'test'
-})
 const targetPort = 999999
 
 describe('webhook-proxy', () => {
@@ -49,19 +44,6 @@ describe('webhook-proxy', () => {
       })
     })
   })
-
-  test('emits events with a valid signature', (done) => {
-    // This test will be done when the webhook is emitted
-    webhook.on('push', () => done())
-
-    const body = {action: 'foo'}
-
-    emit({
-      'x-github-event': 'push',
-      'x-hub-signature': webhook.sign('test'),
-      body
-    })
-})
 
   test('logs an error when the proxy server is not found', (done) => {
     const url = 'http://bad.proxy/events'

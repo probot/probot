@@ -1,7 +1,10 @@
 {
-  "name": "probot-ts",
-  "version": "6.0.0-typescript",
-  "description": "a trainable robot that responds to activity on GitHub. in typescript!",
+  "name": "probot",
+  "version": "7.0.0-typescript.1",
+  "publishConfig": {
+    "tag": "next"
+  },
+  "description": "a trainable robot that responds to activity on GitHub.",
   "repository": "https://github.com/probot/probot",
   "main": "lib/index.js",
   "bin": {

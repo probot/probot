@@ -1,6 +1,7 @@
 import * as cacheManager from 'cache-manager'
 import {createApp} from './github-app'
 import {createRobot, Robot} from './robot'
+import {Context} from './context'
 import {createServer} from './server'
 import {resolve} from './resolver'
 import {logger} from './logger'
@@ -113,4 +114,4 @@ export interface Options {
   port?: number
 }
 
-export { Logger }
+export { Logger, Context, Robot }

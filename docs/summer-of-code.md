@@ -37,7 +37,7 @@ Amazing! Be sure to include it in your application.
         <br>
         <a href="https://github.com/gr2m">Gregor Martynus</a>
       </td>
-      <td align="center" width="20%" valign="top">
+      <td align="center" valign="top">
         <img width="150" height="150" src="https://github.com/JasonEtco.png?s=150">
         <br>
         <a href="https://github.com/JasonEtco">Jason Etcovitch</a>

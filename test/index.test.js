@@ -12,6 +12,7 @@ describe('Probot', () => {
 
     event = {
       event: 'push',
+      name: 'push',
       payload: require('./fixtures/webhook/push')
     }
   })
@@ -20,7 +21,7 @@ describe('Probot', () => {
     it('forwards webhooks to the robot', async () => {
       const robot = probot.load(() => {})
       robot.receive = jest.fn()
-      probot.webhook.emit('*', event)
+      await probot.webhook.receive(event)
       expect(robot.receive).toHaveBeenCalledWith(event)
     })
   })

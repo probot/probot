@@ -51,7 +51,7 @@
     "jsdoc": "^3.5.5",
     "jsdoc-strip-async-await": "^0.1.0",
     "minami": "^1.1.1",
-    "nock": "^9.0.19",
+    "nock": "^9.2.0",
     "semantic-release": "^15.0.0",
     "smee-client": "^1.0.1",
     "standard": "^11.0.0",

@@ -23,7 +23,7 @@ describe('serializers', () => {
   describe('event', () => {
     it('works with a legit event', () => {
       const event = {id: 1,
-        event: 'test',
+        name: 'test',
         payload: {
           action: 'test',
           repository: {full_name: 'probot/test'},
@@ -32,7 +32,7 @@ describe('serializers', () => {
       }
       expect(serializers.event(event)).toEqual({
         id: 1,
-        event: 'test.test',
+        name: 'test.test',
         repository: 'probot/test',
         installation: 1
       })
@@ -40,11 +40,11 @@ describe('serializers', () => {
 
     it('works a malformed event', () => {
       const event = {id: 1,
-        event: 'test',
+        name: 'test',
         payload: {}}
       expect(serializers.event(event)).toEqual({
         id: 1,
-        event: 'test',
+        name: 'test',
         repository: undefined,
         installation: undefined
       })

@@ -18,7 +18,7 @@ Probot includes a wrapper for the GitHub API which can enable you to store and m
 
 If your Probot App needs to store more data than Issues and Pull Requests store normally, you can use the [`probot-metadata` extension](https://probot.github.io/docs/extensions/#metadata) to hide data in comments. It isn't meant to be super secure or scalable, but it's an easy way to manage some data without a full database.
 
-There are even more APIs that you can use to increase the functionality of your Probot App. You can read about all of the ones available in Probot on the [`node-github` documentation](http://mikedeboer.github.io/node-github/).
+There are even more APIs that you can use to increase the functionality of your Probot App. You can read about all of the ones available in Probot on the [`@octokit/rest` documentation](http://octokit.github.io/rest.js/).
 
 ## Using a Database
 
@@ -175,4 +175,3 @@ module.exports = robot => {
   })
 }
 ```
-

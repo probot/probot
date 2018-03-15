@@ -4,7 +4,7 @@ next: docs/webhooks.md
 
 # Developing an App
 
-To develop a Probot app, you will first need a recent version of [Node.js](https://nodejs.org/) installed. Probot uses the `async/await` keywords, so Node.js 7.6 is the minimum required version.
+To develop a Probot app, you will first need a recent version of [Node.js](https://nodejs.org/) installed. Probot uses object rest/spread properties, so Node.js 8.3.0 is the minimum required version.
 
 ## Generating a new app
 

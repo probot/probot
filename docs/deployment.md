@@ -15,6 +15,7 @@ Every app can either be deployed stand-alone, or combined with other apps in one
     1. [Glitch](#glitch)
     1. [Heroku](#heroku)
     1. [Now](#now)
+1. [Share the app](#share-the-app)
 1. [Combining apps](#combining-apps)
 1. [Error tracking](#error-tracking)
 
@@ -133,6 +134,11 @@ Zeit [Now](http://zeit.co/now) is a great service for running Probot apps. After
 1. You can also keep your app running forever, with instant response to webhooks with:
 
         $ now scale https://a-fancier-url.now.sh 1
+
+## Share the app
+
+The Probot website includes a list of [featured apps](https://probot.github.com/apps). Consider [adding your app to the website](https://github.com/probot/probot.github.io/blob/master/CONTRIBUTING.md#adding-your-app
+) so others can discover and use it.
 
 ## Combining apps
 

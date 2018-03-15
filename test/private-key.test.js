@@ -90,6 +90,20 @@ describe('private-key', function () {
         expect(fs.readdirSync).toHaveBeenCalledWith(process.cwd())
       })
 
+      describe('and several key files are present', function () {
+        beforeEach(function () {
+          fs.readdirSync = jest.fn().mockReturnValue([
+            'foo.txt',
+            'foo.pem',
+            'bar.pem'
+          ])
+        })
+
+        it('should throw an error', function () {
+          expect(findPrivateKey).toThrow(/Found several private keys: foo.pem, bar.pem/i)
+        })
+      })
+
       describe('and a key file is present', function () {
         it('should load the key file', function () {
           findPrivateKey()

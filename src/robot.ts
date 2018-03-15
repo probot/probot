@@ -148,8 +148,7 @@ export class Robot {
   async auth (id?: string, log = this.log) {
     const github: OctokitWithPagination = GitHubApi({
       debug: process.env.LOG_LEVEL === 'trace',
-      host: process.env.GHE_HOST || 'api.github.com',
-      pathPrefix: process.env.GHE_HOST ? '/api/v3' : '',
+      baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api/v3`,
       logger: log.child({name: 'github', installation: id})
     })
 

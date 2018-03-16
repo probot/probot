@@ -2,7 +2,6 @@
 // Copyright (c) Christian Tellnes <christian@tellnes.no>
 var uuid = require('uuid')
 import {wrapLogger} from '../wrap-logger'
-// const wrapLogger = require('../wrap-logger').default
 
 export const logRequest = function ({logger}) {
   return function (req, res, next) {

@@ -11,13 +11,14 @@ import {LoggerWithTarget} from './wrap-logger'
  * @property {logger} log - A logger
  */
 export class Context {
-  id?: string
+  id: string
   github: GitHubApi
   log: LoggerWithTarget
   payload!: WebhookPayloadWithRepository
 
   constructor (event:any, github:GitHubApi, log:LoggerWithTarget) {
     Object.assign(this, event)
+    this.id = event.id
     this.github = github
     this.log = log
   }
@@ -149,5 +150,3 @@ export interface WebhookPayloadWithRepository {
   }
 
 }
-
-// export default Context

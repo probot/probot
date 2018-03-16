@@ -23,6 +23,7 @@ describe('Robot', function () {
 
     robot = createRobot()
     robot.auth = () => {}
+    robot.getGraphQLClient = () => {}
 
     event = {
       id: '123-456',

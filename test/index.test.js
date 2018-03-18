@@ -129,7 +129,6 @@ describe('Probot', () => {
       const spy = jest.fn()
       const robot = probot.load(robot => robot.on('push', spy))
       robot.auth = jest.fn().mockReturnValue(Promise.resolve({}))
-      robot.getGraphQLClient = jest.fn().mockReturnValue(Promise.resolve({}))
 
       await probot.receive(event)
 

@@ -1,8 +1,0 @@
-#!/bin/sh
-
-set -e
-
-npm install
-
-# Copy .env template
-[ -f .env ] || cp .env.example .env

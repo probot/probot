@@ -1,6 +1,7 @@
 const Context = require('../lib/context')
-const createRobot = require('../lib/robot')
-const logger = require('../lib/logger')
+const { createRobot, createLogger } = require('probot')
+
+const logger = createLogger()
 
 describe('Robot', function () {
   let robot
@@ -21,7 +22,7 @@ describe('Robot', function () {
     // Clear log output
     output = []
 
-    robot = createRobot()
+    robot = createRobot({logger})
     robot.auth = () => {}
 
     event = {

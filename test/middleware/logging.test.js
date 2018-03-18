@@ -1,7 +1,10 @@
 const request = require('supertest')
 const express = require('express')
-const logger = require('../../lib/logger')
+const { createLogger } = require('probot')
+
 const logging = require('../../lib/middleware/logging')
+
+const logger = createLogger()
 
 describe('logging', () => {
   let server, output

@@ -34,8 +34,7 @@ See the [full API docs](https://octokit.github.io/rest.js/) to see all the ways 
 
 > **Heads Up!** GraphQL support in Probot is currently a preview feature and this interface could change in a future releases without notice. [Let us know]() if you have any feedback or ideas to improve GraphQL support.
 
-The [GitHub GraphQL API](https://developer.github.com/v4/) is an alternative
-
+Use `context.github.query` to make requests to the [GitHub GraphQL API](https://developer.github.com/v4/).
 
 Here is an example of the same autoresponder app from above that comments on opened issues, but this time with GraphQL:
 

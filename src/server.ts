@@ -19,4 +19,7 @@ export const createServer = function (args: ServerArgs) {
   return app
 }
 
-export interface ServerArgs {webhook: express.Application, logger: Logger}
+export interface ServerArgs {
+  webhook: express.Application
+  logger: Logger
+}

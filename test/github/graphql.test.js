@@ -59,6 +59,15 @@ describe('github/graphql', () => {
       await github.query(query)
     })
 
+    test('allows custom headers', async () => {
+      nock('https://api.github.com', {
+        reqheaders: { 'foo': 'bar' }
+      }).post('/graphql', {query})
+        .reply(200, { data })
+
+      await github.query(query, undefined, {foo: 'bar'})
+    })
+
     test('raises errors', async () => {
       const response = {'data': null, 'errors': [{'message': 'Unexpected end of document'}]}
 

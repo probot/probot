@@ -47,6 +47,7 @@ describe('github/graphql', () => {
 
       expect(await github.query(query, variables)).toEqual(data)
     })
+
     test('uses authentication', async () => {
       github.authenticate({type: 'token', token: 'testing'})
 

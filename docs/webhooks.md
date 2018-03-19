@@ -17,6 +17,17 @@ module.exports = robot => {
 }
 ```
 
+You can also pass a list of events :
+
+```js
+module.exports = robot => {
+  robot.on(['issues.opened', 'push'], async context => {
+    // An issue is opened or code was pushed to the repo, what should we do with it?
+    robot.log(context)
+  })
+}
+```
+
 The robot can listen to any of the [GitHub webhook events](https://developer.github.com/webhooks/#events). The `context` object includes everything about the event that was triggered, and `context.payload` has the payload delivered by GitHub.
 
 Most events also include an "action". For example, the [`issues`](https://developer.github.com/v3/activity/events/types/#issuesevent) event has actions of `assigned`, `unassigned`, `labeled`, `unlabeled`, `opened`, `edited`, `milestoned`, `demilestoned`, `closed`, and `reopened`. Often, your bot will only care about one type of action, so you can append it to the event name with a `.`:

@@ -22,11 +22,10 @@ describe('github/graphql', () => {
   })
 
   describe('query', () => {
-    let query
+    const query = 'query { viewer { login } }'
     let data
 
     test('makes a graphql query', async () => {
-      query = 'query { viewer { login } }'
       data = { viewer: { login: 'bkeepers' } }
 
       nock('https://api.github.com', {

@@ -169,6 +169,31 @@ describe('Robot', function () {
       expect(output[0].event.id).toEqual(event.id)
     })
 
+    it('throw error if using context.github on deleted app', async () => {
+      const event3 = {
+        id: '123-456',
+        event: 'installation',
+        payload: {
+          action: 'deleted',
+          installation: {id: 1}
+        }
+      }
+
+      robot.on('installation.deleted', async context => {
+        return await context.github.issues.createComment(/* … */)
+      })
+
+      try {
+        await robot.receive(event3)
+      } catch (err) {
+        expect(err).toBeInstanceOf(Error);
+        expect(err.message).toEqual(
+          'You are trying to make a GitHub request but is seems like your ' +
+          'GitHub App has just been deleted. We cannot authenticate your ' +
+          'request.');
+      }
+    })
+
     it('logs errors from rejected promises', async () => {
       robot.on('test', () => Promise.reject(error))
 

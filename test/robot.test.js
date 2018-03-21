@@ -180,17 +180,17 @@ describe('Robot', function () {
       }
 
       robot.on('installation.deleted', async context => {
-        return await context.github.issues.createComment(/* … */)
+        await context.github.issues.createComment(/* … */)
       })
 
       try {
         await robot.receive(event3)
       } catch (err) {
-        expect(err).toBeInstanceOf(Error);
+        expect(err).toBeInstanceOf(Error)
         expect(err.message).toEqual(
           'You are trying to make a GitHub request but is seems like your ' +
           'GitHub App has just been deleted. We cannot authenticate your ' +
-          'request.');
+          'request.')
       }
     })
 

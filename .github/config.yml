@@ -3,26 +3,24 @@
 # Configuration for new-issue-welcome - https://github.com/behaviorbot/new-issue-welcome
 # Comment to be posted to on first time issues
 newIssueWelcomeComment: >
-  Thanks for opening this issue. 
-  If this issue is regarding feedback about your probot experience, such as things that you found frustrating or confusing, it would be great if you could close this out and open an issue in our [probot/friction](https://github.com/probot/friction) repo instead. Otherwise a maintainer will get back to you shortly.
+  Thanks for opening this issue. A contributor should be by to give feedback soon. In the mean time, please check out the [contributing guidelines](https://github.com/probot/probot/blob/master/CONTRIBUTING.md) and explore other [ways you can get involved](https://probot.github.io/community/).
 
 # Configuration for new-pr-welcome - https://github.com/behaviorbot/new-pr-welcome
 # Comment to be posted to on PRs from first time contributors in your repository
 newPRWelcomeComment: >
-  Thanks for opening this pull request! Please check out our [contributing guidelines](https://github.com/probot/probot/blob/master/CONTRIBUTING.md).
-  <br>
-  <img width="200" src="https://media.giphy.com/media/t5J2yBFaM1464/giphy.gif" />
+  Thanks for opening this pull request! A contributor should be by to give feedback soon. In the mean time, please check out the [contributing guidelines](https://github.com/probot/probot/blob/master/CONTRIBUTING.md) and explore other [ways you can get involved](https://probot.github.io/community/).
 
 # Configuration for first-pr-merge - https://github.com/behaviorbot/first-pr-merge
 # Comment to be posted to on pull requests merged by a first time user
 firstPRMergeComment: >
-  Thanks for your contribution to probot! :tada: <br>
-  ![Congrats!](https://media.giphy.com/media/o0vwzuFwCGAFO/giphy.gif)
+  Thanks for your contribution to probot! :tada:
+  
+  ![Congrats!](https://media.giphy.com/media/Tugu78Y5vg0Ss/giphy.gif)
 
 # Configuration for request-info - https://github.com/behaviorbot/request-info
 # Comment to reply with
 requestInfoReplyComment: >
-  We would appreciate it if you could provide us with more info about this issue/pr!
+  Thanks for opening this, but we'd appreciate a little more information. Could you update it with more details?
 
 # Configuration for sentiment-bot - https://github.com/behaviorbot/sentiment-bot
 

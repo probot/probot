@@ -4,7 +4,7 @@ next: docs/webhooks.md
 
 # Developing an App
 
-To develop a Probot app, you will first need a recent version of [Node.js](https://nodejs.org/) installed. Probot uses the `async/await` keywords, so Node.js 7.6 is the minimum required version.
+To develop a Probot app, you will first need a recent version of [Node.js](https://nodejs.org/) installed. Open a terminal and run `node -v` to verify that it is installed and is at least 8.3.0 or later. Otherwise, [install the latest version](https://nodejs.org/).
 
 ## Generating a new app
 
@@ -55,7 +55,7 @@ To run your app in development, you will need to configure a GitHub App to deliv
     - **Webhook URL**: Use your `WEBHOOK_PROXY_URL` from the previous step.
     - **Webhook Secret:** `development`
     - **Permissions & events** is located lower down the page and will depend on what data you want your app to have access to. Note: if, for example, you only enable issue events, you will not be able to listen on pull request webhooks with your app. However, for development we recommend enabling everything.
-1. Download the private key and move it to your project's directory.
+1. Download the private key and move it to your project's directory. It will get picked up by Probot automatically.
 1. Edit `.env` and set `APP_ID` to the ID of the app you just created. The App ID can be found in your app settings page here <img width="1048" alt="screen shot 2017-08-20 at 8 31 31 am" src="https://user-images.githubusercontent.com/13410355/29496168-044b9a48-8582-11e7-8be4-39cc75090647.png">
 1. Run `$ npm start` to start the server/
 

@@ -8,7 +8,6 @@
     "probot": "./bin/probot.js"
   },
   "scripts": {
-    "start": "node ./bin/probot run",
     "test": "jest --coverage && standard && npm run doc-lint",
     "doc-lint": "standard docs/**/*.md",
     "doc": "jsdoc -c .jsdoc.json",

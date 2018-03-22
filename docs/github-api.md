@@ -32,7 +32,7 @@ See the [full API docs](https://octokit.github.io/rest.js/) to see all the ways 
 
 ## GraphQL API
 
-> **Heads Up!** GraphQL support in Probot is currently a preview feature and this interface could change in a future releases without notice. [Let us know]() if you have any feedback or ideas to improve GraphQL support.
+> **Heads Up!** GraphQL support in Probot is currently a preview feature and this interface could change in a future releases without notice. [Let us know](https://github.com/probot/probot/issues/476) if you have any feedback or ideas to improve GraphQL support.
 
 Use `context.github.query` to make requests to the [GitHub GraphQL API](https://developer.github.com/v4/).
 

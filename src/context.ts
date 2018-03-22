@@ -31,8 +31,8 @@ export class Context {
    *
    * @example
    *
-   * const params = context.repo({path: '.github/stale.yml'})
-   * // Returns: {owner: 'username', repo: 'reponame', path: '.github/stale.yml'}
+   * const params = context.repo({path: '.github/config.yml'})
+   * // Returns: {owner: 'username', repo: 'reponame', path: '.github/config.yml'}
    *
    */
   repo<T> (object?: T) {
@@ -75,15 +75,15 @@ export class Context {
    * Reads the app configuration from the given YAML file in the `.github`
    * directory of the repository.
    *
-   * @example <caption>Contents of <code>.github/myapp.yml</code>.</caption>
+   * @example <caption>Contents of <code>.github/config.yml</code>.</caption>
    *
    * close: true
    * comment: Check the specs on the rotary girder.
    *
-   * @example <caption>App that reads from <code>.github/myapp.yml</code>.</caption>
+   * @example <caption>App that reads from <code>.github/config.yml</code>.</caption>
    *
-   * // Load config from .github/myapp.yml in the repository
-   * const config = await context.config('myapp.yml')
+   * // Load config from .github/config.yml in the repository
+   * const config = await context.config('config.yml')
    *
    * if (config.close) {
    *   context.github.issues.comment(context.issue({body: config.comment}))
@@ -92,8 +92,8 @@ export class Context {
    *
    * @example <caption>Using a <code>defaultConfig</code> object.</caption>
    *
-   * // Load config from .github/myapp.yml in the repository and combine with default config
-   * const config = await context.config('myapp.yml', {comment: 'Make sure to check all the specs.'})
+   * // Load config from .github/config.yml in the repository and combine with default config
+   * const config = await context.config('config.yml', {comment: 'Make sure to check all the specs.'})
    *
    * if (config.close) {
    *   context.github.issues.comment(context.issue({body: config.comment}));

@@ -1,6 +1,5 @@
-module.exports = addPagination
+const defaultCallback = (response, done?) => response
 
-const defaultCallback = response => response
 async function paginate (octokit, responsePromise, callback = defaultCallback) {
   let collection = []
   let getNextPage = true
@@ -17,6 +16,6 @@ async function paginate (octokit, responsePromise, callback = defaultCallback) {
   return collection
 }
 
-function addPagination (octokit) {
+export const addPagination = function (octokit) {
   octokit.paginate = paginate.bind(null, octokit)
 }

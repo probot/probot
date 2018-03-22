@@ -1,6 +1,7 @@
-module.exports = addLogging
+import * as Logger from 'bunyan'
+import {OctokitWithPagination} from './'
 
-function addLogging (octokit, logger) {
+export const addLogging = function (octokit: OctokitWithPagination, logger: Logger) {
   octokit.hook.error('request', (error, options) => {
     const {method, url, headers, ...params} = options
     const msg = `GitHub request: ${method} ${url} - ${error.code} ${error.status}`
@@ -13,3 +14,5 @@ function addLogging (octokit, logger) {
     logger.debug({params}, msg)
   })
 }
+
+export { Logger }

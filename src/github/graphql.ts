@@ -1,10 +1,8 @@
-module.exports = addGraphQL
-
-function addGraphQL (octokit) {
+export const addGraphQL = function (octokit) {
   octokit.query = query.bind(null, octokit)
 }
 
-async function query (octokit, query, variables = undefined, headers = {}) {
+async function query (octokit, query: string, variables: Variables, headers = {}) {
   const res = await octokit.request({
     method: 'POST',
     url: '/graphql',
@@ -25,7 +23,7 @@ async function query (octokit, query, variables = undefined, headers = {}) {
 }
 
 class GraphQLError extends Error {
-  constructor (errors, query, variables) {
+  constructor (errors, query: string, variables: Variables) {
     super(JSON.stringify(errors))
     this.name = 'GraphQLError'
     this.query = query
@@ -36,3 +34,10 @@ class GraphQLError extends Error {
     }
   }
 }
+
+interface GraphQLError {
+  query: string
+  variables: Variables
+}
+
+type Variables = { [key: string]: any }

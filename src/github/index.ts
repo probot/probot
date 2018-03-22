@@ -1,9 +1,8 @@
-const Octokit = require('@octokit/rest')
-
-const addPagination = require('./pagination')
-const addRateLimiting = require('./rate-limiting')
-const addLogging = require('./logging')
-const addGraphQL = require('./graphql')
+import * as Octokit from '@octokit/rest'
+import { Logger, addLogging } from './logging'
+import { addPagination } from './pagination'
+import { addRateLimiting } from './rate-limiting'
+import { addGraphQL } from './graphql'
 
 /**
  * the [@octokit/rest Node.js module](https://github.com/octokit/rest.js),
@@ -13,8 +12,8 @@ const addGraphQL = require('./graphql')
  * @typedef github
  * @see {@link https://github.com/octokit/rest.js}
  */
-function EnhancedGitHubClient (options) {
-  const octokit = Octokit(options)
+export const EnhancedGitHubClient = function (options) {
+  const octokit = <OctokitWithPagination> new Octokit(options)
 
   addRateLimiting(octokit, options.limiter)
   addLogging(octokit, options.logger)
@@ -24,4 +23,35 @@ function EnhancedGitHubClient (options) {
   return octokit
 }
 
-module.exports = EnhancedGitHubClient
+export interface Options extends Octokit.Options {
+  debug: boolean
+  logger: Logger
+  limiter?: any
+}
+
+export interface OctokitRequestOptions {
+  method: string
+  url: string
+  headers: any
+}
+
+export interface OctokitResult {
+  meta: {
+    status: string
+  }
+}
+
+export interface OctokitError {
+  code: number
+  status: string
+}
+
+export interface OctokitWithPagination extends Octokit {
+  paginate: (res: Promise<Octokit.AnyResponse>, callback: (results: Octokit.AnyResponse) => void) => void
+  // The following are added because Octokit does not expose the hook.error, hook.before, and hook.after methods
+  hook: {
+    error: (when: 'request', callback: (error: OctokitError, options: OctokitRequestOptions) => void) => void
+    before: (when: 'request', callback: (result: OctokitResult, options: OctokitRequestOptions) => void) => void
+    after: (when: 'request', callback: (result: OctokitResult, options: OctokitRequestOptions) => void) => void
+  }
+}

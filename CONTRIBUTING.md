@@ -1,5 +1,7 @@
 ## Contributing
 
+[![Build Status](https://travis-ci.org/probot/probot.svg?branch=master)](https://travis-ci.org/probot/probot) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/32r7s2skrgm9ubva?svg=true)](https://ci.appveyor.com/api/projects/status/32r7s2skrgm9ubva?svg=true) [![Codecov](https://img.shields.io/codecov/c/github/probot/probot.svg)](https://codecov.io/gh/probot/probot/) [![Greenkeeper badge](https://badges.greenkeeper.io/probot/probot.svg)](https://greenkeeper.io/)
+
 [fork]: https://github.com/probot/probot/fork
 [pr]: https://github.com/probot/probot/compare
 [style]: https://standardjs.com/

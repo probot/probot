@@ -2,6 +2,7 @@ import * as Logger from 'bunyan'
 
 export const createWebhookProxy = (opts: WebhookProxyOptions) => {
   try {
+    // tslint:disable-next-line
     const SmeeClient = require('smee-client')
 
     const smee = new SmeeClient({

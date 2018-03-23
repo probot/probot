@@ -95,6 +95,8 @@
     "standard": "^11.0.0",
     "supertest": "^3.0.0",
     "ts-jest": "^21.2.4",
+    "tslint": "^5.9.1",
+    "tslint-config-prettier": "^1.10.0",
     "typescript": "^2.7.2"
   },
   "standard": {

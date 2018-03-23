@@ -6,13 +6,14 @@ export const addGraphQL = function (octokit) {
 
 async function query (octokit: OctokitWithPagination, query: string, variables: Variables, headers = {}) {
   const res = await octokit.request({
-    method: 'POST',
-    url: '/graphql',
     headers: {
-      'content-type': 'application/json',
       'accept': 'application/json',
+      'content-type': 'application/json',
       ...headers
     },
+    method: 'POST',
+    url: '/graphql',
+
     query,
     variables
   })

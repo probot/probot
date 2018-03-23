@@ -3,8 +3,8 @@ import * as jwt from 'jsonwebtoken'
 export const createApp = function (options: AppOptions) {
   return function () {
     const payload = {
-      iat: Math.floor(Date.now() / 1000),       // Issued at time
       exp: Math.floor(Date.now() / 1000) + 60,  // JWT expiration time
+      iat: Math.floor(Date.now() / 1000),       // Issued at time
       iss: options.id                           // GitHub App ID
     }
 

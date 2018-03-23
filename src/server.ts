@@ -1,6 +1,7 @@
-import * as path from 'path'
-import * as express from 'express'
 import * as Logger from 'bunyan'
+import * as express from 'express'
+import * as path from 'path'
+
 // Teach express to properly handle async errors
 require('express-async-errors')
 

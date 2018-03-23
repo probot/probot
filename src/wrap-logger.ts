@@ -25,7 +25,7 @@ export const wrapLogger = function (logger: Logger, baseLogger?: Logger): Logger
     const log = logger.child(attrs, true)
 
     // …Sorry, bunyan, doing it anwyway
-    if (name) log.fields.name = name
+    if (name) {log.fields.name = name}
 
     return wrapLogger(log, baseLogger || logger)
   }

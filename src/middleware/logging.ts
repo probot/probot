@@ -1,5 +1,6 @@
 // Borrowed from https://github.com/vvo/bunyan-request
 // Copyright (c) Christian Tellnes <christian@tellnes.no>
+// tslint:disable
 var uuid = require('uuid')
 import {wrapLogger} from '../wrap-logger'
 

@@ -1,9 +1,9 @@
 import * as express from 'express'
 import {Context} from './context'
 import {logger} from './logger'
-import {wrapLogger, LoggerWithTarget} from './wrap-logger'
+import {LoggerWithTarget, wrapLogger} from './wrap-logger'
 const {EventEmitter} = require('promise-events')
-import {OctokitWithPagination, EnhancedGitHubClient as GitHubApi} from './github'
+import {EnhancedGitHubClient as GitHubApi, OctokitWithPagination} from './github'
 
 /**
  * The `robot` parameter available to apps
@@ -11,12 +11,12 @@ import {OctokitWithPagination, EnhancedGitHubClient as GitHubApi} from './github
  * @property {logger} log - A logger
  */
 export class Robot {
-  events: any
-  app: () => string
-  cache: RobotCache
-  router: express.Router
-  catchErrors?: boolean
-  log: LoggerWithTarget
+  public events: any
+  public app: () => string
+  public cache: RobotCache
+  public router: express.Router
+  public catchErrors?: boolean
+  public log: LoggerWithTarget
 
   constructor (options: RobotOptions) {
     const opts = options || {}
@@ -28,7 +28,7 @@ export class Robot {
     this.router = opts.router || express.Router() // you can do this?
   }
 
-  async receive (event: WebhookEvent) {
+  public async receive (event: WebhookEvent) {
     return this.events.emit('*', event).then(() => {
       return this.events.emit(event.event, event)
     })
@@ -55,7 +55,7 @@ export class Robot {
    * @param {string} path - the prefix for the routes
    * @returns {@link http://expressjs.com/en/4x/api.html#router|express.Router}
    */
-  route (path?: string) {
+  public route (path?: string) {
     if (path) {
       const router = express.Router()
       this.router.use(path, router)
@@ -92,7 +92,7 @@ export class Robot {
    *   // An issue was just opened.
    * });
    */
-  on (event: string | Array<string>, callback: (context: Context) => void) {
+  public on (event: string | string[], callback: (context: Context) => void) {
     if (typeof event === 'string') {
 
       const [name, action] = event.split('.')
@@ -145,7 +145,7 @@ export class Robot {
    * @returns {Promise<github>} - An authenticated GitHub API client
    * @private
    */
-  async auth (id?: string, log = this.log) {
+  public async auth (id?: string, log = this.log) {
     const github: OctokitWithPagination = GitHubApi({
       debug: process.env.LOG_LEVEL === 'trace',
       baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api/v3`,

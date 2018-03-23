@@ -1,5 +1,6 @@
-import * as path from 'path'
 import * as yaml from 'js-yaml'
+import * as path from 'path'
+
 import * as GitHubApi from '@octokit/rest'
 import {LoggerWithTarget} from './wrap-logger'
 /**
@@ -11,10 +12,10 @@ import {LoggerWithTarget} from './wrap-logger'
  * @property {logger} log - A logger
  */
 export class Context {
-  id: string
-  github: GitHubApi
-  log: LoggerWithTarget
-  payload!: WebhookPayloadWithRepository
+  public id: string
+  public github: GitHubApi
+  public log: LoggerWithTarget
+  public payload!: WebhookPayloadWithRepository
 
   constructor (event:any, github:GitHubApi, log:LoggerWithTarget) {
     Object.assign(this, event)
@@ -35,7 +36,7 @@ export class Context {
    * // Returns: {owner: 'username', repo: 'reponame', path: '.github/config.yml'}
    *
    */
-  repo<T> (object?: T) {
+  public repo<T> (object?: T) {
     const repo = this.payload.repository
 
     return Object.assign({
@@ -56,7 +57,7 @@ export class Context {
    *
    * @param {object} [object] - Params to be merged with the issue params.
    */
-  issue<T> (object?: T) {
+  public issue<T> (object?: T) {
     const payload = this.payload
     return Object.assign({
       number: (payload.issue || payload.pull_request || payload).number
@@ -104,7 +105,7 @@ export class Context {
    * @param {object} [defaultConfig] - An object of default config options
    * @return {Promise<Object>} - Configuration object read from the file
    */
-  async config<T> (fileName: string, defaultConfig: T) {
+  public async config<T> (fileName: string, defaultConfig: T) {
     const params = this.repo({path: path.posix.join('.github', fileName)})
 
     try {

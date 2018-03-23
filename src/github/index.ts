@@ -1,7 +1,8 @@
 import * as Octokit from '@octokit/rest'
-import { Logger, addLogging } from './logging'
+import { addLogging, Logger  } from './logging'
 import { addPagination } from './pagination'
 import { addRateLimiting } from './rate-limiting'
+
 import { addGraphQL } from './graphql'
 
 /**

@@ -1,13 +1,13 @@
-import * as cacheManager from 'cache-manager'
-import {createApp} from './github-app'
-import {createRobot, Robot} from './robot'
-import {Context} from './context'
-import {createServer} from './server'
-import {resolve} from './resolver'
-import {logger} from './logger'
-import {createWebhookProxy} from './webhook-proxy'
-import * as express from 'express'
 import * as Logger from 'bunyan'
+import * as cacheManager from 'cache-manager'
+import * as express from 'express'
+import {Context} from './context'
+import {createApp} from './github-app'
+import {logger} from './logger'
+import {resolve} from './resolver'
+import {createRobot, Robot} from './robot'
+import {createServer} from './server'
+import {createWebhookProxy} from './webhook-proxy'
 
 const Webhooks = require('@octokit/webhooks')
 const logRequestErrors = require('./middleware/log-request-errors')
@@ -67,7 +67,7 @@ export const createProbot = (options: Options) => {
   // Log all webhook errors
   webhook.on('error', errorHandler)
 
-  const robots: Array<Robot> = []
+  const robots: Robot[] = []
 
   function receive (event: any) {
     return Promise.all(robots.map(robot => robot.receive(event)))
@@ -127,7 +127,7 @@ export const createProbot = (options: Options) => {
 
 module.exports.createRobot = createRobot
 
-export interface Plugin { (robot: Robot): void }
+export type Plugin = (robot: Robot) => void
 
 export interface Options {
   webhookPath?: string

@@ -33,6 +33,8 @@ export interface OctokitRequestOptions {
   method: string
   url: string
   headers: any
+  query?: string
+  variables?: Variables
 }
 
 export interface OctokitResult {
@@ -54,4 +56,11 @@ export interface OctokitWithPagination extends Octokit {
     before: (when: 'request', callback: (result: OctokitResult, options: OctokitRequestOptions) => void) => void
     after: (when: 'request', callback: (result: OctokitResult, options: OctokitRequestOptions) => void) => void
   }
+  request: (OctokitRequestOptions) => Promise<Octokit.AnyResponse>
 }
+
+export interface Headers {
+  [key: string]: string
+}
+
+export type Variables = { [key: string]: any }

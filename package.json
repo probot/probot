@@ -70,7 +70,7 @@
   "devDependencies": {
     "@types/bunyan": "^1.8.4",
     "@types/bunyan-format": "^0.2.0",
-    "@types/cache-manager": "^1.2.5",
+    "@types/cache-manager": "^1.2.6",
     "@types/dotenv": "^4.0.2",
     "@types/express": "^4.0.39",
     "@types/jest": "^21.1.8",

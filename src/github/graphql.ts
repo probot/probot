@@ -1,8 +1,10 @@
+import { OctokitWithPagination, Variables } from './'
+
 export const addGraphQL = function (octokit) {
   octokit.query = query.bind(null, octokit)
 }
 
-async function query (octokit, query: string, variables: Variables, headers = {}) {
+async function query (octokit: OctokitWithPagination, query: string, variables: Variables, headers = {}) {
   const res = await octokit.request({
     method: 'POST',
     url: '/graphql',
@@ -39,5 +41,3 @@ interface GraphQLError {
   query: string
   variables: Variables
 }
-
-type Variables = { [key: string]: any }

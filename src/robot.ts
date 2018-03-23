@@ -28,7 +28,7 @@ export class Robot {
     this.router = opts.router || express.Router() // you can do this?
   }
 
-  async receive (event: EventWithEventField) {
+  async receive (event: WebhookEvent) {
     return this.events.emit('*', event).then(() => {
       return this.events.emit(event.event, event)
     })
@@ -171,8 +171,13 @@ export class Robot {
 
 export const createRobot = (options: RobotOptions) => new Robot(options)
 
-export interface EventWithEventField {
+export interface WebhookEvent {
   event: string
+  id: string
+  payload: any
+  protocol: 'http' | 'https'
+  host: string
+  url: string
 }
 
 // The TypeScript definition for cache-manager does not export the Cache interface so we recreate it here

@@ -169,6 +169,28 @@ describe('Robot', function () {
       expect(output[0].event.id).toEqual(event.id)
     })
 
+    it('throw error if using context.github on created app', async () => {
+      const event3 = {
+        id: '123-456',
+        event: 'installation',
+        payload: {
+          action: 'created',
+          installation: {id: 1}
+        }
+      }
+
+      robot.on('installation.created', async context => {
+        await context.github.issues.createComment(/* … */)
+      })
+
+      try {
+        await robot.receive(event3)
+      } catch (err) {
+        expect(err).toBeInstanceOf(TypeError)
+        expect(err.message).toEqual('Cannot read property \'issues\' of undefined')
+      }
+    })
+
     it('throw error if using context.github on deleted app', async () => {
       const event3 = {
         id: '123-456',
@@ -186,11 +208,8 @@ describe('Robot', function () {
       try {
         await robot.receive(event3)
       } catch (err) {
-        expect(err).toBeInstanceOf(Error)
-        expect(err.message).toEqual(
-          'You are trying to make a GitHub request but is seems like your ' +
-          'GitHub App has just been deleted. We cannot authenticate your ' +
-          'request.')
+        expect(err).toBeInstanceOf(TypeError)
+        expect(err.message).toEqual('Cannot read property \'issues\' of undefined')
       }
     })
 

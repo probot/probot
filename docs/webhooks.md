@@ -40,3 +40,4 @@ module.exports = robot => {
 }
 ```
 
+> **Beware!** `context.github` will be `undefined` when your application is not authorized – you cannot interact with repositories on events such as `installation.created` or `installation.deleted`.

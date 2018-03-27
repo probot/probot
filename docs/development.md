@@ -66,14 +66,24 @@ You'll need to create a test repository and install your app by clicking the "In
 Once you've set the `APP_ID` of your GitHub app in `.env` and downloaded the private key, you're ready to run your app.
 
 ```
-$ npm start
+$ npm run dev
+
+> my-app@1.0.0 dev /Users/z/Desktop/foo
+> nodemon --exec "npm start"
+
+[nodemon] 1.17.2
+[nodemon] to restart at any time, enter `rs`
+[nodemon] watching: *.*
+[nodemon] starting `npm start`
+
+> my-app@1.0.0 start /Users/z/Desktop/foo
 > probot run ./index.js
 
 Yay, the plugin was loaded!
 18:11:55.838Z DEBUG Probot: Loaded plugin: ./index.js
 ```
 
-Optionally, you can also run your app through [nodemon](https://github.com/remy/nodemon#nodemon) which will listen on any files changes in your local development environment and automatically restart the server. After installing nodemon, you can run `nodemon --exec "npm start"` and from there the server will automatically restart upon file changes.
+The `dev` script will start your app using [nodemon](https://github.com/remy/nodemon#nodemon), which will watch for any files changes in your local development environment and automatically restart the server.
 
 ## Debugging
 

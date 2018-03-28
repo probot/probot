@@ -45,7 +45,7 @@ Done! Enjoy building your Probot app!
 
 The most important files note here are `index.js`, which is where the code for your app will go, and `package.json`, which makes this a standard [npm module](https://docs.npmjs.com/files/package.json).
 
-## Configuring a GitHub app
+## Configuring a GitHub App
 
 To run your app in development, you will need to configure a GitHub App to deliver webhooks to your local machine.
 

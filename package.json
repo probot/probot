@@ -8,7 +8,6 @@
     "probot": "./bin/probot.js"
   },
   "scripts": {
-    "start": "node ./bin/probot run",
     "test": "jest --coverage && standard && npm run doc-lint",
     "doc-lint": "standard docs/**/*.md",
     "doc": "jsdoc -c .jsdoc.json",
@@ -24,6 +23,7 @@
   "license": "ISC",
   "dependencies": {
     "@octokit/rest": "15.2.0",
+    "@octokit/webhooks": "^3.1.1",
     "bottleneck": "^2.2.0",
     "bunyan": "^1.8.12",
     "bunyan-format": "^0.2.1",
@@ -32,8 +32,7 @@
     "commander": "^2.11.0",
     "dotenv": "~5.0.0",
     "express": "^4.16.2",
-    "express-async-errors": "2.1.1",
-    "github-webhook-handler": "^0.7.0",
+    "express-async-errors": "^2.1.0",
     "hbs": "^4.0.1",
     "js-yaml": "^3.9.1",
     "jsonwebtoken": "^8.1.0",

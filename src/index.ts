@@ -59,7 +59,7 @@ export const createProbot = (options: Options) => {
 
     delete webhookEvent.name
 
-    logger.info({event: webhookEvent}, 'Webhook received')
+    logger.debug({event: webhookEvent}, 'Webhook received')
 
     receive(webhookEvent)
   })

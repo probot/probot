@@ -1,10 +1,10 @@
 {
   "name": "probot",
-  "version": "6.1.0-typescript",
+  "version": "0.0.0-development",
   "publishConfig": {
     "tag": "next"
   },
-  "description": "a trainable robot that responds to activity on GitHub.",
+  "description": "a trainable robot that responds to activity on GitHub",
   "repository": "https://github.com/probot/probot",
   "main": "lib/index.js",
   "bin": {
@@ -37,10 +37,12 @@
       ".+\\.tsx?$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
     "testMatch": [
-      "<rootDir>/test/*.(ts|js)"
+      "<rootDir>/test/**/*.(ts|js)"
     ],
     "testPathIgnorePatterns": [
-      "<rootDir>/test/setup.js"
+      "<rootDir>/test/setup.js",
+      "<rootDir>/test/fixtures/",
+      "<rootDir>/test/plugins/helper.js"
     ]
   },
   "author": "Brandon Keepers",

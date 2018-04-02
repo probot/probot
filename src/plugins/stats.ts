@@ -1,5 +1,9 @@
 // Built-in plugin to expose stats about the deployment
 module.exports = async (robot: any): Promise<void> => {
+  if (process.env.DISABLE_STATS) {
+    return
+  }
+
   const REFRESH_INTERVAL = 60 * 60 * 1000
 
   // Cache of stats that get reported

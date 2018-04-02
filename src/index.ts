@@ -5,7 +5,7 @@ import {Context} from './context'
 import {createApp} from './github-app'
 import {logger} from './logger'
 import {resolve} from './resolver'
-import {createRobot, Robot} from './robot'
+import {createRobot, Robot, WebhookEvent} from './robot'
 import {createServer} from './server'
 import {createWebhookProxy} from './webhook-proxy'
 
@@ -136,6 +136,16 @@ export interface Options {
   cert: string,
   webhookProxy?: string,
   port?: number
+}
+
+export interface Probot {
+  server: express.Application
+  webhook: any
+  receive: (event: WebhookEvent) => Promise<any[]>
+  logger: Logger
+  load: (plugin: string | Plugin) => Robot
+  setup: (apps: Array<string | Plugin>) => void
+  start: () => void
 }
 
 export { Logger, Context, Robot }

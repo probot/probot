@@ -2,7 +2,8 @@ import * as express from 'express'
 import {Context} from './context'
 import {logger} from './logger'
 import {LoggerWithTarget, wrapLogger} from './wrap-logger'
-const {EventEmitter} = require('promise-events')
+
+import {EventEmitter} from 'promise-events'
 import {EnhancedGitHubClient as GitHubApi, OctokitWithPagination} from './github'
 
 /**
@@ -11,7 +12,7 @@ import {EnhancedGitHubClient as GitHubApi, OctokitWithPagination} from './github
  * @property {logger} log - A logger
  */
 export class Robot {
-  public events: any
+  public events: EventEmitter
   public app: () => string
   public cache: RobotCache
   public router: express.Router

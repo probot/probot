@@ -7,7 +7,7 @@ require('express-async-errors')
 
 import {logRequest} from './middleware/logging'
 
-export const createServer = function (args: ServerArgs) {
+export const createServer = function (args: ServerArgs): express.Application {
   const app:express.Application = express()
 
   app.use(logRequest({logger: args.logger}))

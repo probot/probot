@@ -13,7 +13,7 @@ import { addGraphQL } from './graphql'
  * @typedef github
  * @see {@link https://github.com/octokit/rest.js}
  */
-export const EnhancedGitHubClient = function (options) {
+export const EnhancedGitHubClient = function (options: Options) {
   const octokit = <OctokitWithPagination> new Octokit(options)
 
   addRateLimiting(octokit, options.limiter)
@@ -50,7 +50,7 @@ export interface OctokitError {
 }
 
 export interface OctokitWithPagination extends Octokit {
-  paginate: (res: Promise<Octokit.AnyResponse>, callback: (results: Octokit.AnyResponse) => void) => void
+  paginate: (res: Promise<Octokit.AnyResponse>, callback: (results: Octokit.AnyResponse) => void) => Promise<any[]>
   // The following are added because Octokit does not expose the hook.error, hook.before, and hook.after methods
   hook: {
     error: (when: 'request', callback: (error: OctokitError, options: OctokitRequestOptions) => void) => void

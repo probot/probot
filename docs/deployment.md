@@ -137,7 +137,7 @@ Zeit [Now](http://zeit.co/now) is a great service for running Probot apps. After
 
 ## Share the app
 
-The Probot website includes a list of [featured apps](https://probot.github.com/apps). Consider [adding your app to the website](https://github.com/probot/probot.github.io/blob/master/CONTRIBUTING.md#adding-your-app
+The Probot website includes a list of [featured apps](https://probot.github.io/apps). Consider [adding your app to the website](https://github.com/probot/probot.github.io/blob/master/CONTRIBUTING.md#adding-your-app
 ) so others can discover and use it.
 
 ## Combining apps

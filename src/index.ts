@@ -29,8 +29,8 @@ export const createProbot = (options: Options) => {
 
   const webhook = new Webhooks({path: options.webhookPath, secret: options.secret})
   const app = createApp({
+    cert: options.cert,
     id: options.id,
-    cert: options.cert
   })
   const server: express.Application = createServer({webhook: webhook.middleware, logger})
 
@@ -102,20 +102,20 @@ export const createProbot = (options: Options) => {
   }
 
   return {
-    server,
-    webhook,
-    receive,
-    logger,
     load,
+    logger,
+    receive,
+    server,
     setup,
+    webhook,
 
     start () {
       if (options.webhookProxy) {
         createWebhookProxy({
-          url: options.webhookProxy,
-          port: options.port,
+          logger,
           path: options.webhookPath,
-          logger
+          port: options.port,
+          url: options.webhookProxy,
         })
       }
 

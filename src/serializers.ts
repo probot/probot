@@ -4,7 +4,6 @@ import {PayloadRepository} from './context'
 
 export const serializers: bunyan.StdSerializers = {
 
-  repository: (repository: PayloadRepository) => repository.full_name,
   event: (event: any) => {
     if (typeof event !== 'object' || !event.payload) {
       return event
@@ -15,10 +14,10 @@ export const serializers: bunyan.StdSerializers = {
       }
 
       return {
-        id: event.id,
         event: name,
+        id: event.id,
+        installation: event.payload.installation && event.payload.installation.id,
         repository: event.payload.repository && event.payload.repository.full_name,
-        installation: event.payload.installation && event.payload.installation.id
       }
     }
   },
@@ -32,6 +31,8 @@ export const serializers: bunyan.StdSerializers = {
 
   err: bunyan.stdSerializers.err,
 
+  repository: (repository: PayloadRepository) => repository.full_name,
+
   req: bunyan.stdSerializers.req,
 
   // Same as buyan's standard serializers, but gets headers as an object
@@ -43,8 +44,8 @@ export const serializers: bunyan.StdSerializers = {
     } else {
       return {
         duration: res.duration,
+        headers: res.getHeaders(),
         statusCode: res.statusCode,
-        headers: res.getHeaders()
       }
     }
   }

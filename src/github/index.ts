@@ -64,4 +64,4 @@ export interface Headers {
   [key: string]: string
 }
 
-export type Variables = { [key: string]: any }
+export interface Variables { [key: string]: any }

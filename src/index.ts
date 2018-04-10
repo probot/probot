@@ -135,8 +135,6 @@ export const createProbot = (options: Options) => {
   return new Probot(options)
 }
 
-module.exports.createRobot = createRobot
-
 export type Plugin = (robot: Robot) => void
 
 export interface Options {
@@ -148,4 +146,4 @@ export interface Options {
   port?: number
 }
 
-export { Logger, Context, Robot }
+export { Logger, Context, Robot, createRobot }

@@ -95,7 +95,7 @@ export const createProbot = (options: Options) => {
     process.on('unhandledRejection', errorHandler)
 
     // Load the given apps along with the default apps
-    apps.concat(defaultApps).forEach(app => load(app))
+    apps.concat(defaultApps).forEach(load)
 
     // Register error handler as the last middleware
     server.use(logRequestErrors)

@@ -44,7 +44,13 @@
       "<rootDir>/test/setup.js",
       "<rootDir>/test/fixtures/",
       "<rootDir>/test/plugins/helper.js"
-    ]
+    ],
+    "globals": {
+      "ts-jest": {
+        "skipBabel": true,
+        "enableTsDiagnostics": true
+      }
+    }
   },
   "author": "Brandon Keepers",
   "license": "ISC",

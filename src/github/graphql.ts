@@ -1,6 +1,6 @@
 import { OctokitWithPagination, Variables } from './'
 
-export const addGraphQL = function (octokit) {
+export const addGraphQL = (octokit) => {
   octokit.query = graphql.bind(null, octokit)
 }
 

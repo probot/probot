@@ -1,6 +1,6 @@
 const Bottleneck = require('bottleneck')
 
-export const addRateLimiting = function (octokit, limiter) {
+export const addRateLimiting = (octokit, limiter) => {
   if (!limiter) {
     limiter = new Bottleneck(1, 1000)
   }

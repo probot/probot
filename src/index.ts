@@ -131,9 +131,7 @@ export class Probot {
   }
 }
 
-export const createProbot = (options: Options) => {
-  return new Probot(options)
-}
+export const createProbot = (options: Options) => new Probot(options)
 
 export type Plugin = (robot: Robot) => void
 

@@ -66,7 +66,6 @@ export class Probot {
     this.webhook.on('error', this.errorHandler)
 
     this.robots = []
-
   }
 
   public errorHandler (err) {

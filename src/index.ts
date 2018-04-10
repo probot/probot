@@ -75,7 +75,7 @@ export const createProbot = (options: Options) => {
 
   function load (plugin: string | Plugin) {
     if (typeof plugin === 'string') {
-      plugin = <Plugin> resolve(plugin)
+      plugin = resolve(plugin) as Plugin
     }
 
     const robot = createRobot({app, cache, catchErrors: true})

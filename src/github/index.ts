@@ -14,7 +14,7 @@ import { addGraphQL } from './graphql'
  * @see {@link https://github.com/octokit/rest.js}
  */
 export const EnhancedGitHubClient = function (options: Options = {} as any) {
-  const octokit = <OctokitWithPagination> new Octokit(options)
+  const octokit = new Octokit(options) as OctokitWithPagination
 
   addRateLimiting(octokit, options.limiter)
   addLogging(octokit, options.logger)

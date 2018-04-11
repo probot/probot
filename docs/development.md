@@ -2,7 +2,7 @@
 next: docs/webhooks.md
 ---
 
-# Developing an App
+# Developing an app
 
 To develop a Probot app, you will first need a recent version of [Node.js](https://nodejs.org/) installed. Open a terminal and run `node -v` to verify that it is installed and is at least 8.3.0 or later. Otherwise, [install the latest version](https://nodejs.org/).
 
@@ -45,7 +45,7 @@ Done! Enjoy building your Probot app!
 
 The most important files note here are `index.js`, which is where the code for your app will go, and `package.json`, which makes this a standard [npm module](https://docs.npmjs.com/files/package.json).
 
-## Configure a GitHub App
+## Configuring a GitHub App
 
 To run your app in development, you will need to configure a GitHub App to deliver webhooks to your local machine.
 
@@ -55,25 +55,37 @@ To run your app in development, you will need to configure a GitHub App to deliv
     - **Webhook URL**: Use your `WEBHOOK_PROXY_URL` from the previous step.
     - **Webhook Secret:** `development`
     - **Permissions & events** is located lower down the page and will depend on what data you want your app to have access to. Note: if, for example, you only enable issue events, you will not be able to listen on pull request webhooks with your app. However, for development we recommend enabling everything.
-1. Download the private key and move it to your project's directory. It will get picked up by Probot automatically.
+1. Download the private key and move it to your project's directory. As long as it's in the root of your project, Probot will find it automatically regardless of the filename.
 1. Edit `.env` and set `APP_ID` to the ID of the app you just created. The App ID can be found in your app settings page here <img width="1048" alt="screen shot 2017-08-20 at 8 31 31 am" src="https://user-images.githubusercontent.com/13410355/29496168-044b9a48-8582-11e7-8be4-39cc75090647.png">
-1. Run `$ npm start` to start the server/
+1. 
 
-You'll need to create a test repository and install your app by clicking the "Install" button on the settings page of your app.
+## Installing the app on a repo
 
-## Running the app
+You'll need to create a test repository and install your app by clicking the "Install" button on the settings page of your app, e.g. `https://github.com/apps/your-app`
 
-Once you've set the `APP_ID` of your GitHub app in `.env` and downloaded the private key, you're ready to run your app.
+## Running the app locally
+
+Now you're ready to run the app on your local machine. Run `npm run dev` to start the server:
 
 ```
-$ npm start
+$ npm run dev
+
+> my-app@1.0.0 dev /Users/z/Desktop/foo
+> nodemon --exec "npm start"
+
+[nodemon] 1.17.2
+[nodemon] to restart at any time, enter `rs`
+[nodemon] watching: *.*
+[nodemon] starting `npm start`
+
+> my-app@1.0.0 start /Users/z/Desktop/foo
 > probot run ./index.js
 
 Yay, the plugin was loaded!
 18:11:55.838Z DEBUG Probot: Loaded plugin: ./index.js
 ```
 
-Optionally, you can also run your app through [nodemon](https://github.com/remy/nodemon#nodemon) which will listen on any files changes in your local development environment and automatically restart the server. After installing nodemon, you can run `nodemon --exec "npm start"` and from there the server will automatically restart upon file changes.
+The `dev` script will start your app using [nodemon](https://github.com/remy/nodemon#nodemon), which will watch for any files changes in your local development environment and automatically restart the server.
 
 ## Debugging
 

@@ -1,9 +1,49 @@
 # Events and Actions
 
-Almost all GitHub events have a associated GitHub events with it.
-Here are some GitHub events:
+There are many events on GitHub which gets subscribed to webhooks. One of these events is triggered, GitHub sends a HTTP POST payload to the webhook's configured URL.
 
-## `*`
+While configuring a webhook, one can choose which events you would like to receive payloads for. Only subscribing to the specific events you plan on handling is useful for limiting the number of HTTP requests to your server. You can even opt-in to all current and future events. You can change the list of subscribed events through the API or UI anytime. 
+
+Also, each event corresponds to a certain set of actions that can happen to your organization and/or repository.
+
+Given below is a list of GitHub webhook events and actions related to the events.
+  * [`*`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#)
+  * [`commit_comment`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#commit_comment)
+  * [`create`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#create)
+  * [`delete`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#delete)
+  * [`deployment`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#deployment)
+  * [`deployment_status`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#deployment_status)
+  * [`fork`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#fork)
+  * [`gollum`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#gollum)
+  * [`installation`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#installation)
+  * [`installation_repositories`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#installation_repositories)
+  * [`issue_comment`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#issue_comment)
+  * [`issues`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#issues)
+  * [`label`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#label)
+  * [`marketplace_purchase`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#marketplace_purchase)
+  * [`member`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#member)
+  * [`membership`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#membership)
+  * [`milestone`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#milestone)
+  * [`organization`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#organization)
+  * [`org_block`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#org_block)
+  * [`page_build`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#page_build)
+  * [`ping`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#ping)
+  * [`project_card`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#project_card)
+  * [`project_column`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#project_column)
+  * [`project`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#project)
+  * [`public`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#public)
+  * [`pull_request_review_comment`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#pull_request_review_comment)
+  * [`pull_request_review`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#pull_request_review)
+  * [`pull_request`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#pull_request)
+  * [`push`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#push)
+  * [`repository`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#repository)
+  * [`release`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#release)
+  * [`status`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#status)
+  * [`team`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#team)
+  * [`team_add`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#team_add)
+  * [`watch`](https://github.com/aps120797/probot/blob/master/docs/events-actions.md#watch)
+
+## `*` (Wildcard Event)
 It is the [Wildcard Event](https://developer.github.com/webhooks/#wildcard-event). It matches all supported events. When you add the wildcard event, it will replace any existing events you have configured with the wildcard event and send you payloads for all supported events. One will also automatically get any new events that Developers at GitHub might add in the future.
 
 ## `commit_comment`

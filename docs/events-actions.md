@@ -220,7 +220,9 @@ This event is triggered when a Pages site is built or results in a failed build.
 [Additional Information about `page_build`](https://developer.github.com/v3/activity/events/types/#pagebuildevent)
 
 ## `ping`
-This event is triggered when the app pings the webhook to check its connection.
+When you create a new webhook, GitHub send you a simple ping event to let you know you've set up the webhook correctly. This event isn't stored so it isn't retrievable via the Events API. You can trigger a ping again by calling the ping endpoint.
+
+[Additional Information about `ping`](https://developer.github.com/webhooks/#ping-event)
 
 ## `project_card`
 This event is triggered when a Project Card is created, edited, moved, converted to an issue, or deleted.

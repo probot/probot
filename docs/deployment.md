@@ -125,6 +125,8 @@ Zeit [Now](http://zeit.co/now) is a great service for running Probot apps. After
             -e NODE_ENV=production \
             -e PRIVATE_KEY="$(cat ~/Downloads/*.private-key.pem)"
 
+      **NOTE**: Add `-e LOG_LEVEL=trace` to get verbose logging, or add `-e LOG_LEVEL=info` instead to show less details.
+
 1. Once the deploy is started, go back to your [app settings page](https://github.com/settings/apps) and update the **Webhook URL** to the URL of your deployment (which `now` has kindly copied to your clipboard).
 
 1. Your app should be up and running! For long term use, create an alias for your robot. After making an alias, you can swap to new deploy URLs with no downtime.

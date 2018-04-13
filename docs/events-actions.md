@@ -10,6 +10,19 @@ While configuring a webhook, one can choose which events you would like to recei
 
 Also, each event corresponds to a certain set of actions that can happen to your organization and/or repository.
 
+For an exaple, let us consider the following code snippet:
+
+```javascript
+module.exports = robot => {
+  robot.on('issues.opened', async context => {
+    // A new issue was opened, what should we do with it?
+    // `issues` is the event here,
+    // `opened` is the action associated with the event here
+  })
+}
+```
+Here, `issues` is the event and `opened` is the action associated with the event.
+
 Given below is a list of GitHub webhook events and actions related to the events.
   - [`*`](#-wildcard-event)
   - [`commit_comment`](#commit_comment)

@@ -10,7 +10,7 @@ While configuring a webhook, one can choose which events you would like to recei
 
 Also, each event corresponds to a certain set of actions that can happen to your organization and/or repository.
 
-For an exaple, let us consider the following code snippet:
+For example, let us consider the following code snippet:
 
 ```javascript
 module.exports = robot => {

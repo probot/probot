@@ -215,7 +215,7 @@ This event is triggered when a user is added, removed, or invited to an Organiza
 
 Action | Description | Syntax
 -------|-------------|--------
-`member_added` | This action is triggered when a user is addedto an Organization. | `organization.member_added`
+`member_added` | This action is triggered when a user is added to an Organization. | `organization.member_added`
 `member_invited` |  This action is triggered when a user is invited to an Organization. | `organization.member_invited`
 `member_removed` |  This action is triggered when a user is removed from an Organization. | `organization.member_removed`
 

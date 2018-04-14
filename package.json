@@ -21,6 +21,12 @@
     "postsemantic-release": "script/publish-docs",
     "prepublish": "npm run build"
   },
+  "files": [
+    "lib",
+    "bin",
+    "static",
+    "views"
+  ],
   "jest": {
     "setupFiles": [
       "<rootDir>/test/setup.js"

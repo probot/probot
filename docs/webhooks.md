@@ -39,4 +39,17 @@ module.exports = robot => {
   })
 }
 ```
+You can also use [GitHub wildcard event (`*`)](https://developer.github.com/webhooks/#wildcard-event) to receive all the possible webhook for the events to which your applications is subscribed to:
+```js
+module.exports = robot => {
+  robot.on(`*`, async context => {
+    // Something happened at GitHub, what should I do?
+    robot.log(context.event) // Logs the event details
+    robot.log(context.payload.action) // Logs the related action details
+  })
+}
+```
+When you add the wildcard event (`*`), the app will replace any existing events you have configured with the wildcard event and send you payloads for all supported events. You'll also automatically get any new events that GitHub might might add in the future.
+
+Explore all the GitHub events here : [GitHub Webhook Events](https://developer.github.com/webhooks/#events)
 

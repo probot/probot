@@ -25,6 +25,15 @@ describe('Context', function () {
   })
 
   describe('repo', function () {
+    it('returns error for context.repo()', function () {
+      context.payload.repository = undefined
+      try {
+        context.repo()
+      } catch (e) {
+        expect(String(e)).toEqual('Error: Sorry not available for this event')
+      }
+    })
+
     it('returns attributes from repository payload', function () {
       expect(context.repo()).toEqual({owner: 'bkeepers', repo: 'probot'})
     })

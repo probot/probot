@@ -51,7 +51,7 @@ describe('Context', function () {
     })
 
     it('returns error for context.repo()', function () {
-      context.payload.repository = undefined
+      delete context.payload.repository
       try {
         context.repo()
       } catch (e) {

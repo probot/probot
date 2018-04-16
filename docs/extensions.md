@@ -29,7 +29,7 @@ Use the `_extends` option in your configuration file to extend settings from ano
 For example, given `.github/test.yml`:
 
 ```yaml
-_extends: probot-settings
+_extends: github-settings
 # Override values from the extended config or define new values
 name: myrepo
 ```

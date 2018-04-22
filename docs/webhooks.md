@@ -45,9 +45,7 @@ You can also use the wildcard event (`*`) to listen for any event that your app 
 ```js
 module.exports = robot => {
   robot.on(`*`, async context => {
-    // Something happened at GitHub, what should I do?
-    robot.log(context.event) // Logs the event details
-    robot.log(context.payload.action) // Logs the related action details
+    context.log({event: context.event, action: context.payload.action})
   })
 }
 ```

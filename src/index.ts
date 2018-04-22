@@ -35,37 +35,23 @@ export class Probot {
   constructor(options: Options) {
     options.webhookPath = options.webhookPath || '/'
     options.secret = options.secret || 'development'
-
     this.options = options
     this.logger = logger
-
+    this.robots = []
     this.webhook = new Webhooks({path: options.webhookPath, secret: options.secret})
-
-    this.app = createApp({
-      id: options.id,
-      cert: options.cert
-    })
-
+    this.app = createApp({ id: options.id, cert: options.cert })
     this.server = createServer({webhook: this.webhook.middleware, logger})
 
     // Log all received webhooks
     this.webhook.on('*', (event: any) => {
-      const webhookEvent = {
-        ...event,
-        event: event.name
-      }
-
+      const webhookEvent = { ...event, event: event.name }
       delete webhookEvent.name
-
-      logger.debug({event: webhookEvent}, 'Webhook received')
 
       this.receive(webhookEvent)
     })
 
     // Log all webhook errors
     this.webhook.on('error', this.errorHandler)
-
-    this.robots = []
   }
 
   public errorHandler (err) {
@@ -84,6 +70,7 @@ export class Probot {
   }
 
   public receive (event: WebhookEvent) {
+    this.logger.debug({event}, 'Webhook received')
     return Promise.all(this.robots.map(robot => robot.receive(event)))
   }
 

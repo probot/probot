@@ -7,6 +7,7 @@
   "description": "a trainable robot that responds to activity on GitHub",
   "repository": "https://github.com/probot/probot",
   "main": "lib/index.js",
+  "types": "./lib/index.d.ts",
   "bin": {
     "probot": "./bin/probot.js"
   },
@@ -43,7 +44,13 @@
       "<rootDir>/test/setup.js",
       "<rootDir>/test/fixtures/",
       "<rootDir>/test/plugins/helper.js"
-    ]
+    ],
+    "globals": {
+      "ts-jest": {
+        "skipBabel": true,
+        "enableTsDiagnostics": true
+      }
+    }
   },
   "author": "Brandon Keepers",
   "license": "ISC",

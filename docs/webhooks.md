@@ -50,4 +50,4 @@ module.exports = robot => {
 }
 ```
 
-Explore the [GitHub webhook documentation](https://developer.github.com/webhooks/#events) to see what events are available for your app to use.
+Explore the [GitHub webhook documentation](https://developer.github.com/webhooks/#events) to see what events are available to use in your app.

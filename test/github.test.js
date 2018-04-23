@@ -17,6 +17,14 @@ describe('EnhancedGitHubClient', () => {
     github = new EnhancedGitHubClient({ logger, limiter })
   })
 
+  test('works without options', async () => {
+    github = new EnhancedGitHubClient()
+    const user = {login: 'ohai'}
+
+    nock('https://api.github.com').get('/user').reply(200, user)
+    expect((await github.users.get({})).data).toEqual(user)
+  })
+
   describe('paginate', () => {
     beforeEach(() => {
       // Prepare an array of issue objects

@@ -29,7 +29,7 @@ Use the `_extends` option in your configuration file to extend settings from ano
 For example, given `.github/test.yml`:
 
 ```yaml
-_extends: probot-settings
+_extends: github-settings
 # Override values from the extended config or define new values
 name: myrepo
 ```
@@ -102,3 +102,22 @@ module.exports = robot => {
 ```
 
 Check out [stale](https://github.com/probot/stale) to see it in action.
+
+## Attachments
+
+[probot-attachments](https://github.com/probot/attachments) adds message attachments to comments on GitHub. This extension should be used any time an app is appending content to user comments.
+
+```js
+const attachments = require('probot-attachments')
+
+module.exports = robot => {
+  robot.on('issue_comment.created', context => {
+    return attachments(context).add({
+      'title': 'Hello World',
+      'title_link': 'https://example.com/hello'
+    })
+  })
+}
+```
+
+Check out [probot/unfurl](https://github.com/probot/unfurl) to see it in action.

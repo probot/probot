@@ -61,8 +61,11 @@ describe('stats', function () {
       nock('https://api.github.com')
         .defaultReplyHeaders({'Content-Type': 'application/json'})
         .post('/installations/1/access_tokens').reply(200, {token: 'test'})
-        .get('/app/installations?per_page=100').reply(200, [{id: 2, account: {login: 'spammyUser'}}])
-        .get('/installation/repositories?per_page=100').reply(200, {repositories: [{private: false, stargazers_count: 2}]})
+        .get('/app/installations?per_page=100').reply(200, [{id: 1, account: {login: 'spammyUser'}}])
+        .get('/installation/repositories?per_page=100').reply(200, {repositories: [
+          {private: true, stargazers_count: 1},
+          {private: false, stargazers_count: 2}
+        ]})
 
       robot = helper.createRobot()
 

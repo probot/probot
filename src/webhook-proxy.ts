@@ -6,9 +6,9 @@ export const createWebhookProxy = (opts: WebhookProxyOptions) => {
     const SmeeClient = require('smee-client')
 
     const smee = new SmeeClient({
+      logger: opts.logger,
       source: opts.url,
       target: `http://localhost:${opts.port}${opts.path}`,
-      logger: opts.logger
     })
     return smee.start()
   } catch (err) {

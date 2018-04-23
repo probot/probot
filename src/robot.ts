@@ -3,7 +3,7 @@ import {Context} from './context'
 import {logger} from './logger'
 import {LoggerWithTarget, wrapLogger} from './wrap-logger'
 
-import {EventEmitter} from 'promise-events'
+  import {EventEmitter} from 'promise-events'
 import {EnhancedGitHubClient as GitHubApi, OctokitWithPagination} from './github'
 
 /**
@@ -93,10 +93,10 @@ export class Robot {
    *   // An issue was just opened.
    * });
    */
-  public on (event: string | string[], callback: (context: Context) => void) {
-    if (typeof event === 'string') {
+  public on (eventName: string | string[], callback: (context: Context) => void) {
+    if (typeof eventName === 'string') {
 
-      const [name, action] = event.split('.')
+      const [name, action] = eventName.split('.')
 
       return this.events.on(name, async (event: Context) => {
         if (!action || action === event.payload.action) {
@@ -116,7 +116,7 @@ export class Robot {
         }
       })
     } else {
-      event.forEach(e => this.on(e, callback))
+      eventName.forEach(e => this.on(e, callback))
     }
   }
 
@@ -148,8 +148,8 @@ export class Robot {
    */
   public async auth (id?: string, log = this.log) {
     const github: OctokitWithPagination = GitHubApi({
-      debug: process.env.LOG_LEVEL === 'trace',
       baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api/v3`,
+      debug: process.env.LOG_LEVEL === 'trace',
       logger: log.child({name: 'github', installation: id})
     })
 

@@ -13,8 +13,8 @@ import { addGraphQL } from './graphql'
  * @typedef github
  * @see {@link https://github.com/octokit/rest.js}
  */
-export const EnhancedGitHubClient = function (options: Options = {} as any) {
-  const octokit = <OctokitWithPagination> new Octokit(options)
+export const EnhancedGitHubClient = (options: Options = {} as any) => {
+  const octokit = new Octokit(options) as OctokitWithPagination
 
   addRateLimiting(octokit, options.limiter)
   addLogging(octokit, options.logger)
@@ -64,4 +64,4 @@ export interface Headers {
   [key: string]: string
 }
 
-export type Variables = { [key: string]: any }
+export interface Variables { [key: string]: any }

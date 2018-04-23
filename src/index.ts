@@ -76,7 +76,7 @@ export class Probot {
 
   public load (plugin: string | Plugin) {
     if (typeof plugin === 'string') {
-      plugin = <Plugin> resolve(plugin)
+      plugin = resolve(plugin) as Plugin
     }
 
     const robot = createRobot({app: this.app, cache, catchErrors: true})
@@ -105,10 +105,10 @@ export class Probot {
   public start () {
     if (this.options.webhookProxy) {
       createWebhookProxy({
-        url: this.options.webhookProxy,
-        port: this.options.port,
+        logger,
         path: this.options.webhookPath,
-        logger
+        port: this.options.port,
+        url: this.options.webhookProxy,
       })
     }
 

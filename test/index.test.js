@@ -11,6 +11,7 @@ describe('Probot', () => {
     probot = createProbot()
 
     event = {
+      name: 'push',
       event: 'push',
       payload: require('./fixtures/webhook/push')
     }
@@ -20,8 +21,30 @@ describe('Probot', () => {
     it('forwards webhooks to the robot', async () => {
       const robot = probot.load(() => {})
       robot.receive = jest.fn()
-      probot.webhook.emit('*', event)
-      expect(robot.receive).toHaveBeenCalledWith(event)
+      await probot.webhook.receive(event)
+      expect(robot.receive).toHaveBeenCalledWith({ event: event.name, payload: event.payload })
+    })
+
+    it('responds with the correct error if webhook secret is wrong', async () => {
+      probot.logger.error = jest.fn()
+      probot.webhook.on('push', () => { throw new Error('X-Hub-Signature does not match blob signature') })
+
+      try {
+        await probot.webhook.receive(event)
+      } catch (e) {
+        expect(probot.logger.error.mock.calls[0]).toMatchSnapshot()
+      }
+    })
+
+    it('responds with the correct error if the PEM file is missing', async () => {
+      probot.logger.error = jest.fn()
+      probot.webhook.on('*', () => { throw new Error('error:0906D06C:PEM routines:PEM_read_bio:no start line') })
+
+      try {
+        await probot.webhook.receive(event)
+      } catch (e) {
+        expect(probot.logger.error.mock.calls[0]).toMatchSnapshot()
+      }
     })
   })
 

@@ -8,6 +8,7 @@ exports[`default plugin GET /probot get info from package.json returns the corre
     <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1.0\\">
     <meta http-equiv=\\"X-UA-Compatible\\" content=\\"ie=edge\\">
     <title>probot | built with Probot</title>
+    <link rel=\\"icon\\" href=\\"/probot/static/probot-head.png\\">
     <link rel=\\"stylesheet\\" href=\\"/probot/static/primer.css\\">
   </head>
   <body class=\\"height-full bg-gray-light\\">
@@ -43,6 +44,7 @@ exports[`default plugin GET /probot get info from package.json returns the corre
     <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1.0\\">
     <meta http-equiv=\\"X-UA-Compatible\\" content=\\"ie=edge\\">
     <title>Your App | built with Probot</title>
+    <link rel=\\"icon\\" href=\\"/probot/static/probot-head.png\\">
     <link rel=\\"stylesheet\\" href=\\"/probot/static/primer.css\\">
   </head>
   <body class=\\"height-full bg-gray-light\\">

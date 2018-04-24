@@ -28,3 +28,26 @@ module.exports = robot => {
   })
 }
 ```
+
+Sometimes you want to handle multiple webhook events the same way. `robot.on` can listen to a list of events and run the same callback:
+
+```js
+module.exports = robot => {
+  robot.on(['issues.opened', 'issues.edited'], async context => {
+    // An issue was opened or edited, what should we do with it?
+    robot.log(context)
+  })
+}
+```
+
+You can also use the wildcard event (`*`) to listen for any event that your app is subscribed to:
+
+```js
+module.exports = robot => {
+  robot.on(`*`, async context => {
+    context.log({event: context.event, action: context.payload.action})
+  })
+}
+```
+
+Explore the [GitHub webhook documentation](https://developer.github.com/webhooks/#events) to see what events are available to use in your app.

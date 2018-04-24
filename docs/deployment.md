@@ -15,7 +15,9 @@ Every app can either be deployed stand-alone, or combined with other apps in one
     1. [Glitch](#glitch)
     1. [Heroku](#heroku)
     1. [Now](#now)
+1. [Share the app](#share-the-app)
 1. [Combining apps](#combining-apps)
+1. [Error tracking](#error-tracking)
 
 ## Create the GitHub App
 
@@ -123,6 +125,8 @@ Zeit [Now](http://zeit.co/now) is a great service for running Probot apps. After
             -e NODE_ENV=production \
             -e PRIVATE_KEY="$(cat ~/Downloads/*.private-key.pem)"
 
+      **NOTE**: Add `-e LOG_LEVEL=trace` to get verbose logging, or add `-e LOG_LEVEL=info` instead to show less details.
+
 1. Once the deploy is started, go back to your [app settings page](https://github.com/settings/apps) and update the **Webhook URL** to the URL of your deployment (which `now` has kindly copied to your clipboard).
 
 1. Your app should be up and running! For long term use, create an alias for your robot. After making an alias, you can swap to new deploy URLs with no downtime.
@@ -132,6 +136,11 @@ Zeit [Now](http://zeit.co/now) is a great service for running Probot apps. After
 1. You can also keep your app running forever, with instant response to webhooks with:
 
         $ now scale https://a-fancier-url.now.sh 1
+
+## Share the app
+
+The Probot website includes a list of [featured apps](https://probot.github.io/apps). Consider [adding your app to the website](https://github.com/probot/probot.github.io/blob/master/CONTRIBUTING.md#adding-your-app
+) so others can discover and use it.
 
 ## Combining apps
 

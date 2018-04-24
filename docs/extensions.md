@@ -8,7 +8,7 @@ While Probot doesn't have an official extension API (yet), there are a handful o
 
 ## Config
 
-[probot-config](https://github.com/getsentry/probot-config) is an extension for sharing configs between between repositories.
+[probot-config](https://github.com/getsentry/probot-config) is an extension for sharing configs between repositories.
 
 
 ```js

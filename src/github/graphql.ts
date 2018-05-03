@@ -1,10 +1,10 @@
 import { OctokitWithPagination, Variables } from './'
 
-export const addGraphQL = function (octokit) {
-  octokit.query = query.bind(null, octokit)
+export const addGraphQL = (octokit) => {
+  octokit.query = graphql.bind(null, octokit)
 }
 
-async function query (octokit: OctokitWithPagination, query: string, variables: Variables, headers = {}) {
+async function graphql (octokit: OctokitWithPagination, query: string, variables: Variables, headers = {}) {
   const res = await octokit.request({
     headers: {
       'accept': 'application/json',

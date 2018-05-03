@@ -59,8 +59,8 @@ function toBunyanFormat (format: string) {
 }
 
 export const logger = new Logger({
-  name: 'probot',
   level: toBunyanLogLevel(process.env.LOG_LEVEL || 'info'),
+  name: 'probot',
+  serializers,
   stream: new bunyanFormat({outputMode: toBunyanFormat(process.env.LOG_FORMAT || 'short')}),
-  serializers
 })

@@ -1,7 +1,7 @@
 import * as jwt from 'jsonwebtoken'
 
-export const createApp = function (options: AppOptions) {
-  return function () {
+export const createApp = (options: AppOptions) => {
+  return () => {
     const payload = {
       exp: Math.floor(Date.now() / 1000) + 60,  // JWT expiration time
       iat: Math.floor(Date.now() / 1000),       // Issued at time

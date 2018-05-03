@@ -6,7 +6,7 @@ import * as Logger from 'bunyan'
 //     robot.log("info")
 //     robot.log.trace("verbose details");
 //
-export const wrapLogger = function (logger: Logger, baseLogger?: Logger): LoggerWithTarget {
+export const wrapLogger = (logger: Logger, baseLogger?: Logger): LoggerWithTarget => {
   const fn = logger.info.bind(logger)
 
   // Add level methods on the logger

@@ -23,19 +23,38 @@ const defaultApps = [
   require('./plugins/default')
 ]
 
-export const createProbot = (options: Options) => {
-  options.webhookPath = options.webhookPath || '/'
-  options.secret = options.secret || 'development'
+export class Probot {
+  public server: express.Application
+  public webhook: any
+  public logger: Logger
 
-  const webhook = new Webhooks({path: options.webhookPath, secret: options.secret})
-  const app = createApp({
-    id: options.id,
-    cert: options.cert
-  })
-  const server: express.Application = createServer({webhook: webhook.middleware, logger})
+  private options: Options
+  private robots: Robot[]
+  private app: () => string
 
+  constructor(options: Options) {
+    options.webhookPath = options.webhookPath || '/'
+    options.secret = options.secret || 'development'
+    this.options = options
+    this.logger = logger
+    this.robots = []
+    this.webhook = new Webhooks({path: options.webhookPath, secret: options.secret})
+    this.app = createApp({ id: options.id, cert: options.cert })
+    this.server = createServer({webhook: this.webhook.middleware, logger})
 
-  function errorHandler (err) {
+    // Log all received webhooks
+    this.webhook.on('*', (event: any) => {
+      const webhookEvent = { ...event, event: event.name }
+      delete webhookEvent.name
+
+      this.receive(webhookEvent)
+    })
+
+    // Log all webhook errors
+    this.webhook.on('error', this.errorHandler)
+  }
+
+  public errorHandler (err) {
     switch (err.message) {
       case 'X-Hub-Signature does not match blob signature':
       case 'No X-Hub-Signature found on request':
@@ -50,82 +69,55 @@ export const createProbot = (options: Options) => {
     }
   }
 
-  // Log all received webhooks
-  webhook.on('*', (event: any) => {
-    const webhookEvent = {
-      ...event,
-      event: event.name
-    }
-
-    delete webhookEvent.name
-
-    logger.debug({event: webhookEvent}, 'Webhook received')
-
-    receive(webhookEvent)
-  })
-
-  // Log all webhook errors
-  webhook.on('error', errorHandler)
-
-  const robots: Robot[] = []
-
-  function receive (event: any) {
-    return Promise.all(robots.map(robot => robot.receive(event)))
+  public receive (event: WebhookEvent) {
+    this.logger.debug({event}, 'Webhook received')
+    return Promise.all(this.robots.map(robot => robot.receive(event)))
   }
 
-  function load (plugin: string | Plugin) {
+  public load (plugin: string | Plugin) {
     if (typeof plugin === 'string') {
-      plugin = <Plugin> resolve(plugin)
+      plugin = resolve(plugin) as Plugin
     }
 
-    const robot = createRobot({app, cache, catchErrors: true})
+    const robot = createRobot({app: this.app, cache, catchErrors: true})
 
     // Connect the router from the robot to the server
-    server.use(robot.router)
+    this.server.use(robot.router)
 
     // Initialize the plugin
     plugin(robot)
-    robots.push(robot)
+    this.robots.push(robot)
 
     return robot
   }
 
-  function setup (apps: Array<string | Plugin>) {
+  public setup (apps: Array<string | Plugin>) {
     // Log all unhandled rejections
-    process.on('unhandledRejection', errorHandler)
+    process.on('unhandledRejection', this.errorHandler)
 
     // Load the given apps along with the default apps
-    apps.concat(defaultApps).forEach(app => load(app))
+    apps.concat(defaultApps).forEach(app => this.load(app))
 
     // Register error handler as the last middleware
-    server.use(logRequestErrors)
+    this.server.use(logRequestErrors)
   }
 
-  return {
-    server,
-    webhook,
-    receive,
-    logger,
-    load,
-    setup,
-
-    start () {
-      if (options.webhookProxy) {
-        createWebhookProxy({
-          url: options.webhookProxy,
-          port: options.port,
-          path: options.webhookPath,
-          logger
-        })
-      }
-
-      server.listen(options.port)
-      logger.info('Listening on http://localhost:' + options.port)
+  public start () {
+    if (this.options.webhookProxy) {
+      createWebhookProxy({
+        logger,
+        path: this.options.webhookPath,
+        port: this.options.port,
+        url: this.options.webhookProxy,
+      })
     }
+
+    this.server.listen(this.options.port)
+    logger.info('Listening on http://localhost:' + this.options.port)
   }
 }
 
-module.exports.createRobot = createRobot
+export const createProbot = (options: Options) => new Probot(options)
 
 export type Plugin = (robot: Robot) => void
 
@@ -138,14 +130,4 @@ export interface Options {
   port?: number
 }
 
-export interface Probot {
-  server: express.Application
-  webhook: any
-  receive: (event: WebhookEvent) => Promise<any[]>
-  logger: Logger
-  load: (plugin: string | Plugin) => Robot
-  setup: (apps: Array<string | Plugin>) => void
-  start: () => void
-}
-
-export { Logger, Context, Robot }
+export { Logger, Context, Robot, createRobot }

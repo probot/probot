@@ -1,11 +1,11 @@
 const defaultOptions: ResolveOptions = {}
 
-export const resolve = function (app: string, opts?: ResolveOptions) {
+export const resolve = (app: string, opts?: ResolveOptions) => {
   opts = opts || defaultOptions
   // These are mostly to ease testing
   const basedir = opts.basedir || process.cwd()
-  const resolve = opts.resolver || require('resolve').sync
-  return require(resolve(app, {basedir}))
+  const resolver = opts.resolver || require('resolve').sync
+  return require(resolver(app, {basedir}))
 }
 
 export interface ResolveOptions {

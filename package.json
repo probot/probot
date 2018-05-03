@@ -14,13 +14,20 @@
   "scripts": {
     "build": "rimraf lib && tsc -p tsconfig.json",
     "start": "node ./bin/probot run",
-    "test": "jest --coverage && standard && npm run doc-lint",
+    "lint": "tslint --project .",
+    "test": "tsc --noEmit -p . && jest --coverage && npm run lint && npm run doc-lint",
     "doc-lint": "standard docs/**/*.md",
     "doc": "jsdoc -c .jsdoc.json",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "postsemantic-release": "script/publish-docs",
     "prepublish": "npm run build"
   },
+  "files": [
+    "lib",
+    "bin",
+    "static",
+    "views"
+  ],
   "jest": {
     "setupFiles": [
       "<rootDir>/test/setup.js"
@@ -44,7 +51,13 @@
       "<rootDir>/test/setup.js",
       "<rootDir>/test/fixtures/",
       "<rootDir>/test/plugins/helper.js"
-    ]
+    ],
+    "globals": {
+      "ts-jest": {
+        "skipBabel": true,
+        "enableTsDiagnostics": true
+      }
+    }
   },
   "author": "Brandon Keepers",
   "license": "ISC",

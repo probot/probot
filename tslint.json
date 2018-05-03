@@ -4,13 +4,8 @@
         "tslint-config-prettier"
     ],
     "rules": {
-      "no-shadowed-variable": false,
       "interface-name": [true, "never-prefix"],
       "no-var-requires": false,
-      "no-angle-bracket-type-assertion": false,
-      "interface-over-type-literal": false,
-      "only-arrow-functions": false,
-      "prefer-object-spread": false,
-      "object-literal-sort-keys": false
+      "prefer-object-spread": false
     }
 }

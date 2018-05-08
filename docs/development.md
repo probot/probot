@@ -64,7 +64,7 @@ You'll need to create a test repository and install your app by clicking the "In
 
 ## Running the app locally
 
-Before we run our app, we have install Probot and everything else into our app. Run `npm install --dev` and wait for it to complete.
+Before we run our app, we have install Probot and everything else into our app. Run `npm install` and wait for it to complete.
 
 Now you're ready to run the app on your local machine. Run `npm run dev` to start the server:
 

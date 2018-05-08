@@ -19,6 +19,9 @@
       "<rootDir>/test/setup.js"
     ]
   },
+  "keywords": ["probot", "github-apps", "github", "automation", "robots", "workflow"],
+  "bugs": "https://github.com/probot/probot/issues",
+  "homepage": "https://probot.github.io",
   "author": "Brandon Keepers",
   "license": "ISC",
   "dependencies": {

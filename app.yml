@@ -1,0 +1,75 @@
+# This is a proposed format for declaring GitHub apps.
+#
+# TODO: move this file to the probot/template repo
+
+name: my-sweet-probot-app
+description: It's so sweet
+url: https://example.com
+public: true
+
+# These are the permissions granted to the app.
+# Valid values are: read, write, none
+permissions:
+  # Repository permissions
+  administration: read
+  contents: read
+  deployments: read
+  issues: read
+  metadata: read
+  pages: read
+  pull_requests: read
+  repository_hooks: read
+  repository_projects: read
+  single_file: read
+  statuses: read
+
+  # Organization permissions
+  members: read
+  organization_projects: read
+  team_discussions: read
+
+# If requesting read/write access to `single_file` above:
+# single_file_name: .github/config.yml
+
+events:
+  - commit_comment
+  - create
+  - delete
+  - deployment
+  - deployment_status
+  - fork
+  - gollum
+  - installation
+  - installation_repositories
+  - issue_comment
+  - issues
+  - label
+  - marketplace_purchase
+  - member
+  - membership
+  - milestone
+  - org_block
+  - organization
+  - page_build
+  - ping
+  - project
+  - project_card
+  - project_column
+  - public
+  - pull_request
+  - pull_request_review
+  - pull_request_review_comment
+  - push
+  - release
+  - repository
+  - status
+  - team
+  - team_add
+  - watch
+
+# These settings will all be automatically set at runtime
+
+# callback_url: /path/to/auth
+# setup_url: /path/to/setup
+# webhook_url: /path/to/webhook
+# webhook_secret: asdf1234

@@ -9,68 +9,86 @@ description: It's so sweet
 url: https://example.com
 public: true
 
-## Permissions
 ## These are the permissions granted to the app.
-## Valid values are: read, write, none
+## `access` can be `read`, `write`, or `none`
+## See https://developer.github.com/webhooks/#events for more about events
 permissions:
   ## Repository permissions
-  # administration: read
-  # contents: read
-  # deployments: read
-  # issues: read
-  # metadata: read
-  # pages: read
-  # pull_requests: read
-  # repository_hooks: read
-  # repository_projects: read
-  # single_file: read
-  # statuses: read
+
+  # administration:
+  #   access: read
+  # contents:
+  #   access: read
+  #   events:
+  #     - commit_comment
+  #     - create
+  #     - delete
+  #     - fork
+  #     - gollum
+  #     - push
+  #     - release
+  # deployments:
+  #   access: read
+  #   events:
+  #     - deployment
+  #     - deployment_status
+  # issues:
+  #   access: read
+  #   events:
+  #     - issue_comment
+  #     - issues
+  #     - milestone
+  # metadata:
+  #   access: read
+  #   events:
+  #     - label
+  #     - public
+  #     - repository
+  #     - watch
+  # pages:
+  #   access: read
+  #   events:
+  #     - page_build
+  # pull_requests:
+  #   access: read
+  #   events:
+  #     - milestone
+  #     - pull_request
+  #     - pull_request_review
+  #     - pull_request_review_comment
+  # repository_hooks:
+  #   access: read
+  # repository_projects:
+  #   access: read
+  #   events:
+  #     - project_card
+  #     - project_column
+  #     - project
+  # single_file:
+  #   access: read
+  #   path: .github/config.yml
+  # statuses:
+  #   access: read
+  #   events:
+  #     - status
 
   ## Organization permissions
-  # members: read
-  # organization_projects: read
-  # team_discussions: read
-
-# If requesting read/write access to `single_file` above:
-# single_file_name: .github/config.yml
-
-# These are the events that the app subscribes to.
-# See https://developer.github.com/webhooks/#events for more information
-events:
-  # - commit_comment
-  # - create
-  # - delete
-  # - deployment
-  # - deployment_status
-  # - fork
-  # - gollum
-  # - installation
-  # - installation_repositories
-  # - issue_comment
-  # - issues
-  # - label
-  # - marketplace_purchase
-  # - member
-  # - membership
-  # - milestone
-  # - org_block
-  # - organization
-  # - page_build
-  # - ping
-  # - project
-  # - project_card
-  # - project_column
-  # - public
-  # - pull_request
-  # - pull_request_review
-  # - pull_request_review_comment
-  # - push
-  # - release
-  # - repository
-  # - status
-  # - team
-  # - team_add
-  # - watch
+  # members:
+  #   access: read
+  #   events:
+  #     - member
+  #     - membership
+  #     - organization
+  #     - team
+  #     - team_add
+  # organization_projects:
+  #   access: read
+  #   events:
+  #     - project_card
+  #     - project_column
+  #     - project
+  # team_discussions:
+  #   access: read
 
 # These settings will all be automatically set at runtime
 

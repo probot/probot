@@ -2,7 +2,9 @@
 
 [![npm version](https://img.shields.io/npm/v/probot.svg)](https://www.npmjs.com/package/probot) [![](https://img.shields.io/twitter/follow/ProbotTheRobot.svg?style=social&logo=twitter&label=Follow)](https://twitter.com/ProbotTheRobot)
 
-If you've ever thought, "wouldn't it be cool if GitHub could…"; imma stop you right there. Most features can actually be added via [GitHub Apps](https://developer.github.com/apps/), which extend GitHub and can be installed directly on organizations and user accounts and granted access to specific repositories. They come with granular permissions and built-in webhooks. Apps are first class actors within GitHub.
+> 🤖 A framework for building GitHub Apps to automate and improve your workflow
+
+If you've ever thought, "wouldn't it be cool if GitHub could…"; I'm going to stop you right there. Most features can actually be added via [GitHub Apps](https://developer.github.com/apps/), which extend GitHub and can be installed directly on organizations and user accounts and granted access to specific repositories. They come with granular permissions and built-in webhooks. Apps are first class actors within GitHub.
 
 ## How it works
 

@@ -1,7 +1,7 @@
 {
   "name": "probot",
   "version": "0.0.0-development",
-  "description": "a trainable robot that responds to activity on GitHub",
+  "description": "🤖 A framework for building GitHub Apps to automate and improve your workflow",
   "repository": "https://github.com/probot/probot",
   "main": "lib/index.js",
   "bin": {
@@ -19,6 +19,9 @@
       "<rootDir>/test/setup.js"
     ]
   },
+  "keywords": ["probot", "github-apps", "github", "automation", "robots", "workflow"],
+  "bugs": "https://github.com/probot/probot/issues",
+  "homepage": "https://probot.github.io",
   "author": "Brandon Keepers",
   "license": "ISC",
   "dependencies": {

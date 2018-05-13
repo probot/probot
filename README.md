@@ -21,7 +21,7 @@ module.exports = robot => {
 
 If you've landed in this GitHub repository and are looking to start building your own Probot App, look no further than [probot.github.io](https://probot.github.io/docs/)! The Probot website contains our extensive getting started documentation and will guide you through the set up process.
 
-This repository hosts the code for the npm Probot package which is what all Probot Apps run on. Most folks who land in this repository are likely looking to get started [building the own app](https://probot.github.io/docs/).
+This repository hosts the code for the npm Probot package which is what all Probot Apps run on. Most folks who land in this repository are likely looking to get started [building their own app](https://probot.github.io/docs/).
 
 ## Contributing
 

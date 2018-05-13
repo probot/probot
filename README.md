@@ -18,18 +18,21 @@ module.exports = robot => {
   })
 }
 ```
-Check out some of the [featured apps](https://probot.github.io/apps) or [read the docs](https://probot.github.io/docs/) to learn more about writing a new app.
+
+## Building a Probot App
+
+If you've landed in this GitHub repository and are looking to start building your own Probot App, look no further than [probot.github.io](https://probot.github.io/docs/)! The Probot website contains our extensive getting started documentation and will guide you through the set up process.
+
+This repository hosts the code for the npm Probot package which is what all Probot Apps run on. Most folks who land in this repository are likely looking to get started [building their own app](https://probot.github.io/docs/).
 
 ## Contributing
 
-Probot is built by people just like you! Most of the interesting things are built _with_ Probot, so consider starting by [writing a new app](https://probot.github.io/docs/) or improving one of the [existing ones](https://github.com/search?q=topic%3Aprobot-app&type=Repositories), and check out our [contributing docs](CONTRIBUTING.md) for other ways to get started.
+Probot is built by people just like you! Most of the interesting things are built _with_ Probot, so consider starting by [writing a new app](https://probot.github.io/docs/) or improving one of the [existing ones](https://github.com/search?q=topic%3Aprobot-app&type=Repositories).
+
+If you're interested in contributing to Probot itself, check out our [contributing docs](CONTRIBUTING.md) to get started.
 
 Want to chat with Probot users and contributors? [Join us in Slack](https://probot-slackin.herokuapp.com/)!
 
 ## Ideas
 
 Have an idea for a cool new GitHub App (built with Probot)? That's great! If you want feedback, help, or just to share it with the world you can do so by [creating an issue in the `probot/ideas` repository](https://github.com/probot/ideas/issues/new)!
-
-## Summer of Code
-
-Probot is super excited to be participating in Rails Girls Summer of Code & Google Summer of Code! We've written [some documentation on how to get started](https://probot.github.io/docs/summer-of-code) if you're part of one of these programs.

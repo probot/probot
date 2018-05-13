@@ -11,8 +11,8 @@ A clear and concise description of the behavior.
 ```js
   // Your code here
 module.exports = robot => {
-  robot.log('')
-})
+  robot.log('There is a bug')
+}
 ```
 
 **Expected behavior/code**

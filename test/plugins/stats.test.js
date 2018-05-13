@@ -79,6 +79,7 @@ describe('stats', function () {
       return request(server).get('/probot/stats')
         .expect(200, {'installations': 1, 'popular': []})
     })
+
     afterEach(async () => {
       delete process.env.IGNORED_ACCOUNTS
     })

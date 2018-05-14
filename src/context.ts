@@ -1,7 +1,6 @@
 import * as yaml from 'js-yaml'
 import * as path from 'path'
-
-import * as GitHubApi from '@octokit/rest'
+import { OctokitWithPagination } from './github'
 import {LoggerWithTarget} from './wrap-logger'
 /**
  * Helpers for extracting information from the webhook event, which can be
@@ -13,11 +12,11 @@ import {LoggerWithTarget} from './wrap-logger'
  */
 export class Context {
   public id: string
-  public github: GitHubApi
+  public github: OctokitWithPagination
   public log: LoggerWithTarget
   public payload!: WebhookPayloadWithRepository
 
-  constructor (event:any, github:GitHubApi, log:LoggerWithTarget) {
+  constructor (event:any, github:OctokitWithPagination, log:LoggerWithTarget) {
     Object.assign(this, event)
     this.id = event.id
     this.github = github
@@ -105,7 +104,7 @@ export class Context {
    * @param {object} [defaultConfig] - An object of default config options
    * @return {Promise<Object>} - Configuration object read from the file
    */
-  public async config<T> (fileName: string, defaultConfig: T) {
+  public async config<T> (fileName: string, defaultConfig?: T) {
     const params = this.repo({path: path.posix.join('.github', fileName)})
 
     try {
@@ -132,12 +131,15 @@ export interface PayloadRepository {
     login: string
     name: string
   }
+  html_url: string
 }
 
 export interface WebhookPayloadWithRepository {
   repository: PayloadRepository
   issue: {
     number: number
+    html_url: string
+    body: string
   }
   pull_request: {
     number: number

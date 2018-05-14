@@ -37,6 +37,7 @@ export const wrapLogger = (logger: Logger, baseLogger?: Logger): LoggerWithTarge
 }
 
 export interface LoggerWithTarget extends Logger {
+  (str: string): void
   target: Logger
   child: (attrs: ChildArgs) => LoggerWithTarget
 }

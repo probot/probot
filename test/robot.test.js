@@ -102,6 +102,53 @@ describe('Robot', function () {
       await robot.receive(event)
       expect(handler).toHaveBeenCalled()
     })
+
+    it('allows middleware', async () => {
+      const fakeMiddleware = jest.fn((context, next) => next())
+      const spy = jest.fn()
+      robot.on('test', fakeMiddleware, spy)
+
+      await robot.receive(event)
+      expect(fakeMiddleware).toHaveBeenCalled()
+      expect(spy).toHaveBeenCalled()
+    })
+
+    it('allows multiple middleware', async () => {
+      const fakeMiddleware = jest.fn((context, next) => next())
+      const fakeMiddlewareTwo = jest.fn((context, next) => next())
+      const spy = jest.fn()
+      robot.on('test', fakeMiddleware, fakeMiddlewareTwo, spy)
+
+      await robot.receive(event)
+      expect(fakeMiddleware).toHaveBeenCalled()
+      expect(fakeMiddlewareTwo).toHaveBeenCalled()
+      expect(spy).toHaveBeenCalled()
+    })
+
+    it('exits the chain when done() is called', async () => {
+      const fakeMiddleware = jest.fn((context, next, done) => done())
+      const fakeMiddlewareTwo = jest.fn()
+      const spy = jest.fn()
+      robot.on('test', fakeMiddleware, fakeMiddlewareTwo, spy)
+
+      await robot.receive(event)
+      expect(fakeMiddleware).toHaveBeenCalled()
+      expect(fakeMiddlewareTwo).not.toHaveBeenCalled()
+      expect(spy).not.toHaveBeenCalled()
+    })
+
+    it('allow middleware to modify the context object', async () => {
+      const fakeMiddleware = jest.fn((context, next) => {
+        context.pizza = true
+        next(null, context)
+      })
+      const spy = jest.fn()
+      robot.on('test', fakeMiddleware, spy)
+
+      await robot.receive(event)
+      expect(fakeMiddleware).toHaveBeenCalled()
+      expect(spy.mock.calls[0][0].pizza).toBeTruthy()
+    })
   })
 
   describe('receive', () => {
@@ -181,6 +228,46 @@ describe('Robot', function () {
       expect(output.length).toBe(1)
       expect(output[0].err.message).toEqual('testing')
       expect(output[0].event.id).toEqual(event.id)
+    })
+
+    it('does not call the callback if a middleware sends an error', async () => {
+      const fakeMiddleware = jest.fn((context, next) => {
+        next(error)
+      })
+
+      const spy = jest.fn()
+      robot.on('test', fakeMiddleware, spy)
+
+      try {
+        await robot.receive(event)
+      } catch (err) {
+        // Expected
+      }
+
+      expect(robot.log.error).toHaveBeenCalled()
+      expect(fakeMiddleware).toHaveBeenCalled()
+      const arg = robot.log.error.mock.calls[0][0]
+      expect(arg.err).toBe(error)
+      expect(arg.event).toBe(event)
+    })
+
+    it('does not call the callback if a middleware throws', async () => {
+      const fakeMiddleware = jest.fn(() => Promise.reject(error))
+
+      const spy = jest.fn()
+      robot.on('test', fakeMiddleware, spy)
+
+      try {
+        await robot.receive(event)
+      } catch (err) {
+        // Expected
+      }
+
+      expect(robot.log.error).toHaveBeenCalled()
+      expect(fakeMiddleware).toHaveBeenCalled()
+      const arg = robot.log.error.mock.calls[0][0]
+      expect(arg.err).toBe(error)
+      expect(arg.event).toBe(event)
     })
   })
 })

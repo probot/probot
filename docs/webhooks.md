@@ -40,3 +40,14 @@ module.exports = robot => {
 }
 ```
 
+You can also use the wildcard event (`*`) to listen for any event that your app is subscribed to:
+
+```js
+module.exports = robot => {
+  robot.on(`*`, async context => {
+    context.log({event: context.event, action: context.payload.action})
+  })
+}
+```
+
+Explore the [GitHub webhook documentation](https://developer.github.com/webhooks/#events) to see what events are available to use in your app.

@@ -49,6 +49,15 @@ describe('Context', function () {
       context = new Context(event)
       expect(context.repo()).toEqual({owner: 'bkeepers-inc', repo: 'test'})
     })
+
+    it('return error for context.repo() when repository doesn\'t exist', function () {
+      delete context.payload.repository
+      try {
+        context.repo()
+      } catch (e) {
+        expect(e.message).toMatchSnapshot()
+      }
+    })
   })
 
   describe('issue', function () {

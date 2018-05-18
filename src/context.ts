@@ -38,6 +38,10 @@ export class Context {
   public repo<T> (object?: T) {
     const repo = this.payload.repository
 
+    if (!repo) {
+      throw new Error('context.repo() is not supported for this webhook event.')
+    }
+
     return Object.assign({
       owner: repo.owner.login || repo.owner.name,
       repo: repo.name

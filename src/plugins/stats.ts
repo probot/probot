@@ -15,6 +15,9 @@ module.exports = async (robot: any): Promise<void> => {
   // Refresh the stats on an interval
   setInterval(refresh, REFRESH_INTERVAL)
 
+  // Check for accounts (typically spammy or abusive) to ignore
+  const ignoredAccounts = (process.env.IGNORED_ACCOUNTS || '').toLowerCase().split(',')
+
   // Setup /probot/stats endpoint to return cached stats
   robot.router.get('/probot/stats', async (req, res) => {
     // ensure stats are loaded
@@ -45,9 +48,14 @@ module.exports = async (robot: any): Promise<void> => {
       })
       const account = installation.account
 
-      account.stars = repositories.reduce((stars, repository) => {
-        return stars + repository.stargazers_count
-      }, 0)
+      if (ignoredAccounts.includes(installation.account.login.toLowerCase())) {
+        account.stars = 0
+        robot.log.debug({installation}, 'Installation is ignored')
+      } else {
+        account.stars = repositories.reduce((stars, repository) => {
+          return stars + repository.stargazers_count
+        }, 0)
+      }
 
       return account
     }))
@@ -58,15 +66,16 @@ module.exports = async (robot: any): Promise<void> => {
 }
 
 interface Installation {
-  id: number,
+  id: number
   account: Account
 }
 
 interface Account {
   stars: number
+  login: string
 }
 
 interface Repository {
-  private: boolean,
+  private: boolean
   stargazers_count: number
 }

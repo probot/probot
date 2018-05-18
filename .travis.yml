@@ -3,7 +3,15 @@ sudo: required
 language: node_js
 
 node_js:
-  - "9"
+  - "8"
+
+env:
+matrix:
+  include:
+    - node_js: "10"
+  allow_failures:
+    - node_js: "10"
+
 
 notifications:
   disabled: true

@@ -27,7 +27,6 @@ Every deployment will need an [App](https://developer.github.com/apps/).
     - **Homepage URL**: the URL to the GitHub repository for your app
     - **Webhook URL**: Use `https://example.com/` for now, we'll come back in a minute to update this with the URL of your deployed app.
     - **Webhook Secret**: Generate a unique secret with `openssl rand -base64 32` and save it because you'll need it in a minute to configure your deployed app.
-    - **Permissions & events**: See `docs/deploy.md` in the app for a list of the permissions and events that it needs access to.
 
 1. Download the private key from the app.
 
@@ -114,16 +113,14 @@ Zeit [Now](http://zeit.co/now) is a great service for running Probot apps. After
 
 1. Clone the app that you want to deploy. e.g. `git clone https://github.com/probot/stale`
 
-1. Due to an [ongoing issue](https://github.com/zeit/now-cli/issues/749) in `now.sh`, a workaround must be applied to the private key before it can be used.
-    * You can [modify `package.json`](https://github.com/probot/probot/issues/318#issuecomment-343010573) and base64 encode your private key.
-    * You can concatenate a `\n` onto each line of the private key, and then merge the private key onto a single line. Then, you can follow the deploy script without modifying `package.json`.
-
 1. Run `now` to deploy, replacing the `APP_ID` and `WEBHOOK_SECRET` with the values for those variables, and setting the path for the `PRIVATE_KEY`:
 
         $ now -e APP_ID=aaa \
             -e WEBHOOK_SECRET=bbb \
             -e NODE_ENV=production \
             -e PRIVATE_KEY="$(cat ~/Downloads/*.private-key.pem)"
+
+      **NOTE**: Add `-e LOG_LEVEL=trace` to get verbose logging, or add `-e LOG_LEVEL=info` instead to show less details.
 
 1. Once the deploy is started, go back to your [app settings page](https://github.com/settings/apps) and update the **Webhook URL** to the URL of your deployment (which `now` has kindly copied to your clipboard).
 

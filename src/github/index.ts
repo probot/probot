@@ -58,7 +58,7 @@ export interface OctokitWithPagination extends Octokit {
     after: (when: 'request', callback: (result: OctokitResult, options: OctokitRequestOptions) => void) => void
   }
   request: (OctokitRequestOptions) => Promise<Octokit.AnyResponse>
-  query: (str: string, Variables?: Variables) => Promise<Octokit.AnyResponse>
+  query: (query: string, variables?: Variables, headers?: Headers) => Promise<Octokit.AnyResponse>
 }
 
 export interface Headers {

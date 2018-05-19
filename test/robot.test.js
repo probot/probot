@@ -22,7 +22,7 @@ describe('Robot', function () {
     output = []
 
     robot = createRobot()
-    robot.auth = () => {}
+    robot.auth = jest.fn().mockReturnValue({})
 
     event = {
       id: '123-456',
@@ -102,6 +102,44 @@ describe('Robot', function () {
       await robot.receive(event)
       expect(handler).toHaveBeenCalled()
     })
+
+    it('returns authenticated client for installation.created', async () => {
+      const event = {
+        id: '123-456',
+        event: 'installation',
+        payload: {
+          action: 'created',
+          installation: {id: 1}
+        }
+      }
+
+      robot.on('installation.created', async context => {
+        // no-op
+      })
+
+      await robot.receive(event)
+
+      expect(robot.auth).toHaveBeenCalledWith(1, expect.anything())
+    })
+
+    it('returns authenticated client for installation.deleted', async () => {
+      const event = {
+        id: '123-456',
+        event: 'installation',
+        payload: {
+          action: 'deleted',
+          installation: {id: 1}
+        }
+      }
+
+      robot.on('installation.deleted', async context => {
+        // no-op
+      })
+
+      await robot.receive(event)
+
+      expect(robot.auth).toHaveBeenCalledWith()
+    })
   })
 
   describe('receive', () => {
@@ -167,50 +205,6 @@ describe('Robot', function () {
       expect(output.length).toBe(1)
       expect(output[0].err.message).toEqual('testing')
       expect(output[0].event.id).toEqual(event.id)
-    })
-
-    it('throw error if using context.github on created app', async () => {
-      const event3 = {
-        id: '123-456',
-        event: 'installation',
-        payload: {
-          action: 'created',
-          installation: {id: 1}
-        }
-      }
-
-      robot.on('installation.created', async context => {
-        await context.github.issues.createComment(/* … */)
-      })
-
-      try {
-        await robot.receive(event3)
-      } catch (err) {
-        expect(err).toBeInstanceOf(TypeError)
-        expect(err.message).toEqual('Cannot read property \'issues\' of undefined')
-      }
-    })
-
-    it('throw error if using context.github on deleted app', async () => {
-      const event3 = {
-        id: '123-456',
-        event: 'installation',
-        payload: {
-          action: 'deleted',
-          installation: {id: 1}
-        }
-      }
-
-      robot.on('installation.deleted', async context => {
-        await context.github.issues.createComment(/* … */)
-      })
-
-      try {
-        await robot.receive(event3)
-      } catch (err) {
-        expect(err).toBeInstanceOf(TypeError)
-        expect(err.message).toEqual('Cannot read property \'issues\' of undefined')
-      }
     })
 
     it('logs errors from rejected promises', async () => {

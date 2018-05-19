@@ -156,14 +156,14 @@ export class Robot {
     if (id) {
       const res = await this.cache.wrap(`app:${id}:token`, () => {
         log.trace(`creating token for installation`)
-        github.authenticate({type: 'integration', token: this.app()})
+        github.authenticate({type: 'app', token: this.app()})
 
         return github.apps.createInstallationToken({installation_id: String(id)})
       }, {ttl: 60 * 59}) // Cache for 1 minute less than GitHub expiry
 
       github.authenticate({type: 'token', token: res.data.token})
     } else {
-      github.authenticate({type: 'integration', token: this.app()})
+      github.authenticate({type: 'app', token: this.app()})
     }
 
     return github

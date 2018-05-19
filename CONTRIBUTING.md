@@ -31,7 +31,7 @@ Here are a few things you can do that will increase the likelihood of your pull 
 
 Work in Progress pull requests are also welcome to get feedback early on, or if there is something that blocked you.
 
-### Just starting out? Looking for how to help?
+## Just starting out? Looking for how to help?
 
 Use [this search][good-first-issue-search] to find Probot apps that have issues marked with the `good-first-issue` label.
 

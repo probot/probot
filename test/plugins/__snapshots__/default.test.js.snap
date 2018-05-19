@@ -20,7 +20,7 @@ exports[`default plugin GET /probot get info from package.json returns the corre
             <span class=\\"Label Label--outline v-align-middle ml-2 text-gray-light\\">v0.0.0-development</span>
         </h1>
 
-          <p>a trainable robot that responds to activity on GitHub</p>
+          <p>🤖 A framework for building GitHub Apps to automate and improve your workflow</p>
       </div>
 
       <div class=\\"mt-4\\">

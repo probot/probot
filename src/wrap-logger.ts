@@ -1,4 +1,4 @@
-import * as Logger from 'bunyan'
+import {Logger} from './'
 
 // Return a function that defaults to "info" level, and has properties for
 // other levels:
@@ -37,12 +37,20 @@ export const wrapLogger = (logger: Logger, baseLogger?: Logger): LoggerWithTarge
 }
 
 export interface LoggerWithTarget extends Logger {
-  (str: string): void
+  (): boolean
+  (...params: any[]): void
   target: Logger
   child: (attrs: ChildArgs) => LoggerWithTarget
+  trace: LoggerWithTarget
+  debug: LoggerWithTarget
+  info: LoggerWithTarget
+  warn: LoggerWithTarget
+  error: LoggerWithTarget
+  fatal: LoggerWithTarget
 }
 
 export interface ChildArgs {
+  options?: object
   name?: string
   id?: string
   installation?: string

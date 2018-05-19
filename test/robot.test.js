@@ -22,7 +22,7 @@ describe('Robot', function () {
     output = []
 
     robot = createRobot()
-    robot.auth = () => {}
+    robot.auth = jest.fn().mockReturnValue({})
 
     event = {
       id: '123-456',
@@ -101,6 +101,60 @@ describe('Robot', function () {
       robot.on('test', handler)
       await robot.receive(event)
       expect(handler).toHaveBeenCalled()
+    })
+
+    it('returns an authenticated client for installation.created', async () => {
+      const event = {
+        id: '123-456',
+        event: 'installation',
+        payload: {
+          action: 'created',
+          installation: {id: 1}
+        }
+      }
+
+      robot.on('installation.created', async context => {
+        // no-op
+      })
+
+      await robot.receive(event)
+
+      expect(robot.auth).toHaveBeenCalledWith(1, expect.anything())
+    })
+
+    it('returns an unauthenticated client for installation.deleted', async () => {
+      const event = {
+        id: '123-456',
+        event: 'installation',
+        payload: {
+          action: 'deleted',
+          installation: {id: 1}
+        }
+      }
+
+      robot.on('installation.deleted', async context => {
+        // no-op
+      })
+
+      await robot.receive(event)
+
+      expect(robot.auth).toHaveBeenCalledWith()
+    })
+
+    it('returns an authenticated client for events without an installation', async () => {
+      const event = {
+        id: '123-456',
+        event: 'foobar',
+        payload: { /* no installation */ }
+      }
+
+      robot.on('foobar', async context => {
+        // no-op
+      })
+
+      await robot.receive(event)
+
+      expect(robot.auth).toHaveBeenCalledWith()
     })
   })
 

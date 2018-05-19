@@ -103,7 +103,7 @@ describe('Robot', function () {
       expect(handler).toHaveBeenCalled()
     })
 
-    it('returns authenticated client for installation.created', async () => {
+    it('returns an authenticated client for installation.created', async () => {
       const event = {
         id: '123-456',
         event: 'installation',
@@ -122,7 +122,7 @@ describe('Robot', function () {
       expect(robot.auth).toHaveBeenCalledWith(1, expect.anything())
     })
 
-    it('returns authenticated client for installation.deleted', async () => {
+    it('returns an unauthenticated client for installation.deleted', async () => {
       const event = {
         id: '123-456',
         event: 'installation',

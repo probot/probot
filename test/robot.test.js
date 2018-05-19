@@ -156,7 +156,6 @@ describe('Robot', function () {
 
       expect(robot.auth).toHaveBeenCalledWith()
     })
-
   })
 
   describe('receive', () => {

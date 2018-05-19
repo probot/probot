@@ -77,6 +77,16 @@ module.exports = robot => {
 
 Check out the [GitHub GraphQL API docs](https://developer.github.com/v4/) to learn more.
 
+## Unauthenticated Events
+
+When [receiving webhook events](./webhooks.md), `context.github` is _usually_ an authenticated client, but there are a few events that are exceptions:
+
+- [`installation.deleted`](https://developer.github.com/v3/activity/events/types/#installationevent) - The installation was _just_ deleted, so we can't authenticate as the installation.
+
+- [`marketplace_purchase`](https://developer.github.com/v3/activity/events/types/#marketplacepurchaseevent) - The purchase happens before the app is installed on an account.
+
+For these events, `context.github` will be [authenticated as the GitHub App](https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#authenticating-as-a-github-app) instead of as a specific installation.
+
 ## GitHub Enterprise
 
 If you want to run a Probot App against a GitHub Enterprise instance, you'll need to set the `GHE_HOST` environment variable.

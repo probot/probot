@@ -140,6 +140,23 @@ describe('Robot', function () {
 
       expect(robot.auth).toHaveBeenCalledWith()
     })
+
+    it('returns an authenticated client for events without an installation', async () => {
+      const event = {
+        id: '123-456',
+        event: 'foobar',
+        payload: { /* no installation */ }
+      }
+
+      robot.on('foobar', async context => {
+        // no-op
+      })
+
+      await robot.receive(event)
+
+      expect(robot.auth).toHaveBeenCalledWith()
+    })
+
   })
 
   describe('receive', () => {

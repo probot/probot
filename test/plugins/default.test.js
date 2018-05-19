@@ -29,13 +29,15 @@ describe('default plugin', function () {
 
       it('returns the correct HTML with values', async () => {
         const actual = await request(server).get('/probot').expect(200)
-        expect(actual.text).toMatchSnapshot()
+        expect(actual.text).toMatch('Welcome to probot')
+        expect(actual.text).toMatch('A framework for building GitHub Apps')
+        expect(actual.text).toMatch(/v\d+\.\d+\.\d+/)
       })
 
       it('returns the correct HTML without values', async () => {
         process.chdir(__dirname)
         const actual = await request(server).get('/probot').expect(200)
-        expect(actual.text).toMatchSnapshot()
+        expect(actual.text).toMatch('Welcome to your Probot App')
       })
 
       afterEach(() => {

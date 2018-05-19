@@ -11,7 +11,7 @@ import {LoggerWithTarget} from './wrap-logger'
  * @property {logger} log - A logger
  */
 export class Context {
-  public id: string
+  public id: number
   public github: OctokitWithPagination
   public log: LoggerWithTarget
   public payload!: WebhookPayloadWithRepository
@@ -129,9 +129,11 @@ export class Context {
 }
 
 export interface PayloadRepository {
+  [key: string]: any
   full_name: string
   name: string
   owner: {
+    [key: string]: any
     login: string
     name: string
   }
@@ -139,21 +141,27 @@ export interface PayloadRepository {
 }
 
 export interface WebhookPayloadWithRepository {
+  [key: string]: any
   repository: PayloadRepository
   issue: {
+    [key: string]: any
     number: number
     html_url: string
     body: string
   }
   pull_request: {
+    [key: string]: any
     number: number
+    html_url: string
+    body: string
   }
   sender: {
+    [key: string]: any
     type: string
   }
   action: string
   installation: {
-    id: string
+    id: number
+    [key: string]: any
   }
-
 }

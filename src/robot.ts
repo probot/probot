@@ -146,11 +146,11 @@ export class Robot {
    * @returns {Promise<github>} - An authenticated GitHub API client
    * @private
    */
-  public async auth (id?: string, log = this.log) {
+  public async auth (id?: number, log = this.log) {
     const github: OctokitWithPagination = GitHubApi({
       baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api/v3`,
       debug: process.env.LOG_LEVEL === 'trace',
-      logger: log.child({name: 'github', installation: id})
+      logger: log.child({name: 'github', installation: String(id)})
     })
 
     if (id) {
@@ -158,7 +158,7 @@ export class Robot {
         log.trace(`creating token for installation`)
         github.authenticate({type: 'integration', token: this.app()})
 
-        return github.apps.createInstallationToken({installation_id: id})
+        return github.apps.createInstallationToken({installation_id: String(id)})
       }, {ttl: 60 * 59}) // Cache for 1 minute less than GitHub expiry
 
       github.authenticate({type: 'token', token: res.data.token})
@@ -174,7 +174,7 @@ export const createRobot = (options: RobotOptions) => new Robot(options)
 
 export interface WebhookEvent {
   event: string
-  id: string
+  id: number
   payload: any
   protocol: 'http' | 'https'
   host: string

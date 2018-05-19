@@ -14,6 +14,6 @@ export const createApp = (options: AppOptions) => {
 }
 
 export interface AppOptions {
-  id: string
+  id: number
   cert: string
 }

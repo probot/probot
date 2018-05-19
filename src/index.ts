@@ -124,7 +124,7 @@ export type Plugin = (robot: Robot) => void
 export interface Options {
   webhookPath?: string
   secret?: string,
-  id: string,
+  id: number,
   cert: string,
   webhookProxy?: string,
   port?: number

@@ -1,11 +1,11 @@
-import { Headers, OctokitWithPagination, Variables } from './'
+import {GitHubAPI, Headers, Variables} from './'
 
-export default function addGraphQL (octokit) {
-  octokit.query = graphql.bind(null, octokit)
+export default function addGraphQL (client) {
+  client.query = graphql.bind(null, client)
 }
 
-async function graphql (octokit: OctokitWithPagination, query: string, variables: Variables, headers: Headers = {}) {
-  const res = await octokit.request({
+async function graphql (client: GitHubAPI, query: string, variables: Variables, headers: Headers = {}) {
+  const res = await client.request({
     headers: {
       'accept': 'application/json',
       'content-type': 'application/json',

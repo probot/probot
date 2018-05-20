@@ -20,7 +20,7 @@
     "doc": "jsdoc -c .jsdoc.json",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "postsemantic-release": "script/publish-docs",
-    "prepublish": "npm run build"
+    "prepare": "npm run build"
   },
   "files": [
     "lib",

@@ -6,7 +6,7 @@ import {LoggerWithTarget} from './wrap-logger'
  * Helpers for extracting information from the webhook event, which can be
  * passed to GitHub API calls.
  *
- * @property {github} github - An authenticated GitHub API client
+ * @property {github} github - A GitHub API client
  * @property {payload} payload - The webhook event payload
  * @property {logger} log - A logger
  */

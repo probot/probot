@@ -6,6 +6,12 @@ import {LoggerWithTarget, wrapLogger} from './wrap-logger'
   import {EventEmitter} from 'promise-events'
 import {EnhancedGitHubClient as GitHubApi, OctokitWithPagination} from './github'
 
+// Some events can't get an authenticated client (#382):
+function isUnauthenticatedEvent (context) {
+  return !context.payload.installation ||
+    (context.event === 'installation' && context.payload.action === 'deleted')
+}
+
 /**
  * The `robot` parameter available to apps
  *
@@ -103,7 +109,15 @@ export class Robot {
           const log = this.log.child({name: 'event', id: event.id})
 
           try {
-            const github = await this.auth(event.payload.installation.id, log)
+            let github
+
+            if (isUnauthenticatedEvent(event)) {
+              github = await this.auth()
+              log.debug('`context.github` is unauthenticated. See https://probot.github.io/docs/github-api/#unauthenticated-events')
+            } else {
+              github = await this.auth(event.payload.installation.id, log)
+            }
+
             const context = new Context(event, github, log)
 
             await callback(context)

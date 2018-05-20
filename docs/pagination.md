@@ -51,6 +51,7 @@ module.exports = robot => {
           if (issue.body.includes('something')) {
             console.log('found it:', issue)
             done()
+            break
           }
         }
       }

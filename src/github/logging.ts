@@ -1,7 +1,7 @@
 import * as Logger from 'bunyan'
 import {OctokitWithPagination} from './'
 
-export const addLogging = (octokit: OctokitWithPagination, logger: Logger) => {
+export default function addLogging (octokit: OctokitWithPagination, logger: Logger) {
   if (!logger) {
     return
   }

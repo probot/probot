@@ -4,7 +4,7 @@ import {logger} from './logger'
 import {LoggerWithTarget, wrapLogger} from './wrap-logger'
 
   import {EventEmitter} from 'promise-events'
-import {EnhancedGitHubClient as GitHubApi, OctokitWithPagination} from './github'
+import {GitHubAPI, OctokitWithPagination} from './github'
 
 // Some events can't get an authenticated client (#382):
 function isUnauthenticatedEvent (context) {
@@ -161,7 +161,7 @@ export class Robot {
    * @private
    */
   public async auth (id?: number, log = this.log) {
-    const github: OctokitWithPagination = GitHubApi({
+    const github: OctokitWithPagination = GitHubAPI({
       baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api/v3`,
       debug: process.env.LOG_LEVEL === 'trace',
       logger: log.child({name: 'github', installation: String(id)})

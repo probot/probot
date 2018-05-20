@@ -26,6 +26,9 @@ async function graphql (octokit: OctokitWithPagination, query: string, variables
 }
 
 class GraphQLError extends Error {
+  public query: string
+  public variables: Variables
+
   constructor (errors, query: string, variables: Variables) {
     super(JSON.stringify(errors))
     this.name = 'GraphQLError'
@@ -36,9 +39,4 @@ class GraphQLError extends Error {
       Error.captureStackTrace(this, GraphQLError)
     }
   }
-}
-
-interface GraphQLError {
-  query: string
-  variables: Variables
 }

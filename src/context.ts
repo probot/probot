@@ -1,6 +1,6 @@
 import * as yaml from 'js-yaml'
 import * as path from 'path'
-import { OctokitWithPagination } from './github'
+import {GitHubAPI} from './github'
 import {LoggerWithTarget} from './wrap-logger'
 /**
  * Helpers for extracting information from the webhook event, which can be
@@ -12,11 +12,11 @@ import {LoggerWithTarget} from './wrap-logger'
  */
 export class Context {
   public id: number
-  public github: OctokitWithPagination
+  public github: GitHubAPI
   public log: LoggerWithTarget
   public payload!: WebhookPayloadWithRepository
 
-  constructor (event:any, github:OctokitWithPagination, log:LoggerWithTarget) {
+  constructor (event:any, github:GitHubAPI, log:LoggerWithTarget) {
     Object.assign(this, event)
     this.id = event.id
     this.github = github

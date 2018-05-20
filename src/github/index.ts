@@ -13,7 +13,7 @@ import addRateLimiting from './rate-limiting'
  * @see {@link https://github.com/octokit/rest.js}
  */
 export function GitHubAPI(options: Options = {} as any) {
-  const octokit = new Octokit(options) as OctokitWithPagination
+  const octokit = new Octokit(options) as GitHubAPI
 
   addRateLimiting(octokit, options.limiter)
   addLogging(octokit, options.logger)
@@ -48,7 +48,7 @@ export interface OctokitError {
   status: string
 }
 
-export interface OctokitWithPagination extends Octokit {
+export interface GitHubAPI extends Octokit {
   paginate: (res: Promise<Octokit.AnyResponse>, callback: (results: Octokit.AnyResponse) => void) => Promise<any[]>
   // The following are added because Octokit does not expose the hook.error, hook.before, and hook.after methods
   hook: {

@@ -1,9 +1,8 @@
 import * as Octokit from '@octokit/rest'
+import { addGraphQL } from './graphql'
 import { addLogging, Logger  } from './logging'
 import { addPagination } from './pagination'
 import { addRateLimiting } from './rate-limiting'
-
-import { addGraphQL } from './graphql'
 
 /**
  * the [@octokit/rest Node.js module](https://github.com/octokit/rest.js),
@@ -30,7 +29,7 @@ export interface Options extends Octokit.Options {
   limiter?: any
 }
 
-export interface OctokitRequestOptions {
+export interface RequestOptions {
   method: string
   url: string
   headers: any
@@ -38,7 +37,7 @@ export interface OctokitRequestOptions {
   variables?: Variables
 }
 
-export interface OctokitResult {
+export interface Result {
   meta: {
     status: string
   }
@@ -53,11 +52,12 @@ export interface OctokitWithPagination extends Octokit {
   paginate: (res: Promise<Octokit.AnyResponse>, callback: (results: Octokit.AnyResponse) => void) => Promise<any[]>
   // The following are added because Octokit does not expose the hook.error, hook.before, and hook.after methods
   hook: {
-    error: (when: 'request', callback: (error: OctokitError, options: OctokitRequestOptions) => void) => void
-    before: (when: 'request', callback: (result: OctokitResult, options: OctokitRequestOptions) => void) => void
-    after: (when: 'request', callback: (result: OctokitResult, options: OctokitRequestOptions) => void) => void
+    error: (when: 'request', callback: (error: OctokitError, options: RequestOptions) => void) => void
+    before: (when: 'request', callback: (result: Result, options: RequestOptions) => void) => void
+    after: (when: 'request', callback: (result: Result, options: RequestOptions) => void) => void
   }
-  request: (OctokitRequestOptions) => Promise<Octokit.AnyResponse>
+
+  request: (RequestOptions) => Promise<Octokit.AnyResponse>
   query: (query: string, variables?: Variables, headers?: Headers) => Promise<Octokit.AnyResponse>
 }
 

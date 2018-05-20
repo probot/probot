@@ -1,10 +1,9 @@
 import * as express from 'express'
+import {EventEmitter} from 'promise-events'
 import {Context} from './context'
+import {GitHubAPI, OctokitWithPagination} from './github'
 import {logger} from './logger'
 import {LoggerWithTarget, wrapLogger} from './wrap-logger'
-
-  import {EventEmitter} from 'promise-events'
-import {GitHubAPI, OctokitWithPagination} from './github'
 
 // Some events can't get an authenticated client (#382):
 function isUnauthenticatedEvent (context) {

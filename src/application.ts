@@ -35,9 +35,11 @@ export class Application {
   }
 
   public async receive (event: WebhookEvent) {
-    return this.events.emit('*', event).then(() => {
-      return this.events.emit(event.event, event)
-    })
+    return Promise.all([
+      this.events.emit('*', event),
+      this.events.emit(event.event, event),
+      this.events.emit(`${event.event}.${event.payload.action}`, event),
+    ])
   }
 
   /**
@@ -101,30 +103,26 @@ export class Application {
   public on (eventName: string | string[], callback: (context: Context) => void) {
     if (typeof eventName === 'string') {
 
-      const [name, action] = eventName.split('.')
+      return this.events.on(eventName, async (event: Context) => {
+        const log = this.log.child({name: 'event', id: event.id})
 
-      return this.events.on(name, async (event: Context) => {
-        if (!action || action === event.payload.action) {
-          const log = this.log.child({name: 'event', id: event.id})
+        try {
+          let github
 
-          try {
-            let github
+          if (isUnauthenticatedEvent(event)) {
+            github = await this.auth()
+            log.debug('`context.github` is unauthenticated. See https://probot.github.io/docs/github-api/#unauthenticated-events')
+          } else {
+            github = await this.auth(event.payload.installation.id, log)
+          }
 
-            if (isUnauthenticatedEvent(event)) {
-              github = await this.auth()
-              log.debug('`context.github` is unauthenticated. See https://probot.github.io/docs/github-api/#unauthenticated-events')
-            } else {
-              github = await this.auth(event.payload.installation.id, log)
-            }
+          const context = new Context(event, github, log)
 
-            const context = new Context(event, github, log)
-
-            await callback(context)
-          } catch (err) {
-            log.error({err, event})
-            if (!this.catchErrors) {
-              throw err
-            }
+          await callback(context)
+        } catch (err) {
+          log.error({err, event})
+          if (!this.catchErrors) {
+            throw err
           }
         }
       })

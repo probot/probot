@@ -51,7 +51,7 @@ And one of:
 Glitch lets you host node applications for free and edit them directly in your browser. It’s great for experimentation and entirely sufficient for simple apps.
 
 1. [Create a new app on Glitch](https://glitch.com/edit/#!/new-project).
-2. Click on your app name on the top-right, press on advanced options and then on `Import from GitHub` (You will need to login with your GitHub account to enable that option). Enter the full repository name you want to import, e.g. for the [welcome bot](https://github.com/behaviorbot/new-issue-welcome) it would be `behaviorbot/new-issue-welcome`. The `new-issue-welcome` bot is a great template to get started with your own bot, too!
+2. Click on your app name on the top-right, press on advanced options and then on `Import from GitHub` (You will need to login with your GitHub account to enable that option). Enter the full repository name you want to import, e.g. for the [welcome app](https://github.com/behaviorbot/new-issue-welcome) it would be `behaviorbot/new-issue-welcome`. The `new-issue-welcome` app is a great template to get started with your own app, too!
 3. Next open the `.env` file and replace its content with
    ```
    APP_ID=<your app id>
@@ -61,7 +61,7 @@ Glitch lets you host node applications for free and edit them directly in your b
    ```
    Replace the two `<...>` placeholders with the values from your app. The `.env` file cannot be accessed or seen by others.
 4. Press the `New File` button and enter `.data/private-key.pem`. Paste the content of your GitHub App’s `private-key.pem` in there and save it. Files in the `.data` folder cannot be seen or accessed by others, so your private key is safe.
-5. That’s it, your app should have already started :thumbsup: Press on the `Show` button on top and paste the URL as the value of `Webhook URL`. Ensure that you remove `/probot` from the end of the `Webhook URL` that was just pasted. 
+5. That’s it, your app should have already started :thumbsup: Press on the `Show` button on top and paste the URL as the value of `Webhook URL`. Ensure that you remove `/probot` from the end of the `Webhook URL` that was just pasted.
 
 Enjoy!
 
@@ -128,7 +128,7 @@ Zeit [Now](http://zeit.co/now) is a great service for running Probot apps. After
 
 1. Once the deploy is started, go back to your [app settings page](https://github.com/settings/apps) and update the **Webhook URL** to the URL of your deployment (which `now` has kindly copied to your clipboard).
 
-1. Your app should be up and running! For long term use, create an alias for your robot. After making an alias, you can swap to new deploy URLs with no downtime.
+1. Your app should be up and running! For long term use, create an alias for your app. After making an alias, you can swap to new deploy URLs with no downtime.
 
         $ now alias set https://your-generated-url.now.sh https://a-fancier-url.now.sh
 
@@ -143,11 +143,11 @@ The Probot website includes a list of [featured apps](https://probot.github.io/a
 
 ## Combining apps
 
-To deploy a bot that includes multiple apps, create a new app that has the apps listed as dependencies in `package.json`:
+To deploy multiple apps in one instance, create a new app that has the existing apps listed as dependencies in `package.json`:
 
 ```json
 {
-  "name": "my-probot",
+  "name": "my-probot-app",
   "private": true,
   "dependencies": {
     "probot-autoresponder": "probot/autoresponder",

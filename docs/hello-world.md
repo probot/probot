@@ -7,18 +7,18 @@ next: docs/development.md
 A Probot app is just a [Node.js module](https://nodejs.org/api/modules.html) that exports a function:
 
 ```js
-module.exports = robot => {
+module.exports = app => {
   // your code here
 }
 ```
 
-The `robot` parameter is an instance of [`Robot`](https://probot.github.io/api/latest/Robot.html) and gives you access to all of the bot goodness.
+The `app` parameter is an instance of [`Application`](https://probot.github.io/api/latest/Application.html) and gives you access to all of the GitHub goodness.
 
-`robot.on` will listen for any [webhook events triggered by GitHub](./webhooks.md), which will notify you when anything interesting happens on GitHub that your app wants to know about.
+`app.on` will listen for any [webhook events triggered by GitHub](./webhooks.md), which will notify you when anything interesting happens on GitHub that your app wants to know about.
 
 ```js
-module.exports = robot => {
-  robot.on('issues.opened', async context => {
+module.exports = app => {
+  app.on('issues.opened', async context => {
     // A new issue was opened, what should we do with it?
     context.log(context.payload)
   })
@@ -30,8 +30,8 @@ The `context` passed to the event handler includes everything about the event th
 Here is an example of an autoresponder app that comments on opened issues:
 
 ```js
-module.exports = robot => {
-  robot.on('issues.opened', async context => {
+module.exports = app => {
+  app.on('issues.opened', async context => {
     // `context` extracts information from the event, which can be passed to
     // GitHub API calls. This will return:
     //   {owner: 'yourname', repo: 'yourrepo', number: 123, body: 'Hello World!}

@@ -1,10 +1,10 @@
 import * as path from 'path'
-import {Robot} from '../robot'
+import {Application} from '../application'
 
-export = (robot: Robot) => {
-  const app = robot.route()
+export = (app: Application) => {
+  const route = app.route()
 
-  app.get('/probot', (req, res) => {
+  route.get('/probot', (req, res) => {
     let pkg
     try {
       pkg = require(path.join(process.cwd(), 'package.json'))
@@ -14,5 +14,5 @@ export = (robot: Robot) => {
 
     res.render('probot.hbs', pkg)
   })
-  app.get('/', (req, res, next) => res.redirect('/probot'))
+  route.get('/', (req, res, next) => res.redirect('/probot'))
 }

@@ -6,11 +6,13 @@ const plugin = require('../../src/plugins/stats')
 const helper = require('./helper')
 
 describe('stats', function () {
-  let robot, server
+  let app, server
 
   beforeEach(() => {
     // Clean up env variable
     delete process.env.DISABLE_STATS
+
+    server = express()
   })
 
   describe('GET /probot/stats', () => {
@@ -24,12 +26,8 @@ describe('stats', function () {
           {private: false, stargazers_count: 2}
         ]})
 
-      robot = helper.createRobot()
-
-      await plugin(robot)
-
-      server = express()
-      server.use(robot.router)
+      app = helper.createApp(plugin)
+      server.use(app.router)
     })
 
     it('returns installation count and popular accounts', () => {
@@ -42,12 +40,8 @@ describe('stats', function () {
     beforeEach(async () => {
       process.env.DISABLE_STATS = 'true'
 
-      robot = helper.createRobot()
-
-      await plugin(robot)
-
-      server = express()
-      server.use(robot.router)
+      app = helper.createApp(plugin)
+      server.use(app.router)
     })
 
     it('/probot/stats returns 404', () => {
@@ -67,12 +61,8 @@ describe('stats', function () {
           {private: false, stargazers_count: 2}
         ]})
 
-      robot = helper.createRobot()
-
-      await plugin(robot)
-
-      server = express()
-      server.use(robot.router)
+      app = helper.createApp(plugin)
+      server.use(app.router)
     })
 
     it('returns installation count and popular accounts while exclusing spammy users', () => {

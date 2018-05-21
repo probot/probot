@@ -18,11 +18,11 @@ describe('Probot', () => {
   })
 
   describe('webhook delivery', () => {
-    it('forwards webhooks to the robot', async () => {
-      const robot = probot.load(() => {})
-      robot.receive = jest.fn()
+    it('forwards webhooks to the app', async () => {
+      const app = probot.load(() => {})
+      app.receive = jest.fn()
       await probot.webhook.receive(event)
-      expect(robot.receive).toHaveBeenCalledWith({ event: event.name, payload: event.payload })
+      expect(app.receive).toHaveBeenCalledWith({ event: event.name, payload: event.payload })
     })
 
     it('responds with the correct error if webhook secret is wrong', async () => {
@@ -50,27 +50,27 @@ describe('Probot', () => {
 
   describe('server', () => {
     it('prefixes paths with route name', () => {
-      probot.load(robot => {
-        const app = robot.route('/my-plugin')
-        app.get('/foo', (req, res) => res.end('foo'))
+      probot.load(app => {
+        const route = app.route('/my-plugin')
+        route.get('/foo', (req, res) => res.end('foo'))
       })
 
       return request(probot.server).get('/my-plugin/foo').expect(200, 'foo')
     })
 
     it('allows routes with no path', () => {
-      probot.load(robot => {
-        const app = robot.route()
-        app.get('/foo', (req, res) => res.end('foo'))
+      probot.load(app => {
+        const route = app.route()
+        route.get('/foo', (req, res) => res.end('foo'))
       })
 
       return request(probot.server).get('/foo').expect(200, 'foo')
     })
 
     it('allows you to overwrite the root path', () => {
-      probot.load(robot => {
-        const app = robot.route()
-        app.get('/', (req, res) => res.end('foo'))
+      probot.load(app => {
+        const route = app.route()
+        route.get('/', (req, res) => res.end('foo'))
       })
 
       return request(probot.server).get('/').expect(200, 'foo')
@@ -78,15 +78,15 @@ describe('Probot', () => {
 
     it('isolates plugins from affecting eachother', async () => {
       ['foo', 'bar'].forEach(name => {
-        probot.load(robot => {
-          const app = robot.route('/' + name)
+        probot.load(app => {
+          const route = app.route('/' + name)
 
-          app.use(function (req, res, next) {
+          route.use(function (req, res, next) {
             res.append('X-Test', name)
             next()
           })
 
-          app.get('/hello', (req, res) => res.end(name))
+          route.get('/hello', (req, res) => res.end(name))
         })
       })
 
@@ -105,10 +105,10 @@ describe('Probot', () => {
       // eslint-disable-next-line handle-callback-err
       probot.server.use((err, req, res, next) => { })
 
-      probot.load(robot => {
-        const app = robot.route()
-        app.get('/webhook', (req, res) => res.end('get-webhook'))
-        app.post('/webhook', (req, res) => res.end('post-webhook'))
+      probot.load(app => {
+        const route = app.route()
+        route.get('/webhook', (req, res) => res.end('get-webhook'))
+        route.post('/webhook', (req, res) => res.end('post-webhook'))
       })
 
       // GET requests should succeed
@@ -150,8 +150,8 @@ describe('Probot', () => {
   describe('receive', () => {
     it('forwards events to each plugin', async () => {
       const spy = jest.fn()
-      const robot = probot.load(robot => robot.on('push', spy))
-      robot.auth = jest.fn().mockReturnValue(Promise.resolve({}))
+      const app = probot.load(app => app.on('push', spy))
+      app.auth = jest.fn().mockReturnValue(Promise.resolve({}))
 
       await probot.receive(event)
 
@@ -160,7 +160,7 @@ describe('Probot', () => {
   })
 
   describe('ghe support', function () {
-    let robot
+    let app
 
     beforeEach(() => {
       process.env.GHE_HOST = 'notreallygithub.com'
@@ -169,7 +169,7 @@ describe('Probot', () => {
         .defaultReplyHeaders({'Content-Type': 'application/json'})
         .get('/app/installations').reply(200, ['I work!'])
 
-      robot = helper.createRobot()
+      app = helper.createApp()
     })
 
     afterEach(() => {
@@ -179,14 +179,14 @@ describe('Probot', () => {
     it('requests from the correct API URL', async () => {
       const spy = jest.fn()
 
-      const plugin = async robot => {
-        const github = await robot.auth()
+      const plugin = async app => {
+        const github = await app.auth()
         const res = await github.apps.getInstallations({})
         return spy(res)
       }
 
-      await plugin(robot)
-      await robot.receive(event)
+      await plugin(app)
+      await app.receive(event)
       expect(spy.mock.calls[0][0].data[0]).toBe('I work!')
     })
   })

@@ -1,14 +1,16 @@
 // FIXME: move this to a test helper that can be used by other apps
 
 const cacheManager = require('cache-manager')
-const {createRobot} = require('../../src')
+const {Application} = require('../../src')
 
 const cache = cacheManager.caching({store: 'memory'})
 
-const app = jest.fn().mockReturnValue('test')
+const jwt = jest.fn().mockReturnValue('test')
 
 module.exports = {
-  createRobot () {
-    return createRobot({app, cache})
+  createApp (plugin = () => {}) {
+    const app = new Application({app: jwt, cache})
+    plugin(app)
+    return app
   }
 }

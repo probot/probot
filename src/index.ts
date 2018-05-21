@@ -1,11 +1,11 @@
 import * as Logger from 'bunyan'
 import * as cacheManager from 'cache-manager'
 import * as express from 'express'
+import {Application, WebhookEvent} from './application'
 import {Context} from './context'
 import {createApp} from './github-app'
 import {logger} from './logger'
 import {resolve} from './resolver'
-import {createRobot, Robot, WebhookEvent} from './robot'
 import {createServer} from './server'
 import {createWebhookProxy} from './webhook-proxy'
 
@@ -29,7 +29,7 @@ export class Probot {
   public logger: Logger
 
   private options: Options
-  private robots: Robot[]
+  private apps: Application[]
   private app: () => string
 
   constructor(options: Options) {
@@ -37,7 +37,7 @@ export class Probot {
     options.secret = options.secret || 'development'
     this.options = options
     this.logger = logger
-    this.robots = []
+    this.apps = []
     this.webhook = new Webhooks({path: options.webhookPath, secret: options.secret})
     this.app = createApp({ id: options.id, cert: options.cert })
     this.server = createServer({webhook: this.webhook.middleware, logger})
@@ -71,7 +71,7 @@ export class Probot {
 
   public receive (event: WebhookEvent) {
     this.logger.debug({event}, 'Webhook received')
-    return Promise.all(this.robots.map(robot => robot.receive(event)))
+    return Promise.all(this.apps.map(app => app.receive(event)))
   }
 
   public load (plugin: string | Plugin) {
@@ -79,16 +79,16 @@ export class Probot {
       plugin = resolve(plugin) as Plugin
     }
 
-    const robot = createRobot({app: this.app, cache, catchErrors: true})
+    const app = new Application({app: this.app, cache, catchErrors: true})
 
-    // Connect the router from the robot to the server
-    this.server.use(robot.router)
+    // Connect the router from the app to the server
+    this.server.use(app.router)
 
     // Initialize the plugin
-    plugin(robot)
-    this.robots.push(robot)
+    plugin(app)
+    this.apps.push(app)
 
-    return robot
+    return app
   }
 
   public setup (apps: Array<string | Plugin>) {
@@ -119,7 +119,7 @@ export class Probot {
 
 export const createProbot = (options: Options) => new Probot(options)
 
-export type Plugin = (robot: Robot) => void
+export type Plugin = (app: Application) => void
 
 export interface Options {
   webhookPath?: string
@@ -130,4 +130,4 @@ export interface Options {
   port?: number
 }
 
-export { Logger, Context, Robot, createRobot }
+export { Logger, Context, Application }

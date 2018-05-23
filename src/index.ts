@@ -1,7 +1,7 @@
 import * as Logger from 'bunyan'
-import * as cacheManager from 'cache-manager'
 import * as express from 'express'
 import {Application, WebhookEvent} from './application'
+import {cache} from './cache'
 import {Context} from './context'
 import {createApp} from './github-app'
 import {logger} from './logger'
@@ -11,11 +11,6 @@ import {createWebhookProxy} from './webhook-proxy'
 
 const Webhooks = require('@octokit/webhooks')
 const logRequestErrors = require('./middleware/log-request-errors')
-
-const cache = cacheManager.caching({
-  store: 'memory',
-  ttl: 60 * 60 // 1 hour
-})
 
 const defaultApps = [
   require('./plugins/sentry'),

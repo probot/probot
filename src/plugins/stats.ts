@@ -33,14 +33,14 @@ module.exports = async (app: any): Promise<void> => {
   }
 
   async function getInstallations (): Promise<Installation[]> {
-    const github = await app.auth()
+    const github = await app.adapter.auth()
     const req = github.apps.getInstallations({per_page: 100})
     return github.paginate(req, res => res.data)
   }
 
   async function popularInstallations (installations: Installation[]): Promise<Account[]> {
     let popular = await Promise.all(installations.map(async (installation) => {
-      const github = await app.auth(installation.id)
+      const github = await app.adapter.auth(installation.id)
 
       const req = github.apps.getInstallationRepositories({per_page: 100})
       const repositories: Repository[] = await github.paginate(req, res => {

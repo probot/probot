@@ -22,7 +22,7 @@ describe('Application', function () {
     output = []
 
     app = new Application({})
-    app.auth = jest.fn().mockReturnValue({})
+    app.adapter.auth = jest.fn().mockReturnValue({})
 
     event = {
       id: '123-456',
@@ -119,7 +119,7 @@ describe('Application', function () {
 
       await app.receive(event)
 
-      expect(app.auth).toHaveBeenCalledWith(1, expect.anything())
+      expect(app.adapter.auth).toHaveBeenCalledWith(1, expect.anything())
     })
 
     it('returns an unauthenticated client for installation.deleted', async () => {
@@ -138,7 +138,7 @@ describe('Application', function () {
 
       await app.receive(event)
 
-      expect(app.auth).toHaveBeenCalledWith()
+      expect(app.adapter.auth).toHaveBeenCalledWith()
     })
 
     it('returns an authenticated client for events without an installation', async () => {
@@ -154,7 +154,7 @@ describe('Application', function () {
 
       await app.receive(event)
 
-      expect(app.auth).toHaveBeenCalledWith()
+      expect(app.adapter.auth).toHaveBeenCalledWith()
     })
   })
 

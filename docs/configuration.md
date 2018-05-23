@@ -1,6 +1,6 @@
-# Environmental Configuration
+# Environment Configuration
 
-When developing a Probot App, you will need to have several different fields in a `.env` file which specify environmental variables. Here are some common use cases:
+When developing a Probot App, you will need to have several different fields in a `.env` file which specify environment variables. Here are some common use cases:
 
 ```
 WEBHOOK_PROXY_URL='https://smee.io/yourcustomurl'
@@ -20,7 +20,7 @@ PRIVATE_KEY_PATH=/path/to/private/key #OPTIONAL
 ```
 For more on the set up of these items, check out [Configuring a GitHub App](https://probot.github.io/docs/development/#configuring-a-github-app).
 
-Some less common environmental variables are:
+Some less common environment variables are:
 
 ```
 LOG_LEVEL=debug #OPTIONAL

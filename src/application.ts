@@ -102,25 +102,11 @@ export class Application {
    */
   public on (eventName: string | string[], callback: (context: Context) => void) {
     if (typeof eventName === 'string') {
-
       return this.events.on(eventName, async (event: Context) => {
-        const log = this.log.child({name: 'event', id: event.id})
-
         try {
-          let github
-
-          if (isUnauthenticatedEvent(event)) {
-            github = await this.auth()
-            log.debug('`context.github` is unauthenticated. See https://probot.github.io/docs/github-api/#unauthenticated-events')
-          } else {
-            github = await this.auth(event.payload.installation.id, log)
-          }
-
-          const context = new Context(event, github, log)
-
-          await callback(context)
+          await callback(await this.createContext(event))
         } catch (err) {
-          log.error({err, event})
+          this.log.error({err, event, id: event.id})
           if (!this.catchErrors) {
             throw err
           }
@@ -178,6 +164,21 @@ export class Application {
     }
 
     return github
+  }
+
+  private async createContext (event) {
+    const log = this.log.child({name: 'event', id: event.id})
+
+    let github
+
+    if (isUnauthenticatedEvent(event)) {
+      github = await this.auth()
+      log.debug('`context.github` is unauthenticated. See https://probot.github.io/docs/github-api/#unauthenticated-events')
+    } else {
+      github = await this.auth(event.payload.installation.id, log)
+    }
+
+    return new Context(event, github, log)
   }
 }
 

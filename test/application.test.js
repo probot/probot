@@ -204,7 +204,6 @@ describe('Application', function () {
 
     beforeEach(() => {
       error = new Error('testing')
-      app.log.error = jest.fn()
     })
 
     it('logs errors thrown from handlers', async () => {
@@ -212,11 +211,7 @@ describe('Application', function () {
         throw error
       })
 
-      try {
-        await app.receive(event)
-      } catch (err) {
-        // Expected
-      }
+      await expect(app.receive(event)).rejects.toThrow(error)
 
       expect(output.length).toBe(1)
       expect(output[0].err.message).toEqual('testing')
@@ -226,11 +221,7 @@ describe('Application', function () {
     it('logs errors from rejected promises', async () => {
       app.on('test', () => Promise.reject(error))
 
-      try {
-        await app.receive(event)
-      } catch (err) {
-        // Expected
-      }
+      await expect(app.receive(event)).rejects.toThrow(error)
 
       expect(output.length).toBe(1)
       expect(output[0].err.message).toEqual('testing')

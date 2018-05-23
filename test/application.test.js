@@ -1,6 +1,7 @@
 const {Context} = require('../src/context')
 const {Application} = require('../src/application')
 const {logger} = require('../src/logger')
+const {GitHubAdapter} = require('../src/adapters/github')
 
 describe('Application', function () {
   let app
@@ -21,8 +22,10 @@ describe('Application', function () {
     // Clear log output
     output = []
 
-    app = new Application({})
-    app.adapter.auth = jest.fn().mockReturnValue({})
+    const adapter = new GitHubAdapter({jwt: () => 'test'})
+    adapter.auth = jest.fn().mockReturnValue({})
+
+    app = new Application({adapter})
 
     event = {
       id: '123-456',

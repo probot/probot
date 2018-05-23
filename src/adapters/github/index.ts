@@ -1,8 +1,13 @@
-import {Cache} from '../../cache'
+import * as cacheManager from 'cache-manager'
 import {Context} from '../../context'
 import {GitHubAPI} from '../../github'
 import {logger} from '../../logger'
 import {LoggerWithTarget, wrapLogger} from '../../wrap-logger'
+
+const cache = cacheManager.caching({
+  store: 'memory',
+  ttl: 60 * 60 // 1 hour
+})
 
 // Some events can't get an authenticated client (#382):
 function isUnauthenticatedEvent (context) {
@@ -12,13 +17,12 @@ function isUnauthenticatedEvent (context) {
 
 export class GitHubAdapter {
   public log: LoggerWithTarget
-  public cache: Cache
   public jwt: () => string
 
-  constructor({cache, jwt}) {
+  constructor({jwt}) {
     this.log = wrapLogger(logger, logger)
-    this.cache = cache
     this.jwt = jwt
+
   }
 
   public async createContext (event) {
@@ -70,7 +74,7 @@ export class GitHubAdapter {
     })
 
     if (id) {
-      const res = await this.cache.wrap(`app:${id}:token`, () => {
+      const res = await cache.wrap(`app:${id}:token`, () => {
         log.trace(`creating token for installation`)
         github.authenticate({type: 'app', token: this.jwt()})
 

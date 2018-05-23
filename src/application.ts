@@ -1,7 +1,6 @@
 import * as express from 'express'
 import {EventEmitter} from 'promise-events'
 import {GitHubAdapter} from './adapters/github'
-import {Cache} from './cache'
 import {Context} from './context'
 import {logger} from './logger'
 import {LoggerWithTarget, wrapLogger} from './wrap-logger'
@@ -13,23 +12,18 @@ import {LoggerWithTarget, wrapLogger} from './wrap-logger'
  */
 export class Application {
   public events: EventEmitter
-  public app: () => string
-  public cache: Cache
+  public adapter: GitHubAdapter
   public router: express.Router
   public catchErrors?: boolean
   public log: LoggerWithTarget
-  private adapter: GitHubAdapter
 
   constructor (options: Options) {
     const opts = options || {}
     this.events = new EventEmitter()
     this.log = wrapLogger(logger, logger)
-    this.app = opts.app
-    this.cache = opts.cache
+    this.adapter = opts.adapter
     this.catchErrors = opts.catchErrors
     this.router = opts.router || express.Router() // you can do this?
-
-    this.adapter = new GitHubAdapter({cache: this.cache, jwt: this.app})
   }
 
   public async receive (event: WebhookEvent) {
@@ -126,8 +120,7 @@ export interface WebhookEvent {
 }
 
 export interface Options {
-  app: () => string
-  cache: Cache
+  adapter: GitHubAdapter
   router?: express.Router
   catchErrors: boolean
 }

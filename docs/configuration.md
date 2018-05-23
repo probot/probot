@@ -48,4 +48,4 @@ LOG_FORMAT=json # OPTIONAL
 # By default, logs are formatted for readability in development. If you intend to drain logs to a logging service, use this option.
 ```
 
-For more information on the formatting conventions and rules of `.env` files, check out [the npm documentation](https://www.npmjs.com/package/dotenv#rules).
+For more information on the formatting conventions and rules of `.env` files, check out [the npm `dotenv` module's documentation](https://www.npmjs.com/package/dotenv#rules).

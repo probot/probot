@@ -12,7 +12,6 @@ export const createServer = (args: ServerArgs) => {
 
   app.use(logRequest({logger: args.logger}))
   app.use('/probot/static/', express.static(path.join(__dirname, '..', 'static')))
-  app.use(args.webhook)
   app.set('view engine', 'hbs')
   app.set('views', path.join(__dirname, '..', 'views'))
   app.get('/ping', (req, res) => res.end('PONG'))
@@ -21,6 +20,5 @@ export const createServer = (args: ServerArgs) => {
 }
 
 export interface ServerArgs {
-  webhook: express.Application
   logger: Logger
 }

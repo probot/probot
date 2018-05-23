@@ -36,7 +36,9 @@ export class Probot {
     this.apps = []
     this.webhook = new Webhooks({path: options.webhookPath, secret: options.secret})
     this.app = createApp({ id: options.id, cert: options.cert })
-    this.server = createServer({webhook: this.webhook.middleware, logger})
+    this.server = createServer({logger})
+    this.server.use(this.webhook.middleware)
+
 
     this.adapter = new GitHubAdapter({jwt: this.app})
 

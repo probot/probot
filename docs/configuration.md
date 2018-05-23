@@ -3,7 +3,7 @@
 When developing a Probot App, you will need to have several different fields in a `.env` file which specify environmental variables. Here are some common use cases:
 
 ```
-WEBHOOK_PROXY_URL=https://smee.io/yourcustomurl
+WEBHOOK_PROXY_URL='https://smee.io/yourcustomurl'
 # This is used to allow smee to communicate as your Webhook URL
 
 WEBHOOK_SECRET=development #OPTIONAL
@@ -32,14 +32,14 @@ IGNORED_ACCOUNTS='spammyUser,abusiveUser' #OPTIONAL
 DISABLE_STATS=true #OPTIONAL
 # This option allows for Probot Apps to opt out of inclusion in the /stats endpoint which gathers data about each app.
 
-GHE_HOST=fake.github-enterprise.com #OPTIONAL
+GHE_HOST='fake.github-enterprise.com' #OPTIONAL
 # This allows for a Probot App to be run on a GitHub Enterprise instance.
 
 PORT=3000 #OPTIONAL
 # The port on which Probot will start a local server on.
 
-WEBHOOK_PATH=/webhook #OPTIONAL
-# This is the URL of the path which will recieve webhooks
+WEBHOOK_PATH='/webhook' #OPTIONAL
+# This is the URL path which will recieve webhooks
 
 SENTRY_DSN='https://user:pw@sentry.io/1234' #OPTIONAL
 # Logs all errors to Sentry for error tracking.

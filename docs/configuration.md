@@ -7,7 +7,7 @@ next: docs/deployment.md
 When developing a Probot App, you will need to have several different fields in a `.env` file which specify environment variables. Here are some common use cases:
 
 Variable | Sample Value | Required | Description
----|---
+---|---|---|---
 WEBHOOK_PROXY_URL | 'https://smee.io/yourcustomurl'| Required | Allows your local development environment to receive GitHub webhook events. Go to https://smee.io/new to get started.
 WEBHOOK_SECRET | development | Optional | The webhook secret used when creating a GitHub App
 APP_ID | 1234 | Required | The App ID assigned to your GitHub App
@@ -19,7 +19,7 @@ For more on the set up of these items, check out [Configuring a GitHub App](http
 Some less common environment variables are:
 
 Variable | Sample Value | Required | Description
----|---
+---|---|---|---
 LOG_LEVEL | debug | Optional | The default log level is `info`, but you can also change it to `trace`, `debug`, or `warn`. This affects the verbosity of the logging Probot provides when running your app.
 IGNORED_ACCOUNTS | 'spammyUser,abusiveUser' | Optional | Specific to the probot/stats endpoint which fuels the data about each Probot App for our website. By marking an account as ignored, that account will not be included in data collected on the website. The primary use case for this is spammy or abusive users that the GitHub API sends us but who 404.
 DISABLE_STATS | true | Optional | Allows for Probot Apps to opt out of inclusion in the /stats endpoint which gathers data about each app.

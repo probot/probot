@@ -1,3 +1,7 @@
+---
+next: docs/deployment.md
+---
+
 # Environment Configuration
 
 When developing a Probot App, you will need to have several different fields in a `.env` file which specify environment variables. Here are some common use cases:

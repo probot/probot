@@ -1,7 +1,7 @@
 import * as Logger from 'bunyan'
 import {GitHubAPI} from './'
 
-export default function addLogging (client: GitHubAPI, logger: Logger) {
+export function addLogging (client: GitHubAPI, logger: Logger) {
   if (!logger) {
     return
   }

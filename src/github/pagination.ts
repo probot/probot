@@ -1,4 +1,4 @@
-export default function addPagination (octokit) {
+export function addPagination (octokit) {
   octokit.paginate = paginate.bind(null, octokit)
 }
 

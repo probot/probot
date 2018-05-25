@@ -8,6 +8,4 @@ coverage:
       default:
         threshold: 3
 
-comment:
-  layout: diff
-  require_changes: yes
+comment: false

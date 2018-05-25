@@ -54,7 +54,7 @@ export class Probot {
     this.webhook.on('error', this.errorHandler)
   }
 
-  public errorHandler (err) {
+  public errorHandler (err: Error) {
     switch (err.message) {
       case 'X-Hub-Signature does not match blob signature':
       case 'No X-Hub-Signature found on request':

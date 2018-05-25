@@ -1,6 +1,6 @@
 import {GitHubAPI, Headers, Variables} from './'
 
-export function addGraphQL (client) {
+export function addGraphQL (client: GitHubAPI) {
   client.query = graphql.bind(null, client)
 }
 
@@ -29,7 +29,7 @@ class GraphQLError extends Error {
   public query: string
   public variables: Variables
 
-  constructor (errors, query: string, variables: Variables) {
+  constructor (errors: Error[], query: string, variables: Variables) {
     super(JSON.stringify(errors))
     this.name = 'GraphQLError'
     this.query = query

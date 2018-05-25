@@ -6,7 +6,7 @@ import {logger} from './logger'
 import {LoggerWithTarget, wrapLogger} from './wrap-logger'
 
 // Some events can't get an authenticated client (#382):
-function isUnauthenticatedEvent (context) {
+function isUnauthenticatedEvent (context: Context) {
   return !context.payload.installation ||
     (context.event === 'installation' && context.payload.action === 'deleted')
 }

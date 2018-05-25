@@ -1,6 +1,6 @@
 import {GitHubAPI, Headers, Variables} from './'
 
-export default function addGraphQL (client) {
+export function addGraphQL (client) {
   client.query = graphql.bind(null, client)
 }
 

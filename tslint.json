@@ -1,0 +1,11 @@
+{
+    "extends": [
+        "tslint:latest",
+        "tslint-config-prettier"
+    ],
+    "rules": {
+      "interface-name": [true, "never-prefix"],
+      "no-var-requires": false,
+      "prefer-object-spread": false
+    }
+}

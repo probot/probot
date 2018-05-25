@@ -1,6 +1,7 @@
-const path = require('path')
-const yaml = require('js-yaml')
-
+import * as yaml from 'js-yaml'
+import * as path from 'path'
+import {GitHubAPI} from './github'
+import {LoggerWithTarget} from './wrap-logger'
 /**
  * Helpers for extracting information from the webhook event, which can be
  * passed to GitHub API calls.
@@ -9,9 +10,15 @@ const yaml = require('js-yaml')
  * @property {payload} payload - The webhook event payload
  * @property {logger} log - A logger
  */
-class Context {
-  constructor (event, github, log) {
+export class Context {
+  public id: number
+  public github: GitHubAPI
+  public log: LoggerWithTarget
+  public payload!: WebhookPayloadWithRepository
+
+  constructor (event:any, github:GitHubAPI, log:LoggerWithTarget) {
     Object.assign(this, event)
+    this.id = event.id
     this.github = github
     this.log = log
   }
@@ -28,7 +35,7 @@ class Context {
    * // Returns: {owner: 'username', repo: 'reponame', path: '.github/config.yml'}
    *
    */
-  repo (object) {
+  public repo<T> (object?: T) {
     const repo = this.payload.repository
 
     if (!repo) {
@@ -53,11 +60,11 @@ class Context {
    *
    * @param {object} [object] - Params to be merged with the issue params.
    */
-  issue (object) {
+  public issue<T> (object?: T) {
     const payload = this.payload
     return Object.assign({
       number: (payload.issue || payload.pull_request || payload).number
-    }, this.repo(), object)
+    }, this.repo(object))
   }
 
   /**
@@ -101,7 +108,7 @@ class Context {
    * @param {object} [defaultConfig] - An object of default config options
    * @return {Promise<Object>} - Configuration object read from the file
    */
-  async config (fileName, defaultConfig) {
+  public async config<T> (fileName: string, defaultConfig?: T) {
     const params = this.repo({path: path.posix.join('.github', fileName)})
 
     try {
@@ -121,4 +128,40 @@ class Context {
   }
 }
 
-module.exports = Context
+export interface PayloadRepository {
+  [key: string]: any
+  full_name: string
+  name: string
+  owner: {
+    [key: string]: any
+    login: string
+    name: string
+  }
+  html_url: string
+}
+
+export interface WebhookPayloadWithRepository {
+  [key: string]: any
+  repository: PayloadRepository
+  issue: {
+    [key: string]: any
+    number: number
+    html_url: string
+    body: string
+  }
+  pull_request: {
+    [key: string]: any
+    number: number
+    html_url: string
+    body: string
+  }
+  sender: {
+    [key: string]: any
+    type: string
+  }
+  action: string
+  installation: {
+    id: number
+    [key: string]: any
+  }
+}

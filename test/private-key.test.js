@@ -2,7 +2,7 @@ const fs = require('fs')
 const readFileSync = fs.readFileSync
 const readdirSync = fs.readdirSync
 
-const {findPrivateKey} = require('../lib/private-key')
+const {findPrivateKey} = require('../src/private-key')
 
 describe('private-key', function () {
   let privateKey

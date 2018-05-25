@@ -1,6 +1,7 @@
-const path = require('path')
+import * as path from 'path'
+import {Robot} from '../robot'
 
-module.exports = robot => {
+export = (robot: Robot) => {
   const app = robot.route()
 
   app.get('/probot', (req, res) => {

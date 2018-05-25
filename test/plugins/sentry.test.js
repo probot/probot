@@ -1,6 +1,6 @@
 const Raven = require('raven')
 
-const plugin = require('../../lib/plugins/sentry')
+const plugin = require('../../src/plugins/sentry')
 
 const helper = require('./helper')
 

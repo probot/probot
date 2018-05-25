@@ -1,4 +1,4 @@
-const fs = require('fs')
+import * as fs from 'fs'
 
 const hint = `please use:
   * \`--private-key=/path/to/private-key\` flag, or

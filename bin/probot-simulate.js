@@ -22,7 +22,7 @@ if (!eventName || !payloadPath) {
 
 const payload = require(path.join(process.cwd(), payloadPath))
 
-const createProbot = require('../')
+const {createProbot} = require('../')
 
 const probot = createProbot({
   id: program.app,

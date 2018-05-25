@@ -1,6 +1,6 @@
 const request = require('supertest')
-const createServer = require('../lib/server')
-const logger = require('../lib/logger')
+const {createServer} = require('../src/server')
+const {logger} = require('../src/logger')
 
 describe('server', function () {
   let server

@@ -1,4 +1,4 @@
-const createProbot = require('..')
+const {createProbot} = require('../src')
 const request = require('supertest')
 const nock = require('nock')
 const helper = require('./plugins/helper')
@@ -8,7 +8,7 @@ describe('Probot', () => {
   let event
 
   beforeEach(() => {
-    probot = createProbot()
+    probot = createProbot({})
 
     event = {
       name: 'push',

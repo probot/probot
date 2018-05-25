@@ -1,11 +1,12 @@
-const {EventEmitter} = require('promise-events')
-const express = require('express')
-const Context = require('./context')
-const logger = require('./logger')
-const GitHubApi = require('./github')
+import * as express from 'express'
+import {EventEmitter} from 'promise-events'
+import {Context} from './context'
+import {GitHubAPI} from './github'
+import {logger} from './logger'
+import {LoggerWithTarget, wrapLogger} from './wrap-logger'
 
 // Some events can't get an authenticated client (#382):
-const isUnauthenticatedEvent = (context) => {
+function isUnauthenticatedEvent (context) {
   return !context.payload.installation ||
     (context.event === 'installation' && context.payload.action === 'deleted')
 }
@@ -15,17 +16,25 @@ const isUnauthenticatedEvent = (context) => {
  *
  * @property {logger} log - A logger
  */
-class Robot {
-  constructor ({app, cache, router, catchErrors} = {}) {
+export class Robot {
+  public events: EventEmitter
+  public app: () => string
+  public cache: RobotCache
+  public router: express.Router
+  public catchErrors?: boolean
+  public log: LoggerWithTarget
+
+  constructor (options: RobotOptions) {
+    const opts = options || {}
     this.events = new EventEmitter()
-    this.app = app
-    this.cache = cache
-    this.router = router || new express.Router()
-    this.log = logger.wrap()
-    this.catchErrors = catchErrors
+    this.log = wrapLogger(logger, logger)
+    this.app = opts.app
+    this.cache = opts.cache
+    this.catchErrors = opts.catchErrors
+    this.router = opts.router || express.Router() // you can do this?
   }
 
-  async receive (event) {
+  public async receive (event: WebhookEvent) {
     return this.events.emit('*', event).then(() => {
       return this.events.emit(event.event, event)
     })
@@ -52,9 +61,9 @@ class Robot {
    * @param {string} path - the prefix for the routes
    * @returns {@link http://expressjs.com/en/4x/api.html#router|express.Router}
    */
-  route (path) {
+  public route (path?: string) {
     if (path) {
-      const router = new express.Router()
+      const router = express.Router()
       this.router.use(path, router)
       return router
     } else {
@@ -89,38 +98,39 @@ class Robot {
    *   // An issue was just opened.
    * });
    */
-  on (event, callback) {
-    if (event.constructor === Array) {
-      event.forEach(e => this.on(e, callback))
-      return
-    }
+  public on (eventName: string | string[], callback: (context: Context) => void) {
+    if (typeof eventName === 'string') {
 
-    const [name, action] = event.split('.')
+      const [name, action] = eventName.split('.')
 
-    return this.events.on(name, async event => {
-      if (!action || action === event.payload.action) {
-        const log = this.log.child({name: 'event', id: event.id})
-        let github = null
+      return this.events.on(name, async (event: Context) => {
+        if (!action || action === event.payload.action) {
+          const log = this.log.child({name: 'event', id: event.id})
 
-        try {
-          if (isUnauthenticatedEvent(event)) {
-            github = await this.auth()
-            log.debug('`context.github` is unauthenticated. See https://probot.github.io/docs/github-api/#unauthenticated-events')
-          } else {
-            github = await this.auth(event.payload.installation.id, log)
-          }
+          try {
+            let github
 
-          const context = new Context(event, github, log)
+            if (isUnauthenticatedEvent(event)) {
+              github = await this.auth()
+              log.debug('`context.github` is unauthenticated. See https://probot.github.io/docs/github-api/#unauthenticated-events')
+            } else {
+              github = await this.auth(event.payload.installation.id, log)
+            }
 
-          await callback(context)
-        } catch (err) {
-          log.error({err, event})
-          if (!this.catchErrors) {
-            throw err
+            const context = new Context(event, github, log)
+
+            await callback(context)
+          } catch (err) {
+            log.error({err, event})
+            if (!this.catchErrors) {
+              throw err
+            }
           }
         }
-      }
-    })
+      })
+    } else {
+      eventName.forEach(e => this.on(e, callback))
+    }
   }
 
   /**
@@ -149,11 +159,11 @@ class Robot {
    * @returns {Promise<github>} - An authenticated GitHub API client
    * @private
    */
-  async auth (id, log = this.log) {
-    const github = new GitHubApi({
-      debug: process.env.LOG_LEVEL === 'trace',
+  public async auth (id?: number, log = this.log) {
+    const github = GitHubAPI({
       baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api/v3`,
-      logger: log.child({name: 'github', installation: id})
+      debug: process.env.LOG_LEVEL === 'trace',
+      logger: log.child({name: 'github', installation: String(id)})
     })
 
     if (id) {
@@ -161,7 +171,7 @@ class Robot {
         log.trace(`creating token for installation`)
         github.authenticate({type: 'app', token: this.app()})
 
-        return github.apps.createInstallationToken({installation_id: id})
+        return github.apps.createInstallationToken({installation_id: String(id)})
       }, {ttl: 60 * 59}) // Cache for 1 minute less than GitHub expiry
 
       github.authenticate({type: 'token', token: res.data.token})
@@ -173,7 +183,31 @@ class Robot {
   }
 }
 
-module.exports = (...args) => new Robot(...args)
+export const createRobot = (options: RobotOptions) => new Robot(options)
+
+export interface WebhookEvent {
+  event: string
+  id: number
+  payload: any
+  protocol: 'http' | 'https'
+  host: string
+  url: string
+}
+
+// The TypeScript definition for cache-manager does not export the Cache interface so we recreate it here
+export interface RobotCache {
+  wrap<T>(key: string, wrapper: (callback: (error: any, result: T) => void) => any, options: RobotCacheConfig): Promise<any>;
+}
+export interface RobotCacheConfig {
+    ttl: number;
+}
+
+export interface RobotOptions {
+  app: () => string
+  cache: RobotCache
+  router?: express.Router
+  catchErrors: boolean
+}
 
 /**
  * Do the thing

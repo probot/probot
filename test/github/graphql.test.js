@@ -1,4 +1,4 @@
-const GitHub = require('../../lib/github')
+const { GitHubAPI } = require('../../src/github')
 const nock = require('nock')
 const Bottleneck = require('bottleneck')
 
@@ -16,9 +16,9 @@ describe('github/graphql', () => {
     }
 
     // Set a shorter limiter, otherwise tests are _slow_
-    const limiter = new Bottleneck({ maxConcurrent: 1, minTime: 1 })
+    const limiter = new Bottleneck(1, 1)
 
-    github = new GitHub({ logger, limiter })
+    github = new GitHubAPI({ logger, limiter })
   })
 
   describe('query', () => {

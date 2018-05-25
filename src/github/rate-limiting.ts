@@ -1,10 +1,8 @@
-module.exports = addRateLimiting
-
 const Bottleneck = require('bottleneck')
 
-function addRateLimiting (octokit, limiter = null) {
+export function addRateLimiting (octokit, limiter) {
   if (!limiter) {
-    limiter = new Bottleneck({ maxConcurrent: 1, minTime: 1000 })
+    limiter = new Bottleneck(1, 1000)
   }
 
   const noop = () => Promise.resolve()

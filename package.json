@@ -1,23 +1,63 @@
 {
   "name": "probot",
-  "version": "6.2.0",
+  "version": "7.0.0-typescript.4",
+  "publishConfig": {
+    "tag": "next"
+  },
   "description": "🤖 A framework for building GitHub Apps to automate and improve your workflow",
   "repository": "https://github.com/probot/probot",
   "main": "lib/index.js",
+  "types": "./lib/index.d.ts",
   "bin": {
     "probot": "./bin/probot.js"
   },
   "scripts": {
-    "test": "jest --coverage && standard && npm run doc-lint",
+    "build": "rimraf lib && tsc -p tsconfig.json",
+    "start": "node ./bin/probot run",
+    "lint": "tslint --project .",
+    "test": "tsc --noEmit -p . && jest --coverage && npm run lint && npm run doc-lint",
     "doc-lint": "standard docs/**/*.md",
     "doc": "jsdoc -c .jsdoc.json",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
-    "postsemantic-release": "script/publish-docs"
+    "postsemantic-release": "script/publish-docs",
+    "prepare": "npm run build"
   },
+  "files": [
+    "lib",
+    "bin",
+    "static",
+    "views"
+  ],
   "jest": {
     "setupFiles": [
       "<rootDir>/test/setup.js"
-    ]
+    ],
+    "coveragePathIgnorePatterns": [
+      "<rootDir>/lib/"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "js",
+      "json",
+      "node"
+    ],
+    "transform": {
+      ".+\\.tsx?$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
+    "testMatch": [
+      "<rootDir>/test/**/*.(ts|js)"
+    ],
+    "testPathIgnorePatterns": [
+      "<rootDir>/test/setup.js",
+      "<rootDir>/test/fixtures/",
+      "<rootDir>/test/plugins/helper.js"
+    ],
+    "globals": {
+      "ts-jest": {
+        "skipBabel": true,
+        "enableTsDiagnostics": true
+      }
+    }
   },
   "keywords": ["probot", "github-apps", "github", "automation", "robots", "workflow"],
   "bugs": "https://github.com/probot/probot/issues",
@@ -27,7 +67,7 @@
   "dependencies": {
     "@octokit/rest": "^15.6.0",
     "@octokit/webhooks": "^3.1.1",
-    "bottleneck": "^2.2.0",
+    "bottleneck": "^1.16.0",
     "bunyan": "^1.8.12",
     "bunyan-format": "^0.2.1",
     "bunyan-sentry-stream": "^1.1.0",
@@ -46,9 +86,23 @@
     "semver": "^5.5.0"
   },
   "devDependencies": {
+    "@types/bunyan": "^1.8.4",
+    "@types/bunyan-format": "^0.2.0",
+    "@types/cache-manager": "^1.2.6",
+    "@types/dotenv": "^4.0.2",
+    "@types/express": "^4.0.39",
+    "@types/jest": "^21.1.8",
+    "@types/js-yaml": "^3.10.1",
+    "@types/jsonwebtoken": "^7.2.5",
+    "@types/nock": "^9.1.0",
+    "@types/node": "^8.5.1",
+    "@types/raven": "^2.1.5",
+    "@types/resolve": "^0.0.4",
+    "@types/semver": "^5.4.0",
+    "@types/supertest": "^2.0.4",
     "connect-sse": "^1.2.0",
     "eslint": "^4.18.2",
-    "eslint-plugin-markdown": "^1.0.0-beta.6",
+    "eslint-plugin-markdown": "^1.0.0-beta.7",
     "jest": "^22.0.3",
     "jsdoc": "^3.5.5",
     "jsdoc-strip-async-await": "^0.1.0",
@@ -57,7 +111,11 @@
     "semantic-release": "^15.0.0",
     "smee-client": "^1.0.1",
     "standard": "^11.0.0",
-    "supertest": "^3.0.0"
+    "supertest": "^3.0.0",
+    "ts-jest": "^21.2.4",
+    "tslint": "^5.9.1",
+    "tslint-config-prettier": "^1.10.0",
+    "typescript": "^2.7.2"
   },
   "standard": {
     "env": [

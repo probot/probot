@@ -1,18 +1,19 @@
-module.exports = addGraphQL
+import {GitHubAPI, Headers, Variables} from './'
 
-function addGraphQL (octokit) {
-  octokit.query = query.bind(null, octokit)
+export function addGraphQL (client) {
+  client.query = graphql.bind(null, client)
 }
 
-async function query (octokit, query, variables = undefined, headers = {}) {
-  const res = await octokit.request({
-    method: 'POST',
-    url: '/graphql',
+async function graphql (client: GitHubAPI, query: string, variables: Variables, headers: Headers = {}) {
+  const res = await client.request({
     headers: {
-      'content-type': 'application/json',
       'accept': 'application/json',
+      'content-type': 'application/json',
       ...headers
     },
+    method: 'POST',
+    url: '/graphql',
+
     query,
     variables
   })
@@ -25,7 +26,10 @@ async function query (octokit, query, variables = undefined, headers = {}) {
 }
 
 class GraphQLError extends Error {
-  constructor (errors, query, variables) {
+  public query: string
+  public variables: Variables
+
+  constructor (errors, query: string, variables: Variables) {
     super(JSON.stringify(errors))
     this.name = 'GraphQLError'
     this.query = query

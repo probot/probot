@@ -1,8 +1,10 @@
 // Borrowed from https://github.com/vvo/bunyan-request
 // Copyright (c) Christian Tellnes <christian@tellnes.no>
+// tslint:disable
 var uuid = require('uuid')
+import {wrapLogger} from '../wrap-logger'
 
-module.exports = function logRequest ({logger}) {
+export const logRequest = function ({logger}) {
   return function (req, res, next) {
     // Use X-Request-ID from request if it is set, otherwise generate a uuid
     req.id = req.headers['x-request-id'] ||
@@ -11,7 +13,7 @@ module.exports = function logRequest ({logger}) {
     res.setHeader('x-request-id', req.id)
 
     // Make a logger available on the request
-    req.log = logger.wrap().child({name: 'http', id: req.id})
+    req.log = wrapLogger(logger, logger.target).child({name: 'http', id: req.id})
 
     // Request started
     req.log.trace({req}, `${req.method} ${req.url}`)

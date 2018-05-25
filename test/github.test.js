@@ -1,8 +1,8 @@
-const EnhancedGitHubClient = require('../lib/github')
+const {GitHubAPI} = require('../src/github')
 const nock = require('nock')
 const Bottleneck = require('bottleneck')
 
-describe('EnhancedGitHubClient', () => {
+describe('GitHubAPI', () => {
   let github
 
   beforeEach(() => {
@@ -12,13 +12,13 @@ describe('EnhancedGitHubClient', () => {
     }
 
     // Set a shorter limiter, otherwise tests are _slow_
-    const limiter = new Bottleneck({ maxConcurrent: 1, minTime: 1 })
+    const limiter = new Bottleneck(1, 1)
 
-    github = new EnhancedGitHubClient({ logger, limiter })
+    github = new GitHubAPI({ logger, limiter })
   })
 
   test('works without options', async () => {
-    github = new EnhancedGitHubClient()
+    github = new GitHubAPI()
     const user = {login: 'ohai'}
 
     nock('https://api.github.com').get('/user').reply(200, user)
@@ -70,10 +70,5 @@ describe('EnhancedGitHubClient', () => {
       expect(res.length).toBe(3)
       expect(spy).toHaveBeenCalledTimes(3)
     })
-  })
-
-  test('properly returns 404 responses', () => {
-    nock('https://api.github.com').get('/user').reply(404, {message: 'nope'})
-    return expect(github.users.get({})).rejects.toThrow('nope')
   })
 })

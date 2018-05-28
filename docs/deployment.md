@@ -115,7 +115,7 @@ Zeit [Now](http://zeit.co/now) is a great service for running Probot apps. After
 
 1. Add a `now-start` script to `package.json` as follows:
 
-        "now-start": "PRIVATE_KEY=$(echo $PRIVATE_KEY_BASE64 | base64 -d) probot run ./index.js"
+        "now-start": "PRIVATE_KEY=$(echo $PRIVATE_KEY_BASE64 | base64 -d) npm start"
 
 1. Run `now` to deploy, replacing the `APP_ID` and `WEBHOOK_SECRET` with the values for those variables, and setting the `PRIVATE_KEY_BASE64`:
 

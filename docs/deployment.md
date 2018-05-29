@@ -86,8 +86,8 @@ Probot runs like [any other Node app](https://devcenter.heroku.com/articles/depl
 
 1. Configure the Heroku app, replacing the `APP_ID` and `WEBHOOK_SECRET` with the values for those variables, and setting the path for the `PRIVATE_KEY`:
 
-        $ heroku config:set APP_ID=aaa \
-            WEBHOOK_SECRET=bbb \
+        $ heroku config:set APP_ID=1234 \
+            WEBHOOK_SECRET=mysecret \
             PRIVATE_KEY="$(cat ~/Downloads/*.private-key.pem)"
 
 1. Deploy the app to heroku with `git push`:
@@ -119,8 +119,8 @@ Zeit [Now](http://zeit.co/now) is a great service for running Probot apps. After
 
 1. Run `now` to deploy, replacing the `APP_ID` and `WEBHOOK_SECRET` with the values for those variables, and setting the `PRIVATE_KEY_BASE64`:
 
-        $ now -e APP_ID=aaa \
-            -e WEBHOOK_SECRET=bbb \
+        $ now -e APP_ID=1234 \
+            -e WEBHOOK_SECRET=mysecret \
             -e NODE_ENV=production \
             -e PRIVATE_KEY_BASE64="$(cat ~/Downloads/*.private-key.pem | base64)"
 
@@ -135,6 +135,36 @@ Zeit [Now](http://zeit.co/now) is a great service for running Probot apps. After
 1. You can also keep your app running forever, with instant response to webhooks with:
 
         $ now scale https://a-fancier-url.now.sh 1
+
+**ProTip™**
+
+Instead of passing the environment variables each time when deploying, you can set secrets using [`now secret add`](https://zeit.co/docs/features/env-and-secrets). In that case, you would do the following (make sure to replace `1234` and `mysecret` the values for your app)
+
+    $ now secret add app-id 1234
+    $ now secret add webhook-secret mysecret
+    $ now secret add private-key-base64 mysecret "$(cat ~/Downloads/*.private-key.pem | base64)"
+    
+Then in your package.json you can set environment variables from these secrets.
+
+    "now": {
+      "env": {
+        "APP_ID": "@app-id",
+        "NODE_ENV": "production",
+        "PRIVATE_KEY_BASE64": "@private-key-base64",
+        "WEBHOOK_SECRET": "@webhook-secret"
+      }
+    }
+
+You can also configure a default alias
+
+    "now": {
+      "alias": "a-fancier-url"
+    }
+    
+Now all you have to do is to run
+
+    $ now        # deploys the ap
+    $ now alias  # aliases deployment to a-fancier-url.now.sh
 
 ## Share the app
 

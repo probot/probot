@@ -113,12 +113,16 @@ Zeit [Now](http://zeit.co/now) is a great service for running Probot apps. After
 
 1. Clone the app that you want to deploy. e.g. `git clone https://github.com/probot/stale`
 
-1. Run `now` to deploy, replacing the `APP_ID` and `WEBHOOK_SECRET` with the values for those variables, and setting the path for the `PRIVATE_KEY`:
+1. Add a `now-start` script to `package.json` as follows:
+
+        "now-start": "PRIVATE_KEY=$(echo $PRIVATE_KEY_BASE64 | base64 -d) npm start"
+
+1. Run `now` to deploy, replacing the `APP_ID` and `WEBHOOK_SECRET` with the values for those variables, and setting the `PRIVATE_KEY_BASE64`:
 
         $ now -e APP_ID=aaa \
             -e WEBHOOK_SECRET=bbb \
             -e NODE_ENV=production \
-            -e PRIVATE_KEY="$(cat ~/Downloads/*.private-key.pem)"
+            -e PRIVATE_KEY_BASE64="$(cat ~/Downloads/*.private-key.pem | base64)"
 
       **NOTE**: Add `-e LOG_LEVEL=trace` to get verbose logging, or add `-e LOG_LEVEL=info` instead to show less details.
 

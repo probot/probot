@@ -3,9 +3,11 @@
 // tslint:disable
 var uuid = require('uuid')
 import {wrapLogger} from '../wrap-logger'
+import * as express from 'express'
+import Logger = require('bunyan')
 
-export const logRequest = function ({logger}) {
-  return function (req, res, next) {
+export const logRequest = function ({logger}: any) {
+  return function (req: Request, res: Response, next: express.NextFunction) {
     // Use X-Request-ID from request if it is set, otherwise generate a uuid
     req.id = req.headers['x-request-id'] ||
       req.headers['x-github-delivery'] ||
@@ -34,4 +36,14 @@ export const logRequest = function ({logger}) {
 
     next()
   }
+}
+
+export interface Request extends express.Request {
+  id: number
+  log: Logger
+}
+
+export interface Response extends express.Response {
+  duration: string
+  log: Logger
 }

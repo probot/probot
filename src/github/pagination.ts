@@ -7,7 +7,7 @@ export function addPagination (octokit: GitHubAPI) {
 
 const defaultCallback = (response: Promise<AnyResponse>, done?: () => void) => response
 
-async function paginate (octokit: GitHubAPI, responsePromise, callback = defaultCallback) {
+async function paginate (octokit: GitHubAPI, responsePromise: any, callback = defaultCallback) {
   let collection: any[] = []
   let getNextPage = true
 

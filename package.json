@@ -59,7 +59,14 @@
       }
     }
   },
-  "keywords": ["probot", "github-apps", "github", "automation", "robots", "workflow"],
+  "keywords": [
+    "probot",
+    "github-apps",
+    "github",
+    "automation",
+    "robots",
+    "workflow"
+  ],
   "bugs": "https://github.com/probot/probot/issues",
   "homepage": "https://probot.github.io",
   "author": "Brandon Keepers",
@@ -83,7 +90,8 @@
     "promise-events": "^0.1.3",
     "raven": "^2.4.2",
     "resolve": "^1.4.0",
-    "semver": "^5.5.0"
+    "semver": "^5.5.0",
+    "uuid": "^3.2.1"
   },
   "devDependencies": {
     "@types/bunyan": "^1.8.4",
@@ -100,6 +108,7 @@
     "@types/resolve": "^0.0.4",
     "@types/semver": "^5.4.0",
     "@types/supertest": "^2.0.4",
+    "@types/uuid": "^3.4.3",
     "connect-sse": "^1.2.0",
     "eslint": "^4.18.2",
     "eslint-plugin-markdown": "^1.0.0-beta.7",

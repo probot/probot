@@ -1,12 +1,12 @@
 // Borrowed from https://github.com/vvo/bunyan-request
 // Copyright (c) Christian Tellnes <christian@tellnes.no>
 // tslint:disable
-var uuid = require('uuid')
 import {wrapLogger} from '../wrap-logger'
+import * as uuid from 'uuid'
 import * as express from 'express'
-import Logger = require('bunyan')
+import * as Logger from 'bunyan'
 
-export const logRequest = function ({logger}: any) {
+export const logRequest = function ({logger}: any): express.RequestHandler {
   return function (req: Request, res: Response, next: express.NextFunction) {
     // Use X-Request-ID from request if it is set, otherwise generate a uuid
     req.id = req.headers['x-request-id'] ||
@@ -30,8 +30,10 @@ export const logRequest = function ({logger}: any) {
 
       const message = `${req.method} ${req.url} ${res.statusCode} - ${res.duration} ms`
 
-      req.log.info(message)
-      req.log.trace({res})
+      if (req.log) {
+        req.log.info(message)
+        req.log.trace({res})
+      }
     })
 
     next()
@@ -39,11 +41,11 @@ export const logRequest = function ({logger}: any) {
 }
 
 export interface Request extends express.Request {
-  id: number
-  log: Logger
+  id?: string | number | string[]
+  log?: Logger
 }
 
 export interface Response extends express.Response {
-  duration: string
-  log: Logger
+  duration?: string
+  log?: Logger
 }

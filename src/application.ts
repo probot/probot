@@ -63,7 +63,7 @@ export class Application {
    * @param {string} path - the prefix for the routes
    * @returns {@link http://expressjs.com/en/4x/api.html#router|express.Router}
    */
-  public route (path?: string) {
+  public route (path?: string): express.Router {
     if (path) {
       const router = express.Router()
       this.router.use(path, router)
@@ -157,7 +157,7 @@ export class Application {
    * @returns {Promise<github>} - An authenticated GitHub API client
    * @private
    */
-  public async auth (id?: number, log = this.log) {
+  public async auth (id?: number, log = this.log): Promise<GitHubAPI> {
     const github = GitHubAPI({
       baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api/v3`,
       debug: process.env.LOG_LEVEL === 'trace',

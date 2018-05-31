@@ -38,7 +38,7 @@ export interface RequestOptions {
 }
 
 export interface Result {
-  meta: {
+  headers: {
     status: string
   }
 }

@@ -7,7 +7,7 @@ import * as express from 'express'
 import * as Logger from 'bunyan'
 
 export const logRequest = function ({logger}: any): express.RequestHandler {
-  return function (req: Request, res: Response, next: express.NextFunction) {
+  return function (req: Request, res: Response, next: NextFunction) {
     // Use X-Request-ID from request if it is set, otherwise generate a uuid
     req.id = req.headers['x-request-id'] ||
       req.headers['x-github-delivery'] ||
@@ -49,3 +49,5 @@ export interface Response extends express.Response {
   duration?: string
   log?: Logger
 }
+
+export interface NextFunction extends express.NextFunction { }

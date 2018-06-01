@@ -38,7 +38,7 @@ export class Application {
    * Loads a Probot plugin
    * @param {function} plugin - Probot plugin to load
    */
-  public async load (plugin: Function) {
+  public load (plugin: Function) {
     return plugin(this)
   }
 

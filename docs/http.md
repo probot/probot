@@ -9,13 +9,13 @@ Calling `app.route('/my-app')` will return an [express](http://expressjs.com/) r
 ```js
 module.exports = app => {
   // Get an express router to expose new HTTP endpoints
-  const route = app.route('/my-app')
+  const router = app.route('/my-app')
 
   // Use any middleware
-  route.use(require('express').static('public'))
+  router.use(require('express').static('public'))
 
   // Add a new route
-  route.get('/hello-world', (req, res) => {
+  router.get('/hello-world', (req, res) => {
     res.end('Hello World')
   })
 }

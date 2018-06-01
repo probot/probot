@@ -9,9 +9,9 @@ We highly recommend working in the style of [test-driven development](http://agi
 For our testing examples, we use [jest](https://facebook.github.io/jest/), but there are other options that can perform similar operations. Here's an example of creating an app instance and mocking out the GitHub API:
 
 ```js
-// Requiring probot allows us to get an Application instance
+// Requiring probot allows us to initialize an application
 const {Application} = require('probot')
-// Requiring our app
+// Requiring our app implementation
 const plugin = require('')
 // Create a fixtures folder in your test folder
 // Then put any larger testing payloads in there
@@ -22,7 +22,7 @@ describe('your-app', () => {
   let github
 
   beforeEach(() => {
-    // Here we create an Application instance
+    // Here we create an `Application` instance
     app = new Application()
     // Here we initialize the app
     plugin(app)

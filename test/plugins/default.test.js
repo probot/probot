@@ -4,16 +4,12 @@ const plugin = require('../../src/plugins/default')
 const helper = require('./helper')
 
 describe('default plugin', function () {
-  let server, robot
+  let server, app
 
   beforeEach(async () => {
-    robot = helper.createRobot()
-
-    await plugin(robot)
-
+    app = helper.createApp(plugin)
     server = express()
-
-    server.use(robot.router)
+    server.use(app.router)
   })
 
   describe('GET /probot', () => {

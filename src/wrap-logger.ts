@@ -3,8 +3,8 @@ import {Logger} from './'
 // Return a function that defaults to "info" level, and has properties for
 // other levels:
 //
-//     robot.log("info")
-//     robot.log.trace("verbose details");
+//     app.log("info")
+//     app.log.trace("verbose details");
 //
 export const wrapLogger = (logger: Logger, baseLogger?: Logger): LoggerWithTarget => {
   const fn = logger.info.bind(logger)

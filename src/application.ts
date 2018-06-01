@@ -12,19 +12,19 @@ function isUnauthenticatedEvent (context) {
 }
 
 /**
- * The `robot` parameter available to apps
+ * The `app` parameter available to apps
  *
  * @property {logger} log - A logger
  */
-export class Robot {
+export class Application {
   public events: EventEmitter
   public app: () => string
-  public cache: RobotCache
+  public cache: Cache
   public router: express.Router
   public catchErrors?: boolean
   public log: LoggerWithTarget
 
-  constructor (options: RobotOptions) {
+  constructor (options: Options) {
     const opts = options || {}
     this.events = new EventEmitter()
     this.log = wrapLogger(logger, logger)
@@ -35,9 +35,11 @@ export class Robot {
   }
 
   public async receive (event: WebhookEvent) {
-    return this.events.emit('*', event).then(() => {
-      return this.events.emit(event.event, event)
-    })
+    return Promise.all([
+      this.events.emit('*', event),
+      this.events.emit(event.event, event),
+      this.events.emit(`${event.event}.${event.payload.action}`, event),
+    ])
   }
 
   /**
@@ -45,15 +47,15 @@ export class Robot {
    * expose HTTP endpoints
    *
    * @example
-   * module.exports = robot => {
+   * module.exports = app => {
    *   // Get an express router to expose new HTTP endpoints
-   *   const app = robot.route('/my-app');
+   *   const route = app.route('/my-app');
    *
    *   // Use any middleware
-   *   app.use(require('express').static(__dirname + '/public'));
+   *   route.use(require('express').static(__dirname + '/public'));
    *
    *   // Add a new route
-   *   app.get('/hello-world', (req, res) => {
+   *   route.get('/hello-world', (req, res) => {
    *     res.end('Hello World');
    *   });
    * };
@@ -85,46 +87,42 @@ export class Robot {
    * Often, your bot will only care about one type of action, so you can append
    * it to the event name with a `.`, like `issues.closed`.
    *
-   * @param {Robot~webhookCallback} callback - a function to call when the
+   * @param {Application~webhookCallback} callback - a function to call when the
    * webhook is received.
    *
    * @example
    *
-   * robot.on('push', context => {
+   * app.on('push', context => {
    *   // Code was just pushed.
    * });
    *
-   * robot.on('issues.opened', context => {
+   * app.on('issues.opened', context => {
    *   // An issue was just opened.
    * });
    */
   public on (eventName: string | string[], callback: (context: Context) => void) {
     if (typeof eventName === 'string') {
 
-      const [name, action] = eventName.split('.')
+      return this.events.on(eventName, async (event: Context) => {
+        const log = this.log.child({name: 'event', id: event.id})
 
-      return this.events.on(name, async (event: Context) => {
-        if (!action || action === event.payload.action) {
-          const log = this.log.child({name: 'event', id: event.id})
+        try {
+          let github
 
-          try {
-            let github
+          if (isUnauthenticatedEvent(event)) {
+            github = await this.auth()
+            log.debug('`context.github` is unauthenticated. See https://probot.github.io/docs/github-api/#unauthenticated-events')
+          } else {
+            github = await this.auth(event.payload.installation.id, log)
+          }
 
-            if (isUnauthenticatedEvent(event)) {
-              github = await this.auth()
-              log.debug('`context.github` is unauthenticated. See https://probot.github.io/docs/github-api/#unauthenticated-events')
-            } else {
-              github = await this.auth(event.payload.installation.id, log)
-            }
+          const context = new Context(event, github, log)
 
-            const context = new Context(event, github, log)
-
-            await callback(context)
-          } catch (err) {
-            log.error({err, event})
-            if (!this.catchErrors) {
-              throw err
-            }
+          await callback(context)
+        } catch (err) {
+          log.error({err, event})
+          if (!this.catchErrors) {
+            throw err
           }
         }
       })
@@ -138,15 +136,15 @@ export class Robot {
    *
    * You'll probably want to use `context.github` instead.
    *
-   * **Note**: `robot.auth` is asynchronous, so it needs to be prefixed with a
+   * **Note**: `app.auth` is asynchronous, so it needs to be prefixed with a
    * [`await`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await)
    * to wait for the magic to happen.
    *
    * @example
    *
-   *  module.exports = function(robot) {
-   *    robot.on('issues.opened', async context => {
-   *      const github = await robot.auth();
+   *  module.exports = (app) => {
+   *    app.on('issues.opened', async context => {
+   *      const github = await app.auth();
    *    });
    *  };
    *
@@ -183,8 +181,6 @@ export class Robot {
   }
 }
 
-export const createRobot = (options: RobotOptions) => new Robot(options)
-
 export interface WebhookEvent {
   event: string
   id: number
@@ -195,32 +191,32 @@ export interface WebhookEvent {
 }
 
 // The TypeScript definition for cache-manager does not export the Cache interface so we recreate it here
-export interface RobotCache {
-  wrap<T>(key: string, wrapper: (callback: (error: any, result: T) => void) => any, options: RobotCacheConfig): Promise<any>;
+export interface Cache {
+  wrap<T>(key: string, wrapper: (callback: (error: any, result: T) => void) => any, options: CacheConfig): Promise<any>;
 }
-export interface RobotCacheConfig {
+export interface CacheConfig {
     ttl: number;
 }
 
-export interface RobotOptions {
+export interface Options {
   app: () => string
-  cache: RobotCache
+  cache: Cache
   router?: express.Router
   catchErrors: boolean
 }
 
 /**
  * Do the thing
- * @callback Robot~webhookCallback
+ * @callback Application~webhookCallback
  * @param {Context} context - the context of the event that was triggered,
  *   including `context.payload`, and helpers for extracting information from
  *   the payload, which can be passed to GitHub API calls.
  *
  *  ```js
- *  module.exports = robot => {
- *    robot.on('push', context => {
+ *  module.exports = app => {
+ *    app.on('push', context => {
  *      // Code was pushed to the repo, what should we do with it?
- *      robot.log(context);
+ *      app.log(context);
  *    });
  *  };
  *  ```

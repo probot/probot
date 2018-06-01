@@ -7,8 +7,8 @@ next: docs/extensions.md
 Many GitHub API endpoints are paginated. The `github.paginate` method can be used to get each page of the results.
 
 ```js
-module.exports = robot => {
-  robot.on('issues.opened', context => {
+module.exports = app => {
+  app.on('issues.opened', context => {
     context.github.paginate(
       context.github.issues.getAll(context.repo()),
       res => {
@@ -26,8 +26,8 @@ module.exports = robot => {
 The return value of the `github.paginate` callback will be used to accumulate results.
 
 ```js
-module.exports = robot => {
-  robot.on('issues.opened', async context => {
+module.exports = app => {
+  app.on('issues.opened', async context => {
     const allIssues = await context.github.paginate(
       context.github.issues.getAll(context.repo()),
       res => res.data
@@ -42,8 +42,8 @@ module.exports = robot => {
 Sometimes it is desirable to stop fetching pages after a certain condition has been satisfied. A second argument, `done`, is provided to the callback and can be used to stop pagination. After `done` is invoked, no additional pages will be fetched.
 
 ```js
-module.exports = robot => {
-  robot.on('issues.opened', context => {
+module.exports = app => {
+  app.on('issues.opened', context => {
     context.github.paginate(
       context.github.issues.getAll(context.repo()),
       (res, done) => {

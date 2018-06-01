@@ -16,13 +16,13 @@
  *
  * @example
  *
- * robot.log("This is an info message");
- * robot.log.debug("…so is this");
- * robot.log.trace("Now we're talking");
- * robot.log.info("I thought you should know…");
- * robot.log.warn("Woah there");
- * robot.log.error("ETOOMANYLOGS");
- * robot.log.fatal("Goodbye, cruel world!");
+ * app.log("This is an info message");
+ * app.log.debug("…so is this");
+ * app.log.trace("Now we're talking");
+ * app.log.info("I thought you should know…");
+ * app.log.warn("Woah there");
+ * app.log.error("ETOOMANYLOGS");
+ * app.log.fatal("Goodbye, cruel world!");
  */
 
 import * as Logger from 'bunyan'

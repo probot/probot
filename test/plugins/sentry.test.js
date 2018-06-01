@@ -5,10 +5,10 @@ const plugin = require('../../src/plugins/sentry')
 const helper = require('./helper')
 
 describe('sentry', () => {
-  let robot
+  let app
 
   beforeEach(async () => {
-    robot = helper.createRobot()
+    app = helper.createApp()
   })
 
   beforeEach(() => {
@@ -20,7 +20,7 @@ describe('sentry', () => {
     test('throws an error', () => {
       process.env.SENTRY_DSN = 1233
       expect(() => {
-        plugin(robot)
+        plugin(app)
       }).toThrow(/Invalid Sentry DSN: 1233/)
     })
   })
@@ -28,13 +28,13 @@ describe('sentry', () => {
   describe('with a SENTRY_DSN', () => {
     beforeEach(() => {
       process.env.SENTRY_DSN = 'https://user:pw@sentry.io/123'
-      plugin(robot)
+      plugin(app)
       Raven.captureException = jest.fn()
     })
 
     test('sends reported errors to sentry', () => {
       const err = new Error('test message')
-      robot.log.error(err)
+      app.log.error(err)
 
       expect(Raven.captureException).toHaveBeenCalledWith(err, expect.objectContaining({
         extra: expect.anything()

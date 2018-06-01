@@ -15,8 +15,8 @@ Your app has access to an authenticated GitHub client that can be used to make A
 Here is an example of an autoresponder app that comments on opened issues:
 
 ```js
-module.exports = robot => {
-  robot.on('issues.opened', async context => {
+module.exports = app => {
+  app.on('issues.opened', async context => {
     // `context` extracts information from the event, which can be passed to
     // GitHub API calls. This will return:
     //   {owner: 'yourname', repo: 'yourrepo', number: 123, body: 'Hello World!}
@@ -48,8 +48,8 @@ const addComment = `
   }
 `
 
-module.exports = robot => {
-  robot.on('issues.opened', async context => {
+module.exports = app => {
+  app.on('issues.opened', async context => {
     // Post a comment on the issue
     context.github.query(addComment, {
       id: context.payload.issue.node_id,

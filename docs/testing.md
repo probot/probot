@@ -6,26 +6,26 @@ next: docs/logging.md
 
 We highly recommend working in the style of [test-driven development](http://agiledata.org/essays/tdd.html) when creating probot apps. It is frustrating to constantly create real GitHub events in order to test an app. Redelivering webhooks is possible and can be accessed in your app's [settings](https://github.com/settings/apps) page under the **Advanced** tab. We do offer the above documented `simulate` method to help make this easier; however, by writing your tests first, you can avoid repeatedly recreating actual events from GitHub to check if your code is working.
 
-For our testing examples, we use [jest](https://facebook.github.io/jest/), but there are other options that can perform similar operations. Here's an example of creating a robot instance and mocking out the GitHub API:
+For our testing examples, we use [jest](https://facebook.github.io/jest/), but there are other options that can perform similar operations. Here's an example of creating an app instance and mocking out the GitHub API:
 
 ```js
-// Requiring probot allows us to mock out a robot instance
-const {createRobot} = require('probot')
-// Requiring our app
-const app = require('')
+// Requiring probot allows us to initialize an application
+const {Application} = require('probot')
+// Requiring our app implementation
+const plugin = require('')
 // Create a fixtures folder in your test folder
 // Then put any larger testing payloads in there
 const payload = require('./fixtures/payload')
 
 describe('your-app', () => {
-  let robot
+  let app
   let github
 
   beforeEach(() => {
-    // Here we create a robot instance
-    robot = createRobot()
-    // Here we initialize the app on the robot instance
-    app(robot)
+    // Here we create an `Application` instance
+    app = new Application()
+    // Here we initialize the app
+    plugin(app)
     // This is an easy way to mock out the GitHub API
     github = {
       issues: {
@@ -34,8 +34,8 @@ describe('your-app', () => {
         }))
       }
     }
-    // Passes the mocked out GitHub API into out robot instance
-    robot.auth = () => Promise.resolve(github)
+    // Passes the mocked out GitHub API into out app instance
+    app.auth = () => Promise.resolve(github)
   })
 
   describe('your functionality', () => {
@@ -43,7 +43,7 @@ describe('your-app', () => {
       // Simulates delivery of a payload
       // payload.event is the X-GitHub-Event header sent by GitHub (for example "push")
       // payload.payload is the actual payload body
-      await robot.receive(payload)
+      await app.receive(payload)
       // This test would pass if in your main code you called `context.github.issues.createComment`
       expect(github.issues.createComment).toHaveBeenCalled()
     })

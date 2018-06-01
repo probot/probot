@@ -1,7 +1,7 @@
-module.exports = robot => {
-  robot.log('loaded app')
+module.exports = app => {
+  app.log('loaded app')
 
-  robot.on('issue_comment.created', context => {
+  app.on('issue_comment.created', context => {
     context.log('Comment created')
   })
 }

@@ -1,9 +1,9 @@
 const {Context} = require('../src/context')
-const {createRobot} = require('../src/robot')
+const {Application} = require('../src/application')
 const {logger} = require('../src/logger')
 
-describe('Robot', function () {
-  let robot
+describe('Application', function () {
+  let app
   let event
   let output
 
@@ -21,8 +21,8 @@ describe('Robot', function () {
     // Clear log output
     output = []
 
-    robot = createRobot({})
-    robot.auth = jest.fn().mockReturnValue({})
+    app = new Application({})
+    app.auth = jest.fn().mockReturnValue({})
 
     event = {
       id: '123-456',
@@ -37,10 +37,10 @@ describe('Robot', function () {
   describe('on', function () {
     it('calls callback when no action is specified', async function () {
       const spy = jest.fn()
-      robot.on('test', spy)
+      app.on('test', spy)
 
       expect(spy).toHaveBeenCalledTimes(0)
-      await robot.receive(event)
+      await app.receive(event)
       expect(spy).toHaveBeenCalled()
       expect(spy.mock.calls[0][0]).toBeInstanceOf(Context)
       expect(spy.mock.calls[0][0].payload).toBe(event.payload)
@@ -48,25 +48,25 @@ describe('Robot', function () {
 
     it('calls callback with same action', async function () {
       const spy = jest.fn()
-      robot.on('test.foo', spy)
+      app.on('test.foo', spy)
 
-      await robot.receive(event)
+      await app.receive(event)
       expect(spy).toHaveBeenCalled()
     })
 
     it('does not call callback with different action', async function () {
       const spy = jest.fn()
-      robot.on('test.nope', spy)
+      app.on('test.nope', spy)
 
-      await robot.receive(event)
+      await app.receive(event)
       expect(spy).toHaveBeenCalledTimes(0)
     })
 
     it('calls callback with *', async function () {
       const spy = jest.fn()
-      robot.on('*', spy)
+      app.on('*', spy)
 
-      await robot.receive(event)
+      await app.receive(event)
       expect(spy).toHaveBeenCalled()
     })
 
@@ -80,10 +80,10 @@ describe('Robot', function () {
       }
 
       const spy = jest.fn()
-      robot.on(['test.foo', 'arrayTest.bar'], spy)
+      app.on(['test.foo', 'arrayTest.bar'], spy)
 
-      await robot.receive(event)
-      await robot.receive(event2)
+      await app.receive(event)
+      await app.receive(event2)
       expect(spy.mock.calls.length).toEqual(2)
     })
 
@@ -98,8 +98,8 @@ describe('Robot', function () {
         }))
       })
 
-      robot.on('test', handler)
-      await robot.receive(event)
+      app.on('test', handler)
+      await app.receive(event)
       expect(handler).toHaveBeenCalled()
     })
 
@@ -113,13 +113,13 @@ describe('Robot', function () {
         }
       }
 
-      robot.on('installation.created', async context => {
+      app.on('installation.created', async context => {
         // no-op
       })
 
-      await robot.receive(event)
+      await app.receive(event)
 
-      expect(robot.auth).toHaveBeenCalledWith(1, expect.anything())
+      expect(app.auth).toHaveBeenCalledWith(1, expect.anything())
     })
 
     it('returns an unauthenticated client for installation.deleted', async () => {
@@ -132,13 +132,13 @@ describe('Robot', function () {
         }
       }
 
-      robot.on('installation.deleted', async context => {
+      app.on('installation.deleted', async context => {
         // no-op
       })
 
-      await robot.receive(event)
+      await app.receive(event)
 
-      expect(robot.auth).toHaveBeenCalledWith()
+      expect(app.auth).toHaveBeenCalledWith()
     })
 
     it('returns an authenticated client for events without an installation', async () => {
@@ -148,22 +148,22 @@ describe('Robot', function () {
         payload: { /* no installation */ }
       }
 
-      robot.on('foobar', async context => {
+      app.on('foobar', async context => {
         // no-op
       })
 
-      await robot.receive(event)
+      await app.receive(event)
 
-      expect(robot.auth).toHaveBeenCalledWith()
+      expect(app.auth).toHaveBeenCalledWith()
     })
   })
 
   describe('receive', () => {
     it('delivers the event', async () => {
       const spy = jest.fn()
-      robot.on('test', spy)
+      app.on('test', spy)
 
-      await robot.receive(event)
+      await app.receive(event)
 
       expect(spy).toHaveBeenCalled()
     })
@@ -171,7 +171,7 @@ describe('Robot', function () {
     it('waits for async events to resolve', async () => {
       const spy = jest.fn()
 
-      robot.on('test', () => {
+      app.on('test', () => {
         return new Promise(resolve => {
           setTimeout(() => {
             spy()
@@ -180,18 +180,18 @@ describe('Robot', function () {
         })
       })
 
-      await robot.receive(event)
+      await app.receive(event)
 
       expect(spy).toHaveBeenCalled()
     })
 
     it('returns a reject errors thrown in apps', async () => {
-      robot.on('test', () => {
+      app.on('test', () => {
         throw new Error('error from app')
       })
 
       try {
-        await robot.receive(event)
+        await app.receive(event)
         throw new Error('expected error to be raised from app')
       } catch (err) {
         expect(err.message).toEqual('error from app')
@@ -204,16 +204,16 @@ describe('Robot', function () {
 
     beforeEach(() => {
       error = new Error('testing')
-      robot.log.error = jest.fn()
+      app.log.error = jest.fn()
     })
 
     it('logs errors thrown from handlers', async () => {
-      robot.on('test', () => {
+      app.on('test', () => {
         throw error
       })
 
       try {
-        await robot.receive(event)
+        await app.receive(event)
       } catch (err) {
         // Expected
       }
@@ -224,10 +224,10 @@ describe('Robot', function () {
     })
 
     it('logs errors from rejected promises', async () => {
-      robot.on('test', () => Promise.reject(error))
+      app.on('test', () => Promise.reject(error))
 
       try {
-        await robot.receive(event)
+        await app.receive(event)
       } catch (err) {
         // Expected
       }

@@ -85,7 +85,7 @@ export class Probot {
     this.server.use(app.router)
 
     // Initialize the plugin
-    plugin(app)
+    app.load(plugin)
     this.apps.push(app)
 
     return app

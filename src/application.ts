@@ -34,6 +34,14 @@ export class Application {
     this.router = opts.router || express.Router() // you can do this?
   }
 
+  /**
+   * Loads a Probot plugin
+   * @param {function} plugin - Probot plugin to load
+   */
+  public async load (plugin: Function) {
+    return plugin(this)
+  }
+
   public async receive (event: WebhookEvent) {
     return Promise.all([
       this.events.emit('*', event),

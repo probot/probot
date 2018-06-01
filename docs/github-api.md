@@ -39,17 +39,6 @@ Use `context.github.query` to make requests to the [GitHub GraphQL API](https://
 Here is an example of the same autoresponder app from above that comments on opened issues, but this time with GraphQL:
 
 ```js
-// GraphQL query to get Node id for any resource, which is needed for mutations
-const getResource = `
-  query getResource($url: URI!) {
-    resource(url: $url) {
-      ... on Node {
-        id
-      }
-    }
-  }
-`
-
 // GraphQL query to add a comment
 const addComment = `
   mutation comment($id: ID!, $body: String!) {
@@ -61,14 +50,9 @@ const addComment = `
 
 module.exports = robot => {
   robot.on('issues.opened', async context => {
-    // Get the node id of the issue
-    const { resource } = await context.github.query(getResource, {
-      url: context.payload.issue.html_url
-    })
-
     // Post a comment on the issue
-    await context.github.query(addComment, {
-      id: resource.id,
+    context.github.query(addComment, {
+      id: context.payload.issue.node_id,
       body: 'Hello World'
     })
   })

@@ -34,7 +34,7 @@ export class Application {
     this.router = opts.router || express.Router() // you can do this?
   }
 
-  public async receive (event: WebhookEvent) {
+  public async receive (event: WebhookEvent): Promise<any> {
     return Promise.all([
       this.events.emit('*', event),
       this.events.emit(event.event, event),
@@ -63,7 +63,7 @@ export class Application {
    * @param {string} path - the prefix for the routes
    * @returns {@link http://expressjs.com/en/4x/api.html#router|express.Router}
    */
-  public route (path?: string) {
+  public route (path?: string): express.Router {
     if (path) {
       const router = express.Router()
       this.router.use(path, router)
@@ -100,7 +100,7 @@ export class Application {
    *   // An issue was just opened.
    * });
    */
-  public on (eventName: string | string[], callback: (context: Context) => void) {
+  public on (eventName: string | string[], callback: (context: Context) => Promise<any>): void {
     if (typeof eventName === 'string') {
 
       return this.events.on(eventName, async (event: Context) => {
@@ -157,7 +157,7 @@ export class Application {
    * @returns {Promise<github>} - An authenticated GitHub API client
    * @private
    */
-  public async auth (id?: number, log = this.log) {
+  public async auth (id?: number, log = this.log): Promise<GitHubAPI> {
     const github = GitHubAPI({
       baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api/v3`,
       debug: process.env.LOG_LEVEL === 'trace',
@@ -195,7 +195,7 @@ export interface Cache {
   wrap<T>(key: string, wrapper: (callback: (error: any, result: T) => void) => any, options: CacheConfig): Promise<any>;
 }
 export interface CacheConfig {
-    ttl: number;
+  ttl: number;
 }
 
 export interface Options {

@@ -54,7 +54,7 @@ export class Probot {
     this.webhook.on('error', this.errorHandler)
   }
 
-  public errorHandler (err) {
+  public errorHandler (err: Error): void {
     switch (err.message) {
       case 'X-Hub-Signature does not match blob signature':
       case 'No X-Hub-Signature found on request':
@@ -69,12 +69,12 @@ export class Probot {
     }
   }
 
-  public receive (event: WebhookEvent) {
+  public async receive (event: WebhookEvent): Promise<any> {
     this.logger.debug({event}, 'Webhook received')
     return Promise.all(this.apps.map(app => app.receive(event)))
   }
 
-  public load (plugin: string | Plugin) {
+  public load (plugin: string | Plugin): Application {
     if (typeof plugin === 'string') {
       plugin = resolve(plugin) as Plugin
     }
@@ -91,7 +91,7 @@ export class Probot {
     return app
   }
 
-  public setup (apps: Array<string | Plugin>) {
+  public setup (apps: Array<string | Plugin>): express.Application {
     // Log all unhandled rejections
     process.on('unhandledRejection', this.errorHandler)
 
@@ -102,7 +102,7 @@ export class Probot {
     this.server.use(logRequestErrors)
   }
 
-  public start () {
+  public start (): void {
     if (this.options.webhookProxy) {
       createWebhookProxy({
         logger,

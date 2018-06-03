@@ -185,7 +185,7 @@ describe('Probot', () => {
         return spy(res)
       }
 
-      await app.load(plugin)
+      await plugin(app)
       await app.receive(event)
       expect(spy.mock.calls[0][0].data[0]).toBe('I work!')
     })

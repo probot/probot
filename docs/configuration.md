@@ -24,8 +24,8 @@ LOG_LEVEL | debug | Optional | The default log level is `info`, but you can also
 IGNORED_ACCOUNTS | 'spammyUser,abusiveUser' | Optional | Specific to the probot/stats endpoint which fuels the data about each Probot App for our website. By marking an account as ignored, that account will not be included in data collected on the website. The primary use case for this is spammy or abusive users that the GitHub API sends us but who 404.
 DISABLE_STATS | true | Optional | Allows for Probot Apps to opt out of inclusion in the /stats endpoint which gathers data about each app.
 GHE_HOST | 'fake.github-enterprise.com' | Optional | Allows for a Probot App to be run on a GitHub Enterprise instance.
-PORT | 3000 | Optional | The port on which Probot will start a local server on.
-WEBHOOK_PATH | '/webhook' | Optional | The URL path which will recieve webhooks
+PORT | 5000 | Optional | The port on which Probot will start a local server on. By default, this is 3000.
+WEBHOOK_PATH | '/webhook' | Optional | The URL path which will recieve webhooks. By default, this is `'/'`.
 SENTRY_DSN | 'https://user:pw@sentry.io/1234' | Optional | Logs all errors to [Sentry](https://sentry.io/) for error tracking.
 LOG_FORMAT | json |  Optional | By default, logs are formatted for readability in development. If you intend to drain logs to a logging service, use this option.
 

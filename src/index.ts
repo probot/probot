@@ -3,7 +3,6 @@ import * as express from 'express'
 import {GitHubAdapter} from './adapters/github'
 import {Application, WebhookEvent} from './application'
 import {Context} from './context'
-import {createApp} from './github-app'
 import {logger} from './logger'
 import {resolve} from './resolver'
 import {createServer} from './server'
@@ -25,7 +24,6 @@ export class Probot {
 
   private options: Options
   private apps: Application[]
-  private app: () => string
   private adapter: GitHubAdapter
 
   constructor(options: Options) {
@@ -35,12 +33,11 @@ export class Probot {
     this.logger = logger
     this.apps = []
     this.webhook = new Webhooks({path: options.webhookPath, secret: options.secret})
-    this.app = createApp({ id: options.id, cert: options.cert })
     this.server = createServer({logger})
     this.server.use(this.webhook.middleware)
 
 
-    this.adapter = new GitHubAdapter({jwt: this.app})
+    this.adapter = new GitHubAdapter({ id: options.id, cert: options.cert })
 
     // Log all received webhooks
     this.webhook.on('*', (event: any) => {

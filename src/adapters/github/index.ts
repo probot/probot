@@ -1,4 +1,5 @@
 import * as cacheManager from 'cache-manager'
+import * as jwt from 'jsonwebtoken'
 import {Context} from '../../context'
 import {GitHubAPI} from '../../github'
 import {logger} from '../../logger'
@@ -17,12 +18,24 @@ function isUnauthenticatedEvent (context) {
 
 export class GitHubAdapter {
   public log: LoggerWithTarget
-  public jwt: () => string
+  public id: number
+  public cert: string
 
-  constructor({jwt}) {
+  constructor({id, cert}) {
+    this.id = id
+    this.cert = cert
     this.log = wrapLogger(logger, logger)
-    this.jwt = jwt
+  }
 
+  public jwt() {
+    const payload = {
+      exp: Math.floor(Date.now() / 1000) + 60,  // JWT expiration time
+      iat: Math.floor(Date.now() / 1000),       // Issued at time
+      iss: this.id                           // GitHub App ID
+    }
+
+    // Sign with RSA SHA256
+    return jwt.sign(payload, this.cert, {algorithm: 'RS256'})
   }
 
   public async createContext (event) {

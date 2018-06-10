@@ -39,8 +39,13 @@ export class Application {
    * Loads a Probot plugin
    * @param {function} plugin - Probot plugin to load
    */
-  public load (app: Plugin) : Application {
-    app(this)
+  public load (app: Plugin | Plugin[]) : Application {
+    if (Array.isArray(app)) {
+      app.forEach(a => this.load(a))
+    } else {
+      app(this)
+    }
+
     return this
   }
 

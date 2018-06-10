@@ -1,6 +1,7 @@
-const Bottleneck = require('bottleneck')
+import Bottleneck from 'bottleneck'
+import {GitHubAPI} from './'
 
-export function addRateLimiting (octokit, limiter) {
+export function addRateLimiting (octokit: GitHubAPI, limiter: Bottleneck) {
   if (!limiter) {
     limiter = new Bottleneck({
       maxConcurrent: 1,

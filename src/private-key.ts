@@ -17,7 +17,7 @@ const hint = `please use:
  * @returns {string} Private key
  * @private
  */
-function findPrivateKey (filepath) {
+function findPrivateKey (filepath: string): Buffer | string {
   if (filepath) {
     return fs.readFileSync(filepath)
   }

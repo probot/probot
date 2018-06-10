@@ -13,7 +13,7 @@
     "sourceMap": true,
     "outDir": "./lib",
     "skipLibCheck": true,
-    "noImplicitAny": false, // remove this once we've added all types
+    "noImplicitAny": true,
     "declaration": true // enable this once all files are .ts and we can remove allowJs
   },
   "include": [

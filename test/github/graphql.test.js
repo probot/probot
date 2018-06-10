@@ -16,7 +16,7 @@ describe('github/graphql', () => {
     }
 
     // Set a shorter limiter, otherwise tests are _slow_
-    const limiter = new Bottleneck(1, 1)
+    const limiter = new Bottleneck()
 
     github = new GitHubAPI({ logger, limiter })
   })

@@ -1,6 +1,6 @@
 import * as express from 'express'
 import {EventEmitter} from 'promise-events'
-import {Plugin} from '.'
+import {ApplicationFunction} from '.'
 import {Context} from './context'
 import {GitHubAPI} from './github'
 import {logger} from './logger'
@@ -39,7 +39,7 @@ export class Application {
    * Loads a Probot plugin
    * @param {function} plugin - Probot plugin to load
    */
-  public load (app: Plugin | Plugin[]) : Application {
+  public load (app: ApplicationFunction | ApplicationFunction[]) : Application {
     if (Array.isArray(app)) {
       app.forEach(a => this.load(a))
     } else {

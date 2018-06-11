@@ -1,8 +1,8 @@
 import * as Logger from 'bunyan'
 import * as express from 'express'
-import {GitHubAdapter} from './adapters/github'
 import {Application, WebhookEvent} from './application'
 import {Context} from './context'
+import {GitHubApp} from './github-app'
 import {logger} from './logger'
 import {resolve} from './resolver'
 import {createServer} from './server'
@@ -24,7 +24,7 @@ export class Probot {
 
   private options: Options
   private apps: Application[]
-  private adapter: GitHubAdapter
+  private adapter: GitHubApp
 
   constructor(options: Options) {
     options.webhookPath = options.webhookPath || '/'
@@ -37,7 +37,7 @@ export class Probot {
     this.server.use(this.webhook.middleware)
 
 
-    this.adapter = new GitHubAdapter({ id: options.id, cert: options.cert })
+    this.adapter = new GitHubApp({ id: options.id, cert: options.cert })
 
     // Log all received webhooks
     this.webhook.on('*', (event: any) => {

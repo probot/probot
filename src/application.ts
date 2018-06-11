@@ -1,7 +1,7 @@
 import * as express from 'express'
 import {EventEmitter} from 'promise-events'
-import {GitHubAdapter} from './adapters/github'
 import {Context} from './context'
+import {GitHubApp} from './github-app'
 import {logger} from './logger'
 import {LoggerWithTarget, wrapLogger} from './wrap-logger'
 
@@ -12,7 +12,7 @@ import {LoggerWithTarget, wrapLogger} from './wrap-logger'
  */
 export class Application {
   public events: EventEmitter
-  public adapter: GitHubAdapter
+  public adapter: GitHubApp
   public router: express.Router
   public catchErrors?: boolean
   public log: LoggerWithTarget
@@ -120,7 +120,7 @@ export interface WebhookEvent {
 }
 
 export interface Options {
-  adapter: GitHubAdapter
+  adapter: GitHubApp
   router?: express.Router
   catchErrors: boolean
 }

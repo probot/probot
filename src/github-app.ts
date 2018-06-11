@@ -1,10 +1,10 @@
 import * as cacheManager from 'cache-manager'
 import * as jwt from 'jsonwebtoken'
-import {WebhookEvent} from '../../application'
-import {Context} from '../../context'
-import {GitHubAPI} from '../../github'
-import {logger} from '../../logger'
-import {LoggerWithTarget, wrapLogger} from '../../wrap-logger'
+import {WebhookEvent} from './application'
+import {Context} from './context'
+import {GitHubAPI} from './github'
+import {logger} from './logger'
+import {LoggerWithTarget, wrapLogger} from './wrap-logger'
 
 const cache = cacheManager.caching({
   store: 'memory',
@@ -22,7 +22,7 @@ export interface Options {
   cert: string
 }
 
-export class GitHubAdapter {
+export class GitHubApp {
   public log: LoggerWithTarget
   public id: number
   public cert: string

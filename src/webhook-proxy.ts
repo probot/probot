@@ -1,4 +1,4 @@
-import * as Logger from 'bunyan'
+import Logger from 'bunyan'
 
 export const createWebhookProxy = (opts: WebhookProxyOptions) => {
   try {

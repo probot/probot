@@ -2,9 +2,9 @@
 // Copyright (c) Christian Tellnes <christian@tellnes.no>
 // tslint:disable
 import {wrapLogger} from '../wrap-logger'
-import * as uuid from 'uuid'
-import * as express from 'express'
-import * as Logger from 'bunyan'
+import uuid from 'uuid'
+import express from 'express'
+import Logger from 'bunyan'
 
 export const logRequest = function ({logger}: any): express.RequestHandler {
   return function (req: Request, res: Response, next: NextFunction) {

@@ -1,4 +1,4 @@
-import * as Octokit from '@octokit/rest'
+import Octokit from '@octokit/rest'
 import {addGraphQL} from './graphql'
 import {addLogging, Logger} from './logging'
 import {addPagination} from './pagination'

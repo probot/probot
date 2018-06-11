@@ -1,5 +1,5 @@
-import * as yaml from 'js-yaml'
-import * as path from 'path'
+import yaml from 'js-yaml'
+import path from 'path'
 import {GitHubAPI} from './github'
 import {LoggerWithTarget} from './wrap-logger'
 /**

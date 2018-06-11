@@ -1,4 +1,4 @@
-import * as Raven from 'raven'
+import Raven from 'raven'
 import {Application} from '../application'
 const sentryStream = require('bunyan-sentry-stream')
 

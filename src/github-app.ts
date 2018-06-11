@@ -1,5 +1,5 @@
-import * as cacheManager from 'cache-manager'
-import * as jwt from 'jsonwebtoken'
+import cacheManager from 'cache-manager'
+import jwt from 'jsonwebtoken'
 import {WebhookEvent} from './application'
 import {Context} from './context'
 import {GitHubAPI} from './github'

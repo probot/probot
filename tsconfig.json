@@ -14,6 +14,7 @@
     "outDir": "./lib",
     "skipLibCheck": true,
     "noImplicitAny": true,
+    "esModuleInterop": true,
     "declaration": true // enable this once all files are .ts and we can remove allowJs
   },
   "include": [

@@ -1,5 +1,5 @@
-import * as bunyan from 'bunyan'
-import * as express from 'express'
+import bunyan from 'bunyan'
+import express from 'express'
 import {PayloadRepository} from './context'
 
 export const serializers: bunyan.StdSerializers = {

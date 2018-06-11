@@ -1,5 +1,5 @@
-import * as Logger from 'bunyan'
-import * as express from 'express'
+import Logger from 'bunyan'
+import express from 'express'
 import {Application, WebhookEvent} from './application'
 import {Context} from './context'
 import {GitHubApp} from './github-app'

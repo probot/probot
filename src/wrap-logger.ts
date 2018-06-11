@@ -52,6 +52,6 @@ export interface LoggerWithTarget extends Logger {
 export interface ChildArgs {
   options?: object
   name?: string
-  id?: number
+  id?: string | number | string[]
   installation?: string
 }

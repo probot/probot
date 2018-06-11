@@ -43,7 +43,7 @@ export interface Result {
   }
 }
 
-export interface OctokitError {
+export interface OctokitError extends Error {
   code: number
   status: string
 }
@@ -57,7 +57,7 @@ export interface GitHubAPI extends Octokit {
     after: (when: 'request', callback: (result: Result, options: RequestOptions) => void) => void
   }
 
-  request: (RequestOptions) => Promise<Octokit.AnyResponse>
+  request: (RequestOptions: RequestOptions) => Promise<Octokit.AnyResponse>
   query: (query: string, variables?: Variables, headers?: Headers) => Promise<Octokit.AnyResponse>
 }
 

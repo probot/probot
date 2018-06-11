@@ -1,8 +1,12 @@
-const Bottleneck = require('bottleneck')
+import Bottleneck from 'bottleneck'
+import {GitHubAPI} from './'
 
-export function addRateLimiting (octokit, limiter) {
+export function addRateLimiting (octokit: GitHubAPI, limiter: Bottleneck) {
   if (!limiter) {
-    limiter = new Bottleneck(1, 1000)
+    limiter = new Bottleneck({
+      maxConcurrent: 1,
+      minTime: 1000
+    })
   }
 
   const noop = () => Promise.resolve()

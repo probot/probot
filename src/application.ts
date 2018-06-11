@@ -55,7 +55,7 @@ export class Application {
    * @param {string} path - the prefix for the routes
    * @returns {@link http://expressjs.com/en/4x/api.html#router|express.Router}
    */
-  public route (path?: string) {
+  public route (path?: string): express.Router {
     if (path) {
       const router = express.Router()
       this.router.use(path, router)
@@ -114,9 +114,9 @@ export interface WebhookEvent {
   event: string
   id: number
   payload: any
-  protocol: 'http' | 'https'
-  host: string
-  url: string
+  protocol?: 'http' | 'https'
+  host?: string
+  url?: string
 }
 
 export interface Options {

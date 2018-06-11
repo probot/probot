@@ -15,9 +15,11 @@ export class Context {
   public github: GitHubAPI
   public log: LoggerWithTarget
   public payload!: WebhookPayloadWithRepository
+  public event: any
 
   constructor (event:any, github:GitHubAPI, log:LoggerWithTarget) {
     Object.assign(this, event)
+    this.event = event
     this.id = event.id
     this.github = github
     this.log = log

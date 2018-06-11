@@ -1,5 +1,6 @@
 import * as cacheManager from 'cache-manager'
 import * as jwt from 'jsonwebtoken'
+import {WebhookEvent} from '../../application'
 import {Context} from '../../context'
 import {GitHubAPI} from '../../github'
 import {logger} from '../../logger'
@@ -11,9 +12,14 @@ const cache = cacheManager.caching({
 })
 
 // Some events can't get an authenticated client (#382):
-function isUnauthenticatedEvent (context) {
-  return !context.payload.installation ||
-    (context.event === 'installation' && context.payload.action === 'deleted')
+function isUnauthenticatedEvent (event: WebhookEvent) {
+  return !event.payload.installation ||
+    (event.event === 'installation' && event.payload.action === 'deleted')
+}
+
+export interface Options {
+  id: number
+  cert: string
 }
 
 export class GitHubAdapter {
@@ -21,7 +27,7 @@ export class GitHubAdapter {
   public id: number
   public cert: string
 
-  constructor({id, cert}) {
+  constructor({id, cert}: Options) {
     this.id = id
     this.cert = cert
     this.log = wrapLogger(logger, logger)
@@ -38,7 +44,7 @@ export class GitHubAdapter {
     return jwt.sign(payload, this.cert, {algorithm: 'RS256'})
   }
 
-  public async createContext (event) {
+  public async createContext (event: WebhookEvent) {
     const log = this.log.child({name: 'event', id: event.id})
 
     let github
@@ -79,7 +85,7 @@ export class GitHubAdapter {
    * @returns {Promise<github>} - An authenticated GitHub API client
    * @private
    */
-  public async auth (id?: number, log = this.log) {
+  public async auth (id?: number, log = this.log): Promise<GitHubAPI> {
     const github = GitHubAPI({
       baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api/v3`,
       debug: process.env.LOG_LEVEL === 'trace',

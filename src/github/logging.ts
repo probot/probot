@@ -14,7 +14,7 @@ export function addLogging (client: GitHubAPI, logger: Logger) {
   })
   client.hook.after('request', (result, options) => {
     const {method, url, headers, ...params} = options
-    const msg = `GitHub request: ${method} ${url} - ${result.meta.status}`
+    const msg = `GitHub request: ${method} ${url} - ${result.headers.status}`
     logger.debug({params}, msg)
   })
 }

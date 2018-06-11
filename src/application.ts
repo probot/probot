@@ -12,10 +12,11 @@ import {LoggerWithTarget, wrapLogger} from './wrap-logger'
  */
 export class Application {
   public events: EventEmitter
-  public adapter: GitHubApp
   public router: express.Router
   public catchErrors?: boolean
   public log: LoggerWithTarget
+
+  private adapter: GitHubApp
 
   constructor (options: Options) {
     const opts = options || {}

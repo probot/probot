@@ -1,4 +1,4 @@
-import * as express from 'express'
+import express from 'express'
 import {EventEmitter} from 'promise-events'
 import {Context} from './context'
 import {GitHubAPI} from './github'

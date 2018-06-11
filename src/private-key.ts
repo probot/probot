@@ -1,4 +1,4 @@
-import * as fs from 'fs'
+import fs from 'fs'
 
 const hint = `please use:
   * \`--private-key=/path/to/private-key\` flag, or

@@ -8,7 +8,6 @@ import {resolve} from './resolver'
 import {createServer} from './server'
 import {createWebhookProxy} from './webhook-proxy'
 
-const Webhooks = require('@octokit/webhooks')
 const logRequestErrors = require('./middleware/log-request-errors')
 
 const defaultApps = [
@@ -27,17 +26,18 @@ export class Probot {
   private adapter: GitHubApp
 
   constructor(options: Options) {
-    options.webhookPath = options.webhookPath || '/'
-    options.secret = options.secret || 'development'
+    this.adapter = new GitHubApp({
+      cert: options.cert,
+      id: options.id,
+      secret: options.secret,
+      webhookPath: options.webhookPath,
+    })
     this.options = options
     this.logger = logger
     this.apps = []
-    this.webhook = new Webhooks({path: options.webhookPath, secret: options.secret})
+    this.webhook = this.adapter.webhooks
     this.server = createServer({logger})
     this.server.use(this.webhook.middleware)
-
-
-    this.adapter = new GitHubApp({ id: options.id, cert: options.cert })
 
     // Log all received webhooks
     this.webhook.on('*', (event: any) => {

@@ -1,3 +1,4 @@
+import Webhooks from '@octokit/webhooks'
 import cacheManager from 'cache-manager'
 import jwt from 'jsonwebtoken'
 import {WebhookEvent} from './application'
@@ -20,17 +21,25 @@ function isUnauthenticatedEvent (event: WebhookEvent) {
 export interface Options {
   id: number
   cert: string
+  webhookPath?: string,
+  secret?: string
 }
 
 export class GitHubApp {
   public log: LoggerWithTarget
   public id: number
   public cert: string
+  public webhooks: Webhooks
 
-  constructor({id, cert}: Options) {
+  constructor({id, cert, webhookPath, secret}: Options) {
     this.id = id
     this.cert = cert
     this.log = wrapLogger(logger, logger)
+
+    this.webhooks = new Webhooks({
+      path: webhookPath || '/',
+      secret: secret || 'development'
+    })
   }
 
   public jwt() {

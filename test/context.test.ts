@@ -10,7 +10,7 @@ describe('Context', () => {
 
   beforeEach(() => {
     event = {
-      event: 'push',
+      name: 'push',
       payload: {
         issue: {number: 4},
         repository: {

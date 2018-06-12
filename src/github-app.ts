@@ -1,8 +1,7 @@
-import Webhooks from '@octokit/webhooks'
+import Webhooks, {WebhookEvent} from '@octokit/webhooks'
 import cacheManager from 'cache-manager'
 import {Application} from 'express'
 import jwt from 'jsonwebtoken'
-import {WebhookEvent} from './application'
 import {Context} from './context'
 import {GitHubAPI} from './github'
 import {logger} from './logger'
@@ -16,7 +15,7 @@ const cache = cacheManager.caching({
 // Some events can't get an authenticated client (#382):
 function isUnauthenticatedEvent (event: WebhookEvent) {
   return !event.payload.installation ||
-    (event.event === 'installation' && event.payload.action === 'deleted')
+    (event.name === 'installation' && event.payload.action === 'deleted')
 }
 
 export interface Options {
@@ -43,7 +42,7 @@ export class GitHubApp {
     })
 
     // Log all webhook errors
-    this.webhooks.on('error', this.errorHandler)
+    this.webhooks.on('error', this.errorHandler.bind(this))
   }
 
   get router(): Application {

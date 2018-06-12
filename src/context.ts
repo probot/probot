@@ -1,7 +1,9 @@
+import {WebhookEvent} from '@octokit/webhooks'
 import yaml from 'js-yaml'
 import path from 'path'
 import {GitHubAPI} from './github'
 import {LoggerWithTarget} from './wrap-logger'
+
 /**
  * Helpers for extracting information from the webhook event, which can be
  * passed to GitHub API calls.
@@ -15,14 +17,18 @@ export class Context {
   public github: GitHubAPI
   public log: LoggerWithTarget
   public payload!: WebhookPayloadWithRepository
-  public event: any
+  private name: string
 
-  constructor (event:any, github:GitHubAPI, log:LoggerWithTarget) {
-    Object.assign(this, event)
-    this.event = event
+  constructor (event:WebhookEvent, github:GitHubAPI, log:LoggerWithTarget) {
+    this.name = event.name
     this.id = event.id
+    this.payload = event.payload
     this.github = github
     this.log = log
+  }
+
+  public get event(): string {
+    return this.name
   }
 
   /**

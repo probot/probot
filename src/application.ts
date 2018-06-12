@@ -1,3 +1,4 @@
+import {WebhookEvent} from '@octokit/webhooks'
 import express from 'express'
 import {EventEmitter} from 'promise-events'
 import {Context} from './context'
@@ -30,8 +31,8 @@ export class Application {
   public async receive (event: WebhookEvent) {
     return Promise.all([
       this.events.emit('*', event),
-      this.events.emit(event.event, event),
-      this.events.emit(`${event.event}.${event.payload.action}`, event),
+      this.events.emit(event.name, event),
+      this.events.emit(`${event.name}.${event.payload.action}`, event),
     ])
   }
 
@@ -95,7 +96,7 @@ export class Application {
    */
   public on (eventName: string | string[], callback: (context: Context) => void) {
     if (typeof eventName === 'string') {
-      return this.events.on(eventName, async (event: Context) => {
+      return this.events.on(eventName, async (event: WebhookEvent) => {
         try {
           await callback(await this.adapter.createContext(event))
         } catch (err) {
@@ -109,15 +110,6 @@ export class Application {
       eventName.forEach(e => this.on(e, callback))
     }
   }
-}
-
-export interface WebhookEvent {
-  event: string
-  id: number
-  payload: any
-  protocol?: 'http' | 'https'
-  host?: string
-  url?: string
 }
 
 export interface Options {

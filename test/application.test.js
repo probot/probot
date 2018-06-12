@@ -29,7 +29,7 @@ describe('Application', function () {
 
     event = {
       id: '123-456',
-      event: 'test',
+      name: 'test',
       payload: {
         action: 'foo',
         installation: {id: 1}
@@ -75,7 +75,7 @@ describe('Application', function () {
 
     it('calls callback x amount of times when an array of x actions is passed', async function () {
       const event2 = {
-        event: 'arrayTest',
+        name: 'arrayTest',
         payload: {
           action: 'bar',
           installation: {id: 2}
@@ -109,7 +109,7 @@ describe('Application', function () {
     it('returns an authenticated client for installation.created', async () => {
       const event = {
         id: '123-456',
-        event: 'installation',
+        name: 'installation',
         payload: {
           action: 'created',
           installation: {id: 1}
@@ -128,7 +128,7 @@ describe('Application', function () {
     it('returns an unauthenticated client for installation.deleted', async () => {
       const event = {
         id: '123-456',
-        event: 'installation',
+        name: 'installation',
         payload: {
           action: 'deleted',
           installation: {id: 1}
@@ -147,7 +147,7 @@ describe('Application', function () {
     it('returns an authenticated client for events without an installation', async () => {
       const event = {
         id: '123-456',
-        event: 'foobar',
+        name: 'foobar',
         payload: { /* no installation */ }
       }
 

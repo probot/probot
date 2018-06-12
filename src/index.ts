@@ -1,6 +1,7 @@
+import {WebhookEvent} from '@octokit/webhooks'
 import Logger from 'bunyan'
 import express from 'express'
-import {Application, WebhookEvent} from './application'
+import {Application} from './application'
 import {Context} from './context'
 import {GitHubApp} from './github-app'
 import {logger} from './logger'
@@ -40,12 +41,7 @@ export class Probot {
     this.server.use(this.adapter.router)
 
     // Log all received webhooks
-    this.webhook.on('*', (event: any) => {
-      const webhookEvent = { ...event, event: event.name }
-      delete webhookEvent.name
-
-      this.receive(webhookEvent)
-    })
+    this.webhook.on('*', this.receive.bind(this))
   }
 
   public receive (event: WebhookEvent) {

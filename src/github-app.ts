@@ -40,6 +40,9 @@ export class GitHubApp {
       path: webhookPath || '/',
       secret: secret || 'development'
     })
+
+    // Log all webhook errors
+    this.webhooks.on('error', this.errorHandler)
   }
 
   public jwt() {
@@ -115,5 +118,20 @@ export class GitHubApp {
     }
 
     return github
+  }
+
+  public errorHandler (err: Error) {
+    switch (err.message) {
+      case 'X-Hub-Signature does not match blob signature':
+      case 'No X-Hub-Signature found on request':
+        logger.error('Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.')
+        break
+      case 'error:0906D06C:PEM routines:PEM_read_bio:no start line':
+      case '{"message":"A JSON web token could not be decoded","documentation_url":"https://developer.github.com/v3"}':
+        logger.error('Your private key (usually a .pem file) is not correct. Go to https://github.com/settings/apps/YOUR_APP and generate a new PEM file. If you\'re deploying to Now, visit https://probot.github.io/docs/deployment/#now.')
+        break
+      default:
+        logger.error(err)
+    }
   }
 }

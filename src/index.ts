@@ -46,24 +46,6 @@ export class Probot {
 
       this.receive(webhookEvent)
     })
-
-    // Log all webhook errors
-    this.webhook.on('error', this.errorHandler)
-  }
-
-  public errorHandler (err: Error) {
-    switch (err.message) {
-      case 'X-Hub-Signature does not match blob signature':
-      case 'No X-Hub-Signature found on request':
-        logger.error('Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.')
-        break
-      case 'error:0906D06C:PEM routines:PEM_read_bio:no start line':
-      case '{"message":"A JSON web token could not be decoded","documentation_url":"https://developer.github.com/v3"}':
-        logger.error('Your private key (usually a .pem file) is not correct. Go to https://github.com/settings/apps/YOUR_APP and generate a new PEM file. If you\'re deploying to Now, visit https://probot.github.io/docs/deployment/#now.')
-        break
-      default:
-        logger.error(err)
-    }
   }
 
   public receive (event: WebhookEvent) {
@@ -90,7 +72,7 @@ export class Probot {
 
   public setup (apps: Array<string | Plugin>) {
     // Log all unhandled rejections
-    process.on('unhandledRejection', this.errorHandler)
+    process.on('unhandledRejection', this.adapter.errorHandler)
 
     // Load the given apps along with the default apps
     apps.concat(defaultApps).forEach(app => this.load(app))

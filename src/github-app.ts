@@ -1,5 +1,6 @@
 import Webhooks from '@octokit/webhooks'
 import cacheManager from 'cache-manager'
+import {Application} from 'express'
 import jwt from 'jsonwebtoken'
 import {WebhookEvent} from './application'
 import {Context} from './context'
@@ -43,6 +44,10 @@ export class GitHubApp {
 
     // Log all webhook errors
     this.webhooks.on('error', this.errorHandler)
+  }
+
+  get router(): Application {
+    return this.webhooks.middleware
   }
 
   public jwt() {

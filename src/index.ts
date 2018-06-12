@@ -37,7 +37,7 @@ export class Probot {
     this.apps = []
     this.webhook = this.adapter.webhooks
     this.server = createServer({logger})
-    this.server.use(this.webhook.middleware)
+    this.server.use(this.adapter.router)
 
     // Log all received webhooks
     this.webhook.on('*', (event: any) => {

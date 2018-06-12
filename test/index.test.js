@@ -17,19 +17,25 @@ describe('Probot', () => {
   })
 
   describe('webhook delivery', () => {
+    let webhooks
+
+    beforeEach(() => {
+      webhooks = probot.adapter.webhooks
+    })
+
     it('forwards webhooks to the app', async () => {
       const app = probot.load(() => {})
       app.receive = jest.fn()
-      await probot.webhook.receive(event)
+      await webhooks.receive(event)
       expect(app.receive).toHaveBeenCalledWith(event)
     })
 
     it('responds with the correct error if webhook secret is wrong', async () => {
       probot.logger.error = jest.fn()
-      probot.webhook.on('push', () => { throw new Error('X-Hub-Signature does not match blob signature') })
+      webhooks.on('push', () => { throw new Error('X-Hub-Signature does not match blob signature') })
 
       try {
-        await probot.webhook.receive(event)
+        await webhooks.receive(event)
       } catch (e) {
         expect(probot.logger.error.mock.calls[0]).toMatchSnapshot()
       }
@@ -37,10 +43,10 @@ describe('Probot', () => {
 
     it('responds with the correct error if the PEM file is missing', async () => {
       probot.logger.error = jest.fn()
-      probot.webhook.on('*', () => { throw new Error('error:0906D06C:PEM routines:PEM_read_bio:no start line') })
+      webhooks.on('*', () => { throw new Error('error:0906D06C:PEM routines:PEM_read_bio:no start line') })
 
       try {
-        await probot.webhook.receive(event)
+        await webhooks.receive(event)
       } catch (e) {
         expect(probot.logger.error.mock.calls[0]).toMatchSnapshot()
       }

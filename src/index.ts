@@ -19,7 +19,6 @@ const defaultApps = [
 
 export class Probot {
   public server: express.Application
-  public webhook: any
   public logger: Logger
 
   private options: Options
@@ -36,12 +35,11 @@ export class Probot {
     this.options = options
     this.logger = logger
     this.apps = []
-    this.webhook = this.adapter.webhooks
     this.server = createServer({logger})
     this.server.use(this.adapter.router)
 
     // Log all received webhooks
-    this.webhook.on('*', this.receive.bind(this))
+    this.adapter.webhooks.on('*', this.receive.bind(this))
   }
 
   public receive (event: WebhookEvent) {

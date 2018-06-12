@@ -14,10 +14,10 @@ import {LoggerWithTarget} from './wrap-logger'
  */
 export class Context {
   public id: number
+  public name: string
+  public payload!: WebhookPayloadWithRepository
   public github: GitHubAPI
   public log: LoggerWithTarget
-  public payload!: WebhookPayloadWithRepository
-  private name: string
 
   constructor (event:WebhookEvent, github:GitHubAPI, log:LoggerWithTarget) {
     this.name = event.name
@@ -27,6 +27,7 @@ export class Context {
     this.log = log
   }
 
+  // Maintain backward compatability
   public get event(): string {
     return this.name
   }

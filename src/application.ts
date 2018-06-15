@@ -158,7 +158,7 @@ export class Application {
    * @private
    */
   public async auth (id?: number, log = this.log): Promise<GitHubAPI> {
-    if (process.env.GHE_HOST && /https?:\/\//.test(process.env.GHE_HOST)) {
+    if (process.env.GHE_HOST && /^https?:\/\//.test(process.env.GHE_HOST)) {
       throw new Error('Your \`GHE_HOST\` environment variable should not include a protocol.')
     }
 

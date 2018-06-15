@@ -189,5 +189,15 @@ describe('Probot', () => {
       await app.receive(event)
       expect(spy.mock.calls[0][0].data[0]).toBe('I work!')
     })
+
+    it('throws if the GHE host includes a protocol', async () => {
+      process.env.GHE_HOST = 'https://notreallygithub.com'
+
+      try {
+        await app.auth()
+      } catch (e) {
+        expect(e).toMatchSnapshot()
+      }
+    })
   })
 })

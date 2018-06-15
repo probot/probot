@@ -3,7 +3,7 @@ import Logger from 'bunyan'
 import express from 'express'
 import {Application} from './application'
 import {Context} from './context'
-import {GitHubApp} from './github-app'
+import {GitHubApp, Options as GitHubAppOptions} from './github-app'
 import {logger} from './logger'
 import {resolve} from './resolver'
 import {createServer} from './server'
@@ -94,11 +94,7 @@ export const createProbot = (options: Options) => new Probot(options)
 
 export type Plugin = (app: Application) => void
 
-export interface Options {
-  webhookPath?: string
-  secret?: string,
-  id: number,
-  cert: string,
+export interface Options extends GitHubAppOptions {
   webhookProxy?: string,
   port?: number
 }

@@ -27,6 +27,10 @@ describe('Context', () => {
     expect(context.payload).toBe(event.payload)
   })
 
+  it('aliases name to event', () => {
+    expect(context.event).toEqual(event.name)
+  })
+
   describe('repo', () => {
     it('returns attributes from repository payload', () => {
       expect(context.repo()).toEqual({owner: 'bkeepers', repo: 'probot'})

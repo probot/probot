@@ -48,6 +48,7 @@ module.exports = async (app: any): Promise<void> => {
       if (ignoredAccounts.includes(account.login.toLowerCase())) {
         account.stars = 0
         app.log.debug({installation}, 'Installation is ignored')
+        return account
       }
 
       const github = await app.auth(installation.id)

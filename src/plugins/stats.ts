@@ -43,22 +43,24 @@ module.exports = async (app: any): Promise<void> => {
 
   async function popularInstallations (installations: Installation[]): Promise<Account[]> {
     let popular = await Promise.all(installations.map(async (installation) => {
+      const {account} = installation
+
+      if (ignoredAccounts.includes(account.login.toLowerCase())) {
+        account.stars = 0
+        app.log.debug({installation}, 'Installation is ignored')
+        return account
+      }
+
       const github = await app.auth(installation.id)
 
       const req = github.apps.getInstallationRepositories({per_page: 100})
       const repositories: Repository[] = await github.paginate(req, (res: AnyResponse) => {
         return res.data.repositories.filter((repository: Repository) => !repository.private)
       })
-      const account = installation.account
 
-      if (ignoredAccounts.includes(installation.account.login.toLowerCase())) {
-        account.stars = 0
-        app.log.debug({installation}, 'Installation is ignored')
-      } else {
-        account.stars = repositories.reduce((stars, repository) => {
-          return stars + repository.stargazers_count
-        }, 0)
-      }
+      account.stars = repositories.reduce((stars, repository) => {
+        return stars + repository.stargazers_count
+      }, 0)
 
       return account
     }))

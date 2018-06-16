@@ -199,6 +199,29 @@ describe('Application', function () {
     })
   })
 
+  describe('load', () => {
+    it('loads one app', async () => {
+      const spy = jest.fn()
+      const myApp = a => a.on('test', spy)
+
+      app.load(myApp)
+      await app.receive(event)
+      expect(spy).toHaveBeenCalled()
+    })
+
+    it('loads multiple apps', async () => {
+      const spy = jest.fn()
+      const spy2 = jest.fn()
+      const myApp = a => a.on('test', spy)
+      const myApp2 = a => a.on('test', spy2)
+
+      app.load([myApp, myApp2])
+      await app.receive(event)
+      expect(spy).toHaveBeenCalled()
+      expect(spy2).toHaveBeenCalled()
+    })
+  })
+
   describe('error handling', () => {
     let error
 

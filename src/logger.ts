@@ -25,8 +25,8 @@
  * app.log.fatal("Goodbye, cruel world!");
  */
 
-import * as Logger from 'bunyan'
-import * as bunyanFormat from 'bunyan-format'
+import Logger from 'bunyan'
+import bunyanFormat from 'bunyan-format'
 import {serializers} from './serializers'
 
 function toBunyanLogLevel (level: string) {

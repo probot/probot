@@ -1,4 +1,4 @@
-import * as fs from 'fs'
+import fs from 'fs'
 
 const hint = `please use:
   * \`--private-key=/path/to/private-key\` flag, or
@@ -17,7 +17,7 @@ const hint = `please use:
  * @returns {string} Private key
  * @private
  */
-function findPrivateKey (filepath) {
+function findPrivateKey (filepath: string): Buffer | string {
   if (filepath) {
     return fs.readFileSync(filepath)
   }

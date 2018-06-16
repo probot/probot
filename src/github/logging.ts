@@ -1,4 +1,4 @@
-import * as Logger from 'bunyan'
+import Logger from 'bunyan'
 import {GitHubAPI} from './'
 
 export function addLogging (client: GitHubAPI, logger: Logger) {

@@ -1,6 +1,6 @@
-import * as Logger from 'bunyan'
-import * as cacheManager from 'cache-manager'
-import * as express from 'express'
+import Logger from 'bunyan'
+import cacheManager from 'cache-manager'
+import express from 'express'
 import {Application, WebhookEvent} from './application'
 import {Context} from './context'
 import {createApp} from './github-app'
@@ -54,7 +54,7 @@ export class Probot {
     this.webhook.on('error', this.errorHandler)
   }
 
-  public errorHandler (err) {
+  public errorHandler (err: Error) {
     switch (err.message) {
       case 'X-Hub-Signature does not match blob signature':
       case 'No X-Hub-Signature found on request':

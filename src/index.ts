@@ -74,9 +74,9 @@ export class Probot {
     return Promise.all(this.apps.map(app => app.receive(event)))
   }
 
-  public load (plugin: string | Plugin) {
-    if (typeof plugin === 'string') {
-      plugin = resolve(plugin) as Plugin
+  public load (appFunction: string | ApplicationFunction) {
+    if (typeof appFunction === 'string') {
+      appFunction = resolve(appFunction) as ApplicationFunction
     }
 
     const app = new Application({app: this.app, cache, catchErrors: true})
@@ -85,13 +85,13 @@ export class Probot {
     this.server.use(app.router)
 
     // Initialize the plugin
-    plugin(app)
+    app.load(appFunction)
     this.apps.push(app)
 
     return app
   }
 
-  public setup (apps: Array<string | Plugin>) {
+  public setup (apps: Array<string | ApplicationFunction>) {
     // Log all unhandled rejections
     process.on('unhandledRejection', this.errorHandler)
 
@@ -119,7 +119,7 @@ export class Probot {
 
 export const createProbot = (options: Options) => new Probot(options)
 
-export type Plugin = (app: Application) => void
+export type ApplicationFunction = (app: Application) => void
 
 export interface Options {
   webhookPath?: string

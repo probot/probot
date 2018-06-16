@@ -25,7 +25,7 @@ describe('your-app', () => {
     // Here we create an `Application` instance
     app = new Application()
     // Here we initialize the app
-    plugin(app)
+    app.load(plugin)
     // This is an easy way to mock out the GitHub API
     github = {
       issues: {

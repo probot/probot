@@ -1,5 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Probot ghe support throws if the GHE host includes a protocol 1`] = `[Error: Your \`GHE_HOST\` environment variable should not begin with https:// or http://]`;
+
 exports[`Probot webhook delivery responds with the correct error if the PEM file is missing 1`] = `
 Array [
   "Your private key (usually a .pem file) is not correct. Go to https://github.com/settings/apps/YOUR_APP and generate a new PEM file. If you're deploying to Now, visit https://probot.github.io/docs/deployment/#now.",

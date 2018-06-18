@@ -173,6 +173,10 @@ export class Application {
    * @private
    */
   public async auth (id?: number, log = this.log): Promise<GitHubAPI> {
+    if (process.env.GHE_HOST && /^https?:\/\//.test(process.env.GHE_HOST)) {
+      throw new Error('Your \`GHE_HOST\` environment variable should not begin with https:// or http://')
+    }
+
     const github = GitHubAPI({
       baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api/v3`,
       debug: process.env.LOG_LEVEL === 'trace',

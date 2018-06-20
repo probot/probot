@@ -41,9 +41,9 @@ describe('your-app', () => {
   describe('your functionality', () => {
     it('performs an action', async () => {
       // Simulates delivery of a payload
-      // payload.event is the X-GitHub-Event header sent by GitHub (for example "push")
-      // payload.payload is the actual payload body
-      await app.receive(payload)
+      // event is the X-GitHub-Event header sent by GitHub (for example "push")
+      // payload is the webhook payload body
+      await app.receive({event: 'push', payload})
       // This test would pass if in your main code you called `context.github.issues.createComment`
       expect(github.issues.createComment).toHaveBeenCalled()
     })

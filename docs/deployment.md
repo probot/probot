@@ -56,7 +56,7 @@ Glitch lets you host node applications for free and edit them directly in your b
    ```
    APP_ID=<your app id>
    WEBHOOK_SECRET=<your app secret>
-   PRIVATE_KEY_PATH=.data/private-key.pem
+   PRIVATE_KEY_PATH=./data/private-key.pem
    NODE_ENV=production
    ```
    Replace the two `<...>` placeholders with the values from your app. The `.env` file cannot be accessed or seen by others.

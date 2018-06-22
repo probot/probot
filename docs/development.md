@@ -94,3 +94,4 @@ The `dev` script will start your app using [nodemon](https://github.com/remy/nod
 
 1. Always run `$ npm install` and restart the server if `package.json` has changed.
 1. To turn on verbose logging, start server by running: `$ LOG_LEVEL=trace npm start`
+1. Tip: Disable requests by the app to get installation statistics with `DISABLE_STATS=true`. These requests tend to trigger an abuse mechanism that might prevent your app from sending further requests

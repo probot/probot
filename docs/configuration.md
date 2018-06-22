@@ -28,6 +28,8 @@ Variable | Sample Value | Required | Description
 `WEBHOOK_PATH` | '/webhook' | Optional | The URL path which will recieve webhooks. By default, this is `'/'`.
 `SENTRY_DSN` | 'https://user:pw@sentry.io/1234' | Optional | Logs all errors to [Sentry](https://sentry.io/) for error tracking.
 `LOG_FORMAT` | json |  Optional | By default, logs are formatted for readability in development. If you intend to drain logs to a logging service, use this option.
+`DISABLE_STATS` | true | Optional | Disable requests to retrieve installation statistics. Recommended for local development.
+
 
 
 For more information on the formatting conventions and rules of `.env` files, check out [the npm `dotenv` module's documentation](https://www.npmjs.com/package/dotenv#rules).

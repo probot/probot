@@ -110,7 +110,7 @@
     "@types/supertest": "^2.0.4",
     "@types/uuid": "^3.4.3",
     "connect-sse": "^1.2.0",
-    "eslint": "^4.18.2",
+    "eslint": "^5.0.0",
     "eslint-plugin-markdown": "^1.0.0-beta.7",
     "jest": "^22.0.3",
     "jsdoc": "^3.5.5",

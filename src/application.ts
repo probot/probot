@@ -25,8 +25,8 @@ export class Application {
   public catchErrors?: boolean
   public log: LoggerWithTarget
 
-  constructor (options: Options) {
-    const opts = options || {}
+  constructor (options?: Options) {
+    const opts = options || {} as any
     this.events = new EventEmitter()
     this.log = wrapLogger(logger, logger)
     this.app = opts.app

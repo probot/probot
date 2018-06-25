@@ -202,7 +202,7 @@ export class Application {
 
 export interface WebhookEvent {
   event: string
-  id: number
+  id: string
   payload: any
   protocol: 'http' | 'https'
   host: string

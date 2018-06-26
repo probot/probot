@@ -62,6 +62,8 @@ export class Application {
    * expose HTTP endpoints
    *
    * @example
+   *
+   * ```js
    * module.exports = app => {
    *   // Get an express router to expose new HTTP endpoints
    *   const route = app.route('/my-app');
@@ -107,6 +109,7 @@ export class Application {
    *
    * @example
    *
+   * ```js
    * app.on('push', context => {
    *   // Code was just pushed.
    * });
@@ -114,6 +117,7 @@ export class Application {
    * app.on('issues.opened', context => {
    *   // An issue was just opened.
    * });
+   * ```
    */
   public on (eventName: string | string[], callback: (context: Context) => void) {
     if (typeof eventName === 'string') {
@@ -157,11 +161,13 @@ export class Application {
    *
    * @example
    *
+   * ```js
    *  module.exports = (app) => {
    *    app.on('issues.opened', async context => {
    *      const github = await app.auth();
    *    });
    *  };
+   * ```
    *
    * @param {number} [id] - ID of the installation, which can be extracted from
    * `context.payload.installation.id`. If called without this parameter, the

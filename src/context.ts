@@ -33,8 +33,10 @@ export class Context {
    *
    * @example
    *
+   * ```js
    * const params = context.repo({path: '.github/config.yml'})
    * // Returns: {owner: 'username', repo: 'reponame', path: '.github/config.yml'}
+   * ```
    *
    */
   public repo<T> (object?: T) {
@@ -57,8 +59,10 @@ export class Context {
    *
    * @example
    *
+   * ```js
    * const params = context.issue({body: 'Hello World!'})
    * // Returns: {owner: 'username', repo: 'reponame', number: 123, body: 'Hello World!'}
+   * ```
    *
    * @param {object} [object] - Params to be merged with the issue params.
    */
@@ -83,11 +87,14 @@ export class Context {
    *
    * @example <caption>Contents of <code>.github/config.yml</code>.</caption>
    *
+   * ```yml
    * close: true
    * comment: Check the specs on the rotary girder.
+   * ```
    *
    * @example <caption>App that reads from <code>.github/config.yml</code>.</caption>
    *
+   * ```js
    * // Load config from .github/config.yml in the repository
    * const config = await context.config('config.yml')
    *
@@ -95,9 +102,11 @@ export class Context {
    *   context.github.issues.comment(context.issue({body: config.comment}))
    *   context.github.issues.edit(context.issue({state: 'closed'}))
    * }
+   * ```
    *
    * @example <caption>Using a <code>defaultConfig</code> object.</caption>
    *
+   * ```js
    * // Load config from .github/config.yml in the repository and combine with default config
    * const config = await context.config('config.yml', {comment: 'Make sure to check all the specs.'})
    *
@@ -105,6 +114,7 @@ export class Context {
    *   context.github.issues.comment(context.issue({body: config.comment}));
    *   context.github.issues.edit(context.issue({state: 'closed'}))
    * }
+   * ```
    *
    * @param {string} fileName - Name of the YAML file in the `.github` directory
    * @param {object} [defaultConfig] - An object of default config options

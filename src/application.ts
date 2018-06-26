@@ -230,9 +230,3 @@ export interface Options {
   router?: express.Router
   catchErrors: boolean
 }
-
-/**
- * A [GitHub webhook event](https://developer.github.com/webhooks/#events) payload
- *
- * @typedef payload
- */

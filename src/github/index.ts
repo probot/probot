@@ -9,7 +9,6 @@ import {addRateLimiting} from './rate-limiting'
  * which wraps the [GitHub API](https://developer.github.com/v3/) and allows
  * you to do almost anything programmatically that you can do through a web
  * browser.
- * @typedef github
  * @see {@link https://github.com/octokit/rest.js}
  */
 export function GitHubAPI(options: Options = {} as any) {

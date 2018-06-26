@@ -14,6 +14,7 @@
  *
  * @example
  *
+ * ```js
  * app.log("This is an info message");
  * app.log.debug("…so is this");
  * app.log.trace("Now we're talking");
@@ -21,6 +22,7 @@
  * app.log.warn("Woah there");
  * app.log.error("ETOOMANYLOGS");
  * app.log.fatal("Goodbye, cruel world!");
+ * ```
  */
 
 import Logger from 'bunyan'

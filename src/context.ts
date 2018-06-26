@@ -3,8 +3,16 @@ import path from 'path'
 import {GitHubAPI} from './github'
 import {LoggerWithTarget} from './wrap-logger'
 /**
- * Helpers for extracting information from the webhook event, which can be
- * passed to GitHub API calls.
+ * The context of the event that was triggered, including the payload and
+ * helpers for extracting information can be passed to GitHub API calls.
+ *
+ *  ```js
+ *  module.exports = app => {
+ *    app.on('push', context => {
+ *      context.log('Code was pushed to the repo, what should we do with it?');
+ *    });
+ *  };
+ *  ```
  *
  * @property {github} github - A GitHub API client
  * @property {payload} payload - The webhook event payload
@@ -29,7 +37,7 @@ export class Context {
    * Return the `owner` and `repo` params for making API requests against a
    * repository.
    *
-   * @param {object} [object] - Params to be merged with the repo params.
+   * @param object - Params to be merged with the repo params.
    *
    * @example
    *
@@ -64,7 +72,7 @@ export class Context {
    * // Returns: {owner: 'username', repo: 'reponame', number: 123, body: 'Hello World!'}
    * ```
    *
-   * @param {object} [object] - Params to be merged with the issue params.
+   * @param object - Params to be merged with the issue params.
    */
   public issue<T> (object?: T) {
     const payload = this.payload
@@ -116,9 +124,9 @@ export class Context {
    * }
    * ```
    *
-   * @param {string} fileName - Name of the YAML file in the `.github` directory
-   * @param {object} [defaultConfig] - An object of default config options
-   * @return {Promise<Object>} - Configuration object read from the file
+   * @param fileName - Name of the YAML file in the `.github` directory
+   * @param defaultConfig - An object of default config options
+   * @return Configuration object read from the file
    */
   public async config<T> (fileName: string, defaultConfig?: T) {
     const params = this.repo({path: path.posix.join('.github', fileName)})

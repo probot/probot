@@ -61,8 +61,6 @@ export class Application {
    * Get an {@link http://expressjs.com|express} router that can be used to
    * expose HTTP endpoints
    *
-   * @example Add middleware and routes
-   *
    * ```
    * module.exports = app => {
    *   // Get an express router to expose new HTTP endpoints
@@ -105,11 +103,6 @@ export class Application {
    * Often, your bot will only care about one type of action, so you can append
    * it to the event name with a `.`, like `issues.closed`.
    *
-   * @param callback - a function to call when the
-   * webhook is received.
-   *
-   * @example
-   *
    * ```js
    * app.on('push', context => {
    *   // Code was just pushed.
@@ -119,6 +112,9 @@ export class Application {
    *   // An issue was just opened.
    * });
    * ```
+   *
+   * @param callback - a function to call when the
+   * webhook is received.
    */
   public on (eventName: string | string[], callback: (context: Context) => void) {
     if (typeof eventName === 'string') {
@@ -159,8 +155,6 @@ export class Application {
    * **Note**: `app.auth` is asynchronous, so it needs to be prefixed with a
    * [`await`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await)
    * to wait for the magic to happen.
-   *
-   * @example
    *
    * ```js
    *  module.exports = (app) => {

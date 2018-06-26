@@ -12,8 +12,6 @@
  * [sentry](https://github.com/getsentry/sentry) if the `SENTRY_DSN` environment
  * variable is set.
  *
- * @example
- *
  * ```js
  * app.log("This is an info message");
  * app.log.debug("…so is this");

@@ -1,0 +1,13 @@
+{
+  "mode": "modules",
+  "out": "out",
+  "exclude": "test",
+  "theme": "minimal",
+  "excludePrivate": true,
+  "excludeNotExported": true,
+  "target": "ES6",
+  "moduleResolution": "node",
+  "preserveConstEnums": "true",
+  "stripInternal": "true",
+  "module": "commonjs"
+}

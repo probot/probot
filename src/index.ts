@@ -100,7 +100,7 @@ export class Probot {
     process.on('unhandledRejection', this.errorHandler)
 
     // Load the given apps along with the default apps
-    apps.concat(defaultApps).forEach((app: any) => this.load(app))
+    apps.concat(defaultApps).forEach(app => this.load(app))
 
     // Register error handler as the last middleware
     this.server.use(logRequestErrors)

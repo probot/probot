@@ -58,6 +58,7 @@ export class Probot {
     switch (err.message) {
       case 'X-Hub-Signature does not match blob signature':
       case 'No X-Hub-Signature found on request':
+      case 'webhooks:receiver ignored: POST / due to missing headers: x-hub-signature':
         logger.error('Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.')
         break
       case 'error:0906D06C:PEM routines:PEM_read_bio:no start line':

@@ -8,7 +8,7 @@ If you've ever thought, "wouldn't it be cool if GitHub could…"; I'm going to s
 
 ## How it works
 
-**Probot is a framework for building [GitHub Apps](http://developer.github.com/apps) in [Node.js](https://nodejs.org/)**. GitHub Apps can listen to webhook events sent by a repository or organization. Probot uses its internal event emitter to perform actions based on those events. A simple Probot App might look like this:
+**Probot is a framework for building [GitHub Apps](http://developer.github.com/apps) in [Node.js](https://nodejs.org/), written in [TypeScript](https://www.typescriptlang.org/)**. GitHub Apps can listen to webhook events sent by a repository or organization. Probot uses its internal event emitter to perform actions based on those events. If you've never used TypeScript, don't worry! While the source code is written in TypeScript, the [npm package](https://www.npmjs.com/package/probot) is [compiled to JavaScript](https://en.wikipedia.org/wiki/TypeScript#Compiler) and can be used in any JavaScript app! A simple Probot App might look like this:
 
 ```js
 module.exports = (app) => {

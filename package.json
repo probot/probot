@@ -111,7 +111,7 @@
     "@types/uuid": "^3.4.3",
     "connect-sse": "^1.2.0",
     "eslint": "^5.0.0",
-    "eslint-plugin-markdown": "^1.0.0-beta.7",
+    "eslint-plugin-markdown": "^1.0.0-beta.6",
     "jest": "^22.0.3",
     "jsdoc": "^3.5.5",
     "jsdoc-strip-async-await": "^0.1.0",

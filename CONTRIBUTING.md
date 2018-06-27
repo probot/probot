@@ -7,6 +7,7 @@
 [style]: https://standardjs.com/
 [code-of-conduct]: CODE_OF_CONDUCT.md
 [good-first-issue-search]: https://github.com/search?utf8=%E2%9C%93&q=topic%3Aprobot+topic%3Aprobot-app+good-first-issues%3A%3E0&type=
+[linter]: https://github.com/probot/probot/blob/ts-readme/tslint.json
 
 Hi there! We're thrilled that you'd like to contribute to this project. Your help is essential for keeping it great.
 
@@ -16,7 +17,7 @@ Please note that this project is released with a [Contributor Code of Conduct][c
 
 1. [Fork][fork] and clone the repository
 1. Configure and install the dependencies: `npm install`
-1. Make sure the tests pass on your machine: `npm test`, note: these tests also apply the linter, so no need to lint separately
+1. Make sure the tests pass on your machine: `npm test`, note: these tests also apply the [linter][linter] and run the TypeScript compiler (`tsc`) to check for type errors, so there's no need to run these commands separately.
 1. Create a new branch: `git checkout -b my-branch-name`
 1. Make your change, add tests, and make sure the tests still pass
 1. Push to your fork and [submit a pull request][pr]

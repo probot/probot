@@ -116,7 +116,7 @@ export class Application {
    * @param callback - a function to call when the
    * webhook is received.
    */
-  public on (eventName: string | string[], callback: (context: Context) => void) {
+  public on (eventName: string | string[], callback: (context: Context) => Promise<void>) {
     if (typeof eventName === 'string') {
 
       return this.events.on(eventName, async (event: Context) => {

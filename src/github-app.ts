@@ -9,7 +9,7 @@ export const createApp = (options: AppOptions) => {
     }
 
     // Sign with RSA SHA256
-    return jwt.sign(payload, options.cert, {algorithm: 'RS256'})
+    return jwt.sign(payload, options.cert, { algorithm: 'RS256' })
   }
 }
 

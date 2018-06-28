@@ -9,7 +9,7 @@ When developing a Probot App, you will need to have several different fields in 
 Variable | Sample Value | Required | Description
 ---|---|---|---
 `WEBHOOK_PROXY_URL` | 'https://smee.io/yourcustomurl'| Required | Allows your local development environment to receive GitHub webhook events. Go to https://smee.io/new to get started.
-`WEBHOOK_SECRET` | development | Optional | The webhook secret used when creating a GitHub App
+`WEBHOOK_SECRET` | development | Required | The webhook secret used when creating a GitHub App. 'development' is used as a default, but the value in `.env` needs to match the value configured in your App settings on GitHub.
 `APP_ID` | 1234 | Required | The App ID assigned to your GitHub App
 `PRIVATE_KEY` | SECRETS | Optional | Private key; however, this variable is optional, if it is not present Probot will look in your project's directory for the private key, specifically a file ending in `.pem`. Having a private key somewhere _is_ necessary to run your Probot App.
 `PRIVATE_KEY_PATH` | /path/to/private/key | Optional | Path to your private key, a `.pem` file. This is only necessary if your private key is not in your project directory.

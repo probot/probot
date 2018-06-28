@@ -5,7 +5,7 @@ export const resolve = (app: string, opts?: ResolveOptions) => {
   // These are mostly to ease testing
   const basedir = opts.basedir || process.cwd()
   const resolver = opts.resolver || require('resolve').sync
-  return require(resolver(app, {basedir}))
+  return require(resolver(app, { basedir }))
 }
 
 export interface ResolveOptions {

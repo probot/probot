@@ -1,9 +1,6 @@
 {
   "name": "probot",
   "version": "7.0.0",
-  "publishConfig": {
-    "tag": "next"
-  },
   "description": "🤖 A framework for building GitHub Apps to automate and improve your workflow",
   "repository": "https://github.com/probot/probot",
   "main": "lib/index.js",

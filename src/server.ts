@@ -3,6 +3,7 @@ import express from 'express'
 import path from 'path'
 
 // Teach express to properly handle async errors
+// tslint:disable-next-line:no-var-requires
 require('express-async-errors')
 
 import { logRequest } from './middleware/logging'

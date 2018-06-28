@@ -9,6 +9,8 @@ import { resolve } from './resolver'
 import { createServer } from './server'
 import { createWebhookProxy } from './webhook-proxy'
 
+// tslint:disable:no-var-requires
+// These needs types
 const Webhooks = require('@octokit/webhooks')
 const logRequestErrors = require('./middleware/log-request-errors')
 
@@ -17,11 +19,12 @@ const cache = cacheManager.caching({
   ttl: 60 * 60 // 1 hour
 })
 
-const defaultApps = [
+const defaultApps: ApplicationFunction[] = [
+  require('./plugins/default'),
   require('./plugins/sentry'),
-  require('./plugins/stats'),
-  require('./plugins/default')
+  require('./plugins/stats')
 ]
+// tslint:enable:no-var-requires
 
 export class Probot {
   public server: express.Application

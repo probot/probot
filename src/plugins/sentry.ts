@@ -1,6 +1,6 @@
+import sentryStream from 'bunyan-sentry-stream'
 import Raven from 'raven'
 import { Application } from '../application'
-const sentryStream = require('bunyan-sentry-stream')
 
 export = (app: Application) => {
   // If sentry is configured, report all logged errors

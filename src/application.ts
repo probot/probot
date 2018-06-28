@@ -1,10 +1,10 @@
 import express from 'express'
-import {EventEmitter} from 'promise-events'
-import {ApplicationFunction} from '.'
-import {Context} from './context'
-import {GitHubAPI} from './github'
-import {logger} from './logger'
-import {LoggerWithTarget, wrapLogger} from './wrap-logger'
+import { EventEmitter } from 'promise-events'
+import { ApplicationFunction } from '.'
+import { Context } from './context'
+import { GitHubAPI } from './github'
+import { logger } from './logger'
+import { LoggerWithTarget, wrapLogger } from './wrap-logger'
 
 // Some events can't get an authenticated client (#382):
 function isUnauthenticatedEvent (context: Context) {
@@ -39,7 +39,7 @@ export class Application {
    * Loads a Probot plugin
    * @param plugin - Probot plugin to load
    */
-  public load (app: ApplicationFunction | ApplicationFunction[]) : Application {
+  public load (app: ApplicationFunction | ApplicationFunction[]): Application {
     if (Array.isArray(app)) {
       app.forEach(a => this.load(a))
     } else {
@@ -53,7 +53,7 @@ export class Application {
     return Promise.all([
       this.events.emit('*', event),
       this.events.emit(event.event, event),
-      this.events.emit(`${event.event}.${event.payload.action}`, event),
+      this.events.emit(`${event.event}.${event.payload.action}`, event)
     ])
   }
 
@@ -116,11 +116,11 @@ export class Application {
    * @param callback - a function to call when the
    * webhook is received.
    */
-  public on (eventName: string | string[], callback: (context: Context) => void) {
+  public on (eventName: string | string[], callback: (context: Context) => Promise<void>) {
     if (typeof eventName === 'string') {
 
       return this.events.on(eventName, async (event: Context) => {
-        const log = this.log.child({name: 'event', id: event.id})
+        const log = this.log.child({ name: 'event', id: event.id })
 
         try {
           let github
@@ -136,7 +136,7 @@ export class Application {
 
           await callback(context)
         } catch (err) {
-          log.error({err, event})
+          log.error({ err, event })
           if (!this.catchErrors) {
             throw err
           }
@@ -181,20 +181,20 @@ export class Application {
     const github = GitHubAPI({
       baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api/v3`,
       debug: process.env.LOG_LEVEL === 'trace',
-      logger: log.child({name: 'github', installation: String(id)})
+      logger: log.child({ name: 'github', installation: String(id) })
     })
 
     if (id) {
       const res = await this.cache.wrap(`app:${id}:token`, () => {
         log.trace(`creating token for installation`)
-        github.authenticate({type: 'app', token: this.app()})
+        github.authenticate({ type: 'app', token: this.app() })
 
-        return github.apps.createInstallationToken({installation_id: String(id)})
-      }, {ttl: 60 * 59}) // Cache for 1 minute less than GitHub expiry
+        return github.apps.createInstallationToken({ installation_id: String(id) })
+      }, { ttl: 60 * 59 }) // Cache for 1 minute less than GitHub expiry
 
-      github.authenticate({type: 'token', token: res.data.token})
+      github.authenticate({ type: 'token', token: res.data.token })
     } else {
-      github.authenticate({type: 'app', token: this.app()})
+      github.authenticate({ type: 'app', token: this.app() })
     }
 
     return github
@@ -212,10 +212,10 @@ export interface WebhookEvent {
 
 // The TypeScript definition for cache-manager does not export the Cache interface so we recreate it here
 export interface Cache {
-  wrap<T>(key: string, wrapper: (callback: (error: any, result: T) => void) => any, options: CacheConfig): Promise<any>;
+  wrap<T> (key: string, wrapper: (callback: (error: any, result: T) => void) => any, options: CacheConfig): Promise<any>
 }
 export interface CacheConfig {
-    ttl: number;
+  ttl: number
 }
 
 export interface Options {

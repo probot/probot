@@ -1,13 +1,13 @@
 import Logger from 'bunyan'
 import cacheManager from 'cache-manager'
 import express from 'express'
-import {Application, WebhookEvent} from './application'
-import {Context} from './context'
-import {createApp} from './github-app'
-import {logger} from './logger'
-import {resolve} from './resolver'
-import {createServer} from './server'
-import {createWebhookProxy} from './webhook-proxy'
+import { Application, WebhookEvent } from './application'
+import { Context } from './context'
+import { createApp } from './github-app'
+import { logger } from './logger'
+import { resolve } from './resolver'
+import { createServer } from './server'
+import { createWebhookProxy } from './webhook-proxy'
 
 const Webhooks = require('@octokit/webhooks')
 const logRequestErrors = require('./middleware/log-request-errors')
@@ -32,22 +32,22 @@ export class Probot {
   private apps: Application[]
   private app: () => string
 
-  constructor(options: Options) {
+  constructor (options: Options) {
     options.webhookPath = options.webhookPath || '/'
     options.secret = options.secret || 'development'
     this.options = options
     this.logger = logger
     this.apps = []
-    this.webhook = new Webhooks({path: options.webhookPath, secret: options.secret})
+    this.webhook = new Webhooks({ path: options.webhookPath, secret: options.secret })
     this.app = createApp({ id: options.id, cert: options.cert })
-    this.server = createServer({webhook: this.webhook.middleware, logger})
+    this.server = createServer({ webhook: this.webhook.middleware, logger })
 
     // Log all received webhooks
     this.webhook.on('*', (event: any) => {
       const webhookEvent = { ...event, event: event.name }
       delete webhookEvent.name
 
-      this.receive(webhookEvent)
+      return this.receive(webhookEvent)
     })
 
     // Log all webhook errors
@@ -71,7 +71,7 @@ export class Probot {
   }
 
   public receive (event: WebhookEvent) {
-    this.logger.debug({event}, 'Webhook received')
+    this.logger.debug({ event }, 'Webhook received')
     return Promise.all(this.apps.map(app => app.receive(event)))
   }
 
@@ -80,7 +80,7 @@ export class Probot {
       appFunction = resolve(appFunction) as ApplicationFunction
     }
 
-    const app = new Application({app: this.app, cache, catchErrors: true})
+    const app = new Application({ app: this.app, cache, catchErrors: true })
 
     // Connect the router from the app to the server
     this.server.use(app.router)
@@ -109,7 +109,7 @@ export class Probot {
         logger,
         path: this.options.webhookPath,
         port: this.options.port,
-        url: this.options.webhookProxy,
+        url: this.options.webhookProxy
       })
     }
 

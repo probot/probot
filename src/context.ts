@@ -1,7 +1,7 @@
 import yaml from 'js-yaml'
 import path from 'path'
-import {GitHubAPI} from './github'
-import {LoggerWithTarget} from './wrap-logger'
+import { GitHubAPI } from './github'
+import { LoggerWithTarget } from './wrap-logger'
 /**
  * The context of the event that was triggered, including the payload and
  * helpers for extracting information can be passed to GitHub API calls.
@@ -25,7 +25,7 @@ export class Context {
   public payload!: WebhookPayloadWithRepository
   public event: any
 
-  constructor (event:any, github:GitHubAPI, log:LoggerWithTarget) {
+  constructor (event: any, github: GitHubAPI, log: LoggerWithTarget) {
     Object.assign(this, event)
     this.event = event
     this.id = event.id
@@ -125,7 +125,7 @@ export class Context {
    * @return Configuration object read from the file
    */
   public async config<T> (fileName: string, defaultConfig?: T) {
-    const params = this.repo({path: path.posix.join('.github', fileName)})
+    const params = this.repo({ path: path.posix.join('.github', fileName) })
 
     try {
       const res = await this.github.repos.getContent(params)

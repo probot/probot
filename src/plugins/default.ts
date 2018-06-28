@@ -1,5 +1,5 @@
 import path from 'path'
-import {Application} from '../application'
+import { Application } from '../application'
 
 export = (app: Application) => {
   const route = app.route()

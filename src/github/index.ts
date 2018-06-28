@@ -1,8 +1,8 @@
 import Octokit from '@octokit/rest'
-import {addGraphQL} from './graphql'
-import {addLogging, Logger} from './logging'
-import {addPagination} from './pagination'
-import {addRateLimiting} from './rate-limiting'
+import { addGraphQL } from './graphql'
+import { addLogging, Logger } from './logging'
+import { addPagination } from './pagination'
+import { addRateLimiting } from './rate-limiting'
 
 /**
  * the [@octokit/rest Node.js module](https://github.com/octokit/rest.js),
@@ -11,7 +11,7 @@ import {addRateLimiting} from './rate-limiting'
  * browser.
  * @see {@link https://github.com/octokit/rest.js}
  */
-export function GitHubAPI(options: Options = {} as any) {
+export function GitHubAPI (options: Options = {} as any) {
   const octokit = new Octokit(options) as GitHubAPI
 
   addRateLimiting(octokit, options.limiter)

@@ -25,6 +25,22 @@ If you've landed in this GitHub repository and are looking to start building you
 
 This repository hosts the code for the npm Probot package which is what all Probot Apps run on. Most folks who land in this repository are likely looking to get started [building their own app](https://probot.github.io/docs/).
 
+### Install and Usage
+
+Now that we've made sure you want to use _this_ repository's code (and you've already looked at the links above), here's how you use `probot`.
+
+First, require `probot` as a high-level GitHub App framework for Node.js. The best way to do this is probably `npm install --save probot`. However, don't require probot in your JavaScript `mybot.js`. Instead, use the probot binary in an npm script. For example, this is how [wip-bot](https://github.com/gr2m/wip-bot/blob/04c8e8307fe0d6fda30e5cbc4b5bcdd5777f25c0/package.json#L12) does this:
+
+```
+"scripts": {
+    "start": "probot run ./index.js",
+    ...
+},
+```
+Then your entry .js file exports a function that receives a `robot` instance, which you can then listen to events coming from webhooks. See [this snippet](https://github.com/gr2m/wip-bot/blob/04c8e8307fe0d6fda30e5cbc4b5bcdd5777f25c0/index.js) as an example of how this works.
+
+If you have more questions or run into a bug, that's great! Check out the Contributing section, below, for how to find out how you can answer your questions and hopefully contribute back.
+
 ## Contributing
 
 Probot is built by people just like you! Most of the interesting things are built _with_ Probot, so consider starting by [writing a new app](https://probot.github.io/docs/) or improving one of the [existing ones](https://github.com/search?q=topic%3Aprobot-app&type=Repositories).

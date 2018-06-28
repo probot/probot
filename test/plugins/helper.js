@@ -8,7 +8,7 @@ module.exports = {
     const adapter = new GitHubApp({})
     adapter.jwt = jest.fn().mockReturnValue('test')
     const app = new Application({adapter})
-    plugin(app)
+    app.load(plugin)
     return app
   }
 }

@@ -30,9 +30,31 @@ describe('Probot', () => {
       expect(app.receive).toHaveBeenCalledWith(event)
     })
 
-    it('responds with the correct error if webhook secret is wrong', async () => {
+    it('responds with the correct error if webhook secret does not match', async () => {
       probot.logger.error = jest.fn()
       webhooks.on('push', () => { throw new Error('X-Hub-Signature does not match blob signature') })
+
+      try {
+        await webhooks.receive(event)
+      } catch (e) {
+        expect(probot.logger.error.mock.calls[0]).toMatchSnapshot()
+      }
+    })
+
+    it('responds with the correct error if webhook secret is not found', async () => {
+      probot.logger.error = jest.fn()
+      webhooks.on('push', () => { throw new Error('No X-Hub-Signature found on request') })
+
+      try {
+        await webhooks.receive(event)
+      } catch (e) {
+        expect(probot.logger.error.mock.calls[0]).toMatchSnapshot()
+      }
+    })
+
+    it('responds with the correct error if webhook secret is wrong', async () => {
+      probot.logger.error = jest.fn()
+      webhooks.on('push', () => { throw new Error('webhooks:receiver ignored: POST / due to missing headers: x-hub-signature') })
 
       try {
         await webhooks.receive(event)
@@ -44,6 +66,17 @@ describe('Probot', () => {
     it('responds with the correct error if the PEM file is missing', async () => {
       probot.logger.error = jest.fn()
       webhooks.on('*', () => { throw new Error('error:0906D06C:PEM routines:PEM_read_bio:no start line') })
+
+      try {
+        await webhooks.receive(event)
+      } catch (e) {
+        expect(probot.logger.error.mock.calls[0]).toMatchSnapshot()
+      }
+    })
+
+    it('responds with the correct error if the jwt could not be decoded', async () => {
+      probot.logger.error = jest.fn()
+      webhooks.on('*', () => { throw new Error('{"message":"A JSON web token could not be decoded","documentation_url":"https://developer.github.com/v3"}') })
 
       try {
         await webhooks.receive(event)
@@ -193,6 +226,16 @@ describe('Probot', () => {
       await plugin(app)
       await app.receive(event)
       expect(spy.mock.calls[0][0].data[0]).toBe('I work!')
+    })
+
+    it('throws if the GHE host includes a protocol', async () => {
+      process.env.GHE_HOST = 'https://notreallygithub.com'
+
+      try {
+        await app.adapter.auth()
+      } catch (e) {
+        expect(e).toMatchSnapshot()
+      }
     })
   })
 })

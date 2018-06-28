@@ -1,6 +1,7 @@
 import {WebhookEvent} from '@octokit/webhooks'
 import express from 'express'
 import {EventEmitter} from 'promise-events'
+import {ApplicationFunction} from '.'
 import {Context} from './context'
 import {GitHubApp} from './github-app'
 import {logger} from './logger'
@@ -28,6 +29,20 @@ export class Application {
     this.router = opts.router || express.Router() // you can do this?
   }
 
+  /**
+   * Loads a Probot plugin
+   * @param plugin - Probot plugin to load
+   */
+  public load (app: ApplicationFunction | ApplicationFunction[]) : Application {
+    if (Array.isArray(app)) {
+      app.forEach(a => this.load(a))
+    } else {
+      app(this)
+    }
+
+    return this
+  }
+
   public async receive (event: WebhookEvent) {
     return Promise.all([
       this.events.emit('*', event),
@@ -40,7 +55,7 @@ export class Application {
    * Get an {@link http://expressjs.com|express} router that can be used to
    * expose HTTP endpoints
    *
-   * @example
+   * ```
    * module.exports = app => {
    *   // Get an express router to expose new HTTP endpoints
    *   const route = app.route('/my-app');
@@ -53,9 +68,10 @@ export class Application {
    *     res.end('Hello World');
    *   });
    * };
+   * ```
    *
-   * @param {string} path - the prefix for the routes
-   * @returns {@link http://expressjs.com/en/4x/api.html#router|express.Router}
+   * @param path - the prefix for the routes
+   * @returns an [express.Router](http://expressjs.com/en/4x/api.html#router)
    */
   public route (path?: string): express.Router {
     if (path) {
@@ -72,7 +88,7 @@ export class Application {
    * which are fired for almost every significant action that users take on
    * GitHub.
    *
-   * @param {string} event - the name of the [GitHub webhook
+   * @param event - the name of the [GitHub webhook
    * event](https://developer.github.com/webhooks/#events). Most events also
    * include an "action". For example, the * [`issues`](
    * https://developer.github.com/v3/activity/events/types/#issuesevent)
@@ -81,11 +97,7 @@ export class Application {
    * Often, your bot will only care about one type of action, so you can append
    * it to the event name with a `.`, like `issues.closed`.
    *
-   * @param {Application~webhookCallback} callback - a function to call when the
-   * webhook is received.
-   *
-   * @example
-   *
+   * ```js
    * app.on('push', context => {
    *   // Code was just pushed.
    * });
@@ -93,6 +105,10 @@ export class Application {
    * app.on('issues.opened', context => {
    *   // An issue was just opened.
    * });
+   * ```
+   *
+   * @param callback - a function to call when the
+   * webhook is received.
    */
   public on (eventName: string | string[], callback: (context: Context) => void) {
     if (typeof eventName === 'string') {
@@ -117,26 +133,3 @@ export interface Options {
   router?: express.Router
   catchErrors: boolean
 }
-
-/**
- * Do the thing
- * @callback Application~webhookCallback
- * @param {Context} context - the context of the event that was triggered,
- *   including `context.payload`, and helpers for extracting information from
- *   the payload, which can be passed to GitHub API calls.
- *
- *  ```js
- *  module.exports = app => {
- *    app.on('push', context => {
- *      // Code was pushed to the repo, what should we do with it?
- *      app.log(context);
- *    });
- *  };
- *  ```
- */
-
-/**
- * A [GitHub webhook event](https://developer.github.com/webhooks/#events) payload
- *
- * @typedef payload
- */

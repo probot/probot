@@ -49,7 +49,7 @@ export class Application {
     return this
   }
 
-  public async receive (event: WebhookEvent) {
+  public async receive (event: WebhookEvent): Promise<any> {
     return Promise.all([
       this.events.emit('*', event),
       this.events.emit(event.event, event),
@@ -116,7 +116,7 @@ export class Application {
    * @param callback - a function to call when the
    * webhook is received.
    */
-  public on (eventName: string | string[], callback: (context: Context) => void) {
+  public on (eventName: string | string[], callback: (context: Context) => Promise<any>): void {
     if (typeof eventName === 'string') {
 
       return this.events.on(eventName, async (event: Context) => {
@@ -215,7 +215,7 @@ export interface Cache {
   wrap<T>(key: string, wrapper: (callback: (error: any, result: T) => void) => any, options: CacheConfig): Promise<any>;
 }
 export interface CacheConfig {
-    ttl: number;
+  ttl: number;
 }
 
 export interface Options {

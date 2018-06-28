@@ -81,7 +81,7 @@ export class Context {
    * Returns a boolean if the actor on the event was a bot.
    * @type {boolean}
    */
-  get isBot () {
+  get isBot (): boolean {
     return this.payload.sender.type === 'Bot'
   }
 
@@ -124,7 +124,7 @@ export class Context {
    * @param defaultConfig - An object of default config options
    * @return Configuration object read from the file
    */
-  public async config<T> (fileName: string, defaultConfig?: T) {
+  public async config<T> (fileName: string, defaultConfig?: T): Promise<T | null> {
     const params = this.repo({path: path.posix.join('.github', fileName)})
 
     try {

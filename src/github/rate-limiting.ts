@@ -1,5 +1,5 @@
 import Bottleneck from 'bottleneck'
-import {GitHubAPI} from './'
+import { GitHubAPI } from './'
 
 export function addRateLimiting (octokit: GitHubAPI, limiter: Bottleneck) {
   if (!limiter) {

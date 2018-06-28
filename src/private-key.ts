@@ -13,8 +13,8 @@ const hint = `please use:
  * 2. `PRIVATE_KEY` env var
  * 3. `PRIVATE_KEY_PATH` env var
  * 4. Any file w/ `.pem` extension in current working dir
- * @param {string} [filepath] - Explicit, user-defined path to keyfile
- * @returns {string} Private key
+ * @param filepath - Explicit, user-defined path to keyfile
+ * @returns Private key
  * @private
  */
 function findPrivateKey (filepath: string): Buffer | string {

@@ -55,6 +55,7 @@ export class Probot {
     switch (err.message) {
       case 'X-Hub-Signature does not match blob signature':
       case 'No X-Hub-Signature found on request':
+      case 'webhooks:receiver ignored: POST / due to missing headers: x-hub-signature':
         logger.error('Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.')
         break
       case 'error:0906D06C:PEM routines:PEM_read_bio:no start line':
@@ -71,9 +72,9 @@ export class Probot {
     return Promise.all(this.apps.map(app => app.receive(event)))
   }
 
-  public load (plugin: string | Plugin) {
-    if (typeof plugin === 'string') {
-      plugin = resolve(plugin) as Plugin
+  public load (appFunction: string | ApplicationFunction) {
+    if (typeof appFunction === 'string') {
+      appFunction = resolve(appFunction) as ApplicationFunction
     }
 
     const app = new Application({adapter: this.adapter, catchErrors: true})
@@ -82,13 +83,13 @@ export class Probot {
     this.server.use(app.router)
 
     // Initialize the plugin
-    plugin(app)
+    app.load(appFunction)
     this.apps.push(app)
 
     return app
   }
 
-  public setup (apps: Array<string | Plugin>) {
+  public setup (apps: Array<string | ApplicationFunction>) {
     // Log all unhandled rejections
     process.on('unhandledRejection', this.errorHandler)
 
@@ -116,7 +117,7 @@ export class Probot {
 
 export const createProbot = (options: Options) => new Probot(options)
 
-export type Plugin = (app: Application) => void
+export type ApplicationFunction = (app: Application) => void
 
 export interface Options {
   webhookPath?: string

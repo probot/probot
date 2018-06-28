@@ -68,24 +68,28 @@ export class GitHubApp {
    * [`await`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await)
    * to wait for the magic to happen.
    *
-   * @example
-   *
+   * ```js
    *  module.exports = (app) => {
    *    app.on('issues.opened', async context => {
    *      const github = await app.auth();
    *    });
    *  };
+   * ```
    *
-   * @param {number} [id] - ID of the installation, which can be extracted from
+   * @param id - ID of the installation, which can be extracted from
    * `context.payload.installation.id`. If called without this parameter, the
    * client wil authenticate [as the app](https://developer.github.com/apps/building-integrations/setting-up-and-registering-github-apps/about-authentication-options-for-github-apps/#authenticating-as-a-github-app)
    * instead of as a specific installation, which means it can only be used for
    * [app APIs](https://developer.github.com/v3/apps/).
    *
-   * @returns {Promise<github>} - An authenticated GitHub API client
+   * @returns An authenticated GitHub API client
    * @private
    */
   public async auth (id?: number, log = this.log): Promise<GitHubAPI> {
+    if (process.env.GHE_HOST && /^https?:\/\//.test(process.env.GHE_HOST)) {
+      throw new Error('Your \`GHE_HOST\` environment variable should not begin with https:// or http://')
+    }
+
     const github = GitHubAPI({
       baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api/v3`,
       debug: process.env.LOG_LEVEL === 'trace',

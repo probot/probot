@@ -73,10 +73,10 @@ For these events, `context.github` will be [authenticated as the GitHub App](htt
 
 ## GitHub Enterprise
 
-If you want to run a Probot App against a GitHub Enterprise instance, you'll need to set the `GHE_HOST` environment variable.
+If you want to run a Probot App against a GitHub Enterprise instance, you'll need to create and set the `GHE_HOST` environment variable inside of the `.env` file.
 
 ```
 GHE_HOST=fake.github-enterprise.com
 ```
 
-> GitHub Apps are enabled in GitHub Enterprise 2.12 as an [early access technical preview](https://developer.github.com/enterprise/2.12/apps/).
+> GitHub Apps are enabled in GitHub Enterprise 2.12 as an [early access technical preview](https://developer.github.com/enterprise/2.12/apps/) but are generally available in GitHub Enterprise 2.13 and above.

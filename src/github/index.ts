@@ -29,6 +29,7 @@ export interface Options extends Octokit.Options {
 }
 
 export interface RequestOptions {
+  baseUrl?: string
   method: string
   url: string
   headers: any

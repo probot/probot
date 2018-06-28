@@ -19,7 +19,6 @@ const cache = cacheManager.caching({
   ttl: 60 * 60 // 1 hour
 })
 
-
 const defaultApps: ApplicationFunction[] = [
   require('./plugins/default'),
   require('./plugins/sentry'),

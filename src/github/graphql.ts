@@ -1,11 +1,12 @@
 import {GitHubAPI, Headers, Variables} from './'
 
-export function addGraphQL (client) {
+export function addGraphQL (client: GitHubAPI) {
   client.query = graphql.bind(null, client)
 }
 
 async function graphql (client: GitHubAPI, query: string, variables: Variables, headers: Headers = {}) {
   const res = await client.request({
+    baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api`,
     headers: {
       'accept': 'application/json',
       'content-type': 'application/json',
@@ -29,7 +30,7 @@ class GraphQLError extends Error {
   public query: string
   public variables: Variables
 
-  constructor (errors, query: string, variables: Variables) {
+  constructor (errors: Error[], query: string, variables: Variables) {
     super(JSON.stringify(errors))
     this.name = 'GraphQLError'
     this.query = query

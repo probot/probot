@@ -1,4 +1,4 @@
-import * as fs from 'fs'
+import fs from 'fs'
 
 const hint = `please use:
   * \`--private-key=/path/to/private-key\` flag, or
@@ -13,11 +13,11 @@ const hint = `please use:
  * 2. `PRIVATE_KEY` env var
  * 3. `PRIVATE_KEY_PATH` env var
  * 4. Any file w/ `.pem` extension in current working dir
- * @param {string} [filepath] - Explicit, user-defined path to keyfile
- * @returns {string} Private key
+ * @param filepath - Explicit, user-defined path to keyfile
+ * @returns Private key
  * @private
  */
-function findPrivateKey (filepath) {
+function findPrivateKey (filepath: string): Buffer | string {
   if (filepath) {
     return fs.readFileSync(filepath)
   }

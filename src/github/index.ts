@@ -1,4 +1,4 @@
-import * as Octokit from '@octokit/rest'
+import Octokit from '@octokit/rest'
 import {addGraphQL} from './graphql'
 import {addLogging, Logger} from './logging'
 import {addPagination} from './pagination'
@@ -9,7 +9,6 @@ import {addRateLimiting} from './rate-limiting'
  * which wraps the [GitHub API](https://developer.github.com/v3/) and allows
  * you to do almost anything programmatically that you can do through a web
  * browser.
- * @typedef github
  * @see {@link https://github.com/octokit/rest.js}
  */
 export function GitHubAPI(options: Options = {} as any) {
@@ -30,6 +29,7 @@ export interface Options extends Octokit.Options {
 }
 
 export interface RequestOptions {
+  baseUrl?: string
   method: string
   url: string
   headers: any
@@ -43,7 +43,7 @@ export interface Result {
   }
 }
 
-export interface OctokitError {
+export interface OctokitError extends Error {
   code: number
   status: string
 }
@@ -57,7 +57,7 @@ export interface GitHubAPI extends Octokit {
     after: (when: 'request', callback: (result: Result, options: RequestOptions) => void) => void
   }
 
-  request: (RequestOptions) => Promise<Octokit.AnyResponse>
+  request: (RequestOptions: RequestOptions) => Promise<Octokit.AnyResponse>
   query: (query: string, variables?: Variables, headers?: Headers) => Promise<Octokit.AnyResponse>
 }
 

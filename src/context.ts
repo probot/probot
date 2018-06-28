@@ -1,10 +1,18 @@
-import * as yaml from 'js-yaml'
-import * as path from 'path'
+import yaml from 'js-yaml'
+import path from 'path'
 import {GitHubAPI} from './github'
 import {LoggerWithTarget} from './wrap-logger'
 /**
- * Helpers for extracting information from the webhook event, which can be
- * passed to GitHub API calls.
+ * The context of the event that was triggered, including the payload and
+ * helpers for extracting information can be passed to GitHub API calls.
+ *
+ *  ```js
+ *  module.exports = app => {
+ *    app.on('push', context => {
+ *      context.log('Code was pushed to the repo, what should we do with it?');
+ *    });
+ *  };
+ *  ```
  *
  * @property {github} github - A GitHub API client
  * @property {payload} payload - The webhook event payload
@@ -15,9 +23,11 @@ export class Context {
   public github: GitHubAPI
   public log: LoggerWithTarget
   public payload!: WebhookPayloadWithRepository
+  public event: any
 
   constructor (event:any, github:GitHubAPI, log:LoggerWithTarget) {
     Object.assign(this, event)
+    this.event = event
     this.id = event.id
     this.github = github
     this.log = log
@@ -27,12 +37,12 @@ export class Context {
    * Return the `owner` and `repo` params for making API requests against a
    * repository.
    *
-   * @param {object} [object] - Params to be merged with the repo params.
-   *
-   * @example
-   *
+   * ```js
    * const params = context.repo({path: '.github/config.yml'})
    * // Returns: {owner: 'username', repo: 'reponame', path: '.github/config.yml'}
+   * ```
+   *
+   * @param object - Params to be merged with the repo params.
    *
    */
   public repo<T> (object?: T) {
@@ -53,12 +63,12 @@ export class Context {
    * against an issue or pull request. The object passed in will be merged with
    * the repo params.
    *
-   * @example
-   *
+   * ```js
    * const params = context.issue({body: 'Hello World!'})
    * // Returns: {owner: 'username', repo: 'reponame', number: 123, body: 'Hello World!'}
+   * ```
    *
-   * @param {object} [object] - Params to be merged with the issue params.
+   * @param object - Params to be merged with the issue params.
    */
   public issue<T> (object?: T) {
     const payload = this.payload
@@ -79,13 +89,16 @@ export class Context {
    * Reads the app configuration from the given YAML file in the `.github`
    * directory of the repository.
    *
-   * @example <caption>Contents of <code>.github/config.yml</code>.</caption>
+   * For example, given a file named `.github/config.yml`:
    *
+   * ```yml
    * close: true
    * comment: Check the specs on the rotary girder.
+   * ```
    *
-   * @example <caption>App that reads from <code>.github/config.yml</code>.</caption>
+   * You app can read that file from the target repository:
    *
+   * ```js
    * // Load config from .github/config.yml in the repository
    * const config = await context.config('config.yml')
    *
@@ -93,9 +106,11 @@ export class Context {
    *   context.github.issues.comment(context.issue({body: config.comment}))
    *   context.github.issues.edit(context.issue({state: 'closed'}))
    * }
+   * ```
    *
-   * @example <caption>Using a <code>defaultConfig</code> object.</caption>
+   * You can also use a `defaultConfig` object:
    *
+   * ```js
    * // Load config from .github/config.yml in the repository and combine with default config
    * const config = await context.config('config.yml', {comment: 'Make sure to check all the specs.'})
    *
@@ -103,12 +118,13 @@ export class Context {
    *   context.github.issues.comment(context.issue({body: config.comment}));
    *   context.github.issues.edit(context.issue({state: 'closed'}))
    * }
+   * ```
    *
-   * @param {string} fileName - Name of the YAML file in the `.github` directory
-   * @param {object} [defaultConfig] - An object of default config options
-   * @return {Promise<Object | null>} - Configuration object read from the file
+   * @param fileName - Name of the YAML file in the `.github` directory
+   * @param defaultConfig - An object of default config options
+   * @return Configuration object read from the file
    */
-  public async config<T> (fileName: string, defaultConfig?: T): Promise<Object | null> {
+  public async config<T> (fileName: string, defaultConfig?: T): Promise<T | null> {
     const params = this.repo({path: path.posix.join('.github', fileName)})
 
     try {

@@ -10,7 +10,7 @@ const jwt = jest.fn().mockReturnValue('test')
 module.exports = {
   createApp (plugin = () => {}) {
     const app = new Application({app: jwt, cache})
-    plugin(app)
+    app.load(plugin)
     return app
   }
 }

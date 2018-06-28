@@ -16,7 +16,7 @@ describe('github/graphql', () => {
     }
 
     // Set a shorter limiter, otherwise tests are _slow_
-    const limiter = new Bottleneck(1, 1)
+    const limiter = new Bottleneck()
 
     github = new GitHubAPI({ logger, limiter })
   })
@@ -74,6 +74,30 @@ describe('github/graphql', () => {
         .reply(200, response)
 
       await expect(github.query(query)).rejects.toThrow('Unexpected end of document')
+    })
+  })
+
+  describe('ghe support', () => {
+    const query = 'query { viewer { login } }'
+    let data
+
+    beforeEach(() => {
+      process.env.GHE_HOST = 'notreallygithub.com'
+    })
+
+    afterEach(() => {
+      delete process.env.GHE_HOST
+    })
+
+    test('makes a graphql query', async () => {
+      data = { viewer: { login: 'bkeepers' } }
+
+      nock('https://notreallygithub.com', {
+        reqheaders: { 'content-type': 'application/json' }
+      }).post('/api/graphql', {query})
+        .reply(200, { data })
+
+      expect(await github.query(query)).toEqual(data)
     })
   })
 })

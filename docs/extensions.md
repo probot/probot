@@ -1,5 +1,5 @@
 ---
-next: docs/deployment.md
+next: docs/configuration.md
 ---
 
 # Extensions
@@ -73,7 +73,7 @@ const metadata = require('probot-metadata')
 module.exports = app => {
   app.on(['issues.edited', 'issue_comment.edited'], async context => {
     const kv = await metadata(context)
-    kv.set('edits', kv.get('edits') || 1)
+    await kv.set('edits', await kv.get('edits') || 1)
   })
 
   app.on('issues.closed', async context => {

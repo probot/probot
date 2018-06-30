@@ -116,7 +116,7 @@
     "smee-client": "^1.0.1",
     "standard": "^11.0.0",
     "supertest": "^3.0.0",
-    "ts-jest": "^21.2.4",
+    "ts-jest": "^23.0.0",
     "tslint": "^5.9.1",
     "tslint-config-prettier": "^1.10.0",
     "tslint-config-standard": "^7.1.0",

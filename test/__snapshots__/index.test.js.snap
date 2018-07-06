@@ -8,6 +8,24 @@ Array [
 ]
 `;
 
+exports[`Probot webhook delivery responds with the correct error if the jwt could not be decoded 1`] = `
+Array [
+  "Your private key (usually a .pem file) is not correct. Go to https://github.com/settings/apps/YOUR_APP and generate a new PEM file. If you're deploying to Now, visit https://probot.github.io/docs/deployment/#now.",
+]
+`;
+
+exports[`Probot webhook delivery responds with the correct error if webhook secret does not match 1`] = `
+Array [
+  "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
+]
+`;
+
+exports[`Probot webhook delivery responds with the correct error if webhook secret is not found 1`] = `
+Array [
+  "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
+]
+`;
+
 exports[`Probot webhook delivery responds with the correct error if webhook secret is wrong 1`] = `
 Array [
   "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",

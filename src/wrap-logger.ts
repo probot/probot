@@ -1,4 +1,4 @@
-import {Logger} from './'
+import { Logger } from './'
 
 // Return a function that defaults to "info" level, and has properties for
 // other levels:
@@ -25,7 +25,9 @@ export const wrapLogger = (logger: Logger, baseLogger?: Logger): LoggerWithTarge
     const log = logger.child(attrs, true)
 
     // …Sorry, bunyan, doing it anwyway
-    if (name) {log.fields.name = name}
+    if (name) {
+      log.fields.name = name
+    }
 
     return wrapLogger(log, baseLogger || logger)
   }

@@ -1,5 +1,5 @@
-import {AnyResponse} from "@octokit/rest"
-import {GitHubAPI} from './'
+import { AnyResponse } from '@octokit/rest'
+import { GitHubAPI } from './'
 
 export function addPagination (octokit: GitHubAPI) {
   octokit.paginate = paginate.bind(null, octokit)

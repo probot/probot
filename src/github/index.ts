@@ -1,18 +1,17 @@
 import Octokit from '@octokit/rest'
-import {addGraphQL} from './graphql'
-import {addLogging, Logger} from './logging'
-import {addPagination} from './pagination'
-import {addRateLimiting} from './rate-limiting'
+import { addGraphQL } from './graphql'
+import { addLogging, Logger } from './logging'
+import { addPagination } from './pagination'
+import { addRateLimiting } from './rate-limiting'
 
 /**
  * the [@octokit/rest Node.js module](https://github.com/octokit/rest.js),
  * which wraps the [GitHub API](https://developer.github.com/v3/) and allows
  * you to do almost anything programmatically that you can do through a web
  * browser.
- * @typedef github
  * @see {@link https://github.com/octokit/rest.js}
  */
-export function GitHubAPI(options: Options = {} as any) {
+export function GitHubAPI (options: Options = {} as any) {
   const octokit = new Octokit(options) as GitHubAPI
 
   addRateLimiting(octokit, options.limiter)
@@ -30,6 +29,7 @@ export interface Options extends Octokit.Options {
 }
 
 export interface RequestOptions {
+  baseUrl?: string
   method: string
   url: string
   headers: any

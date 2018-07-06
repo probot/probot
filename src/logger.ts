@@ -12,10 +12,7 @@
  * [sentry](https://github.com/getsentry/sentry) if the `SENTRY_DSN` environment
  * variable is set.
  *
- * @typedef logger
- *
- * @example
- *
+ * ```js
  * app.log("This is an info message");
  * app.log.debug("…so is this");
  * app.log.trace("Now we're talking");
@@ -23,11 +20,12 @@
  * app.log.warn("Woah there");
  * app.log.error("ETOOMANYLOGS");
  * app.log.fatal("Goodbye, cruel world!");
+ * ```
  */
 
 import Logger from 'bunyan'
 import bunyanFormat from 'bunyan-format'
-import {serializers} from './serializers'
+import { serializers } from './serializers'
 
 function toBunyanLogLevel (level: string) {
   switch (level) {
@@ -62,5 +60,5 @@ export const logger = new Logger({
   level: toBunyanLogLevel(process.env.LOG_LEVEL || 'info'),
   name: 'probot',
   serializers,
-  stream: new bunyanFormat({outputMode: toBunyanFormat(process.env.LOG_FORMAT || 'short')}),
+  stream: new bunyanFormat({ outputMode: toBunyanFormat(process.env.LOG_FORMAT || 'short') })
 })

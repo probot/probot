@@ -1,6 +1,6 @@
 {
   "name": "probot",
-  "version": "7.0.0",
+  "version": "7.0.1",
   "description": "🤖 A framework for building GitHub Apps to automate and improve your workflow",
   "repository": "https://github.com/probot/probot",
   "main": "lib/index.js",

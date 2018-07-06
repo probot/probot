@@ -69,7 +69,7 @@
   "author": "Brandon Keepers",
   "license": "ISC",
   "dependencies": {
-    "@octokit/rest": "^15.6.0",
+    "@octokit/rest": "^15.9.4",
     "@octokit/webhooks": "^3.1.1",
     "bottleneck": "^2.4.0",
     "bunyan": "^1.8.12",

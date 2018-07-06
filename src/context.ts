@@ -27,7 +27,6 @@ export class Context {
 
   constructor (event: any, github: GitHubAPI, log: LoggerWithTarget) {
     Object.assign(this, event)
-    this.event = event
     this.id = event.id
     this.github = github
     this.log = log

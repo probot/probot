@@ -83,7 +83,7 @@ export class Probot {
       appFunction = resolve(appFunction) as ApplicationFunction
     }
 
-    const app = new Application({ app: this.app, cache, catchErrors: true })
+    const app = new Application({ app: this.app, cache, catchErrors: true, id: this.options.id })
 
     // Connect the router from the app to the server
     this.server.use(app.router)

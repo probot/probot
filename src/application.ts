@@ -15,6 +15,7 @@ function isUnauthenticatedEvent (context: Context) {
 /**
  * The `app` parameter available to apps
  *
+ * @property {number} id - The GitHub App ID
  * @property {logger} log - A logger
  */
 export class Application {
@@ -23,6 +24,7 @@ export class Application {
   public cache: Cache
   public router: express.Router
   public catchErrors?: boolean
+  public id: number
   public log: LoggerWithTarget
 
   constructor (options?: Options) {
@@ -32,6 +34,7 @@ export class Application {
     this.app = opts.app
     this.cache = opts.cache
     this.catchErrors = opts.catchErrors
+    this.id = opts.id
     this.router = opts.router || express.Router() // you can do this?
   }
 
@@ -223,4 +226,5 @@ export interface Options {
   cache: Cache
   router?: express.Router
   catchErrors: boolean
+  id: number
 }

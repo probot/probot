@@ -1,6 +1,6 @@
-const {Context} = require('../src/context')
-const {Application} = require('../src/application')
-const {logger} = require('../src/logger')
+import {Context} from '../src/context'
+import {Application} from '../src/application'
+import {logger} from '../src/logger'
 
 describe('Application', function () {
   let app
@@ -14,14 +14,14 @@ describe('Application', function () {
       level: 'trace',
       type: 'raw',
       stream: {write: log => output.push(log)}
-    })
+    } as any)
   })
 
   beforeEach(function () {
     // Clear log output
     output = []
 
-    app = new Application({})
+    app = new Application({} as any)
     app.auth = jest.fn().mockReturnValue({})
 
     event = {

@@ -1,7 +1,7 @@
 import express from 'express'
 import { EventEmitter } from 'promise-events'
 import { ApplicationFunction } from '.'
-import { Context } from './context'
+import { Context, WebhookEvent } from './context'
 import { GitHubAPI } from './github'
 import { logger } from './logger'
 import { LoggerWithTarget, wrapLogger } from './wrap-logger'
@@ -199,15 +199,6 @@ export class Application {
 
     return github
   }
-}
-
-export interface WebhookEvent {
-  event: string
-  id: string
-  payload: any
-  protocol: 'http' | 'https'
-  host: string
-  url: string
 }
 
 // The TypeScript definition for cache-manager does not export the Cache interface so we recreate it here

@@ -3,16 +3,16 @@ import { Context } from '../src/context'
 import { logger } from '../src/logger'
 
 describe('Application', () => {
-  let app
-  let event
-  let output
+  let app: Application
+  let event: any
+  let output: any
 
   beforeAll(() => {
     // Add a new stream for testing the logger
     // https://github.com/trentm/node-bunyan#adding-a-stream
     logger.addStream({
       level: 'trace',
-      stream: { write: log => output.push(log) },
+      stream: { write: (log: any) => output.push(log) },
       type: 'raw'
     } as any)
   })
@@ -77,7 +77,7 @@ describe('Application', () => {
           action: 'bar',
           installation: { id: 2 }
         }
-      }
+      } as any
 
       const spy = jest.fn()
       app.on(['test.foo', 'arrayTest.bar'], spy)
@@ -111,7 +111,7 @@ describe('Application', () => {
           action: 'created',
           installation: { id: 1 }
         }
-      }
+      } as any
 
       app.on('installation.created', async context => {
         // no-op
@@ -130,7 +130,7 @@ describe('Application', () => {
           action: 'deleted',
           installation: { id: 1 }
         }
-      }
+      } as any
 
       app.on('installation.deleted', async context => {
         // no-op
@@ -146,7 +146,7 @@ describe('Application', () => {
         event: 'foobar',
         id: '123-456',
         payload: { /* no installation */ }
-      }
+      } as any
 
       app.on('foobar', async context => {
         // no-op
@@ -202,7 +202,7 @@ describe('Application', () => {
   describe('load', () => {
     it('loads one app', async () => {
       const spy = jest.fn()
-      const myApp = a => a.on('test', spy)
+      const myApp = (a: any) => a.on('test', spy)
 
       app.load(myApp)
       await app.receive(event)
@@ -212,8 +212,8 @@ describe('Application', () => {
     it('loads multiple apps', async () => {
       const spy = jest.fn()
       const spy2 = jest.fn()
-      const myApp = a => a.on('test', spy)
-      const myApp2 = a => a.on('test', spy2)
+      const myApp = (a: any) => a.on('test', spy)
+      const myApp2 = (a: any) => a.on('test', spy2)
 
       app.load([myApp, myApp2])
       await app.receive(event)
@@ -223,11 +223,11 @@ describe('Application', () => {
   })
 
   describe('error handling', () => {
-    let error
+    let error: any
 
     beforeEach(() => {
       error = new Error('testing')
-      app.log.error = jest.fn()
+      app.log.error = jest.fn() as any
     })
 
     it('logs errors thrown from handlers', async () => {

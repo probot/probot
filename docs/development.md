@@ -53,7 +53,7 @@ To run your app in development, you will need to configure a GitHub App to deliv
 1. Go to [smee.io](https://smee.io) and click **Start a new channel**. Set `WEBHOOK_PROXY_URL` in `.env` to the URL that you are redirected to.
 1. [Create a new GitHub App](https://github.com/settings/apps/new) with:
     - **Webhook URL**: Use your `WEBHOOK_PROXY_URL` from the previous step.
-    - **Webhook Secret:** `development`
+    - **Webhook Secret:** `development` (Note: For optimal security, Probot apps **require** this secret be set, even though it's optional on GitHub.).
     - **Permissions & events** is located lower down the page and will depend on what data you want your app to have access to. Note: if, for example, you only enable issue events, you will not be able to listen on pull request webhooks with your app. However, for development we recommend enabling everything.
 1. Download the private key and move it to your project's directory. As long as it's in the root of your project, Probot will find it automatically regardless of the filename.
 1. Edit `.env` and set `APP_ID` to the ID of the app you just created. The App ID can be found in your app settings page here <img width="1048" alt="screen shot 2017-08-20 at 8 31 31 am" src="https://user-images.githubusercontent.com/5713670/42248717-f6bf4f10-7edb-11e8-8dd5-387181c771bc.png">

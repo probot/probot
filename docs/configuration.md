@@ -12,7 +12,7 @@ Variable | Description
 `PRIVATE_KEY_PATH` | The path to the `.pem` file for your GitHub App. If not present, Probot will look for a file ending in `.pem` in your project's directory. **Required** if the `.pem` file is not in your project directory and `PRIVATE_KEY` is not set. <p>_(Example: `path/to/key.pem`)_</p>
 `PRIVATE_KEY` | The contents of the private key for your GitHub App. **Required** if the `.pem` file is not in your project directory and `PRIVATE_KEY_PATH` is not set.
 `WEBHOOK_PROXY_URL` | Allows your local development environment to receive GitHub webhook events. Go to https://smee.io/new to get started. <p>_(Example: `https://smee.io/your-custom-url`)_</p>
-`WEBHOOK_SECRET` | The webhook secret used when creating a GitHub App. 'development' is used as a default, but the value in `.env` needs to match the value configured in your App settings on GitHub. **Required** <p>_(Example: `development`)_</p>
+`WEBHOOK_SECRET` | The webhook secret used when creating a GitHub App. 'development' is used as a default, but the value in `.env` needs to match the value configured in your App settings on GitHub. Note: GitHub marks this value as optional, but for optimal security it's required for Probot apps. **Required** <p>_(Example: `development`)_</p>
 
 For more on the set up of these items, check out [Configuring a GitHub App](https://probot.github.io/docs/development/#configuring-a-github-app).
 

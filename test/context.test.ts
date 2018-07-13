@@ -11,17 +11,13 @@ describe('Context', () => {
   beforeEach(() => {
     event = {
       event: 'push',
-      host: 'example.com',
-      id: '123',
       payload: {
         issue: { number: 4 },
         repository: {
           name: 'probot',
           owner: { login: 'bkeepers' }
         }
-      },
-      protocol: 'https',
-      url: '/'
+      }
     }
 
     context = new Context(event, {} as any, {} as any)

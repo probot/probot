@@ -2,6 +2,7 @@ import fs from 'fs'
 
 const hint = `please use:
   * \`--private-key=/path/to/private-key\` flag, or
+  * \`PRIVATE_KEY_BASE64\` environment variable
   * \`PRIVATE_KEY\` environment variable, or
   * \`PRIVATE_KEY_PATH\` environment variable
 `
@@ -10,9 +11,10 @@ const hint = `please use:
  * Finds a private key through various user-(un)specified methods.
  * Order of precedence:
  * 1. Explicit path (CLI option)
- * 2. `PRIVATE_KEY` env var
- * 3. `PRIVATE_KEY_PATH` env var
- * 4. Any file w/ `.pem` extension in current working dir
+ * 2. `PRIVATE_KEY_BASE64` env var
+ * 3. `PRIVATE_KEY` env var
+ * 4. `PRIVATE_KEY_PATH` env var
+ * 5. Any file w/ `.pem` extension in current working dir
  * @param filepath - Explicit, user-defined path to keyfile
  * @returns Private key
  * @private
@@ -20,6 +22,9 @@ const hint = `please use:
 function findPrivateKey (filepath: string): Buffer | string {
   if (filepath) {
     return fs.readFileSync(filepath)
+  }
+  if (process.env.PRIVATE_KEY_BASE64) {
+    return Buffer.from(process.env.PRIVATE_KEY_BASE64, 'base64').toString()
   }
   if (process.env.PRIVATE_KEY) {
     return process.env.PRIVATE_KEY.replace(/\\n/g, '\n')

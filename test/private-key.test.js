@@ -10,6 +10,7 @@ describe('private-key', function () {
 
   beforeEach(function () {
     privateKey = 'I AM PRIVET KEY!?!!~1!'
+    privateKey64 = Buffer.from(privateKey).toString('base64')
     keyfilePath = '/some/path'
     fs.readFileSync = jest.fn().mockReturnValue(privateKey)
   })
@@ -30,6 +31,19 @@ describe('private-key', function () {
       })
     })
 
+    describe('when a PRIVATE_KEY_BASE64 env var is provided', function () {
+      beforeEach(function () {
+        process.env.PRIVATE_KEY_BASE64 = privateKey64
+      })
+
+      it('should convert the base64 key back to the .pem format', function () {
+        expect(findPrivateKey()).toEqual(privateKey)
+      })
+
+      afterEach(function () {
+        delete process.env.PRIVATE_KEY_BASE64
+      })
+    })
     describe('when a PRIVATE_KEY env var is provided', function () {
       beforeEach(function () {
         process.env.PRIVATE_KEY = privateKey

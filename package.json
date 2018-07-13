@@ -11,8 +11,8 @@
   "scripts": {
     "build": "rimraf lib && tsc -p tsconfig.json",
     "start": "node ./bin/probot run",
-    "lint": "tslint --project .",
-    "test": "tsc --noEmit -p . && jest --coverage && npm run lint && npm run doc-lint",
+    "lint": "tslint --project test",
+    "test": "tsc --noEmit -p test && jest --coverage && npm run lint && npm run doc-lint",
     "doc-lint": "standard-markdown docs/",
     "doc": "typedoc --options .typedoc.json",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",

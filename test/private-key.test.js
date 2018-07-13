@@ -44,6 +44,7 @@ describe('private-key', function () {
         delete process.env.PRIVATE_KEY_BASE64
       })
     })
+  
     describe('when a PRIVATE_KEY env var is provided', function () {
       beforeEach(function () {
         process.env.PRIVATE_KEY = privateKey

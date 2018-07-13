@@ -1,23 +1,27 @@
 import fs = require('fs')
 import path = require('path')
 
-import { Context } from '../src/context'
-import { OctokitError } from '../src/github'
+import { Context, WebhookEvent } from '../src/context'
+import { GitHubAPI, OctokitError } from '../src/github'
 
 describe('Context', () => {
-  let event
-  let context
+  let event: WebhookEvent
+  let context: Context
 
   beforeEach(() => {
     event = {
       event: 'push',
+      host: 'example.com',
+      id: '123',
       payload: {
         issue: { number: 4 },
         repository: {
           name: 'probot',
           owner: { login: 'bkeepers' }
         }
-      }
+      },
+      protocol: 'https',
+      url: '/'
     }
 
     context = new Context(event, {} as any, {} as any)
@@ -82,9 +86,9 @@ describe('Context', () => {
   })
 
   describe('config', () => {
-    let github
+    let github: GitHubAPI
 
-    function readConfig (fileName) {
+    function readConfig (fileName: string) {
       const configPath = path.join(__dirname, 'fixtures', 'config', fileName)
       const content = fs.readFileSync(configPath, { encoding: 'utf8' })
       return { data: { content: Buffer.from(content).toString('base64') } }

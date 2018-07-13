@@ -1,11 +1,11 @@
 import fs = require('fs')
 import path = require('path')
 
-import { Context, WebhookEvent } from '../src/context'
+import { Context } from '../src/context'
 import { GitHubAPI, OctokitError } from '../src/github'
 
 describe('Context', () => {
-  let event: WebhookEvent
+  let event: any
   let context: Context
 
   beforeEach(() => {
@@ -95,12 +95,7 @@ describe('Context', () => {
     }
 
     beforeEach(() => {
-      github = {
-        repos: {
-          getContent: jest.fn()
-        }
-      }
-
+      github = GitHubAPI()
       context = new Context(event, github, {} as any)
     })
 

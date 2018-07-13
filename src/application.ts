@@ -1,7 +1,7 @@
 import express from 'express'
 import { EventEmitter } from 'promise-events'
 import { ApplicationFunction } from '.'
-import { Context } from './context'
+import { Context, WebhookEvent } from './context'
 import { GitHubAPI } from './github'
 import { logger } from './logger'
 import { LoggerWithTarget, wrapLogger } from './wrap-logger'
@@ -22,7 +22,7 @@ export class Application {
   public app: () => string
   public cache: Cache
   public router: express.Router
-  public catchErrors?: boolean
+  public catchErrors: boolean
   public log: LoggerWithTarget
 
   constructor (options?: Options) {
@@ -31,7 +31,7 @@ export class Application {
     this.log = wrapLogger(logger, logger)
     this.app = opts.app
     this.cache = opts.cache
-    this.catchErrors = opts.catchErrors
+    this.catchErrors = opts.catchErrors || false
     this.router = opts.router || express.Router() // you can do this?
   }
 
@@ -201,15 +201,6 @@ export class Application {
   }
 }
 
-export interface WebhookEvent {
-  event: string
-  id: string
-  payload: any
-  protocol: 'http' | 'https'
-  host: string
-  url: string
-}
-
 // The TypeScript definition for cache-manager does not export the Cache interface so we recreate it here
 export interface Cache {
   wrap<T> (key: string, wrapper: (callback: (error: any, result: T) => void) => any, options: CacheConfig): Promise<any>
@@ -222,5 +213,5 @@ export interface Options {
   app: () => string
   cache: Cache
   router?: express.Router
-  catchErrors: boolean
+  catchErrors?: boolean
 }

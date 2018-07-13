@@ -18,16 +18,35 @@ import { LoggerWithTarget } from './wrap-logger'
  * @property {payload} payload - The webhook event payload
  * @property {logger} log - A logger
  */
-export class Context {
-  public id: number
+
+export interface WebhookEvent {
+  event: string
+  id: string
+  payload: WebhookPayloadWithRepository
+  protocol: 'http' | 'https'
+  host: string
+  url: string
+}
+
+export class Context implements WebhookEvent {
+  public event: string
+  public id: string
+  public payload: WebhookPayloadWithRepository
+  public protocol: 'http' | 'https'
+  public host: string
+  public url: string
+
   public github: GitHubAPI
   public log: LoggerWithTarget
-  public payload!: WebhookPayloadWithRepository
-  public event: any
 
-  constructor (event: any, github: GitHubAPI, log: LoggerWithTarget) {
-    Object.assign(this, event)
+  constructor (event: WebhookEvent, github: GitHubAPI, log: LoggerWithTarget) {
+    this.event = event.event
     this.id = event.id
+    this.payload = event.payload
+    this.protocol = event.protocol
+    this.host = event.host
+    this.url = event.url
+
     this.github = github
     this.log = log
   }

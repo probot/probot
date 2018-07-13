@@ -1,8 +1,8 @@
-import {Context} from '../src/context'
-import {Application} from '../src/application'
-import {logger} from '../src/logger'
+import { Application } from '../src/application'
+import { Context } from '../src/context'
+import { logger } from '../src/logger'
 
-describe('Application', function () {
+describe('Application', () => {
   let app
   let event
   let output
@@ -12,12 +12,12 @@ describe('Application', function () {
     // https://github.com/trentm/node-bunyan#adding-a-stream
     logger.addStream({
       level: 'trace',
-      type: 'raw',
-      stream: {write: log => output.push(log)}
+      stream: { write: log => output.push(log) },
+      type: 'raw'
     } as any)
   })
 
-  beforeEach(function () {
+  beforeEach(() => {
     // Clear log output
     output = []
 
@@ -25,17 +25,17 @@ describe('Application', function () {
     app.auth = jest.fn().mockReturnValue({})
 
     event = {
-      id: '123-456',
       event: 'test',
+      id: '123-456',
       payload: {
         action: 'foo',
-        installation: {id: 1}
+        installation: { id: 1 }
       }
     }
   })
 
-  describe('on', function () {
-    it('calls callback when no action is specified', async function () {
+  describe('on', () => {
+    it('calls callback when no action is specified', async () => {
       const spy = jest.fn()
       app.on('test', spy)
 
@@ -46,7 +46,7 @@ describe('Application', function () {
       expect(spy.mock.calls[0][0].payload).toBe(event.payload)
     })
 
-    it('calls callback with same action', async function () {
+    it('calls callback with same action', async () => {
       const spy = jest.fn()
       app.on('test.foo', spy)
 
@@ -54,7 +54,7 @@ describe('Application', function () {
       expect(spy).toHaveBeenCalled()
     })
 
-    it('does not call callback with different action', async function () {
+    it('does not call callback with different action', async () => {
       const spy = jest.fn()
       app.on('test.nope', spy)
 
@@ -62,7 +62,7 @@ describe('Application', function () {
       expect(spy).toHaveBeenCalledTimes(0)
     })
 
-    it('calls callback with *', async function () {
+    it('calls callback with *', async () => {
       const spy = jest.fn()
       app.on('*', spy)
 
@@ -70,12 +70,12 @@ describe('Application', function () {
       expect(spy).toHaveBeenCalled()
     })
 
-    it('calls callback x amount of times when an array of x actions is passed', async function () {
+    it('calls callback x amount of times when an array of x actions is passed', async () => {
       const event2 = {
         event: 'arrayTest',
         payload: {
           action: 'bar',
-          installation: {id: 2}
+          installation: { id: 2 }
         }
       }
 
@@ -93,8 +93,8 @@ describe('Application', function () {
         context.log('testing')
 
         expect(output[0]).toEqual(expect.objectContaining({
-          msg: 'testing',
-          id: context.id
+          id: context.id,
+          msg: 'testing'
         }))
       })
 
@@ -104,12 +104,12 @@ describe('Application', function () {
     })
 
     it('returns an authenticated client for installation.created', async () => {
-      const event = {
-        id: '123-456',
+      const event2 = {
         event: 'installation',
+        id: '123-456',
         payload: {
           action: 'created',
-          installation: {id: 1}
+          installation: { id: 1 }
         }
       }
 
@@ -117,18 +117,18 @@ describe('Application', function () {
         // no-op
       })
 
-      await app.receive(event)
+      await app.receive(event2)
 
       expect(app.auth).toHaveBeenCalledWith(1, expect.anything())
     })
 
     it('returns an unauthenticated client for installation.deleted', async () => {
-      const event = {
-        id: '123-456',
+      const event2 = {
         event: 'installation',
+        id: '123-456',
         payload: {
           action: 'deleted',
-          installation: {id: 1}
+          installation: { id: 1 }
         }
       }
 
@@ -136,15 +136,15 @@ describe('Application', function () {
         // no-op
       })
 
-      await app.receive(event)
+      await app.receive(event2)
 
       expect(app.auth).toHaveBeenCalledWith()
     })
 
     it('returns an authenticated client for events without an installation', async () => {
-      const event = {
-        id: '123-456',
+      const event2 = {
         event: 'foobar',
+        id: '123-456',
         payload: { /* no installation */ }
       }
 
@@ -152,7 +152,7 @@ describe('Application', function () {
         // no-op
       })
 
-      await app.receive(event)
+      await app.receive(event2)
 
       expect(app.auth).toHaveBeenCalledWith()
     })

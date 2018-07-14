@@ -104,7 +104,7 @@ describe('Application', () => {
     })
 
     it('returns an authenticated client for installation.created', async () => {
-      const event2 = {
+      event = {
         event: 'installation',
         id: '123-456',
         payload: {
@@ -117,13 +117,13 @@ describe('Application', () => {
         // no-op
       })
 
-      await app.receive(event2)
+      await app.receive(event)
 
       expect(app.auth).toHaveBeenCalledWith(1, expect.anything())
     })
 
     it('returns an unauthenticated client for installation.deleted', async () => {
-      const event2 = {
+      event = {
         event: 'installation',
         id: '123-456',
         payload: {
@@ -136,13 +136,13 @@ describe('Application', () => {
         // no-op
       })
 
-      await app.receive(event2)
+      await app.receive(event)
 
       expect(app.auth).toHaveBeenCalledWith()
     })
 
     it('returns an authenticated client for events without an installation', async () => {
-      const event2 = {
+      event = {
         event: 'foobar',
         id: '123-456',
         payload: { /* no installation */ }
@@ -152,7 +152,7 @@ describe('Application', () => {
         // no-op
       })
 
-      await app.receive(event2)
+      await app.receive(event)
 
       expect(app.auth).toHaveBeenCalledWith()
     })

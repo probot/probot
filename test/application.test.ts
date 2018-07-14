@@ -111,7 +111,7 @@ describe('Application', () => {
           action: 'created',
           installation: { id: 1 }
         }
-      } as any
+      }
 
       app.on('installation.created', async context => {
         // no-op
@@ -130,7 +130,7 @@ describe('Application', () => {
           action: 'deleted',
           installation: { id: 1 }
         }
-      } as any
+      }
 
       app.on('installation.deleted', async context => {
         // no-op
@@ -146,7 +146,7 @@ describe('Application', () => {
         event: 'foobar',
         id: '123-456',
         payload: { /* no installation */ }
-      } as any
+      }
 
       app.on('foobar', async context => {
         // no-op

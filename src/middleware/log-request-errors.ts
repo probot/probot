@@ -1,4 +1,4 @@
-import {NextFunction,Request,Response} from './logging'
+import { NextFunction, Request, Response } from './logging'
 
 module.exports = (err: Error, req: Request, res: Response, next: NextFunction) => {
   if (req.log) {

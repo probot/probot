@@ -1,4 +1,20 @@
-import {GitHubAPI, Headers, Variables} from './'
+import { GitHubAPI, Headers, Variables } from './'
+
+class GraphQLError extends Error {
+  public query: string
+  public variables: Variables
+
+  constructor (errors: Error[], query: string, variables: Variables) {
+    super(JSON.stringify(errors))
+    this.name = 'GraphQLError'
+    this.query = query
+    this.variables = variables
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, GraphQLError)
+    }
+  }
+}
 
 export function addGraphQL (client: GitHubAPI) {
   client.query = graphql.bind(null, client)
@@ -24,20 +40,4 @@ async function graphql (client: GitHubAPI, query: string, variables: Variables, 
   }
 
   return res.data.data
-}
-
-class GraphQLError extends Error {
-  public query: string
-  public variables: Variables
-
-  constructor (errors: Error[], query: string, variables: Variables) {
-    super(JSON.stringify(errors))
-    this.name = 'GraphQLError'
-    this.query = query
-    this.variables = variables
-
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, GraphQLError)
-    }
-  }
 }

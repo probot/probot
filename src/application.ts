@@ -1,10 +1,10 @@
 import express from 'express'
-import {EventEmitter} from 'promise-events'
-import {ApplicationFunction} from '.'
-import {Context} from './context'
-import {GitHubApp} from './github-app'
-import {logger} from './logger'
-import {LoggerWithTarget, wrapLogger} from './wrap-logger'
+import { EventEmitter } from 'promise-events'
+import { ApplicationFunction } from '.'
+import { Context, WebhookEvent } from './context'
+import { GitHubApp } from './github-app'
+import { logger } from './logger'
+import { LoggerWithTarget, wrapLogger } from './wrap-logger'
 
 /**
  * The `app` parameter available to apps
@@ -14,13 +14,13 @@ import {LoggerWithTarget, wrapLogger} from './wrap-logger'
 export class Application {
   public events: EventEmitter
   public router: express.Router
-  public catchErrors?: boolean
+  public catchErrors: boolean
   public log: LoggerWithTarget
 
   private adapter: GitHubApp
 
-  constructor (options: Options) {
-    const opts = options || {}
+  constructor (options?: Options) {
+    const opts = options || {} as any
     this.events = new EventEmitter()
     this.log = wrapLogger(logger, logger)
     this.adapter = opts.adapter
@@ -32,7 +32,7 @@ export class Application {
    * Loads a Probot plugin
    * @param plugin - Probot plugin to load
    */
-  public load (app: ApplicationFunction | ApplicationFunction[]) : Application {
+  public load (app: ApplicationFunction | ApplicationFunction[]): Application {
     if (Array.isArray(app)) {
       app.forEach(a => this.load(a))
     } else {
@@ -46,7 +46,7 @@ export class Application {
     return Promise.all([
       this.events.emit('*', event),
       this.events.emit(event.event, event),
-      this.events.emit(`${event.event}.${event.payload.action}`, event),
+      this.events.emit(`${event.event}.${event.payload.action}`, event)
     ])
   }
 
@@ -109,13 +109,13 @@ export class Application {
    * @param callback - a function to call when the
    * webhook is received.
    */
-  public on (eventName: string | string[], callback: (context: Context) => void) {
+  public on (eventName: string | string[], callback: (context: Context) => Promise<void>) {
     if (typeof eventName === 'string') {
-      return this.events.on(eventName, async (event: Context) => {
+      return this.events.on(eventName, async (event: WebhookEvent) => {
         try {
           await callback(await this.adapter.createContext(event))
         } catch (err) {
-          this.log.error({err, event, id: event.id})
+          this.log.error({ err, event, id: event.id })
           if (!this.catchErrors) {
             throw err
           }
@@ -127,17 +127,8 @@ export class Application {
   }
 }
 
-export interface WebhookEvent {
-  event: string
-  id: number
-  payload: any
-  protocol?: 'http' | 'https'
-  host?: string
-  url?: string
-}
-
 export interface Options {
   adapter: GitHubApp
   router?: express.Router
-  catchErrors: boolean
+  catchErrors?: boolean
 }

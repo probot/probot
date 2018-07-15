@@ -1,10 +1,9 @@
 import cacheManager from 'cache-manager'
 import jwt from 'jsonwebtoken'
-import {WebhookEvent} from './application'
-import {Context} from './context'
-import {GitHubAPI} from './github'
-import {logger} from './logger'
-import {LoggerWithTarget, wrapLogger} from './wrap-logger'
+import { Context, WebhookEvent } from './context'
+import { GitHubAPI } from './github'
+import { logger } from './logger'
+import { LoggerWithTarget, wrapLogger } from './wrap-logger'
 
 const cache = cacheManager.caching({
   store: 'memory',
@@ -27,13 +26,13 @@ export class GitHubApp {
   public id: number
   public cert: string
 
-  constructor({id, cert}: Options) {
+  constructor ({ id, cert }: Options) {
     this.id = id
     this.cert = cert
     this.log = wrapLogger(logger, logger)
   }
 
-  public jwt() {
+  public jwt () {
     const payload = {
       exp: Math.floor(Date.now() / 1000) + 60,  // JWT expiration time
       iat: Math.floor(Date.now() / 1000),       // Issued at time
@@ -41,11 +40,11 @@ export class GitHubApp {
     }
 
     // Sign with RSA SHA256
-    return jwt.sign(payload, this.cert, {algorithm: 'RS256'})
+    return jwt.sign(payload, this.cert, { algorithm: 'RS256' })
   }
 
   public async createContext (event: WebhookEvent) {
-    const log = this.log.child({name: 'event', id: event.id})
+    const log = this.log.child({ name: 'event', id: event.id })
 
     let github
 
@@ -93,20 +92,20 @@ export class GitHubApp {
     const github = GitHubAPI({
       baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api/v3`,
       debug: process.env.LOG_LEVEL === 'trace',
-      logger: log.child({name: 'github', installation: String(id)})
+      logger: log.child({ name: 'github', installation: String(id) })
     })
 
     if (id) {
       const res = await cache.wrap(`app:${id}:token`, () => {
         log.trace(`creating token for installation`)
-        github.authenticate({type: 'app', token: this.jwt()})
+        github.authenticate({ type: 'app', token: this.jwt() })
 
-        return github.apps.createInstallationToken({installation_id: String(id)})
-      }, {ttl: 60 * 59}) // Cache for 1 minute less than GitHub expiry
+        return github.apps.createInstallationToken({ installation_id: String(id) })
+      }, { ttl: 60 * 59 }) // Cache for 1 minute less than GitHub expiry
 
-      github.authenticate({type: 'token', token: res.data.token})
+      github.authenticate({ type: 'token', token: res.data.token })
     } else {
-      github.authenticate({type: 'app', token: this.jwt()})
+      github.authenticate({ type: 'app', token: this.jwt() })
     }
 
     return github

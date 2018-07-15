@@ -1,21 +1,24 @@
 import Logger from 'bunyan'
 import express from 'express'
-import {Application, WebhookEvent} from './application'
-import {Context} from './context'
-import {GitHubApp} from './github-app'
-import {logger} from './logger'
-import {resolve} from './resolver'
-import {createServer} from './server'
-import {createWebhookProxy} from './webhook-proxy'
+import { Application } from './application'
+import { Context, WebhookEvent } from './context'
+import { GitHubApp } from './github-app'
+import { logger } from './logger'
+import { resolve } from './resolver'
+import { createServer } from './server'
+import { createWebhookProxy } from './webhook-proxy'
 
+// tslint:disable:no-var-requires
+// These needs types
 const Webhooks = require('@octokit/webhooks')
 const logRequestErrors = require('./middleware/log-request-errors')
 
-const defaultApps = [
+const defaultApps: ApplicationFunction[] = [
+  require('./plugins/default'),
   require('./plugins/sentry'),
-  require('./plugins/stats'),
-  require('./plugins/default')
+  require('./plugins/stats')
 ]
+// tslint:enable:no-var-requires
 
 export class Probot {
   public server: express.Application
@@ -26,16 +29,15 @@ export class Probot {
   private apps: Application[]
   private adapter: GitHubApp
 
-  constructor(options: Options) {
+  constructor (options: Options) {
     options.webhookPath = options.webhookPath || '/'
     options.secret = options.secret || 'development'
     this.options = options
     this.logger = logger
     this.apps = []
-    this.webhook = new Webhooks({path: options.webhookPath, secret: options.secret})
-    this.server = createServer({logger})
+    this.webhook = new Webhooks({ path: options.webhookPath, secret: options.secret })
+    this.server = createServer({ logger })
     this.server.use(this.webhook.middleware)
-
 
     this.adapter = new GitHubApp({ id: options.id, cert: options.cert })
 
@@ -44,7 +46,7 @@ export class Probot {
       const webhookEvent = { ...event, event: event.name }
       delete webhookEvent.name
 
-      this.receive(webhookEvent)
+      return this.receive(webhookEvent)
     })
 
     // Log all webhook errors
@@ -68,7 +70,7 @@ export class Probot {
   }
 
   public receive (event: WebhookEvent) {
-    this.logger.debug({event}, 'Webhook received')
+    this.logger.debug({ event }, 'Webhook received')
     return Promise.all(this.apps.map(app => app.receive(event)))
   }
 
@@ -77,7 +79,7 @@ export class Probot {
       appFunction = resolve(appFunction) as ApplicationFunction
     }
 
-    const app = new Application({adapter: this.adapter, catchErrors: true})
+    const app = new Application({ adapter: this.adapter, catchErrors: true })
 
     // Connect the router from the app to the server
     this.server.use(app.router)
@@ -106,7 +108,7 @@ export class Probot {
         logger,
         path: this.options.webhookPath,
         port: this.options.port,
-        url: this.options.webhookProxy,
+        url: this.options.webhookProxy
       })
     }
 

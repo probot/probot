@@ -3,12 +3,12 @@
 # Configuration for new-issue-welcome - https://github.com/behaviorbot/new-issue-welcome
 # Comment to be posted to on first time issues
 newIssueWelcomeComment: >
-  Thanks for opening this issue. A contributor should be by to give feedback soon. In the mean time, please check out the [contributing guidelines](https://github.com/probot/probot/blob/master/CONTRIBUTING.md) and explore other [ways you can get involved](https://probot.github.io/community/).
+  Thanks for opening this issue. A contributor should be by to give feedback soon. In the meantime, please check out the [contributing guidelines](https://github.com/probot/probot/blob/master/CONTRIBUTING.md) and explore other [ways you can get involved](https://probot.github.io/community/).
 
 # Configuration for new-pr-welcome - https://github.com/behaviorbot/new-pr-welcome
 # Comment to be posted to on PRs from first time contributors in your repository
 newPRWelcomeComment: >
-  Thanks for opening this pull request! A contributor should be by to give feedback soon. In the mean time, please check out the [contributing guidelines](https://github.com/probot/probot/blob/master/CONTRIBUTING.md) and explore other [ways you can get involved](https://probot.github.io/community/).
+  Thanks for opening this pull request! A contributor should be by to give feedback soon. In the meantime, please check out the [contributing guidelines](https://github.com/probot/probot/blob/master/CONTRIBUTING.md) and explore other [ways you can get involved](https://probot.github.io/community/).
 
 # Configuration for first-pr-merge - https://github.com/behaviorbot/first-pr-merge
 # Comment to be posted to on pull requests merged by a first time user

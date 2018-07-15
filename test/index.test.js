@@ -20,7 +20,7 @@ describe('Probot', () => {
     let webhooks
 
     beforeEach(() => {
-      webhooks = probot.adapter.webhooks
+      webhooks = probot.github.webhooks
     })
 
     it('forwards webhooks to the app', async () => {
@@ -189,7 +189,7 @@ describe('Probot', () => {
     it('forwards events to each plugin', async () => {
       const spy = jest.fn()
       const app = probot.load(app => app.on('push', spy))
-      app.adapter.auth = jest.fn().mockReturnValue(Promise.resolve({}))
+      app.github.auth = jest.fn().mockReturnValue(Promise.resolve({}))
 
       await probot.receive(event)
 
@@ -218,7 +218,7 @@ describe('Probot', () => {
       const spy = jest.fn()
 
       const plugin = async app => {
-        const github = await app.adapter.auth()
+        const github = await app.github.auth()
         const res = await github.apps.getInstallations({})
         return spy(res)
       }
@@ -232,7 +232,7 @@ describe('Probot', () => {
       process.env.GHE_HOST = 'https://notreallygithub.com'
 
       try {
-        await app.adapter.auth()
+        await app.github.auth()
       } catch (e) {
         expect(e).toMatchSnapshot()
       }

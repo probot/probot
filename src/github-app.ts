@@ -1,11 +1,11 @@
-import Webhooks, {WebhookEvent} from '@octokit/webhooks'
+import Webhooks, { WebhookEvent } from '@octokit/webhooks'
 import cacheManager from 'cache-manager'
-import {Application} from 'express'
+import { Application } from 'express'
 import jwt from 'jsonwebtoken'
-import {Context} from './context'
-import {GitHubAPI} from './github'
-import {logger} from './logger'
-import {LoggerWithTarget, wrapLogger} from './wrap-logger'
+import { Context } from './context'
+import { GitHubAPI } from './github'
+import { logger } from './logger'
+import { LoggerWithTarget, wrapLogger } from './wrap-logger'
 
 const cache = cacheManager.caching({
   store: 'memory',
@@ -31,7 +31,7 @@ export class GitHubApp {
   public cert: string
   public webhooks: Webhooks
 
-  constructor({id, cert, webhookPath, secret}: Options) {
+  constructor ({ id, cert, webhookPath, secret }: Options) {
     this.id = id
     this.cert = cert
     this.log = wrapLogger(logger, logger)
@@ -45,23 +45,27 @@ export class GitHubApp {
     this.webhooks.on('error', this.errorHandler.bind(this))
   }
 
-  get router(): Application {
+  get router (): Application {
     return this.webhooks.middleware
   }
 
-  public jwt() {
+  /**
+   * Create a new JWT, which is used to [authenticate as a GitHub
+   * App](https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#authenticating-as-a-github-app)
+   */
+  public jwt () {
     const payload = {
       exp: Math.floor(Date.now() / 1000) + 60,  // JWT expiration time
       iat: Math.floor(Date.now() / 1000),       // Issued at time
-      iss: this.id                           // GitHub App ID
+      iss: this.id                              // GitHub App ID
     }
 
     // Sign with RSA SHA256
-    return jwt.sign(payload, this.cert, {algorithm: 'RS256'})
+    return jwt.sign(payload, this.cert, { algorithm: 'RS256' })
   }
 
   public async createContext (event: WebhookEvent) {
-    const log = this.log.child({name: 'event', id: event.id})
+    const log = this.log.child({ name: 'event', id: event.id })
 
     let github
 
@@ -69,7 +73,7 @@ export class GitHubApp {
       github = await this.auth()
       log.debug('`context.github` is unauthenticated. See https://probot.github.io/docs/github-api/#unauthenticated-events')
     } else {
-      github = await this.auth(event.payload.installation.id, log)
+      github = await this.auth(event.payload.installation!.id, log)
     }
 
     return new Context(event, github, log)
@@ -99,7 +103,6 @@ export class GitHubApp {
    * [app APIs](https://developer.github.com/v3/apps/).
    *
    * @returns An authenticated GitHub API client
-   * @private
    */
   public async auth (id?: number, log = this.log): Promise<GitHubAPI> {
     if (process.env.GHE_HOST && /^https?:\/\//.test(process.env.GHE_HOST)) {
@@ -109,20 +112,20 @@ export class GitHubApp {
     const github = GitHubAPI({
       baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api/v3`,
       debug: process.env.LOG_LEVEL === 'trace',
-      logger: log.child({name: 'github', installation: String(id)})
+      logger: log.child({ name: 'github', installation: String(id) })
     })
 
     if (id) {
       const res = await cache.wrap(`app:${id}:token`, () => {
         log.trace(`creating token for installation`)
-        github.authenticate({type: 'app', token: this.jwt()})
+        github.authenticate({ type: 'app', token: this.jwt() })
 
-        return github.apps.createInstallationToken({installation_id: String(id)})
-      }, {ttl: 60 * 59}) // Cache for 1 minute less than GitHub expiry
+        return github.apps.createInstallationToken({ installation_id: String(id) })
+      }, { ttl: 60 * 59 }) // Cache for 1 minute less than GitHub expiry
 
-      github.authenticate({type: 'token', token: res.data.token})
+      github.authenticate({ type: 'token', token: res.data.token })
     } else {
-      github.authenticate({type: 'app', token: this.jwt()})
+      github.authenticate({ type: 'app', token: this.jwt() })
     }
 
     return github

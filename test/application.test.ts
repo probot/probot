@@ -1,44 +1,46 @@
-const {Context} = require('../src/context')
-const {Application} = require('../src/application')
-const {logger} = require('../src/logger')
-const {GitHubApp} = require('../src/github-app')
+import { WebhookEvent } from '@octokit/webhooks'
+import { Application } from '../src/application'
+import { Context } from '../src/context'
+import { GitHubApp } from '../src/github-app'
+import { logger } from '../src/logger'
 
-describe('Application', function () {
-  let app
-  let event
-  let output
+describe('Application', () => {
+  let github: GitHubApp
+  let app: Application
+  let event: WebhookEvent
+  let output: any
 
   beforeAll(() => {
     // Add a new stream for testing the logger
     // https://github.com/trentm/node-bunyan#adding-a-stream
     logger.addStream({
       level: 'trace',
-      type: 'raw',
-      stream: {write: log => output.push(log)}
-    })
+      stream: { write: (log: any) => output.push(log) },
+      type: 'raw'
+    } as any)
   })
 
-  beforeEach(function () {
+  beforeEach(() => {
     // Clear log output
     output = []
 
-    const adapter = new GitHubApp({jwt: () => 'test'})
-    adapter.auth = jest.fn().mockReturnValue({})
+    github = new GitHubApp({} as any)
+    github.auth = jest.fn().mockReturnValue({})
 
-    app = new Application({adapter})
+    app = new Application({ github })
 
     event = {
       id: '123-456',
       name: 'test',
       payload: {
         action: 'foo',
-        installation: {id: 1}
+        installation: { id: 1 }
       }
     }
   })
 
-  describe('on', function () {
-    it('calls callback when no action is specified', async function () {
+  describe('on', () => {
+    it('calls callback when no action is specified', async () => {
       const spy = jest.fn()
       app.on('test', spy)
 
@@ -49,7 +51,7 @@ describe('Application', function () {
       expect(spy.mock.calls[0][0].payload).toBe(event.payload)
     })
 
-    it('calls callback with same action', async function () {
+    it('calls callback with same action', async () => {
       const spy = jest.fn()
       app.on('test.foo', spy)
 
@@ -57,7 +59,7 @@ describe('Application', function () {
       expect(spy).toHaveBeenCalled()
     })
 
-    it('does not call callback with different action', async function () {
+    it('does not call callback with different action', async () => {
       const spy = jest.fn()
       app.on('test.nope', spy)
 
@@ -65,7 +67,7 @@ describe('Application', function () {
       expect(spy).toHaveBeenCalledTimes(0)
     })
 
-    it('calls callback with *', async function () {
+    it('calls callback with *', async () => {
       const spy = jest.fn()
       app.on('*', spy)
 
@@ -73,14 +75,14 @@ describe('Application', function () {
       expect(spy).toHaveBeenCalled()
     })
 
-    it('calls callback x amount of times when an array of x actions is passed', async function () {
+    it('calls callback x amount of times when an array of x actions is passed', async () => {
       const event2 = {
         name: 'arrayTest',
         payload: {
           action: 'bar',
-          installation: {id: 2}
+          installation: { id: 2 }
         }
-      }
+      } as any
 
       const spy = jest.fn()
       app.on(['test.foo', 'arrayTest.bar'], spy)
@@ -96,8 +98,8 @@ describe('Application', function () {
         context.log('testing')
 
         expect(output[0]).toEqual(expect.objectContaining({
-          msg: 'testing',
-          id: context.id
+          id: context.id,
+          msg: 'testing'
         }))
       })
 
@@ -107,12 +109,12 @@ describe('Application', function () {
     })
 
     it('returns an authenticated client for installation.created', async () => {
-      const event = {
+      event = {
         id: '123-456',
         name: 'installation',
         payload: {
           action: 'created',
-          installation: {id: 1}
+          installation: { id: 1 }
         }
       }
 
@@ -122,16 +124,16 @@ describe('Application', function () {
 
       await app.receive(event)
 
-      expect(app.adapter.auth).toHaveBeenCalledWith(1, expect.anything())
+      expect(github.auth).toHaveBeenCalledWith(1, expect.anything())
     })
 
     it('returns an unauthenticated client for installation.deleted', async () => {
-      const event = {
+      event = {
         id: '123-456',
         name: 'installation',
         payload: {
           action: 'deleted',
-          installation: {id: 1}
+          installation: { id: 1 }
         }
       }
 
@@ -141,11 +143,11 @@ describe('Application', function () {
 
       await app.receive(event)
 
-      expect(app.adapter.auth).toHaveBeenCalledWith()
+      expect(github.auth).toHaveBeenCalledWith()
     })
 
     it('returns an authenticated client for events without an installation', async () => {
-      const event = {
+      event = {
         id: '123-456',
         name: 'foobar',
         payload: { /* no installation */ }
@@ -157,7 +159,7 @@ describe('Application', function () {
 
       await app.receive(event)
 
-      expect(app.adapter.auth).toHaveBeenCalledWith()
+      expect(github.auth).toHaveBeenCalledWith()
     })
   })
 
@@ -205,7 +207,7 @@ describe('Application', function () {
   describe('load', () => {
     it('loads one app', async () => {
       const spy = jest.fn()
-      const myApp = a => a.on('test', spy)
+      const myApp = (a: any) => a.on('test', spy)
 
       app.load(myApp)
       await app.receive(event)
@@ -215,8 +217,8 @@ describe('Application', function () {
     it('loads multiple apps', async () => {
       const spy = jest.fn()
       const spy2 = jest.fn()
-      const myApp = a => a.on('test', spy)
-      const myApp2 = a => a.on('test', spy2)
+      const myApp = (a: any) => a.on('test', spy)
+      const myApp2 = (a: any) => a.on('test', spy2)
 
       app.load([myApp, myApp2])
       await app.receive(event)
@@ -226,7 +228,7 @@ describe('Application', function () {
   })
 
   describe('error handling', () => {
-    let error
+    let error: any
 
     beforeEach(() => {
       error = new Error('testing')
@@ -252,6 +254,20 @@ describe('Application', function () {
       expect(output.length).toBe(1)
       expect(output[0].err.message).toEqual('testing')
       expect(output[0].event.id).toEqual(event.id)
+    })
+  })
+
+  describe('deprecations', () => {
+    test('app() calls github.jwt()', () => {
+      github.jwt = jest.fn().mockReturnValue('testing')
+      expect(app.app()).toEqual('testing')
+      expect(github.jwt).toHaveBeenCalled()
+    })
+
+    test('auth() calls github.auth()', async () => {
+      github.auth = jest.fn().mockReturnValue(Promise.resolve('a github client'))
+      expect(await app.auth(1, 'a logger' as any)).toEqual('a github client')
+      expect(github.auth).toHaveBeenCalledWith(1, 'a logger')
     })
   })
 })

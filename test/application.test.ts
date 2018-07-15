@@ -262,4 +262,20 @@ describe('Application', () => {
       expect(output[0].event.id).toEqual(event.id)
     })
   })
+
+  describe('deprecations', () => {
+    test('recieve() accepts param with {event}', async () => {
+      const spy = jest.fn()
+      app.events.on('deprecated', spy)
+      await app.receive({ event: 'deprecated', payload: { action: 'test' } } as any)
+      expect(spy).toHaveBeenCalled()
+    })
+
+    test('recieve() accepts param with {name,event}', async () => {
+      const spy = jest.fn()
+      app.events.on('real-event-name', spy)
+      await app.receive({ name: 'real-event-name', event: 'deprecated', payload: { action: 'test' } } as any)
+      expect(spy).toHaveBeenCalled()
+    })
+  })
 })

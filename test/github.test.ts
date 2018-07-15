@@ -1,20 +1,21 @@
 import Bottleneck from 'bottleneck'
 import nock from 'nock'
-import { GitHubAPI } from '../src/github'
+import { GitHubAPI, Options } from '../src/github'
+import { logger } from '../src/logger'
 
 describe('GitHubAPI', () => {
   let github: GitHubAPI
 
   beforeEach(() => {
-    const logger = {
-      debug: jest.fn(),
-      trace: jest.fn()
-    }
-
     // Set a shorter limiter, otherwise tests are _slow_
     const limiter = new Bottleneck()
 
-    github = GitHubAPI({ logger, limiter } as any)
+    const options: Options = {
+      limiter,
+      logger
+    }
+
+    github = GitHubAPI(options)
   })
 
   test('works without options', async () => {

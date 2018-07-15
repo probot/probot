@@ -21,6 +21,9 @@ export interface Options {
   cert: string
 }
 
+/**
+ *
+ */
 export class GitHubApp {
   public log: LoggerWithTarget
   public id: number
@@ -82,7 +85,6 @@ export class GitHubApp {
    * [app APIs](https://developer.github.com/v3/apps/).
    *
    * @returns An authenticated GitHub API client
-   * @private
    */
   public async auth (id?: number, log = this.log): Promise<GitHubAPI> {
     if (process.env.GHE_HOST && /^https?:\/\//.test(process.env.GHE_HOST)) {

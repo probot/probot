@@ -1,22 +1,22 @@
 import fs = require('fs')
 import path = require('path')
 
-import {Context} from '../src/context'
-import {OctokitError} from '../src/github'
+import { Context } from '../src/context'
+import { GitHubAPI, OctokitError } from '../src/github'
 
 describe('Context', () => {
-  let event
-  let context
+  let event: any
+  let context: Context
 
   beforeEach(() => {
     event = {
       event: 'push',
       payload: {
-        issue: {number: 4},
+        issue: { number: 4 },
         repository: {
           name: 'probot',
-          owner: {login: 'bkeepers'},
-        },
+          owner: { login: 'bkeepers' }
+        }
       }
     }
 
@@ -29,17 +29,17 @@ describe('Context', () => {
 
   describe('repo', () => {
     it('returns attributes from repository payload', () => {
-      expect(context.repo()).toEqual({owner: 'bkeepers', repo: 'probot'})
+      expect(context.repo()).toEqual({ owner: 'bkeepers', repo: 'probot' })
     })
 
     it('merges attributes', () => {
-      expect(context.repo({foo: 1, bar: 2})).toEqual({
-        bar: 2, foo: 1, owner: 'bkeepers', repo: 'probot',
+      expect(context.repo({ foo: 1, bar: 2 })).toEqual({
+        bar: 2, foo: 1, owner: 'bkeepers', repo: 'probot'
       })
     })
 
     it('overrides repo attributes', () => {
-      expect(context.repo({owner: 'muahaha'})).toEqual({
+      expect(context.repo({ owner: 'muahaha' })).toEqual({
         owner: 'muahaha', repo: 'probot'
       })
     })
@@ -50,7 +50,7 @@ describe('Context', () => {
       event.payload = require('./fixtures/webhook/push')
 
       context = new Context(event, {} as any, {} as any)
-      expect(context.repo()).toEqual({owner: 'bkeepers-inc', repo: 'test'})
+      expect(context.repo()).toEqual({ owner: 'bkeepers-inc', repo: 'test' })
     })
 
     it('return error for context.repo() when repository doesn\'t exist', () => {
@@ -65,38 +65,33 @@ describe('Context', () => {
 
   describe('issue', () => {
     it('returns attributes from repository payload', () => {
-      expect(context.issue()).toEqual({owner: 'bkeepers', repo: 'probot', number: 4})
+      expect(context.issue()).toEqual({ owner: 'bkeepers', repo: 'probot', number: 4 })
     })
 
     it('merges attributes', () => {
-      expect(context.issue({foo: 1, bar: 2})).toEqual({
-        bar: 2, foo: 1, number: 4, owner: 'bkeepers', repo: 'probot',
+      expect(context.issue({ foo: 1, bar: 2 })).toEqual({
+        bar: 2, foo: 1, number: 4, owner: 'bkeepers', repo: 'probot'
       })
     })
 
     it('overrides repo attributes', () => {
-      expect(context.issue({owner: 'muahaha', number: 5})).toEqual({
+      expect(context.issue({ owner: 'muahaha', number: 5 })).toEqual({
         number: 5, owner: 'muahaha', repo: 'probot'
       })
     })
   })
 
   describe('config', () => {
-    let github
+    let github: GitHubAPI
 
-    function readConfig (fileName) {
+    function readConfig (fileName: string) {
       const configPath = path.join(__dirname, 'fixtures', 'config', fileName)
-      const content = fs.readFileSync(configPath, {encoding: 'utf8'})
-      return {data: {content: Buffer.from(content).toString('base64')}}
+      const content = fs.readFileSync(configPath, { encoding: 'utf8' })
+      return { data: { content: Buffer.from(content).toString('base64') } }
     }
 
     beforeEach(() => {
-      github = {
-        repos: {
-          getContent: jest.fn()
-        }
-      }
-
+      github = GitHubAPI()
       context = new Context(event, github, {} as any)
     })
 
@@ -107,12 +102,12 @@ describe('Context', () => {
       expect(github.repos.getContent).toHaveBeenCalledWith({
         owner: 'bkeepers',
         path: '.github/test-file.yml',
-        repo: 'probot',
+        repo: 'probot'
       })
       expect(config).toEqual({
         bar: 7,
         baz: 11,
-        foo: 5,
+        foo: 5
       })
     })
 
@@ -121,8 +116,8 @@ describe('Context', () => {
         code: 404,
         message: 'An error occurred',
         name: 'OctokitError',
-        status: 'Not Found',
-      };
+        status: 'Not Found'
+      }
 
       github.repos.getContent = jest.fn().mockReturnValue(Promise.reject(error))
 
@@ -134,14 +129,14 @@ describe('Context', () => {
         code: 404,
         message: 'An error occurred',
         name: 'OctokitError',
-        status: 'Not Found',
-      };
+        status: 'Not Found'
+      }
 
       github.repos.getContent = jest.fn().mockReturnValue(Promise.reject(error))
       const defaultConfig = {
         bar: 7,
         baz: 11,
-        foo: 5,
+        foo: 5
       }
       const contents = await context.config('test-file.yml', defaultConfig)
       expect(contents).toEqual(defaultConfig)
@@ -189,33 +184,33 @@ describe('Context', () => {
 
     it('overwrites default config settings', async () => {
       github.repos.getContent = jest.fn().mockReturnValue(Promise.resolve(readConfig('basic.yml')))
-      const config = await context.config('test-file.yml', {foo: 10})
+      const config = await context.config('test-file.yml', { foo: 10 })
 
       expect(github.repos.getContent).toHaveBeenCalledWith({
         owner: 'bkeepers',
         path: '.github/test-file.yml',
-        repo: 'probot',
+        repo: 'probot'
       })
       expect(config).toEqual({
         bar: 7,
         baz: 11,
-        foo: 5,
+        foo: 5
       })
     })
 
     it('uses default settings to fill in missing options', async () => {
       github.repos.getContent = jest.fn().mockReturnValue(Promise.resolve(readConfig('missing.yml')))
-      const config = await context.config('test-file.yml', {bar: 7})
+      const config = await context.config('test-file.yml', { bar: 7 })
 
       expect(github.repos.getContent).toHaveBeenCalledWith({
         owner: 'bkeepers',
         path: '.github/test-file.yml',
-        repo: 'probot',
+        repo: 'probot'
       })
       expect(config).toEqual({
         bar: 7,
         baz: 11,
-        foo: 5,
+        foo: 5
       })
     })
   })

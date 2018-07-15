@@ -1,41 +1,41 @@
-const {Context} = require('../src/context')
-const {Application} = require('../src/application')
-const {logger} = require('../src/logger')
+import { Application } from '../src/application'
+import { Context } from '../src/context'
+import { logger } from '../src/logger'
 
-describe('Application', function () {
-  let app
-  let event
-  let output
+describe('Application', () => {
+  let app: Application
+  let event: any
+  let output: any
 
   beforeAll(() => {
     // Add a new stream for testing the logger
     // https://github.com/trentm/node-bunyan#adding-a-stream
     logger.addStream({
       level: 'trace',
-      type: 'raw',
-      stream: {write: log => output.push(log)}
-    })
+      stream: { write: (log: any) => output.push(log) },
+      type: 'raw'
+    } as any)
   })
 
-  beforeEach(function () {
+  beforeEach(() => {
     // Clear log output
     output = []
 
-    app = new Application({})
+    app = new Application({} as any)
     app.auth = jest.fn().mockReturnValue({})
 
     event = {
-      id: '123-456',
       event: 'test',
+      id: '123-456',
       payload: {
         action: 'foo',
-        installation: {id: 1}
+        installation: { id: 1 }
       }
     }
   })
 
-  describe('on', function () {
-    it('calls callback when no action is specified', async function () {
+  describe('on', () => {
+    it('calls callback when no action is specified', async () => {
       const spy = jest.fn()
       app.on('test', spy)
 
@@ -46,7 +46,7 @@ describe('Application', function () {
       expect(spy.mock.calls[0][0].payload).toBe(event.payload)
     })
 
-    it('calls callback with same action', async function () {
+    it('calls callback with same action', async () => {
       const spy = jest.fn()
       app.on('test.foo', spy)
 
@@ -54,7 +54,7 @@ describe('Application', function () {
       expect(spy).toHaveBeenCalled()
     })
 
-    it('does not call callback with different action', async function () {
+    it('does not call callback with different action', async () => {
       const spy = jest.fn()
       app.on('test.nope', spy)
 
@@ -62,7 +62,7 @@ describe('Application', function () {
       expect(spy).toHaveBeenCalledTimes(0)
     })
 
-    it('calls callback with *', async function () {
+    it('calls callback with *', async () => {
       const spy = jest.fn()
       app.on('*', spy)
 
@@ -70,14 +70,14 @@ describe('Application', function () {
       expect(spy).toHaveBeenCalled()
     })
 
-    it('calls callback x amount of times when an array of x actions is passed', async function () {
+    it('calls callback x amount of times when an array of x actions is passed', async () => {
       const event2 = {
         event: 'arrayTest',
         payload: {
           action: 'bar',
-          installation: {id: 2}
+          installation: { id: 2 }
         }
-      }
+      } as any
 
       const spy = jest.fn()
       app.on(['test.foo', 'arrayTest.bar'], spy)
@@ -93,8 +93,8 @@ describe('Application', function () {
         context.log('testing')
 
         expect(output[0]).toEqual(expect.objectContaining({
-          msg: 'testing',
-          id: context.id
+          id: context.id,
+          msg: 'testing'
         }))
       })
 
@@ -104,12 +104,12 @@ describe('Application', function () {
     })
 
     it('returns an authenticated client for installation.created', async () => {
-      const event = {
-        id: '123-456',
+      event = {
         event: 'installation',
+        id: '123-456',
         payload: {
           action: 'created',
-          installation: {id: 1}
+          installation: { id: 1 }
         }
       }
 
@@ -123,12 +123,12 @@ describe('Application', function () {
     })
 
     it('returns an unauthenticated client for installation.deleted', async () => {
-      const event = {
-        id: '123-456',
+      event = {
         event: 'installation',
+        id: '123-456',
         payload: {
           action: 'deleted',
-          installation: {id: 1}
+          installation: { id: 1 }
         }
       }
 
@@ -142,9 +142,9 @@ describe('Application', function () {
     })
 
     it('returns an authenticated client for events without an installation', async () => {
-      const event = {
-        id: '123-456',
+      event = {
         event: 'foobar',
+        id: '123-456',
         payload: { /* no installation */ }
       }
 
@@ -202,7 +202,7 @@ describe('Application', function () {
   describe('load', () => {
     it('loads one app', async () => {
       const spy = jest.fn()
-      const myApp = a => a.on('test', spy)
+      const myApp = (a: any) => a.on('test', spy)
 
       app.load(myApp)
       await app.receive(event)
@@ -212,8 +212,8 @@ describe('Application', function () {
     it('loads multiple apps', async () => {
       const spy = jest.fn()
       const spy2 = jest.fn()
-      const myApp = a => a.on('test', spy)
-      const myApp2 = a => a.on('test', spy2)
+      const myApp = (a: any) => a.on('test', spy)
+      const myApp2 = (a: any) => a.on('test', spy2)
 
       app.load([myApp, myApp2])
       await app.receive(event)
@@ -223,11 +223,11 @@ describe('Application', function () {
   })
 
   describe('error handling', () => {
-    let error
+    let error: any
 
     beforeEach(() => {
       error = new Error('testing')
-      app.log.error = jest.fn()
+      app.log.error = jest.fn() as any
     })
 
     it('logs errors thrown from handlers', async () => {

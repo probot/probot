@@ -3,7 +3,7 @@ import nock from 'nock'
 import { GitHubAPI } from '../src/github'
 
 describe('GitHubAPI', () => {
-  let github
+  let github: GitHubAPI
 
   beforeEach(() => {
     const logger = {
@@ -14,11 +14,11 @@ describe('GitHubAPI', () => {
     // Set a shorter limiter, otherwise tests are _slow_
     const limiter = new Bottleneck()
 
-    github = new GitHubAPI({ logger, limiter })
+    github = GitHubAPI({ logger, limiter } as any)
   })
 
   test('works without options', async () => {
-    github = new GitHubAPI()
+    github = GitHubAPI()
     const user = { login: 'ohai' }
 
     nock('https://api.github.com').get('/user').reply(200, user)
@@ -28,7 +28,7 @@ describe('GitHubAPI', () => {
   describe('paginate', () => {
     beforeEach(() => {
       // Prepare an array of issue objects
-      const issues = new Array(5).fill().map((_, i, arr) => {
+      const issues = new Array(5).fill(0).map((_, i, arr) => {
         return {
           id: i,
           number: i,

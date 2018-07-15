@@ -221,4 +221,20 @@ describe('Context', () => {
       })
     })
   })
+
+  describe('isBot', () => {
+    test('returns true if sender is a bot', () => {
+      event.payload.sender = { type: 'Bot' }
+      context = new Context(event, {} as any, {} as any)
+
+      expect(context.isBot).toBe(true)
+    })
+
+    test('returns false if sender is not a bot', () => {
+      event.payload.sender = { type: 'User' }
+      context = new Context(event, {} as any, {} as any)
+
+      expect(context.isBot).toBe(false)
+    })
+  })
 })

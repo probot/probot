@@ -67,7 +67,7 @@ export class Context implements WebhookEvent {
     }
 
     return Object.assign({
-      owner: repo.owner.login || repo.owner.name,
+      owner: repo.owner.login || repo.owner.name!,
       repo: repo.name
     }, object)
   }

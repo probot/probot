@@ -46,10 +46,16 @@ export class Application {
   }
 
   public async receive (event: WebhookEvent) {
+    if ((event as any).event) {
+      // tslint:disable-next-line:no-console
+      console.warn(new Error('Propery `event` is deprecated, use `name`'))
+      event = { name: (event as any).event, ...event }
+    }
+
     return Promise.all([
       this.events.emit('*', event),
       this.events.emit(event.name, event),
-      this.events.emit(`${event.name}.${event.payload.action}`, event)
+      this.events.emit(`${ event.name }.${ event.payload.action }`, event)
     ])
   }
 

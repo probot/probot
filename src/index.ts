@@ -9,6 +9,8 @@ import { resolve } from './resolver'
 import { createServer } from './server'
 import { createWebhookProxy } from './webhook-proxy'
 
+// tslint:disable:no-var-requires
+// These needs types
 const logRequestErrors = require('./middleware/log-request-errors')
 
 const defaultApps: ApplicationFunction[] = [

@@ -26,14 +26,14 @@ declare module '@octokit/webhooks' {
 
     export interface PayloadRepository {
       [key: string]: any
-      full_name: string
+      full_name?: string
       name: string
       owner: {
         [key: string]: any
         login: string
-        name: string
+        name?: string
       }
-      html_url: string
+      html_url?: string
     }
 
     export interface WebhookPayloadWithRepository {
@@ -42,14 +42,14 @@ declare module '@octokit/webhooks' {
       issue?: {
         [key: string]: any
         number: number
-        html_url: string
-        body: string
+        html_url?: string
+        body?: string
       }
       pull_request?: {
         [key: string]: any
         number: number
-        html_url: string
-        body: string
+        html_url?: string
+        body?: string
       }
       sender?: {
         [key: string]: any

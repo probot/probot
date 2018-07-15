@@ -76,13 +76,14 @@ describe('Application', () => {
     })
 
     it('calls callback x amount of times when an array of x actions is passed', async () => {
-      const event2 = {
+      const event2: WebhookEvent = {
+        id: '123',
         name: 'arrayTest',
         payload: {
           action: 'bar',
           installation: { id: 2 }
         }
-      } as any
+      }
 
       const spy = jest.fn()
       app.on(['test.foo', 'arrayTest.bar'], spy)
@@ -268,6 +269,20 @@ describe('Application', () => {
       github.auth = jest.fn().mockReturnValue(Promise.resolve('a github client'))
       expect(await app.auth(1, 'a logger' as any)).toEqual('a github client')
       expect(github.auth).toHaveBeenCalledWith(1, 'a logger')
+    })
+
+    test('recieve() accepts param with {event}', async () => {
+      const spy = jest.fn()
+      app.events.on('deprecated', spy)
+      await app.receive({ event: 'deprecated', payload: { action: 'test' } } as any)
+      expect(spy).toHaveBeenCalled()
+    })
+
+    test('recieve() accepts param with {name,event}', async () => {
+      const spy = jest.fn()
+      app.events.on('real-event-name', spy)
+      await app.receive({ name: 'real-event-name', event: 'deprecated', payload: { action: 'test' } } as any)
+      expect(spy).toHaveBeenCalled()
     })
   })
 })

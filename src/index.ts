@@ -1,8 +1,9 @@
+import { WebhookEvent } from '@octokit/webhooks'
 import Logger from 'bunyan'
 import cacheManager from 'cache-manager'
 import express from 'express'
 import { Application } from './application'
-import { Context, WebhookEvent } from './context'
+import { Context } from './context'
 import { createApp } from './github-app'
 import { logger } from './logger'
 import { resolve } from './resolver'
@@ -46,11 +47,8 @@ export class Probot {
     this.server = createServer({ webhook: this.webhook.middleware, logger })
 
     // Log all received webhooks
-    this.webhook.on('*', (event: any) => {
-      const webhookEvent = { ...event, event: event.name }
-      delete webhookEvent.name
-
-      return this.receive(webhookEvent)
+    this.webhook.on('*', (event: WebhookEvent) => {
+      return this.receive(event)
     })
 
     // Log all webhook errors

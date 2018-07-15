@@ -26,7 +26,7 @@ export class Application {
     this.events = new EventEmitter()
     this.log = wrapLogger(logger, logger)
     this.github = opts.github
-    this.catchErrors = opts.catchErrors
+    this.catchErrors = opts.catchErrors || false
     this.router = opts.router || express.Router() // you can do this?
   }
 

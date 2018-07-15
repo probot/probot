@@ -27,7 +27,7 @@ export class Probot {
 
   private options: Options
   private apps: Application[]
-  private adapter: GitHubApp
+  private github: GitHubApp
 
   constructor (options: Options) {
     options.webhookPath = options.webhookPath || '/'
@@ -39,7 +39,7 @@ export class Probot {
     this.server = createServer({ logger })
     this.server.use(this.webhook.middleware)
 
-    this.adapter = new GitHubApp({ id: options.id, cert: options.cert })
+    this.github = new GitHubApp({ id: options.id, cert: options.cert })
 
     // Log all received webhooks
     this.webhook.on('*', (event: any) => {
@@ -79,7 +79,7 @@ export class Probot {
       appFunction = resolve(appFunction) as ApplicationFunction
     }
 
-    const app = new Application({ adapter: this.adapter, catchErrors: true })
+    const app = new Application({ github: this.github, catchErrors: true })
 
     // Connect the router from the app to the server
     this.server.use(app.router)

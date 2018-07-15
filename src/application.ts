@@ -17,13 +17,13 @@ export class Application {
   public catchErrors: boolean
   public log: LoggerWithTarget
 
-  private adapter: GitHubApp
+  private github: GitHubApp
 
   constructor (options?: Options) {
     const opts = options || {} as any
     this.events = new EventEmitter()
     this.log = wrapLogger(logger, logger)
-    this.adapter = opts.adapter
+    this.github = opts.github
     this.catchErrors = opts.catchErrors
     this.router = opts.router || express.Router() // you can do this?
   }
@@ -113,7 +113,7 @@ export class Application {
     if (typeof eventName === 'string') {
       return this.events.on(eventName, async (event: WebhookEvent) => {
         try {
-          await callback(await this.adapter.createContext(event))
+          await callback(await this.github.createContext(event))
         } catch (err) {
           this.log.error({ err, event, id: event.id })
           if (!this.catchErrors) {
@@ -128,7 +128,7 @@ export class Application {
 }
 
 export interface Options {
-  adapter: GitHubApp
+  github: GitHubApp
   router?: express.Router
   catchErrors?: boolean
 }

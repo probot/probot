@@ -4,7 +4,7 @@ import { GitHubApp } from '../src/github-app'
 import { logger } from '../src/logger'
 
 describe('Application', () => {
-  let adapter: GitHubApp
+  let github: GitHubApp
   let app: Application
   let event: any
   let output: any
@@ -23,10 +23,10 @@ describe('Application', () => {
     // Clear log output
     output = []
 
-    adapter = new GitHubApp({ } as any)
-    adapter.auth = jest.fn().mockReturnValue({})
+    github = new GitHubApp({ } as any)
+    github.auth = jest.fn().mockReturnValue({})
 
-    app = new Application({ adapter })
+    app = new Application({ github })
 
     event = {
       event: 'test',
@@ -123,7 +123,7 @@ describe('Application', () => {
 
       await app.receive(event)
 
-      expect(adapter.auth).toHaveBeenCalledWith(1, expect.anything())
+      expect(github.auth).toHaveBeenCalledWith(1, expect.anything())
     })
 
     it('returns an unauthenticated client for installation.deleted', async () => {
@@ -142,7 +142,7 @@ describe('Application', () => {
 
       await app.receive(event)
 
-      expect(adapter.auth).toHaveBeenCalledWith()
+      expect(github.auth).toHaveBeenCalledWith()
     })
 
     it('returns an authenticated client for events without an installation', async () => {
@@ -158,7 +158,7 @@ describe('Application', () => {
 
       await app.receive(event)
 
-      expect(adapter.auth).toHaveBeenCalledWith()
+      expect(github.auth).toHaveBeenCalledWith()
     })
   })
 

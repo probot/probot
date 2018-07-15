@@ -1,4 +1,4 @@
-import { WebhookEvent } from '@octokit/webhooks'
+import Webhooks, { WebhookEvent } from '@octokit/webhooks'
 import Logger from 'bunyan'
 import cacheManager from 'cache-manager'
 import express from 'express'
@@ -12,7 +12,6 @@ import { createWebhookProxy } from './webhook-proxy'
 
 // tslint:disable:no-var-requires
 // These needs types
-const Webhooks = require('@octokit/webhooks')
 const logRequestErrors = require('./middleware/log-request-errors')
 
 const cache = cacheManager.caching({
@@ -29,7 +28,7 @@ const defaultApps: ApplicationFunction[] = [
 
 export class Probot {
   public server: express.Application
-  public webhook: any
+  public webhook: Webhooks
   public logger: Logger
 
   private options: Options

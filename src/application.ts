@@ -1,7 +1,9 @@
+import deprecated from 'deprecated-decorator'
 import express from 'express'
 import { EventEmitter } from 'promise-events'
 import { ApplicationFunction } from '.'
 import { Context, WebhookEvent } from './context'
+import { GitHubAPI } from './github'
 import { GitHubApp } from './github-app'
 import { logger } from './logger'
 import { LoggerWithTarget, wrapLogger } from './wrap-logger'
@@ -124,6 +126,16 @@ export class Application {
     } else {
       eventName.forEach(e => this.on(e, callback))
     }
+  }
+
+  @deprecated('github.jwt')
+  public app (): string {
+    return this.github.jwt()
+  }
+
+  @deprecated('github.auth')
+  public auth (id?: number, log = this.log): Promise<GitHubAPI> {
+    return this.github.auth(id, log)
   }
 }
 

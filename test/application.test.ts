@@ -255,4 +255,18 @@ describe('Application', () => {
       expect(output[0].event.id).toEqual(event.id)
     })
   })
+
+  describe('deprecations', () => {
+    test('app() calls github.jwt()', () => {
+      github.jwt = jest.fn().mockReturnValue('testing')
+      expect(app.app()).toEqual('testing')
+      expect(github.jwt).toHaveBeenCalled()
+    })
+
+    test('auth() calls github.auth()', async () => {
+      github.auth = jest.fn().mockReturnValue(Promise.resolve('a github client'))
+      expect(await app.auth(1, 'a logger' as any)).toEqual('a github client')
+      expect(github.auth).toHaveBeenCalledWith(1, 'a logger')
+    })
+  })
 })

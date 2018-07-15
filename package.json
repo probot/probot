@@ -76,6 +76,7 @@
     "bunyan-sentry-stream": "^1.1.0",
     "cache-manager": "^2.4.0",
     "commander": "^2.11.0",
+    "deprecated-decorator": "^0.1.6",
     "dotenv": "~6.0.0",
     "express": "^4.16.2",
     "express-async-errors": "^3.0.0",

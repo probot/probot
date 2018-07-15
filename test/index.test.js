@@ -12,7 +12,6 @@ describe('Probot', () => {
 
     event = {
       name: 'push',
-      event: 'push',
       payload: require('./fixtures/webhook/push')
     }
   })

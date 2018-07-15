@@ -5,7 +5,7 @@ const {GitHubApp} = require('../../src/github-app')
 
 module.exports = {
   createApp (plugin = () => {}) {
-    const github = new GitHubApp({})
+    const github = new GitHubApp(1, 'test')
     github.jwt = jest.fn().mockReturnValue('test')
     const app = new Application({github})
     app.load(plugin)

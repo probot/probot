@@ -23,7 +23,7 @@ describe('Application', () => {
     // Clear log output
     output = []
 
-    github = new GitHubApp({ } as any)
+    github = new GitHubApp(1, 'cert')
     github.auth = jest.fn().mockReturnValue({})
 
     app = new Application({ github })

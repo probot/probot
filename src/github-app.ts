@@ -21,25 +21,30 @@ export interface Options {
   cert: string
 }
 
-/**
- *
- */
 export class GitHubApp {
   public log: LoggerWithTarget
   public id: number
   public cert: string
 
-  constructor ({ id, cert }: Options) {
+  /**
+   * @param id - ID of the GitHub App
+   * @param cert - The private key of the GitHub App
+   */
+  constructor (id: number, cert: string) {
     this.id = id
     this.cert = cert
     this.log = wrapLogger(logger, logger)
   }
 
+  /**
+   * Create a new JWT, which is used to [authenticate as a GitHub
+   * App](https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#authenticating-as-a-github-app)
+   */
   public jwt () {
     const payload = {
       exp: Math.floor(Date.now() / 1000) + 60,  // JWT expiration time
       iat: Math.floor(Date.now() / 1000),       // Issued at time
-      iss: this.id                           // GitHub App ID
+      iss: this.id                              // GitHub App ID
     }
 
     // Sign with RSA SHA256

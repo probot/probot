@@ -39,7 +39,7 @@ export class Probot {
     this.server = createServer({ logger })
     this.server.use(this.webhook.middleware)
 
-    this.github = new GitHubApp({ id: options.id, cert: options.cert })
+    this.github = new GitHubApp(options.id, options.cert)
 
     // Log all received webhooks
     this.webhook.on('*', (event: any) => {

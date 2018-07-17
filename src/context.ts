@@ -1,3 +1,4 @@
+import { WebhookEvent, WebhookPayloadWithRepository } from '@octokit/webhooks'
 import yaml from 'js-yaml'
 import path from 'path'
 import { GitHubAPI } from './github'
@@ -19,28 +20,19 @@ import { LoggerWithTarget } from './wrap-logger'
  * @property {logger} log - A logger
  */
 
-export interface WebhookEvent {
-  event: string
-  id: string
-  payload: WebhookPayloadWithRepository
-  protocol: 'http' | 'https'
-  host: string
-  url: string
-}
-
 export class Context implements WebhookEvent {
-  public event: string
+  public name: string
   public id: string
   public payload: WebhookPayloadWithRepository
-  public protocol: 'http' | 'https'
-  public host: string
-  public url: string
+  public protocol?: 'http' | 'https'
+  public host?: string
+  public url?: string
 
   public github: GitHubAPI
   public log: LoggerWithTarget
 
   constructor (event: WebhookEvent, github: GitHubAPI, log: LoggerWithTarget) {
-    this.event = event.event
+    this.name = event.name
     this.id = event.id
     this.payload = event.payload
     this.protocol = event.protocol
@@ -49,6 +41,11 @@ export class Context implements WebhookEvent {
 
     this.github = github
     this.log = log
+  }
+
+  // Maintain backward compatability
+  public get event (): string {
+    return this.name
   }
 
   /**
@@ -71,7 +68,7 @@ export class Context implements WebhookEvent {
     }
 
     return Object.assign({
-      owner: repo.owner.login || repo.owner.name,
+      owner: repo.owner.login || repo.owner.name!,
       repo: repo.name
     }, object)
   }
@@ -100,7 +97,7 @@ export class Context implements WebhookEvent {
    * @type {boolean}
    */
   get isBot () {
-    return this.payload.sender.type === 'Bot'
+    return this.payload.sender!.type === 'Bot'
   }
 
   /**
@@ -159,43 +156,5 @@ export class Context implements WebhookEvent {
         throw err
       }
     }
-  }
-}
-
-export interface PayloadRepository {
-  [key: string]: any
-  full_name: string
-  name: string
-  owner: {
-    [key: string]: any
-    login: string
-    name: string
-  }
-  html_url: string
-}
-
-export interface WebhookPayloadWithRepository {
-  [key: string]: any
-  repository: PayloadRepository
-  issue: {
-    [key: string]: any
-    number: number
-    html_url: string
-    body: string
-  }
-  pull_request: {
-    [key: string]: any
-    number: number
-    html_url: string
-    body: string
-  }
-  sender: {
-    [key: string]: any
-    type: string
-  }
-  action: string
-  installation: {
-    id: number
-    [key: string]: any
   }
 }

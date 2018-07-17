@@ -12,7 +12,6 @@ describe('Probot', () => {
 
     event = {
       name: 'push',
-      event: 'push',
       payload: require('./fixtures/webhook/push')
     }
   })
@@ -22,7 +21,7 @@ describe('Probot', () => {
       const app = probot.load(() => {})
       app.receive = jest.fn()
       await probot.webhook.receive(event)
-      expect(app.receive).toHaveBeenCalledWith({ event: event.name, payload: event.payload })
+      expect(app.receive).toHaveBeenCalledWith(event)
     })
 
     it('responds with the correct error if webhook secret does not match', async () => {

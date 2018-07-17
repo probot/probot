@@ -1,15 +1,16 @@
+import { WebhookEvent } from '@octokit/webhooks'
 import express from 'express'
 import { EventEmitter } from 'promise-events'
 import { ApplicationFunction } from '.'
-import { Context, WebhookEvent } from './context'
+import { Context } from './context'
 import { GitHubAPI } from './github'
 import { logger } from './logger'
 import { LoggerWithTarget, wrapLogger } from './wrap-logger'
 
 // Some events can't get an authenticated client (#382):
-function isUnauthenticatedEvent (context: Context) {
-  return !context.payload.installation ||
-    (context.event === 'installation' && context.payload.action === 'deleted')
+function isUnauthenticatedEvent (event: WebhookEvent) {
+  return !event.payload.installation ||
+    (event.name === 'installation' && event.payload.action === 'deleted')
 }
 
 /**
@@ -50,10 +51,16 @@ export class Application {
   }
 
   public async receive (event: WebhookEvent) {
+    if ((event as any).event) {
+      // tslint:disable-next-line:no-console
+      console.warn(new Error('Propery `event` is deprecated, use `name`'))
+      event = { name: (event as any).event, ...event }
+    }
+
     return Promise.all([
       this.events.emit('*', event),
-      this.events.emit(event.event, event),
-      this.events.emit(`${event.event}.${event.payload.action}`, event)
+      this.events.emit(event.name, event),
+      this.events.emit(`${ event.name }.${ event.payload.action }`, event)
     ])
   }
 
@@ -119,7 +126,7 @@ export class Application {
   public on (eventName: string | string[], callback: (context: Context) => Promise<void>) {
     if (typeof eventName === 'string') {
 
-      return this.events.on(eventName, async (event: Context) => {
+      return this.events.on(eventName, async (event: WebhookEvent) => {
         const log = this.log.child({ name: 'event', id: event.id })
 
         try {
@@ -129,7 +136,7 @@ export class Application {
             github = await this.auth()
             log.debug('`context.github` is unauthenticated. See https://probot.github.io/docs/github-api/#unauthenticated-events')
           } else {
-            github = await this.auth(event.payload.installation.id, log)
+            github = await this.auth(event.payload.installation!.id, log)
           }
 
           const context = new Context(event, github, log)

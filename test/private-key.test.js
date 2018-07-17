@@ -29,7 +29,7 @@ describe('private-key', function () {
         expect(findPrivateKey(keyfilePath)).toEqual(privateKey)
       })
     })
-  
+
     describe('when a PRIVATE_KEY env var is provided', function () {
       beforeEach(function () {
         process.env.PRIVATE_KEY = privateKey

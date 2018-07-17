@@ -9,8 +9,7 @@ describe('private-key', function () {
   let keyfilePath
 
   beforeEach(function () {
-    privateKey = 'I AM PRIVET KEY!?!!~1!'
-    privateKey64 = Buffer.from(privateKey).toString('base64')
+    privateKey = '-----BEGIN RSA PRIVATE KEY-----\nTHIs+is+A+Fak3+K3y\n-----END RSA PRIVATE KEY-----'
     keyfilePath = '/some/path'
     fs.readFileSync = jest.fn().mockReturnValue(privateKey)
   })
@@ -30,20 +29,6 @@ describe('private-key', function () {
         expect(findPrivateKey(keyfilePath)).toEqual(privateKey)
       })
     })
-
-    describe('when a PRIVATE_KEY_BASE64 env var is provided', function () {
-      beforeEach(function () {
-        process.env.PRIVATE_KEY_BASE64 = privateKey64
-      })
-
-      it('should convert the base64 key back to the .pem format', function () {
-        expect(findPrivateKey()).toEqual(privateKey)
-      })
-
-      afterEach(function () {
-        delete process.env.PRIVATE_KEY_BASE64
-      })
-    })
   
     describe('when a PRIVATE_KEY env var is provided', function () {
       beforeEach(function () {
@@ -55,13 +40,14 @@ describe('private-key', function () {
       })
 
       it('should return the key', function () {
+        process.env.PRIVATE_KEY = privateKey
         expect(findPrivateKey()).toEqual(privateKey)
       })
     })
 
     describe('when a PRIVATE_KEY has line breaks', function () {
       beforeEach(function () {
-        process.env.PRIVATE_KEY = 'line 1\\nline 2'
+        process.env.PRIVATE_KEY = '-----BEGIN RSA PRIVATE KEY-----\\nTHIs+is+A+Fak3+K3y\\n-----END RSA PRIVATE KEY-----'
       })
 
       afterEach(function () {
@@ -69,7 +55,21 @@ describe('private-key', function () {
       })
 
       it('should return the key', function () {
-        expect(findPrivateKey()).toEqual('line 1\nline 2')
+        expect(findPrivateKey()).toEqual(privateKey)
+      })
+    })
+
+    describe('when a PRIVATE_KEY is base64 encoded', function () {
+      beforeEach(function () {
+        process.env.PRIVATE_KEY = Buffer.from(privateKey).toString('base64')
+      })
+
+      afterEach(function () {
+        delete process.env.PRIVATE_KEY
+      })
+
+      it('should decode and return the key', function () {
+        expect(findPrivateKey()).toEqual(privateKey)
       })
     })
 

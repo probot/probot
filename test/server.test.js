@@ -4,11 +4,9 @@ const {logger} = require('../src/logger')
 
 describe('server', function () {
   let server
-  let webhook
 
   beforeEach(() => {
-    webhook = jest.fn((req, res, next) => next())
-    server = createServer({webhook, logger})
+    server = createServer({logger})
 
     // Error handler to avoid printing logs
     server.use(function (err, req, res, next) {
@@ -19,13 +17,6 @@ describe('server', function () {
   describe('GET /ping', () => {
     it('returns a 200 response', () => {
       return request(server).get('/ping').expect(200, 'PONG')
-    })
-  })
-
-  describe('webhook handler', () => {
-    it('should 500 on a webhook error', () => {
-      webhook.mockImplementation((req, res, callback) => callback(new Error('webhook error')))
-      return request(server).post('/').expect(500)
     })
   })
 

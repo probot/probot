@@ -12,25 +12,30 @@ describe('Probot', () => {
 
     event = {
       name: 'push',
-      event: 'push',
       payload: require('./fixtures/webhook/push')
     }
   })
 
   describe('webhook delivery', () => {
+    let webhooks
+
+    beforeEach(() => {
+      webhooks = probot.github.webhooks
+    })
+
     it('forwards webhooks to the app', async () => {
       const app = probot.load(() => {})
       app.receive = jest.fn()
-      await probot.webhook.receive(event)
-      expect(app.receive).toHaveBeenCalledWith({ event: event.name, payload: event.payload })
+      await webhooks.receive(event)
+      expect(app.receive).toHaveBeenCalledWith(event)
     })
 
     it('responds with the correct error if webhook secret does not match', async () => {
       probot.logger.error = jest.fn()
-      probot.webhook.on('push', () => { throw new Error('X-Hub-Signature does not match blob signature') })
+      webhooks.on('push', () => { throw new Error('X-Hub-Signature does not match blob signature') })
 
       try {
-        await probot.webhook.receive(event)
+        await webhooks.receive(event)
       } catch (e) {
         expect(probot.logger.error.mock.calls[0]).toMatchSnapshot()
       }
@@ -38,10 +43,10 @@ describe('Probot', () => {
 
     it('responds with the correct error if webhook secret is not found', async () => {
       probot.logger.error = jest.fn()
-      probot.webhook.on('push', () => { throw new Error('No X-Hub-Signature found on request') })
+      webhooks.on('push', () => { throw new Error('No X-Hub-Signature found on request') })
 
       try {
-        await probot.webhook.receive(event)
+        await webhooks.receive(event)
       } catch (e) {
         expect(probot.logger.error.mock.calls[0]).toMatchSnapshot()
       }
@@ -49,10 +54,10 @@ describe('Probot', () => {
 
     it('responds with the correct error if webhook secret is wrong', async () => {
       probot.logger.error = jest.fn()
-      probot.webhook.on('push', () => { throw new Error('webhooks:receiver ignored: POST / due to missing headers: x-hub-signature') })
+      webhooks.on('push', () => { throw new Error('webhooks:receiver ignored: POST / due to missing headers: x-hub-signature') })
 
       try {
-        await probot.webhook.receive(event)
+        await webhooks.receive(event)
       } catch (e) {
         expect(probot.logger.error.mock.calls[0]).toMatchSnapshot()
       }
@@ -60,10 +65,10 @@ describe('Probot', () => {
 
     it('responds with the correct error if the PEM file is missing', async () => {
       probot.logger.error = jest.fn()
-      probot.webhook.on('*', () => { throw new Error('error:0906D06C:PEM routines:PEM_read_bio:no start line') })
+      webhooks.on('*', () => { throw new Error('error:0906D06C:PEM routines:PEM_read_bio:no start line') })
 
       try {
-        await probot.webhook.receive(event)
+        await webhooks.receive(event)
       } catch (e) {
         expect(probot.logger.error.mock.calls[0]).toMatchSnapshot()
       }
@@ -71,10 +76,10 @@ describe('Probot', () => {
 
     it('responds with the correct error if the jwt could not be decoded', async () => {
       probot.logger.error = jest.fn()
-      probot.webhook.on('*', () => { throw new Error('{"message":"A JSON web token could not be decoded","documentation_url":"https://developer.github.com/v3"}') })
+      webhooks.on('*', () => { throw new Error('{"message":"A JSON web token could not be decoded","documentation_url":"https://developer.github.com/v3"}') })
 
       try {
-        await probot.webhook.receive(event)
+        await webhooks.receive(event)
       } catch (e) {
         expect(probot.logger.error.mock.calls[0]).toMatchSnapshot()
       }
@@ -184,7 +189,7 @@ describe('Probot', () => {
     it('forwards events to each plugin', async () => {
       const spy = jest.fn()
       const app = probot.load(app => app.on('push', spy))
-      app.auth = jest.fn().mockReturnValue(Promise.resolve({}))
+      app.github.auth = jest.fn().mockReturnValue(Promise.resolve({}))
 
       await probot.receive(event)
 
@@ -213,7 +218,7 @@ describe('Probot', () => {
       const spy = jest.fn()
 
       const plugin = async app => {
-        const github = await app.auth()
+        const github = await app.github.auth()
         const res = await github.apps.getInstallations({})
         return spy(res)
       }
@@ -227,7 +232,7 @@ describe('Probot', () => {
       process.env.GHE_HOST = 'https://notreallygithub.com'
 
       try {
-        await app.auth()
+        await app.github.auth()
       } catch (e) {
         expect(e).toMatchSnapshot()
       }

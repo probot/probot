@@ -1,16 +1,18 @@
 import fs = require('fs')
 import path = require('path')
 
+import { WebhookEvent } from '@octokit/webhooks'
 import { Context } from '../src/context'
 import { GitHubAPI, OctokitError } from '../src/github'
 
 describe('Context', () => {
-  let event: any
+  let event: WebhookEvent
   let context: Context
 
   beforeEach(() => {
     event = {
-      event: 'push',
+      id: '123',
+      name: 'push',
       payload: {
         issue: { number: 4 },
         repository: {
@@ -25,6 +27,11 @@ describe('Context', () => {
 
   it('inherits the payload', () => {
     expect(context.payload).toBe(event.payload)
+  })
+
+  it('aliases the event name', () => {
+    expect(context.name).toEqual('push')
+    expect(context.event).toEqual('push')
   })
 
   describe('repo', () => {
@@ -212,6 +219,22 @@ describe('Context', () => {
         baz: 11,
         foo: 5
       })
+    })
+  })
+
+  describe('isBot', () => {
+    test('returns true if sender is a bot', () => {
+      event.payload.sender = { type: 'Bot' }
+      context = new Context(event, {} as any, {} as any)
+
+      expect(context.isBot).toBe(true)
+    })
+
+    test('returns false if sender is not a bot', () => {
+      event.payload.sender = { type: 'User' }
+      context = new Context(event, {} as any, {} as any)
+
+      expect(context.isBot).toBe(false)
     })
   })
 })

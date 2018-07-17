@@ -1,15 +1,13 @@
 // FIXME: move this to a test helper that can be used by other apps
 
-const cacheManager = require('cache-manager')
 const {Application} = require('../../src')
-
-const cache = cacheManager.caching({store: 'memory'})
-
-const jwt = jest.fn().mockReturnValue('test')
+const {GitHubApp} = require('../../src/github-app')
 
 module.exports = {
   createApp (plugin = () => {}) {
-    const app = new Application({app: jwt, cache})
+    const github = new GitHubApp({})
+    github.jwt = jest.fn().mockReturnValue('test')
+    const app = new Application({github})
     app.load(plugin)
     return app
   }

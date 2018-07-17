@@ -1,10 +1,13 @@
+import { WebhookEvent } from '@octokit/webhooks'
 import { Application } from '../src/application'
 import { Context } from '../src/context'
+import { GitHubApp } from '../src/github-app'
 import { logger } from '../src/logger'
 
 describe('Application', () => {
+  let github: GitHubApp
   let app: Application
-  let event: any
+  let event: WebhookEvent
   let output: any
 
   beforeAll(() => {
@@ -21,12 +24,14 @@ describe('Application', () => {
     // Clear log output
     output = []
 
-    app = new Application({} as any)
-    app.auth = jest.fn().mockReturnValue({})
+    github = new GitHubApp({} as any)
+    github.auth = jest.fn().mockReturnValue({})
+
+    app = new Application({ github })
 
     event = {
-      event: 'test',
       id: '123-456',
+      name: 'test',
       payload: {
         action: 'foo',
         installation: { id: 1 }
@@ -71,13 +76,14 @@ describe('Application', () => {
     })
 
     it('calls callback x amount of times when an array of x actions is passed', async () => {
-      const event2 = {
-        event: 'arrayTest',
+      const event2: WebhookEvent = {
+        id: '123',
+        name: 'arrayTest',
         payload: {
           action: 'bar',
           installation: { id: 2 }
         }
-      } as any
+      }
 
       const spy = jest.fn()
       app.on(['test.foo', 'arrayTest.bar'], spy)
@@ -105,8 +111,8 @@ describe('Application', () => {
 
     it('returns an authenticated client for installation.created', async () => {
       event = {
-        event: 'installation',
         id: '123-456',
+        name: 'installation',
         payload: {
           action: 'created',
           installation: { id: 1 }
@@ -119,13 +125,13 @@ describe('Application', () => {
 
       await app.receive(event)
 
-      expect(app.auth).toHaveBeenCalledWith(1, expect.anything())
+      expect(github.auth).toHaveBeenCalledWith(1, expect.anything())
     })
 
     it('returns an unauthenticated client for installation.deleted', async () => {
       event = {
-        event: 'installation',
         id: '123-456',
+        name: 'installation',
         payload: {
           action: 'deleted',
           installation: { id: 1 }
@@ -138,13 +144,13 @@ describe('Application', () => {
 
       await app.receive(event)
 
-      expect(app.auth).toHaveBeenCalledWith()
+      expect(github.auth).toHaveBeenCalledWith()
     })
 
     it('returns an authenticated client for events without an installation', async () => {
       event = {
-        event: 'foobar',
         id: '123-456',
+        name: 'foobar',
         payload: { /* no installation */ }
       }
 
@@ -154,7 +160,7 @@ describe('Application', () => {
 
       await app.receive(event)
 
-      expect(app.auth).toHaveBeenCalledWith()
+      expect(github.auth).toHaveBeenCalledWith()
     })
   })
 
@@ -227,7 +233,6 @@ describe('Application', () => {
 
     beforeEach(() => {
       error = new Error('testing')
-      app.log.error = jest.fn() as any
     })
 
     it('logs errors thrown from handlers', async () => {
@@ -235,11 +240,7 @@ describe('Application', () => {
         throw error
       })
 
-      try {
-        await app.receive(event)
-      } catch (err) {
-        // Expected
-      }
+      await expect(app.receive(event)).rejects.toThrow(error)
 
       expect(output.length).toBe(1)
       expect(output[0].err.message).toEqual('testing')
@@ -249,15 +250,39 @@ describe('Application', () => {
     it('logs errors from rejected promises', async () => {
       app.on('test', () => Promise.reject(error))
 
-      try {
-        await app.receive(event)
-      } catch (err) {
-        // Expected
-      }
+      await expect(app.receive(event)).rejects.toThrow(error)
 
       expect(output.length).toBe(1)
       expect(output[0].err.message).toEqual('testing')
       expect(output[0].event.id).toEqual(event.id)
+    })
+  })
+
+  describe('deprecations', () => {
+    test('app() calls github.jwt()', () => {
+      github.jwt = jest.fn().mockReturnValue('testing')
+      expect(app.app()).toEqual('testing')
+      expect(github.jwt).toHaveBeenCalled()
+    })
+
+    test('auth() calls github.auth()', async () => {
+      github.auth = jest.fn().mockReturnValue(Promise.resolve('a github client'))
+      expect(await app.auth(1, 'a logger' as any)).toEqual('a github client')
+      expect(github.auth).toHaveBeenCalledWith(1, 'a logger')
+    })
+
+    test('recieve() accepts param with {event}', async () => {
+      const spy = jest.fn()
+      app.events.on('deprecated', spy)
+      await app.receive({ event: 'deprecated', payload: { action: 'test' } } as any)
+      expect(spy).toHaveBeenCalled()
+    })
+
+    test('recieve() accepts param with {name,event}', async () => {
+      const spy = jest.fn()
+      app.events.on('real-event-name', spy)
+      await app.receive({ name: 'real-event-name', event: 'deprecated', payload: { action: 'test' } } as any)
+      expect(spy).toHaveBeenCalled()
     })
   })
 })

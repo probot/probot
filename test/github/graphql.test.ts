@@ -1,6 +1,6 @@
-const { GitHubAPI } = require('../../src/github')
-const nock = require('nock')
-const Bottleneck = require('bottleneck')
+import Bottleneck from 'bottleneck'
+import nock from 'nock'
+import { GitHubAPI } from '../../src/github'
 
 describe('github/graphql', () => {
   let github
@@ -30,29 +30,29 @@ describe('github/graphql', () => {
 
       nock('https://api.github.com', {
         reqheaders: { 'content-type': 'application/json' }
-      }).post('/graphql', {query})
+      }).post('/graphql', { query })
         .reply(200, { data })
 
       expect(await github.query(query)).toEqual(data)
     })
 
     test('makes a graphql query with variables', async () => {
-      const variables = {owner: 'probot', repo: 'test'}
+      const variables = { owner: 'probot', repo: 'test' }
 
       nock('https://api.github.com', {
         reqheaders: { 'content-type': 'application/json' }
-      }).post('/graphql', {query, variables})
+      }).post('/graphql', { query, variables })
         .reply(200, { data })
 
       expect(await github.query(query, variables)).toEqual(data)
     })
 
     test('uses authentication', async () => {
-      github.authenticate({type: 'token', token: 'testing'})
+      github.authenticate({ type: 'token', token: 'testing' })
 
       nock('https://api.github.com', {
         reqheaders: { authorization: 'token testing' }
-      }).post('/graphql', {query})
+      }).post('/graphql', { query })
         .reply(200, { data })
 
       await github.query(query)
@@ -61,16 +61,16 @@ describe('github/graphql', () => {
     test('allows custom headers', async () => {
       nock('https://api.github.com', {
         reqheaders: { 'foo': 'bar' }
-      }).post('/graphql', {query})
+      }).post('/graphql', { query })
         .reply(200, { data })
 
-      await github.query(query, undefined, {foo: 'bar'})
+      await github.query(query, undefined, { foo: 'bar' })
     })
 
     test('raises errors', async () => {
-      const response = {'data': null, 'errors': [{'message': 'Unexpected end of document'}]}
+      const response = { 'data': null, 'errors': [{ 'message': 'Unexpected end of document' }] }
 
-      nock('https://api.github.com').post('/graphql', {query})
+      nock('https://api.github.com').post('/graphql', { query })
         .reply(200, response)
 
       await expect(github.query(query)).rejects.toThrow('Unexpected end of document')
@@ -94,7 +94,7 @@ describe('github/graphql', () => {
 
       nock('https://notreallygithub.com', {
         reqheaders: { 'content-type': 'application/json' }
-      }).post('/api/graphql', {query})
+      }).post('/api/graphql', { query })
         .reply(200, { data })
 
       expect(await github.query(query)).toEqual(data)

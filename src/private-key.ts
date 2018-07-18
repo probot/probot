@@ -31,16 +31,14 @@ function findPrivateKey (filepath: string): Buffer | string {
     if (cert.includes(begin) && cert.includes(end)) {
       // Full key with new lines
       return cert.replace(/\\n/g, '\n')
-    } else {
+    } else if (isBase64(cert)) {
       // Cert doesn't look like an RSA key, so let's see if it matches when we convert it
-      if (isBase64(cert)) {
-        const decodedCert = Buffer.from(cert, 'base64').toString()
-        if (decodedCert.includes(begin) && decodedCert.includes(end)) {
-          return decodedCert
-        }
+      const decodedCert = Buffer.from(cert, 'base64').toString()
+      if (decodedCert.includes(begin) && decodedCert.includes(end)) {
+        return decodedCert
       }
     }
-    throw new Error(`The contents of \`PRIVATE_KEY\` could not be validated. Please check to ensure you've copied the contents of the .pem file correctly.`)
+    throw new Error('The contents of \`PRIVATE_KEY\` could not be validated. Please check to ensure you have copied the contents of the .pem file correctly.')
   }
   if (process.env.PRIVATE_KEY_PATH) {
     return fs.readFileSync(process.env.PRIVATE_KEY_PATH)

@@ -23,7 +23,7 @@ export function GitHubAPI (options: Options = {} as any) {
 }
 
 export interface Options extends Octokit.Options {
-  debug: boolean
+  debug?: boolean
   logger: Logger
   limiter?: any
 }

@@ -1,29 +1,30 @@
 import Bottleneck from 'bottleneck'
 import nock from 'nock'
-import { GitHubAPI } from '../../src/github'
+import { GitHubAPI, Options } from '../../src/github'
+import { logger } from '../../src/logger'
 
 describe('github/graphql', () => {
-  let github
+  let github: GitHubAPI
 
   // Expect there are no more pending nock requests
   beforeEach(async () => nock.cleanAll())
   afterEach(() => expect(nock.pendingMocks()).toEqual([]))
 
   beforeEach(() => {
-    const logger = {
-      debug: jest.fn(),
-      trace: jest.fn()
-    }
-
     // Set a shorter limiter, otherwise tests are _slow_
     const limiter = new Bottleneck()
 
-    github = new GitHubAPI({ logger, limiter })
+    const options: Options = {
+      limiter,
+      logger
+    }
+
+    github = GitHubAPI(options)
   })
 
   describe('query', () => {
     const query = 'query { viewer { login } }'
-    let data
+    let data: any
 
     test('makes a graphql query', async () => {
       data = { viewer: { login: 'bkeepers' } }

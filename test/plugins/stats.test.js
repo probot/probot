@@ -1,11 +1,10 @@
 const request = require('supertest')
 const express = require('express')
 const nock = require('nock')
-const plugin = require('../../src/plugins/stats')
-
 const helper = require('./helper')
+const appFn = require('../../src/plugins/stats')
 
-describe('stats', function () {
+describe('stats app', function () {
   let app, server
 
   beforeEach(() => {
@@ -26,7 +25,7 @@ describe('stats', function () {
           {private: false, stargazers_count: 2}
         ]})
 
-      app = helper.createApp(plugin)
+      app = helper.createApp(appFn)
       server.use(app.router)
     })
 
@@ -40,7 +39,7 @@ describe('stats', function () {
     beforeEach(async () => {
       process.env.DISABLE_STATS = 'true'
 
-      app = helper.createApp(plugin)
+      app = helper.createApp(appFn)
       server.use(app.router)
     })
 
@@ -61,7 +60,7 @@ describe('stats', function () {
           {private: false, stargazers_count: 2}
         ]})
 
-      app = helper.createApp(plugin)
+      app = helper.createApp(appFn)
       server.use(app.router)
     })
 

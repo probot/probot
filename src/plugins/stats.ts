@@ -1,7 +1,7 @@
 import { AnyResponse } from '@octokit/rest'
 import { Request,Response } from 'express'
 
-// Built-in plugin to expose stats about the deployment
+// Built-in app to expose stats about the deployment
 module.exports = async (app: any): Promise<void> => {
   if (process.env.DISABLE_STATS) {
     return
@@ -12,7 +12,7 @@ module.exports = async (app: any): Promise<void> => {
   // Cache of stats that get reported
   const stats = { installations: 0, popular: [{}] }
 
-  // Refresh the stats when the plugin is loaded
+  // Refresh the stats when the ApplicationFunction is loaded
   const initializing = refresh()
 
   // Refresh the stats on an interval

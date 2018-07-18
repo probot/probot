@@ -1,18 +1,18 @@
 const {resolve} = require('../src/resolver')
 
-const stubPluginPath = require.resolve('./fixtures/plugin/stub-plugin')
+const stubAppFnPath = require.resolve('./fixtures/plugin/stub-plugin')
 const basedir = process.cwd()
 
 describe('resolver', () => {
   let stubResolver
 
   beforeEach(() => {
-    stubResolver = jest.fn().mockReturnValue(stubPluginPath)
+    stubResolver = jest.fn().mockReturnValue(stubAppFnPath)
   })
 
   it('loads the module at the resolved path', () => {
     const module = resolve('foo', {resolver: stubResolver})
-    expect(module).toBe(require(stubPluginPath))
+    expect(module).toBe(require(stubAppFnPath))
     expect(stubResolver).toHaveBeenCalledWith('foo', {basedir})
   })
 })

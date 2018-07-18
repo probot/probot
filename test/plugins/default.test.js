@@ -1,13 +1,13 @@
 const request = require('supertest')
 const express = require('express')
-const plugin = require('../../src/plugins/default')
+const appFn = require('../../src/plugins/default')
 const helper = require('./helper')
 
-describe('default plugin', function () {
+describe('default app', function () {
   let server, app
 
   beforeEach(async () => {
-    app = helper.createApp(plugin)
+    app = helper.createApp(appFn)
     server = express()
     server.use(app.router)
   })

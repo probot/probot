@@ -14,7 +14,7 @@ function isUnauthenticatedEvent (event: WebhookEvent) {
 }
 
 /**
- * The `app` parameter available to apps
+ * The `app` parameter available to `ApplicationFunction`s
  *
  * @property {logger} log - A logger
  */
@@ -37,14 +37,14 @@ export class Application {
   }
 
   /**
-   * Loads a Probot plugin
-   * @param plugin - Probot plugin to load
+   * Loads an ApplicationFunction into the current Application
+   * @param appFn - Probot application function to load
    */
-  public load (app: ApplicationFunction | ApplicationFunction[]): Application {
-    if (Array.isArray(app)) {
-      app.forEach(a => this.load(a))
+  public load (appFn: ApplicationFunction | ApplicationFunction[]): Application {
+    if (Array.isArray(appFn)) {
+      appFn.forEach(a => this.load(a))
     } else {
-      app(this)
+      appFn(this)
     }
 
     return this

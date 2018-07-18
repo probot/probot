@@ -83,11 +83,11 @@ describe('Probot', () => {
   describe('server', () => {
     it('prefixes paths with route name', () => {
       probot.load(app => {
-        const route = app.route('/my-plugin')
+        const route = app.route('/my-app')
         route.get('/foo', (req, res) => res.end('foo'))
       })
 
-      return request(probot.server).get('/my-plugin/foo').expect(200, 'foo')
+      return request(probot.server).get('/my-app/foo').expect(200, 'foo')
     })
 
     it('allows routes with no path', () => {
@@ -108,7 +108,7 @@ describe('Probot', () => {
       return request(probot.server).get('/').expect(200, 'foo')
     })
 
-    it('isolates plugins from affecting eachother', async () => {
+    it('isolates apps from affecting eachother', async () => {
       ['foo', 'bar'].forEach(name => {
         probot.load(app => {
           const route = app.route('/' + name)
@@ -180,7 +180,7 @@ describe('Probot', () => {
   })
 
   describe('receive', () => {
-    it('forwards events to each plugin', async () => {
+    it('forwards events to each app', async () => {
       const spy = jest.fn()
       const app = probot.load(app => app.on('push', spy))
       app.auth = jest.fn().mockReturnValue(Promise.resolve({}))
@@ -211,13 +211,13 @@ describe('Probot', () => {
     it('requests from the correct API URL', async () => {
       const spy = jest.fn()
 
-      const plugin = async app => {
+      const appFn = async app => {
         const github = await app.auth()
         const res = await github.apps.getInstallations({})
         return spy(res)
       }
 
-      await plugin(app)
+      await appFn(app)
       await app.receive(event)
       expect(spy.mock.calls[0][0].data[0]).toBe('I work!')
     })

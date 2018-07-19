@@ -25,19 +25,20 @@ function findPrivateKey (filepath: string): Buffer | string {
     return fs.readFileSync(filepath)
   }
   if (process.env.PRIVATE_KEY) {
-    const cert = process.env.PRIVATE_KEY
+    let cert = process.env.PRIVATE_KEY
+
+    if (isBase64(cert)) {
+      // Decode base64-encoded certificate
+      cert = Buffer.from(cert, 'base64').toString()
+    }
+
     const begin = '-----BEGIN RSA PRIVATE KEY-----'
     const end = '-----END RSA PRIVATE KEY-----'
     if (cert.includes(begin) && cert.includes(end)) {
       // Full key with new lines
       return cert.replace(/\\n/g, '\n')
-    } else if (isBase64(cert)) {
-      // Cert doesn't look like an RSA key, so let's see if it matches when we convert it
-      const decodedCert = Buffer.from(cert, 'base64').toString()
-      if (decodedCert.includes(begin) && decodedCert.includes(end)) {
-        return decodedCert
-      }
     }
+
     throw new Error('The contents of \`PRIVATE_KEY\` could not be validated. Please check to ensure you have copied the contents of the .pem file correctly.')
   }
   if (process.env.PRIVATE_KEY_PATH) {

@@ -121,3 +121,26 @@ module.exports = app => {
 ```
 
 Check out [probot/unfurl](https://github.com/probot/unfurl) to see it in action.
+
+## Messages
+
+[probot-messages](https://github.com/dessant/probot-messages) is an extension for delivering messages that require user action to ensure the correct operation of the app, such as configuring the app after installation, or fixing configuration errors. A new issue is submitted for messages that don't already have an open issue, otherwise an optional update is posted on the existing issue in the form of a comment.
+
+```js
+const sendMessage = require('probot-messages');
+
+module.exports = app => {
+  app.on('installation_repositories.added', async context => {
+    for (const item of context.payload.repositories_added) {
+      const [owner, repo] = item.full_name.split('/');
+      await sendMessage(
+        app,
+        context,
+        '[{appName}] Getting started',
+        'Follow these steps to configure the app...',
+        {owner, repo}
+      );
+    }
+  });
+};
+```

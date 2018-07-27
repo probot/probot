@@ -53,7 +53,8 @@
       "ts-jest": {
         "skipBabel": true
       }
-    }
+    },
+    "testURL": "http://localhost/"
   },
   "keywords": [
     "probot",

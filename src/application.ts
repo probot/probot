@@ -7,9 +7,6 @@ import { GitHubAPI } from './github'
 import { logger } from './logger'
 import { LoggerWithTarget, wrapLogger } from './wrap-logger'
 
-// Cache for 1 minute less than GitHub expiry
-const installationTokenTTL = parseInt(process.env.INSTALLATION_TOKEN_TTL || '3540', 10)
-
 // Some events can't get an authenticated client (#382):
 function isUnauthenticatedEvent (event: WebhookEvent) {
   return !event.payload.installation ||
@@ -193,6 +190,9 @@ export class Application {
       debug: process.env.LOG_LEVEL === 'trace',
       logger: log.child({ name: 'github', installation: String(id) })
     })
+
+    // Cache for 1 minute less than GitHub expiry
+    const installationTokenTTL = parseInt(process.env.INSTALLATION_TOKEN_TTL || '3540', 10)
 
     if (id) {
       const res = await this.cache.wrap(`app:${id}:token`, () => {

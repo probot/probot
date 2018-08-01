@@ -352,7 +352,7 @@ describe('Application', () => {
       })
       await app.receive(event)
 
-      // Sleep for 2 seconds to let token cache expire
+      // Sleep longer than ttl value to let token cache expire
       const sleep = async () => new Promise(resolve => setTimeout(resolve, 1200))
       await sleep()
 

@@ -19,7 +19,7 @@ const cache = cacheManager.caching({
   ttl: 60 * 60 // 1 hour
 })
 
-const defaultApps: ApplicationFunction[] = [
+const defaultAppFns: ApplicationFunction[] = [
   require('./plugins/default'),
   require('./plugins/sentry'),
   require('./plugins/stats')
@@ -75,9 +75,9 @@ export class Probot {
     return Promise.all(this.apps.map(app => app.receive(event)))
   }
 
-  public load (appFunction: string | ApplicationFunction) {
-    if (typeof appFunction === 'string') {
-      appFunction = resolve(appFunction) as ApplicationFunction
+  public load (appFn: string | ApplicationFunction) {
+    if (typeof appFn === 'string') {
+      appFn = resolve(appFn) as ApplicationFunction
     }
 
     const app = new Application({ app: this.app, cache, catchErrors: true })
@@ -85,19 +85,19 @@ export class Probot {
     // Connect the router from the app to the server
     this.server.use(app.router)
 
-    // Initialize the plugin
-    app.load(appFunction)
+    // Initialize the ApplicationFunction
+    app.load(appFn)
     this.apps.push(app)
 
     return app
   }
 
-  public setup (apps: Array<string | ApplicationFunction>) {
+  public setup (appFns: Array<string | ApplicationFunction>) {
     // Log all unhandled rejections
     process.on('unhandledRejection', this.errorHandler)
 
-    // Load the given apps along with the default apps
-    apps.concat(defaultApps).forEach(app => this.load(app))
+    // Load the given appFns along with the default ones
+    appFns.concat(defaultAppFns).forEach(appFn => this.load(appFn))
 
     // Register error handler as the last middleware
     this.server.use(logRequestErrors)

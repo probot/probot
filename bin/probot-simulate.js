@@ -22,7 +22,7 @@ if (!eventName || !payloadPath) {
 
 const payload = require(path.join(process.cwd(), payloadPath))
 
-const createProbot = require('../')
+const {createProbot} = require('../')
 
 const probot = createProbot({
   id: program.app,
@@ -32,4 +32,4 @@ const probot = createProbot({
 probot.setup(program.args.slice(2))
 
 probot.logger.debug('Simulating event', eventName)
-probot.receive({event: eventName, payload})
+probot.receive({name: eventName, payload})

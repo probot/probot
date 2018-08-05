@@ -1,19 +1,15 @@
 const request = require('supertest')
 const express = require('express')
-const plugin = require('../../lib/plugins/default')
+const appFn = require('../../src/plugins/default')
 const helper = require('./helper')
 
-describe('default plugin', function () {
-  let server, robot
+describe('default app', function () {
+  let server, app
 
   beforeEach(async () => {
-    robot = helper.createRobot()
-
-    await plugin(robot)
-
+    app = helper.createApp(appFn)
     server = express()
-
-    server.use(robot.router)
+    server.use(app.router)
   })
 
   describe('GET /probot', () => {
@@ -29,13 +25,15 @@ describe('default plugin', function () {
 
       it('returns the correct HTML with values', async () => {
         const actual = await request(server).get('/probot').expect(200)
-        expect(actual.text).toMatchSnapshot()
+        expect(actual.text).toMatch('Welcome to probot')
+        expect(actual.text).toMatch('A framework for building GitHub Apps')
+        expect(actual.text).toMatch(/v\d+\.\d+\.\d+/)
       })
 
       it('returns the correct HTML without values', async () => {
         process.chdir(__dirname)
         const actual = await request(server).get('/probot').expect(200)
-        expect(actual.text).toMatchSnapshot()
+        expect(actual.text).toMatch('Welcome to your Probot App')
       })
 
       afterEach(() => {

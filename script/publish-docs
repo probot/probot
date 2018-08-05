@@ -30,7 +30,7 @@ git pull origin master
 rm -rf api/$VERSION
 
 # Copy over the new docs
-mv ../../out/probot/$VERSION api/$VERSION
+mv ../../out api/$VERSION
 
 # Update the /api/latest link to point to this version
 ln -sfn $VERSION api/latest

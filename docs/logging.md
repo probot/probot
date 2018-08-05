@@ -6,13 +6,13 @@ next: docs/pagination.md
 
 A good logger is a good developer's secret weapon. Probot comes with [bunyan](https://github.com/trentm/node-bunyan), which is a simple and fast logging library that supports some pretty sophisticated logging if you need it (hint: you will).
 
-`robot.log`, `context.log` in an event handler, and `req.log` in an HTTP request are all loggers that you can use to get more information about what your app is doing.
+`app.log`, `context.log` in an event handler, and `req.log` in an HTTP request are all loggers that you can use to get more information about what your app is doing.
 
 ```js
-module.exports = robot => {
-  robot.log('Yay, my app is loaded')
+module.exports = app => {
+  app.log('Yay, my app is loaded')
 
-  robot.on('issues.opened', context => {
+  app.on('issues.opened', context => {
     if (context.payload.issue.body.match(/bacon/)) {
       context.log('This issue is about bacon')
     } else {
@@ -20,7 +20,7 @@ module.exports = robot => {
     }
   })
 
-  robot.route().get('/hello-world', (req, res) => {
+  app.route().get('/hello-world', (req, res) => {
     req.log('Someone is saying hello')
   })
 }
@@ -30,19 +30,19 @@ When you start up your app with `npm start`, You should see your log message app
 
 <img width="753" alt="" src="https://user-images.githubusercontent.com/173/33234904-d43e7f14-d1f3-11e7-8dcb-6c47e58bd56b.png">
 
-`robot.log` will log messages at the `info` level, which is what your app should use for most relevant messages. Occasionally you will want to log more detailed information that is useful for debugging, but you might not want to see it all the time.
+`app.log` will log messages at the `info` level, which is what your app should use for most relevant messages. Occasionally you will want to log more detailed information that is useful for debugging, but you might not want to see it all the time.
 
 ```js
-module.exports = robot => {
+module.exports = app => {
   // …
-  robot.log.trace('Really low-level logging')
-  robot.log.debug({data: 'here'}, 'End-line specs on the rotary girder')
-  robot.log.info('Same as using `robot.log`')
+  app.log.trace('Really low-level logging')
+  app.log.debug({data: 'here'}, 'End-line specs on the rotary girder')
+  app.log.info('Same as using `app.log`')
 
   const err = new Error('Some error')
-  robot.log.warn(err, 'Uh-oh, this may not be good')
-  robot.log.error(err, 'Yeah, it was bad')
-  robot.log.fatal(err, 'Goodbye, cruel world!')
+  app.log.warn(err, 'Uh-oh, this may not be good')
+  app.log.error(err, 'Yeah, it was bad')
+  app.log.fatal(err, 'Goodbye, cruel world!')
 }
 ```
 
@@ -62,8 +62,8 @@ Set `LOG_FORMAT=json` to show log messages as structured JSON, which can then be
 For example, given this log:
 
 ```js
-module.exports = robot => {
-  robot.on('issue_comment.created', context => {
+module.exports = app => {
+  app.on('issue_comment.created', context => {
     context.log('Comment created')
   })
 }

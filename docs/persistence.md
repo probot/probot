@@ -63,8 +63,8 @@ mongoose.connect(mongoUri, {
 // Register the mongoose model
 const People = require('./PeopleSchema')
 
-module.exports = robot => {
-  robot.on('issues.opened', async context => {
+module.exports = app => {
+  app.on('issues.opened', async context => {
     // Find all the people in the database
     const people = await People.find().exec()
 
@@ -115,8 +115,8 @@ function performQuery (query) {
   })
 }
 
-module.exports = robot => {
-  robot.on('issues.opened', async context => {
+module.exports = app => {
+  app.on('issues.opened', async context => {
     // Find all the people in the database
     const people = await performQuery('SELECT * FROM `people`')
 
@@ -154,8 +154,8 @@ firebase.initializeApp(config)
 
 const database = firebase.database()
 
-module.exports = robot => {
-  robot.on('issues.opened', async context => {
+module.exports = app => {
+  app.on('issues.opened', async context => {
     // Find all the people in the database
     const people = await database.ref('/people').once('value').then((snapshot) => {
       return snapshot.val()

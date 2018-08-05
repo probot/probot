@@ -15,8 +15,8 @@ Your app has access to an authenticated GitHub client that can be used to make A
 Here is an example of an autoresponder app that comments on opened issues:
 
 ```js
-module.exports = robot => {
-  robot.on('issues.opened', async context => {
+module.exports = app => {
+  app.on('issues.opened', async context => {
     // `context` extracts information from the event, which can be passed to
     // GitHub API calls. This will return:
     //   {owner: 'yourname', repo: 'yourrepo', number: 123, body: 'Hello World!}
@@ -39,17 +39,6 @@ Use `context.github.query` to make requests to the [GitHub GraphQL API](https://
 Here is an example of the same autoresponder app from above that comments on opened issues, but this time with GraphQL:
 
 ```js
-// GraphQL query to get Node id for any resource, which is needed for mutations
-const getResource = `
-  query getResource($url: URI!) {
-    resource(url: $url) {
-      ... on Node {
-        id
-      }
-    }
-  }
-`
-
 // GraphQL query to add a comment
 const addComment = `
   mutation comment($id: ID!, $body: String!) {
@@ -59,16 +48,11 @@ const addComment = `
   }
 `
 
-module.exports = robot => {
-  robot.on('issues.opened', async context => {
-    // Get the node id of the issue
-    const { resource } = await context.github.query(getResource, {
-      url: context.payload.issue.html_url
-    })
-
+module.exports = app => {
+  app.on('issues.opened', async context => {
     // Post a comment on the issue
-    await context.github.query(addComment, {
-      id: resource.id,
+    context.github.query(addComment, {
+      id: context.payload.issue.node_id,
       body: 'Hello World'
     })
   })
@@ -77,12 +61,22 @@ module.exports = robot => {
 
 Check out the [GitHub GraphQL API docs](https://developer.github.com/v4/) to learn more.
 
+## Unauthenticated Events
+
+When [receiving webhook events](./webhooks.md), `context.github` is _usually_ an authenticated client, but there are a few events that are exceptions:
+
+- [`installation.deleted`](https://developer.github.com/v3/activity/events/types/#installationevent) - The installation was _just_ deleted, so we can't authenticate as the installation.
+
+- [`marketplace_purchase`](https://developer.github.com/v3/activity/events/types/#marketplacepurchaseevent) - The purchase happens before the app is installed on an account.
+
+For these events, `context.github` will be [authenticated as the GitHub App](https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#authenticating-as-a-github-app) instead of as a specific installation.
+
 ## GitHub Enterprise
 
-If you want to run a Probot App against a GitHub Enterprise instance, you'll need to set the `GHE_HOST` environment variable.
+If you want to run a Probot App against a GitHub Enterprise instance, you'll need to create and set the `GHE_HOST` environment variable inside of the `.env` file.
 
 ```
 GHE_HOST=fake.github-enterprise.com
 ```
 
-> GitHub Apps are enabled in GitHub Enterprise 2.12 as an [early access technical preview](https://developer.github.com/enterprise/2.12/apps/).
+> GitHub Apps are enabled in GitHub Enterprise 2.12 as an [early access technical preview](https://developer.github.com/enterprise/2.12/apps/) but are generally available in GitHub Enterprise 2.13 and above.

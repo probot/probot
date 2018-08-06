@@ -1,3 +1,5 @@
+import fs from 'fs'
+import yaml from 'js-yaml'
 import path from 'path'
 import qs from 'qs'
 
@@ -5,11 +7,13 @@ import { Request } from 'express'
 import { Application } from '../application'
 
 class Setup {
+  public config: any
   public pkg: any
   public env: any
   public req: Request
 
-  constructor (pkg: any, env: any, req: Request) {
+  constructor (config: any, pkg: any, env: any, req: Request) {
+    this.config = config
     this.pkg = pkg
     this.env = env
     this.req = req
@@ -32,7 +36,7 @@ class Setup {
   }
 
   get params () {
-    return {
+    return Object.assign({
       description: this.pkg.description,
       name: this.pkg.name,
       url: this.pkg.homepage || this.pkg.repository,
@@ -43,7 +47,7 @@ class Setup {
       // events,
       webhook_secret: this.webhook_secret,
       webhook_url: this.webhook_url
-    }
+    }, this.config)
   }
 }
 
@@ -55,10 +59,21 @@ export = (app: Application) => {
     pkg = {}
   }
 
+  let config: any
+  try {
+    const file = fs.readFileSync(path.join(process.cwd(), 'app.yml'), 'utf8')
+    config = yaml.safeLoad(file)
+  } catch (err) {
+    // App config does not exist, which is ok.
+    if (err.code !== 'ENOENT') {
+      throw err
+    }
+  }
+
   const route = app.route()
 
   route.get('/probot', (req, res) => {
-    const setup = new Setup(pkg, process.env, req)
+    const setup = new Setup(config, pkg, process.env, req)
     res.render('probot.hbs', { pkg, setup })
   })
 

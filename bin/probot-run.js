@@ -17,13 +17,20 @@ program
   .option('-P, --private-key <file>', 'Path to certificate of the GitHub App', findPrivateKey)
   .parse(process.argv)
 
+// FIXME: put probot into "unconfigured" mode if APP_ID/PRIVATE_KEY missing
+  
 if (!program.app) {
-  console.warn('Missing GitHub App ID.\nUse --app flag or set APP_ID environment variable.')
-  program.help()
+  // console.warn('Missing GitHub App ID.\nUse --app flag or set APP_ID environment variable.')
+  // program.help()
+  program.app = '-1'
 }
 
 if (!program.privateKey) {
-  program.privateKey = findPrivateKey()
+  try {
+    program.privateKey = findPrivateKey()
+  } catch() {
+    program.privateKey = 'fake'
+  }
 }
 
 const {createProbot} = require('../')

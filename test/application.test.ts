@@ -286,8 +286,13 @@ describe('Application', () => {
     let scopeInstall: nock.Scope
     let scopeData: nock.Scope
 
-    beforeEach(() => {
+    const cleanGlobals = () => {
       delete process.env.INSTALLATION_TOKEN_TTL
+      nock.cleanAll()
+    }
+
+    beforeEach(() => {
+      cleanGlobals()
 
       const cache = cacheManager.caching({
         store: 'memory',
@@ -296,7 +301,6 @@ describe('Application', () => {
       app = new Application({ cache } as any)
       app.app = () => 'app-bearer-authorization-token'
 
-      nock.cleanAll()
       scopeInstall = nock('https://api.github.com')
         .post('/installations/1/access_tokens')
         .reply(200, { token: 'installation-bearer-authorization-token' })
@@ -309,6 +313,8 @@ describe('Application', () => {
     afterEach(() => {
       expect(scopeInstall.isDone()).toEqual(true)
       expect(scopeData.isDone()).toEqual(true)
+
+      cleanGlobals()
     })
 
     it('requests an installation token once for one event', async () => {

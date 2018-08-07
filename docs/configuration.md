@@ -28,5 +28,6 @@ Variable | Description
 `PORT` | The port to start the local server on. Default: `3000`.
 `SENTRY_DSN` | Set to a [Sentry](https://sentry.io/) DSN to report all errors thrown by your app.  <p>_(Example: `https://1234abcd@sentry.io/12345`)_</p>
 `WEBHOOK_PATH` | The URL path which will recieve webhooks. Default: `/`.
+`INSTALLATION_TOKEN_TTL` | The length of time installation access tokens are cached by Probot. This may be useful if your app is running long processes before accessing `context.github`. Default: `3540` (59 minutes) <p>_(Example: `3300` or 55 minutes)_</p>
 
 For more information on the formatting conventions and rules of `.env` files, check out [the npm `dotenv` module's documentation](https://www.npmjs.com/package/dotenv#rules).

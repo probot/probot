@@ -17,8 +17,6 @@ program
   .option('-P, --private-key <file>', 'Path to certificate of the GitHub App', findPrivateKey)
   .parse(process.argv)
 
-// FIXME: put probot into "unconfigured" mode if APP_ID/PRIVATE_KEY missing
-
 program.privateKey = findPrivateKey()
 
 const {createProbot} = require('../')

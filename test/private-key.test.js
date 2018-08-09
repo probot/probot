@@ -116,8 +116,8 @@ describe('private-key', function () {
           fs.readdirSync = readdirSync
         })
 
-        it('should throw an error', function () {
-          expect(findPrivateKey).toThrow(/missing private key for GitHub App/i)
+        it('should return null', function () {
+          expect(findPrivateKey()).toBe(null)
         })
       })
     })

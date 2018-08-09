@@ -18,20 +18,8 @@ program
   .parse(process.argv)
 
 // FIXME: put probot into "unconfigured" mode if APP_ID/PRIVATE_KEY missing
-  
-if (!program.app) {
-  // console.warn('Missing GitHub App ID.\nUse --app flag or set APP_ID environment variable.')
-  // program.help()
-  program.app = '-1'
-}
 
-if (!program.privateKey) {
-  try {
-    program.privateKey = findPrivateKey()
-  } catch() {
-    program.privateKey = 'fake'
-  }
-}
+program.privateKey = findPrivateKey()
 
 const {createProbot} = require('../')
 
@@ -44,7 +32,15 @@ const probot = createProbot({
   webhookProxy: program.webhookProxy
 })
 
-pkgConf('probot').then(pkg => {
-  probot.setup(program.args.concat(pkg.apps || pkg.plugins || []))
+const setupMode = !program.app || !program.privateKey
+
+if (setupMode) {
+  const setupApp = require('../lib/plugins/setup')
+  probot.load(setupApp)
   probot.start()
-})
+} else {
+  pkgConf('probot').then(pkg => {
+    probot.setup(program.args.concat(pkg.apps || pkg.plugins || []))
+    probot.start()
+  })
+}

@@ -1,5 +1,3 @@
-import fs from 'fs'
-import yaml from 'js-yaml'
 import path from 'path'
 import qs from 'qs'
 
@@ -10,14 +8,10 @@ import { createApp } from '../github-app'
 import updateDotenv from '../update-dotenv'
 
 class Setup {
-  public config: any
-  public pkg: any
   public env: any
   public req: Request
 
-  constructor (config: any, pkg: any, env: any, req: Request) {
-    this.config = config
-    this.pkg = pkg
+  constructor (env: any, req: Request) {
     this.env = env
     this.req = req
   }
@@ -45,10 +39,6 @@ class Setup {
 
   }
 
-  get webhook_secret () {
-    return this.env.WEBHOOK_SECRET || 'development'
-  }
-
   get params () {
     return {
       callback_url: this.callback_url,
@@ -66,21 +56,10 @@ export = (app: Application) => {
     pkg = {}
   }
 
-  let config: any = {}
-  try {
-    const file = fs.readFileSync(path.join(process.cwd(), 'app.yml'), 'utf8')
-    config = yaml.safeLoad(file)
-  } catch (err) {
-    // App config does not exist, which is ok.
-    if (err.code !== 'ENOENT') {
-      throw err
-    }
-  }
-
   const route = app.route()
 
   route.get('/probot', (req, res) => {
-    const setup = new Setup(config, pkg, process.env, req)
+    const setup = new Setup(process.env, req)
     res.render('probot.hbs', { pkg, setup })
   })
 

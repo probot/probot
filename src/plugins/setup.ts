@@ -7,48 +7,6 @@ import { GitHubAPI } from '../github'
 import { createApp } from '../github-app'
 import updateDotenv from '../update-dotenv'
 
-class Setup {
-  public env: any
-  public req: Request
-
-  constructor (env: any, req: Request) {
-    this.env = env
-    this.req = req
-  }
-
-  get baseUrl () {
-    const protocols = this.req.headers['x-forwarded-proto'] || this.req.protocol
-    const protocol = typeof protocols === 'string' ? protocols.split(',')[0] : protocols[0]
-    const host = this.req.headers['x-forwarded-host'] || this.req.get('host')
-    return `${protocol}://${host}`
-  }
-
-  get url () {
-    const host = process.env.GHE_HOST || `github.com`
-    const params = qs.stringify(this.params)
-    return `https://${host}/settings/apps/new?${params}`
-  }
-
-  get callback_url () {
-    return `${this.baseUrl}/probot/setup`
-  }
-
-  // GitHub properties use underscores
-  /* eslint-disable camelcase */
-  get webhook_url () {
-    return this.env.WEBHOOK_PROXY_URL || `${this.baseUrl}/`
-
-  }
-
-  get params () {
-    return {
-      callback_url: this.callback_url,
-      managed: true,
-      webhook_url: this.webhook_url
-    }
-  }
-}
-
 // TODO: use actual server address:port
 const welcomeMessage = `
 Welcome to Probot! Go to https://localhost:3000 to get started.
@@ -66,9 +24,23 @@ export = (app: Application) => {
 
   const route = app.route()
 
-  route.get('/probot', (req, res) => {
-    const setup = new Setup(process.env, req)
-    res.render('setup.hbs', { pkg, setup })
+  route.get('/probot', async (req, res) => {
+    const protocols = req.headers['x-forwarded-proto'] || req.protocol
+    const protocol = typeof protocols === 'string' ? protocols.split(',')[0] : protocols[0]
+    const host = req.headers['x-forwarded-host'] || req.get('host')
+    const baseUrl = `${protocol}://${host}`
+
+    const githubHost = process.env.GHE_HOST || `github.com`
+
+    const params = qs.stringify({
+      callback_url: `${baseUrl}/probot/setup`,
+      managed: true,
+      webhook_url: `${baseUrl}/`
+    })
+
+    const createAppUrl = `https://${githubHost}/settings/apps/new?${params}`
+
+    res.render('setup.hbs', { pkg, createAppUrl })
   })
 
   route.get('/probot/setup', async (req: Request, res: Response) => {

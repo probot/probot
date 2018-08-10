@@ -1,6 +1,7 @@
 import path from 'path'
 import qs from 'qs'
 
+import { exec } from 'child_process'
 import { Request, Response } from 'express'
 import { Application } from '../application'
 import { GitHubAPI } from '../github'
@@ -52,6 +53,13 @@ export = (app: Application) => {
       PRIVATE_KEY: `"${pem}"`,
       WEBHOOK_SECRET: webhook_secret
     })
+    if (process.env.PROJECT_REMIX_CHAIN) {
+      exec('refresh', (err, stdout, stderr) => {
+        if (err) {
+          app.log.error(err, stderr)
+        }
+      })
+    }
 
     const jwt = createApp({ id: app_id, cert: pem })
     const github = GitHubAPI()

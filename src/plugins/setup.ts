@@ -23,6 +23,16 @@ export = async (app: Application) => {
     pkg = {}
   }
 
+  if (process.env.NODE_ENV !== 'production') {
+    try {
+      // tslint:disable:no-var-requires
+      const SmeeClient = require('smee-client')
+      await updateDotenv({ WEBHOOK_PROXY_URL: await SmeeClient.createChannel() })
+    } catch (err) {
+      // Smee is not available, so we'll just move on
+    }
+  }
+
   const route = app.route()
 
   route.get('/probot', async (req, res) => {
@@ -36,7 +46,7 @@ export = async (app: Application) => {
     const params = qs.stringify({
       callback_url: `${baseUrl}/probot/setup`,
       managed: true,
-      webhook_url: `${baseUrl}/`
+      webhook_url: process.env.WEBHOOK_PROXY_URL || `${baseUrl}/`
     })
 
     const createAppUrl = `https://${githubHost}/settings/apps/new?${params}`

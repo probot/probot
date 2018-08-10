@@ -77,7 +77,7 @@ export = (app: Application) => {
     // Save secrets in .env
     await updateDotenv({
       APP_ID: app_id,
-      PRIVATE_KEY: pem,
+      PRIVATE_KEY: `"${pem}"`,
       WEBHOOK_SECRET: webhook_secret
     })
 

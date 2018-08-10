@@ -17,7 +17,8 @@ class Setup {
   }
 
   get baseUrl () {
-    const protocol = this.req.headers['x-forwarded-proto'] || this.req.protocol
+    const protocols = this.req.headers['x-forwarded-proto'] || this.req.protocol
+    const protocol = typeof protocols === 'string' ? protocols.split(',')[0] : protocols[0]
     const host = this.req.headers['x-forwarded-host'] || this.req.get('host')
     return `${protocol}://${host}`
   }

@@ -3,17 +3,17 @@ import qs from 'qs'
 
 import { exec } from 'child_process'
 import { Request, Response } from 'express'
+import updateDotenv from 'update-dotenv'
 import { Application } from '../application'
 import { GitHubAPI } from '../github'
 import { createApp } from '../github-app'
-import updateDotenv from '../update-dotenv'
 
 // TODO: use actual server address:port
 const welcomeMessage = `
 Welcome to Probot! Go to https://localhost:3000 to get started.
 `
 
-export = (app: Application) => {
+export = async (app: Application) => {
   app.log.info(welcomeMessage)
 
   let pkg: any

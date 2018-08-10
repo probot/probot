@@ -42,12 +42,7 @@
       ".+\\.tsx?$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
     "testMatch": [
-      "<rootDir>/test/**/*.(ts|js)"
-    ],
-    "testPathIgnorePatterns": [
-      "<rootDir>/test/setup.js",
-      "<rootDir>/test/fixtures/",
-      "<rootDir>/test/plugins/helper.js"
+      "<rootDir>/test/**/*.test.(ts|js)"
     ],
     "globals": {
       "ts-jest": {

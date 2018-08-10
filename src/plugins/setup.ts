@@ -63,12 +63,11 @@ export = (app: Application) => {
     pkg = {}
   }
 
-  // hello
   const route = app.route()
 
   route.get('/probot', (req, res) => {
     const setup = new Setup(process.env, req)
-    res.render('probot.hbs', { pkg, setup })
+    res.render('setup.hbs', { pkg, setup })
   })
 
   route.get('/probot/setup', async (req: Request, res: Response) => {

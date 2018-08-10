@@ -10,5 +10,5 @@ function escapeNewlines (str: string) {
 export default function updateDotenv (env: any) {
   const filename = path.join(process.cwd(), '.env')
   const contents = Object.keys(env).map(key => `${key}=${escapeNewlines(env[key])}`).join('\n')
-  writeFile(filename, contents)
+  return writeFile(filename, contents)
 }

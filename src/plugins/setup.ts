@@ -54,7 +54,7 @@ Welcome to Probot! Go to https://localhost:3000 to get started.
 `
 
 export = (app: Application) => {
-  console.log(welcomeMessage)
+  app.log.info(welcomeMessage)
 
   let pkg: any
   try {
@@ -80,9 +80,9 @@ export = (app: Application) => {
       WEBHOOK_SECRET: webhook_secret
     })
 
-    const app = createApp({ id: app_id, cert: pem })
+    const jwt = createApp({ id: app_id, cert: pem })
     const github = GitHubAPI()
-    github.authenticate({ type: 'app', token: app() })
+    github.authenticate({ type: 'app', token: jwt() })
 
     const { data: info } = await github.apps.get({})
     res.redirect(`${info.html_url}/installations/new`)

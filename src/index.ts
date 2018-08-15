@@ -20,9 +20,9 @@ const cache = cacheManager.caching({
 })
 
 const defaultAppFns: ApplicationFunction[] = [
-  require('./plugins/default'),
-  require('./plugins/sentry'),
-  require('./plugins/stats')
+  require('./apps/default'),
+  require('./apps/sentry'),
+  require('./apps/stats')
 ]
 // tslint:enable:no-var-requires
 

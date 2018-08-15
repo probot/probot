@@ -47,7 +47,7 @@
     "testPathIgnorePatterns": [
       "<rootDir>/test/setup.js",
       "<rootDir>/test/fixtures/",
-      "<rootDir>/test/plugins/helper.js"
+      "<rootDir>/test/apps/helper.js"
     ],
     "globals": {
       "ts-jest": {

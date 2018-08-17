@@ -51,10 +51,10 @@
     ],
     "globals": {
       "ts-jest": {
-        "skipBabel": true,
-        "enableTsDiagnostics": true
+        "skipBabel": true
       }
-    }
+    },
+    "testURL": "http://localhost/"
   },
   "keywords": [
     "probot",
@@ -81,6 +81,7 @@
     "express": "^4.16.2",
     "express-async-errors": "^3.0.0",
     "hbs": "^4.0.1",
+    "is-base64": "0.0.5",
     "js-yaml": "^3.9.1",
     "jsonwebtoken": "^8.1.0",
     "pkg-conf": "^2.0.0",
@@ -109,7 +110,7 @@
     "connect-sse": "^1.2.0",
     "eslint": "^5.0.1",
     "eslint-plugin-markdown": "^1.0.0-beta.8",
-    "jest": "^22.0.3",
+    "jest": "^23.4.1",
     "minami": "^1.1.1",
     "nock": "^9.2.0",
     "semantic-release": "^15.0.0",
@@ -117,7 +118,7 @@
     "standard": "^11.0.0",
     "standard-markdown": "^4.0.2",
     "supertest": "^3.0.0",
-    "ts-jest": "^21.2.4",
+    "ts-jest": "^23.0.0",
     "tslint": "^5.9.1",
     "tslint-config-prettier": "^1.10.0",
     "tslint-config-standard": "^7.1.0",

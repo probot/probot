@@ -8,9 +8,9 @@ const cache = cacheManager.caching({store: 'memory'})
 const jwt = jest.fn().mockReturnValue('test')
 
 module.exports = {
-  createApp (plugin = () => {}) {
+  createApp (appFn = () => {}) {
     const app = new Application({app: jwt, cache})
-    app.load(plugin)
+    app.load(appFn)
     return app
   }
 }

@@ -32,4 +32,4 @@ const probot = createProbot({
 probot.setup(program.args.slice(2))
 
 probot.logger.debug('Simulating event', eventName)
-probot.receive({event: eventName, payload})
+probot.receive({name: eventName, payload})

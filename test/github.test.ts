@@ -1,25 +1,26 @@
-const {GitHubAPI} = require('../src/github')
-const nock = require('nock')
-const Bottleneck = require('bottleneck')
+import Bottleneck from 'bottleneck'
+import nock from 'nock'
+import { GitHubAPI, Options } from '../src/github'
+import { logger } from '../src/logger'
 
 describe('GitHubAPI', () => {
-  let github
+  let github: GitHubAPI
 
   beforeEach(() => {
-    const logger = {
-      debug: jest.fn(),
-      trace: jest.fn()
-    }
-
     // Set a shorter limiter, otherwise tests are _slow_
     const limiter = new Bottleneck()
 
-    github = new GitHubAPI({ logger, limiter })
+    const options: Options = {
+      limiter,
+      logger
+    }
+
+    github = GitHubAPI(options)
   })
 
   test('works without options', async () => {
-    github = new GitHubAPI()
-    const user = {login: 'ohai'}
+    github = GitHubAPI()
+    const user = { login: 'ohai' }
 
     nock('https://api.github.com').get('/user').reply(200, user)
     expect((await github.users.get({})).data).toEqual(user)
@@ -28,11 +29,11 @@ describe('GitHubAPI', () => {
   describe('paginate', () => {
     beforeEach(() => {
       // Prepare an array of issue objects
-      const issues = new Array(5).fill().map((_, i, arr) => {
+      const issues = new Array(5).fill(0).map((_, i, arr) => {
         return {
-          title: `Issue number ${i}`,
           id: i,
-          number: i
+          number: i,
+          title: `Issue number ${i}`
         }
       })
 
@@ -63,8 +64,8 @@ describe('GitHubAPI', () => {
     })
 
     it('stops iterating if the done() function is called in the callback', async () => {
-      const spy = jest.fn((res, done) => {
-        if (res.data.id === 2) done()
+      const spy = jest.fn((response, done) => {
+        if (response.data.id === 2) done()
       })
       const res = await github.paginate(github.issues.getForRepo({ owner: 'JasonEtco', repo: 'pizza', per_page: 1 }), spy)
       expect(res.length).toBe(3)

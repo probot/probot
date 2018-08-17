@@ -1,8 +1,9 @@
+import Webhooks, { WebhookEvent } from '@octokit/webhooks'
 import Logger from 'bunyan'
 import cacheManager from 'cache-manager'
 import express from 'express'
 import { Application } from './application'
-import { Context, WebhookEvent } from './context'
+import { Context } from './context'
 import { createApp } from './github-app'
 import { logger } from './logger'
 import { resolve } from './resolver'
@@ -11,7 +12,6 @@ import { createWebhookProxy } from './webhook-proxy'
 
 // tslint:disable:no-var-requires
 // These needs types
-const Webhooks = require('@octokit/webhooks')
 const logRequestErrors = require('./middleware/log-request-errors')
 
 const cache = cacheManager.caching({
@@ -19,7 +19,7 @@ const cache = cacheManager.caching({
   ttl: 60 * 60 // 1 hour
 })
 
-const defaultApps: ApplicationFunction[] = [
+const defaultAppFns: ApplicationFunction[] = [
   require('./plugins/default'),
   require('./plugins/sentry'),
   require('./plugins/stats')
@@ -28,7 +28,7 @@ const defaultApps: ApplicationFunction[] = [
 
 export class Probot {
   public server: express.Application
-  public webhook: any
+  public webhook: Webhooks
   public logger: Logger
 
   private options: Options
@@ -46,11 +46,8 @@ export class Probot {
     this.server = createServer({ webhook: this.webhook.middleware, logger })
 
     // Log all received webhooks
-    this.webhook.on('*', (event: any) => {
-      const webhookEvent = { ...event, event: event.name }
-      delete webhookEvent.name
-
-      return this.receive(webhookEvent)
+    this.webhook.on('*', (event: WebhookEvent) => {
+      return this.receive(event)
     })
 
     // Log all webhook errors
@@ -78,9 +75,9 @@ export class Probot {
     return Promise.all(this.apps.map(app => app.receive(event)))
   }
 
-  public load (appFunction: string | ApplicationFunction) {
-    if (typeof appFunction === 'string') {
-      appFunction = resolve(appFunction) as ApplicationFunction
+  public load (appFn: string | ApplicationFunction) {
+    if (typeof appFn === 'string') {
+      appFn = resolve(appFn) as ApplicationFunction
     }
 
     const app = new Application({ app: this.app, cache, catchErrors: true })
@@ -88,19 +85,19 @@ export class Probot {
     // Connect the router from the app to the server
     this.server.use(app.router)
 
-    // Initialize the plugin
-    app.load(appFunction)
+    // Initialize the ApplicationFunction
+    app.load(appFn)
     this.apps.push(app)
 
     return app
   }
 
-  public setup (apps: Array<string | ApplicationFunction>) {
+  public setup (appFns: Array<string | ApplicationFunction>) {
     // Log all unhandled rejections
     process.on('unhandledRejection', this.errorHandler)
 
-    // Load the given apps along with the default apps
-    apps.concat(defaultApps).forEach(app => this.load(app))
+    // Load the given appFns along with the default ones
+    appFns.concat(defaultAppFns).forEach(appFn => this.load(appFn))
 
     // Register error handler as the last middleware
     this.server.use(logRequestErrors)

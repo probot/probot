@@ -9,44 +9,38 @@ We highly recommend working in the style of [test-driven development](http://agi
 For our testing examples, we use [jest](https://facebook.github.io/jest/), but there are other options that can perform similar operations. Here's an example of creating an app instance and mocking out the GitHub API:
 
 ```js
-// Requiring probot allows us to initialize an application
-const {Application} = require('probot')
+const { Application } = require('probot')
 // Requiring our app implementation
-const plugin = require('')
-// Create a fixtures folder in your test folder
-// Then put any larger testing payloads in there
-const payload = require('./fixtures/payload')
+const myProbotApp = require('..')
 
-describe('your-app', () => {
-  let app
-  let github
+const issuesOpenedPayload = require('./fixtures/issues.opened.json')
+
+describe('My Probot app', () => {
+  let app, github
 
   beforeEach(() => {
-    // Here we create an `Application` instance
     app = new Application()
-    // Here we initialize the app
-    app.load(plugin)
+    // Initialize the app based on the code from index.js
+    app.load(myProbotApp)
     // This is an easy way to mock out the GitHub API
     github = {
       issues: {
-        createComment: jest.fn().mockReturnValue(Promise.resolve({
-          // Whatever the GitHub API should return
-        }))
+        createComment: jest.fn().mockReturnValue(Promise.resolve({}))
       }
     }
     // Passes the mocked out GitHub API into out app instance
     app.auth = () => Promise.resolve(github)
   })
 
-  describe('your functionality', () => {
-    it('performs an action', async () => {
-      // Simulates delivery of a payload
-      // event is the X-GitHub-Event header sent by GitHub (for example "push")
-      // payload is the webhook payload body
-      await app.receive({event: 'push', payload})
-      // This test would pass if in your main code you called `context.github.issues.createComment`
-      expect(github.issues.createComment).toHaveBeenCalled()
+  test('creates a comment when an issue is opened', async () => {
+    // Simulates delivery of an issues.opened webhook
+    await app.receive({
+      event: 'issues.opened',
+      payload: issuesOpenedPayload
     })
+
+    // This test passes if the code in your index.js file calls `context.github.issues.createComment`
+    expect(github.issues.createComment).toHaveBeenCalled()
   })
 })
 ```

@@ -1,19 +1,20 @@
+import { WebhookEvent } from '@octokit/webhooks'
 import express from 'express'
 import { EventEmitter } from 'promise-events'
 import { ApplicationFunction } from '.'
-import { Context, WebhookEvent } from './context'
+import { Context } from './context'
 import { GitHubAPI } from './github'
 import { logger } from './logger'
 import { LoggerWithTarget, wrapLogger } from './wrap-logger'
 
 // Some events can't get an authenticated client (#382):
-function isUnauthenticatedEvent (context: Context) {
-  return !context.payload.installation ||
-    (context.event === 'installation' && context.payload.action === 'deleted')
+function isUnauthenticatedEvent (event: WebhookEvent) {
+  return !event.payload.installation ||
+    (event.name === 'installation' && event.payload.action === 'deleted')
 }
 
 /**
- * The `app` parameter available to apps
+ * The `app` parameter available to `ApplicationFunction`s
  *
  * @property {logger} log - A logger
  */
@@ -36,24 +37,30 @@ export class Application {
   }
 
   /**
-   * Loads a Probot plugin
-   * @param plugin - Probot plugin to load
+   * Loads an ApplicationFunction into the current Application
+   * @param appFn - Probot application function to load
    */
-  public load (app: ApplicationFunction | ApplicationFunction[]): Application {
-    if (Array.isArray(app)) {
-      app.forEach(a => this.load(a))
+  public load (appFn: ApplicationFunction | ApplicationFunction[]): Application {
+    if (Array.isArray(appFn)) {
+      appFn.forEach(a => this.load(a))
     } else {
-      app(this)
+      appFn(this)
     }
 
     return this
   }
 
   public async receive (event: WebhookEvent) {
+    if ((event as any).event) {
+      // tslint:disable-next-line:no-console
+      console.warn(new Error('Propery `event` is deprecated, use `name`'))
+      event = { name: (event as any).event, ...event }
+    }
+
     return Promise.all([
       this.events.emit('*', event),
-      this.events.emit(event.event, event),
-      this.events.emit(`${event.event}.${event.payload.action}`, event)
+      this.events.emit(event.name, event),
+      this.events.emit(`${ event.name }.${ event.payload.action }`, event)
     ])
   }
 
@@ -119,7 +126,7 @@ export class Application {
   public on (eventName: string | string[], callback: (context: Context) => Promise<void>) {
     if (typeof eventName === 'string') {
 
-      return this.events.on(eventName, async (event: Context) => {
+      return this.events.on(eventName, async (event: WebhookEvent) => {
         const log = this.log.child({ name: 'event', id: event.id })
 
         try {
@@ -129,7 +136,7 @@ export class Application {
             github = await this.auth()
             log.debug('`context.github` is unauthenticated. See https://probot.github.io/docs/github-api/#unauthenticated-events')
           } else {
-            github = await this.auth(event.payload.installation.id, log)
+            github = await this.auth(event.payload.installation!.id, log)
           }
 
           const context = new Context(event, github, log)
@@ -184,13 +191,16 @@ export class Application {
       logger: log.child({ name: 'github', installation: String(id) })
     })
 
+    // Cache for 1 minute less than GitHub expiry
+    const installationTokenTTL = parseInt(process.env.INSTALLATION_TOKEN_TTL || '3540', 10)
+
     if (id) {
       const res = await this.cache.wrap(`app:${id}:token`, () => {
         log.trace(`creating token for installation`)
         github.authenticate({ type: 'app', token: this.app() })
 
         return github.apps.createInstallationToken({ installation_id: String(id) })
-      }, { ttl: 60 * 59 }) // Cache for 1 minute less than GitHub expiry
+      }, { ttl: installationTokenTTL })
 
       github.authenticate({ type: 'token', token: res.data.token })
     } else {

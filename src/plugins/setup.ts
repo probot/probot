@@ -1,5 +1,6 @@
+import fs from 'fs'
+import yaml from 'js-yaml'
 import path from 'path'
-import qs from 'qs'
 
 import { exec } from 'child_process'
 import { Request, Response } from 'express'
@@ -23,6 +24,17 @@ export = async (app: Application) => {
     pkg = {}
   }
 
+  let manifest: any = {}
+  try {
+    const file = fs.readFileSync(path.join(process.cwd(), 'app.yml'), 'utf8')
+    manifest = yaml.safeLoad(file)
+  } catch (err) {
+    // App config does not exist, which is ok.
+    if (err.code !== 'ENOENT') {
+      throw err
+    }
+  }
+
   if (process.env.NODE_ENV !== 'production') {
     try {
       // tslint:disable:no-var-requires
@@ -43,15 +55,26 @@ export = async (app: Application) => {
 
     const githubHost = process.env.GHE_HOST || `github.com`
 
-    const params = qs.stringify({
-      callback_url: `${baseUrl}/probot/setup`,
-      managed: true,
-      webhook_url: process.env.WEBHOOK_PROXY_URL || `${baseUrl}/`
-    })
-
-    const createAppUrl = `https://${githubHost}/settings/apps/new?${params}`
+    const createAppUrl = `https://${githubHost}/settings/apps/new?manifest=${baseUrl}/probot/app.json`
 
     res.render('setup.hbs', { pkg, createAppUrl })
+  })
+
+  route.get('/probot/app.json', (req: Request, res: Response) => {
+    const protocols = req.headers['x-forwarded-proto'] || req.protocol
+    const protocol = typeof protocols === 'string' ? protocols.split(',')[0] : protocols[0]
+    const host = req.headers['x-forwarded-host'] || req.get('host')
+    const baseUrl = `${protocol}://${host}`
+
+    res.json(Object.assign({
+      callback_url: `${baseUrl}/probot/setup`,
+      description: manifest.description || pkg.description,
+      hook_attributes: {
+        url: process.env.WEBHOOK_PROXY_URL || `${baseUrl}/`
+      },
+      name: manifest.name || pkg.name,
+      url: manifest.url || pkg.homepage || pkg.repository
+    }, manifest))
   })
 
   route.get('/probot/setup', async (req: Request, res: Response) => {

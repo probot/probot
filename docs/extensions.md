@@ -124,4 +124,4 @@ Check out [probot/unfurl](https://github.com/probot/unfurl) to see it in action.
 
 ## Community Created Extensions
 
-[probot-messages](https://github.com/dessant/probot-messages) was created by [@dessant](https://github.com/dessant) to deliver messages that require user action to ensure the correct operation of the app. Check it and some code samples out [here](https://github.com/dessant/probot-messages) to see it in action.
+[probot-messages](https://github.com/dessant/probot-messages) was created by [@dessant](https://github.com/dessant) to deliver messages that require user action to ensure the correct operation of the app.

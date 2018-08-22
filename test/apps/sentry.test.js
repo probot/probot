@@ -1,6 +1,6 @@
 const Raven = require('raven')
 const helper = require('./helper')
-const appFn = require('../../src/plugins/sentry')
+const appFn = require('../../src/apps/sentry')
 
 describe('sentry app', () => {
   let app

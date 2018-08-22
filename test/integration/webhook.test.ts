@@ -1,11 +1,24 @@
-process.env.LOG_LEVEL = 'trace'
-import { createProbot } from '../..'
+import fs from 'fs'
 import request from 'supertest'
-import data from '../fixtures/webhook/push.json'
+import { createProbot, Probot } from '../..'
+const data = JSON.parse(fs.readFileSync('./test/fixtures/webhook/push.json', 'UTF-8'))
 
-describe('webhooks', async function () {
-  test('it works', async function () {
-    const probot = createProbot({id: 1, cert: 'aw4sed5rf6tg7y8hu'})
+describe('webhooks', async () => {
+  let logger: any
+  let probot: Probot
+
+  beforeEach(() => {
+    logger = jest.fn()
+
+    probot = createProbot({ id: 1, cert: 'bexo🥪' })
+    probot.logger.addStream({
+      level: 'trace',
+      stream: { write: logger } as any,
+      type: 'raw'
+    })
+  })
+
+  test('it works when all headers are porperly passed onto the event', async () => {
     await request(probot.server)
       .post('/')
       .send(data)
@@ -15,14 +28,17 @@ describe('webhooks', async function () {
       .expect(200)
   })
 
-  test('it works', async function () {
-    const probot = createProbot({id: 1, cert: 'aw4sed5rf6tg7y8hu'})
+  test('it does not work when GitHub does not pass a webhooks secret through x-hub-signature', async () => {
     await request(probot.server)
       .post('/')
       .send(data)
       .set('x-github-event', 'push')
-      //.set('x-hub-signature') // missing
+      // Note: 'x-hub-signature' is missing
       .set('x-github-delivery', '3sw4d5f6g7h8')
       .expect(400)
+
+    expect(logger).toHaveBeenCalledWith(expect.objectContaining({
+      msg: 'Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.'
+    }))
   })
 })

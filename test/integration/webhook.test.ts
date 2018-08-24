@@ -18,7 +18,7 @@ describe('webhooks', async () => {
     })
   })
 
-  test('it works when all headers are porperly passed onto the event', async () => {
+  test('it works when all headers are properly passed onto the event', async () => {
     await request(probot.server)
       .post('/')
       .send(data)
@@ -28,7 +28,7 @@ describe('webhooks', async () => {
       .expect(200)
   })
 
-  test('it does not work when GitHub does not pass a webhooks secret through x-hub-signature', async () => {
+  test('shows a friendly error when x-hub-signature is missing', async () => {
     await request(probot.server)
       .post('/')
       .send(data)

@@ -1,6 +1,6 @@
 const request = require('supertest')
 const express = require('express')
-const appFn = require('../../src/plugins/default')
+const appFn = require('../../src/apps/default')
 const helper = require('./helper')
 
 describe('default app', function () {

@@ -2,7 +2,7 @@ const request = require('supertest')
 const express = require('express')
 const nock = require('nock')
 const helper = require('./helper')
-const appFn = require('../../src/plugins/stats')
+const appFn = require('../../src/apps/stats')
 
 describe('stats app', function () {
   let app, server

@@ -47,7 +47,7 @@
     "testPathIgnorePatterns": [
       "<rootDir>/test/setup.js",
       "<rootDir>/test/fixtures/",
-      "<rootDir>/test/plugins/helper.js"
+      "<rootDir>/test/apps/helper.js"
     ],
     "globals": {
       "ts-jest": {
@@ -71,7 +71,7 @@
   "dependencies": {
     "@octokit/rest": "^15.9.4",
     "@octokit/webhooks": "^3.1.1",
-    "bottleneck": "^2.4.0",
+    "bottleneck": "^2.8.0",
     "bunyan": "^1.8.12",
     "bunyan-format": "^0.2.1",
     "bunyan-sentry-stream": "^1.1.0",
@@ -101,7 +101,7 @@
     "@types/js-yaml": "^3.10.1",
     "@types/jsonwebtoken": "^7.2.5",
     "@types/nock": "^9.1.0",
-    "@types/node": "^10.3.0",
+    "@types/node": "^10.7.0",
     "@types/raven": "^2.1.5",
     "@types/resolve": "^0.0.4",
     "@types/semver": "^5.4.0",
@@ -118,11 +118,11 @@
     "standard": "^11.0.0",
     "standard-markdown": "^4.0.2",
     "supertest": "^3.0.0",
-    "ts-jest": "^23.0.0",
+    "ts-jest": "^23.1.4",
     "tslint": "^5.9.1",
     "tslint-config-prettier": "^1.10.0",
     "tslint-config-standard": "^7.1.0",
-    "typedoc": "^0.11.1",
+    "typedoc": "^0.12.0",
     "typescript": "^2.7.2"
   },
   "standard": {

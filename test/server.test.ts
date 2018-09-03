@@ -1,9 +1,10 @@
+import { Application, NextFunction, Request, Response } from 'express'
 import request from 'supertest'
 import { logger } from '../src/logger'
 import { createServer } from '../src/server'
 
 describe('server', () => {
-  let server: any
+  let server: Application
   let webhook: any
 
   beforeEach(() => {
@@ -11,7 +12,7 @@ describe('server', () => {
     server = createServer({ webhook, logger })
 
     // Error handler to avoid printing logs
-    server.use((err: any, req: any, res: any, next: any) => {
+    server.use((err: Error, req: Request, res: Response, next: NextFunction) => {
       res.status(500).send(err.message)
     })
   })
@@ -24,7 +25,7 @@ describe('server', () => {
 
   describe('webhook handler', () => {
     it('should 500 on a webhook error', () => {
-      webhook.mockImplementation((req: any, res: any, callback: any) => callback(new Error('webhook error')))
+      webhook.mockImplementation((req: Request, res: Response, callback: NextFunction) => callback(new Error('webhook error')))
       return request(server).post('/').expect(500)
     })
   })

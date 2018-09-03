@@ -1,17 +1,18 @@
-const request = require('supertest')
-const {createServer} = require('../src/server')
-const {logger} = require('../src/logger')
+import { Application, NextFunction, Request, Response } from 'express'
+import request from 'supertest'
+import { logger } from '../src/logger'
+import { createServer } from '../src/server'
 
-describe('server', function () {
-  let server
-  let webhook
+describe('server', () => {
+  let server: Application
+  let webhook: any
 
   beforeEach(() => {
     webhook = jest.fn((req, res, next) => next())
-    server = createServer({webhook, logger})
+    server = createServer({ webhook, logger })
 
     // Error handler to avoid printing logs
-    server.use(function (err, req, res, next) {
+    server.use((err: Error, req: Request, res: Response, next: NextFunction) => {
       res.status(500).send(err.message)
     })
   })
@@ -24,7 +25,7 @@ describe('server', function () {
 
   describe('webhook handler', () => {
     it('should 500 on a webhook error', () => {
-      webhook.mockImplementation((req, res, callback) => callback(new Error('webhook error')))
+      webhook.mockImplementation((req: Request, res: Response, callback: NextFunction) => callback(new Error('webhook error')))
       return request(server).post('/').expect(500)
     })
   })

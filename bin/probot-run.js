@@ -20,6 +20,9 @@ program
 if (!program.app) {
   console.warn('Missing GitHub App ID.\nUse --app flag or set APP_ID environment variable.')
   program.help()
+} else if (!program.webhookProxy) {
+  console.warn('Missing Webhook Proxy URL.\nGo to smee.io to create a new channel and set WEBHOOK_PROXY_URL environment variable.')
+  program.help()
 }
 
 if (!program.privateKey) {

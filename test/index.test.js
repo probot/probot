@@ -78,6 +78,19 @@ describe('Probot', () => {
         expect(probot.logger.error.mock.calls[0]).toMatchSnapshot()
       }
     })
+
+    it('responds with the error even if the was no error message', async () => {
+      probot.logger.error = jest.fn()
+      let err = Error()
+      err.message = null
+      probot.webhook.on('*', () => { throw err })
+
+      try {
+        await probot.webhook.receive(event)
+      } catch (e) {
+        expect(probot.logger.error.mock.calls[0]).toMatchSnapshot()
+      }
+    })
   })
 
   describe('server', () => {

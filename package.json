@@ -70,7 +70,7 @@
   "license": "ISC",
   "dependencies": {
     "@octokit/rest": "^15.11.0",
-    "@octokit/webhooks": "5.0.0",
+    "@octokit/webhooks": "5.0.1",
     "bottleneck": "^2.8.0",
     "bunyan": "^1.8.12",
     "bunyan-format": "^0.2.1",

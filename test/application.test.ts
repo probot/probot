@@ -302,7 +302,7 @@ describe('Application', () => {
       app.app = () => 'app-bearer-authorization-token'
 
       scopeInstall = nock('https://api.github.com')
-        .post('/installations/1/access_tokens')
+        .post('/app/installations/1/access_tokens')
         .reply(200, { token: 'installation-bearer-authorization-token' })
       scopeData = nock('https://api.github.com')
         .matchHeader('authorization', 'token installation-bearer-authorization-token')
@@ -335,7 +335,7 @@ describe('Application', () => {
 
       // Receive second event
       const scopeInstallTwo = nock('https://api.github.com')
-        .post('/installations/1/access_tokens')
+        .post('/app/installations/1/access_tokens')
           .reply(200, { token: 'token-should-not-be-requested' })
       const scopeDataTwo = nock('https://api.github.com')
         .matchHeader('authorization', 'token installation-bearer-authorization-token')
@@ -364,7 +364,7 @@ describe('Application', () => {
 
       // Receive second event
       const scopeInstallTwo = nock('https://api.github.com')
-        .post('/installations/1/access_tokens')
+        .post('/app/installations/1/access_tokens')
           .reply(200, { token: 'second-installation-token' })
       const scopeDataTwo = nock('https://api.github.com')
         .matchHeader('authorization', 'token second-installation-token')

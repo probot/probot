@@ -18,7 +18,7 @@ describe('stats app', function () {
     beforeEach(async () => {
       nock('https://api.github.com')
         .defaultReplyHeaders({'Content-Type': 'application/json'})
-        .post('/installations/1/access_tokens').reply(200, {token: 'test'})
+        .post('/app/installations/1/access_tokens').reply(200, {token: 'test'})
         .get('/app/installations?per_page=100').reply(200, [{id: 1, account: {login: 'testing'}}])
         .get('/installation/repositories?per_page=100').reply(200, {repositories: [
           {private: true, stargazers_count: 1},
@@ -53,7 +53,7 @@ describe('stats app', function () {
       process.env.IGNORED_ACCOUNTS = 'hiimbex,spammyUser'
       nock('https://api.github.com')
         .defaultReplyHeaders({'Content-Type': 'application/json'})
-        .post('/installations/1/access_tokens').reply(200, {token: 'test'})
+        .post('/app/installations/1/access_tokens').reply(200, {token: 'test'})
         .get('/app/installations?per_page=100').reply(200, [{id: 1, account: {login: 'spammyUser'}}])
         .get('/installation/repositories?per_page=100').reply(200, {repositories: [
           {private: true, stargazers_count: 1},

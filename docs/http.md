@@ -16,7 +16,7 @@ module.exports = app => {
 
   // Add a new route
   router.get('/hello-world', (req, res) => {
-    res.end('Hello World')
+    res.send('Hello World')
   })
 }
 ```

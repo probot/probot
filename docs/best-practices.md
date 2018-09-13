@@ -19,7 +19,7 @@ Now that we agree that nobody will get hurt, here are some tips to make your app
 
 Understanding and being aware of the what another person is thinking or feeling is critical to healthy relationships. This is true for interactions with humans as well as apps, and it works both ways. Empathy enhances our [ability to receive and process information](http://5a5f89b8e10a225a44ac-ccbed124c38c4f7a3066210c073e7d55.r9.cf1.rackcdn.com/files/pdfs/news/Empathy_on_the_Edge.pdf), and it helps us communicate more effectively.
 
-Think about how how people will experience the interactions with your app.
+Think about how people will experience the interactions with your app.
 
 ### Avoid the uncanny valley
 

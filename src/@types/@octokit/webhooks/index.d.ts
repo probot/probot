@@ -12,6 +12,7 @@ declare module '@octokit/webhooks' {
     constructor (Options)
 
     public on (event: string, callback: (event: WebhookEvent | Error) => void)
+    public sign (data: WebhookPayloadWithRepository)
   }
 
   declare namespace Webhooks {

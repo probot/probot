@@ -1,6 +1,8 @@
 import fs from 'fs'
 import yaml from 'js-yaml'
 import path from 'path'
+// Remove me once this is possible via octokit/rest.js
+import fetch from 'node-fetch'
 
 import { exec } from 'child_process'
 import { Request, Response } from 'express'
@@ -55,7 +57,7 @@ export = async (app: Application) => {
 
     const githubHost = process.env.GHE_HOST || `github.com`
 
-    const createAppUrl = `https://${githubHost}/settings/apps/new?manifest=${baseUrl}/probot/app.json`
+    const createAppUrl = `http://${githubHost}/settings/apps/new?manifest=${baseUrl}/probot/app.json`
 
     res.render('setup.hbs', { pkg, createAppUrl })
   })
@@ -78,12 +80,19 @@ export = async (app: Application) => {
   })
 
   route.get('/probot/setup', async (req: Request, res: Response) => {
-    const { app_id, pem, webhook_secret } = req.query
+    // const { app_id, pem, webhook_secret } = req.query
+    const { code } = req.query
+    // Todo can we re-use the logic from application.ts here?
+    const response = await fetch(`http://api.github.localhost/app?code=${code}`, {
+      method: 'POST'
+    })
+    const { id, webhook_secret, pem } = await response.json()
+    console.log(id, webhook_secret, pem)
 
     // Save secrets in .env
     await updateDotenv({
-      APP_ID: app_id,
-      PRIVATE_KEY: `"${pem}"`,
+      APP_ID: id.toString(),
+      PRIVATE_KEY: pem,
       WEBHOOK_SECRET: webhook_secret
     })
     if (process.env.PROJECT_REMIX_CHAIN) {
@@ -94,8 +103,10 @@ export = async (app: Application) => {
       })
     }
 
-    const jwt = createApp({ id: app_id, cert: pem })
-    const github = GitHubAPI()
+    const jwt = createApp({ id, cert: pem })
+    const github = GitHubAPI({
+      baseUrl: 'http://api.github.localhost'
+    })
     github.authenticate({ type: 'app', token: jwt() })
 
     const { data: info } = await github.apps.get({})

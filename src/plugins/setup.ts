@@ -10,8 +10,9 @@ import { GitHubAPI } from '../github'
 import { createApp } from '../github-app'
 
 // TODO: use actual server address:port
+// I think this is fine since index.ts does the same thing
 const welcomeMessage = `
-Welcome to Probot! Go to https://localhost:3000 to get started.
+Welcome to Probot! Go to http://localhost:${process.env.PORT || 3000} to get started.
 `
 
 export = async (app: Application) => {
@@ -42,6 +43,7 @@ export = async (app: Application) => {
       await updateDotenv({ WEBHOOK_PROXY_URL: await SmeeClient.createChannel() })
     } catch (err) {
       // Smee is not available, so we'll just move on
+      console.warn('Unable to connect to smee.io, try restarting your server.')
     }
   }
 
@@ -69,6 +71,7 @@ export = async (app: Application) => {
     res.json(Object.assign({
       callback_url: `${baseUrl}/probot/setup`,
       description: manifest.description || pkg.description,
+      // add setup url
       hook_attributes: {
         url: process.env.WEBHOOK_PROXY_URL || `${baseUrl}/`
       },
@@ -78,6 +81,8 @@ export = async (app: Application) => {
   })
 
   route.get('/probot/setup', async (req: Request, res: Response) => {
+    // make api request
+    // https://github.com/probot/probot/compare/setup-callback...manifest-with-code
     const { app_id, pem, webhook_secret } = req.query
 
     // Save secrets in .env

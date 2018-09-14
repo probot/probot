@@ -88,7 +88,6 @@ export class Probot {
     // Initialize the ApplicationFunction
     app.load(appFn)
     this.apps.push(app)
-
     return app
   }
 
@@ -113,7 +112,14 @@ export class Probot {
       })
     }
 
-    this.server.listen(this.options.port)
+    this.server.listen(this.options.port, function(){
+      console.log('Express listening on port', this.address());
+    });
+    this.server.on('listening', function() {
+      console.log('Express server started on port %s at %s', this.server.address().port, this.server.address().address);
+    });
+    //this.server.listen(this.options.port)
+    //console.log(this.server, this.options.port)
     logger.info('Listening on http://localhost:' + this.options.port)
   }
 }

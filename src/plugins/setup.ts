@@ -1,6 +1,8 @@
 import fs from 'fs'
 import yaml from 'js-yaml'
 import path from 'path'
+// Remove me once this is possible via octokit/rest.js
+import fetch from 'node-fetch'
 
 import { exec } from 'child_process'
 import { Request, Response } from 'express'
@@ -10,7 +12,6 @@ import { GitHubAPI } from '../github'
 import { createApp } from '../github-app'
 
 // TODO: use actual server address:port
-// I think this is fine since index.ts does the same thing
 const welcomeMessage = `
 Welcome to Probot! Go to http://localhost:${process.env.PORT || 3000} to get started.
 `
@@ -48,6 +49,7 @@ export = async (app: Application) => {
   }
 
   const route = app.route()
+  // console.log(route)
 
   route.get('/probot', async (req, res) => {
     const protocols = req.headers['x-forwarded-proto'] || req.protocol
@@ -57,7 +59,7 @@ export = async (app: Application) => {
 
     const githubHost = process.env.GHE_HOST || `github.com`
 
-    const createAppUrl = `https://${githubHost}/settings/apps/new?manifest=${baseUrl}/probot/app.json`
+    const createAppUrl = `http://${githubHost}/settings/apps/new?manifest=${baseUrl}/probot/app.json`
 
     res.render('setup.hbs', { pkg, createAppUrl })
   })
@@ -81,14 +83,18 @@ export = async (app: Application) => {
   })
 
   route.get('/probot/setup', async (req: Request, res: Response) => {
-    // make api request
-    // https://github.com/probot/probot/compare/setup-callback...manifest-with-code
-    const { app_id, pem, webhook_secret } = req.query
+    const { code } = req.query
+    // Todo can we re-use the logic from application.ts here?
+    const response = await fetch(`https://app-manifest.review-lab.github.com/api/v3/app-manifests/${code}/conversions`, {
+      headers: { 'User-Agent': 'curl/92dfe4c95d28b737ec118c3b4a2c1b269871d3b8' },
+      method: 'POST'
+    })
+    const { id, webhook_secret, pem } = await response.json()
 
     // Save secrets in .env
     await updateDotenv({
-      APP_ID: app_id,
-      PRIVATE_KEY: `"${pem}"`,
+      APP_ID: id.toString(),
+      PRIVATE_KEY: pem,
       WEBHOOK_SECRET: webhook_secret
     })
     if (process.env.PROJECT_REMIX_CHAIN) {
@@ -99,12 +105,27 @@ export = async (app: Application) => {
       })
     }
 
-    const jwt = createApp({ id: app_id, cert: pem })
-    const github = GitHubAPI()
+    const jwt = createApp({ id, cert: pem })
+    const github = GitHubAPI({
+      baseUrl: 'https://app-manifest.review-lab.github.com'
+    })
     github.authenticate({ type: 'app', token: jwt() })
 
-    const { data: info } = await github.apps.get({})
-    res.redirect(`${info.html_url}/installations/new`)
+    try {
+    // TODO: figure out why this 406's
+    //  { HttpError
+    //   at response.text.then.message (/Users/hiimbex/Desktop/probot/node_modules/@octokit/rest/lib/request/request.js:72:19)
+    //   at <anonymous>
+    //   at process._tickDomainCallback (internal/process/next_tick.js:228:7)
+    // name: 'HttpError',
+    // code: 406,
+    // status: undefined,
+      const response = await github.apps.get({})
+      console.log(response.data.info)
+      res.redirect(`${response.data.info.html_url}/installations/new`)
+    } catch (err) {
+      console.log(err)
+    }
   })
 
   route.get('/', (req, res, next) => res.redirect('/probot'))

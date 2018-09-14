@@ -107,25 +107,14 @@ export = async (app: Application) => {
 
     const jwt = createApp({ id, cert: pem })
     const github = GitHubAPI({
-      baseUrl: 'https://app-manifest.review-lab.github.com'
+      baseUrl: 'https://app-manifest.review-lab.github.com/api/v3'
     })
     github.authenticate({ type: 'app', token: jwt() })
 
-    try {
-    // TODO: figure out why this 406's
-    //  { HttpError
-    //   at response.text.then.message (/Users/hiimbex/Desktop/probot/node_modules/@octokit/rest/lib/request/request.js:72:19)
-    //   at <anonymous>
-    //   at process._tickDomainCallback (internal/process/next_tick.js:228:7)
-    // name: 'HttpError',
-    // code: 406,
-    // status: undefined,
-      const response = await github.apps.get({})
-      console.log(response.data.info)
-      res.redirect(`${response.data.info.html_url}/installations/new`)
-    } catch (err) {
-      console.log(err)
-    }
+    const response = await github.apps.get({
+      headers: { 'User-Agent': 'curl/92dfe4c95d28b737ec118c3b4a2c1b269871d3b8' }
+    })
+    res.redirect(`${response.data.html_url}/installations/new`)
   })
 
   route.get('/', (req, res, next) => res.redirect('/probot'))

@@ -116,7 +116,7 @@
     "semantic-release": "^15.0.0",
     "smee-client": "^1.0.1",
     "standard": "^12.0.0",
-    "standard-markdown": "^4.0.2",
+    "standard-markdown": "^5.0.1",
     "supertest": "^3.0.0",
     "ts-jest": "^23.1.4",
     "tslint": "^5.9.1",

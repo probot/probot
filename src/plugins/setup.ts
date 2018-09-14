@@ -74,6 +74,7 @@ export = async (app: Application) => {
       callback_url: `${baseUrl}/probot/setup`,
       description: manifest.description || pkg.description,
       // add setup url
+      setup_url:`${baseUrl}/probot/success`
       hook_attributes: {
         url: process.env.WEBHOOK_PROXY_URL || `${baseUrl}/`
       },
@@ -115,6 +116,10 @@ export = async (app: Application) => {
       headers: { 'User-Agent': 'curl/92dfe4c95d28b737ec118c3b4a2c1b269871d3b8' }
     })
     res.redirect(`${response.data.html_url}/installations/new`)
+  })
+
+  route.get('/probot/success', async (req, res) => {
+    res.render('success.hbs')
   })
 
   route.get('/', (req, res, next) => res.redirect('/probot'))

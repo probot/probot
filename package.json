@@ -112,7 +112,7 @@
     "eslint-plugin-markdown": "^1.0.0-beta.8",
     "jest": "^23.4.1",
     "minami": "^1.1.1",
-    "nock": "^9.2.0",
+    "nock": "^10.0.0",
     "semantic-release": "^15.0.0",
     "smee-client": "^1.0.1",
     "standard": "^12.0.0",

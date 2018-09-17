@@ -74,7 +74,7 @@ export = async (app: Application) => {
       callback_url: `${baseUrl}/probot/setup`,
       description: manifest.description || pkg.description,
       // add setup url
-      setup_url:`${baseUrl}/probot/success`
+      setup_url:`${baseUrl}/probot/success`,
       hook_attributes: {
         url: process.env.WEBHOOK_PROXY_URL || `${baseUrl}/`
       },
@@ -85,11 +85,17 @@ export = async (app: Application) => {
 
   route.get('/probot/setup', async (req: Request, res: Response) => {
     const { code } = req.query
-    // Todo can we re-use the logic from application.ts here?
-    const response = await fetch(`https://app-manifest.review-lab.github.com/api/v3/app-manifests/${code}/conversions`, {
-      headers: { 'User-Agent': 'curl/92dfe4c95d28b737ec118c3b4a2c1b269871d3b8' },
-      method: 'POST'
+    console.log(code)
+
+//curl -X POST https://api.github.com/app-manifests/:code/conversions -I \
+//-H "Accept: application/vnd.github.fury-preview+json"
+
+    const response = await fetch(`https://api.github.com/app-manifests/${code}/conversions`, {
+      method: 'POST',
+      headers: { 'Accept': 'application/vnd.github.fury-preview+json', 'Content-Type': 'application/json' }
     })
+    //  .catch(err => console.error(err));
+    console.log(response)
     const { id, webhook_secret, pem } = await response.json()
 
     // Save secrets in .env
@@ -107,15 +113,12 @@ export = async (app: Application) => {
     }
 
     const jwt = createApp({ id, cert: pem })
-    const github = GitHubAPI({
-      baseUrl: 'https://app-manifest.review-lab.github.com/api/v3'
-    })
+    const github = GitHubAPI({})
     github.authenticate({ type: 'app', token: jwt() })
 
-    const response = await github.apps.get({
-      headers: { 'User-Agent': 'curl/92dfe4c95d28b737ec118c3b4a2c1b269871d3b8' }
-    })
+    const response = await github.apps.get({})
     res.redirect(`${response.data.html_url}/installations/new`)
+  //  exec('npm start')
   })
 
   route.get('/probot/success', async (req, res) => {

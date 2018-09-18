@@ -57,30 +57,29 @@ export = async (app: Application) => {
     const host = req.headers['x-forwarded-host'] || req.get('host')
     const baseUrl = `${protocol}://${host}`
 
-    const githubHost = process.env.GHE_HOST || `github.com`
+    //const githubHost = process.env.GHE_HOST || `github.com`
+    const githubHost = 'https://post-app-manifest-client-side.review-lab.github.com'
 
-    const createAppUrl = `http://${githubHost}/settings/apps/new?manifest=${baseUrl}/probot/app.json`
-
-    res.render('setup.hbs', { pkg, createAppUrl })
-  })
-
-  route.get('/probot/app.json', (req: Request, res: Response) => {
-    const protocols = req.headers['x-forwarded-proto'] || req.protocol
-    const protocol = typeof protocols === 'string' ? protocols.split(',')[0] : protocols[0]
-    const host = req.headers['x-forwarded-host'] || req.get('host')
-    const baseUrl = `${protocol}://${host}`
-
-    res.json(Object.assign({
-      callback_url: `${baseUrl}/probot/setup`,
+    let generatedManifest = Object.assign({
+      redirect_url: `${baseUrl}/probot/setup`,
       description: manifest.description || pkg.description,
       // add setup url
-      setup_url:`${baseUrl}/probot/success`,
+      // setup_url:`${baseUrl}/probot/success`,
       hook_attributes: {
         url: process.env.WEBHOOK_PROXY_URL || `${baseUrl}/`
       },
       name: manifest.name || pkg.name,
-      url: manifest.url || pkg.homepage || pkg.repository
-    }, manifest))
+      url: manifest.url || pkg.homepage || pkg.repository,
+      public: manifest.public || 'true'
+    }, manifest)
+    console.log(generatedManifest, typeof generatedManifest)
+    generatedManifest = JSON.stringify(generatedManifest)
+    console.log(generatedManifest, typeof generatedManifest)
+    // POST the manifest
+    // http://github.localhost/settings/apps/new
+    const createAppUrl = `${githubHost}/settings/apps/new`
+
+    res.render('setup.hbs', { pkg, createAppUrl, generatedManifest })
   })
 
   route.get('/probot/setup', async (req: Request, res: Response) => {

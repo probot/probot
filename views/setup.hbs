@@ -28,9 +28,12 @@
         <div class="text-left mt-6">
           <h2 class="alt-h3 mb-2">Getting Started</h2>
 
-          <p>Some intro text about what you need to do to get this working.</p>
+          <p>To start building a GitHub App, you'll need to register a need app on GitHub.</p>
+          <br>
 
-          <a href="{{ createAppUrl }}" target="_blank" class="btn btn-outline">Register GitHub App</a>
+          <form action="{{ createAppUrl }}" method="post">
+            <button class="btn btn-outline" name="manifest" id="manifest" value={{ generatedManifest }}>Register GitHub App</button>
+          </form>
         </div>
       </div>
 

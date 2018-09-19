@@ -47,6 +47,7 @@ export = async (app: Application) => {
       console.warn('Unable to connect to smee.io, try restarting your server.')
     }
   }
+  const githubHost = process.env.GHE_HOST || `github.com`
 
   const route = app.route()
 
@@ -57,7 +58,7 @@ export = async (app: Application) => {
     const baseUrl = `${protocol}://${host}`
 
     //const githubHost = process.env.GHE_HOST || `github.com`
-    const githubHost = 'post-app-manifest-client-side.review-lab.github.com'
+    //const githubHost = 'post-app-manifest-client-side.review-lab.github.com'
     // TODO: once this is live, remove this
 
     let generatedManifest = JSON.stringify(Object.assign({
@@ -80,10 +81,10 @@ export = async (app: Application) => {
 
   route.get('/probot/setup', async (req: Request, res: Response) => {
     const { code } = req.query
-    //curl -X POST https://api.github.com/app-manifests/:code/conversions -I \
+    //curl -X POST https://api.github.com/app-manifests/702790e7ab49bdd0e47cb7cdc64854a79cf5c529/conversions -I \
     // -H "Accept: application/vnd.github.fury-preview+json"
 
-    const response = await fetch(`https://api.github.com/app-manifests/${code}/conversions`, {
+    const response = await fetch(`http://${githubHost}/app-manifests/${code}/conversions`, {
       method: 'POST',
       headers: { 'Accept': 'application/vnd.github.fury-preview+json', 'Content-Type': 'application/json' }
     })

@@ -49,7 +49,6 @@ export = async (app: Application) => {
   }
 
   const route = app.route()
-  // console.log(route)
 
   route.get('/probot', async (req, res) => {
     const protocols = req.headers['x-forwarded-proto'] || req.protocol
@@ -58,9 +57,10 @@ export = async (app: Application) => {
     const baseUrl = `${protocol}://${host}`
 
     //const githubHost = process.env.GHE_HOST || `github.com`
-    const githubHost = 'https://post-app-manifest-client-side.review-lab.github.com'
+    const githubHost = 'post-app-manifest-client-side.review-lab.github.com'
+    // TODO: once this is live, remove this
 
-    let generatedManifest = Object.assign({
+    let generatedManifest = JSON.stringify(Object.assign({
       redirect_url: `${baseUrl}/probot/setup`,
       description: manifest.description || pkg.description,
       // add setup url
@@ -71,29 +71,23 @@ export = async (app: Application) => {
       name: manifest.name || pkg.name,
       url: manifest.url || pkg.homepage || pkg.repository,
       public: manifest.public || 'true'
-    }, manifest)
-    console.log(generatedManifest, typeof generatedManifest)
-    generatedManifest = JSON.stringify(generatedManifest)
-    console.log(generatedManifest, typeof generatedManifest)
-    // POST the manifest
-    // http://github.localhost/settings/apps/new
-    const createAppUrl = `${githubHost}/settings/apps/new`
+    }, manifest))
 
+    const createAppUrl = `http://${githubHost}/settings/apps/new`
+    // Pass the manifest to be POST'd
     res.render('setup.hbs', { pkg, createAppUrl, generatedManifest })
   })
 
   route.get('/probot/setup', async (req: Request, res: Response) => {
     const { code } = req.query
-    console.log(code)
-
-//curl -X POST https://api.github.com/app-manifests/:code/conversions -I \
-//-H "Accept: application/vnd.github.fury-preview+json"
+    //curl -X POST https://api.github.com/app-manifests/:code/conversions -I \
+    // -H "Accept: application/vnd.github.fury-preview+json"
 
     const response = await fetch(`https://api.github.com/app-manifests/${code}/conversions`, {
       method: 'POST',
       headers: { 'Accept': 'application/vnd.github.fury-preview+json', 'Content-Type': 'application/json' }
     })
-    //  .catch(err => console.error(err));
+
     console.log(response)
     const { id, webhook_secret, pem } = await response.json()
 

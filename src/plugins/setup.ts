@@ -1,24 +1,13 @@
 import fs from 'fs'
 import yaml from 'js-yaml'
 import path from 'path'
-// Remove me once this is possible via octokit/rest.js
-import fetch from 'node-fetch'
-
 import { exec } from 'child_process'
 import { Request, Response } from 'express'
 import updateDotenv from 'update-dotenv'
 import { Application } from '../application'
 import { GitHubAPI } from '../github'
-import { createApp } from '../github-app'
-
-// TODO: use actual server address:port
-const welcomeMessage = `
-Welcome to Probot! Go to http://localhost:${process.env.PORT || 3000} to get started.
-`
 
 export = async (app: Application) => {
-  app.log.info(welcomeMessage)
-
   let pkg: any
   try {
     pkg = require(path.join(process.cwd(), 'package.json'))
@@ -47,7 +36,6 @@ export = async (app: Application) => {
       console.warn('Unable to connect to smee.io, try restarting your server.')
     }
   }
-  const githubHost = process.env.GHE_HOST || `github.com`
 
   const route = app.route()
 
@@ -57,6 +45,7 @@ export = async (app: Application) => {
     const host = req.headers['x-forwarded-host'] || req.get('host')
     const baseUrl = `${protocol}://${host}`
 
+    const githubHost = process.env.GHE_HOST || `github.com`
     //const githubHost = process.env.GHE_HOST || `github.com`
     //const githubHost = 'post-app-manifest-client-side.review-lab.github.com'
     // TODO: once this is live, remove this
@@ -81,16 +70,17 @@ export = async (app: Application) => {
 
   route.get('/probot/setup', async (req: Request, res: Response) => {
     const { code } = req.query
-    //curl -X POST https://api.github.com/app-manifests/702790e7ab49bdd0e47cb7cdc64854a79cf5c529/conversions -I \
+    //curl -X POST https://api.github.com/app-manifests/cd5a8639598666ca51001451dce9b832ea1692bc/conversions -I \
     // -H "Accept: application/vnd.github.fury-preview+json"
-
-    const response = await fetch(`http://${githubHost}/app-manifests/${code}/conversions`, {
+    const github = GitHubAPI()
+    const response = await github.request({
+      url: `/app-manifests/${code}/conversions`,
       method: 'POST',
-      headers: { 'Accept': 'application/vnd.github.fury-preview+json', 'Content-Type': 'application/json' }
+      headers: { accept: 'application/vnd.github.fury-preview+json' }
     })
 
     console.log(response)
-    const { id, webhook_secret, pem } = await response.json()
+    const { id, webhook_secret, pem } = response.data
 
     // Save secrets in .env
     await updateDotenv({
@@ -106,13 +96,10 @@ export = async (app: Application) => {
       })
     }
 
-    const jwt = createApp({ id, cert: pem })
-    const github = GitHubAPI({})
-    github.authenticate({ type: 'app', token: jwt() })
-
-    const response = await github.apps.get({})
     res.redirect(`${response.data.html_url}/installations/new`)
-  //  exec('npm start')
+    // TODO: make sure app is actually running regularly ??
+    // dotenv.load() ??
+    // exec('npm start')
   })
 
   route.get('/probot/success', async (req, res) => {

@@ -1,19 +1,15 @@
+import { exec } from 'child_process'
+import { Request, Response } from 'express'
 import fs from 'fs'
 import yaml from 'js-yaml'
 import path from 'path'
-import { exec } from 'child_process'
-import { Request, Response } from 'express'
 import updateDotenv from 'update-dotenv'
 import { Application } from '../application'
 import { GitHubAPI } from '../github'
+import { Thingerator } from '../thingerator'
 
-export = async (app: Application) => {
-  let pkg: any
-  try {
-    pkg = require(path.join(process.cwd(), 'package.json'))
-  } catch (e) {
-    pkg = {}
-  }
+export = async (app: Application, setup: Thingerator = new Thingerator()) => {
+  const pkg = setup.pkg
 
   let manifest: any = {}
   try {
@@ -27,14 +23,7 @@ export = async (app: Application) => {
   }
 
   if (process.env.NODE_ENV !== 'production') {
-    try {
-      // tslint:disable:no-var-requires
-      const SmeeClient = require('smee-client')
-      await updateDotenv({ WEBHOOK_PROXY_URL: await SmeeClient.createChannel() })
-    } catch (err) {
-      // Smee is not available, so we'll just move on
-      console.warn('Unable to connect to smee.io, try restarting your server.')
-    }
+    await setup.createWebhookChannel()
   }
 
   const route = app.route()
@@ -46,11 +35,11 @@ export = async (app: Application) => {
     const baseUrl = `${protocol}://${host}`
 
     const githubHost = process.env.GHE_HOST || `github.com`
-    //const githubHost = process.env.GHE_HOST || `github.com`
-    //const githubHost = 'post-app-manifest-client-side.review-lab.github.com'
+    // const githubHost = process.env.GHE_HOST || `github.com`
+    // const githubHost = 'post-app-manifest-client-side.review-lab.github.com'
     // TODO: once this is live, remove this
 
-    let generatedManifest = JSON.stringify(Object.assign({
+    const generatedManifest = JSON.stringify(Object.assign({
       redirect_url: `${baseUrl}/probot/setup`,
       description: manifest.description || pkg.description,
       // add setup url
@@ -70,7 +59,7 @@ export = async (app: Application) => {
 
   route.get('/probot/setup', async (req: Request, res: Response) => {
     const { code } = req.query
-    //curl -X POST https://api.github.com/app-manifests/cd5a8639598666ca51001451dce9b832ea1692bc/conversions -I \
+    // curl -X POST https://api.github.com/app-manifests/cd5a8639598666ca51001451dce9b832ea1692bc/conversions -I \
     // -H "Accept: application/vnd.github.fury-preview+json"
     const github = GitHubAPI()
     const response = await github.request({

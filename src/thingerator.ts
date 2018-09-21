@@ -1,7 +1,7 @@
-import path from 'path'
-import updateDotenv from 'update-dotenv'
 import fs from 'fs'
 import yaml from 'js-yaml'
+import path from 'path'
+import updateDotenv from 'update-dotenv'
 import { GitHubAPI } from './github'
 
 export class Thingerator {
@@ -16,7 +16,6 @@ export class Thingerator {
   }
 
   public async createWebhookChannel () {
-    console.log('creating webhook channel')
     try {
       // tslint:disable:no-var-requires
       const SmeeClient = require('smee-client')
@@ -41,16 +40,16 @@ export class Thingerator {
     }
 
     const generatedManifest = JSON.stringify(Object.assign({
-      redirect_url: `${baseUrl}/probot/setup`,
       description: manifest.description || pkg.description,
-      // add setup url
-      // setup_url:`${baseUrl}/probot/success`,
       hook_attributes: {
         url: process.env.WEBHOOK_PROXY_URL || `${baseUrl}/`
       },
       name: manifest.name || pkg.name,
-      url: manifest.url || pkg.homepage || pkg.repository,
-      public: manifest.public || 'true'
+      public: manifest.public || 'true',
+      redirect_url: `${baseUrl}/probot/setup`,
+      // add setup url
+      // setup_url:`${baseUrl}/probot/success`,
+      url: manifest.url || pkg.homepage || pkg.repository
     }, manifest))
 
     return generatedManifest
@@ -59,9 +58,9 @@ export class Thingerator {
   public async createAppFromCode (code: any) {
     const github = GitHubAPI()
     const response = await github.request({
-      url: `/app-manifests/${code}/conversions`,
+      headers: { accept: 'application/vnd.github.fury-preview+json' },
       method: 'POST',
-      headers: { accept: 'application/vnd.github.fury-preview+json' }
+      url: `/app-manifests/${code}/conversions`
     })
 
     const { id, webhook_secret, pem } = response.data

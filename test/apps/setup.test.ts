@@ -3,7 +3,7 @@ import request from 'supertest'
 import { Application } from '../../src'
 import appFn from '../../src/plugins/setup'
 import { Thingerator } from '../../src/thingerator'
-const { newApp } = require('./helper')
+import { newApp } from './helper'
 
 describe('Setup app', () => {
   let server: express.Application
@@ -16,14 +16,16 @@ describe('Setup app', () => {
 
     setup.createWebhookChannel = jest.fn()
 
-    appFn(app, setup)
+    await appFn(app, setup)
     server = express()
     server.use(app.router)
   })
 
   describe('GET /probot', () => {
     it('returns a 200 response', () => {
-      return request(server).get('/probot').expect(200)
+      request(server)
+        .get('/probot')
+        .expect(200)
     })
   })
 })

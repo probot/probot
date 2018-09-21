@@ -42,7 +42,7 @@
       ".+\\.tsx?$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
     "testMatch": [
-      "<rootDir>/test/**/*.test.(ts|js)"
+      "<rootDir>/test/**/*.(ts|js)"
     ],
     "testPathIgnorePatterns": [
       "<rootDir>/test/setup.js",

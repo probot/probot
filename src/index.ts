@@ -83,6 +83,7 @@ export class Probot {
     // Initialize the ApplicationFunction
     app.load(appFn)
     this.apps.push(app)
+
     return app
   }
 

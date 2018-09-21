@@ -191,13 +191,16 @@ export class Application {
       logger: log.child({ name: 'github', installation: String(id) })
     })
 
+    // Cache for 1 minute less than GitHub expiry
+    const installationTokenTTL = parseInt(process.env.INSTALLATION_TOKEN_TTL || '3540', 10)
+
     if (id) {
       const res = await this.cache.wrap(`app:${id}:token`, () => {
         log.trace(`creating token for installation`)
         github.authenticate({ type: 'app', token: this.app() })
 
         return github.apps.createInstallationToken({ installation_id: String(id) })
-      }, { ttl: 60 * 59 }) // Cache for 1 minute less than GitHub expiry
+      }, { ttl: installationTokenTTL })
 
       github.authenticate({ type: 'token', token: res.data.token })
     } else {

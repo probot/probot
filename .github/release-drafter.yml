@@ -1,0 +1,18 @@
+template: >
+  TODO before cutting release:
+  - [ ] Sort changes into relevant sections below
+  - [ ] Replace `master` with next tag in "See full changelog" link
+  - [ ] Delete this TODO list
+  - [ ] Hit pubish
+  
+  ## Breaking Changes
+
+  - TODO
+  
+  ## Improvements
+  
+  - TODO
+  
+  $CHANGES
+  
+  [See full changelog](https://github.com/probot/probot/compare/$PREVIOUS_TAG...master)

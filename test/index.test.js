@@ -1,7 +1,7 @@
 const {createProbot} = require('../src')
 const request = require('supertest')
 const nock = require('nock')
-const helper = require('./plugins/helper')
+const helper = require('./apps/helper')
 
 describe('Probot', () => {
   let probot

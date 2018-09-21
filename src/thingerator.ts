@@ -71,7 +71,7 @@ export class Thingerator {
       WEBHOOK_SECRET: webhook_secret
     })
 
-    return response
+    return response.data.html_url
   }
 
   private async updateEnv (env: any) {

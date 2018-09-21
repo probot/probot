@@ -3,7 +3,7 @@ import request from 'supertest'
 import { Application } from '../../src'
 import appFn from '../../src/plugins/setup'
 import { Thingerator } from '../../src/thingerator'
-import { newApp } from './helper'
+const { newApp } = require('./helper')
 
 describe('Setup app', () => {
   let server: express.Application

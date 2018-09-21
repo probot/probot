@@ -25,7 +25,7 @@ export = async (app: Application, setup: Thingerator = new Thingerator()) => {
 
   route.get('/probot/setup', async (req: Request, res: Response) => {
     const { code } = req.query
-    const response = await setup.createAppFromCode(code)
+    const url = await setup.createAppFromCode(code)
 
     // if (process.env.PROJECT_REMIX_CHAIN) {
     //   exec('refresh', (err, stdout, stderr) => {
@@ -34,7 +34,7 @@ export = async (app: Application, setup: Thingerator = new Thingerator()) => {
     //     }
     //   })
     // }
-    res.redirect(`${response.data.html_url}/installations/new`)
+    res.redirect(`${url}/installations/new`)
   })
 
   route.get('/probot/success', async (req, res) => {

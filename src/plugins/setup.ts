@@ -1,4 +1,4 @@
-// import { exec } from 'child_process'
+import { exec } from 'child_process'
 import { Request, Response } from 'express'
 import { Application } from '../application'
 import { Thingerator } from '../thingerator'
@@ -27,13 +27,13 @@ export = async (app: Application, setup: Thingerator = new Thingerator()) => {
     const { code } = req.query
     const url = await setup.createAppFromCode(code)
 
-    // if (process.env.PROJECT_REMIX_CHAIN) {
-    //   exec('refresh', (err, stdout, stderr) => {
-    //     if (err) {
-    //       app.log.error(err, stderr)
-    //     }
-    //   })
-    // }
+    if (process.env.PROJECT_REMIX_CHAIN) {
+      exec('refresh', (err, stdout, stderr) => {
+        if (err) {
+          app.log.error(err, stderr)
+        }
+      })
+    }
     res.redirect(`${url}/installations/new`)
   })
 

@@ -62,6 +62,7 @@ export class Thingerator {
       method: 'POST',
       url: `/app-manifests/${code}/conversions`
     })
+    console.log(response.data, response.data.html_url)
 
     const { id, webhook_secret, pem } = response.data
     await this.updateEnv({

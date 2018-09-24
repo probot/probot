@@ -1,6 +1,7 @@
 const { Thingerator } = require('../src/thingerator')
 const nock = require('nock')
 const package = require('../package.json')
+const response = require('./fixtures/setup/response.json')
 
 describe('Thingerator', () => {
   let setup
@@ -56,32 +57,21 @@ describe('Thingerator', () => {
   })
 
   describe('createAppFromCode', () => {
-    beforeEach(() => {
-      const code = '123abc'
-    })
+    test('creates an app from a code', async () => {
+      nock('https://api.github.com')
+        .post('/app-manifests/123abc/conversions')
+        .reply(200, response)
 
-    test('creates an app from a code', () => {
-      // TODO: use nock to mock out this endpoint
-      // add a response fixture
-      // check the updateEnv is called with data from the Response
-      // check that the return value matches the fixture
-
-      // setup.createAppFromCode(code)
+      const createdApp = await setup.createAppFromCode('123abc')
+      expect(createdApp).toEqual('https://github.com/apps/testerino0000000')
+      // expect dotenv to be called with id, webhook_secret, pem
     })
   })
 
-  // getManifest
   describe('getManifest', () => {
-    beforeEach(() => {
-      const baseUrl = 'localhost://3000'
-    })
-
     test('creates an app from a code', () => {
-      // TODO: check that getManifest returns a JSON.stringified manifest
-      // maybe check if app.yml is found
-      // maybe make the tmp directory to use to store a fake app.yml
-
-      // setup.getManifest(package, baseUrl)
+      // checks that getManifest returns a JSON.stringified manifest
+      expect(setup.getManifest(package, 'localhost://3000')).toEqual('{"description":"🤖 A framework for building GitHub Apps to automate and improve your workflow","hook_attributes":{"url":"localhost://3000/"},"name":"probot","public":"true","redirect_url":"localhost://3000/probot/setup","url":"https://probot.github.io"}')
     })
   })
 })

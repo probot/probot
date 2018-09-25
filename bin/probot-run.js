@@ -33,7 +33,7 @@ const probot = createProbot({
 const setupMode = !program.app || !program.privateKey
 
 if (setupMode) {
-  const setupApp = require('../lib/plugins/setup')
+  const setupApp = require('../lib/apps/setup')
   probot.load(setupApp)
   probot.start()
 } else {

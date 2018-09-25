@@ -9,13 +9,13 @@ const domain = process.env.PROJECT_DOMAIN || `http://localhost:${process.env.POR
 const welcomeMessage = `\nWelcome to Probot! Go to ${domain} to get started.\n`
 
 export = async (app: Application, setup: Thingerator = new Thingerator()) => {
-  app.log.info(welcomeMessage)
-
-  if (process.env.NODE_ENV !== 'production' && !process.env.PROJECT_DOMAIN) {
+  if (process.env.NODE_ENV !== 'production' && !(process.env.PROJECT_DOMAIN || process.env.WEBHOOK_PROXY_URL)) {
     await setup.createWebhookChannel()
   }
 
   const route = app.route()
+
+  app.log.info(welcomeMessage)
 
   route.get('/probot', async (req, res) => {
     const protocols = req.headers['x-forwarded-proto'] || req.protocol
@@ -45,7 +45,7 @@ export = async (app: Application, setup: Thingerator = new Thingerator()) => {
     // Programmatically detect if users are running app with nodemon?
     // if not
     // app.log.info(`We noticed you weren't using nodemon! Be sure to restart your app, since your .env has been updated.`)
-    res.redirect(`${response.data.html_url}/installations/new`)
+    res.redirect(`${response}/installations/new`)
   })
 
   route.get('/probot/success', async (req, res) => {

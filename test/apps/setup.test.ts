@@ -1,7 +1,7 @@
 import express from 'express'
 import request from 'supertest'
 import { Application } from '../../src'
-import appFn from '../../src/plugins/setup'
+import appFn from '../../src/apps/setup'
 import { Thingerator } from '../../src/thingerator'
 import { newApp } from './helper'
 

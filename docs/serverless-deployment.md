@@ -4,7 +4,9 @@ next: docs/persistence.md
 
 # Serverless Deployment
 
-Serverless computing is a model which aims to abstract server management without concerns for implementing, tweaking, or scaling a server (at least, to the perspective of a user). The follow sections will provide examples on how to deploy your application to service that will run on-demand as a Function as a Service(FaaS).
+Serverless computing is a model which aims to abstract server management without concerns for implementing, tweaking, or scaling a server (at least, to the perspective of a user). The following sections will provide examples on how to deploy your application to service that will run on-demand as a Function as a Service(FaaS).
+
+To learn more about other FaaS offerings and the concept of serverless, check out the [comparisons and case studies](https://serverless.com/learn/overview) created by the Serverless Framework.
 
 > Deploying to FaaS provider will require you to first [create a GitHub App](#create-the-github-app)
 
@@ -17,16 +19,7 @@ Serverless computing is a model which aims to abstract server management without
 
 ## Create the GitHub App
 
-Every deployment will need an [App](https://developer.github.com/apps/).
-
-1. [Create a new GitHub App](https://github.com/settings/apps/new) with:
-    - **Homepage URL**: the URL to the GitHub repository for your app
-    - **Webhook URL**: Use `https://example.com/` for now, we'll come back in a minute to update this with the URL of your deployed app.
-    - **Webhook Secret**: Generate a unique secret with `openssl rand -base64 32` and save it because you'll need it in a minute to configure your deployed app.
-
-1. Download the private key from the app and rename it to private-key.pem.
-
-1. Make sure that you click the green **Install** button on the top left of the app page. This gives you an option of installing the app on all or a subset of your repositories.
+Every deployment will need an [App](https://developer.github.com/apps/). If you have not created a GitHub App, you learn how using the [Deployment section of our docs](/deployment/#create-the-github-app)
 
 ## Deploy the app
 
@@ -37,7 +30,7 @@ To deploy an app to any cloud provider, you will need 2 environment variables:
 
 ### AWS Lambda
 
-AWS Lambda is an event-driven, serverless computing platform provided by Amazon as a part of the Amazon Web Services. It is a computing service that runs code in response to events and automatically manages the computing resources required by that code.
+AWS Lambda is an event-driven, serverless computing platform provided by Amazon as a part of the Amazon Web Services. AWS Lamba additionally manages the computing resources required for the code and adjusts those resources in conjunction with incoming events.
 1. [Install the @probot/serverless-lambda](https://github.com/probot/serverless-lambda#usage) plugin.
 2. Create a `handler.js` file in the route of you probot application
    ```

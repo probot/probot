@@ -8,7 +8,7 @@ Serverless computing is a model which aims to abstract server management without
 
 To learn more about other FaaS offerings and the concept of serverless, check out the [comparisons and case studies](https://serverless.com/learn/overview) created by the Serverless Framework.
 
-> Deploying to FaaS provider will require you to first [create a GitHub App](#create-the-github-app)
+> note: Deploying to FaaS provider will require you to first [create a GitHub App](#create-the-github-app)
 
 **Contents:**
 
@@ -23,10 +23,13 @@ Every deployment will need an [App](https://developer.github.com/apps/). If you 
 
 ## Deploy the app
 
-To deploy an app to any cloud provider, you will need 2 environment variables:
+To deploy an app to any cloud provider, you will need 3 environment variables:
 
 - `APP_ID`: the ID of the app, which you can get from the [app settings page](https://github.com/settings/apps).
 - `WEBHOOK_SECRET`: the **Webhook Secret** that you generated when you created the app.
+- `PRIVATE_KEY_PATH`: the path to a private key file
+
+> These environment variables will need to be pass through to your FaaS solution. Each solution is different, please consult their documentation on how to use variables in the deployed environment. 
 
 ### AWS Lambda
 

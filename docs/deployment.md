@@ -175,4 +175,4 @@ Probot comes bundled with a client for the [Sentry](https://github.com/getsentry
   3. Set the `SENTRY_DSN` environment variable with the DSN you retrieved.
 
 ## Serverless
-Serverless abstracts away the most menial parts of building an application, leaving developers to write code and not actively manage scaling for their applications. The [Serverless Deployment](/serverless-deployment) will show you how to deploy you application using functions instead of servers.
+Serverless abstracts away the most menial parts of building an application, leaving developers to write code and not actively manage scaling for their applications. The [Serverless Deployment](/serverless-deployment) section will show you how to deploy you application using functions instead of servers.

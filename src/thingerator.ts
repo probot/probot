@@ -45,7 +45,7 @@ export class Thingerator {
         url: process.env.WEBHOOK_PROXY_URL || `${baseUrl}/`
       },
       name: manifest.name || pkg.name,
-      public: manifest.public || 'true',
+      public: manifest.public || true,
       redirect_url: `${baseUrl}/probot/setup`,
       // add setup url
       // setup_url:`${baseUrl}/probot/success`,

@@ -31,6 +31,8 @@ To deploy an app to any cloud provider, you will need 3 environment variables:
 
 > These environment variables will need to be pass through to your FaaS solution. Each solution is different, please consult their documentation on how to use variables in the deployed environment. 
 
+Choosing a FaaS provider is mostly dependent on developer preference. Each Probot plugin interacts in a similar fashion, but the plugins implementation is dealing with different requests and responses specific to the provider. If you do not have a preference for a provider, choose the solution you have the most familiarity with.
+
 ### AWS Lambda
 
 AWS Lambda is an event-driven, serverless computing platform provided by Amazon as a part of the Amazon Web Services. AWS Lamba additionally manages the computing resources required for the code and adjusts those resources in conjunction with incoming events.

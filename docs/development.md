@@ -63,22 +63,22 @@ Now you're ready to run the app on your local machine. Run `npm run dev` to star
 
 The `dev` script will start your app using [nodemon](https://github.com/remy/nodemon#nodemon), which will watch for any files changes in your local development environment and automatically restart the server.
 
-## GitHub App Manifests
+## Configuring a GitHub App
 
-GitHub App Manifests--otherwise known as easy app creation--make it simple to generate all the settings necessary for a GitHub App. To get started with this simple process, which abstracts the [Configuring a GitHub App](#configuring-a-github-app) section, you'll need to run your app locally as described above.
+To automatically configrue your GitHub App, follow these steps:
 
 1. Run the app locally by running `npm run dev`.
 1. Next follow instructions to visit localhost:3000 (or your custom Glitch URL).
 1. You should see something like this: <img width="625" alt="screen shot 2018-09-25 at 10 01 28 pm" src="https://user-images.githubusercontent.com/13410355/46052950-a19e2900-c10e-11e8-9e7e-0c803b8ca35c.png">
 1. Go ahead and click the **Register a GitHub App** button. 
 1. Next you'll get to decide on an app name that isn't already taken.
-1. After registering your GitHub App, you'll be redirected to install the app on any repos. At the same time, you can check your local `.env` and notive it will be populated with values GitHub sends us in the course of that redirect.
+1. After registering your GitHub App, you'll be redirected to install the app on any repos. At the same time, you can check your local `.env` and notice it will be populated with values GitHub sends us in the course of that redirect.
 1. Install the app on a test repo and try triggering a webhook to activate the bot!
 1. You're all set! Head down to [Debugging](#debugging) to learn more about developing your Probot App.
 
-You can learn more about how GitHub App Manifests work and how to change your settings for one via the [GitHub Developer Docs](https://developer.github.com/apps/building-github-apps/creating-github-apps-from-a-manifest/).
+GitHub App Manifests--otherwise known as easy app creation--make it simple to generate all the settings necessary for a GitHub App. This process abstracts the [Configuring a GitHub App](#configuring-a-github-app) section. You can learn more about how GitHub App Manifests work and how to change your settings for one via the [GitHub Developer Docs](https://developer.github.com/apps/building-github-apps/creating-github-apps-from-a-manifest/).
 
-## Configuring a GitHub App
+## Manually Configuring a GitHub App
 
 > If you created an App with a manifest, you can skip this section; your app is already configured! If you ever need to edit those settings, you can visit `https://github.com/settings/apps/your-app-name`
 

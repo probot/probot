@@ -45,12 +45,12 @@ describe('ManifestCreation', () => {
     })
 
     test('creates an app url', () => {
-      expect(setup.createAppUrl).toEqual('http://github.com/settings/apps/new')
+      expect(setup.createAppUrl).toEqual('https://github.com/settings/apps/new')
     })
 
     test('creates an app url when github host env is set', () => {
       process.env.GHE_HOST = 'hiimbex.github.com'
-      expect(setup.createAppUrl).toEqual('http://hiimbex.github.com/settings/apps/new')
+      expect(setup.createAppUrl).toEqual('https://hiimbex.github.com/settings/apps/new')
     })
   })
 

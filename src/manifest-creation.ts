@@ -79,6 +79,6 @@ export class ManifestCreation {
 
   get createAppUrl () {
     const githubHost = process.env.GHE_HOST || `github.com`
-    return `http://${githubHost}/settings/apps/new`
+    return `https://${githubHost}/settings/apps/new`
   }
 }

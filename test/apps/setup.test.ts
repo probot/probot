@@ -29,6 +29,14 @@ describe('Setup app', () => {
     })
   })
 
+  describe('GET /probot/setup', () => {
+    it('returns a 200 response', () => {
+      return request(server)
+        .get('/probot')
+        .expect(200)
+    })
+  })
+
   describe('GET /probot/success', () => {
     it('returns a 200 response', () => {
       return request(server)

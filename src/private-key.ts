@@ -20,7 +20,7 @@ const hint = `please use:
  * @returns Private key
  * @private
  */
-export function findPrivateKey (filepath?: string): Buffer | string {
+export function findPrivateKey (filepath?: string): Buffer | string | null {
   if (filepath) {
     return fs.readFileSync(filepath)
   }
@@ -54,5 +54,5 @@ export function findPrivateKey (filepath?: string): Buffer | string {
   } else if (pemFiles[0]) {
     return findPrivateKey(pemFiles[0])
   }
-  throw new Error(`Missing private key for GitHub App, ${hint}`)
+  return null
 }

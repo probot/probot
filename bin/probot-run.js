@@ -17,14 +17,7 @@ program
   .option('-P, --private-key <file>', 'Path to certificate of the GitHub App', findPrivateKey)
   .parse(process.argv)
 
-if (!program.app) {
-  console.warn('Missing GitHub App ID.\nUse --app flag or set APP_ID environment variable.')
-  program.help()
-}
-
-if (!program.privateKey) {
-  program.privateKey = findPrivateKey()
-}
+program.privateKey = findPrivateKey()
 
 const {createProbot} = require('../')
 
@@ -37,7 +30,15 @@ const probot = createProbot({
   webhookProxy: program.webhookProxy
 })
 
-pkgConf('probot').then(pkg => {
-  probot.setup(program.args.concat(pkg.apps || pkg.plugins || []))
+const setupMode = !program.app || !program.privateKey
+
+if (setupMode) {
+  const setupApp = require('../lib/apps/setup')
+  probot.load(setupApp)
   probot.start()
-})
+} else {
+  pkgConf('probot').then(pkg => {
+    probot.setup(program.args.concat(pkg.apps || pkg.plugins || []))
+    probot.start()
+  })
+}

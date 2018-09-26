@@ -76,6 +76,8 @@ GitHub App Manifests--otherwise known as easy app creation--make it simple to ge
 1. Install the app on a test repo and try triggering a webhook to activate the bot!
 1. You're all set! Head down to [Debugging](#debugging) to learn more about developing your Probot App.
 
+You can learn more about how GitHub App Manifests work and how to change your settings for one via the [GitHub Developer Docs](https://developer.github.com/apps/building-github-apps/creating-github-apps-from-a-manifest/).
+
 ## Configuring a GitHub App
 
 > If you created an App with a manifest, you can skip this section; your app is already configured! If you ever need to edit those settings, you can visit `https://github.com/settings/apps/your-app-name`

@@ -1,14 +1,14 @@
-const { Thingerator } = require('../src/thingerator')
+const { ManifestCreation } = require('../src/manifest-creation')
 const nock = require('nock')
 const package = require('../package.json')
 const response = require('./fixtures/setup/response.json')
 
-describe('Thingerator', () => {
+describe('ManifestCreation', () => {
   let setup
   let SmeeClient
 
   beforeEach(() => {
-    setup = new Thingerator()
+    setup = new ManifestCreation()
   })
 
   describe('createWebhookChannel', () => {

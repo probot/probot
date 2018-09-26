@@ -2,17 +2,17 @@ import express from 'express'
 import request from 'supertest'
 import { Application } from '../../src'
 import appFn from '../../src/apps/setup'
-import { Thingerator } from '../../src/thingerator'
+import { ManifestCreation } from '../../src/manifest-creation'
 import { newApp } from './helper'
 
 describe('Setup app', () => {
   let server: express.Application
   let app: Application
-  let setup: Thingerator
+  let setup: ManifestCreation
 
   beforeEach(async () => {
     app = newApp()
-    setup = new Thingerator()
+    setup = new ManifestCreation()
 
     setup.createWebhookChannel = jest.fn()
 

@@ -4,7 +4,7 @@ import path from 'path'
 import updateDotenv from 'update-dotenv'
 import { GitHubAPI } from './github'
 
-export class Thingerator {
+export class ManifestCreation {
   get pkg () {
     let pkg: any
     try {
@@ -47,7 +47,7 @@ export class Thingerator {
       name: manifest.name || pkg.name,
       public: manifest.public || true,
       redirect_url: `${baseUrl}/probot/setup`,
-      // add setup url
+      // TODO: add setup url
       // setup_url:`${baseUrl}/probot/success`,
       url: manifest.url || pkg.homepage || pkg.repository
     }, manifest))

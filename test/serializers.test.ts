@@ -69,8 +69,7 @@ describe('serializers', () => {
     })
 
     it('returns nothing when passed nothing', () => {
-      const res = undefined
-      expect(serializers.res(res)).toBe(undefined)
+      expect(serializers.res(undefined)).toBe(undefined)
     })
   })
 })

@@ -26,6 +26,7 @@
 import Logger from 'bunyan'
 import bunyanFormat from 'bunyan-format'
 import { serializers } from './serializers'
+import supportsColor from 'supports-color'
 
 function toBunyanLogLevel (level: string) {
   switch (level) {
@@ -60,5 +61,5 @@ export const logger = new Logger({
   level: toBunyanLogLevel(process.env.LOG_LEVEL || 'info'),
   name: 'probot',
   serializers,
-  stream: new bunyanFormat({ outputMode: toBunyanFormat(process.env.LOG_FORMAT || 'short') })
+  stream: new bunyanFormat({ outputMode: toBunyanFormat(process.env.LOG_FORMAT || 'short'), color: supportsColor.stdout })
 })

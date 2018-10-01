@@ -53,9 +53,9 @@ Now you're ready to run the app on your local machine. Run `npm run dev` to star
 > probot run ./index.js
 
 01:57:22.365Z  INFO probot:
-  
+
   Welcome to Probot! Go to http://localhost:3000 to get started.
-  
+
 01:57:22.428Z  INFO probot: Forwarding https://smee.io/1S10MsoRSjZKWKMt to http://localhost:3000/
 01:57:22.431Z  INFO probot: Listening on http://localhost:3000
 01:57:22.564Z  INFO probot: Connected https://smee.io/1S10MsoRSjZKWKMt
@@ -65,12 +65,12 @@ The `dev` script will start your app using [nodemon](https://github.com/remy/nod
 
 ## Configuring a GitHub App
 
-To automatically configrue your GitHub App, follow these steps:
+To automatically configure your GitHub App, follow these steps:
 
 1. Run the app locally by running `npm run dev`.
 1. Next follow instructions to visit localhost:3000 (or your custom Glitch URL).
 1. You should see something like this: <img width="625" alt="screen shot 2018-09-25 at 10 01 28 pm" src="https://user-images.githubusercontent.com/13410355/46052950-a19e2900-c10e-11e8-9e7e-0c803b8ca35c.png">
-1. Go ahead and click the **Register a GitHub App** button. 
+1. Go ahead and click the **Register a GitHub App** button.
 1. Next you'll get to decide on an app name that isn't already taken.
 1. After registering your GitHub App, you'll be redirected to install the app on any repos. At the same time, you can check your local `.env` and notice it will be populated with values GitHub sends us in the course of that redirect.
 1. Install the app on a test repo and try triggering a webhook to activate the bot!

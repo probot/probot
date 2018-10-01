@@ -25,8 +25,8 @@
 
 import Logger from 'bunyan'
 import bunyanFormat from 'bunyan-format'
-import { serializers } from './serializers'
 import supportsColor from 'supports-color'
+import { serializers } from './serializers'
 
 function toBunyanLogLevel (level: string) {
   switch (level) {

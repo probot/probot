@@ -58,7 +58,7 @@ export interface GitHubAPI extends Octokit {
   }
 
   request: (RequestOptions: RequestOptions) => Promise<Octokit.AnyResponse>
-  query: (query: string, variables?: Variables, headers?: Headers) => Promise<GraphQLResponse>
+  query: (query: string, variables?: Variables, headers?: Headers) => Promise<any>
 }
 
 export interface Headers {

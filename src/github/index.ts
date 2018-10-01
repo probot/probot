@@ -67,6 +67,18 @@ export interface Headers {
 
 export interface Variables { [key: string]: any }
 
-export interface GraphQLResponse {
+export interface GraphQLError {
+  message: string,
+  locations?: Array<{ line: number, column: number }>,
+  path?: Array<string | number>,
+  extensions?: {
+    [key: string]: any
+  }
+}
+
+export interface GraphQLQueryError extends Error {
+  errors: GraphQLError[],
+  query: string,
+  variables: Variables,
   data: any
 }

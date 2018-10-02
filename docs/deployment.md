@@ -18,7 +18,7 @@ Every app can either be deployed stand-alone, or combined with other apps in one
 1. [Share the app](#share-the-app)
 1. [Combining apps](#combining-apps)
 1. [Error tracking](#error-tracking)
-1. [Servereless Deployments](#serverless)
+1. [Serverless Deployments](#serverless)
 
 ## Create the GitHub App
 

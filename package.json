@@ -66,6 +66,7 @@
   "dependencies": {
     "@octokit/rest": "^15.11.0",
     "@octokit/webhooks": "^5.0.2",
+    "@types/supports-color": "^5.3.0",
     "bottleneck": "^2.8.0",
     "bunyan": "^1.8.12",
     "bunyan-format": "^0.2.1",
@@ -85,6 +86,7 @@
     "raven": "^2.4.2",
     "resolve": "^1.4.0",
     "semver": "^5.5.0",
+    "supports-color": "^5.5.0",
     "update-dotenv": "^1.1.0",
     "uuid": "^3.2.1"
   },

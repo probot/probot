@@ -25,6 +25,7 @@ export class Application {
   public router: express.Router
   public catchErrors: boolean
   public log: LoggerWithTarget
+  public error: LoggerWithTarget['error']
 
   constructor (options?: Options) {
     const opts = options || {} as any

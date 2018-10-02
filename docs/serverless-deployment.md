@@ -47,7 +47,7 @@ AWS Lambda is an event-driven, serverless computing platform provided by Amazon 
 2. Follow the lambda [configuration steps](https://github.com/probot/serverless-lambda#configuration) using the [AWS CLI](https://aws.amazon.com/cli/) or [Serverless framework](https://github.com/serverless/serverless).
 3. Once the app is is configured and you can proceed with deploying using the either [AWS CLI](https://aws.amazon.com/cli/) or [Serverless framework](https://github.com/serverless/serverless)
 
-> note: The Servereless framework provides a simpler approach to setting up your AWS environment. It requires the creation of a serverless.yml in the root of your application.
+> note: The Serverless framework provides a simpler approach to setting up your AWS environment. It requires the creation of a serverless.yml in the root of your application.
 
 ### Google Cloud Function
 

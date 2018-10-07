@@ -20,13 +20,13 @@ export class Application {
   public catchErrors: boolean
   public log: LoggerWithTarget
 
-  private github: GitHubApp
+  private adapter: GitHubApp
 
   constructor (options?: Options) {
     const opts = options || {} as any
     this.events = new EventEmitter()
     this.log = wrapLogger(logger, logger)
-    this.github = opts.github
+    this.adapter = opts.adapter
     this.catchErrors = opts.catchErrors || false
     this.router = opts.router || express.Router() // you can do this?
   }
@@ -122,7 +122,7 @@ export class Application {
     if (typeof eventName === 'string') {
       return this.events.on(eventName, async (event: WebhookEvent) => {
         try {
-          await callback(await this.github.createContext(event))
+          await callback(await this.adapter.createContext(event))
         } catch (err) {
           this.log.error({ err, event, id: event.id })
           if (!this.catchErrors) {
@@ -135,19 +135,19 @@ export class Application {
     }
   }
 
-  @deprecated('github.jwt')
+  @deprecated('adapter.jwt', '8.0.0')
   public app (): string {
-    return this.github.jwt()
+    return this.adapter.jwt()
   }
 
-  @deprecated('github.auth')
+  @deprecated('adapter.auth', '8.0.0')
   public auth (id?: number, log = this.log): Promise<GitHubAPI> {
-    return this.github.auth(id, log)
+    return this.adapter.auth(id, log)
   }
 }
 
 export interface Options {
-  github: GitHubApp
+  adapter: GitHubApp
   router?: express.Router
   catchErrors?: boolean
 }

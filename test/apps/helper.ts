@@ -4,9 +4,9 @@ import { Application, ApplicationFunction } from '../../src'
 import { GitHubApp } from '../../src/github-app'
 
 export function newApp (): Application {
-  const github = new GitHubApp(1, 'test')
-  github.jwt = jest.fn().mockReturnValue('test')
-  return new Application({ github })
+  const adapter = new GitHubApp(1, 'test')
+  adapter.jwt = jest.fn().mockReturnValue('test')
+  return new Application({ adapter })
 }
 
 export function createApp (appFn?: ApplicationFunction) {

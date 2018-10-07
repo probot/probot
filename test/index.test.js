@@ -183,7 +183,7 @@ describe('Probot', () => {
     it('forwards events to each app', async () => {
       const spy = jest.fn()
       const app = probot.load(app => app.on('push', spy))
-      app.github.auth = jest.fn().mockReturnValue(Promise.resolve({}))
+      app.adapter.auth = jest.fn().mockReturnValue(Promise.resolve({}))
 
       await probot.receive(event)
 
@@ -212,7 +212,7 @@ describe('Probot', () => {
       const spy = jest.fn()
 
       const appFn = async app => {
-        const github = await app.github.auth()
+        const github = await app.adapter.auth()
         const res = await github.apps.getInstallations({})
         return spy(res)
       }
@@ -226,7 +226,7 @@ describe('Probot', () => {
       process.env.GHE_HOST = 'https://notreallygithub.com'
 
       try {
-        await app.github.auth()
+        await app.adapter.auth()
       } catch (e) {
         expect(e).toMatchSnapshot()
       }

@@ -6,7 +6,7 @@ import { GitHubApp } from '../src/github-app'
 import { logger } from '../src/logger'
 
 describe('Application', () => {
-  let github: GitHubApp
+  let adapter: GitHubApp
   let app: Application
   let event: WebhookEvent
   let output: any
@@ -25,10 +25,10 @@ describe('Application', () => {
     // Clear log output
     output = []
 
-    github = new GitHubApp(1, 'cert')
-    github.auth = jest.fn().mockReturnValue({})
+    adapter = new GitHubApp(1, 'cert')
+    adapter.auth = jest.fn().mockReturnValue({})
 
-    app = new Application({ github })
+    app = new Application({ adapter })
 
     event = {
       id: '123-456',
@@ -126,7 +126,7 @@ describe('Application', () => {
 
       await app.receive(event)
 
-      expect(github.auth).toHaveBeenCalledWith(1, expect.anything())
+      expect(adapter.auth).toHaveBeenCalledWith(1, expect.anything())
     })
 
     it('returns an unauthenticated client for installation.deleted', async () => {
@@ -145,7 +145,7 @@ describe('Application', () => {
 
       await app.receive(event)
 
-      expect(github.auth).toHaveBeenCalledWith()
+      expect(adapter.auth).toHaveBeenCalledWith()
     })
 
     it('returns an authenticated client for events without an installation', async () => {
@@ -161,7 +161,7 @@ describe('Application', () => {
 
       await app.receive(event)
 
-      expect(github.auth).toHaveBeenCalledWith()
+      expect(adapter.auth).toHaveBeenCalledWith()
     })
   })
 
@@ -274,16 +274,16 @@ describe('Application', () => {
       expect(spy).toHaveBeenCalled()
     })
 
-    test('app() calls github.jwt()', () => {
-      github.jwt = jest.fn().mockReturnValue('testing')
+    test('app() calls adapter.jwt()', () => {
+      adapter.jwt = jest.fn().mockReturnValue('testing')
       expect(app.app()).toEqual('testing')
-      expect(github.jwt).toHaveBeenCalled()
+      expect(adapter.jwt).toHaveBeenCalled()
     })
 
-    test('auth() calls github.auth()', async () => {
-      github.auth = jest.fn().mockReturnValue(Promise.resolve('a github client'))
+    test('auth() calls adapter.auth()', async () => {
+      adapter.auth = jest.fn().mockReturnValue(Promise.resolve('a github client'))
       expect(await app.auth(1, 'a logger' as any)).toEqual('a github client')
-      expect(github.auth).toHaveBeenCalledWith(1, 'a logger')
+      expect(adapter.auth).toHaveBeenCalledWith(1, 'a logger')
     })
   })
 })

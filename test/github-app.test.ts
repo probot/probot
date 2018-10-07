@@ -5,14 +5,14 @@ import path from 'path'
 import { GitHubApp } from '../src/github-app'
 
 describe('github-app', () => {
-  let github: GitHubApp
+  let adapter: GitHubApp
 
   describe('auth', () => {
     let scopeInstall: nock.Scope
 
     beforeEach(() => {
       const pem = path.join(__dirname, 'fixtures', 'private-key.pem')
-      github = new GitHubApp(1, fs.readFileSync(pem).toString())
+      adapter = new GitHubApp(1, fs.readFileSync(pem).toString())
 
       scopeInstall = nock('https://api.github.com')
         .post('/app/installations/1/access_tokens')
@@ -25,7 +25,7 @@ describe('github-app', () => {
     })
 
     it('returns authenticated GitHub client', async () => {
-      const client = await github.auth(1)
+      const client = await adapter.auth(1)
       expect(scopeInstall.isDone()).toEqual(true)
 
       const scopeData = nock('https://api.github.com')
@@ -38,8 +38,8 @@ describe('github-app', () => {
     })
 
     it('requests an installation token once for two events', async () => {
-      await github.auth(1)
-      await github.auth(1)
+      await adapter.auth(1)
+      await adapter.auth(1)
       expect(scopeInstall.isDone()).toEqual(true)
     })
 
@@ -47,7 +47,7 @@ describe('github-app', () => {
       // Only cache token for 1 second
       process.env.INSTALLATION_TOKEN_TTL = '1'
 
-      await github.auth(1)
+      await adapter.auth(1)
 
       // Sleep longer than ttl value to let token cache expire
       await (new Promise(resolve => setTimeout(resolve, 1001)))
@@ -61,7 +61,7 @@ describe('github-app', () => {
         .get('/orgs/myorg')
           .reply(200, {})
 
-      const client = await github.auth(1)
+      const client = await adapter.auth(1)
       await client.orgs.get({ org: 'myorg' })
 
       // our second token should have been requested and used

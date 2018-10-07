@@ -36,7 +36,7 @@ module.exports = async (app: any): Promise<void> => {
   }
 
   async function getInstallations (): Promise<Installation[]> {
-    const github = await app.github.auth()
+    const github = await app.adapter.auth()
     const req = github.apps.getInstallations({ per_page: 100 })
     return github.paginate(req, (res: AnyResponse) => res.data)
   }
@@ -51,7 +51,7 @@ module.exports = async (app: any): Promise<void> => {
         return account
       }
 
-      const github = await app.github.auth(installation.id)
+      const github = await app.adapter.auth(installation.id)
 
       const req = github.apps.getInstallationRepositories({ per_page: 100 })
       const repositories: Repository[] = await github.paginate(req, (res: AnyResponse) => {

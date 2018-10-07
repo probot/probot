@@ -1,3 +1,5 @@
+import { WebhookEvent } from '@octokit/webhooks'
+
 import { Application } from '../src/application'
 import { Context } from '../src/context'
 import { GitHubApp } from '../src/github-app'
@@ -6,7 +8,7 @@ import { logger } from '../src/logger'
 describe('Application', () => {
   let github: GitHubApp
   let app: Application
-  let event: any
+  let event: WebhookEvent
   let output: any
 
   beforeAll(() => {
@@ -29,8 +31,8 @@ describe('Application', () => {
     app = new Application({ github })
 
     event = {
-      event: 'test',
       id: '123-456',
+      name: 'test',
       payload: {
         action: 'foo',
         installation: { id: 1 }
@@ -75,13 +77,14 @@ describe('Application', () => {
     })
 
     it('calls callback x amount of times when an array of x actions is passed', async () => {
-      const event2 = {
-        event: 'arrayTest',
+      const event2: WebhookEvent = {
+        id: '123',
+        name: 'arrayTest',
         payload: {
           action: 'bar',
           installation: { id: 2 }
         }
-      } as any
+      }
 
       const spy = jest.fn()
       app.on(['test.foo', 'arrayTest.bar'], spy)
@@ -109,8 +112,8 @@ describe('Application', () => {
 
     it('returns an authenticated client for installation.created', async () => {
       event = {
-        event: 'installation',
         id: '123-456',
+        name: 'installation',
         payload: {
           action: 'created',
           installation: { id: 1 }
@@ -128,8 +131,8 @@ describe('Application', () => {
 
     it('returns an unauthenticated client for installation.deleted', async () => {
       event = {
-        event: 'installation',
         id: '123-456',
+        name: 'installation',
         payload: {
           action: 'deleted',
           installation: { id: 1 }
@@ -147,8 +150,8 @@ describe('Application', () => {
 
     it('returns an authenticated client for events without an installation', async () => {
       event = {
-        event: 'foobar',
         id: '123-456',
+        name: 'foobar',
         payload: { /* no installation */ }
       }
 
@@ -257,6 +260,20 @@ describe('Application', () => {
   })
 
   describe('deprecations', () => {
+    test('recieve() accepts param with {event}', async () => {
+      const spy = jest.fn()
+      app.events.on('deprecated', spy)
+      await app.receive({ event: 'deprecated', payload: { action: 'test' } } as any)
+      expect(spy).toHaveBeenCalled()
+    })
+
+    test('recieve() accepts param with {name,event}', async () => {
+      const spy = jest.fn()
+      app.events.on('real-event-name', spy)
+      await app.receive({ name: 'real-event-name', event: 'deprecated', payload: { action: 'test' } } as any)
+      expect(spy).toHaveBeenCalled()
+    })
+
     test('app() calls github.jwt()', () => {
       github.jwt = jest.fn().mockReturnValue('testing')
       expect(app.app()).toEqual('testing')

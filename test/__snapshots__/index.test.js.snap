@@ -4,30 +4,45 @@ exports[`Probot ghe support throws if the GHE host includes a protocol 1`] = `[E
 
 exports[`Probot webhook delivery responds with the correct error if the PEM file is missing 1`] = `
 Array [
+  Object {
+    "err": [Error: error:0906D06C:PEM routines:PEM_read_bio:no start line],
+  },
   "Your private key (usually a .pem file) is not correct. Go to https://github.com/settings/apps/YOUR_APP and generate a new PEM file. If you're deploying to Now, visit https://probot.github.io/docs/deployment/#now.",
 ]
 `;
 
 exports[`Probot webhook delivery responds with the correct error if the jwt could not be decoded 1`] = `
 Array [
+  Object {
+    "err": [Error: {"message":"A JSON web token could not be decoded","documentation_url":"https://developer.github.com/v3"}],
+  },
   "Your private key (usually a .pem file) is not correct. Go to https://github.com/settings/apps/YOUR_APP and generate a new PEM file. If you're deploying to Now, visit https://probot.github.io/docs/deployment/#now.",
 ]
 `;
 
 exports[`Probot webhook delivery responds with the correct error if webhook secret does not match 1`] = `
 Array [
+  Object {
+    "err": [Error: X-Hub-Signature does not match blob signature],
+  },
   "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
 ]
 `;
 
 exports[`Probot webhook delivery responds with the correct error if webhook secret is not found 1`] = `
 Array [
+  Object {
+    "err": [Error: No X-Hub-Signature found on request],
+  },
   "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
 ]
 `;
 
 exports[`Probot webhook delivery responds with the correct error if webhook secret is wrong 1`] = `
 Array [
+  Object {
+    "err": [Error: webhooks:receiver ignored: POST / due to missing headers: x-hub-signature],
+  },
   "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
 ]
 `;

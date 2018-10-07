@@ -1,15 +1,16 @@
-const request = require('supertest')
-const {createServer} = require('../src/server')
-const {logger} = require('../src/logger')
+import { Application, NextFunction, Request, Response } from 'express'
+import request from 'supertest'
+import { logger } from '../src/logger'
+import { createServer } from '../src/server'
 
-describe('server', function () {
-  let server
+describe('server', () => {
+  let server: Application
 
   beforeEach(() => {
-    server = createServer({logger})
+    server = createServer({ logger })
 
     // Error handler to avoid printing logs
-    server.use(function (err, req, res, next) {
+    server.use((err: Error, req: Request, res: Response, next: NextFunction) => {
       res.status(500).send(err.message)
     })
   })

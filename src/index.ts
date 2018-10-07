@@ -1,7 +1,8 @@
+import Webhooks, { WebhookEvent } from '@octokit/webhooks'
 import Logger from 'bunyan'
 import express from 'express'
 import { Application } from './application'
-import { Context, WebhookEvent } from './context'
+import { Context } from './context'
 import { GitHubApp } from './github-app'
 import { logger } from './logger'
 import { resolve } from './resolver'
@@ -10,19 +11,18 @@ import { createWebhookProxy } from './webhook-proxy'
 
 // tslint:disable:no-var-requires
 // These needs types
-const Webhooks = require('@octokit/webhooks')
 const logRequestErrors = require('./middleware/log-request-errors')
 
-const defaultApps: ApplicationFunction[] = [
-  require('./plugins/default'),
-  require('./plugins/sentry'),
-  require('./plugins/stats')
+const defaultAppFns: ApplicationFunction[] = [
+  require('./apps/default'),
+  require('./apps/sentry'),
+  require('./apps/stats')
 ]
 // tslint:enable:no-var-requires
 
 export class Probot {
   public server: express.Application
-  public webhook: any
+  public webhook: Webhooks
   public logger: Logger
 
   private options: Options
@@ -42,11 +42,8 @@ export class Probot {
     this.github = new GitHubApp(options.id, options.cert)
 
     // Log all received webhooks
-    this.webhook.on('*', (event: any) => {
-      const webhookEvent = { ...event, event: event.name }
-      delete webhookEvent.name
-
-      return this.receive(webhookEvent)
+    this.webhook.on('*', (event: WebhookEvent) => {
+      return this.receive(event)
     })
 
     // Log all webhook errors
@@ -54,18 +51,13 @@ export class Probot {
   }
 
   public errorHandler (err: Error) {
-    switch (err.message) {
-      case 'X-Hub-Signature does not match blob signature':
-      case 'No X-Hub-Signature found on request':
-      case 'webhooks:receiver ignored: POST / due to missing headers: x-hub-signature':
-        logger.error('Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.')
-        break
-      case 'error:0906D06C:PEM routines:PEM_read_bio:no start line':
-      case '{"message":"A JSON web token could not be decoded","documentation_url":"https://developer.github.com/v3"}':
-        logger.error('Your private key (usually a .pem file) is not correct. Go to https://github.com/settings/apps/YOUR_APP and generate a new PEM file. If you\'re deploying to Now, visit https://probot.github.io/docs/deployment/#now.')
-        break
-      default:
-        logger.error(err)
+    const errMessage = err.message.toLowerCase()
+    if (errMessage.includes('x-hub-signature')) {
+      logger.error({ err }, 'Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.')
+    } else if (errMessage.includes('pem') || errMessage.includes('json web token')) {
+      logger.error({ err }, 'Your private key (usually a .pem file) is not correct. Go to https://github.com/settings/apps/YOUR_APP and generate a new PEM file. If you\'re deploying to Now, visit https://probot.github.io/docs/deployment/#now.')
+    } else {
+      logger.error(err)
     }
   }
 
@@ -74,9 +66,9 @@ export class Probot {
     return Promise.all(this.apps.map(app => app.receive(event)))
   }
 
-  public load (appFunction: string | ApplicationFunction) {
-    if (typeof appFunction === 'string') {
-      appFunction = resolve(appFunction) as ApplicationFunction
+  public load (appFn: string | ApplicationFunction) {
+    if (typeof appFn === 'string') {
+      appFn = resolve(appFn) as ApplicationFunction
     }
 
     const app = new Application({ github: this.github, catchErrors: true })
@@ -84,19 +76,19 @@ export class Probot {
     // Connect the router from the app to the server
     this.server.use(app.router)
 
-    // Initialize the plugin
-    app.load(appFunction)
+    // Initialize the ApplicationFunction
+    app.load(appFn)
     this.apps.push(app)
 
     return app
   }
 
-  public setup (apps: Array<string | ApplicationFunction>) {
+  public setup (appFns: Array<string | ApplicationFunction>) {
     // Log all unhandled rejections
     process.on('unhandledRejection', this.errorHandler)
 
-    // Load the given apps along with the default apps
-    apps.concat(defaultApps).forEach(app => this.load(app))
+    // Load the given appFns along with the default ones
+    appFns.concat(defaultAppFns).forEach(appFn => this.load(appFn))
 
     // Register error handler as the last middleware
     this.server.use(logRequestErrors)

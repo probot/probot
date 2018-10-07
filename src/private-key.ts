@@ -1,5 +1,8 @@
 import fs from 'fs'
 
+// tslint:disable-next-line:no-var-requires
+const isBase64 = require('is-base64')
+
 const hint = `please use:
   * \`--private-key=/path/to/private-key\` flag, or
   * \`PRIVATE_KEY\` environment variable, or
@@ -17,12 +20,26 @@ const hint = `please use:
  * @returns Private key
  * @private
  */
-function findPrivateKey (filepath: string): Buffer | string {
+export function findPrivateKey (filepath?: string): Buffer | string | null {
   if (filepath) {
     return fs.readFileSync(filepath)
   }
   if (process.env.PRIVATE_KEY) {
-    return process.env.PRIVATE_KEY.replace(/\\n/g, '\n')
+    let cert = process.env.PRIVATE_KEY
+
+    if (isBase64(cert)) {
+      // Decode base64-encoded certificate
+      cert = Buffer.from(cert, 'base64').toString()
+    }
+
+    const begin = '-----BEGIN RSA PRIVATE KEY-----'
+    const end = '-----END RSA PRIVATE KEY-----'
+    if (cert.includes(begin) && cert.includes(end)) {
+      // Full key with new lines
+      return cert.replace(/\\n/g, '\n')
+    }
+
+    throw new Error('The contents of \`PRIVATE_KEY\` could not be validated. Please check to ensure you have copied the contents of the .pem file correctly.')
   }
   if (process.env.PRIVATE_KEY_PATH) {
     return fs.readFileSync(process.env.PRIVATE_KEY_PATH)
@@ -37,9 +54,5 @@ function findPrivateKey (filepath: string): Buffer | string {
   } else if (pemFiles[0]) {
     return findPrivateKey(pemFiles[0])
   }
-  throw new Error(`Missing private key for GitHub App, ${hint}`)
-}
-
-module.exports = {
-  findPrivateKey
+  return null
 }

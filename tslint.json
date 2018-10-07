@@ -6,6 +6,7 @@
     ],
     "rules": {
       "interface-name": [true, "never-prefix"],
-      "prefer-object-spread": false
+      "prefer-object-spread": false,
+      "no-implicit-dependencies": [true, "dev"]
     }
 }

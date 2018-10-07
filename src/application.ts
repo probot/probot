@@ -1,15 +1,16 @@
+import { WebhookEvent } from '@octokit/webhooks'
 import deprecated from 'deprecated-decorator'
 import express from 'express'
 import { EventEmitter } from 'promise-events'
 import { ApplicationFunction } from '.'
-import { Context, WebhookEvent } from './context'
+import { Context } from './context'
 import { GitHubAPI } from './github'
 import { GitHubApp } from './github-app'
 import { logger } from './logger'
 import { LoggerWithTarget, wrapLogger } from './wrap-logger'
 
 /**
- * The `app` parameter available to apps
+ * The `app` parameter available to `ApplicationFunction`s
  *
  * @property {logger} log - A logger
  */
@@ -31,24 +32,30 @@ export class Application {
   }
 
   /**
-   * Loads a Probot plugin
-   * @param plugin - Probot plugin to load
+   * Loads an ApplicationFunction into the current Application
+   * @param appFn - Probot application function to load
    */
-  public load (app: ApplicationFunction | ApplicationFunction[]): Application {
-    if (Array.isArray(app)) {
-      app.forEach(a => this.load(a))
+  public load (appFn: ApplicationFunction | ApplicationFunction[]): Application {
+    if (Array.isArray(appFn)) {
+      appFn.forEach(a => this.load(a))
     } else {
-      app(this)
+      appFn(this)
     }
 
     return this
   }
 
   public async receive (event: WebhookEvent) {
+    if ((event as any).event) {
+      // tslint:disable-next-line:no-console
+      console.warn(new Error('Propery `event` is deprecated, use `name`'))
+      event = { name: (event as any).event, ...event }
+    }
+
     return Promise.all([
       this.events.emit('*', event),
-      this.events.emit(event.event, event),
-      this.events.emit(`${event.event}.${event.payload.action}`, event)
+      this.events.emit(event.name, event),
+      this.events.emit(`${ event.name }.${ event.payload.action }`, event)
     ])
   }
 

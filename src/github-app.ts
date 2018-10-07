@@ -1,30 +1,23 @@
+import { WebhookEvent } from '@octokit/webhooks'
 import cacheManager from 'cache-manager'
 import jwt from 'jsonwebtoken'
-import { Context, WebhookEvent } from './context'
+import { Context } from './context'
 import { GitHubAPI } from './github'
 import { logger } from './logger'
 import { LoggerWithTarget, wrapLogger } from './wrap-logger'
 
-const cache = cacheManager.caching({
-  store: 'memory',
-  ttl: 60 * 60 // 1 hour
-})
-
 // Some events can't get an authenticated client (#382):
 function isUnauthenticatedEvent (event: WebhookEvent) {
   return !event.payload.installation ||
-    (event.event === 'installation' && event.payload.action === 'deleted')
-}
-
-export interface Options {
-  id: number
-  cert: string
+    (event.name === 'installation' && event.payload.action === 'deleted')
 }
 
 export class GitHubApp {
   public log: LoggerWithTarget
   public id: number
   public cert: string
+
+  private cache: any
 
   /**
    * @param id - ID of the GitHub App
@@ -34,6 +27,10 @@ export class GitHubApp {
     this.id = id
     this.cert = cert
     this.log = wrapLogger(logger, logger)
+    this.cache = cacheManager.caching({
+      store: 'memory',
+      ttl: 60 * 60 // 1 hour
+    })
   }
 
   /**
@@ -60,7 +57,7 @@ export class GitHubApp {
       github = await this.auth()
       log.debug('`context.github` is unauthenticated. See https://probot.github.io/docs/github-api/#unauthenticated-events')
     } else {
-      github = await this.auth(event.payload.installation.id, log)
+      github = await this.auth(event.payload.installation!.id, log)
     }
 
     return new Context(event, github, log)
@@ -90,6 +87,7 @@ export class GitHubApp {
    * [app APIs](https://developer.github.com/v3/apps/).
    *
    * @returns An authenticated GitHub API client
+   * @private
    */
   public async auth (id?: number, log = this.log): Promise<GitHubAPI> {
     if (process.env.GHE_HOST && /^https?:\/\//.test(process.env.GHE_HOST)) {
@@ -102,13 +100,16 @@ export class GitHubApp {
       logger: log.child({ name: 'github', installation: String(id) })
     })
 
+    // Cache for 1 minute less than GitHub expiry
+    const installationTokenTTL = parseInt(process.env.INSTALLATION_TOKEN_TTL || '3540', 10)
+
     if (id) {
-      const res = await cache.wrap(`app:${id}:token`, () => {
+      const res = await this.cache.wrap(`app:${id}:token`, () => {
         log.trace(`creating token for installation`)
         github.authenticate({ type: 'app', token: this.jwt() })
 
-        return github.apps.createInstallationToken({ installation_id: String(id) })
-      }, { ttl: 60 * 59 }) // Cache for 1 minute less than GitHub expiry
+        return github.apps.createInstallationToken({ installation_id: id })
+      }, { ttl: installationTokenTTL })
 
       github.authenticate({ type: 'token', token: res.data.token })
     } else {

@@ -1,9 +1,9 @@
 import Webhooks, { WebhookEvent } from '@octokit/webhooks'
 import Logger from 'bunyan'
 import express from 'express'
+import { GitHubApp } from './adapter/github-app'
 import { Application } from './application'
 import { Context } from './context'
-import { GitHubApp } from './github-app'
 import { logger } from './logger'
 import { resolve } from './resolver'
 import { createServer } from './server'
@@ -122,4 +122,4 @@ export interface Options {
   port?: number
 }
 
-export { Logger, Context, Application }
+export { Logger, Context, Application, GitHubApp }

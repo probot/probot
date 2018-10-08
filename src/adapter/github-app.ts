@@ -1,10 +1,10 @@
 import { WebhookEvent } from '@octokit/webhooks'
 import cacheManager from 'cache-manager'
 import jwt from 'jsonwebtoken'
-import { Context } from './context'
-import { GitHubAPI } from './github'
-import { logger } from './logger'
-import { LoggerWithTarget, wrapLogger } from './wrap-logger'
+import { Context } from '../context'
+import { GitHubAPI } from '../github'
+import { logger } from '../logger'
+import { LoggerWithTarget, wrapLogger } from '../wrap-logger'
 
 // Some events can't get an authenticated client (#382):
 function isUnauthenticatedEvent (event: WebhookEvent) {

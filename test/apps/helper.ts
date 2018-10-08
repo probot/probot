@@ -1,7 +1,6 @@
 // FIXME: move this to a test helper that can be used by other apps
 
-import { Application, ApplicationFunction } from '../../src'
-import { GitHubApp } from '../../src/github-app'
+import { Application, ApplicationFunction, GitHubApp } from '../../src'
 
 export function newApp (): Application {
   const adapter = new GitHubApp(1, 'test')

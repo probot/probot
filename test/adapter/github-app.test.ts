@@ -2,7 +2,7 @@ import fs from 'fs'
 import nock from 'nock'
 import path from 'path'
 
-import { GitHubApp } from '../src/github-app'
+import { GitHubApp } from '../../src'
 
 describe('github-app', () => {
   let adapter: GitHubApp
@@ -11,7 +11,7 @@ describe('github-app', () => {
     let scopeInstall: nock.Scope
 
     beforeEach(() => {
-      const pem = path.join(__dirname, 'fixtures', 'private-key.pem')
+      const pem = path.join(__dirname, '..', 'fixtures', 'private-key.pem')
       adapter = new GitHubApp(1, fs.readFileSync(pem).toString())
 
       scopeInstall = nock('https://api.github.com')

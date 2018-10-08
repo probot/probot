@@ -1,8 +1,6 @@
 import { WebhookEvent } from '@octokit/webhooks'
 
-import { Application } from '../src/application'
-import { Context } from '../src/context'
-import { GitHubApp } from '../src/github-app'
+import { Application, Context, GitHubApp } from '../src'
 import { logger } from '../src/logger'
 
 describe('Application', () => {

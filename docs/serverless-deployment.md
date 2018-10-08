@@ -29,15 +29,15 @@ To deploy an app to any cloud provider, you will need 3 environment variables:
 - `WEBHOOK_SECRET`: the **Webhook Secret** that you generated when you created the app.
 - `PRIVATE_KEY_PATH`: the path to a private key file
 
-> These environment variables will need to be pass through to your FaaS solution. Each solution is different, please consult their documentation on how to use variables in the deployed environment. 
+> These environment variables will need to be passed through to your FaaS solution. Each solution is different; please consult their documentation on how to use variables in the deployed environment. 
 
-Choosing a FaaS provider is mostly dependent on developer preference. Each Probot plugin interacts in a similar fashion, but the plugins implementation is dealing with different requests and responses specific to the provider. If you do not have a preference for a provider, choose the solution you have the most familiarity with.
+Choosing a FaaS provider is mostly dependent on developer preference. Each Probot plugin interacts similarly, but the plugins implementation is dealing with different requests and responses specific to the provider. If you do not have a preference for a provider, choose the solution you have the most familiarity.
 
 ### AWS Lambda
 
 AWS Lambda is an event-driven, serverless computing platform provided by Amazon as a part of the Amazon Web Services. AWS Lamba additionally manages the computing resources required for the code and adjusts those resources in conjunction with incoming events.
 1. [Install the @probot/serverless-lambda](https://github.com/probot/serverless-lambda#usage) plugin.
-2. Create a `handler.js` file in the route of you probot application
+2. Create a `handler.js` file in the root of you probot application
    ```
    // handler.js
    const serverless = require('@probot/serverless-lambda')
@@ -47,11 +47,11 @@ AWS Lambda is an event-driven, serverless computing platform provided by Amazon 
 2. Follow the lambda [configuration steps](https://github.com/probot/serverless-lambda#configuration) using the [AWS CLI](https://aws.amazon.com/cli/) or [Serverless framework](https://github.com/serverless/serverless).
 3. Once the app is is configured and you can proceed with deploying using the either [AWS CLI](https://aws.amazon.com/cli/) or [Serverless framework](https://github.com/serverless/serverless)
 
-> note: The Serverless framework provides a simpler approach to setting up your AWS environment. It requires the creation of a serverless.yml in the root of your application.
+> note: The Serverless framework provides a more straightforward approach to setting up your AWS environment. It requires the creation of a serverless.yml in the root of your application.
 
 ### Google Cloud Function
 
-Google Cloud Platform, is a suite of cloud computing services that runs on the same infrastructure that Google uses internally for its end-user products. Cloud Functions are the Platform's FaaS offering.
+Google Cloud Platform, is a suite of cloud computing services that run on the same infrastructure that Google uses internally for its end-user products. Cloud Functions are the Platform's FaaS offering.
 
 1. [Install the @probot/serverless-gcf](https://github.com/probot/serverless-gcf#usage) plugin.
 2. Create a `handler.js` file in the route of you probot application

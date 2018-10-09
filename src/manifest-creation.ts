@@ -73,7 +73,7 @@ export class ManifestCreation {
     return response.data.html_url
   }
 
-  private async updateEnv (env: any) {
+  public async updateEnv (env: any) {
     return updateDotenv(env)
   }
 

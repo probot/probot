@@ -1,13 +1,19 @@
-const express = require('express')
-const sse = require('connect-sse')()
-const nock = require('nock')
-const {createWebhookProxy} = require('../src/webhook-proxy')
-const {logger} = require('../src/logger')
+import connect_sse from 'connect-sse'
+import express from 'express'
+const sse = connect_sse()
+import { Server } from 'http'
+import nock from 'nock'
+import { logger } from '../src/logger'
+import { createWebhookProxy } from '../src/webhook-proxy'
 
 const targetPort = 999999
 
 describe('webhook-proxy', () => {
-  let app, server, proxy, url, emit
+  let app: express.Express
+  let server: Server
+  let proxy: any
+  let url: string
+  let emit: express.Response['json']
 
   afterEach(() => {
     server && server.close()
@@ -18,14 +24,14 @@ describe('webhook-proxy', () => {
     beforeEach((done) => {
       app = express()
 
-      app.get('/events', sse, function (req, res) {
-        res.json({}, 'ready')
+      app.get('/events', sse, (req, res) => {
+        res.json({})
         emit = res.json
       })
 
       server = app.listen(0, () => {
         url = `http://127.0.0.1:${server.address().port}/events`
-        proxy = createWebhookProxy({url, port: targetPort, path: '/test', logger})
+        proxy = createWebhookProxy({ url, port: targetPort, path: '/test', logger })
 
         // Wait for proxy to be ready
         proxy.addEventListener('ready', () => done())
@@ -37,25 +43,25 @@ describe('webhook-proxy', () => {
         done()
       })
 
-      const body = {action: 'foo'}
+      const body = { action: 'foo' }
 
       emit({
-        'x-github-event': 'test',
-        body
+        body,
+        'x-github-event': 'test'
       })
     })
   })
 
   test('logs an error when the proxy server is not found', (done) => {
-    const url = 'http://bad.proxy/events'
+    url = 'http://bad.proxy/events'
     nock('http://bad.proxy').get('/events').reply(404)
 
-    const log = logger.child()
+    const log = logger.child({})
     log.error = jest.fn()
 
-    proxy = createWebhookProxy({url, logger: log})
+    proxy = createWebhookProxy({ url, logger: log })
 
-    proxy.on('error', err => {
+    proxy.on('error', (err: any) => {
       expect(err.status).toBe(404)
       expect(log.error).toHaveBeenCalledWith(err)
       done()

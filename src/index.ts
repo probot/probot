@@ -51,8 +51,12 @@ export class Probot {
     this.server = createServer({ webhook: this.webhook.middleware, logger })
 
     // Log all received webhooks
-    this.webhook.on('*', (event: WebhookEvent) => {
-      return this.receive(event)
+    this.webhook.on('*', async (event: WebhookEvent) => {
+      try {
+        await this.receive(event)
+      } catch {
+        // Errors have already been logged.
+      }
     })
 
     // Log all webhook errors
@@ -79,7 +83,7 @@ export class Probot {
     if (typeof appFn === 'string') {
       appFn = resolve(appFn) as ApplicationFunction
     }
-    const app = new Application({ app: this.app, cache, catchErrors: true, githubToken: this.githubToken })
+    const app = new Application({ app: this.app, cache, githubToken: this.githubToken })
 
     // Connect the router from the app to the server
     this.server.use(app.router)

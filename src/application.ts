@@ -32,7 +32,6 @@ export class Application {
   public app: () => string
   public cache: Cache
   public router: express.Router
-  public catchErrors: boolean
   public log: LoggerWithTarget
 
   private githubToken?: string
@@ -43,9 +42,14 @@ export class Application {
     this.log = wrapLogger(logger, logger)
     this.app = opts.app
     this.cache = opts.cache
-    this.catchErrors = opts.catchErrors || false
     this.router = opts.router || express.Router() // you can do this?
     this.githubToken = opts.githubToken
+
+    if (opts.catchErrors) {
+      // Deprecated since 7.2.0
+      // tslint:disable-next-line:no-console
+      console.warn(new Error('Propery `catchErrors` is deprecated and has no effect'))
+    }
   }
 
   /**
@@ -148,9 +152,7 @@ export class Application {
           await callback(context)
         } catch (err) {
           log.error({ err, event })
-          if (!this.catchErrors) {
-            throw err
-          }
+          throw err
         }
       })
     } else {

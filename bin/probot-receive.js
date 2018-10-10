@@ -6,7 +6,9 @@ require('dotenv').config()
 const path = require('path')
 const uuid = require('uuid')
 const program = require('commander')
-const {findPrivateKey} = require('../lib/private-key')
+
+const { findPrivateKey } = require('../lib/private-key')
+const { createProbot } = require('../')
 
 program
   .usage('[options] [path/to/app.js...]')
@@ -29,8 +31,6 @@ if (githubToken) {
 
 const payload = require(path.join(process.cwd(), program.payloadPath))
 
-const {createProbot} = require('../')
-
 const probot = createProbot({
   id: program.app,
   cert: findPrivateKey(),
@@ -40,7 +40,7 @@ const probot = createProbot({
 probot.setup(program.args)
 
 probot.logger.debug('Receiving event', program.event)
-probot.receive({name: program.event, payload, id: uuid.v4() })
+probot.receive({ name: program.event, payload, id: uuid.v4() })
   .catch(err => {
     // Process must exist non-zero to indicate that the action failed to run
     // TODO: this is not working yet

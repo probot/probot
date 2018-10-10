@@ -1,13 +1,15 @@
-const request = require('supertest')
-const express = require('express')
-const appFn = require('../../src/apps/default')
-const helper = require('./helper')
+import express from 'express'
+import request from 'supertest'
+import { Application } from '../../src'
+import appFn = require('../../src/apps/default')
+import { createApp } from './helper'
 
-describe('default app', function () {
-  let server, app
+describe('default app', () => {
+  let server: express.Application
+  let app: Application
 
   beforeEach(async () => {
-    app = helper.createApp(appFn)
+    app = createApp(appFn)
     server = express()
     server.use(app.router)
   })
@@ -18,7 +20,7 @@ describe('default app', function () {
     })
 
     describe('get info from package.json', () => {
-      let cwd
+      let cwd: string
       beforeEach(() => {
         cwd = process.cwd()
       })

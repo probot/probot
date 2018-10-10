@@ -45,7 +45,7 @@ You can also use the wildcard event (`*`) to listen for any event that your app 
 ```js
 module.exports = app => {
   app.on(`*`, async context => {
-    context.log({event: context.event, action: context.payload.action})
+    context.log({ event: context.event, action: context.payload.action })
   })
 }
 ```

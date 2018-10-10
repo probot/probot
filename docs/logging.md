@@ -36,7 +36,7 @@ When you start up your app with `npm start`, You should see your log message app
 module.exports = app => {
   // …
   app.log.trace('Really low-level logging')
-  app.log.debug({data: 'here'}, 'End-line specs on the rotary girder')
+  app.log.debug({ data: 'here' }, 'End-line specs on the rotary girder')
   app.log.info('Same as using `app.log`')
 
   const err = new Error('Some error')

@@ -1,12 +1,13 @@
-const Raven = require('raven')
-const helper = require('./helper')
-const appFn = require('../../src/apps/sentry')
+import Raven from 'raven'
+import { Application } from '../../src'
+import appFn = require('../../src/apps/sentry')
+import { createApp } from './helper'
 
 describe('sentry app', () => {
-  let app
+  let app: Application
 
   beforeEach(async () => {
-    app = helper.createApp()
+    app = createApp()
   })
 
   beforeEach(() => {
@@ -16,7 +17,7 @@ describe('sentry app', () => {
 
   describe('with an invalid SENTRY_DSN', () => {
     test('throws an error', () => {
-      process.env.SENTRY_DSN = 1233
+      process.env.SENTRY_DSN = '1233'
       expect(() => {
         appFn(app)
       }).toThrow(/Invalid Sentry DSN: 1233/)

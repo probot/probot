@@ -1,6 +1,6 @@
 {
   "name": "probot",
-  "version": "7.1.2",
+  "version": "7.2.0",
   "description": "🤖 A framework for building GitHub Apps to automate and improve your workflow",
   "repository": "https://github.com/probot/probot",
   "main": "lib/index.js",
@@ -39,15 +39,10 @@
       "node"
     ],
     "transform": {
-      ".+\\.tsx?$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+      ".+\\.tsx?$": "ts-jest"
     },
     "testMatch": [
-      "<rootDir>/test/**/*.(ts|js)"
-    ],
-    "testPathIgnorePatterns": [
-      "<rootDir>/test/setup.js",
-      "<rootDir>/test/fixtures/",
-      "<rootDir>/test/apps/helper.js"
+      "<rootDir>/test/**/*.test.(ts|js)"
     ],
     "globals": {
       "ts-jest": {
@@ -69,15 +64,16 @@
   "author": "Brandon Keepers",
   "license": "ISC",
   "dependencies": {
-    "@octokit/rest": "^15.11.0",
+    "@octokit/rest": "^15.13.0",
     "@octokit/webhooks": "^5.0.2",
+    "@types/supports-color": "^5.3.0",
     "bottleneck": "^2.8.0",
     "bunyan": "^1.8.12",
     "bunyan-format": "^0.2.1",
     "bunyan-sentry-stream": "^1.1.0",
     "cache-manager": "^2.4.0",
-    "commander": "^2.11.0",
-    "dotenv": "~6.0.0",
+    "commander": "^2.19.0",
+    "dotenv": "~6.1.0",
     "express": "^4.16.2",
     "express-async-errors": "^3.0.0",
     "hbs": "^4.0.1",
@@ -86,9 +82,12 @@
     "jsonwebtoken": "^8.1.0",
     "pkg-conf": "^2.0.0",
     "promise-events": "^0.1.3",
+    "qs": "^6.5.2",
     "raven": "^2.4.2",
     "resolve": "^1.4.0",
     "semver": "^5.5.0",
+    "supports-color": "^5.5.0",
+    "update-dotenv": "^1.1.0",
     "uuid": "^3.2.1"
   },
   "devDependencies": {
@@ -102,6 +101,7 @@
     "@types/jsonwebtoken": "^7.2.5",
     "@types/nock": "^9.1.0",
     "@types/node": "^10.7.0",
+    "@types/qs": "^6.5.1",
     "@types/raven": "^2.1.5",
     "@types/resolve": "^0.0.4",
     "@types/semver": "^5.4.0",
@@ -110,9 +110,9 @@
     "connect-sse": "^1.2.0",
     "eslint": "^5.0.1",
     "eslint-plugin-markdown": "^1.0.0-beta.8",
-    "jest": "^23.4.1",
+    "jest": "^23.6.0",
     "minami": "^1.1.1",
-    "nock": "^9.2.0",
+    "nock": "^10.0.0",
     "semantic-release": "^15.0.0",
     "smee-client": "^1.0.1",
     "standard": "^12.0.0",
@@ -122,7 +122,7 @@
     "tslint": "^5.9.1",
     "tslint-config-prettier": "^1.10.0",
     "tslint-config-standard": "^8.0.0",
-    "typedoc": "^0.12.0",
+    "typedoc": "^0.13.0",
     "typescript": "^2.7.2"
   },
   "standard": {

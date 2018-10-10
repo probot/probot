@@ -199,7 +199,7 @@ export class Application {
         log.trace(`creating token for installation`)
         github.authenticate({ type: 'app', token: this.app() })
 
-        return github.apps.createInstallationToken({ installation_id: String(id) })
+        return github.apps.createInstallationToken({ installation_id: id })
       }, { ttl: installationTokenTTL })
 
       github.authenticate({ type: 'token', token: res.data.token })

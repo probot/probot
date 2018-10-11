@@ -40,6 +40,9 @@ The most important files note here are `index.js`, which is where the code for y
 
 Now you're ready to run the app on your local machine. Run `npm run dev` to start the server:
 
+
+> Note: If you're building a TypeScript app, be sure to run `npm run build` first!
+
 ```
 > testerino@1.0.0 dev /Users/hiimbex/Desktop/testerino
 > nodemon

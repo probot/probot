@@ -12,7 +12,7 @@ const { createProbot } = require('../')
 
 program
   .usage('[options] [path/to/app.js...]')
-  .option('-e, --event <event-name>', 'Event name', process.env.GITHUB_EVENT_TYPE)
+  .option('-e, --event <event-name>', 'Event name', process.env.GITHUB_EVENT_NAME)
   .option('-p, --payload-path <payload-path>', 'Path to the event payload', process.env.GITHUB_EVENT_PATH)
   .option('-t, --token <access-token>', 'Access token', process.env.GITHUB_TOKEN)
   .option('-a, --app <id>', 'ID of the GitHub App', process.env.APP_ID)

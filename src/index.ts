@@ -1,8 +1,8 @@
 import Webhooks, { WebhookEvent } from '@octokit/webhooks'
 import Logger from 'bunyan'
-import cacheManager from 'cache-manager'
 import express from 'express'
 import { Application } from './application'
+import { createDefaultCache } from './cache'
 import { Context } from './context'
 import { createApp } from './github-app'
 import { logger } from './logger'
@@ -14,10 +14,7 @@ import { createWebhookProxy } from './webhook-proxy'
 // These needs types
 const logRequestErrors = require('./middleware/log-request-errors')
 
-const cache = cacheManager.caching({
-  store: 'memory',
-  ttl: 60 * 60 // 1 hour
-})
+const cache = createDefaultCache()
 
 const defaultAppFns: ApplicationFunction[] = [
   require('./apps/default'),
@@ -34,6 +31,7 @@ export class Probot {
   private options: Options
   private apps: Application[]
   private app: () => string
+  private githubToken?: string
 
   constructor (options: Options) {
     options.webhookPath = options.webhookPath || '/'
@@ -42,12 +40,23 @@ export class Probot {
     this.logger = logger
     this.apps = []
     this.webhook = new Webhooks({ path: options.webhookPath, secret: options.secret })
-    this.app = createApp({ id: options.id, cert: options.cert })
+    if (options.githubToken) {
+      this.githubToken = options.githubToken
+      this.app = () => ''
+    } else if (options.id && options.cert) {
+      this.app = createApp({ id: options.id, cert: options.cert })
+    } else {
+      throw new Error('You must provide either an id/cert combination or an access token')
+    }
     this.server = createServer({ webhook: this.webhook.middleware, logger })
 
     // Log all received webhooks
-    this.webhook.on('*', (event: WebhookEvent) => {
-      return this.receive(event)
+    this.webhook.on('*', async (event: WebhookEvent) => {
+      try {
+        await this.receive(event)
+      } catch {
+        // Errors have already been logged.
+      }
     })
 
     // Log all webhook errors
@@ -74,8 +83,7 @@ export class Probot {
     if (typeof appFn === 'string') {
       appFn = resolve(appFn) as ApplicationFunction
     }
-
-    const app = new Application({ app: this.app, cache, catchErrors: true })
+    const app = new Application({ app: this.app, cache, githubToken: this.githubToken })
 
     // Connect the router from the app to the server
     this.server.use(app.router)
@@ -120,8 +128,9 @@ export type ApplicationFunction = (app: Application) => void
 export interface Options {
   webhookPath?: string
   secret?: string,
-  id: number,
-  cert: string,
+  id?: number,
+  cert?: string,
+  githubToken?: string,
   webhookProxy?: string,
   port?: number
 }

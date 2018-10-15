@@ -56,7 +56,7 @@ module.exports = app => {
   // Type `/label foo, bar` in a comment box for an Issue or Pull Request
   commands(app, 'label', (context, command) => {
     const labels = command.arguments.split(/, */)
-    return context.github.issues.addLabels(context.issue({labels}))
+    return context.github.issues.addLabels(context.issue({ labels }))
   })
 }
 ```

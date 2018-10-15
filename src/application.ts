@@ -2,10 +2,19 @@ import { WebhookEvent } from '@octokit/webhooks'
 import express from 'express'
 import { EventEmitter } from 'promise-events'
 import { ApplicationFunction } from '.'
+import { Cache } from './cache'
 import { Context } from './context'
 import { GitHubAPI } from './github'
 import { logger } from './logger'
 import { LoggerWithTarget, wrapLogger } from './wrap-logger'
+
+export interface Options {
+  app: () => string
+  cache: Cache
+  router?: express.Router
+  catchErrors?: boolean
+  githubToken?: string
+}
 
 // Some events can't get an authenticated client (#382):
 function isUnauthenticatedEvent (event: WebhookEvent) {
@@ -23,8 +32,9 @@ export class Application {
   public app: () => string
   public cache: Cache
   public router: express.Router
-  public catchErrors: boolean
   public log: LoggerWithTarget
+
+  private githubToken?: string
 
   constructor (options?: Options) {
     const opts = options || {} as any
@@ -32,8 +42,14 @@ export class Application {
     this.log = wrapLogger(logger, logger)
     this.app = opts.app
     this.cache = opts.cache
-    this.catchErrors = opts.catchErrors || false
     this.router = opts.router || express.Router() // you can do this?
+    this.githubToken = opts.githubToken
+
+    if (opts.catchErrors) {
+      // Deprecated since 7.2.0
+      // tslint:disable-next-line:no-console
+      console.warn(new Error('Propery `catchErrors` is deprecated and has no effect'))
+    }
   }
 
   /**
@@ -130,23 +146,13 @@ export class Application {
         const log = this.log.child({ name: 'event', id: event.id })
 
         try {
-          let github
-
-          if (isUnauthenticatedEvent(event)) {
-            github = await this.auth()
-            log.debug('`context.github` is unauthenticated. See https://probot.github.io/docs/github-api/#unauthenticated-events')
-          } else {
-            github = await this.auth(event.payload.installation!.id, log)
-          }
-
+          const github = await this.authenticateEvent(event, log)
           const context = new Context(event, github, log)
 
           await callback(context)
         } catch (err) {
           log.error({ err, event })
-          if (!this.catchErrors) {
-            throw err
-          }
+          throw err
         }
       })
     } else {
@@ -191,6 +197,11 @@ export class Application {
       logger: log.child({ name: 'github', installation: String(id) })
     })
 
+    if (this.githubToken) {
+      github.authenticate({ type: 'app', token: this.githubToken })
+      return github
+    }
+
     // Cache for 1 minute less than GitHub expiry
     const installationTokenTTL = parseInt(process.env.INSTALLATION_TOKEN_TTL || '3540', 10)
 
@@ -209,19 +220,17 @@ export class Application {
 
     return github
   }
-}
 
-// The TypeScript definition for cache-manager does not export the Cache interface so we recreate it here
-export interface Cache {
-  wrap<T> (key: string, wrapper: (callback: (error: any, result: T) => void) => any, options: CacheConfig): Promise<any>
-}
-export interface CacheConfig {
-  ttl: number
-}
+  private authenticateEvent (event: WebhookEvent, log: LoggerWithTarget): Promise<GitHubAPI> {
+    if (this.githubToken) {
+      return this.auth()
+    }
 
-export interface Options {
-  app: () => string
-  cache: Cache
-  router?: express.Router
-  catchErrors?: boolean
+    if (isUnauthenticatedEvent(event)) {
+      log.debug('`context.github` is unauthenticated. See https://probot.github.io/docs/github-api/#unauthenticated-events')
+      return this.auth()
+    }
+
+    return this.auth(event.payload.installation!.id, log)
+  }
 }

@@ -8,12 +8,21 @@ describe('Probot', () => {
   let event
 
   beforeEach(() => {
-    probot = createProbot({})
+    probot = createProbot({ githubToken: 'faketoken' })
 
     event = {
       name: 'push',
       payload: require('./fixtures/webhook/push')
     }
+  })
+
+  it('constructor', () => {
+    // probot with token. Should not throw
+    createProbot({ githubToken: 'faketoken' })
+    // probot with id/cert
+    createProbot({ id: 1234, cert: 'xxxx' })
+    // empty constructor should throw
+    expect(() => createProbot({ })).toThrow(new Error('You must provide either an id/cert combination or an access token'));
   })
 
   describe('webhook delivery', () => {
@@ -132,7 +141,7 @@ describe('Probot', () => {
     })
 
     it('allows users to configure webhook paths', async () => {
-      probot = createProbot({webhookPath: '/webhook'})
+      probot = createProbot({webhookPath: '/webhook', githubToken: 'faketoken'})
       // Error handler to avoid printing logs
       // eslint-disable-next-line handle-callback-err
       probot.server.use((err, req, res, next) => { })

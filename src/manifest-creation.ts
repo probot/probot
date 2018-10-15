@@ -66,7 +66,7 @@ export class ManifestCreation {
     const { id, webhook_secret, pem } = response.data
     await this.updateEnv({
       APP_ID: id.toString(),
-      PRIVATE_KEY: pem,
+      PRIVATE_KEY: `"${pem}"`,
       WEBHOOK_SECRET: webhook_secret
     })
 

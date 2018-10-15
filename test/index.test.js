@@ -21,8 +21,6 @@ describe('Probot', () => {
     createProbot({ githubToken: 'faketoken' })
     // probot with id/cert
     createProbot({ id: 1234, cert: 'xxxx' })
-    // empty constructor should throw
-    expect(() => createProbot({ })).toThrow(new Error('You must provide either an id/cert combination or an access token'));
   })
 
   describe('webhook delivery', () => {

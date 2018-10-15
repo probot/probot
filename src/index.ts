@@ -43,10 +43,8 @@ export class Probot {
     if (options.githubToken) {
       this.githubToken = options.githubToken
       this.app = () => ''
-    } else if (options.id && options.cert) {
-      this.app = createApp({ id: options.id, cert: options.cert })
     } else {
-      throw new Error('You must provide either an id/cert combination or an access token')
+      this.app = createApp({ id: options.id!, cert: options.cert! })
     }
     this.server = createServer({ webhook: this.webhook.middleware, logger })
 

@@ -73,7 +73,7 @@ describe('ManifestCreation', () => {
       const createdApp = await setup.createAppFromCode('123abc')
       expect(createdApp).toEqual('https://github.com/apps/testerino0000000')
       // expect dotenv to be called with id, webhook_secret, pem
-      expect(setup.updateEnv).toHaveBeenCalledWith({"APP_ID": "6666", "PRIVATE_KEY": "-----BEGIN RSA PRIVATE KEY-----\nsecrets\n-----END RSA PRIVATE KEY-----\n", "WEBHOOK_SECRET": "12345abcde"})
+      expect(setup.updateEnv).toHaveBeenCalledWith({"APP_ID": "6666", "PRIVATE_KEY": '"-----BEGIN RSA PRIVATE KEY-----\nsecrets\n-----END RSA PRIVATE KEY-----\n"', "WEBHOOK_SECRET": "12345abcde"})
     })
   })
 

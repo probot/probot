@@ -152,7 +152,7 @@ GitHub Actions allows you to trigger workflows based on GitHub events, which mak
     CMD ["/app/index.js"]
     ```
 
-  1. In the repository that you want to run the app, create a `.github/main.workflow` file that defines the action and listens for any events that your app depends on. For example, here is the workflow for @jasonetco's [TODO](https://github.com/jasonetco/todo):
+1. In the repository that you want to run the app, create a `.github/main.workflow` file that defines the action and listens for any events that your app depends on. For example, here is the workflow for @jasonetco's [TODO](https://github.com/jasonetco/todo):
     ```
     workflow "Check for TODOs in Pull Requests" {
       on = "pull_request"

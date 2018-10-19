@@ -5,6 +5,8 @@
 <p align="center">A framework for building GitHub Apps to automate and improve your workflow<p>
 <p align="center"><a href="https://npmjs.com/package/probot"><img src="https://badgen.net/npm/v/probot" alt="NPM"></a> <a href="https://travis-ci.com/probot/probot"><img src="https://badgen.now.sh/travis/probot/probot" alt="Build Status"></a> <a href="https://codecov.io/gh/probot/probot/"><img src="https://badgen.now.sh/codecov/c/github/probot/probot" alt="Codecov"></a> <a href="https://twitter.com/ProbotTheRobot"><img src="https://img.shields.io/npm/v/probot.svg" alt="@ProbotTheRobot on Twitter"></a></p>
 
+---
+
 If you've ever thought, "wouldn't it be cool if GitHub could…"; I'm going to stop you right there. Most features can actually be added via [GitHub Apps](https://developer.github.com/apps/), which extend GitHub and can be installed directly on organizations and user accounts and granted access to specific repositories. They come with granular permissions and built-in webhooks. Apps are first class actors within GitHub.
 
 ## How it works

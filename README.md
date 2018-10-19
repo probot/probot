@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="/static/robot.svg" width="160" />
+  <img src="/static/robot.svg" width="160" alt="Probot's logo, a cartoon robot" />
 </p>
 <h3 align="center">Probot</h3>
 <p align="center">A framework for building GitHub Apps to automate and improve your workflow<p>

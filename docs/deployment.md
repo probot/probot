@@ -15,6 +15,7 @@ Every app can either be deployed stand-alone, or combined with other apps in one
     1. [Glitch](#glitch)
     1. [Heroku](#heroku)
     1. [Now](#now)
+    1. [GitHub Actions](#github-actions)
 1. [Share the app](#share-the-app)
 1. [Combining apps](#combining-apps)
 1. [Error tracking](#error-tracking)
@@ -27,7 +28,6 @@ Every deployment will need an [App](https://developer.github.com/apps/).
     - **Homepage URL**: the URL to the GitHub repository for your app
     - **Webhook URL**: Use `https://example.com/` for now, we'll come back in a minute to update this with the URL of your deployed app.
     - **Webhook Secret**: Generate a unique secret with `openssl rand -base64 32` and save it because you'll need it in a minute to configure your deployed app.
-    - **Permissions & events**: See `docs/deploy.md` in the app for a list of the permissions and events that it needs access to.
 
 1. Download the private key from the app.
 
@@ -52,7 +52,7 @@ And one of:
 Glitch lets you host node applications for free and edit them directly in your browser. It’s great for experimentation and entirely sufficient for simple apps.
 
 1. [Create a new app on Glitch](https://glitch.com/edit/#!/new-project).
-2. Click on your app name on the top-right, press on advanced options and then on `Import from GitHub` (You will need to login with your GitHub account to enable that option). Enter the full repository name you want to import, e.g. for the [welcome bot](https://github.com/behaviorbot/new-issue-welcome) it would be `behaviorbot/new-issue-welcome`. The `new-issue-welcome` bot is a great template to get started with your own bot, too!
+2. Click on your app name on the top-right, press on advanced options and then on `Import from GitHub` (You will need to login with your GitHub account to enable that option). Enter the full repository name you want to import, e.g. for the [welcome app](https://github.com/behaviorbot/new-issue-welcome) it would be `behaviorbot/new-issue-welcome`. The `new-issue-welcome` app is a great template to get started with your own app, too!
 3. Next open the `.env` file and replace its content with
    ```
    APP_ID=<your app id>
@@ -62,7 +62,7 @@ Glitch lets you host node applications for free and edit them directly in your b
    ```
    Replace the two `<...>` placeholders with the values from your app. The `.env` file cannot be accessed or seen by others.
 4. Press the `New File` button and enter `.data/private-key.pem`. Paste the content of your GitHub App’s `private-key.pem` in there and save it. Files in the `.data` folder cannot be seen or accessed by others, so your private key is safe.
-5. That’s it, your app should have already started :thumbsup: Press on the `Show` button on top and paste the URL as the value of `Webhook URL`. Ensure that you remove `/probot` from the end of the `Webhook URL` that was just pasted. 
+5. That’s it, your app should have already started :thumbsup: Press on the `Show` button on top and paste the URL as the value of `Webhook URL`. Ensure that you remove `/probot` from the end of the `Webhook URL` that was just pasted.
 
 Enjoy!
 
@@ -114,20 +114,18 @@ Zeit [Now](http://zeit.co/now) is a great service for running Probot apps. After
 
 1. Clone the app that you want to deploy. e.g. `git clone https://github.com/probot/stale`
 
-1. Due to an [ongoing issue](https://github.com/zeit/now-cli/issues/749) in `now.sh`, a workaround must be applied to the private key before it can be used.
-    * You can [modify `package.json`](https://github.com/probot/probot/issues/318#issuecomment-343010573) and base64 encode your private key.
-    * You can concatenate a `\n` onto each line of the private key, and then merge the private key onto a single line. Then, you can follow the deploy script without modifying `package.json`.
-
-1. Run `now` to deploy, replacing the `APP_ID` and `WEBHOOK_SECRET` with the values for those variables, and setting the path for the `PRIVATE_KEY`:
+1. Run `now` to deploy, replacing the `APP_ID` and `WEBHOOK_SECRET` with the values for those variables, and setting the `PRIVATE_KEY`:
 
         $ now -e APP_ID=aaa \
             -e WEBHOOK_SECRET=bbb \
             -e NODE_ENV=production \
-            -e PRIVATE_KEY="$(cat ~/Downloads/*.private-key.pem)"
+            -e PRIVATE_KEY="$(cat ~/Downloads/*.private-key.pem | base64)"
+
+      **NOTE**: Add `-e LOG_LEVEL=trace` to get verbose logging, or add `-e LOG_LEVEL=info` instead to show less details.
 
 1. Once the deploy is started, go back to your [app settings page](https://github.com/settings/apps) and update the **Webhook URL** to the URL of your deployment (which `now` has kindly copied to your clipboard).
 
-1. Your app should be up and running! For long term use, create an alias for your robot. After making an alias, you can swap to new deploy URLs with no downtime.
+1. Your app should be up and running! For long term use, create an alias for your app. After making an alias, you can swap to new deploy URLs with no downtime.
 
         $ now alias set https://your-generated-url.now.sh https://a-fancier-url.now.sh
 
@@ -135,18 +133,61 @@ Zeit [Now](http://zeit.co/now) is a great service for running Probot apps. After
 
         $ now scale https://a-fancier-url.now.sh 1
 
+### GitHub Actions
+
+> **Heads Up!** [GitHub Actions](https://github.com/features/actions) is still in limited beta.
+
+GitHub Actions allows you to trigger workflows based on GitHub events, which makes it a great fit for running Probot Apps. To run a your app on GitHub Actions:
+
+1. Add a `Dockerfile` to your app:
+    ```
+    FROM node:10
+
+    ENV PATH=$PATH:/app/node_modules/.bin
+    WORKDIR /app
+    COPY . .
+    RUN npm install --production
+
+    ENTRYPOINT ["probot", "receive"]
+    CMD ["/app/index.js"]
+    ```
+
+1. In the repository that you want to run the app, create a `.github/main.workflow` file that defines the action and listens for any events that your app depends on. For example, here is the workflow for @jasonetco's [TODO](https://github.com/jasonetco/todo):
+    ```
+    workflow "Check for TODOs in Pull Requests" {
+      on = "pull_request"
+      resolves = "TODO"
+    }
+
+    workflow "Check for TODOs on Push" {
+      on = "push"
+      resolves = "TODO"
+    }
+
+    action "TODO" {
+      uses = "jasonetco/todo"
+      secrets = ["GITHUB_TOKEN"]
+    }
+    ```
+
+There are a few caveats when running Probot Apps on GitHub Actions:
+
+- The GitHub API token available to actions has a [fixed set of permisisons](https://developer.github.com/actions/creating-workflows/storing-secrets/#github-token-secret), and only has access to the repository that triggered the action. `app.auth()` will always return a GitHub client authenticated for the current repository.
+- [probot/scheduler](https://github.com/probot/scheduler) and other extensions that require long-running processes are not currently supported.
+- Your app cannot expose [HTTP routes](./http.md)
+
 ## Share the app
 
-The Probot website includes a list of [featured apps](https://probot.github.com/apps). Consider [adding your app to the website](https://github.com/probot/probot.github.io/blob/master/CONTRIBUTING.md#adding-your-app
+The Probot website includes a list of [featured apps](https://probot.github.io/apps). Consider [adding your app to the website](https://github.com/probot/probot.github.io/blob/master/CONTRIBUTING.md#adding-your-app
 ) so others can discover and use it.
 
 ## Combining apps
 
-To deploy a bot that includes multiple apps, create a new app that has the apps listed as dependencies in `package.json`:
+To deploy multiple apps in one instance, create a new app that has the existing apps listed as dependencies in `package.json`:
 
 ```json
 {
-  "name": "my-probot",
+  "name": "my-probot-app",
   "private": true,
   "dependencies": {
     "probot-autoresponder": "probot/autoresponder",

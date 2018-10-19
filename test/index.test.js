@@ -1,33 +1,61 @@
-const createProbot = require('..')
+const {createProbot} = require('../src')
 const request = require('supertest')
 const nock = require('nock')
-const helper = require('./plugins/helper')
+const helper = require('./apps/helper')
 
 describe('Probot', () => {
   let probot
   let event
 
   beforeEach(() => {
-    probot = createProbot()
+    probot = createProbot({ githubToken: 'faketoken' })
 
     event = {
       name: 'push',
-      event: 'push',
       payload: require('./fixtures/webhook/push')
     }
   })
 
+  it('constructor', () => {
+    // probot with token. Should not throw
+    createProbot({ githubToken: 'faketoken' })
+    // probot with id/cert
+    createProbot({ id: 1234, cert: 'xxxx' })
+  })
+
   describe('webhook delivery', () => {
-    it('forwards webhooks to the robot', async () => {
-      const robot = probot.load(() => {})
-      robot.receive = jest.fn()
+    it('forwards webhooks to the app', async () => {
+      const app = probot.load(() => {})
+      app.receive = jest.fn()
       await probot.webhook.receive(event)
-      expect(robot.receive).toHaveBeenCalledWith({ event: event.name, payload: event.payload })
+      expect(app.receive).toHaveBeenCalledWith(event)
+    })
+
+    it('responds with the correct error if webhook secret does not match', async () => {
+      probot.logger.error = jest.fn()
+      probot.webhook.on('push', () => { throw new Error('X-Hub-Signature does not match blob signature') })
+
+      try {
+        await probot.webhook.receive(event)
+      } catch (e) {
+        expect(probot.logger.error.mock.calls[0]).toMatchSnapshot()
+      }
+    })
+
+    it('responds with the correct error if webhook secret is not found', async () => {
+      probot.logger.error = jest.fn()
+      probot.webhook.on('push', () => { throw new Error('No X-Hub-Signature found on request') })
+
+      try {
+        await probot.webhook.receive(event)
+      } catch (e) {
+        expect(probot.logger.error.mock.calls[0]).toMatchSnapshot()
+      }
     })
 
     it('responds with the correct error if webhook secret is wrong', async () => {
       probot.logger.error = jest.fn()
-      probot.webhook.on('push', () => { throw new Error('X-Hub-Signature does not match blob signature') })
+      probot.webhook.on('push', () => { throw new Error('webhooks:receiver ignored: POST / due to missing headers: x-hub-signature') })
 
       try {
         await probot.webhook.receive(event)
@@ -46,47 +74,58 @@ describe('Probot', () => {
         expect(probot.logger.error.mock.calls[0]).toMatchSnapshot()
       }
     })
+
+    it('responds with the correct error if the jwt could not be decoded', async () => {
+      probot.logger.error = jest.fn()
+      probot.webhook.on('*', () => { throw new Error('{"message":"A JSON web token could not be decoded","documentation_url":"https://developer.github.com/v3"}') })
+
+      try {
+        await probot.webhook.receive(event)
+      } catch (e) {
+        expect(probot.logger.error.mock.calls[0]).toMatchSnapshot()
+      }
+    })
   })
 
   describe('server', () => {
     it('prefixes paths with route name', () => {
-      probot.load(robot => {
-        const app = robot.route('/my-plugin')
-        app.get('/foo', (req, res) => res.end('foo'))
+      probot.load(app => {
+        const route = app.route('/my-app')
+        route.get('/foo', (req, res) => res.end('foo'))
       })
 
-      return request(probot.server).get('/my-plugin/foo').expect(200, 'foo')
+      return request(probot.server).get('/my-app/foo').expect(200, 'foo')
     })
 
     it('allows routes with no path', () => {
-      probot.load(robot => {
-        const app = robot.route()
-        app.get('/foo', (req, res) => res.end('foo'))
+      probot.load(app => {
+        const route = app.route()
+        route.get('/foo', (req, res) => res.end('foo'))
       })
 
       return request(probot.server).get('/foo').expect(200, 'foo')
     })
 
     it('allows you to overwrite the root path', () => {
-      probot.load(robot => {
-        const app = robot.route()
-        app.get('/', (req, res) => res.end('foo'))
+      probot.load(app => {
+        const route = app.route()
+        route.get('/', (req, res) => res.end('foo'))
       })
 
       return request(probot.server).get('/').expect(200, 'foo')
     })
 
-    it('isolates plugins from affecting eachother', async () => {
+    it('isolates apps from affecting eachother', async () => {
       ['foo', 'bar'].forEach(name => {
-        probot.load(robot => {
-          const app = robot.route('/' + name)
+        probot.load(app => {
+          const route = app.route('/' + name)
 
-          app.use(function (req, res, next) {
+          route.use(function (req, res, next) {
             res.append('X-Test', name)
             next()
           })
 
-          app.get('/hello', (req, res) => res.end(name))
+          route.get('/hello', (req, res) => res.end(name))
         })
       })
 
@@ -100,15 +139,15 @@ describe('Probot', () => {
     })
 
     it('allows users to configure webhook paths', async () => {
-      probot = createProbot({webhookPath: '/webhook'})
+      probot = createProbot({webhookPath: '/webhook', githubToken: 'faketoken'})
       // Error handler to avoid printing logs
       // eslint-disable-next-line handle-callback-err
       probot.server.use((err, req, res, next) => { })
 
-      probot.load(robot => {
-        const app = robot.route()
-        app.get('/webhook', (req, res) => res.end('get-webhook'))
-        app.post('/webhook', (req, res) => res.end('post-webhook'))
+      probot.load(app => {
+        const route = app.route()
+        route.get('/webhook', (req, res) => res.end('get-webhook'))
+        route.post('/webhook', (req, res) => res.end('post-webhook'))
       })
 
       // GET requests should succeed
@@ -148,10 +187,10 @@ describe('Probot', () => {
   })
 
   describe('receive', () => {
-    it('forwards events to each plugin', async () => {
+    it('forwards events to each app', async () => {
       const spy = jest.fn()
-      const robot = probot.load(robot => robot.on('push', spy))
-      robot.auth = jest.fn().mockReturnValue(Promise.resolve({}))
+      const app = probot.load(app => app.on('push', spy))
+      app.auth = jest.fn().mockReturnValue(Promise.resolve({}))
 
       await probot.receive(event)
 
@@ -160,7 +199,7 @@ describe('Probot', () => {
   })
 
   describe('ghe support', function () {
-    let robot
+    let app
 
     beforeEach(() => {
       process.env.GHE_HOST = 'notreallygithub.com'
@@ -169,7 +208,7 @@ describe('Probot', () => {
         .defaultReplyHeaders({'Content-Type': 'application/json'})
         .get('/app/installations').reply(200, ['I work!'])
 
-      robot = helper.createRobot()
+      app = helper.createApp()
     })
 
     afterEach(() => {
@@ -179,15 +218,25 @@ describe('Probot', () => {
     it('requests from the correct API URL', async () => {
       const spy = jest.fn()
 
-      const plugin = async robot => {
-        const github = await robot.auth()
+      const appFn = async app => {
+        const github = await app.auth()
         const res = await github.apps.getInstallations({})
         return spy(res)
       }
 
-      await plugin(robot)
-      await robot.receive(event)
+      await appFn(app)
+      await app.receive(event)
       expect(spy.mock.calls[0][0].data[0]).toBe('I work!')
+    })
+
+    it('throws if the GHE host includes a protocol', async () => {
+      process.env.GHE_HOST = 'https://notreallygithub.com'
+
+      try {
+        await app.auth()
+      } catch (e) {
+        expect(e).toMatchSnapshot()
+      }
     })
   })
 })

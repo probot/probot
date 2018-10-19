@@ -1,8 +1,8 @@
 const express = require('express')
 const sse = require('connect-sse')()
 const nock = require('nock')
-const createWebhookProxy = require('../lib/webhook-proxy')
-const logger = require('../lib/logger')
+const {createWebhookProxy} = require('../src/webhook-proxy')
+const {logger} = require('../src/logger')
 
 const targetPort = 999999
 

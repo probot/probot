@@ -1,0 +1,17 @@
+{
+  "mode": "file",
+  "out": "out",
+  "exclude": "test",
+  "theme": "minimal",
+  "excludePrivate": true,
+  "excludeNotExported": true,
+  "excludeExternals": true,
+  "listInvalidSymbolLinks": true,
+  "target": "ES5",
+  "moduleResolution": "node",
+  "preserveConstEnums": "true",
+  "stripInternal": "true",
+  "module": "commonjs",
+  "readme": "none",
+  "gaID": "UA-102577034-2"
+}

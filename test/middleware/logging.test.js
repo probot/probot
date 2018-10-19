@@ -1,7 +1,7 @@
 const request = require('supertest')
 const express = require('express')
-const logger = require('../../lib/logger')
-const logging = require('../../lib/middleware/logging')
+const {logger} = require('../../src/logger')
+const {logRequest} = require('../../src/middleware/logging')
 
 describe('logging', () => {
   let server, output
@@ -19,7 +19,7 @@ describe('logging', () => {
     output = []
 
     server.use(express.json())
-    server.use(logging({logger}))
+    server.use(logRequest({logger}))
     server.get('/', (req, res) => {
       res.set('X-Test-Header', 'testing')
       res.send('OK')

@@ -1,24 +1,32 @@
-sudo: false
+sudo: required
 
 language: node_js
 
 node_js:
   - "8"
-  
+
+env:
+matrix:
+  include:
+    - node_js: "10"
+  allow_failures:
+    - node_js: "10"
+
+
 notifications:
   disabled: true
-  
+
 before_install:
-  - npm install -g npm@5
+  - npm install -g codecov
 
 install:
-  - npm install -g codecov
   - npm install
+  - npm run build
 
 branches:
   except:
     - /^v\d+\.\d+\.\d+$/
-    
+
 script:
   - npm test
   - codecov

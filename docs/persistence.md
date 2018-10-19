@@ -63,8 +63,8 @@ mongoose.connect(mongoUri, {
 // Register the mongoose model
 const People = require('./PeopleSchema')
 
-module.exports = robot => {
-  robot.on('issues.opened', async context => {
+module.exports = app => {
+  app.on('issues.opened', async context => {
     // Find all the people in the database
     const people = await People.find().exec()
 
@@ -74,8 +74,8 @@ module.exports = robot => {
 
     // `context` extracts information from the event, which can be passed to
     // GitHub API calls. This will return:
-    //   {owner: 'yourname', repo: 'yourrepo', number: 123, body: 'The following people are in the database: Jason, Jane, James, Jennifer'}
-    const params = context.issue({body: `The following people are in the database: ${peoplesNames}`})
+    //   { owner: 'yourname', repo: 'yourrepo', number: 123, body: 'The following people are in the database: Jason, Jane, James, Jennifer' }
+    const params = context.issue({ body: `The following people are in the database: ${peoplesNames}` })
 
     // Post a comment on the issue
     return context.github.issues.createComment(params)
@@ -115,8 +115,8 @@ function performQuery (query) {
   })
 }
 
-module.exports = robot => {
-  robot.on('issues.opened', async context => {
+module.exports = app => {
+  app.on('issues.opened', async context => {
     // Find all the people in the database
     const people = await performQuery('SELECT * FROM `people`')
 
@@ -126,8 +126,8 @@ module.exports = robot => {
 
     // `context` extracts information from the event, which can be passed to
     // GitHub API calls. This will return:
-    //   {owner: 'yourname', repo: 'yourrepo', number: 123, body: 'The following people are in the database: Jason, Jane, James, Jennifer'}
-    const params = context.issue({body: `The following people are in the database: ${peoplesNames}`})
+    //   { owner: 'yourname', repo: 'yourrepo', number: 123, body: 'The following people are in the database: Jason, Jane, James, Jennifer' }
+    const params = context.issue({ body: `The following people are in the database: ${peoplesNames}` })
 
     // Post a comment on the issue
     return context.github.issues.createComment(params)
@@ -154,8 +154,8 @@ firebase.initializeApp(config)
 
 const database = firebase.database()
 
-module.exports = robot => {
-  robot.on('issues.opened', async context => {
+module.exports = app => {
+  app.on('issues.opened', async context => {
     // Find all the people in the database
     const people = await database.ref('/people').once('value').then((snapshot) => {
       return snapshot.val()
@@ -167,8 +167,8 @@ module.exports = robot => {
 
     // `context` extracts information from the event, which can be passed to
     // GitHub API calls. This will return:
-    //   {owner: 'yourname', repo: 'yourrepo', number: 123, body: 'The following people are in the database: Jason, Jane, James, Jennifer'}
-    const params = context.issue({body: `The following people are in the database: ${peoplesNames}`})
+    //   { owner: 'yourname', repo: 'yourrepo', number: 123, body: 'The following people are in the database: Jason, Jane, James, Jennifer' }
+    const params = context.issue({ body: `The following people are in the database: ${peoplesNames}` })
 
     // Post a comment on the issue
     return context.github.issues.createComment(params)

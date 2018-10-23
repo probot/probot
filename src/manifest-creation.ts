@@ -44,7 +44,7 @@ export class ManifestCreation {
       hook_attributes: {
         url: process.env.WEBHOOK_PROXY_URL || `${baseUrl}/`
       },
-      name: manifest.name || pkg.name,
+      name: manifest.name || pkg.name || process.env.PROJECT_DOMAIN,
       public: manifest.public || true,
       redirect_url: `${baseUrl}/probot/setup`,
       // TODO: add setup url

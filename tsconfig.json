@@ -1,10 +1,9 @@
 {
   "compilerOptions": {
-    "allowJs": false,
     "lib": ["es2015", "es2017"],
     "module": "commonjs",
     "moduleResolution": "node",
-    "target": "es5",
+    "target": "es6",
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
@@ -15,8 +14,7 @@
     "skipLibCheck": true,
     "noImplicitAny": true,
     "esModuleInterop": true,
-    "declaration": true, // enable this once all files are .ts and we can remove allowJs
-    "resolveJsonModule": true
+    "declaration": true
   },
   "include": [
     "src/**/*"

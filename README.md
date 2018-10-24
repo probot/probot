@@ -1,8 +1,11 @@
-# Probot
+<p align="center">
+  <a href="https://probot.github.io"><img src="/static/robot.svg" width="160" alt="Probot's logo, a cartoon robot" /></a>
+</p>
+<h3 align="center"><a href="https://probot.github.io">Probot</a></h3>
+<p align="center">A framework for building GitHub Apps to automate and improve your workflow<p>
+<p align="center"><a href="https://npmjs.com/package/probot"><img src="https://badgen.net/npm/v/probot" alt="NPM"></a> <a href="https://travis-ci.com/probot/probot"><img src="https://badgen.now.sh/travis/probot/probot" alt="Build Status"></a> <a href="https://codecov.io/gh/probot/probot/"><img src="https://badgen.now.sh/codecov/c/github/probot/probot" alt="Codecov"></a> <a href="https://twitter.com/ProbotTheRobot"><img src="https://img.shields.io/twitter/follow/ProbotTheRobot.svg?style=social&logo=twitter&label=Follow" alt="@ProbotTheRobot on Twitter"></a></p>
 
-[![npm version](https://img.shields.io/npm/v/probot.svg)](https://www.npmjs.com/package/probot) [![](https://img.shields.io/twitter/follow/ProbotTheRobot.svg?style=social&logo=twitter&label=Follow)](https://twitter.com/ProbotTheRobot)
-
-> 🤖 A framework for building GitHub Apps to automate and improve your workflow
+---
 
 If you've ever thought, "wouldn't it be cool if GitHub could…"; I'm going to stop you right there. Most features can actually be added via [GitHub Apps](https://developer.github.com/apps/), which extend GitHub and can be installed directly on organizations and user accounts and granted access to specific repositories. They come with granular permissions and built-in webhooks. Apps are first class actors within GitHub.
 

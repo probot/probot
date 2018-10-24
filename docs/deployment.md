@@ -137,7 +137,7 @@ Zeit [Now](http://zeit.co/now) is a great service for running Probot apps. After
 
 > **Heads Up!** [GitHub Actions](https://github.com/features/actions) is still in limited beta.
 
-GitHub Actions allows you to trigger workflows based on GitHub events, which makes it a great fit for running Probot Apps. To run a your app on GitHub Actions:
+GitHub Actions allows you to trigger workflows based on GitHub events, which makes it a great fit for running Probot Apps. To run your app on GitHub Actions:
 
 1. Add a `Dockerfile` to your app:
     ```

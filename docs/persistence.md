@@ -74,8 +74,8 @@ module.exports = app => {
 
     // `context` extracts information from the event, which can be passed to
     // GitHub API calls. This will return:
-    //   {owner: 'yourname', repo: 'yourrepo', number: 123, body: 'The following people are in the database: Jason, Jane, James, Jennifer'}
-    const params = context.issue({body: `The following people are in the database: ${peoplesNames}`})
+    //   { owner: 'yourname', repo: 'yourrepo', number: 123, body: 'The following people are in the database: Jason, Jane, James, Jennifer' }
+    const params = context.issue({ body: `The following people are in the database: ${peoplesNames}` })
 
     // Post a comment on the issue
     return context.github.issues.createComment(params)
@@ -126,8 +126,8 @@ module.exports = app => {
 
     // `context` extracts information from the event, which can be passed to
     // GitHub API calls. This will return:
-    //   {owner: 'yourname', repo: 'yourrepo', number: 123, body: 'The following people are in the database: Jason, Jane, James, Jennifer'}
-    const params = context.issue({body: `The following people are in the database: ${peoplesNames}`})
+    //   { owner: 'yourname', repo: 'yourrepo', number: 123, body: 'The following people are in the database: Jason, Jane, James, Jennifer' }
+    const params = context.issue({ body: `The following people are in the database: ${peoplesNames}` })
 
     // Post a comment on the issue
     return context.github.issues.createComment(params)
@@ -167,8 +167,8 @@ module.exports = app => {
 
     // `context` extracts information from the event, which can be passed to
     // GitHub API calls. This will return:
-    //   {owner: 'yourname', repo: 'yourrepo', number: 123, body: 'The following people are in the database: Jason, Jane, James, Jennifer'}
-    const params = context.issue({body: `The following people are in the database: ${peoplesNames}`})
+    //   { owner: 'yourname', repo: 'yourrepo', number: 123, body: 'The following people are in the database: Jason, Jane, James, Jennifer' }
+    const params = context.issue({ body: `The following people are in the database: ${peoplesNames}` })
 
     // Post a comment on the issue
     return context.github.issues.createComment(params)

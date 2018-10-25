@@ -69,12 +69,24 @@ describe('github/graphql', () => {
     })
 
     test('raises errors', async () => {
-      const response = { 'data': null, 'errors': [{ 'message': 'Unexpected end of document' }] }
+      const response = { 'data': 'some data', 'errors': [{ 'message': 'Unexpected end of document' }] }
 
       nock('https://api.github.com').post('/graphql', { query })
         .reply(200, response)
 
-      await expect(github.query(query)).rejects.toThrow('Unexpected end of document')
+      let thrownError
+      try {
+        await github.query(query)
+      } catch (err) {
+        thrownError = err
+      }
+
+      expect(thrownError).not.toBeUndefined()
+      expect(thrownError.name).toEqual('GraphQLQueryError')
+      expect(thrownError.toString()).toContain('Unexpected end of document')
+      expect(thrownError.query).toEqual(query)
+      expect(thrownError.errors).toEqual(response.errors)
+      expect(thrownError.data).toEqual('some data')
     })
   })
 

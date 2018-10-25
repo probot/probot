@@ -1,17 +1,30 @@
-import { GitHubAPI, Headers, Variables } from './'
+import {
+  GitHubAPI,
+  Headers,
+  Variables
+} from './'
 
-class GraphQLError extends Error {
-  public query: string
-  public variables: Variables
+export interface GraphQLError {
+  message: string,
+  locations?: Array<{ line: number, column: number }>,
+  path?: Array<string | number>,
+  extensions?: {
+    [key: string]: any
+  }
+}
 
-  constructor (errors: Error[], query: string, variables: Variables) {
-    super(JSON.stringify(errors))
-    this.name = 'GraphQLError'
-    this.query = query
-    this.variables = variables
+export class GraphQLQueryError extends Error {
+  constructor (
+    public errors: GraphQLError[],
+    public query: string,
+    public variables: Variables,
+    public data: any
+  ) {
+    super(`Error(s) occurred executing GraphQL query:\n${JSON.stringify(errors, null, 2)}`)
+    this.name = 'GraphQLQueryError'
 
     if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, GraphQLError)
+      Error.captureStackTrace(this, GraphQLQueryError)
     }
   }
 }
@@ -35,8 +48,13 @@ async function graphql (client: GitHubAPI, query: string, variables: Variables, 
     variables
   })
 
-  if (res.data.errors) {
-    throw new GraphQLError(res.data.errors, query, variables)
+  if (res.data.errors && res.data.errors.length > 0) {
+    throw new GraphQLQueryError(
+      res.data.errors,
+      query,
+      variables,
+      res.data.data
+    )
   }
 
   return res.data.data

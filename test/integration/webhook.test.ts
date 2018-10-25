@@ -1,6 +1,6 @@
 import fs from 'fs'
 import request from 'supertest'
-import { createProbot, Probot } from '../..'
+import { createProbot, Probot } from '../../src'
 const data = JSON.parse(fs.readFileSync('./test/fixtures/webhook/push.json', 'UTF-8'))
 
 describe('webhooks', async () => {

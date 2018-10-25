@@ -1,15 +1,15 @@
-const {serializers} = require('../src/serializers')
+import { serializers } from '../src/serializers'
 
 describe('serializers', () => {
   describe('repository', () => {
-    it('returns the repository\'s full name', () => {
+    it("returns the repository's full name", () => {
       const repo = { full_name: 'probot/JasonEtco' }
       expect(serializers.repository(repo)).toBe('probot/JasonEtco')
     })
   })
 
   describe('installation', () => {
-    it('returns the installation\'s account login', () => {
+    it("returns the installation's account login", () => {
       const inst = { account: { login: 'JasonEtco' } }
       expect(serializers.installation(inst)).toBe('JasonEtco')
     })
@@ -22,31 +22,34 @@ describe('serializers', () => {
 
   describe('event', () => {
     it('works with a legit event', () => {
-      const event = {id: 1,
+      const event = {
+        id: 1,
         name: 'test',
         payload: {
           action: 'test',
-          repository: {full_name: 'probot/test'},
-          installation: {id: 1}
+          installation: { id: 1 },
+          repository: { full_name: 'probot/test' }
         }
       }
       expect(serializers.event(event)).toEqual({
-        id: 1,
         event: 'test.test',
-        repository: 'probot/test',
-        installation: 1
+        id: 1,
+        installation: 1,
+        repository: 'probot/test'
       })
     })
 
     it('works a malformed event', () => {
-      const event = {id: 1,
-        name: 'test',
-        payload: {}}
-      expect(serializers.event(event)).toEqual({
+      const event = {
         id: 1,
+        name: 'test',
+        payload: {}
+      }
+      expect(serializers.event(event)).toEqual({
         event: 'test',
-        repository: undefined,
-        installation: undefined
+        id: 1,
+        installation: undefined,
+        repository: undefined
       })
     })
 
@@ -66,7 +69,7 @@ describe('serializers', () => {
     })
 
     it('returns nothing when passed nothing', () => {
-      expect(serializers.res()).toBe(undefined)
+      expect(serializers.res(undefined)).toBe(undefined)
     })
   })
 })

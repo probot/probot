@@ -15,6 +15,7 @@ Every app can either be deployed stand-alone, or combined with other apps in one
     1. [Glitch](#glitch)
     1. [Heroku](#heroku)
     1. [Now](#now)
+    1. [GitHub Actions](#github-actions)
 1. [Share the app](#share-the-app)
 1. [Combining apps](#combining-apps)
 1. [Error tracking](#error-tracking)
@@ -113,16 +114,12 @@ Zeit [Now](http://zeit.co/now) is a great service for running Probot apps. After
 
 1. Clone the app that you want to deploy. e.g. `git clone https://github.com/probot/stale`
 
-1. Add a `now-start` script to `package.json` as follows:
-
-        "now-start": "PRIVATE_KEY=$(echo $PRIVATE_KEY_BASE64 | base64 -d) npm start"
-
-1. Run `now` to deploy, replacing the `APP_ID` and `WEBHOOK_SECRET` with the values for those variables, and setting the `PRIVATE_KEY_BASE64`:
+1. Run `now` to deploy, replacing the `APP_ID` and `WEBHOOK_SECRET` with the values for those variables, and setting the `PRIVATE_KEY`:
 
         $ now -e APP_ID=aaa \
             -e WEBHOOK_SECRET=bbb \
             -e NODE_ENV=production \
-            -e PRIVATE_KEY_BASE64="$(cat ~/Downloads/*.private-key.pem | base64)"
+            -e PRIVATE_KEY="$(cat ~/Downloads/*.private-key.pem | base64)"
 
       **NOTE**: Add `-e LOG_LEVEL=trace` to get verbose logging, or add `-e LOG_LEVEL=info` instead to show less details.
 
@@ -135,6 +132,49 @@ Zeit [Now](http://zeit.co/now) is a great service for running Probot apps. After
 1. You can also keep your app running forever, with instant response to webhooks with:
 
         $ now scale https://a-fancier-url.now.sh 1
+
+### GitHub Actions
+
+> **Heads Up!** [GitHub Actions](https://github.com/features/actions) is still in limited beta.
+
+GitHub Actions allows you to trigger workflows based on GitHub events, which makes it a great fit for running Probot Apps. To run your app on GitHub Actions:
+
+1. Add a `Dockerfile` to your app:
+    ```
+    FROM node:10
+
+    ENV PATH=$PATH:/app/node_modules/.bin
+    WORKDIR /app
+    COPY . .
+    RUN npm install --production
+
+    ENTRYPOINT ["probot", "receive"]
+    CMD ["/app/index.js"]
+    ```
+
+1. In the repository that you want to run the app, create a `.github/main.workflow` file that defines the action and listens for any events that your app depends on. For example, here is the workflow for @jasonetco's [TODO](https://github.com/jasonetco/todo):
+    ```
+    workflow "Check for TODOs in Pull Requests" {
+      on = "pull_request"
+      resolves = "TODO"
+    }
+
+    workflow "Check for TODOs on Push" {
+      on = "push"
+      resolves = "TODO"
+    }
+
+    action "TODO" {
+      uses = "jasonetco/todo"
+      secrets = ["GITHUB_TOKEN"]
+    }
+    ```
+
+There are a few caveats when running Probot Apps on GitHub Actions:
+
+- The GitHub API token available to actions has a [fixed set of permisisons](https://developer.github.com/actions/creating-workflows/storing-secrets/#github-token-secret), and only has access to the repository that triggered the action. `app.auth()` will always return a GitHub client authenticated for the current repository.
+- [probot/scheduler](https://github.com/probot/scheduler) and other extensions that require long-running processes are not currently supported.
+- Your app cannot expose [HTTP routes](./http.md)
 
 ## Share the app
 

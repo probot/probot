@@ -18,7 +18,7 @@ describe('private-key', () => {
     fs.readFileSync = readFileSync
   })
 
-  describe('findPrivateKey()', () => {
+  describe('findPrivateKey(undefined)', () => {
     describe('when a filepath is provided', () => {
       it('should read the file at given filepath', () => {
         findPrivateKey(keyfilePath)
@@ -41,7 +41,7 @@ describe('private-key', () => {
 
       it('should return the key', () => {
         process.env.PRIVATE_KEY = privateKey
-        expect(findPrivateKey()).toEqual(privateKey)
+        expect(findPrivateKey(undefined)).toEqual(privateKey)
       })
     })
 
@@ -55,7 +55,7 @@ describe('private-key', () => {
       })
 
       it('should return the key', () => {
-        expect(findPrivateKey()).toEqual(privateKey)
+        expect(findPrivateKey(undefined)).toEqual(privateKey)
       })
     })
 
@@ -69,7 +69,7 @@ describe('private-key', () => {
       })
 
       it('should decode and return the key', () => {
-        expect(findPrivateKey()).toEqual(privateKey)
+        expect(findPrivateKey(undefined)).toEqual(privateKey)
       })
     })
 
@@ -83,12 +83,12 @@ describe('private-key', () => {
       })
 
       it('should read the file at given filepath', () => {
-        findPrivateKey()
+        findPrivateKey(undefined)
         expect(fs.readFileSync).toHaveBeenCalledWith(keyfilePath)
       })
 
       it('should return the key', () => {
-        expect(findPrivateKey()).toEqual(privateKey)
+        expect(findPrivateKey(undefined)).toEqual(privateKey)
       })
     })
 
@@ -101,7 +101,7 @@ describe('private-key', () => {
       })
 
       it('should look for one in the current directory', () => {
-        findPrivateKey()
+        findPrivateKey(undefined)
         expect(fs.readdirSync).toHaveBeenCalledWith(process.cwd())
       })
 
@@ -121,7 +121,7 @@ describe('private-key', () => {
 
       describe('and a key file is present', () => {
         it('should load the key file', () => {
-          findPrivateKey()
+          findPrivateKey(undefined)
           expect(fs.readFileSync).toHaveBeenCalledWith('foo.pem')
         })
       })
@@ -131,10 +131,12 @@ describe('private-key', () => {
           fs.readdirSync = readdirSync
         })
 
-        it('should throw an error', () => {
-          expect(findPrivateKey).toThrow(/missing private key for GitHub App/i)
+        it('should return null', () => {
+          expect(findPrivateKey()).toBe(null)
         })
       })
     })
   })
 })
+
+// https://stackoverflow.com/questions/30734509/how-to-pass-optional-parameters-in-typescript-while-omitting-some-other-optional wtf

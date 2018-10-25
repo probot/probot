@@ -1,12 +1,19 @@
 import {
   GitHubAPI,
-  GraphQLError,
-  GraphQLQueryError as GraphQLQueryErrorInterface,
   Headers,
   Variables
 } from './'
 
-class GraphQLQueryError extends Error implements GraphQLQueryErrorInterface {
+export interface GraphQLError {
+  message: string,
+  locations?: Array<{ line: number, column: number }>,
+  path?: Array<string | number>,
+  extensions?: {
+    [key: string]: any
+  }
+}
+
+export class GraphQLQueryError extends Error {
   constructor (
     public errors: GraphQLError[],
     public query: string,
@@ -14,7 +21,7 @@ class GraphQLQueryError extends Error implements GraphQLQueryErrorInterface {
     public data: any
   ) {
     super(`Error(s) occurred executing GraphQL query:\n${JSON.stringify(errors, null, 2)}`)
-    this.name = 'GraphQLError'
+    this.name = 'GraphQLQueryError'
 
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, GraphQLQueryError)

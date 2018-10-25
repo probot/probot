@@ -1,8 +1,11 @@
-import createProbot = require("../src");
-import request = require("supertest");
-import nock = require("nock");
-import helper = require("./apps/helper");
-import { Probot } from "../lib";
+const request = require("supertest");
+const nock = require("nock");
+const helper = require("./apps/helper");
+//Commented out for code to run
+//const Probot  = require("../lib");
+//const resolveAny = require("dns");
+//const create  = require("domain");
+import { createProbot } from "../src";
 
 describe("Probot", () => {
   let probot: any;
@@ -20,19 +23,20 @@ describe("Probot", () => {
   it("constructor", () => {
     // probot with token. Should not throw
     createProbot({ githubToken: "faketoken" });
+    createProbot({ githubToken: "faketoken" });
     // probot with id/cert
     createProbot({ id: 1234, cert: "xxxx" });
   });
 
   describe("webhook delivery", () => {
-    it("forwards webhooks to the app", async () => {
+    it("forwards webhooks to the app", async function() {
       const app = probot.load(() => {});
       app.receive = jest.fn();
       await probot.webhook.receive(event);
       expect(app.receive).toHaveBeenCalledWith(event);
     });
 
-    it("responds with the correct error if webhook secret does not match", async () => {
+    it("responds with the correct error if webhook secret does not match", async function() {
       probot.logger.error = jest.fn();
       probot.webhook.on("push", () => {
         throw new Error("X-Hub-Signature does not match blob signature");
@@ -45,7 +49,7 @@ describe("Probot", () => {
       }
     });
 
-    it("responds with the correct error if webhook secret is not found", async () => {
+    it("responds with the correct error if webhook secret is not found", async function() {
       probot.logger.error = jest.fn();
       probot.webhook.on("push", () => {
         throw new Error("No X-Hub-Signature found on request");
@@ -58,7 +62,7 @@ describe("Probot", () => {
       }
     });
 
-    it("responds with the correct error if webhook secret is wrong", async () => {
+    it("responds with the correct error if webhook secret is wrong", async function() {
       probot.logger.error = jest.fn();
       probot.webhook.on("push", () => {
         throw new Error(
@@ -105,10 +109,12 @@ describe("Probot", () => {
   });
 
   describe("server", () => {
-    it("prefixes paths with route name", () => {
-      probot.load(app => {
+    it("prefixes paths with route name", function() {
+      probot.load(function(app: any) {
         const route = app.route("/my-app");
-        route.get("/foo", function(req:any, res:any){ res.end("foo"))};
+        route.get("/foo", function(req: any, res: any) {
+          res.end("foo");
+        });
       });
 
       return request(probot.server)
@@ -117,9 +123,11 @@ describe("Probot", () => {
     });
 
     it("allows routes with no path", () => {
-      probot.load(app => {
+      probot.load(function(app: any) {
         const route = app.route();
-        route.get("/foo",function (req:any, res:any)  {res.end("foo")});
+        route.get("/foo", function(req: any, res: any) {
+          res.end("foo");
+        });
       });
 
       return request(probot.server)
@@ -128,9 +136,11 @@ describe("Probot", () => {
     });
 
     it("allows you to overwrite the root path", () => {
-      probot.load(function(app:any){
+      probot.load(function(app: any) {
         const route = app.route();
-        route.get("/", function(req:any, res:any) {res.end("foo")});
+        route.get("/", function(req: any, res: any) {
+          res.end("foo");
+        });
       });
 
       return request(probot.server)
@@ -140,15 +150,15 @@ describe("Probot", () => {
 
     it("isolates apps from affecting eachother", async () => {
       ["foo", "bar"].forEach(name => {
-        probot.load(function(app:any) {
+        probot.load(function(app: any) {
           const route = app.route("/" + name);
 
-          route.use(function(req:any, res:any, next:any) {
+          route.use(function(req: any, res: any, next: any) {
             res.append("X-Test", name);
             next();
           });
 
-          route.get("/hello", (req, res) => res.end(name));
+          route.get("/hello", (req: any, res: any) => res.end(name));
         });
       });
 
@@ -170,12 +180,16 @@ describe("Probot", () => {
       });
       // Error handler to avoid printing logs
       // eslint-disable-next-line handle-callback-err
-      probot.server.use((err, req, res, next) => {});
+      probot.server.use((err: any, req: any, res: any, next: any) => {});
 
-      probot.load(function(app:any){
+      probot.load(function(app: any) {
         const route = app.route();
-        route.get("/webhook", function(req:any, res:any) {res.end("get-webhook")});
-        route.post("/webhook", function(req:any, res:any) {res.end("post-webhook")});
+        route.get("/webhook", function(req: any, res: any) {
+          res.end("get-webhook");
+        });
+        route.post("/webhook", function(req: any, res: any) {
+          res.end("post-webhook");
+        });
       });
 
       // GET requests should succeed
@@ -189,10 +203,10 @@ describe("Probot", () => {
         .expect(400);
     });
 
-    it("defaults webhook path to `/`", async () => {
+    it("defaults webhook path to `/`", async function() {
       // Error handler to avoid printing logs
       // eslint-disable-next-line handle-callback-err
-      probot.server.use((err, req, res, next) => {});
+      probot.server.use((err: any, req: any, res: any, next: any) => {});
 
       // POST requests to `/` should 400 b/c webhook signature will fail
       await request(probot.server)
@@ -200,7 +214,7 @@ describe("Probot", () => {
         .expect(400);
     });
 
-    it("responds with 500 on error", async () => {
+    it("responds with 500 on error", async function() {
       probot.server.get("/boom", () => {
         throw new Error("boom");
       });
@@ -210,7 +224,7 @@ describe("Probot", () => {
         .expect(500);
     });
 
-    it("responds with 500 on async error", async () => {
+    it("responds with 500 on async error", async function() {
       probot.server.get("/boom", () => {
         return Promise.reject(new Error("boom"));
       });
@@ -222,9 +236,11 @@ describe("Probot", () => {
   });
 
   describe("receive", () => {
-    it("forwards events to each app", async () => {
+    it("forwards events to each app", async function() {
       const spy = jest.fn();
-      const app = probot.load(function(app) {app.on("push", spy)});
+      const app = probot.load(function(app: any) {
+        app.on("push", spy);
+      });
       app.auth = jest.fn().mockReturnValue(Promise.resolve({}));
 
       await probot.receive(event);
@@ -234,7 +250,7 @@ describe("Probot", () => {
   });
 
   describe("ghe support", function() {
-    let app:any;
+    let app: any;
 
     beforeEach(() => {
       process.env.GHE_HOST = "notreallygithub.com";
@@ -254,7 +270,7 @@ describe("Probot", () => {
     it("requests from the correct API URL", async () => {
       const spy = jest.fn();
 
-      const appFn = async app => {
+      const appFn = async function(app: any) {
         const github = await app.auth();
         const res = await github.apps.getInstallations({});
         return spy(res);

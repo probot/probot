@@ -6,14 +6,14 @@ import express from 'express'
 import Redis from 'ioredis'
 
 import { Application } from './application'
+import setupApp from './apps/setup'
 import { createDefaultCache } from './cache'
 import { Context } from './context'
 import { logger } from './logger'
+import { findPrivateKey } from './private-key'
 import { resolve } from './resolver'
 import { createServer } from './server'
 import { createWebhookProxy } from './webhook-proxy'
-import { findPrivateKey } from './private-key'
-import setupApp from './apps/setup'
 
 // tslint:disable:no-var-requires
 // These needs types
@@ -157,16 +157,16 @@ export class Probot {
 
 export const createProbot = (options: Options) => new Probot(options)
 
-export const run = (appFns: Array<ApplicationFunction>) => {
+export const run = (appFns: ApplicationFunction[]) => {
   require('dotenv').config()
 
   const privateKey = findPrivateKey()
 
   const probot = createProbot({
-    id: Number(process.env.APP_ID),
-    secret: process.env.WEBHOOK_SECRET,
     cert: (privateKey && privateKey.toString()) || undefined,
+    id: Number(process.env.APP_ID),
     port: Number(process.env.PORT) || 3000,
+    secret: process.env.WEBHOOK_SECRET,
     webhookPath: process.env.WEBHOOK_PATH,
     webhookProxy: process.env.WEBHOOK_PROXY_URL
   })

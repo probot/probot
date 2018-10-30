@@ -1,5 +1,5 @@
 ---
-next: docs/persistence.md
+next: docs/serverless-deployment.md
 ---
 
 # Deployment
@@ -19,6 +19,7 @@ Every app can either be deployed stand-alone, or combined with other apps in one
 1. [Share the app](#share-the-app)
 1. [Combining apps](#combining-apps)
 1. [Error tracking](#error-tracking)
+1. [Serverless Deployments](#serverless)
 
 ## Create the GitHub App
 
@@ -212,3 +213,6 @@ Probot comes bundled with a client for the [Sentry](https://github.com/getsentry
   1. [Install Sentry from Marketplace](https://github.com/marketplace/sentry) (with [10k events/month free](https://github.com/marketplace/sentry/plan/MDIyOk1hcmtldHBsYWNlTGlzdGluZ1BsYW40Nw==#pricing-and-setup)) or [host your own instance](https://github.com/getsentry/sentry) (Students can get [extra Sentry credit](https://education.github.com/pack))
   2. Follow the setup instructions to find your DSN.
   3. Set the `SENTRY_DSN` environment variable with the DSN you retrieved.
+
+## Serverless
+Serverless abstracts away the most menial parts of building an application, leaving developers to write code and not actively manage scaling for their applications. The [Serverless Deployment](/serverless-deployment) section will show you how to deploy you application using functions instead of servers.

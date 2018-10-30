@@ -49,7 +49,7 @@ export interface OctokitError extends Error {
 }
 
 export interface GitHubAPI extends Octokit {
-  paginate: (res: Promise<Octokit.AnyResponse>, callback: (results: Octokit.AnyResponse) => void) => Promise<any[]>
+  paginate: (res: Promise<Octokit.AnyResponse>, callback: (response: Promise<Octokit.AnyResponse>, done?: () => void) => void) => Promise<any[]>
   // The following are added because Octokit does not expose the hook.error, hook.before, and hook.after methods
   hook: {
     error: (when: 'request', callback: (error: OctokitError, options: RequestOptions) => void) => void
@@ -58,7 +58,7 @@ export interface GitHubAPI extends Octokit {
   }
 
   request: (RequestOptions: RequestOptions) => Promise<Octokit.AnyResponse>
-  query: (query: string, variables?: Variables, headers?: Headers) => Promise<GraphQLResponse>
+  query: (query: string, variables?: Variables, headers?: Headers) => Promise<any>
 }
 
 export interface Headers {
@@ -67,6 +67,4 @@ export interface Headers {
 
 export interface Variables { [key: string]: any }
 
-export interface GraphQLResponse {
-  data: any
-}
+export { GraphQLError, GraphQLQueryError } from './graphql'

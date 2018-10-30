@@ -1,17 +1,23 @@
-const request = require('supertest')
-const express = require('express')
-const {logger} = require('../../src/logger')
-const {logRequest} = require('../../src/middleware/logging')
+import express from 'express'
+import request from 'supertest'
+import { logger } from '../../src/logger'
+import { logRequest } from '../../src/middleware/logging'
 
 describe('logging', () => {
-  let server, output
+  let server: express.Express
+  let output: any[]
 
   beforeAll(() => {
-    logger.addStream({
+    const stream: any = {
       level: 'trace',
-      type: 'raw',
-      stream: {write: msg => output.push(msg)}
-    })
+      stream: {
+        write: (msg: any) => {
+          output.push(msg)
+        }
+      },
+      type: 'raw'
+    }
+    logger.addStream(stream)
   })
 
   beforeEach(() => {
@@ -19,7 +25,7 @@ describe('logging', () => {
     output = []
 
     server.use(express.json())
-    server.use(logRequest({logger}))
+    server.use(logRequest({ logger }))
     server.get('/', (req, res) => {
       res.set('X-Test-Header', 'testing')
       res.send('OK')
@@ -29,25 +35,25 @@ describe('logging', () => {
 
   test('logs requests and responses', () => {
     return request(server).get('/').expect(200).expect(res => {
-      var requestLog = output[0]
-      var responseLog = output[2]
+      const requestLog = output[0]
+      const responseLog = output[2]
 
       // logs id with request and response
       expect(requestLog.id).toBeTruthy()
       expect(responseLog.id).toEqual(requestLog.id)
-      expect(res.headers['x-request-id']).toEqual(requestLog.id)
+      expect(res.header['x-request-id']).toEqual(requestLog.id)
 
       expect(requestLog).toEqual(expect.objectContaining({
         msg: 'GET /',
         req: expect.objectContaining({
-          method: 'GET',
-          url: '/',
-          remoteAddress: '::ffff:127.0.0.1',
           headers: expect.objectContaining({
             'accept-encoding': 'gzip, deflate',
-            'user-agent': expect.stringMatching(/^node-superagent/),
-            'connection': 'close'
-          })
+            'connection': 'close',
+            'user-agent': expect.stringMatching(/^node-superagent/)
+          }),
+          method: 'GET',
+          remoteAddress: '::ffff:127.0.0.1',
+          url: '/'
         })
       }))
 

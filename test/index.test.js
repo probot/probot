@@ -30,23 +30,18 @@ describe('Probot', () => {
 
   describe('run', () => {
 
+    let env
+
     beforeAll(() => {
+      env = { ...process.env }
       process.env.APP_ID = '1'
       process.env.PRIVATE_KEY_PATH = path.join(__dirname, 'test-private-key.pem')
       process.env.WEBHOOK_PROXY_URL = 'https://smee.io/EfHXC9BFfGAxbM6J'
+      process.env.DISABLE_STATS = 'true'
     })
 
     afterAll(() => {
-      delete process.env.APP_ID
-      delete process.env.PRIVATE_KEY
-      delete process.env.WEBHOOK_PROXY_URL
-      delete process.env.PORT
-    })
-
-    it('runs with an array of strings', async () => {
-      const probot = await Probot.run(['run', 'file.js'])
-      expect(probot.options).toMatchSnapshot()
-      probot.httpServer.close()
+      process.env = env
     })
 
     it('runs with a function as argument', async () => {
@@ -57,6 +52,23 @@ describe('Probot', () => {
       })
       expect(probot.options).toMatchSnapshot()
       expect(initialized).toBeTruthy()
+      probot.httpServer.close()
+    })
+
+    it('runs with an array of strings', async () => {
+      const probot = await Probot.run(['run', 'file.js'])
+      expect(probot.options).toMatchSnapshot()
+      probot.httpServer.close()
+    })
+
+    it('runs without config and loads the setup app', async () => {
+      let initialized = false
+      delete process.env.PRIVATE_KEY_PATH
+      const probot = await Probot.run((app) => {
+        initialized = true
+      })
+      expect(probot.options).toMatchSnapshot()
+      expect(initialized).toBeFalsy()
       probot.httpServer.close()
     })
   })

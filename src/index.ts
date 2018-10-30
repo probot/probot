@@ -45,11 +45,11 @@ export class Probot {
           .option('-w, --webhook-path <path>', 'URL path which receives webhooks. Ex: `/webhook`', process.env.WEBHOOK_PATH)
           .option('-a, --app <id>', 'ID of the GitHub App', process.env.APP_ID)
           .option('-s, --secret <secret>', 'Webhook secret of the GitHub App', process.env.WEBHOOK_SECRET)
-            .option('-P, --private-key <file>', 'Path to certificate of the GitHub App', findPrivateKey)
-            .parse(appFn)
+          .option('-P, --private-key <file>', 'Path to certificate of the GitHub App', process.env.PRIVATE_KEY_PATH)
+          .parse(appFn)
 
         return {
-          cert: program.privateKey,
+          cert: findPrivateKey(program.privateKey) || undefined,
           id: program.app,
           port: program.port,
           secret: program.secret,

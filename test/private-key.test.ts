@@ -23,7 +23,7 @@ describe('private-key', () => {
     describe('when a filepath is provided', () => {
       it('should read the file at given filepath', () => {
         findPrivateKey(keyfilePath)
-        expect(fs.readFileSync).toHaveBeenCalledWith(keyfilePath)
+        expect(fs.readFileSync).toHaveBeenCalledWith(keyfilePath, 'utf8')
       })
 
       it('should return the key', () => {
@@ -139,7 +139,7 @@ describe('private-key', () => {
       describe('and a key file is present', () => {
         it('should load the key file', () => {
           findPrivateKey(undefined)
-          expect(fs.readFileSync).toHaveBeenCalledWith('foo.pem')
+          expect(fs.readFileSync).toHaveBeenCalledWith('foo.pem', 'utf8')
         })
       })
 

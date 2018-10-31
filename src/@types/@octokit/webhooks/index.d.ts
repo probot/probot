@@ -44,7 +44,7 @@ declare module '@octokit/webhooks' {
     }
   }
 
-  declare class Webhooks {
+  class Webhooks {
     public middleware: Application
 
     constructor (Options)
@@ -53,7 +53,7 @@ declare module '@octokit/webhooks' {
     public sign (data: WebhookPayloadWithRepository)
   }
 
-  declare namespace Webhooks {
+  namespace Webhooks {
     export interface WebhookEvent {
       id: string
       name: string

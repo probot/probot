@@ -60,7 +60,7 @@ declare module '@octokit/webhooks' {
 
     constructor (options: Options)
 
-    public on (event: string, callback: (event: Webhooks.WebhookEvent | Error) => void): void
+    public on (event: string, callback: (event: Webhooks.WebhookEvent) => Promise<void>): void
     public on (event: 'error', callback: (err: Error) => void): void
     public sign (data: WebhookPayloadWithRepository): string
   }

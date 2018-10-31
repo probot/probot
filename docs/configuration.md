@@ -9,7 +9,7 @@ When developing a Probot App, you will need to have several different fields in 
 Variable | Description
 ---|---
 `APP_ID` | The App ID assigned to your GitHub App. **Required** <p>_(Example: `1234`)_</p>
-**Private Key Options** | One of the following is **Required** if there is no `.pem` file in your project's root directory
+**Private key options** | One of the following is **Required** if there is no `.pem` file in your project's root directory
 `PRIVATE_KEY_PATH` | The path to the `.pem` file for your GitHub App. <p>_(Example: `path/to/key.pem`)_</p>
 `PRIVATE_KEY` | The contents of the private key for your GitHub App. If you're unable to use multiline environment variables, use base64 encoding to convert the key to a single line string. See the [Deployment](deployment.md) docs for provider specific usage. |
 **Webhook options** |

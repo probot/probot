@@ -49,8 +49,8 @@ declare module '@octokit/webhooks' {
 
     constructor (options: Options)
 
-    public on (event: string, callback: (event: WebhookEvent | Error) => void)
-    public sign (data: WebhookPayloadWithRepository)
+    public on (event: string, callback: (event: WebhookEvent | Error) => void): void
+    public sign (data: WebhookPayloadWithRepository): string
   }
 
   namespace Webhooks {

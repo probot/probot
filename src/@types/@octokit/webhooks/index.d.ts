@@ -44,15 +44,6 @@ declare module '@octokit/webhooks' {
     }
   }
 
-  class Webhooks {
-    public middleware: Application
-
-    constructor (options: Options)
-
-    public on (event: string, callback: (event: WebhookEvent | Error) => void): void
-    public sign (data: WebhookPayloadWithRepository): string
-  }
-
   namespace Webhooks {
     export interface WebhookEvent {
       id: string
@@ -62,6 +53,15 @@ declare module '@octokit/webhooks' {
       host?: string
       url?: string
     }
+  }
+
+  class Webhooks {
+    public middleware: Application
+
+    constructor (options: Options)
+
+    public on (event: string, callback: (event: Webhooks.WebhookEvent | Error) => void): void
+    public sign (data: WebhookPayloadWithRepository): string
   }
 
   export = Webhooks

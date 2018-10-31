@@ -47,8 +47,7 @@ export class ManifestCreation {
       name: manifest.name || pkg.name,
       public: manifest.public || true,
       redirect_url: `${baseUrl}/probot/setup`,
-      // TODO: add setup url
-      // setup_url:`${baseUrl}/probot/success`,
+      setup_url:`${baseUrl}/probot/success`,
       url: manifest.url || pkg.homepage || pkg.repository
     }, manifest))
 

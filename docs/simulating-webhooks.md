@@ -2,7 +2,7 @@
 next: docs/testing.md
 ---
 
-# Simulate Receiving Webhooks
+# Simulate receiving webhooks
 
 As you are developing your app, you will likely want to test it by repeatedly triggering the same webhook. You can simulate a webhook being delivered by saving the payload to a file, and then calling `probot receive` from the command line.
 

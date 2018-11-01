@@ -2,7 +2,7 @@
 next: docs/simulating-webhooks.md
 ---
 
-# HTTP Routes
+# HTTP routes
 
 Calling `app.route('/my-app')` will return an [express](http://expressjs.com/) router that you can use to expose HTTP endpoints from your app.
 

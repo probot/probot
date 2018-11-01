@@ -12,8 +12,10 @@ To develop a Probot app, you will first need a recent version of [Node.js](https
 
 To get started, run one of these commands:
 
-- If you're using npm: `$ npx create-probot-app [--typescript] my-first-app`
-- or, if you're using Yarn: `$ yarn create probot-app [--typescript] my-first-app`
+- If you're using npm: `$ npx create-probot-app my-first-app`
+- or, if you're using Yarn: `$ yarn create probot-app my-first-app`
+
+> `create-probot-app` accepts an optional `template` argument which accepts the following values: `basic-js`, `checks-js`, `git-data-js`, `deploy-js` and `basic-ts` (use this one for TypeScript support).
 
 This will ask you a series of questions about your app, which should look something like this:
 
@@ -26,6 +28,12 @@ Let's create a Probot app!
 ? Homepage:
 ? GitHub user or org name: khorne3
 ? Repository name: my-first-app
+? Which template would you like to use? (Use arrow keys)
+❯ basic-js 
+  checks-js 
+  git-data-js 
+  deploy-js 
+  basic-ts 
 created files...
 Finished scaffolding files!
 

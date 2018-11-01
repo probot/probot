@@ -28,7 +28,12 @@ Let's create a Probot app!
 ? Homepage:
 ? GitHub user or org name: khorne3
 ? Repository name: my-first-app
-? Which template would you like to use? basic-js
+? Which template would you like to use? (Use arrow keys)
+❯ basic-js 
+  checks-js 
+  git-data-js 
+  deploy-js 
+  basic-ts 
 created files...
 Finished scaffolding files!
 

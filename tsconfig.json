@@ -18,7 +18,8 @@
     "declaration": true // enable this once all files are .ts and we can remove allowJs
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "typings/*.d.ts"
   ],
   "compileOnSave": false
 }

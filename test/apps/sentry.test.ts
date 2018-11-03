@@ -1,6 +1,6 @@
 import Raven from 'raven'
 import { Application } from '../../src'
-import appFn = require('../../src/apps/sentry')
+import appFn from '../../src/apps/sentry'
 import { createApp } from './helper'
 
 describe('sentry app', () => {

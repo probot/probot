@@ -6,22 +6,24 @@ import { createDefaultCache } from './cache'
 import { Context } from './context'
 import { createApp } from './github-app'
 import { logger } from './logger'
+import { requestErrorLogger } from './middleware/log-request-errors'
 import { resolve } from './resolver'
 import { createServer } from './server'
-import { createWebhookProxy } from './webhook-proxy'
 
-// tslint:disable:no-var-requires
-// These needs types
-const logRequestErrors = require('./middleware/log-request-errors')
+// Default Apps
+import defaultApp from './apps/default'
+import sentryApp from './apps/sentry'
+import statsApp from './apps/stats'
+
+import { createWebhookProxy } from './webhook-proxy'
 
 const cache = createDefaultCache()
 
 const defaultAppFns: ApplicationFunction[] = [
-  require('./apps/default'),
-  require('./apps/sentry'),
-  require('./apps/stats')
+  defaultApp,
+  sentryApp,
+  statsApp
 ]
-// tslint:enable:no-var-requires
 
 export class Probot {
   public server: express.Application
@@ -77,9 +79,14 @@ export class Probot {
     return Promise.all(this.apps.map(app => app.receive(event)))
   }
 
-  public load (appFn: string | ApplicationFunction) {
+  public load (appFn: string | ApplicationFunction | ESMApplicationFunction) {
     if (typeof appFn === 'string') {
-      appFn = resolve(appFn) as ApplicationFunction
+      appFn = resolve<ApplicationFunction | ESMApplicationFunction>(appFn)
+    }
+    // __esModule is a magic property babel and typescript set on their ESM exports
+    // to identify them.  If it's an ESM export we should load the "default" export
+    if (appFn && typeof appFn === 'object' && appFn.__esModule) {
+      appFn = appFn.default
     }
     const app = new Application({ app: this.app, cache, githubToken: this.githubToken })
 
@@ -87,7 +94,7 @@ export class Probot {
     this.server.use(app.router)
 
     // Initialize the ApplicationFunction
-    app.load(appFn)
+    app.load(appFn as ApplicationFunction)
     this.apps.push(app)
 
     return app
@@ -101,7 +108,7 @@ export class Probot {
     appFns.concat(defaultAppFns).forEach(appFn => this.load(appFn))
 
     // Register error handler as the last middleware
-    this.server.use(logRequestErrors)
+    this.server.use(requestErrorLogger)
   }
 
   public start () {
@@ -122,6 +129,10 @@ export class Probot {
 export const createProbot = (options: Options) => new Probot(options)
 
 export type ApplicationFunction = (app: Application) => void
+
+export type ESMApplicationFunction = {
+  default: ApplicationFunction
+} & Record<string, any>
 
 export interface Options {
   webhookPath?: string

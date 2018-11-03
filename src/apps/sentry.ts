@@ -2,7 +2,7 @@ import sentryStream from 'bunyan-sentry-stream'
 import Raven from 'raven'
 import { Application } from '../application'
 
-export = (app: Application) => {
+export default (app: Application) => {
   // If sentry is configured, report all logged errors
   if (process.env.SENTRY_DSN) {
     app.log.debug(process.env.SENTRY_DSN, 'Errors will be reported to Sentry')

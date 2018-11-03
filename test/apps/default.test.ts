@@ -1,7 +1,7 @@
 import express from 'express'
 import request from 'supertest'
 import { Application } from '../../src'
-import appFn = require('../../src/apps/default')
+import appFn from '../../src/apps/default'
 import { createApp } from './helper'
 
 describe('default app', () => {

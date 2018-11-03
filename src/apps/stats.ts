@@ -2,7 +2,7 @@ import { AnyResponse } from '@octokit/rest'
 import { Request, Response } from 'express'
 
 // Built-in app to expose stats about the deployment
-export = async (app: any): Promise<void> => {
+export default async (app: any): Promise<void> => {
   if (process.env.DISABLE_STATS) {
     return
   }

@@ -2,7 +2,7 @@ import express from 'express'
 import nock from 'nock'
 import request from 'supertest'
 import { Application } from '../../src'
-import appFn = require('../../src/apps/stats')
+import appFn from '../../src/apps/stats'
 import { createApp } from './helper'
 
 describe('stats app', () => {

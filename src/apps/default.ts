@@ -1,7 +1,7 @@
 import path from 'path'
 import { Application } from '../application'
 
-export = (app: Application) => {
+export default (app: Application) => {
   const route = app.route()
 
   route.get('/probot', (req, res) => {

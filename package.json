@@ -46,7 +46,8 @@
     ],
     "globals": {
       "ts-jest": {
-        "skipBabel": true
+        "skipBabel": true,
+        "tsConfig": "<rootDir>/test/tsconfig.json"
       }
     },
     "testURL": "http://localhost/"

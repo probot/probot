@@ -3,5 +3,11 @@
   "include": [
     "../src/**/*",
     "**/*.ts"
-  ]
+  ],
+  "compilerOptions": {
+    "typeRoots": [
+      "../node_modules/@types",
+      "./ambient.d.ts"
+    ]
+  }
 }

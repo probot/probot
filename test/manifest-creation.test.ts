@@ -1,4 +1,3 @@
-
 import nock from 'nock'
 import pkg from '../package.json'
 import { ManifestCreation } from '../src/manifest-creation'

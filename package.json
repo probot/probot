@@ -87,7 +87,7 @@
     "resolve": "^1.4.0",
     "semver": "^5.5.0",
     "supports-color": "^5.5.0",
-    "update-dotenv": "^1.1.0",
+    "update-dotenv": "^1.1.1",
     "uuid": "^3.2.1"
   },
   "devDependencies": {

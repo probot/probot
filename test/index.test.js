@@ -1,4 +1,4 @@
-const {createProbot} = require('../src')
+const { createProbot } = require('../src')
 const request = require('supertest')
 const nock = require('nock')
 const helper = require('./apps/helper')
@@ -139,7 +139,7 @@ describe('Probot', () => {
     })
 
     it('allows users to configure webhook paths', async () => {
-      probot = createProbot({webhookPath: '/webhook', githubToken: 'faketoken'})
+      probot = createProbot({ webhookPath: '/webhook', githubToken: 'faketoken' })
       // Error handler to avoid printing logs
       // eslint-disable-next-line handle-callback-err
       probot.server.use((err, req, res, next) => { })
@@ -205,7 +205,7 @@ describe('Probot', () => {
       process.env.GHE_HOST = 'notreallygithub.com'
 
       nock('https://notreallygithub.com/api/v3')
-        .defaultReplyHeaders({'Content-Type': 'application/json'})
+        .defaultReplyHeaders({ 'Content-Type': 'application/json' })
         .get('/app/installations').reply(200, ['I work!'])
 
       app = helper.createApp()

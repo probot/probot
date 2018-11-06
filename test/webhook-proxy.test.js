@@ -1,8 +1,8 @@
 const express = require('express')
 const sse = require('connect-sse')()
 const nock = require('nock')
-const {createWebhookProxy} = require('../src/webhook-proxy')
-const {logger} = require('../src/logger')
+const { createWebhookProxy } = require('../src/webhook-proxy')
+const { logger } = require('../src/logger')
 
 const targetPort = 999999
 
@@ -25,7 +25,7 @@ describe('webhook-proxy', () => {
 
       server = app.listen(0, () => {
         url = `http://127.0.0.1:${server.address().port}/events`
-        proxy = createWebhookProxy({url, port: targetPort, path: '/test', logger})
+        proxy = createWebhookProxy({ url, port: targetPort, path: '/test', logger })
 
         // Wait for proxy to be ready
         proxy.addEventListener('ready', () => done())
@@ -37,7 +37,7 @@ describe('webhook-proxy', () => {
         done()
       })
 
-      const body = {action: 'foo'}
+      const body = { action: 'foo' }
 
       emit({
         'x-github-event': 'test',
@@ -53,7 +53,7 @@ describe('webhook-proxy', () => {
     const log = logger.child()
     log.error = jest.fn()
 
-    proxy = createWebhookProxy({url, logger: log})
+    proxy = createWebhookProxy({ url, logger: log })
 
     proxy.on('error', err => {
       expect(err.status).toBe(404)

@@ -49,7 +49,8 @@ export class ManifestCreation {
       redirect_url: `${baseUrl}/probot/setup`,
       // TODO: add setup url
       // setup_url:`${baseUrl}/probot/success`,
-      url: manifest.url || pkg.homepage || pkg.repository
+      url: manifest.url || pkg.homepage || pkg.repository,
+      version: 'v1'
     }, manifest))
 
     return generatedManifest

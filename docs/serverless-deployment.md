@@ -2,7 +2,7 @@
 next: docs/persistence.md
 ---
 
-# Serverless Deployment
+# Serverless deployment
 
 Serverless computing is a model which aims to abstract server management without concerns for implementing, tweaking, or scaling a server (at least, to the perspective of a user). The following sections will provide examples on how to deploy your application to service that will run on-demand as a Function as a Service(FaaS).
 
@@ -29,7 +29,7 @@ To deploy an app to any cloud provider, you will need 3 environment variables:
 - `WEBHOOK_SECRET`: the **Webhook Secret** that you generated when you created the app.
 - `PRIVATE_KEY_PATH`: the path to a private key file
 
-> These environment variables will need to be passed through to your FaaS solution. Each solution is different; please consult their documentation on how to use variables in the deployed environment. 
+> These environment variables will need to be passed through to your FaaS solution. Each solution is different; please consult their documentation on how to use variables in the deployed environment.
 
 Choosing a FaaS provider is mostly dependent on developer preference. Each Probot plugin interacts similarly, but the plugins implementation is dealing with different requests and responses specific to the provider. If you do not have a preference for a provider, choose the solution you have the most familiarity.
 

@@ -220,7 +220,7 @@ describe('Probot', () => {
 
       const appFn = async app => {
         const github = await app.auth()
-        const res = await github.apps.getInstallations({})
+        const res = await github.apps.listInstallations({})
         return spy(res)
       }
 

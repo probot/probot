@@ -103,10 +103,10 @@ describe('Context', () => {
     })
 
     it('gets a valid configuration', async () => {
-      github.repos.getContent = jest.fn().mockReturnValue(Promise.resolve(readConfig('basic.yml')))
+      github.repos.getContents = jest.fn().mockReturnValue(Promise.resolve(readConfig('basic.yml')))
       const config = await context.config('test-file.yml')
 
-      expect(github.repos.getContent).toHaveBeenCalledWith({
+      expect(github.repos.getContents).toHaveBeenCalledWith({
         owner: 'bkeepers',
         path: '.github/test-file.yml',
         repo: 'probot'
@@ -126,7 +126,7 @@ describe('Context', () => {
         status: 'Not Found'
       }
 
-      github.repos.getContent = jest.fn().mockReturnValue(Promise.reject(error))
+      github.repos.getContents = jest.fn().mockReturnValue(Promise.reject(error))
 
       expect(await context.config('test-file.yml')).toBe(null)
     })
@@ -139,7 +139,7 @@ describe('Context', () => {
         status: 'Not Found'
       }
 
-      github.repos.getContent = jest.fn().mockReturnValue(Promise.reject(error))
+      github.repos.getContents = jest.fn().mockReturnValue(Promise.reject(error))
       const defaultConfig = {
         bar: 7,
         baz: 11,
@@ -150,7 +150,7 @@ describe('Context', () => {
     })
 
     it('throws when the configuration file is malformed', async () => {
-      github.repos.getContent = jest.fn().mockReturnValue(Promise.resolve(readConfig('malformed.yml')))
+      github.repos.getContents = jest.fn().mockReturnValue(Promise.resolve(readConfig('malformed.yml')))
 
       let e
       let contents
@@ -166,7 +166,7 @@ describe('Context', () => {
     })
 
     it('throws when loading unsafe yaml', async () => {
-      github.repos.getContent = jest.fn().mockReturnValue(readConfig('evil.yml'))
+      github.repos.getContents = jest.fn().mockReturnValue(readConfig('evil.yml'))
 
       let e
       let config
@@ -182,7 +182,7 @@ describe('Context', () => {
     })
 
     it('returns an empty object when the file is empty', async () => {
-      github.repos.getContent = jest.fn().mockReturnValue(readConfig('empty.yml'))
+      github.repos.getContents = jest.fn().mockReturnValue(readConfig('empty.yml'))
 
       const contents = await context.config('test-file.yml')
 
@@ -190,10 +190,10 @@ describe('Context', () => {
     })
 
     it('overwrites default config settings', async () => {
-      github.repos.getContent = jest.fn().mockReturnValue(Promise.resolve(readConfig('basic.yml')))
+      github.repos.getContents = jest.fn().mockReturnValue(Promise.resolve(readConfig('basic.yml')))
       const config = await context.config('test-file.yml', { foo: 10 })
 
-      expect(github.repos.getContent).toHaveBeenCalledWith({
+      expect(github.repos.getContents).toHaveBeenCalledWith({
         owner: 'bkeepers',
         path: '.github/test-file.yml',
         repo: 'probot'
@@ -206,10 +206,10 @@ describe('Context', () => {
     })
 
     it('uses default settings to fill in missing options', async () => {
-      github.repos.getContent = jest.fn().mockReturnValue(Promise.resolve(readConfig('missing.yml')))
+      github.repos.getContents = jest.fn().mockReturnValue(Promise.resolve(readConfig('missing.yml')))
       const config = await context.config('test-file.yml', { bar: 7 })
 
-      expect(github.repos.getContent).toHaveBeenCalledWith({
+      expect(github.repos.getContents).toHaveBeenCalledWith({
         owner: 'bkeepers',
         path: '.github/test-file.yml',
         repo: 'probot'

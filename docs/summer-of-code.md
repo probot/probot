@@ -6,7 +6,7 @@ In 2018, Probot is participating in Google's Summer of Code and Rails Girls Summ
 
 #### How do I get started with Probot?
 
-We suggest that you build our ["Hello World" app](https://probot.github.io/docs/hello-world/) to get the hang of registering a GitHub App and the base setup of a Probot App. In your application, include a link to a comment that your Hello World app created on a test repository.
+We suggest that you build our ["Hello World" app](./hello-world.md) to get the hang of registering a GitHub App and the base setup of a Probot App. In your application, include a link to a comment that your Hello World app created on a test repository.
 
 You can also [join our Slack](https://probot-slackin.herokuapp.com/) and join the **#summer-of-code** channel.
 
@@ -54,4 +54,4 @@ Amazing! Be sure to include it in your application.
 
 ## Application Requirements
 
-* You must have created the ["Hello World" app](https://probot.github.io/docs/hello-world/), and provided a link to a comment that it has posted.
+* You must have created the ["Hello World" app](./hello-world.md), and provided a link to a comment that it has posted.

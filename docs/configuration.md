@@ -16,7 +16,7 @@ Variable | Description
 `WEBHOOK_PROXY_URL` | Allows your local development environment to receive GitHub webhook events. Go to https://smee.io/new to get started. <p>_(Example: `https://smee.io/your-custom-url`)_</p>
 `WEBHOOK_SECRET` | The webhook secret used when creating a GitHub App. 'development' is used as a default, but the value in `.env` needs to match the value configured in your App settings on GitHub. Note: GitHub marks this value as optional, but for optimal security it's required for Probot apps. **Required** <p>_(Example: `development`)_</p>
 
-For more on the set up of these items, check out [Configuring a GitHub App](https://probot.github.io/docs/development/#configuring-a-github-app).
+For more on the set up of these items, check out [Configuring a GitHub App](./development.md#configuring-a-github-app).
 
 Some less common environment variables are:
 

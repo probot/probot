@@ -43,7 +43,7 @@ module.exports = app => {
 }
 ```
 
-To get started, you can use the instructions for [Developing an App](https://probot.github.io/docs/development/) or remix this 'Hello World' project on Glitch:
+To get started, you can use the instructions for [Developing an App](./development.md) or remix this 'Hello World' project on Glitch:
 
 [![Remix on Glitch](https://cdn.glitch.com/2703baf2-b643-4da7-ab91-7ee2a2d00b5b%2Fremix-button.svg)](https://glitch.com/edit/#!/remix/probot-hello-world)
 

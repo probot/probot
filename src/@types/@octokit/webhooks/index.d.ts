@@ -69,7 +69,13 @@ declare module '@octokit/webhooks' {
     public on (event: string[], callback: EventCallbackFunction): void
     public on (event: 'error', callback: (err: Error) => void): void
     public on (event: 'error', callback: (err: Error) => Promise<void>): void
+
     public sign (data: WebhookPayloadWithRepository): string
+    public verify (eventPayload: WebhookPayloadWithRepository, signature: string): boolean
+    public verifyAndReceive (options: {id: string, name: string, payload: WebhookPayloadWithRepository, signature: string}): Promise<void>
+    public receive (options: {id: string, name: string, payload: WebhookPayloadWithRepository}): Promise<void>
+    public removeListener (event: string, callback: AsyncEventCallbackFunction)
+    public removeListener (event: string, callback: EventCallbackFunction)
   }
 
   export = Webhooks

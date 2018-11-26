@@ -55,13 +55,20 @@ declare module '@octokit/webhooks' {
     }
   }
 
+  type AsyncEventCallbackFunction = (event: Webhooks.WebhookEvent) => Promise<void>;
+  type EventCallbackFunction = (event: Webhooks.WebhookEvent) => void;
+
   class Webhooks {
     public middleware: Application
 
     constructor (options: Options)
 
-    public on (event: string, callback: (event: Webhooks.WebhookEvent) => Promise<void>): void
+    public on (event: string, callback: AsyncEventCallbackFunction): void
+    public on (event: string[], callback: AsyncEventCallbackFunction): void
+    public on (event: string, callback: EventCallbackFunction): void
+    public on (event: string[], callback: EventCallbackFunction): void
     public on (event: 'error', callback: (err: Error) => void): void
+    public on (event: 'error', callback: (err: Error) => Promise<void>): void
     public sign (data: WebhookPayloadWithRepository): string
   }
 

@@ -80,7 +80,7 @@ describe('ManifestCreation', () => {
   describe('getManifest', () => {
     test('creates an app from a code', () => {
       // checks that getManifest returns a JSON.stringified manifest
-      expect(setup.getManifest(package, 'localhost://3000')).toEqual('{"description":"🤖 A framework for building GitHub Apps to automate and improve your workflow","hook_attributes":{"url":"localhost://3000/"},"name":"probot","public":true,"redirect_url":"localhost://3000/probot/setup","url":"https://probot.github.io"}')
+      expect(setup.getManifest(package, 'localhost://3000')).toEqual('{"description":"🤖 A framework for building GitHub Apps to automate and improve your workflow","hook_attributes":{"url":"localhost://3000/"},"name":"probot","public":true,"redirect_url":"localhost://3000/probot/setup","url":"https://probot.github.io","version":"v1"}')
     })
   })
 })

@@ -38,6 +38,7 @@ export = async (app: Application): Promise<void> => {
 
   async function getInstallations (): Promise<Installation[]> {
     const github = await app.auth()
+
     const req = github.apps.getInstallations({ per_page: 100 })
     return github.paginate(req, async (response: Promise<AnyResponse>) => {
       const res = await response

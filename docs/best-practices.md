@@ -1,4 +1,4 @@
-# Best Practices
+# Best practices
 
 First and foremost, your app must obey the [The Three Laws of Robotics](https://en.wikipedia.org/wiki/Three_Laws_of_Robotics):
 

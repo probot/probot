@@ -1,8 +1,9 @@
 import { AnyResponse } from '@octokit/rest'
 import { Request, Response } from 'express'
+import { Application } from '../application'
 
 // Built-in app to expose stats about the deployment
-export = async (app: any): Promise<void> => {
+export = async (app: Application): Promise<void> => {
   if (process.env.DISABLE_STATS) {
     return
   }
@@ -37,8 +38,12 @@ export = async (app: any): Promise<void> => {
 
   async function getInstallations (): Promise<Installation[]> {
     const github = await app.auth()
+
     const req = github.apps.listInstallations({ per_page: 100 })
-    return github.paginate(req, (res: AnyResponse) => res.data)
+    return github.paginate(req, async (response: Promise<AnyResponse>) => {
+      const res = await response
+      return res.data
+    })
   }
 
   async function popularInstallations (installations: Installation[]): Promise<Account[]> {
@@ -54,7 +59,8 @@ export = async (app: any): Promise<void> => {
       const github = await app.auth(installation.id)
 
       const req = github.apps.listRepos({ per_page: 100 })
-      const repositories: Repository[] = await github.paginate(req, (res: AnyResponse) => {
+      const repositories: Repository[] = await github.paginate(req, async (response: Promise<AnyResponse>) => {
+        const res = await response
         return res.data.repositories.filter((repository: Repository) => !repository.private)
       })
 

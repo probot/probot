@@ -42,7 +42,11 @@ export function findPrivateKey (filepath?: string): Buffer | string | null {
     throw new Error('The contents of \`PRIVATE_KEY\` could not be validated. Please check to ensure you have copied the contents of the .pem file correctly.')
   }
   if (process.env.PRIVATE_KEY_PATH) {
-    return fs.readFileSync(process.env.PRIVATE_KEY_PATH)
+    if (fs.existsSync(process.env.PRIVATE_KEY_PATH)) {
+      return fs.readFileSync(process.env.PRIVATE_KEY_PATH)
+    } else {
+      throw new Error(`Private key does not exists at path: ${process.env.PRIVATE_KEY_PATH}. Please check to ensure that the PRIVATE_KEY_PATH is correct.`)
+    }
   }
   const pemFiles = fs.readdirSync(process.cwd())
     .filter(path => path.endsWith('.pem'))

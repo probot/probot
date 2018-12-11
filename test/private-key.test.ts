@@ -1,5 +1,6 @@
 import fs from 'fs'
 const readFileSync = fs.readFileSync
+const existsSync = fs.existsSync
 const readdirSync = fs.readdirSync
 
 import { findPrivateKey } from '../src/private-key'
@@ -76,10 +77,12 @@ describe('private-key', () => {
     describe('when a PRIVATE_KEY_PATH env var is provided', () => {
       beforeEach(() => {
         process.env.PRIVATE_KEY_PATH = keyfilePath
+        fs.existsSync = jest.fn().mockReturnValue(true)
       })
 
       afterEach(() => {
         delete process.env.PRIVATE_KEY_PATH
+        fs.existsSync = existsSync
       })
 
       it('should read the file at given filepath', () => {
@@ -89,6 +92,20 @@ describe('private-key', () => {
 
       it('should return the key', () => {
         expect(findPrivateKey(undefined)).toEqual(privateKey)
+      })
+    })
+
+    describe('when a PRIVATE_KEY_PATH env var is provided but file is not present at that path', () => {
+      beforeEach(() => {
+        process.env.PRIVATE_KEY_PATH = keyfilePath
+      })
+
+      afterEach(() => {
+        delete process.env.PRIVATE_KEY_PATH
+      })
+
+      it('should throw an error', () => {
+        expect(findPrivateKey).toThrow(`Private key does not exists at path: ${keyfilePath}. Please check to ensure that the PRIVATE_KEY_PATH is correct.`)
       })
     })
 

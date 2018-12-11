@@ -105,17 +105,25 @@ export class Probot {
   }
 
   public start () {
-    if (this.options.webhookProxy) {
-      createWebhookProxy({
-        logger,
-        path: this.options.webhookPath,
-        port: this.options.port,
-        url: this.options.webhookProxy
-      })
-    }
+    this.server.listen(this.options.port, () => {
+      if (this.options.webhookProxy) {
+        createWebhookProxy({
+          logger,
+          path: this.options.webhookPath,
+          port: this.options.port,
+          url: this.options.webhookProxy
+        })
+      }
 
-    this.server.listen(this.options.port)
-    logger.info('Listening on http://localhost:' + this.options.port)
+      logger.info('Listening on http://localhost:' + this.options.port)
+    }).on('error', (err: NodeJS.ErrnoException) => {
+      if (err.code === 'EADDRINUSE') {
+        logger.error(`Port:${this.options.port} is already in use. You can define the PORT environment variable to use a different port.`)
+      } else {
+        logger.error(err)
+      }
+      process.exit(1)
+    })
   }
 }
 

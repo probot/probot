@@ -143,7 +143,7 @@ export class Context implements WebhookEvent {
     const params = this.repo({ path: path.posix.join('.github', fileName) })
 
     try {
-      const res = await this.github.repos.getContent(params)
+      const res = await this.github.repos.getContents(params)
       const config = yaml.safeLoad(Buffer.from(res.data.content, 'base64').toString()) || {}
       return Object.assign({}, defaultConfig, config)
     } catch (err) {

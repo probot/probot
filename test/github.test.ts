@@ -23,7 +23,7 @@ describe('GitHubAPI', () => {
     const user = { login: 'ohai' }
 
     nock('https://api.github.com').get('/user').reply(200, user)
-    expect((await github.users.get({})).data).toEqual(user)
+    expect((await github.users.getAuthenticated({})).data).toEqual(user)
   })
 
   describe('paginate', () => {
@@ -57,7 +57,7 @@ describe('GitHubAPI', () => {
 
     it('returns an array of pages', async () => {
       const spy = jest.fn()
-      const res = await github.paginate(github.issues.getForRepo({ owner: 'JasonEtco', repo: 'pizza', per_page: 1 }), spy)
+      const res = await github.paginate(github.issues.listForRepo({ owner: 'JasonEtco', repo: 'pizza', per_page: 1 }), spy)
       expect(Array.isArray(res)).toBeTruthy()
       expect(res.length).toBe(5)
       expect(spy).toHaveBeenCalledTimes(5)
@@ -67,7 +67,7 @@ describe('GitHubAPI', () => {
       const spy = jest.fn((response, done) => {
         if (response.data.id === 2) done()
       })
-      const res = await github.paginate(github.issues.getForRepo({ owner: 'JasonEtco', repo: 'pizza', per_page: 1 }), spy)
+      const res = await github.paginate(github.issues.listForRepo({ owner: 'JasonEtco', repo: 'pizza', per_page: 1 }), spy)
       expect(res.length).toBe(3)
       expect(spy).toHaveBeenCalledTimes(3)
     })

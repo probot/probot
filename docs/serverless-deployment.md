@@ -19,7 +19,7 @@ To learn more about other FaaS offerings and the concept of serverless, check ou
 
 ## Create the GitHub App
 
-Every deployment will need an [App](https://developer.github.com/apps/). If you have not created a GitHub App, you learn how using the [Deployment section of our docs](/deployment/#create-the-github-app)
+Every deployment will need an [App](https://developer.github.com/apps/). If you have not created a GitHub App, you learn how using the [Deployment section of our docs](/docs/deployment/#create-the-github-app)
 
 ## Deploy the app
 

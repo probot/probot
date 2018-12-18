@@ -4,7 +4,7 @@ next: docs/logging.md
 
 # Testing
 
-We highly recommend working in the style of [test-driven development](http://agiledata.org/essays/tdd.html) when creating probot apps. It is frustrating to constantly create real GitHub events in order to test an app. Redelivering webhooks is possible and can be accessed in your app's [settings](https://github.com/settings/apps) page under the **Advanced** tab. We do offer the above documented `recieve` method to help make this easier; however, by writing your tests first, you can avoid repeatedly recreating actual events from GitHub to check if your code is working.
+We highly recommend working in the style of [test-driven development](http://agiledata.org/essays/tdd.html) when creating probot apps. It is frustrating to constantly create real GitHub events in order to test an app. Redelivering webhooks is possible and can be accessed in your app's [settings](https://github.com/settings/apps) page under the **Advanced** tab. We do offer the above documented `receive` method to help make this easier; however, by writing your tests first, you can avoid repeatedly recreating actual events from GitHub to check if your code is working.
 
 For our testing examples, we use [jest](https://facebook.github.io/jest/), but there are other options that can perform similar operations. We also recommend using [nock](https://github.com/nock/nock), a tool for mocking HTTP requests, which is often crucial to testing in Probot, considering how much of Probot depends on GitHub's APIs. Here's an example of creating an app instance and using nock to test that we correctly hit the GitHub API:
 
@@ -45,7 +45,7 @@ describe('My Probot app', () => {
       })
       .reply(200)
 
-    // Recieve a webhook event
+    // Receive a webhook event
     await probot.receive({ name: 'issues', payload })
   })
 })

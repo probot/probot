@@ -47,7 +47,7 @@ module.exports = app => {
 ```
 
 By default, messages that are `info` and above will show in your logs, but you can change it by setting the
-`LOG_LEVEL` environment variable to `trace`, `debug`, `info`, `warn`, `error`, or `fatal` in `.env` or on the comand line.
+`LOG_LEVEL` environment variable to `trace`, `debug`, `info`, `warn`, `error`, or `fatal` in `.env` or on the command line.
 
 ```
 $ LOG_LEVEL=debug npm start

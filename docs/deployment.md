@@ -173,7 +173,7 @@ GitHub Actions allows you to trigger workflows based on GitHub events, which mak
 
 There are a few caveats when running Probot Apps on GitHub Actions:
 
-- The GitHub API token available to actions has a [fixed set of permisisons](https://developer.github.com/actions/creating-workflows/storing-secrets/#github-token-secret), and only has access to the repository that triggered the action. `app.auth()` will always return a GitHub client authenticated for the current repository.
+- The GitHub API token available to actions has a [fixed set of permissions](https://developer.github.com/actions/creating-workflows/storing-secrets/#github-token-secret), and only has access to the repository that triggered the action. `app.auth()` will always return a GitHub client authenticated for the current repository.
 - [probot/scheduler](https://github.com/probot/scheduler) and other extensions that require long-running processes are not currently supported.
 - Your app cannot expose [HTTP routes](./http.md)
 

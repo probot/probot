@@ -35,7 +35,7 @@ export const serializers: bunyan.StdSerializers = {
 
   req: bunyan.stdSerializers.req,
 
-  // Same as buyan's standard serializers, but gets headers as an object
+  // Same as bunyan's standard serializers, but gets headers as an object
   // instead of a string.
   // https://github.com/trentm/node-bunyan/blob/fe31b83e42d9c7f784e83fdcc528a7c76e0dacae/lib/bunyan.js#L1105-L1113
   res: (res: ExpressResponseWithDuration) => {

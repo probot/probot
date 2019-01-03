@@ -24,7 +24,7 @@ export const wrapLogger = (logger: Logger, baseLogger?: Logger): LoggerWithTarge
     delete attrs.name
     const log = logger.child(attrs, true)
 
-    // …Sorry, bunyan, doing it anwyway
+    // …Sorry, bunyan, doing it anyway
     if (name) {
       log.fields.name = name
     }

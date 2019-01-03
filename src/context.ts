@@ -43,7 +43,7 @@ export class Context implements WebhookEvent {
     this.log = log
   }
 
-  // Maintain backward compatability
+  // Maintain backward compatibility
   public get event (): string {
     return this.name
   }

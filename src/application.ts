@@ -48,7 +48,7 @@ export class Application {
     if (opts.catchErrors) {
       // Deprecated since 7.2.0
       // tslint:disable-next-line:no-console
-      console.warn(new Error('Propery `catchErrors` is deprecated and has no effect'))
+      console.warn(new Error('Property `catchErrors` is deprecated and has no effect'))
     }
   }
 
@@ -69,7 +69,7 @@ export class Application {
   public async receive (event: WebhookEvent) {
     if ((event as any).event) {
       // tslint:disable-next-line:no-console
-      console.warn(new Error('Propery `event` is deprecated, use `name`'))
+      console.warn(new Error('Property `event` is deprecated, use `name`'))
       event = { name: (event as any).event, ...event }
     }
 

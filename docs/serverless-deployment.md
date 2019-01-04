@@ -40,7 +40,7 @@ AWS Lambda is an event-driven, serverless computing platform provided by Amazon 
 2. Create a `handler.js` file in the root of you probot application
    ```
    // handler.js
-   const serverless = require('@probot/serverless-lambda')
+   const { serverless } = require('@probot/serverless-lambda')
    const appFn = require('./')
    module.exports.probot = serverless(appFn)
    ```
@@ -57,7 +57,7 @@ Google Cloud Platform, is a suite of cloud computing services that run on the sa
 2. Create a `handler.js` file in the route of you probot application
    ```
    // handler.js
-   const serverless = require('@probot/serverless-gcf')
+   const { serverless } = require('@probot/serverless-gcf')
    const appFn = require('./')
    module.exports.probot = serverless(appFn)
    ```

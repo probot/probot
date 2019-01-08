@@ -32,9 +32,7 @@ See the [full API docs](https://octokit.github.io/rest.js/) to see all the ways 
 
 ## GraphQL API
 
-> **Heads Up!** GraphQL support in Probot is currently a preview feature and this interface could change in a future releases without notice. [Let us know](https://github.com/probot/probot/issues/476) if you have any feedback or ideas to improve GraphQL support.
-
-Use `context.github.query` to make requests to the [GitHub GraphQL API](https://developer.github.com/v4/).
+Use `context.github.graphql` to make requests to the [GitHub GraphQL API](https://developer.github.com/v4/).
 
 Here is an example of the same autoresponder app from above that comments on opened issues, but this time with GraphQL:
 
@@ -51,9 +49,33 @@ const addComment = `
 module.exports = app => {
   app.on('issues.opened', async context => {
     // Post a comment on the issue
-    context.github.query(addComment, {
+    context.github.graphql(addComment, {
       id: context.payload.issue.node_id,
       body: 'Hello World'
+    })
+  })
+}
+```
+
+The options in the 2nd argument will be passed as variables to the query. You can pass custom headers by using the `headers` key:
+
+```js
+// GraphQL query to pin an issue
+const pinIssue = `
+  mutation comment($id: ID!) {
+    pinIssue(input: {subjectId: $id}) {
+      clientMutationId
+    }
+  }
+`
+
+module.exports = app => {
+  app.on('issues.opened', async context => {
+    context.github.graphql(pinIssue, {
+      id: context.payload.issue.node_id,
+      headers: {
+        accept: 'application/vnd.github.elektra-preview+json'
+      }
     })
   })
 }

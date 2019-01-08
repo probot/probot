@@ -8,7 +8,7 @@ export function addLogging (client: GitHubAPI, logger: Logger) {
 
   client.hook.error('request', (error, options) => {
     const { method, url, headers, ...params } = options
-    const msg = `GitHub request: ${method} ${url} - ${error.code} ${error.status}`
+    const msg = `GitHub request: ${method} ${url} - ${error.status}`
     logger.debug({ params }, msg)
     throw error
   })

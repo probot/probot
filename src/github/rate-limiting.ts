@@ -10,5 +10,5 @@ export function addRateLimiting (octokit: GitHubAPI, limiter: Bottleneck) {
   }
 
   const noop = () => Promise.resolve()
-  octokit.hook.before('request', limiter.schedule.bind(limiter, noop))
+  octokit.hook.before('request', () => limiter.schedule(noop))
 }

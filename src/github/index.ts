@@ -14,9 +14,9 @@ import { addRateLimiting } from './rate-limiting'
 export function GitHubAPI (options: Options = {} as any) {
   const octokit = new Octokit(options) as GitHubAPI
 
+  addPagination(octokit)
   addRateLimiting(octokit, options.limiter)
   addLogging(octokit, options.logger)
-  addPagination(octokit)
   addGraphQL(octokit)
 
   return octokit
@@ -30,11 +30,12 @@ export interface Options extends Octokit.Options {
 
 export interface RequestOptions {
   baseUrl?: string
-  method: string
-  url: string
-  headers: any
+  method?: string
+  url?: string
+  headers?: any
   query?: string
   variables?: Variables
+  data?: any
 }
 
 export interface Result {
@@ -48,17 +49,35 @@ export interface OctokitError extends Error {
   status: string
 }
 
-export interface GitHubAPI extends Octokit {
-  paginate: (res: Promise<Octokit.AnyResponse>, callback: (response: Octokit.AnyResponse, done?: () => void) => any) => Promise<any[]>
-  // The following are added because Octokit does not expose the hook.error, hook.before, and hook.after methods
-  hook: {
-    error: (when: 'request', callback: (error: OctokitError, options: RequestOptions) => void) => void
-    before: (when: 'request', callback: (result: Result, options: RequestOptions) => void) => void
-    after: (when: 'request', callback: (result: Result, options: RequestOptions) => void) => void
-  }
+interface Paginate extends Octokit.Paginate {
+  (
+    responsePromise: Promise<Octokit.AnyResponse>,
+    callback?: (response: Octokit.AnyResponse) => any
+  ): Promise<any[]>
+}
 
-  request: (RequestOptions: RequestOptions) => Promise<Octokit.AnyResponse>
-  query: (query: string, variables?: Variables, headers?: Headers) => Promise<any>
+type Graphql = (query: string, variables?: Variables, headers?: Headers) => Promise<GraphQlQueryResponse>
+
+export interface GitHubAPI extends Octokit {
+  paginate: Paginate
+  graphql: Graphql
+  /**
+   * .query() is deprecated, use .gaphql() instead
+   */
+  query: Graphql
+}
+
+export interface GraphQlQueryResponse {
+  data: { [ key: string ]: any } | null
+  errors?: [{
+    message: string
+    path: [string]
+    extensions: { [ key: string ]: any }
+    locations: [{
+      line: number,
+      column: number
+    }]
+  }]
 }
 
 export interface Headers {
@@ -67,4 +86,4 @@ export interface Headers {
 
 export interface Variables { [key: string]: any }
 
-export { GraphQLError, GraphQLQueryError } from './graphql'
+export { GraphQLError } from './graphql'

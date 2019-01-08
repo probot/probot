@@ -1,7 +1,8 @@
+// tslint:disable-next-line
+import octokitGraphqlWithDefaults from '@octokit/graphql/lib/with-defaults'
+
 import {
-  GitHubAPI,
-  Headers,
-  Variables
+  GitHubAPI
 } from './'
 
 export interface GraphQLError {
@@ -13,49 +14,29 @@ export interface GraphQLError {
   }
 }
 
-export class GraphQLQueryError extends Error {
-  constructor (
-    public errors: GraphQLError[],
-    public query: string,
-    public variables: Variables,
-    public data: any
-  ) {
-    super(`Error(s) occurred executing GraphQL query:\n${JSON.stringify(errors, null, 2)}`)
-    this.name = 'GraphQLQueryError'
-
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, GraphQLQueryError)
-    }
-  }
-}
-
 export function addGraphQL (client: GitHubAPI) {
-  client.query = graphql.bind(null, client)
-}
-
-async function graphql (client: GitHubAPI, query: string, variables: Variables, headers: Headers = {}) {
-  const res = await client.request({
-    baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api`,
-    headers: {
-      'accept': 'application/json',
-      'content-type': 'application/json',
-      ...headers
-    },
+  const graphql = octokitGraphqlWithDefaults(client.request, {
     method: 'POST',
     url: '/graphql',
-
-    query,
-    variables
+    ...(process.env.GHE_HOST ? { baseUrl: `https://${process.env.GHE_HOST}/api` } : {})
   })
+  client.graphql = (...args: any[]): any => {
+    if (args[2]) {
+      // tslint:disable-next-line:no-console
+      console.warn(`github.graphql: passing extra headers as 3rd argument is deprecated. You can pass headers in the 2nd argument instead, using the "headers" key:
 
-  if (res.data.errors && res.data.errors.length > 0) {
-    throw new GraphQLQueryError(
-      res.data.errors,
-      query,
-      variables,
-      res.data.data
-    )
+    github.graphql(query, { headers })
+
+See https://probot.github.io/docs/github-api/#graphql-api`)
+
+      args[1] = Object.assign(args[1] || {}, { headers: args[2] })
+    }
+
+    return graphql(args[0], args[1])
   }
-
-  return res.data.data
+  client.query = (...args: any[]): any => {
+    // tslint:disable-next-line:no-console
+    console.warn('github.query is deprecated. Use github.graphql instead')
+    return client.graphql(args[0], args[1], args[2])
+  }
 }

@@ -38,19 +38,19 @@ describe('GitHubAPI', () => {
       })
 
       nock('https://api.github.com')
-        .get('/repos/JasonEtco/pizza/issues?per_page=1').reply(200, issues[0], {
+        .get('/repos/JasonEtco/pizza/issues?per_page=1').reply(200, [issues[0]], {
           link: '<https://api.github.com/repositories/123/issues?per_page=1&page=2>; rel="next"'
         })
-        .get('/repositories/123/issues?per_page=1&page=2').reply(200, issues[1], {
+        .get('/repositories/123/issues?per_page=1&page=2').reply(200, [issues[1]], {
           link: '<https://api.github.com/repositories/123/issues?per_page=1&page=3>; rel="next"'
         })
-        .get('/repositories/123/issues?per_page=1&page=3').reply(200, issues[2], {
+        .get('/repositories/123/issues?per_page=1&page=3').reply(200, [issues[2]], {
           link: '<https://api.github.com/repositories/123/issues?per_page=1&page=4>; rel="next"'
         })
-        .get('/repositories/123/issues?per_page=1&page=4').reply(200, issues[3], {
+        .get('/repositories/123/issues?per_page=1&page=4').reply(200, [issues[3]], {
           link: '<https://api.github.com/repositories/123/issues?per_page=1&page=5>; rel="next"'
         })
-        .get('/repositories/123/issues?per_page=1&page=5').reply(200, issues[4], {
+        .get('/repositories/123/issues?per_page=1&page=5').reply(200, [issues[4]], {
           link: ''
         })
     })
@@ -65,7 +65,7 @@ describe('GitHubAPI', () => {
 
     it('stops iterating if the done() function is called in the callback', async () => {
       const spy = jest.fn((response, done) => {
-        if (response.data.id === 2) done()
+        if (response.data[0].id === 2) done()
       })
       const res = await github.paginate(github.issues.listForRepo({ owner: 'JasonEtco', repo: 'pizza', per_page: 1 }), spy)
       expect(res.length).toBe(3)

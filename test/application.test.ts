@@ -267,11 +267,19 @@ describe('Application', () => {
   })
 
   describe('deprecations', () => {
+    let consoleWarnSpy: any
+    beforeEach(() => {
+      consoleWarnSpy = jest.spyOn(global.console, 'warn').mockImplementation(() => null)
+    })
+    afterEach(() => {
+      consoleWarnSpy.mockReset()
+    })
     test('receive() accepts param with {event}', async () => {
       const spy = jest.fn()
       app.events.on('deprecated', spy)
       await app.receive({ event: 'deprecated', payload: { action: 'test' } } as any)
       expect(spy).toHaveBeenCalled()
+      expect(consoleWarnSpy).toHaveBeenCalled()
     })
 
     test('receive() accepts param with {name,event}', async () => {
@@ -279,6 +287,7 @@ describe('Application', () => {
       app.events.on('real-event-name', spy)
       await app.receive({ name: 'real-event-name', event: 'deprecated', payload: { action: 'test' } } as any)
       expect(spy).toHaveBeenCalled()
+      expect(consoleWarnSpy).toHaveBeenCalled()
     })
   })
 

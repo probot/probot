@@ -1,3 +1,4 @@
+import enterpriseCompatibility from '@octokit/plugin-enterprise-compatibility'
 import retryPlugin from '@octokit/plugin-retry'
 import throttlePlugin from '@octokit/plugin-throttling'
 import Octokit from '@octokit/rest'
@@ -9,6 +10,7 @@ import { addPagination } from './pagination'
 const ProbotOctokit = Octokit
   .plugin(throttlePlugin)
   .plugin(retryPlugin)
+  .plugin(enterpriseCompatibility)
 
 /**
  * the [@octokit/rest Node.js module](https://github.com/octokit/rest.js),

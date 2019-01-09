@@ -1,8 +1,14 @@
+import retryPlugin from '@octokit/plugin-retry'
+import throttlePlugin from '@octokit/plugin-throttling'
 import Octokit from '@octokit/rest'
+
 import { addGraphQL } from './graphql'
 import { addLogging, Logger } from './logging'
 import { addPagination } from './pagination'
-import { addRateLimiting } from './rate-limiting'
+
+const ProbotOctokit = Octokit
+  .plugin(throttlePlugin)
+  .plugin(retryPlugin)
 
 /**
  * the [@octokit/rest Node.js module](https://github.com/octokit/rest.js),
@@ -12,10 +18,14 @@ import { addRateLimiting } from './rate-limiting'
  * @see {@link https://github.com/octokit/rest.js}
  */
 export function GitHubAPI (options: Options = {} as any) {
-  const octokit = new Octokit(options) as GitHubAPI
+  const octokit = new ProbotOctokit(Object.assign(options, {
+    throttle: {
+      onAbuseLimit: (retryAfter: number) => options.logger.warn(`Abuse limit hit, retrying in ${retryAfter} seconds`),
+      onRateLimit: (retryAfter: number) => options.logger.warn(`Rate limit hit, retrying in ${retryAfter} seconds`)
+    }
+  })) as GitHubAPI
 
   addPagination(octokit)
-  addRateLimiting(octokit, options.limiter)
   addLogging(octokit, options.logger)
   addGraphQL(octokit)
 
@@ -25,7 +35,6 @@ export function GitHubAPI (options: Options = {} as any) {
 export interface Options extends Octokit.Options {
   debug?: boolean
   logger: Logger
-  limiter?: any
 }
 
 export interface RequestOptions {

@@ -1,4 +1,3 @@
-import Bottleneck from 'bottleneck'
 import nock from 'nock'
 import { GitHubAPI, Options } from '../src/github'
 import { logger } from '../src/logger'
@@ -7,11 +6,7 @@ describe('GitHubAPI', () => {
   let github: GitHubAPI
 
   beforeEach(() => {
-    // Set a shorter limiter, otherwise tests are _slow_
-    const limiter = new Bottleneck()
-
     const options: Options = {
-      limiter,
       logger
     }
 

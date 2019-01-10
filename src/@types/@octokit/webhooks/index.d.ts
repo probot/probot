@@ -9,7 +9,7 @@ declare module '@octokit/webhooks' {
   declare class Webhooks {
     public middleware: Application
 
-    constructor (Options)
+    constructor (options: Options)
 
     public on (event: 'error', callback: (error: Error) => void)
     public on (event: '*' | string[], callback: (event: Webhooks.WebhookEvent | Error) => void)

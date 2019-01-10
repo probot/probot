@@ -3,7 +3,7 @@
 </p>
 <h3 align="center"><a href="https://probot.github.io">Probot</a></h3>
 <p align="center">A framework for building GitHub Apps to automate and improve your workflow<p>
-<p align="center"><a href="https://npmjs.com/package/probot"><img src="https://badgen.net/npm/v/probot" alt="NPM"></a> <a href="https://travis-ci.com/probot/probot"><img src="https://badgen.now.sh/travis/probot/probot" alt="Build Status"></a> <a href="https://codecov.io/gh/probot/probot/"><img src="https://badgen.now.sh/codecov/c/github/probot/probot" alt="Codecov"></a> <a href="https://twitter.com/ProbotTheRobot"><img src="https://img.shields.io/twitter/follow/ProbotTheRobot.svg?style=social&logo=twitter&label=Follow" alt="@ProbotTheRobot on Twitter"></a> <a href="https://pullreminders.com?ref=badge"><img src="https://pullreminders.com/badge.svg" alt="Pull Reminders"></a></p>
+<p align="center"><a href="https://npmjs.com/package/probot"><img src="https://badgen.net/npm/v/probot" alt="NPM"></a> <a href="https://travis-ci.org/probot/probot"><img src="https://badgen.now.sh/travis/probot/probot" alt="Build Status"></a> <a href="https://codecov.io/gh/probot/probot/"><img src="https://badgen.now.sh/codecov/c/github/probot/probot" alt="Codecov"></a> <a href="https://twitter.com/ProbotTheRobot"><img src="https://img.shields.io/twitter/follow/ProbotTheRobot.svg?style=social&logo=twitter&label=Follow" alt="@ProbotTheRobot on Twitter"></a> <a href="https://pullreminders.com?ref=badge"><img src="https://pullreminders.com/badge.svg" alt="Pull Reminders"></a></p>
 
 ---
 

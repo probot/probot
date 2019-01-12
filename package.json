@@ -1,6 +1,6 @@
 {
   "name": "probot",
-  "version": "7.5.0",
+  "version": "0.0.0-development",
   "description": "🤖 A framework for building GitHub Apps to automate and improve your workflow",
   "repository": "https://github.com/probot/probot",
   "main": "lib/index.js",
@@ -15,8 +15,6 @@
     "test": "tsc --noEmit -p test && jest --coverage && npm run lint && npm run doc-lint",
     "doc-lint": "standard-markdown docs/",
     "doc": "typedoc --options .typedoc.json",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
-    "postsemantic-release": "script/publish-docs",
     "prepare": "npm run build"
   },
   "files": [
@@ -113,7 +111,7 @@
     "jest": "^23.6.0",
     "minami": "^1.1.1",
     "nock": "^10.0.0",
-    "semantic-release": "^15.0.0",
+    "semantic-release": "^16.0.0-beta.16",
     "smee-client": "^1.0.1",
     "standard": "^12.0.0",
     "standard-markdown": "^5.0.1",

@@ -1,25 +1,30 @@
-sudo: required
-
 language: node_js
-
-node_js:
-  - "8"
-  - "10"
-
-notifications:
-  disabled: true
-
-before_install:
-  - npm install -g codecov
-
-install:
-  - npm install
-  - npm run build
+cache: npm
 
 branches:
-  except:
-    - /^v\d+\.\d+\.\d+$/
+  only:
+    - master
+    - beta # semantic-release preview releases
+    - next # semantic-release @next releases
+    - /^\d+\.x$/ # semantic-release maintenance releases
+    - /^greenkeeper.*$/ # Greenkeeper updates
 
-script:
-  - npm test
-  - codecov
+stages:
+  - test
+  - name: release
+    if: branch =~ /^(\d+\.x|master|next|beta)$/ AND type IN (push)
+
+jobs:
+  include:
+    - stage: test
+      node_js: 10
+      before_script: npm run build
+    - node_js: 8
+      env: test & coverage upload
+      before_script: npm run build
+      after_script: npx codecov
+    - stage: release
+      node_js: lts/*
+      env: semantic-release
+      before_script: npm run build
+      script: npx semantic-release

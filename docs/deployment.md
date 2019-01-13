@@ -166,10 +166,12 @@ GitHub Actions allows you to trigger workflows based on GitHub events, which mak
     }
 
     action "TODO" {
-      uses = "jasonetco/todo"
+      uses = "jasonetco/todo@master"
       secrets = ["GITHUB_TOKEN"]
     }
     ```
+
+`uses` inside an `action` must take the form `owner/repo@ref`, where `ref` can either be a branch: `jasonetco/todo@master`, or a tag: `jasonetco/todo@v1.0.0`.
 
 There are a few caveats when running Probot Apps on GitHub Actions:
 

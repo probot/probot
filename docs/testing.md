@@ -7,14 +7,16 @@ next: docs/logging.md
 We highly recommend working in the style of [test-driven development](http://agiledata.org/essays/tdd.html) when creating Probot apps. It is frustrating to constantly create real GitHub events in order to test an app. Redelivering webhooks is possible and can be accessed in your app's [settings](https://github.com/settings/apps) page under the **Advanced** tab. We do offer the above documented `receive` method to help make this easier; however, by writing your tests first, you can avoid repeatedly recreating actual events from GitHub to check if your code is working.
 
 ## Dependencies
+
 When you set up a new Probot application using `create-probot-app`, it will be bundled with [jest](https://facebook.github.com/github/jest/) to describe and run tests and [nock](https://github.com/nock/nock) as a HTTP server mocker.
 As there is no shortage of testing libraries out there, feel free to swap these out for whatever you are more comfortable with if you want to.
 
 ## Main Concepts
+
 Testing Probot applications consists of three main steps:
-* Writing fixtures of the GitHub API responses
-* Mocking the GitHub API Endpoints that your function will hit
-* Triggering the event in the main application and ensuring that it behaves as expected
+1. Writing fixtures of the GitHub API responses
+2. Mocking the GitHub API Endpoints that your function will hit
+3. Triggering the event in the main application and ensuring that it behaves as expected
 
 If you set up a new Probot application using `create-probot-app`, a test showing how to perform these actions will be included in the `tests/` directory.
 
@@ -101,8 +103,11 @@ npm run test:watch
 ```
 
 If you would like to know more about configuring the environment in which the tests are ran, please refer to [jest's documentation](https://jestjs.io/docs/en/configuration).
+
 ## Advanced
+
 ### Testing Configuration Option
+
 One of the [Best Practices](https://probot.github.io/docs/best-practices/) to keep in mind when developing Probot applications is that configurations should be stored in the target repository. Hence, in order to test that all configuration scenarios work, it is necessary to mock this configuration.
 
 The configuration is obtained by Probot by making a request to the GitHub API. As we have already seen before, we can very easily mock this API and use fixtures as mock responses.

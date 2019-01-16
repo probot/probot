@@ -1,3 +1,7 @@
+---
+next: docs/logging.md
+---
+
 # Testing
 
 We highly recommend working in the style of [test-driven development](http://agiledata.org/essays/tdd.html) when creating Probot apps. It is frustrating to constantly create real GitHub events in order to test an app. Redelivering webhooks is possible and can be accessed in your app's [settings](https://github.com/settings/apps) page under the **Advanced** tab. We do offer the above documented `receive` method to help make this easier; however, by writing your tests first, you can avoid repeatedly recreating actual events from GitHub to check if your code is working.

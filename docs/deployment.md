@@ -120,7 +120,7 @@ Zeit [Now](http://zeit.co/now) is a great service for running Probot apps. After
         $ now -e APP_ID=aaa \
             -e WEBHOOK_SECRET=bbb \
             -e NODE_ENV=production \
-            -e PRIVATE_KEY="$(cat ~/Downloads/*.private-key.pem | base64)"
+            -e PRIVATE_KEY_BASE64="$(cat ~/Downloads/*.private-key.pem | base64)"
 
       **NOTE**: Add `-e LOG_LEVEL=trace` to get verbose logging, or add `-e LOG_LEVEL=info` instead to show less details.
 

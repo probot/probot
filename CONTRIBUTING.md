@@ -1,17 +1,14 @@
-## Contributing
-
-[![Build Status](https://travis-ci.org/probot/probot.svg?branch=master)](https://travis-ci.org/probot/probot) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/32r7s2skrgm9ubva?svg=true)](https://ci.appveyor.com/api/projects/status/32r7s2skrgm9ubva?svg=true) [![Codecov](https://img.shields.io/codecov/c/github/probot/probot.svg)](https://codecov.io/gh/probot/probot/) [![Greenkeeper badge](https://badges.greenkeeper.io/probot/probot.svg)](https://greenkeeper.io/)
-
-[fork]: https://github.com/probot/probot/fork
-[pr]: https://github.com/probot/probot/compare
-[style]: https://standardjs.com/
-[code-of-conduct]: CODE_OF_CONDUCT.md
-[good-first-issue-search]: https://github.com/search?utf8=%E2%9C%93&q=topic%3Aprobot+topic%3Aprobot-app+good-first-issues%3A%3E0&type=
-[linter]: https://github.com/probot/probot/blob/ts-readme/tslint.json
+# Contributing
 
 Hi there! We're thrilled that you'd like to contribute to this project. Your help is essential for keeping it great.
 
 Please note that this project is released with a [Contributor Code of Conduct][code-of-conduct]. By participating in this project you agree to abide by its terms.
+
+# 🏗 Probot v8 beta
+
+Heads up: we are currently working on version 8. If you submit a pull request, please select the `beta` branch as your base.
+
+If you need a fix in v7, please submit the fix to the `beta` branch first (if applicable). Then create another pull request against the `v7.x` branch.
 
 ## Submitting a pull request
 
@@ -63,3 +60,10 @@ Use [this search][good-first-issue-search] to find Probot apps that have issues 
 - [How to Contribute to Open Source](https://opensource.guide/how-to-contribute/)
 - [Using Pull Requests](https://help.github.com/articles/about-pull-requests/)
 - [GitHub Help](https://help.github.com)
+
+[fork]: https://github.com/probot/probot/fork
+[pr]: https://github.com/probot/probot/compare
+[style]: https://standardjs.com/
+[code-of-conduct]: CODE_OF_CONDUCT.md
+[good-first-issue-search]: https://github.com/search?utf8=%E2%9C%93&q=topic%3Aprobot+topic%3Aprobot-app+good-first-issues%3A%3E0&type=
+[linter]: https://github.com/probot/probot/blob/ts-readme/tslint.json

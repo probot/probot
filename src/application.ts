@@ -191,32 +191,38 @@ export class Application {
       throw new Error('Your \`GHE_HOST\` environment variable should not begin with https:// or http://')
     }
 
+    // if installation ID passed, instantiate and authenticate Octokit, then cache the instance
+    // so that it can be used across received webhook events.
+    if (id) {
+      // Cache for 1 minute less than GitHub expiry
+      const installationTokenTTL = parseInt(process.env.INSTALLATION_TOKEN_TTL || '3540', 10)
+
+      return this.cache.wrap(`app:${id}`, async () => {
+        const installation = GitHubAPI({
+          baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api/v3`,
+          debug: process.env.LOG_LEVEL === 'trace',
+          logger: log.child({ name: 'github', installation: String(id) })
+        })
+
+        log.trace(`creating token for installation`)
+        installation.authenticate({ type: 'app', token: this.app() })
+
+        const response = await installation.apps.createInstallationToken({ installation_id: id })
+        installation.authenticate({ type: 'token', token: response.data.token })
+        return installation
+      }, { ttl: installationTokenTTL })
+    }
+
     const github = GitHubAPI({
       baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api/v3`,
       debug: process.env.LOG_LEVEL === 'trace',
       logger: log.child({ name: 'github', installation: String(id) })
     })
 
-    if (this.githubToken) {
-      github.authenticate({ type: 'app', token: this.githubToken })
-      return github
-    }
-
-    // Cache for 1 minute less than GitHub expiry
-    const installationTokenTTL = parseInt(process.env.INSTALLATION_TOKEN_TTL || '3540', 10)
-
-    if (id) {
-      const res = await this.cache.wrap(`app:${id}:token`, () => {
-        log.trace(`creating token for installation`)
-        github.authenticate({ type: 'app', token: this.app() })
-
-        return github.apps.createInstallationToken({ installation_id: id })
-      }, { ttl: installationTokenTTL })
-
-      github.authenticate({ type: 'token', token: res.data.token })
-    } else {
-      github.authenticate({ type: 'app', token: this.app() })
-    }
+    github.authenticate({
+      token: this.githubToken ? this.githubToken : this.app(),
+      type: 'app'
+    })
 
     return github
   }

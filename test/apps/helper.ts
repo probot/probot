@@ -5,10 +5,11 @@ import { Application, ApplicationFunction } from '../../src'
 
 const cache = cacheManager.caching({ store: 'memory', ttl: 0 })
 
-const jwt = jest.fn().mockReturnValue('test')
-
 export function newApp (): Application {
-  return new Application({ app: jwt, cache })
+  return new Application({ app: {
+    getInstallationAccessToken: jest.fn().mockResolvedValue('test'),
+    getSignedJsonWebToken: jest.fn().mockReturnValue('test')
+  }, cache })
 }
 
 export function createApp (appFn?: ApplicationFunction) {

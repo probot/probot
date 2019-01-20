@@ -62,6 +62,7 @@
   "author": "Brandon Keepers",
   "license": "ISC",
   "dependencies": {
+    "@octokit/app": "^2.1.0",
     "@octokit/graphql": "2.0.1",
     "@octokit/plugin-enterprise-compatibility": "^1.0.0",
     "@octokit/plugin-retry": "^2.1.1",

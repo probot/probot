@@ -1,10 +1,11 @@
+import OctokitApp from '@octokit/app'
 import Webhooks, { WebhookEvent } from '@octokit/webhooks'
 import Logger from 'bunyan'
 import express from 'express'
+
 import { Application } from './application'
 import { createDefaultCache } from './cache'
 import { Context } from './context'
-import { createApp } from './github-app'
 import { logger } from './logger'
 import { resolve } from './resolver'
 import { createServer } from './server'
@@ -30,7 +31,7 @@ export class Probot {
 
   private options: Options
   private apps: Application[]
-  private app: () => string
+  private app?: OctokitApp
   private githubToken?: string
 
   constructor (options: Options) {
@@ -40,11 +41,12 @@ export class Probot {
     this.logger = logger
     this.apps = []
     this.webhook = new Webhooks({ path: options.webhookPath, secret: options.secret })
-    if (options.githubToken) {
-      this.githubToken = options.githubToken
-      this.app = () => ''
-    } else {
-      this.app = createApp({ id: options.id!, cert: options.cert! })
+    this.githubToken = options.githubToken
+    if (this.options.id) {
+      this.app = new OctokitApp({
+        id: options.id as number,
+        privateKey: options.cert as string
+      })
     }
     this.server = createServer({ webhook: this.webhook.middleware, logger })
 
@@ -81,7 +83,11 @@ export class Probot {
     if (typeof appFn === 'string') {
       appFn = resolve(appFn) as ApplicationFunction
     }
-    const app = new Application({ app: this.app, cache, githubToken: this.githubToken })
+    const app = new Application({
+      app: this.app as OctokitApp,
+      cache,
+      githubToken: this.githubToken
+    })
 
     // Connect the router from the app to the server
     this.server.use(app.router)
@@ -131,6 +137,7 @@ export interface Options {
   githubToken?: string,
   webhookProxy?: string,
   port?: number
+
 }
 
 export { Logger, Context, Application }

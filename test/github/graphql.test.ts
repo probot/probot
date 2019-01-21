@@ -11,6 +11,7 @@ describe('github/graphql', () => {
 
   beforeEach(() => {
     const options: Options = {
+      auth: 'token testing',
       logger
     }
 
@@ -21,11 +22,14 @@ describe('github/graphql', () => {
     const query = 'query { viewer { login } }'
     let data: any
 
-    test('makes a graphql query', async () => {
+    test('makes an authenticated graphql query', async () => {
       data = { viewer: { login: 'bkeepers' } }
 
       nock('https://api.github.com', {
-        reqheaders: { 'content-type': 'application/json; charset=utf-8' }
+        reqheaders: {
+          authorization: 'token testing',
+          'content-type': 'application/json; charset=utf-8'
+        }
       })
         .post('/graphql', { query })
         .reply(200, { data })
@@ -36,23 +40,10 @@ describe('github/graphql', () => {
     test('makes a graphql query with variables', async () => {
       const variables = { owner: 'probot', repo: 'test' }
 
-      nock('https://api.github.com', {
-        reqheaders: { 'content-type': 'application/json; charset=utf-8' }
-      }).post('/graphql', { query, variables })
+      nock('https://api.github.com').post('/graphql', { query, variables })
         .reply(200, { data })
 
       expect(await github.graphql(query, variables)).toEqual(data)
-    })
-
-    test('uses authentication', async () => {
-      github.authenticate({ type: 'token', token: 'testing' })
-
-      nock('https://api.github.com', {
-        reqheaders: { authorization: 'token testing' }
-      }).post('/graphql', { query })
-        .reply(200, { data })
-
-      await github.graphql(query)
     })
 
     test('allows custom headers', async () => {

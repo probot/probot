@@ -210,14 +210,11 @@ export class Application {
       }, { ttl: installationTokenTTL })
     }
 
+    const token = this.githubToken || this.app.getSignedJsonWebToken()
     const github = GitHubAPI({
+      auth: `Bearer ${token}`,
       baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api/v3`,
       logger: log.child({ name: 'github', installation: String(id) })
-    })
-
-    github.authenticate({
-      token: this.githubToken ? this.githubToken : this.app.getSignedJsonWebToken(),
-      type: 'app'
     })
 
     return github

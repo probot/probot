@@ -205,7 +205,6 @@ export class Application {
             return `token ${accessToken}`
           },
           baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api/v3`,
-          debug: process.env.LOG_LEVEL === 'trace',
           logger: log.child({ name: 'github', installation: String(id) })
         })
       }, { ttl: installationTokenTTL })
@@ -213,7 +212,6 @@ export class Application {
 
     const github = GitHubAPI({
       baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api/v3`,
-      debug: process.env.LOG_LEVEL === 'trace',
       logger: log.child({ name: 'github', installation: String(id) })
     })
 

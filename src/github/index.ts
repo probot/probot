@@ -21,10 +21,10 @@ const ProbotOctokit = Octokit
  */
 export function GitHubAPI (options: Options = {} as any) {
   const octokit = new ProbotOctokit(Object.assign(options, {
-    throttle: {
+    throttle: Object.assign({
       onAbuseLimit: (retryAfter: number) => options.logger.warn(`Abuse limit hit, retrying in ${retryAfter} seconds`),
       onRateLimit: (retryAfter: number) => options.logger.warn(`Rate limit hit, retrying in ${retryAfter} seconds`)
-    }
+    }, options.throttle)
   })) as GitHubAPI
 
   addPagination(octokit)

@@ -8,6 +8,10 @@ describe('GitHubAPI', () => {
   beforeEach(() => {
     const options: Options = {
       logger,
+      retry: {
+        // disable retries to test error states
+        enabled: false
+      },
       throttle: {
         // disable throttling, otherwise tests are _slow_
         enabled: false
@@ -23,6 +27,19 @@ describe('GitHubAPI', () => {
 
     nock('https://api.github.com').get('/user').reply(200, user)
     expect((await github.users.getAuthenticated({})).data).toEqual(user)
+  })
+
+  test('logs request errors', async () => {
+    nock('https://api.github.com')
+      .get('/')
+      .reply(500, {})
+
+    try {
+      await github.request('/')
+      throw new Error('should throw')
+    } catch (error) {
+      expect(error.status).toBe(500)
+    }
   })
 
   describe('paginate', () => {

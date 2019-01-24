@@ -1,7 +1,9 @@
- import { WebhookEvent } from '@octokit/webhooks'
+import { WebhookEvent } from '@octokit/webhooks'
+import Bottleneck from 'bottleneck'
 
 import { Application } from '../src/application'
 import { Context } from '../src/context'
+import * as GitHubApiModule from '../src/github'
 import { logger } from '../src/logger'
 
 describe('Application', () => {
@@ -222,6 +224,26 @@ describe('Application', () => {
       await app.receive(event)
       expect(spy).toHaveBeenCalled()
       expect(spy2).toHaveBeenCalled()
+    })
+  })
+
+  describe('auth', () => {
+    it('process.env.REDIS_URL', async () => {
+      process.env.REDIS_URL = 'test'
+      const appWithRedis = new Application({} as any)
+      delete process.env.REDIS_URL
+
+      Object.defineProperty(GitHubApiModule, 'GitHubAPI', {
+        value (options: any) {
+          expect(options.throttle.id).toBe(1)
+          expect(options.throttle.Bottleneck).toBe(Bottleneck)
+          expect(options.throttle.connection).toBeInstanceOf(Bottleneck.IORedisConnection)
+          return 'github mock'
+        }
+      })
+
+      const result = await appWithRedis.auth(1)
+      expect(result).toBe('github mock')
     })
   })
 

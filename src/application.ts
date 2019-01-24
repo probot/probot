@@ -34,6 +34,7 @@ export class Application {
   public cache: Cache
   public router: express.Router
   public log: LoggerWithTarget
+  public throttleOptions: any
 
   private githubToken?: string
 
@@ -45,6 +46,20 @@ export class Application {
     this.cache = opts.cache
     this.router = opts.router || express.Router() // you can do this?
     this.githubToken = opts.githubToken
+
+    if (process.env.REDIS_URL) {
+      const Bottleneck = require('bottleneck')
+      const Redis = require('ioredis')
+
+      const client = new Redis(process.env.REDIS_URL)
+      const connection = new Bottleneck.IORedisConnection({ client })
+      connection.on('error', this.log.error)
+
+      this.throttleOptions = {
+        Bottleneck,
+        connection
+      }
+    }
 
     if (opts.catchErrors) {
       // Deprecated since 7.2.0
@@ -195,26 +210,35 @@ export class Application {
     // if installation ID passed, instantiate and authenticate Octokit, then cache the instance
     // so that it can be used across received webhook events.
     if (id) {
+      const options = {
+        auth: async () => {
+          const accessToken = await this.app.getInstallationAccessToken({ installationId: id })
+          return `token ${accessToken}`
+        },
+        baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api/v3`,
+        logger: log.child({ name: 'github', installation: String(id) })
+      }
+
+      if (this.throttleOptions) {
+        return GitHubAPI({
+          ...options,
+          throttle: {
+            id,
+            ...this.throttleOptions
+          }
+        })
+      }
+
       // Cache for 1 minute less than GitHub expiry
       const installationTokenTTL = parseInt(process.env.INSTALLATION_TOKEN_TTL || '3540', 10)
-
-      return this.cache.wrap(`app:${id}`, async () => {
-        return GitHubAPI({
-          auth: async () => {
-            const accessToken = await this.app.getInstallationAccessToken({ installationId: id })
-            return `token ${accessToken}`
-          },
-          baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api/v3`,
-          logger: log.child({ name: 'github', installation: String(id) })
-        })
-      }, { ttl: installationTokenTTL })
+      return this.cache.wrap(`app:${id}`, () => GitHubAPI(options), { ttl: installationTokenTTL })
     }
 
     const token = this.githubToken || this.app.getSignedJsonWebToken()
     const github = GitHubAPI({
       auth: `Bearer ${token}`,
       baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api/v3`,
-      logger: log.child({ name: 'github', installation: String(id) })
+      logger: log.child({ name: 'github' })
     })
 
     return github

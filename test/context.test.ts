@@ -6,7 +6,7 @@ import { Context } from '../src/context'
 import { GitHubAPI, OctokitError } from '../src/github'
 
 describe('Context', () => {
-  let event: WebhookEvent
+  let event: WebhookEvent<any>
   let context: Context
 
   beforeEach(() => {

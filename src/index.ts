@@ -1,5 +1,5 @@
 import OctokitApp from '@octokit/app'
-import Webhooks, { WebhookEvent } from '@octokit/webhooks'
+import { Webhooks } from '@octokit/webhooks'
 import Logger from 'bunyan'
 import express from 'express'
 
@@ -26,7 +26,7 @@ const defaultAppFns: ApplicationFunction[] = [
 
 export class Probot {
   public server: express.Application
-  public webhook: Webhooks
+  public webhook: Webhooks.Webhooks
   public logger: Logger
 
   private options: Options
@@ -40,7 +40,7 @@ export class Probot {
     this.options = options
     this.logger = logger
     this.apps = []
-    this.webhook = new Webhooks({ path: options.webhookPath, secret: options.secret })
+    this.webhook = new Webhooks.Webhooks({ path: options.webhookPath, secret: options.secret })
     this.githubToken = options.githubToken
     if (this.options.id) {
       this.app = new OctokitApp({
@@ -48,10 +48,10 @@ export class Probot {
         privateKey: options.cert as string
       })
     }
-    this.server = createServer({ webhook: this.webhook.middleware, logger })
+    this.server = createServer({ webhook: (this.webhook as any).middleware, logger })
 
     // Log all received webhooks
-    this.webhook.on('*', async (event: WebhookEvent) => {
+    this.webhook.on('*', async (event: Webhooks.WebhookEvent<any>) => {
       try {
         await this.receive(event)
       } catch {
@@ -74,7 +74,7 @@ export class Probot {
     }
   }
 
-  public receive (event: WebhookEvent) {
+  public receive (event: Webhooks.WebhookEvent<any>) {
     this.logger.debug({ event }, 'Webhook received')
     return Promise.all(this.apps.map(app => app.receive(event)))
   }

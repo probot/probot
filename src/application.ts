@@ -1,5 +1,5 @@
 import OctokitApp from '@octokit/app'
-import { WebhookEvent } from '@octokit/webhooks'
+import { Webhooks } from '@octokit/webhooks'
 import express from 'express'
 import { EventEmitter } from 'promise-events'
 import { ApplicationFunction } from '.'
@@ -18,7 +18,7 @@ export interface Options {
 }
 
 // Some events can't get an authenticated client (#382):
-function isUnauthenticatedEvent (event: WebhookEvent) {
+function isUnauthenticatedEvent (event: Webhooks.WebhookEvent<any>) {
   return !event.payload.installation ||
     (event.name === 'installation' && event.payload.action === 'deleted')
 }
@@ -67,7 +67,7 @@ export class Application {
     return this
   }
 
-  public async receive (event: WebhookEvent) {
+  public async receive (event: Webhooks.WebhookEvent<any>) {
     if ((event as any).event) {
       // tslint:disable-next-line:no-console
       console.warn(new Error('Property `event` is deprecated, use `name`'))
@@ -143,7 +143,7 @@ export class Application {
   public on (eventName: string | string[], callback: (context: Context) => Promise<void>) {
     if (typeof eventName === 'string') {
 
-      return this.events.on(eventName, async (event: WebhookEvent) => {
+      return this.events.on(eventName, async (event: Webhooks.WebhookEvent<any>) => {
         const log = this.log.child({ name: 'event', id: event.id })
 
         try {
@@ -159,6 +159,10 @@ export class Application {
     } else {
       eventName.forEach(e => this.on(e, callback))
     }
+
+    this.on('security_advisory', async (context) => {
+      return
+    })
   }
 
   /**
@@ -220,7 +224,7 @@ export class Application {
     return github
   }
 
-  private authenticateEvent (event: WebhookEvent, log: LoggerWithTarget): Promise<GitHubAPI> {
+  private authenticateEvent (event: Webhooks.WebhookEvent<any>, log: LoggerWithTarget): Promise<GitHubAPI> {
     if (this.githubToken) {
       return this.auth()
     }
@@ -230,6 +234,6 @@ export class Application {
       return this.auth()
     }
 
-    return this.auth(event.payload.installation!.id, log)
+    return this.auth(event.payload.installation.id, log)
   }
 }

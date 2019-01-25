@@ -6,7 +6,7 @@ import { logger } from '../src/logger'
 
 describe('Application', () => {
   let app: Application
-  let event: WebhookEvent
+  let event: WebhookEvent<any>
   let output: any
 
   beforeAll(() => {
@@ -73,7 +73,7 @@ describe('Application', () => {
     })
 
     it('calls callback x amount of times when an array of x actions is passed', async () => {
-      const event2: WebhookEvent = {
+      const event2: WebhookEvent<any> = {
         id: '123',
         name: 'arrayTest',
         payload: {

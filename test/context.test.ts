@@ -1,12 +1,12 @@
 import fs = require('fs')
 import path = require('path')
 
-import { WebhookEvent } from '@octokit/webhooks'
+import Webhooks from '@octokit/webhooks'
 import { Context } from '../src/context'
 import { GitHubAPI, OctokitError } from '../src/github'
 
 describe('Context', () => {
-  let event: WebhookEvent
+  let event: Webhooks.WebhookEvent<any>
   let context: Context
 
   beforeEach(() => {

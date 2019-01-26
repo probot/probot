@@ -1,4 +1,4 @@
-import { WebhookEvent } from '@octokit/webhooks'
+import Webhooks from '@octokit/webhooks'
 import Bottleneck from 'bottleneck'
 
 import { Application } from '../src/application'
@@ -8,7 +8,7 @@ import { logger } from '../src/logger'
 
 describe('Application', () => {
   let app: Application
-  let event: WebhookEvent
+  let event: Webhooks.WebhookEvent<any>
   let output: any
 
   beforeAll(() => {
@@ -75,7 +75,7 @@ describe('Application', () => {
     })
 
     it('calls callback x amount of times when an array of x actions is passed', async () => {
-      const event2: WebhookEvent = {
+      const event2: Webhooks.WebhookEvent<any> = {
         id: '123',
         name: 'arrayTest',
         payload: {

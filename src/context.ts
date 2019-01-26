@@ -1,8 +1,35 @@
-import { WebhookEvent, WebhookPayloadWithRepository } from '@octokit/webhooks'
+import { PayloadRepository, Webhooks } from '@octokit/webhooks'
 import yaml from 'js-yaml'
 import path from 'path'
 import { GitHubAPI } from './github'
 import { LoggerWithTarget } from './wrap-logger'
+
+interface WebhookPayloadWithRepository {
+  [key: string]: any
+  repository?: PayloadRepository
+  issue?: {
+    [key: string]: any
+    number: number
+    html_url?: string
+    body?: string
+  }
+  pull_request?: {
+    [key: string]: any
+    number: number
+    html_url?: string
+    body?: string
+  }
+  sender?: {
+    [key: string]: any
+    type: string
+  }
+  action?: string
+  installation?: {
+    id: number
+    [key: string]: any
+  }
+}
+
 /**
  * The context of the event that was triggered, including the payload and
  * helpers for extracting information can be passed to GitHub API calls.
@@ -20,7 +47,7 @@ import { LoggerWithTarget } from './wrap-logger'
  * @property {logger} log - A logger
  */
 
-export class Context implements WebhookEvent {
+export class Context implements Webhooks.WebhookEvent<any> {
   public name: string
   public id: string
   public payload: WebhookPayloadWithRepository
@@ -31,7 +58,7 @@ export class Context implements WebhookEvent {
   public github: GitHubAPI
   public log: LoggerWithTarget
 
-  constructor (event: WebhookEvent, github: GitHubAPI, log: LoggerWithTarget) {
+  constructor (event: Webhooks.WebhookEvent<any>, github: GitHubAPI, log: LoggerWithTarget) {
     this.name = event.name
     this.id = event.id
     this.payload = event.payload

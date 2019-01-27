@@ -1,5 +1,4 @@
 import Webhooks from '@octokit/webhooks'
-import Bottleneck from 'bottleneck'
 
 import { Application } from '../src/application'
 import { Context } from '../src/context'
@@ -228,16 +227,17 @@ describe('Application', () => {
   })
 
   describe('auth', () => {
-    it('process.env.REDIS_URL', async () => {
-      process.env.REDIS_URL = 'test'
-      const appWithRedis = new Application({} as any)
-      delete process.env.REDIS_URL
+    it('throttleOptions', async () => {
+      const appWithRedis = new Application({
+        throttleOptions: {
+          foo: 'bar'
+        }
+      } as any)
 
       Object.defineProperty(GitHubApiModule, 'GitHubAPI', {
         value (options: any) {
           expect(options.throttle.id).toBe(1)
-          expect(options.throttle.Bottleneck).toBe(Bottleneck)
-          expect(options.throttle.connection).toBeInstanceOf(Bottleneck.IORedisConnection)
+          expect(options.throttle.foo).toBe('bar')
           return 'github mock'
         }
       })

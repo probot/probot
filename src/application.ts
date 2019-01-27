@@ -15,6 +15,7 @@ export interface Options {
   router?: express.Router
   catchErrors?: boolean
   githubToken?: string
+  throttleOptions?: any
 }
 
 // Some events can't get an authenticated client (#382):
@@ -34,9 +35,9 @@ export class Application {
   public cache: Cache
   public router: express.Router
   public log: LoggerWithTarget
-  public throttleOptions: any
 
   private githubToken?: string
+  private throttleOptions: any
 
   constructor (options?: Options) {
     const opts = options || {} as any
@@ -46,20 +47,7 @@ export class Application {
     this.cache = opts.cache
     this.router = opts.router || express.Router() // you can do this?
     this.githubToken = opts.githubToken
-
-    if (process.env.REDIS_URL) {
-      const Bottleneck = require('bottleneck')
-      const Redis = require('ioredis')
-
-      const client = new Redis(process.env.REDIS_URL)
-      const connection = new Bottleneck.IORedisConnection({ client })
-      connection.on('error', this.log.error)
-
-      this.throttleOptions = {
-        Bottleneck,
-        connection
-      }
-    }
+    this.throttleOptions = opts.throttleOptions
 
     if (opts.catchErrors) {
       // Deprecated since 7.2.0

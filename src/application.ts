@@ -48,12 +48,6 @@ export class Application {
     this.router = opts.router || express.Router() // you can do this?
     this.githubToken = opts.githubToken
     this.throttleOptions = opts.throttleOptions
-
-    if (opts.catchErrors) {
-      // Deprecated since 7.2.0
-      // tslint:disable-next-line:no-console
-      console.warn(new Error('Property `catchErrors` is deprecated and has no effect'))
-    }
   }
 
   /**

@@ -1,6 +1,8 @@
-const { createProbot } = require('../src')
-const request = require('supertest')
+const Bottleneck = require('bottleneck')
 const nock = require('nock')
+const request = require('supertest')
+
+const { createProbot } = require('../src')
 const helper = require('./apps/helper')
 
 describe('Probot', () => {
@@ -237,6 +239,23 @@ describe('Probot', () => {
       } catch (e) {
         expect(e).toMatchSnapshot()
       }
+    })
+  })
+
+  describe('process.env.REDIS_URL', () => {
+    beforeEach(() => {
+      process.env.REDIS_URL = 'test'
+    })
+
+    afterEach(() => {
+      delete process.env.REDIS_URL
+    })
+
+    it('sets throttleOptions', async () => {
+      const probot = createProbot({ webhookPath: '/webhook', githubToken: 'faketoken' })
+
+      expect(probot.throttleOptions.Bottleneck).toBe(Bottleneck)
+      expect(probot.throttleOptions.connection).toBeInstanceOf(Bottleneck.IORedisConnection)
     })
   })
 })

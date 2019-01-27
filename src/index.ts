@@ -33,6 +33,7 @@ export class Probot {
   private apps: Application[]
   private app?: OctokitApp
   private githubToken?: string
+  private throttleOptions: any
 
   constructor (options: Options) {
     options.webhookPath = options.webhookPath || '/'
@@ -64,6 +65,20 @@ export class Probot {
 
     // Log all webhook errors
     this.webhook.on('error', this.errorHandler)
+
+    if (process.env.REDIS_URL) {
+      const Bottleneck = require('bottleneck')
+      const Redis = require('ioredis')
+
+      const client = new Redis(process.env.REDIS_URL)
+      const connection = new Bottleneck.IORedisConnection({ client })
+      connection.on('error', this.logger.error)
+
+      this.throttleOptions = {
+        Bottleneck,
+        connection
+      }
+    }
   }
 
   public errorHandler (err: Error) {
@@ -89,7 +104,8 @@ export class Probot {
     const app = new Application({
       app: this.app as OctokitApp,
       cache,
-      githubToken: this.githubToken
+      githubToken: this.githubToken,
+      throttleOptions: this.throttleOptions
     })
 
     // Connect the router from the app to the server

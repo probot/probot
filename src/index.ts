@@ -1,4 +1,5 @@
 import OctokitApp from '@octokit/app'
+import Octokit from '@octokit/rest';
 import Webhooks from '@octokit/webhooks'
 import Bottleneck from 'bottleneck'
 import Logger from 'bunyan'
@@ -36,6 +37,7 @@ export class Probot {
   private app?: OctokitApp
   private githubToken?: string
   private throttleOptions: any
+  private octokitConstructor?: Octokit.Static
 
   constructor (options: Options) {
     options.webhookPath = options.webhookPath || '/'
@@ -48,6 +50,7 @@ export class Probot {
       secret: options.secret
     })
     this.githubToken = options.githubToken
+    this.octokitConstructor = options.octokitConstructor
     if (this.options.id) {
       if (process.env.GHE_HOST && /^https?:\/\//.test(process.env.GHE_HOST)) {
         throw new Error('Your \`GHE_HOST\` environment variable should not begin with https:// or http://')
@@ -114,7 +117,8 @@ export class Probot {
       app: this.app as OctokitApp,
       cache,
       githubToken: this.githubToken,
-      throttleOptions: this.throttleOptions
+      throttleOptions: this.throttleOptions,
+      octokitConstructor: this.octokitConstructor
     })
 
     // Connect the router from the app to the server
@@ -165,7 +169,8 @@ export interface Options {
   githubToken?: string,
   webhookProxy?: string,
   port?: number,
-  redisConfig?: Redis.RedisOptions
+  redisConfig?: Redis.RedisOptions,
+  octokitConstructor?: Octokit.Static
 }
 
 export { Logger, Context, Application }

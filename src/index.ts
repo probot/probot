@@ -49,7 +49,8 @@ export class Probot {
     if (this.options.id) {
       this.app = new OctokitApp({
         id: options.id as number,
-        privateKey: options.cert as string
+        privateKey: options.cert as string,
+        baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api/v3`
       })
     }
     this.server = createServer({ webhook: (this.webhook as any).middleware, logger })

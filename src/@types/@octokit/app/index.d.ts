@@ -1,8 +1,8 @@
 declare module '@octokit/app' {
   interface Options {
+    baseUrl?: string,
     id: number,
-    privateKey: string,
-    baseUrl?: string
+    privateKey: string
   }
 
   declare class App {

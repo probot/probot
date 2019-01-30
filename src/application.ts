@@ -1,5 +1,5 @@
 import OctokitApp from '@octokit/app'
-import Octokit from '@octokit/rest';
+import Octokit from '@octokit/rest'
 import Webhooks from '@octokit/webhooks'
 import express from 'express'
 import { EventEmitter } from 'promise-events'

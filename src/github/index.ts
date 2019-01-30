@@ -20,7 +20,11 @@ const ProbotOctokit = Octokit
  * @see {@link https://github.com/octokit/rest.js}
  */
 export function GitHubAPI (options: Options = {} as any) {
-  const octokit = new ProbotOctokit(Object.assign(options, {
+  let OctokitConstructor = ProbotOctokit;
+  if(options.octokit != null) {
+    OctokitConstructor = options.octokit;
+  }
+  const octokit = new OctokitConstructor(Object.assign(options, {
     throttle: Object.assign({
       onAbuseLimit: (retryAfter: number) => options.logger.warn(`Abuse limit hit, retrying in ${retryAfter} seconds`),
       onRateLimit: (retryAfter: number) => options.logger.warn(`Rate limit hit, retrying in ${retryAfter} seconds`)
@@ -37,6 +41,7 @@ export function GitHubAPI (options: Options = {} as any) {
 export interface Options extends Octokit.Options {
   debug?: boolean
   logger: Logger
+  octokit?: Octokit.Static
 }
 
 export interface RequestOptions {

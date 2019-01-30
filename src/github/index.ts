@@ -21,7 +21,7 @@ const ProbotOctokit = Octokit
  */
 export function GitHubAPI (options: Options = {} as any) {
   let OctokitConstructor = ProbotOctokit;
-  if(options.octokitConstructor != null) {
+  if (options.octokitConstructor != null) {
     OctokitConstructor = options.octokitConstructor;
   }
   const octokit = new OctokitConstructor(Object.assign(options, {

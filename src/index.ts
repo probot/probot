@@ -117,8 +117,8 @@ export class Probot {
       app: this.app as OctokitApp,
       cache,
       githubToken: this.githubToken,
-      throttleOptions: this.throttleOptions,
-      octokitConstructor: this.octokitConstructor
+      octokitConstructor: this.octokitConstructor,
+      throttleOptions: this.throttleOptions
     })
 
     // Connect the router from the app to the server

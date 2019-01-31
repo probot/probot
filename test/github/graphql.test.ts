@@ -11,9 +11,9 @@ describe('github/graphql', () => {
 
   beforeEach(() => {
     const options: Options = {
+      Octokit: ProbotOctokit,
       auth: 'token testing',
-      logger,
-      Octokit: ProbotOctokit
+      logger
     }
 
     github = GitHubAPI(options)
@@ -85,8 +85,8 @@ describe('github/graphql', () => {
       process.env.GHE_HOST = 'notreallygithub.com'
 
       const options: Options = {
-        logger,
-        Octokit: ProbotOctokit
+        Octokit: ProbotOctokit,
+        logger
       }
 
       github = GitHubAPI(options)

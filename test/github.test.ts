@@ -7,6 +7,7 @@ describe('GitHubAPI', () => {
 
   beforeEach(() => {
     const options: Options = {
+      Octokit: ProbotOctokit,
       logger,
       retry: {
         // disable retries to test error states
@@ -15,8 +16,7 @@ describe('GitHubAPI', () => {
       throttle: {
         // disable throttling, otherwise tests are _slow_
         enabled: false
-      },
-      Octokit: ProbotOctokit
+      }
     }
 
     github = GitHubAPI(options)

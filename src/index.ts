@@ -9,7 +9,7 @@ import Redis from 'ioredis'
 import { Application } from './application'
 import { createDefaultCache } from './cache'
 import { Context } from './context'
-import { ProbotOctokit } from './github';
+import { ProbotOctokit } from './github'
 import { logger } from './logger'
 import { resolve } from './resolver'
 import { createServer } from './server'
@@ -115,10 +115,10 @@ export class Probot {
       appFn = resolve(appFn) as ApplicationFunction
     }
     const app = new Application({
+      Octokit: this.Octokit,
       app: this.app as OctokitApp,
       cache,
       githubToken: this.githubToken,
-      Octokit: this.Octokit,
       throttleOptions: this.throttleOptions
     })
 

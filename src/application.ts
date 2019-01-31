@@ -191,13 +191,13 @@ export class Application {
     // so that it can be used across received webhook events.
     if (id) {
       const options = {
+        Octokit: this.Octokit,
         auth: async () => {
           const accessToken = await this.app.getInstallationAccessToken({ installationId: id })
           return `token ${accessToken}`
         },
         baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api/v3`,
-        logger: log.child({ name: 'github', installation: String(id) }),
-        Octokit: this.Octokit
+        logger: log.child({ name: 'github', installation: String(id) })
       }
 
       if (this.throttleOptions) {
@@ -217,10 +217,10 @@ export class Application {
 
     const token = this.githubToken || this.app.getSignedJsonWebToken()
     const github = GitHubAPI({
+      Octokit: this.Octokit,
       auth: `Bearer ${token}`,
       baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api/v3`,
-      logger: log.child({ name: 'github' }),
-      Octokit: this.Octokit
+      logger: log.child({ name: 'github' })
     })
 
     return github

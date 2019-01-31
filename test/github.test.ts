@@ -1,5 +1,5 @@
 import nock from 'nock'
-import { GitHubAPI, Options } from '../src/github'
+import { GitHubAPI, Options, ProbotOctokit } from '../src/github'
 import { logger } from '../src/logger'
 
 describe('GitHubAPI', () => {
@@ -15,7 +15,8 @@ describe('GitHubAPI', () => {
       throttle: {
         // disable throttling, otherwise tests are _slow_
         enabled: false
-      }
+      },
+      Octokit: ProbotOctokit
     }
 
     github = GitHubAPI(options)

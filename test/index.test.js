@@ -209,6 +209,7 @@ describe('Probot', () => {
       nock('https://notreallygithub.com/api/v3')
         .defaultReplyHeaders({ 'Content-Type': 'application/json' })
         .get('/app/installations').reply(200, ['I work!'])
+        .post('/app/installations/5/access_tokens').reply(200, { token: 'github_token' })
 
       app = helper.createApp()
     })
@@ -231,11 +232,34 @@ describe('Probot', () => {
       expect(spy.mock.calls[0][0].data[0]).toBe('I work!')
     })
 
+    it('passes GHE host to the app', async () => {
+      probot = createProbot({
+        id: 1234,
+        // Some valid RSA key to be able to sign the initial token
+        cert: '-----BEGIN RSA PRIVATE KEY-----\n' +
+          'MIIBOQIBAAJBAIILhiN9IFpaE0pUXsesuuoaj6eeDiAqCiE49WB1tMB8ZMhC37kY\n' +
+          'Fl52NUYbUxb7JEf6pH5H9vqw1Wp69u78XeUCAwEAAQJAb88urnaXiXdmnIK71tuo\n' +
+          '/TyHBKt9I6Rhfzz0o9Gv7coL7a537FVDvV5UCARXHJMF41tKwj+zlt9EEUw7a1HY\n' +
+          'wQIhAL4F/VHWSPHeTgXYf4EaX2OlpSOk/n7lsFtL/6bWRzRVAiEArzJs2vopJitv\n' +
+          'A1yBjz3q2nX+zthk+GLXrJQkYOnIk1ECIHfeFV8TWm5gej1LxZquBTA5pINoqDVq\n' +
+          'NKZSuZEHqGEFAiB6EDrxkovq8SYGhIQsJeqkTMO8n94xhMRZlFmIQDokEQIgAq5U\n' +
+          'r1UQNnUExRh7ZT0kFbMfO9jKYZVlQdCL9Dn93vo=\n' +
+          '-----END RSA PRIVATE KEY-----'
+      })
+      expect(await probot.app.getInstallationAccessToken({installationId: 5})).toBe('github_token')
+    });
+
     it('throws if the GHE host includes a protocol', async () => {
       process.env.GHE_HOST = 'https://notreallygithub.com'
 
       try {
         await app.auth()
+      } catch (e) {
+        expect(e).toMatchSnapshot()
+      }
+
+      try {
+        createProbot({ id: 1234, cert: 'xxxx' })
       } catch (e) {
         expect(e).toMatchSnapshot()
       }

@@ -2,6 +2,8 @@
 
 exports[`Probot ghe support throws if the GHE host includes a protocol 1`] = `[Error: Your \`GHE_HOST\` environment variable should not begin with https:// or http://]`;
 
+exports[`Probot ghe support throws if the GHE host includes a protocol 2`] = `[Error: Your \`GHE_HOST\` environment variable should not begin with https:// or http://]`;
+
 exports[`Probot webhook delivery responds with the correct error if the PEM file is missing 1`] = `
 Array [
   Object {

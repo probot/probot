@@ -9,6 +9,7 @@ import Redis from 'ioredis'
 import { Application } from './application'
 import { createDefaultCache } from './cache'
 import { Context } from './context'
+import { ProbotOctokit } from './github';
 import { logger } from './logger'
 import { resolve } from './resolver'
 import { createServer } from './server'
@@ -37,7 +38,7 @@ export class Probot {
   private app?: OctokitApp
   private githubToken?: string
   private throttleOptions: any
-  private octokitConstructor?: Octokit.Static
+  private Octokit: Octokit.Static
 
   constructor (options: Options) {
     options.webhookPath = options.webhookPath || '/'
@@ -50,7 +51,7 @@ export class Probot {
       secret: options.secret
     })
     this.githubToken = options.githubToken
-    this.octokitConstructor = options.octokitConstructor
+    this.Octokit = options.Octokit || ProbotOctokit
     if (this.options.id) {
       if (process.env.GHE_HOST && /^https?:\/\//.test(process.env.GHE_HOST)) {
         throw new Error('Your \`GHE_HOST\` environment variable should not begin with https:// or http://')
@@ -117,7 +118,7 @@ export class Probot {
       app: this.app as OctokitApp,
       cache,
       githubToken: this.githubToken,
-      octokitConstructor: this.octokitConstructor,
+      Octokit: this.Octokit,
       throttleOptions: this.throttleOptions
     })
 
@@ -170,7 +171,7 @@ export interface Options {
   webhookProxy?: string,
   port?: number,
   redisConfig?: Redis.RedisOptions,
-  octokitConstructor?: Octokit.Static
+  Octokit?: Octokit.Static
 }
 
 export { Logger, Context, Application }

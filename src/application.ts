@@ -6,7 +6,7 @@ import { EventEmitter } from 'promise-events'
 import { ApplicationFunction } from '.'
 import { Cache } from './cache'
 import { Context } from './context'
-import { GitHubAPI } from './github'
+import { GitHubAPI, ProbotOctokit } from './github'
 import { logger } from './logger'
 import { LoggerWithTarget, wrapLogger } from './wrap-logger'
 
@@ -17,7 +17,7 @@ export interface Options {
   catchErrors?: boolean
   githubToken?: string
   throttleOptions?: any
-  octokitConstructor?: Octokit.Static
+  Octokit?: Octokit.Static
 }
 
 // Some events can't get an authenticated client (#382):
@@ -40,7 +40,7 @@ export class Application {
 
   private githubToken?: string
   private throttleOptions: any
-  private octokitConstructor?: Octokit.Static
+  private Octokit: Octokit.Static
 
   constructor (options?: Options) {
     const opts = options || {} as any
@@ -51,7 +51,7 @@ export class Application {
     this.router = opts.router || express.Router() // you can do this?
     this.githubToken = opts.githubToken
     this.throttleOptions = opts.throttleOptions
-    this.octokitConstructor = opts.octokitConstructor
+    this.Octokit = opts.Octokit || ProbotOctokit
   }
 
   /**
@@ -197,7 +197,7 @@ export class Application {
         },
         baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api/v3`,
         logger: log.child({ name: 'github', installation: String(id) }),
-        octokitConstructor: this.octokitConstructor
+        Octokit: this.Octokit
       }
 
       if (this.throttleOptions) {
@@ -220,7 +220,7 @@ export class Application {
       auth: `Bearer ${token}`,
       baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api/v3`,
       logger: log.child({ name: 'github' }),
-      octokitConstructor: this.octokitConstructor
+      Octokit: this.Octokit
     })
 
     return github

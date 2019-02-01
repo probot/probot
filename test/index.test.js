@@ -308,7 +308,7 @@ describe('Probot', () => {
       })
     })
 
-    it('is propagated to application', async () => {
+    it('is propagated to GithubAPI', async () => {
       const app = probot.load(() => {})
       const githubApi = await app.auth()
       expect(githubApi.foo).toBe('bar')

@@ -174,4 +174,4 @@ export interface Options {
   Octokit?: Octokit.Static
 }
 
-export { Logger, Context, Application }
+export { Logger, Context, Application, Octokit }

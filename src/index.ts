@@ -36,6 +36,7 @@ export class Probot {
   private throttleOptions: any
 
   constructor (options: Options) {
+    options.redisConfig = options.redisConfig || process.env.REDIS_URL
     options.webhookPath = options.webhookPath || '/'
     options.secret = options.secret || 'development'
     this.options = options
@@ -71,11 +72,11 @@ export class Probot {
     // Log all webhook errors
     this.webhook.on('error', this.errorHandler)
 
-    if (process.env.REDIS_URL) {
+    if (options.redisConfig) {
       const Bottleneck = require('bottleneck')
       const Redis = require('ioredis')
 
-      const client = new Redis(process.env.REDIS_URL)
+      const client = new Redis(options.redisConfig)
       const connection = new Bottleneck.IORedisConnection({ client })
       connection.on('error', this.logger.error)
 
@@ -160,7 +161,8 @@ export interface Options {
   cert?: string,
   githubToken?: string,
   webhookProxy?: string,
-  port?: number
+  port?: number,
+  redisConfig?: object | string
 
 }
 

@@ -282,4 +282,18 @@ describe('Probot', () => {
       expect(probot.throttleOptions.connection).toBeInstanceOf(Bottleneck.IORedisConnection)
     })
   })
+
+  describe('redis configuration object', () => {
+
+    it('sets throttleOptions', async () => {
+      const redisConfig = {
+        host: 'test'
+      }
+      const probot = createProbot({ webhookPath: '/webhook', githubToken: 'faketoken', redisConfig})
+
+      expect(probot.throttleOptions.Bottleneck).toBe(Bottleneck)
+      expect(probot.throttleOptions.connection).toBeInstanceOf(Bottleneck.IORedisConnection)
+    })
+  })
+
 })

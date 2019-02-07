@@ -1,5 +1,6 @@
 import OctokitApp from '@octokit/app'
 import Webhooks from '@octokit/webhooks'
+import Bottleneck from 'bottleneck'
 import Logger from 'bunyan'
 import express from 'express'
 import Redis from 'ioredis'
@@ -73,8 +74,6 @@ export class Probot {
     this.webhook.on('error', this.errorHandler)
 
     if (options.redisConfig || process.env.REDIS_URL) {
-      const Bottleneck = require('bottleneck')
-
       let client
       if (options.redisConfig) {
         client = new Redis(options.redisConfig)

@@ -2,6 +2,7 @@ import OctokitApp from '@octokit/app'
 import Webhooks from '@octokit/webhooks'
 import Logger from 'bunyan'
 import express from 'express'
+import Redis from 'ioredis'
 
 import { Application } from './application'
 import { createDefaultCache } from './cache'
@@ -36,7 +37,6 @@ export class Probot {
   private throttleOptions: any
 
   constructor (options: Options) {
-    options.redisConfig = options.redisConfig || process.env.REDIS_URL
     options.webhookPath = options.webhookPath || '/'
     options.secret = options.secret || 'development'
     this.options = options
@@ -72,11 +72,15 @@ export class Probot {
     // Log all webhook errors
     this.webhook.on('error', this.errorHandler)
 
-    if (options.redisConfig) {
+    if (options.redisConfig || process.env.REDIS_URL) {
       const Bottleneck = require('bottleneck')
-      const Redis = require('ioredis')
 
-      const client = new Redis(options.redisConfig)
+      let client
+      if (options.redisConfig) {
+        client = new Redis(options.redisConfig)
+      } else if (process.env.REDIS_URL) {
+        client = new Redis(process.env.REDIS_URL)
+      }
       const connection = new Bottleneck.IORedisConnection({ client })
       connection.on('error', this.logger.error)
 
@@ -162,8 +166,7 @@ export interface Options {
   githubToken?: string,
   webhookProxy?: string,
   port?: number,
-  redisConfig?: object | string
-
+  redisConfig?: Redis.RedisOptions
 }
 
 export { Logger, Context, Application }

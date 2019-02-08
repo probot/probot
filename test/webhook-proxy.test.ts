@@ -6,14 +6,14 @@ import nock = require('nock')
 import {createWebhookProxy} from '../src/webhook-proxy'
 import {logger} from '../src/logger'
 import http = require('http')
+import net = require('net')
 
 const targetPort = 999999
 
 describe('webhook-proxy', () => {
   let app: express.Express,
       emit: Response['json'],
-      url: string,
-      proxy: any,
+      proxy: EventSource,
       server: http.Server
 
   afterEach(() => {
@@ -31,7 +31,7 @@ describe('webhook-proxy', () => {
       })
 
       server = app.listen(0, () => {
-        url = `http://127.0.0.1:${server.address().port}/events`
+        const url = `http://127.0.0.1:${(server.address() as net.AddressInfo).port}/events`
         proxy = createWebhookProxy({url, port: targetPort, path: '/test', logger})
 
         // Wait for proxy to be ready

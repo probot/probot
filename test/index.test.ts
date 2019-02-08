@@ -1,11 +1,11 @@
-const Bottleneck = require('bottleneck')
-const { Probot, createProbot } = require('../src')
-const nock = require('nock')
-const Octokit = require('@octokit/rest')
-const request = require('supertest')
+import Octokit = require('@octokit/rest')
+import Bottleneck = require('bottleneck')
+import nock = require('nock')
+import request = require('supertest')
+import { createProbot, Probot } from '../src'
 
-const helper = require('./apps/helper')
-const path = require('path')
+import path = require('path')
+import helper = require('./apps/helper')
 
 describe('Probot', () => {
   let probot

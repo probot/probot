@@ -2,7 +2,7 @@
 
 process.env.LOG_LEVEL = 'fatal'
 
-const nock = require('nock')
+import nock = require('nock')
 
 nock.disableNetConnect()
 nock.enableNetConnect(/127\.0\.0\.1/)

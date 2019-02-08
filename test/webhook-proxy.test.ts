@@ -11,7 +11,7 @@ const targetPort = 999999
 
 describe('webhook-proxy', () => {
   let app: express.Express,
-      emit: Response.json,
+      emit: Response['json'],
       url: string,
       proxy: any,
       server: http.Server
@@ -25,7 +25,7 @@ describe('webhook-proxy', () => {
     beforeEach((done) => {
       app = express()
 
-      app.get('/events', sse, function (req, res) {
+      app.get('/events', sse, (req, res) => {
         res.json({}, 'ready')
         emit = res.json
       })
@@ -62,7 +62,7 @@ describe('webhook-proxy', () => {
 
     proxy = createWebhookProxy({url, logger: log})
 
-    proxy.on('error', err => {
+    proxy.on('error', (err: any) => {
       expect(err.status).toBe(404)
       expect(log.error).toHaveBeenCalledWith(err)
       done()

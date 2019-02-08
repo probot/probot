@@ -1,14 +1,20 @@
 import express = require('express')
+import {Response} from 'express'
 import sse_ = require('connect-sse')
 const sse = sse_()
 import nock = require('nock')
 import {createWebhookProxy} from '../src/webhook-proxy'
 import {logger} from '../src/logger'
+import http = require('http')
 
 const targetPort = 999999
 
 describe('webhook-proxy', () => {
-  let app, server, proxy, url, emit
+  let app: express.Express,
+      emit: Response.json,
+      url: string,
+      proxy: any,
+      server: http.Server
 
   afterEach(() => {
     server && server.close()

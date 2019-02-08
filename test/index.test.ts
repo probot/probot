@@ -8,8 +8,11 @@ import path = require('path')
 import helper = require('./apps/helper')
 
 describe('Probot', () => {
-  let probot
-  let event
+  let probot: Probot
+  let event: {
+    name: string
+    payload: () => void
+  }
 
   beforeEach(() => {
     probot = createProbot({ githubToken: 'faketoken' })

@@ -28,10 +28,10 @@ if (!program.event || !program.payloadPath) {
 
 const cert = findPrivateKey()
 if (!githubToken && (!program.app || !cert)) {
-  console.warn('No token specified and no certifiate found, which means you will not be able to do authenticated requests to GitHub')
+  console.warn('No token specified and no certificate found, which means you will not be able to do authenticated requests to GitHub')
 }
 
-const payload = require(path.join(process.cwd(), program.payloadPath))
+const payload = require(path.resolve(program.payloadPath))
 
 const probot = createProbot({
   id: program.app,

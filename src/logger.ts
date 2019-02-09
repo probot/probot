@@ -8,7 +8,7 @@
  * By default, logs are formatted for readability in development. If you intend
  * to drain logs to a logging service, set `LOG_FORMAT=json`.
  *
- * **Note**: All execptions reported with `logger.error` will be forwarded to
+ * **Note**: All exceptions reported with `logger.error` will be forwarded to
  * [sentry](https://github.com/getsentry/sentry) if the `SENTRY_DSN` environment
  * variable is set.
  *

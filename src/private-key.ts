@@ -43,7 +43,7 @@ export function findPrivateKey (filepath?: string): Buffer | string | null {
   }
   if (process.env.PRIVATE_KEY_PATH) {
     if (fs.existsSync(process.env.PRIVATE_KEY_PATH)) {
-      return fs.readFileSync(process.env.PRIVATE_KEY_PATH)
+      return fs.readFileSync(process.env.PRIVATE_KEY_PATH, 'utf8')
     } else {
       throw new Error(`Private key does not exists at path: ${process.env.PRIVATE_KEY_PATH}. Please check to ensure that the PRIVATE_KEY_PATH is correct.`)
     }

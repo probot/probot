@@ -5,7 +5,6 @@ node_modules/
 .env
 out
 tmp
-package-lock.json
 coverage
 lib/
 .idea

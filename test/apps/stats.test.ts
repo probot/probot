@@ -70,7 +70,7 @@ describe('stats app', () => {
       server.use(app.router)
     })
 
-    it('returns installation count and popular accounts while exclusing spammy users', () => {
+    it('returns installation count and popular accounts while excluding spammy users', () => {
       return request(server).get('/probot/stats')
         .expect(200, { 'installations': 1, 'popular': [] })
     })

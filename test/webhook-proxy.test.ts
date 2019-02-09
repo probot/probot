@@ -1,12 +1,13 @@
-import express = require('express')
-import {Response} from 'express'
-import sse_ = require('connect-sse')
+import sse_ from 'connect-sse'
+import express, { Response } from 'express'
 const sse = sse_()
-import nock = require('nock')
-import {createWebhookProxy} from '../src/webhook-proxy'
-import {logger} from '../src/logger'
-import http = require('http')
-import net = require('net')
+// tslint:disable-next-line:no-implicit-dependencies
+import EventSource from 'eventsource'
+import http from 'http'
+import net from 'net'
+import nock from 'nock'
+import { logger } from '../src/logger'
+import { createWebhookProxy } from '../src/webhook-proxy'
 
 const targetPort = 999999
 

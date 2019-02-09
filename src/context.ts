@@ -111,7 +111,7 @@ export class Context implements WebhookEvent {
    * comment: Check the specs on the rotary girder.
    * ```
    *
-   * You app can read that file from the target repository:
+   * Your app can read that file from the target repository:
    *
    * ```js
    * // Load config from .github/config.yml in the repository

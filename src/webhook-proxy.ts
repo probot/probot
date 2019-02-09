@@ -14,6 +14,7 @@ export const createWebhookProxy = (opts: WebhookProxyOptions) => {
     return smee.start()
   } catch (err) {
     opts.logger.warn('Run `npm install --save-dev smee-client` to proxy webhooks to localhost.')
+    return
   }
 }
 

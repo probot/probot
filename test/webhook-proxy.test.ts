@@ -62,7 +62,7 @@ describe('webhook-proxy', () => {
 
     proxy = createWebhookProxy({url, logger: log})
 
-    proxy.on('error', (err: any) => {
+    proxy.addEventListener('error', (err: any) => {
       expect(err.status).toBe(404)
       expect(log.error).toHaveBeenCalledWith(err)
       done()

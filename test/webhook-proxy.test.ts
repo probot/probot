@@ -12,6 +12,7 @@ import { createWebhookProxy } from '../src/webhook-proxy'
 const targetPort = 999999
 
 describe('webhook-proxy', () => {
+  // tslint:disable-next-line:one-variable-per-declaration
   let app: express.Express,
       emit: Response['json'],
       proxy: EventSource,
@@ -58,7 +59,7 @@ describe('webhook-proxy', () => {
     const url = 'http://bad.proxy/events'
     nock('http://bad.proxy').get('/events').reply(404)
 
-    const log = logger.child()
+    const log = logger.child({})
     log.error = jest.fn()
 
     proxy = createWebhookProxy({url, logger: log})

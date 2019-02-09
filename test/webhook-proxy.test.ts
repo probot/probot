@@ -28,7 +28,8 @@ describe('webhook-proxy', () => {
       app = express()
 
       app.get('/events', sse, (req, res) => {
-        res.json({}, 'ready')
+        res.json({})
+        res.send('ready')
         emit = res.json
       })
 
@@ -62,7 +63,7 @@ describe('webhook-proxy', () => {
     const log = logger.child({})
     log.error = jest.fn()
 
-    proxy = createWebhookProxy({ url, logger: log })
+    proxy = createWebhookProxy({ url, logger: log })!
 
     proxy.addEventListener('error', (err: any) => {
       expect(err.status).toBe(404)

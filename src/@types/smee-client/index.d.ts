@@ -1,8 +1,8 @@
 declare module "smee-client" {
   import EventSource = require('eventsource')
-  
+
   interface Options {
-      source: string
+      source?: string
       target: string
       logger?: console
   }

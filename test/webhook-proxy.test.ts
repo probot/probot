@@ -14,9 +14,9 @@ const targetPort = 999999
 describe('webhook-proxy', () => {
   // tslint:disable-next-line:one-variable-per-declaration
   let app: express.Express,
-      emit: Response['json'],
-      proxy: EventSource,
-      server: http.Server
+    emit: Response['json'],
+    proxy: EventSource,
+    server: http.Server
 
   afterEach(() => {
     server && server.close()
@@ -34,7 +34,7 @@ describe('webhook-proxy', () => {
 
       server = app.listen(0, () => {
         const url = `http://127.0.0.1:${(server.address() as net.AddressInfo).port}/events`
-        proxy = createWebhookProxy({url, port: targetPort, path: '/test', logger})
+        proxy = createWebhookProxy({ url, port: targetPort, path: '/test', logger })!
 
         // Wait for proxy to be ready
         proxy.addEventListener('ready', () => done())
@@ -46,11 +46,11 @@ describe('webhook-proxy', () => {
         done()
       })
 
-      const body = {action: 'foo'}
+      const body = { action: 'foo' }
 
       emit({
-        'x-github-event': 'test',
-        body
+        body,
+        'x-github-event': 'test'
       })
     })
   })
@@ -62,7 +62,7 @@ describe('webhook-proxy', () => {
     const log = logger.child({})
     log.error = jest.fn()
 
-    proxy = createWebhookProxy({url, logger: log})
+    proxy = createWebhookProxy({ url, logger: log })
 
     proxy.addEventListener('error', (err: any) => {
       expect(err.status).toBe(404)

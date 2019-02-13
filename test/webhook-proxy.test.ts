@@ -13,8 +13,7 @@ const targetPort = 999999
 
 describe('webhook-proxy', () => {
   // tslint:disable-next-line:one-variable-per-declaration
-  let app: express.Express,
-    emit: Response['json'],
+  let emit: Response['json'],
     proxy: EventSource,
     server: http.Server
 
@@ -25,7 +24,7 @@ describe('webhook-proxy', () => {
 
   describe('with a valid proxy server', () => {
     beforeEach((done) => {
-      app = express()
+      const app = express()
 
       app.get('/events', sse, (req, res) => {
         res.json({})

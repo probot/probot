@@ -27,8 +27,7 @@ describe('webhook-proxy', () => {
       const app = express()
 
       app.get('/events', sse, (req, res) => {
-        res.json({})
-        res.send('ready')
+        res.status(200).json({})
         emit = res.json
       })
 

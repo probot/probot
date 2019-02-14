@@ -1,4 +1,4 @@
-import { PayloadRepository, Webhooks } from '@octokit/webhooks'
+import Webhooks, { PayloadRepository } from '@octokit/webhooks'
 import yaml from 'js-yaml'
 import path from 'path'
 import { GitHubAPI } from './github'

@@ -126,7 +126,18 @@ If you take a look to the `npm start` script, this is what it runs: `probot run 
 const { Probot } = require('probot')
 const app = require('./index.js')
 
+// pass a probot app as a function
 Probot.run(app)
+```
+
+or
+
+```js
+// main.js
+const { Probot } = require('probot')
+
+// or pass the same arguments you would pass to the `probot` command
+Probot.run(process.argv)
 ```
 
 Now you can run `main.js` however you want.

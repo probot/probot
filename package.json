@@ -25,7 +25,7 @@
   ],
   "jest": {
     "setupFiles": [
-      "<rootDir>/test/setup.js"
+      "<rootDir>/test/setup.ts"
     ],
     "coveragePathIgnorePatterns": [
       "<rootDir>/lib/"

@@ -131,6 +131,395 @@ export class Application {
    * @param callback - a function to call when the
    * webhook is received.
    */
+    public on(event: "error", callback: (event: Error) => void): void;
+  public on(
+    event: "*" | string[],
+    callback: (event: Webhooks.WebhookEvent<any>) => Promise<void> | void
+  ): void;
+
+  public on(
+    event:
+      | "check_run"
+      | "check_run.completed"
+      | "check_run.created"
+      | "check_run.requested_action"
+      | "check_run.rerequested",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadCheckRun>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event:
+      | "check_suite"
+      | "check_suite.completed"
+      | "check_suite.requested"
+      | "check_suite.rerequested",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadCheckSuite>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event: "commit_comment" | "commit_comment.created",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadCommitComment>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event: "create",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadCreate>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event: "delete",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadDelete>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event: "deployment",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadDeployment>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event: "deployment_status",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadDeploymentStatus>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event: "fork",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadFork>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event: "github_app_authorization",
+    callback: (
+      event: Webhooks.WebhookEvent<
+        Webhooks.WebhookPayloadGithubAppAuthorization
+      >
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event: "gollum",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadGollum>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event: "installation" | "installation.created" | "installation.deleted",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadInstallation>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event:
+      | "installation_repositories"
+      | "installation_repositories.added"
+      | "installation_repositories.removed",
+    callback: (
+      event: Webhooks.WebhookEvent<
+        Webhooks.WebhookPayloadInstallationRepositories
+      >
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event:
+      | "issue_comment"
+      | "issue_comment.created"
+      | "issue_comment.deleted"
+      | "issue_comment.edited",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadIssueComment>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event:
+      | "issues"
+      | "issues.assigned"
+      | "issues.closed"
+      | "issues.deleted"
+      | "issues.demilestoned"
+      | "issues.edited"
+      | "issues.labeled"
+      | "issues.milestoned"
+      | "issues.opened"
+      | "issues.reopened"
+      | "issues.transferred"
+      | "issues.unassigned"
+      | "issues.unlabeled",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadIssues>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event: "label" | "label.created" | "label.deleted" | "label.edited",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadLabel>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event:
+      | "marketplace_purchase"
+      | "marketplace_purchase.cancelled"
+      | "marketplace_purchase.changed"
+      | "marketplace_purchase.pending_change"
+      | "marketplace_purchase.pending_change_cancelled"
+      | "marketplace_purchase.purchased",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadMarketplacePurchase>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event: "member" | "member.added" | "member.deleted" | "member.edited",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadMember>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event: "membership" | "membership.added" | "membership.removed",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadMembership>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event:
+      | "milestone"
+      | "milestone.closed"
+      | "milestone.created"
+      | "milestone.deleted"
+      | "milestone.edited"
+      | "milestone.opened",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadMilestone>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event:
+      | "organization"
+      | "organization.member_added"
+      | "organization.member_invited"
+      | "organization.member_removed",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadOrganization>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event: "org_block" | "org_block.blocked" | "org_block.unblocked",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadOrgBlock>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event: "page_build",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadPageBuild>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event:
+      | "project_card"
+      | "project_card.converted"
+      | "project_card.created"
+      | "project_card.deleted"
+      | "project_card.edited"
+      | "project_card.moved",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadProjectCard>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event:
+      | "project_column"
+      | "project_column.created"
+      | "project_column.deleted"
+      | "project_column.edited"
+      | "project_column.moved",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadProjectColumn>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event:
+      | "project"
+      | "project.closed"
+      | "project.created"
+      | "project.deleted"
+      | "project.edited"
+      | "project.reopened",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadProject>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event: "public",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadPublic>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event:
+      | "pull_request"
+      | "pull_request.assigned"
+      | "pull_request.closed"
+      | "pull_request.edited"
+      | "pull_request.labeled"
+      | "pull_request.opened"
+      | "pull_request.reopened"
+      | "pull_request.review_request_removed"
+      | "pull_request.review_requested"
+      | "pull_request.unassigned"
+      | "pull_request.unlabeled"
+      | "pull_request.synchronize",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadPullRequest>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event:
+      | "pull_request_review"
+      | "pull_request_review.dismissed"
+      | "pull_request_review.edited"
+      | "pull_request_review.submitted",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadPullRequestReview>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event:
+      | "pull_request_review_comment"
+      | "pull_request_review_comment.created"
+      | "pull_request_review_comment.deleted"
+      | "pull_request_review_comment.edited",
+    callback: (
+      event: Webhooks.WebhookEvent<
+        Webhooks.WebhookPayloadPullRequestReviewComment
+      >
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event: "push",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadPush>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event: "release" | "release.published",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadRelease>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event:
+      | "repository"
+      | "repository.archived"
+      | "repository.created"
+      | "repository.deleted"
+      | "repository.privatized"
+      | "repository.publicized"
+      | "repository.unarchived",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadRepository>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event: "repository_import",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadRepositoryImport>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event:
+      | "repository_vulnerability_alert"
+      | "repository_vulnerability_alert.create"
+      | "repository_vulnerability_alert.dismiss"
+      | "repository_vulnerability_alert.resolve",
+    callback: (
+      event: Webhooks.WebhookEvent<
+        Webhooks.WebhookPayloadRepositoryVulnerabilityAlert
+      >
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event:
+      | "security_advisory"
+      | "security_advisory.performed"
+      | "security_advisory.published"
+      | "security_advisory.updated",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadSecurityAdvisory>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event: "status",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadStatus>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event:
+      | "team"
+      | "team.added_to_repository"
+      | "team.created"
+      | "team.deleted"
+      | "team.edited"
+      | "team.removed_from_repository",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadTeam>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event: "team_add",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadTeamAdd>
+    ) => Promise<void> | void
+  ): void;
+
+  public on(
+    event: "watch" | "watch.started",
+    callback: (
+      event: Webhooks.WebhookEvent<Webhooks.WebhookPayloadWatch>
+    ) => Promise<void> | void
+): void;
   public on (eventName: string | string[], callback: (context: Context) => Promise<void>) {
     if (typeof eventName === 'string') {
 

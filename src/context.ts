@@ -47,10 +47,10 @@ interface WebhookPayloadWithRepository {
  * @property {logger} log - A logger
  */
 
-export class Context implements Webhooks.WebhookEvent<any> {
+export class Context<E = WebhookPayloadWithRepository> implements Webhooks.WebhookEvent<any> {
   public name: string
   public id: string
-  public payload: WebhookPayloadWithRepository
+  public payload: WebhookPayloadWithRepository | E
   public protocol?: 'http' | 'https'
   public host?: string
   public url?: string
@@ -58,7 +58,7 @@ export class Context implements Webhooks.WebhookEvent<any> {
   public github: GitHubAPI
   public log: LoggerWithTarget
 
-  constructor (event: Webhooks.WebhookEvent<any>, github: GitHubAPI, log: LoggerWithTarget) {
+  constructor (event: Webhooks.WebhookEvent<E>, github: GitHubAPI, log: LoggerWithTarget) {
     this.name = event.name
     this.id = event.id
     this.payload = event.payload

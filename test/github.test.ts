@@ -1,5 +1,5 @@
 import nock from 'nock'
-import { GitHubAPI, Options } from '../src/github'
+import { GitHubAPI, Options, ProbotOctokit } from '../src/github'
 import { logger } from '../src/logger'
 
 describe('GitHubAPI', () => {
@@ -7,6 +7,7 @@ describe('GitHubAPI', () => {
 
   beforeEach(() => {
     const options: Options = {
+      Octokit: ProbotOctokit,
       logger,
       retry: {
         // disable retries to test error states

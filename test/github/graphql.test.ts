@@ -1,5 +1,5 @@
 import nock from 'nock'
-import { GitHubAPI, Options } from '../../src/github'
+import { GitHubAPI, Options, ProbotOctokit } from '../../src/github'
 import { logger } from '../../src/logger'
 
 describe('github/graphql', () => {
@@ -11,6 +11,7 @@ describe('github/graphql', () => {
 
   beforeEach(() => {
     const options: Options = {
+      Octokit: ProbotOctokit,
       auth: 'token testing',
       logger
     }
@@ -84,6 +85,7 @@ describe('github/graphql', () => {
       process.env.GHE_HOST = 'notreallygithub.com'
 
       const options: Options = {
+        Octokit: ProbotOctokit,
         logger
       }
 

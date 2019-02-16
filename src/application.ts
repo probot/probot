@@ -1,11 +1,12 @@
 import OctokitApp from '@octokit/app'
+import Octokit from '@octokit/rest'
 import Webhooks from '@octokit/webhooks'
 import express from 'express'
 import { EventEmitter } from 'promise-events'
 import { ApplicationFunction } from '.'
 import { Cache } from './cache'
 import { Context } from './context'
-import { GitHubAPI } from './github'
+import { GitHubAPI, ProbotOctokit } from './github'
 import { logger } from './logger'
 import { LoggerWithTarget, wrapLogger } from './wrap-logger'
 
@@ -16,6 +17,7 @@ export interface Options {
   catchErrors?: boolean
   githubToken?: string
   throttleOptions?: any
+  Octokit?: Octokit.Static
 }
 
 // Some events can't get an authenticated client (#382):
@@ -38,6 +40,7 @@ export class Application {
 
   private githubToken?: string
   private throttleOptions: any
+  private Octokit: Octokit.Static
 
   constructor (options?: Options) {
     const opts = options || {} as any
@@ -48,6 +51,7 @@ export class Application {
     this.router = opts.router || express.Router() // you can do this?
     this.githubToken = opts.githubToken
     this.throttleOptions = opts.throttleOptions
+    this.Octokit = opts.Octokit || ProbotOctokit
   }
 
   /**
@@ -187,6 +191,7 @@ export class Application {
     // so that it can be used across received webhook events.
     if (id) {
       const options = {
+        Octokit: this.Octokit,
         auth: async () => {
           const accessToken = await this.app.getInstallationAccessToken({ installationId: id })
           return `token ${accessToken}`
@@ -212,6 +217,7 @@ export class Application {
 
     const token = this.githubToken || this.app.getSignedJsonWebToken()
     const github = GitHubAPI({
+      Octokit: this.Octokit,
       auth: `Bearer ${token}`,
       baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api/v3`,
       logger: log.child({ name: 'github' })

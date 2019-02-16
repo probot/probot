@@ -10,8 +10,9 @@ import helper = require('./apps/helper')
 describe('Probot', () => {
   let probot: Probot
   let event: {
+    id: string
     name: string
-    payload: () => void
+    payload: any
   }
 
   beforeEach(() => {

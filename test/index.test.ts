@@ -36,7 +36,7 @@ describe('Probot', () => {
 
   describe('run', () => {
 
-    let env
+    let env: NodeJS.ProcessEnv
 
     beforeAll(() => {
       env = { ...process.env }
@@ -53,7 +53,7 @@ describe('Probot', () => {
     it('runs with a function as argument', async () => {
       process.env.PORT = '3003'
       let initialized = false
-      const probot = await Probot.run((app) => {
+      probot = await Probot.run((app) => {
         initialized = true
       })
       expect(probot.options).toMatchSnapshot()
@@ -62,7 +62,7 @@ describe('Probot', () => {
     })
 
     it('runs with an array of strings', async () => {
-      const probot = await Probot.run(['run', 'file.js'])
+      probot = await Probot.run(['run', 'file.js'])
       expect(probot.options).toMatchSnapshot()
       probot.httpServer.close()
     })
@@ -70,7 +70,7 @@ describe('Probot', () => {
     it('runs without config and loads the setup app', async () => {
       let initialized = false
       delete process.env.PRIVATE_KEY_PATH
-      const probot = await Probot.run((app) => {
+      probot = await Probot.run((app) => {
         initialized = true
       })
       expect(probot.options).toMatchSnapshot()
@@ -245,7 +245,7 @@ describe('Probot', () => {
   describe('receive', () => {
     it('forwards events to each app', async () => {
       const spy = jest.fn()
-      const app = probot.load(app => app.on('push', spy))
+      const app = probot.load(appl => appl.on('push', spy))
       app.auth = jest.fn().mockReturnValue(Promise.resolve({}))
 
       await probot.receive(event)
@@ -275,8 +275,8 @@ describe('Probot', () => {
     it('requests from the correct API URL', async () => {
       const spy = jest.fn()
 
-      const appFn = async (app: Application) => {
-        const github = await app.auth()
+      const appFn = async (appl: Application) => {
+        const github = await appl.auth()
         const res = await github.apps.listInstallations({})
         return spy(res)
       }
@@ -331,7 +331,7 @@ describe('Probot', () => {
     })
 
     it('sets throttleOptions', async () => {
-      const probot = createProbot({ webhookPath: '/webhook', githubToken: 'faketoken' })
+      probot = createProbot({ webhookPath: '/webhook', githubToken: 'faketoken' })
 
       expect(probot.throttleOptions.Bottleneck).toBe(Bottleneck)
       expect(probot.throttleOptions.connection).toBeInstanceOf(Bottleneck.IORedisConnection)
@@ -343,7 +343,7 @@ describe('Probot', () => {
       const redisConfig = {
         host: 'test'
       }
-      const probot = createProbot({ webhookPath: '/webhook', githubToken: 'faketoken', redisConfig })
+      probot = createProbot({ webhookPath: '/webhook', githubToken: 'faketoken', redisConfig })
 
       expect(probot.throttleOptions.Bottleneck).toBe(Bottleneck)
       expect(probot.throttleOptions.connection).toBeInstanceOf(Bottleneck.IORedisConnection)

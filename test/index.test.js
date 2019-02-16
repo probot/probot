@@ -1,5 +1,6 @@
 const Bottleneck = require('bottleneck')
 const nock = require('nock')
+const Octokit = require('@octokit/rest')
 const request = require('supertest')
 
 const { createProbot } = require('../src')
@@ -246,8 +247,8 @@ describe('Probot', () => {
           'r1UQNnUExRh7ZT0kFbMfO9jKYZVlQdCL9Dn93vo=\n' +
           '-----END RSA PRIVATE KEY-----'
       })
-      expect(await probot.app.getInstallationAccessToken({installationId: 5})).toBe('github_token')
-    });
+      expect(await probot.app.getInstallationAccessToken({ installationId: 5 })).toBe('github_token')
+    })
 
     it('throws if the GHE host includes a protocol', async () => {
       process.env.GHE_HOST = 'https://notreallygithub.com'
@@ -284,16 +285,33 @@ describe('Probot', () => {
   })
 
   describe('redis configuration object', () => {
-
     it('sets throttleOptions', async () => {
       const redisConfig = {
         host: 'test'
       }
-      const probot = createProbot({ webhookPath: '/webhook', githubToken: 'faketoken', redisConfig})
+      const probot = createProbot({ webhookPath: '/webhook', githubToken: 'faketoken', redisConfig })
 
       expect(probot.throttleOptions.Bottleneck).toBe(Bottleneck)
       expect(probot.throttleOptions.connection).toBeInstanceOf(Bottleneck.IORedisConnection)
     })
   })
 
+  describe('custom Octokit constructor', () => {
+    beforeEach(() => {
+      const MyOctokit = Octokit.plugin(octokit => {
+        octokit.foo = 'bar'
+      })
+
+      probot = createProbot({
+        Octokit: MyOctokit,
+        githubToken: 'faketoken'
+      })
+    })
+
+    it('is propagated to GithubAPI', async () => {
+      const app = probot.load(() => {})
+      const githubApi = await app.auth()
+      expect(githubApi.foo).toBe('bar')
+    })
+  })
 })

@@ -56,16 +56,15 @@ export class Probot {
           webhookPath: program.webhookPath,
           webhookProxy: program.webhookProxy
         }
-      } else {
-        const privateKey = findPrivateKey()
-        return {
-          cert: (privateKey && privateKey.toString()) || undefined,
-          id: Number(process.env.APP_ID),
-          port: Number(process.env.PORT) || 3000,
-          secret: process.env.WEBHOOK_SECRET,
-          webhookPath: process.env.WEBHOOK_PATH,
-          webhookProxy: process.env.WEBHOOK_PROXY_URL
-        }
+      }
+      const privateKey = findPrivateKey()
+      return {
+        cert: (privateKey && privateKey.toString()) || undefined,
+        id: Number(process.env.APP_ID),
+        port: Number(process.env.PORT) || 3000,
+        secret: process.env.WEBHOOK_SECRET,
+        webhookPath: process.env.WEBHOOK_PATH,
+        webhookProxy: process.env.WEBHOOK_PROXY_URL
       }
     }
 

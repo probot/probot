@@ -29,11 +29,11 @@ Let's create a Probot app!
 ? GitHub user or org name: khorne3
 ? Repository name: my-first-app
 ? Which template would you like to use? (Use arrow keys)
-❯ basic-js 
-  checks-js 
-  git-data-js 
-  deploy-js 
-  basic-ts 
+❯ basic-js
+  checks-js
+  git-data-js
+  deploy-js
+  basic-ts
 created files...
 Finished scaffolding files!
 
@@ -116,3 +116,18 @@ You'll need to create a test repository and install your app by clicking the "In
 
 1. Always run `$ npm install` and restart the server if `package.json` has changed.
 1. To turn on verbose logging, start server by running: `$ LOG_LEVEL=trace npm start`
+
+## Alternate way of running a probot app
+
+If you take a look to the `npm start` script, this is what it runs: `probot run ./index.js`. This is nice, but you sometimes need more control on how your Node.js application is executed. For example if you want to use custom V8 flags, `ts-node`, etc. you need more flexibility. In those cases there's a simple way of executing your probot application programmatically:
+
+```js
+// main.js
+const { Probot } = require('probot')
+const app = require('./index.js')
+
+// pass a probot app as a function
+Probot.run(app)
+```
+
+Now you can run `main.js` however you want.

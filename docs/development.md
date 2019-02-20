@@ -130,14 +130,4 @@ const app = require('./index.js')
 Probot.run(app)
 ```
 
-or
-
-```js
-// main.js
-const { Probot } = require('probot')
-
-// or pass the same arguments you would pass to the `probot` command
-Probot.run(process.argv)
-```
-
 Now you can run `main.js` however you want.

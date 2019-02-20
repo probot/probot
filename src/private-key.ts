@@ -20,9 +20,9 @@ const hint = `please use:
  * @returns Private key
  * @private
  */
-export function findPrivateKey (filepath?: string): Buffer | string | null {
+export function findPrivateKey (filepath?: string): string | null {
   if (filepath) {
-    return fs.readFileSync(filepath)
+    return fs.readFileSync(filepath, 'utf8')
   }
   if (process.env.PRIVATE_KEY) {
     let cert = process.env.PRIVATE_KEY

@@ -6,11 +6,14 @@ import Logger from 'bunyan'
 import express from 'express'
 import Redis from 'ioredis'
 
+import { Server } from 'http'
 import { Application } from './application'
+import setupApp from './apps/setup'
 import { createDefaultCache } from './cache'
 import { Context } from './context'
 import { ProbotOctokit } from './github'
 import { logger } from './logger'
+import { findPrivateKey } from './private-key'
 import { resolve } from './resolver'
 import { createServer } from './server'
 import { createWebhookProxy } from './webhook-proxy'
@@ -29,7 +32,61 @@ const defaultAppFns: ApplicationFunction[] = [
 // tslint:enable:no-var-requires
 
 export class Probot {
+  public static async run (appFn: ApplicationFunction | string[]) {
+    require('dotenv').config()
+
+    const pkgConf = require('pkg-conf')
+    const program = require('commander')
+
+    const readOptions = (): Options => {
+      if (Array.isArray(appFn)) {
+        program
+          .usage('[options] <apps...>')
+          .option('-p, --port <n>', 'Port to start the server on', process.env.PORT || 3000)
+          .option('-W, --webhook-proxy <url>', 'URL of the webhook proxy service.`', process.env.WEBHOOK_PROXY_URL)
+          .option('-w, --webhook-path <path>', 'URL path which receives webhooks. Ex: `/webhook`', process.env.WEBHOOK_PATH)
+          .option('-a, --app <id>', 'ID of the GitHub App', process.env.APP_ID)
+          .option('-s, --secret <secret>', 'Webhook secret of the GitHub App', process.env.WEBHOOK_SECRET)
+          .option('-P, --private-key <file>', 'Path to certificate of the GitHub App', process.env.PRIVATE_KEY_PATH)
+          .parse(appFn)
+
+        return {
+          cert: findPrivateKey(program.privateKey) || undefined,
+          id: program.app,
+          port: program.port,
+          secret: program.secret,
+          webhookPath: program.webhookPath,
+          webhookProxy: program.webhookProxy
+        }
+      }
+      const privateKey = findPrivateKey()
+      return {
+        cert: (privateKey && privateKey.toString()) || undefined,
+        id: Number(process.env.APP_ID),
+        port: Number(process.env.PORT) || 3000,
+        secret: process.env.WEBHOOK_SECRET,
+        webhookPath: process.env.WEBHOOK_PATH,
+        webhookProxy: process.env.WEBHOOK_PROXY_URL
+      }
+    }
+
+    const options = readOptions()
+    const probot = new Probot(options)
+    if (!options.id || !options.cert) {
+      probot.load(setupApp)
+    } else if (Array.isArray(appFn)) {
+      const pkg = await pkgConf('probot')
+      probot.setup(program.args.concat(pkg.apps || pkg.plugins || []))
+    } else {
+      probot.load(appFn)
+    }
+    probot.start()
+
+    return probot
+  }
+
   public server: express.Application
+  public httpServer?: Server
   public webhook: Webhooks
   public logger: Logger
 
@@ -153,7 +210,7 @@ export class Probot {
       })
     }
 
-    this.server.listen(this.options.port)
+    this.httpServer = this.server.listen(this.options.port)
     logger.info('Listening on http://localhost:' + this.options.port)
   }
 }

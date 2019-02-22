@@ -1,6 +1,6 @@
-import sse_ from 'connect-sse'
 import express, { Response } from 'express'
-const sse = sse_()
+// tslint:disable-next-line:no-var-requires
+const sse: (req: express.Request, res: express.Response, next: express.NextFunction) => void = require('connect-sse')()
 // tslint:disable-next-line:no-implicit-dependencies
 import EventSource from 'eventsource'
 import http from 'http'
@@ -11,9 +11,13 @@ import { createWebhookProxy } from '../src/webhook-proxy'
 
 const targetPort = 999999
 
+interface SSEResponse extends Response {
+  json (body: any, status?: string): Response
+}
+
 describe('webhook-proxy', () => {
   // tslint:disable-next-line:one-variable-per-declaration
-  let emit: Response['json'],
+  let emit: SSEResponse['json'],
     proxy: EventSource,
     server: http.Server
 
@@ -26,8 +30,8 @@ describe('webhook-proxy', () => {
     beforeEach((done) => {
       const app = express()
 
-      app.get('/events', sse, (req, res) => {
-        res.status(200).json({})
+      app.get('/events', sse, (req, res: SSEResponse) => {
+        res.json({}, 'ready')
         emit = res.json
       })
 

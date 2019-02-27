@@ -4,6 +4,7 @@ import { NextFunction, Request, Response } from 'express'
 import nock = require('nock')
 import request = require('supertest')
 import { Application, createProbot, Probot } from '../src'
+import { GitHubAPI } from '../src/github'
 
 import path = require('path')
 import helper = require('./apps/helper')
@@ -352,7 +353,7 @@ describe('Probot', () => {
 
   describe('custom Octokit constructor', () => {
     beforeEach(() => {
-      const MyOctokit = Octokit.plugin(octokit => {
+      const MyOctokit = Octokit.plugin((octokit: Octokit & { [key: string]: any}) => {
         octokit.foo = 'bar'
       })
 
@@ -364,7 +365,7 @@ describe('Probot', () => {
 
     it('is propagated to GithubAPI', async () => {
       const app = probot.load(() => {})
-      const githubApi = await app.auth()
+      const githubApi: GitHubAPI & { [key: string]: any } = await app.auth()
       expect(githubApi.foo).toBe('bar')
     })
   })

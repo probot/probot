@@ -39,7 +39,7 @@ export function findPrivateKey (filepath?: string): string | null {
       return cert.replace(/\\n/g, '\n')
     }
 
-    throw new Error('The contents of \`PRIVATE_KEY\` could not be validated. Please check to ensure you have copied the contents of the .pem file correctly.')
+    throw new Error('The contents of `PRIVATE_KEY` could not be validated. Please check to ensure you have copied the contents of the .pem file correctly.')
   }
   if (process.env.PRIVATE_KEY_PATH) {
     if (fs.existsSync(process.env.PRIVATE_KEY_PATH)) {

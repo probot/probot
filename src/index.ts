@@ -89,12 +89,13 @@ export class Probot {
   public httpServer?: Server
   public webhook: Webhooks
   public logger: Logger
+  // These 3 need to be public for the tests to work.
+  public options: Options
+  public app?: OctokitApp
+  public throttleOptions: any
 
-  private options: Options
   private apps: Application[]
-  private app?: OctokitApp
   private githubToken?: string
-  private throttleOptions: any
   private Octokit: Octokit.Static
 
   constructor (options: Options) {

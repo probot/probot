@@ -430,7 +430,7 @@ export class Application {
     event: 'watch' | 'watch.started',
     callback: OnCallback<Webhooks.WebhookPayloadWatch>
   ): void
-  public on (eventName: '*' | string[], callback: OnCallback<any>): void
+  public on (eventName: string | string[], callback: OnCallback<any>): void
   public on (eventName: string | string[], callback: (context: Context) => Promise<void>) {
     if (typeof eventName === 'string') {
 

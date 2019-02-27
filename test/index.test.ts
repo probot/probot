@@ -1,5 +1,5 @@
 import Octokit = require('@octokit/rest')
-import Bottleneck = require('bottleneck')
+import Bottleneck from 'bottleneck'
 import { NextFunction, Request, Response } from 'express'
 import nock = require('nock')
 import request = require('supertest')

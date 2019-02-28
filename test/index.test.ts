@@ -95,7 +95,7 @@ describe('Probot', () => {
       try {
         await probot.webhook.receive(event)
       } catch (e) {
-        expect(probot.logger.error.mock.calls[0]).toMatchSnapshot()
+        expect((probot.logger.error as jest.Mock).mock.calls[0]).toMatchSnapshot()
       }
     })
 
@@ -106,7 +106,7 @@ describe('Probot', () => {
       try {
         await probot.webhook.receive(event)
       } catch (e) {
-        expect(probot.logger.error.mock.calls[0]).toMatchSnapshot()
+        expect((probot.logger.error as jest.Mock).mock.calls[0]).toMatchSnapshot()
       }
     })
 
@@ -117,7 +117,7 @@ describe('Probot', () => {
       try {
         await probot.webhook.receive(event)
       } catch (e) {
-        expect(probot.logger.error.mock.calls[0]).toMatchSnapshot()
+        expect((probot.logger.error as jest.Mock).mock.calls[0]).toMatchSnapshot()
       }
     })
 
@@ -128,7 +128,7 @@ describe('Probot', () => {
       try {
         await probot.webhook.receive(event)
       } catch (e) {
-        expect(probot.logger.error.mock.calls[0]).toMatchSnapshot()
+        expect((probot.logger.error as jest.Mock).mock.calls[0]).toMatchSnapshot()
       }
     })
 
@@ -139,7 +139,7 @@ describe('Probot', () => {
       try {
         await probot.webhook.receive(event)
       } catch (e) {
-        expect(probot.logger.error.mock.calls[0]).toMatchSnapshot()
+        expect((probot.logger.error as jest.Mock).mock.calls[0]).toMatchSnapshot()
       }
     })
   })

@@ -13,17 +13,15 @@ import { createDefaultCache } from './cache'
 import { Context } from './context'
 import { ProbotOctokit } from './github'
 import { logger } from './logger'
+import { logRequestErrors } from './middleware/log-request-errors'
 import { findPrivateKey } from './private-key'
 import { resolve } from './resolver'
 import { createServer } from './server'
 import { createWebhookProxy } from './webhook-proxy'
 
-// tslint:disable:no-var-requires
-// These needs types
-const logRequestErrors = require('./middleware/log-request-errors')
-
 const cache = createDefaultCache()
 
+// tslint:disable:no-var-requires
 const defaultAppFns: ApplicationFunction[] = [
   require('./apps/default'),
   require('./apps/sentry'),

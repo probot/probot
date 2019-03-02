@@ -3,6 +3,7 @@
 exports[`Probot ghe support throws if the GHE host includes a protocol 1`] = `[Error: Your \`GHE_HOST\` environment variable should not begin with https:// or http://]`;
 
 exports[`Probot ghe support throws if the GHE host includes a protocol 2`] = `[Error: Your \`GHE_HOST\` environment variable should not begin with https:// or http://]`;
+
 exports[`Probot run runs with a function as argument 1`] = `
 Object {
   "cert": "-----BEGIN RSA PRIVATE KEY-----

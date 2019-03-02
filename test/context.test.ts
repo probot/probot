@@ -5,7 +5,7 @@ import Webhooks from '@octokit/webhooks'
 import { Context } from '../src/context'
 import { GitHubAPI, OctokitError } from '../src/github'
 
-import { createMockResponse } from './fixtures/octokit/mock-response';
+import { createMockResponse } from './fixtures/octokit/mock-response'
 
 describe('Context', () => {
   let event: Webhooks.WebhookEvent<any>

@@ -4,7 +4,7 @@ declare module "smee-client" {
   interface Options {
       source?: string
       target: string
-      logger?: console
+      logger?: Console
   }
 
   class Client {

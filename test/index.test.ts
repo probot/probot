@@ -1,20 +1,28 @@
-const Bottleneck = require('bottleneck')
-const { Probot, createProbot } = require('../src')
-const nock = require('nock')
-const Octokit = require('@octokit/rest')
-const request = require('supertest')
+import Octokit = require('@octokit/rest')
+import Bottleneck from 'bottleneck'
+import { NextFunction, Request, Response } from 'express'
+import nock = require('nock')
+import request = require('supertest')
+import { Application, createProbot, Probot } from '../src'
+import { GitHubAPI } from '../src/github'
 
-const helper = require('./apps/helper')
-const path = require('path')
+import path = require('path')
+import helper = require('./apps/helper')
 
+// tslint:disable:no-empty
 describe('Probot', () => {
-  let probot
-  let event
+  let probot: Probot
+  let event: {
+    id: string
+    name: string
+    payload: any
+  }
 
   beforeEach(() => {
     probot = createProbot({ githubToken: 'faketoken' })
 
     event = {
+      id: '0',
       name: 'push',
       payload: require('./fixtures/webhook/push')
     }
@@ -29,7 +37,7 @@ describe('Probot', () => {
 
   describe('run', () => {
 
-    let env
+    let env: NodeJS.ProcessEnv
 
     beforeAll(() => {
       env = { ...process.env }
@@ -46,29 +54,29 @@ describe('Probot', () => {
     it('runs with a function as argument', async () => {
       process.env.PORT = '3003'
       let initialized = false
-      const probot = await Probot.run((app) => {
+      probot = await Probot.run((app) => {
         initialized = true
       })
       expect(probot.options).toMatchSnapshot()
       expect(initialized).toBeTruthy()
-      probot.httpServer.close()
+      probot.httpServer!.close()
     })
 
     it('runs with an array of strings', async () => {
-      const probot = await Probot.run(['run', 'file.js'])
+      probot = await Probot.run(['run', 'file.js'])
       expect(probot.options).toMatchSnapshot()
-      probot.httpServer.close()
+      probot.httpServer!.close()
     })
 
     it('runs without config and loads the setup app', async () => {
       let initialized = false
       delete process.env.PRIVATE_KEY_PATH
-      const probot = await Probot.run((app) => {
+      probot = await Probot.run((app) => {
         initialized = true
       })
       expect(probot.options).toMatchSnapshot()
       expect(initialized).toBeFalsy()
-      probot.httpServer.close()
+      probot.httpServer!.close()
     })
   })
 
@@ -87,7 +95,7 @@ describe('Probot', () => {
       try {
         await probot.webhook.receive(event)
       } catch (e) {
-        expect(probot.logger.error.mock.calls[0]).toMatchSnapshot()
+        expect((probot.logger.error as jest.Mock).mock.calls[0]).toMatchSnapshot()
       }
     })
 
@@ -98,7 +106,7 @@ describe('Probot', () => {
       try {
         await probot.webhook.receive(event)
       } catch (e) {
-        expect(probot.logger.error.mock.calls[0]).toMatchSnapshot()
+        expect((probot.logger.error as jest.Mock).mock.calls[0]).toMatchSnapshot()
       }
     })
 
@@ -109,7 +117,7 @@ describe('Probot', () => {
       try {
         await probot.webhook.receive(event)
       } catch (e) {
-        expect(probot.logger.error.mock.calls[0]).toMatchSnapshot()
+        expect((probot.logger.error as jest.Mock).mock.calls[0]).toMatchSnapshot()
       }
     })
 
@@ -120,7 +128,7 @@ describe('Probot', () => {
       try {
         await probot.webhook.receive(event)
       } catch (e) {
-        expect(probot.logger.error.mock.calls[0]).toMatchSnapshot()
+        expect((probot.logger.error as jest.Mock).mock.calls[0]).toMatchSnapshot()
       }
     })
 
@@ -131,7 +139,7 @@ describe('Probot', () => {
       try {
         await probot.webhook.receive(event)
       } catch (e) {
-        expect(probot.logger.error.mock.calls[0]).toMatchSnapshot()
+        expect((probot.logger.error as jest.Mock).mock.calls[0]).toMatchSnapshot()
       }
     })
   })
@@ -169,7 +177,7 @@ describe('Probot', () => {
         probot.load(app => {
           const route = app.route('/' + name)
 
-          route.use(function (req, res, next) {
+          route.use((req, res, next) => {
             res.append('X-Test', name)
             next()
           })
@@ -190,8 +198,8 @@ describe('Probot', () => {
     it('allows users to configure webhook paths', async () => {
       probot = createProbot({ webhookPath: '/webhook', githubToken: 'faketoken' })
       // Error handler to avoid printing logs
-      // eslint-disable-next-line handle-callback-err
-      probot.server.use((err, req, res, next) => { })
+      // tslint:disable-next-line handle-callback-err
+      probot.server.use((err: any, req: Request, res: Response, next: NextFunction) => { })
 
       probot.load(app => {
         const route = app.route()
@@ -210,8 +218,8 @@ describe('Probot', () => {
 
     it('defaults webhook path to `/`', async () => {
       // Error handler to avoid printing logs
-      // eslint-disable-next-line handle-callback-err
-      probot.server.use((err, req, res, next) => { })
+      // tslint:disable-next-line handle-callback-err
+      probot.server.use((err: any, req: Request, res: Response, next: NextFunction) => { })
 
       // POST requests to `/` should 400 b/c webhook signature will fail
       await request(probot.server).post('/')
@@ -238,7 +246,7 @@ describe('Probot', () => {
   describe('receive', () => {
     it('forwards events to each app', async () => {
       const spy = jest.fn()
-      const app = probot.load(app => app.on('push', spy))
+      const app = probot.load(appl => appl.on('push', spy))
       app.auth = jest.fn().mockReturnValue(Promise.resolve({}))
 
       await probot.receive(event)
@@ -247,8 +255,8 @@ describe('Probot', () => {
     })
   })
 
-  describe('ghe support', function () {
-    let app
+  describe('ghe support', () => {
+    let app: Application
 
     beforeEach(() => {
       process.env.GHE_HOST = 'notreallygithub.com'
@@ -268,8 +276,8 @@ describe('Probot', () => {
     it('requests from the correct API URL', async () => {
       const spy = jest.fn()
 
-      const appFn = async app => {
-        const github = await app.auth()
+      const appFn = async (appl: Application) => {
+        const github = await appl.auth()
         const res = await github.apps.listInstallations({})
         return spy(res)
       }
@@ -283,6 +291,7 @@ describe('Probot', () => {
       probot = createProbot({
         id: 1234,
         // Some valid RSA key to be able to sign the initial token
+        // tslint:disable-next-line:object-literal-sort-keys
         cert: '-----BEGIN RSA PRIVATE KEY-----\n' +
           'MIIBOQIBAAJBAIILhiN9IFpaE0pUXsesuuoaj6eeDiAqCiE49WB1tMB8ZMhC37kY\n' +
           'Fl52NUYbUxb7JEf6pH5H9vqw1Wp69u78XeUCAwEAAQJAb88urnaXiXdmnIK71tuo\n' +
@@ -293,7 +302,7 @@ describe('Probot', () => {
           'r1UQNnUExRh7ZT0kFbMfO9jKYZVlQdCL9Dn93vo=\n' +
           '-----END RSA PRIVATE KEY-----'
       })
-      expect(await probot.app.getInstallationAccessToken({ installationId: 5 })).toBe('github_token')
+      expect(await probot.app!.getInstallationAccessToken({ installationId: 5 })).toBe('github_token')
     })
 
     it('throws if the GHE host includes a protocol', async () => {
@@ -323,7 +332,7 @@ describe('Probot', () => {
     })
 
     it('sets throttleOptions', async () => {
-      const probot = createProbot({ webhookPath: '/webhook', githubToken: 'faketoken' })
+      probot = createProbot({ webhookPath: '/webhook', githubToken: 'faketoken' })
 
       expect(probot.throttleOptions.Bottleneck).toBe(Bottleneck)
       expect(probot.throttleOptions.connection).toBeInstanceOf(Bottleneck.IORedisConnection)
@@ -335,7 +344,7 @@ describe('Probot', () => {
       const redisConfig = {
         host: 'test'
       }
-      const probot = createProbot({ webhookPath: '/webhook', githubToken: 'faketoken', redisConfig })
+      probot = createProbot({ webhookPath: '/webhook', githubToken: 'faketoken', redisConfig })
 
       expect(probot.throttleOptions.Bottleneck).toBe(Bottleneck)
       expect(probot.throttleOptions.connection).toBeInstanceOf(Bottleneck.IORedisConnection)
@@ -344,7 +353,7 @@ describe('Probot', () => {
 
   describe('custom Octokit constructor', () => {
     beforeEach(() => {
-      const MyOctokit = Octokit.plugin(octokit => {
+      const MyOctokit = Octokit.plugin((octokit: Octokit & { [key: string]: any}) => {
         octokit.foo = 'bar'
       })
 
@@ -356,7 +365,7 @@ describe('Probot', () => {
 
     it('is propagated to GithubAPI', async () => {
       const app = probot.load(() => {})
-      const githubApi = await app.auth()
+      const githubApi: GitHubAPI & { [key: string]: any } = await app.auth()
       expect(githubApi.foo).toBe('bar')
     })
   })

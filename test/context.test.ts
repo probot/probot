@@ -122,10 +122,9 @@ describe('Context', () => {
 
     it('returns null when the file is missing', async () => {
       const error: OctokitError = {
-        code: 404,
         message: 'An error occurred',
         name: 'OctokitError',
-        status: 'Not Found'
+        status: 404
       }
 
       jest.spyOn(github.repos, 'getContents').mockReturnValue(Promise.reject(error))
@@ -135,10 +134,9 @@ describe('Context', () => {
 
     it('returns the default config when the file is missing and default config is passed', async () => {
       const error: OctokitError = {
-        code: 404,
         message: 'An error occurred',
         name: 'OctokitError',
-        status: 'Not Found'
+        status: 404
       }
 
       jest.spyOn(github.repos, 'getContents').mockReturnValue(Promise.reject(error))

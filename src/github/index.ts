@@ -57,8 +57,7 @@ export interface Result {
 }
 
 export interface OctokitError extends Error {
-  code: number
-  status: string
+  status: number
 }
 
 interface Paginate extends Octokit.Paginate {

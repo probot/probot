@@ -1,9 +1,9 @@
 import Logger from 'bunyan'
 import EventSource from 'eventsource'
-import SmeeClient from 'smee-client'
 
 export const createWebhookProxy = (opts: WebhookProxyOptions): EventSource | undefined => {
   try {
+    const SmeeClient = require('smee-client')
     const smee = new SmeeClient({
       logger: opts.logger,
       source: opts.url,

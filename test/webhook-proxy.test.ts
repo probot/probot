@@ -1,7 +1,6 @@
 import express, { Response } from 'express'
 // tslint:disable-next-line:no-var-requires
 const sse: (req: express.Request, res: express.Response, next: express.NextFunction) => void = require('connect-sse')()
-// tslint:disable-next-line:no-implicit-dependencies
 import EventSource from 'eventsource'
 import http from 'http'
 import net from 'net'

@@ -1,10 +1,12 @@
 declare module "smee-client" {
   import EventSource = require('eventsource')
 
+  type Severity = 'info' | 'error'
+
   interface Options {
       source?: string
       target: string
-      logger?: Console
+      logger?: Pick<Console, Severity>
   }
 
   class Client {

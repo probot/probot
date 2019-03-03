@@ -111,7 +111,7 @@
     "jest": "^24.1.0",
     "minami": "^1.1.1",
     "nock": "^10.0.0",
-    "semantic-release": "^16.0.0-beta.16",
+    "semantic-release": "16.0.0-beta.18",
     "smee-client": "^1.0.1",
     "standard": "^12.0.0",
     "standard-markdown": "^5.0.1",

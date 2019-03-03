@@ -80,7 +80,7 @@
     "eventsource": "^1.0.7",
     "express": "^4.16.2",
     "express-async-errors": "^3.0.0",
-    "hbs": "^4.0.1",
+    "hbs": "^4.0.3",
     "ioredis": "^4.5.1",
     "is-base64": "0.1.0",
     "js-yaml": "^3.9.1",

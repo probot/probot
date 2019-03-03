@@ -110,7 +110,7 @@
     "connect-sse": "^1.2.0",
     "eslint": "^5.0.1",
     "eslint-plugin-markdown": "^1.0.0-beta.8",
-    "jest": "^23.6.0",
+    "jest": "^24.1.0",
     "minami": "^1.1.1",
     "nock": "^10.0.0",
     "semantic-release": "^15.0.0",

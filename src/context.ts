@@ -174,7 +174,7 @@ export class Context<E extends WebhookPayloadWithRepository = any> implements We
       const config = yaml.safeLoad(Buffer.from(res.data.content, 'base64').toString()) || {}
       return Object.assign({}, defaultConfig, config)
     } catch (err) {
-      if (err.code === 404) {
+      if (err.status === 404) {
         if (defaultConfig) {
           return defaultConfig
         }

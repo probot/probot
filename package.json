@@ -39,15 +39,11 @@
     "transform": {
       ".+\\.tsx?$": "ts-jest"
     },
-    "testMatch": [
-      "<rootDir>/test/**/*.test.(ts|js)"
-    ],
     "globals": {
       "ts-jest": {
         "skipBabel": true
       }
-    },
-    "testURL": "http://localhost/"
+    }
   },
   "keywords": [
     "probot",

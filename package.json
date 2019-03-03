@@ -36,14 +36,7 @@
       "json",
       "node"
     ],
-    "transform": {
-      ".+\\.tsx?$": "ts-jest"
-    },
-    "globals": {
-      "ts-jest": {
-        "skipBabel": true
-      }
-    }
+    "preset": "ts-jest"
   },
   "keywords": [
     "probot",

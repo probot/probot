@@ -1,10 +1,9 @@
 import Logger from 'bunyan'
+import EventSource from 'eventsource'
+import SmeeClient from 'smee-client'
 
-export const createWebhookProxy = (opts: WebhookProxyOptions) => {
+export const createWebhookProxy = (opts: WebhookProxyOptions): EventSource | undefined => {
   try {
-    // tslint:disable-next-line
-    const SmeeClient = require('smee-client')
-
     const smee = new SmeeClient({
       logger: opts.logger,
       source: opts.url,
@@ -13,6 +12,7 @@ export const createWebhookProxy = (opts: WebhookProxyOptions) => {
     return smee.start()
   } catch (err) {
     opts.logger.warn('Run `npm install --save-dev smee-client` to proxy webhooks to localhost.')
+    return
   }
 }
 

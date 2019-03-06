@@ -42,7 +42,7 @@ Installing Node dependencies!
 Done! Enjoy building your Probot app!
 ```
 
-The most important files note here are `index.js`, which is where the code for your app will go, and `package.json`, which makes this a standard [npm module](https://docs.npmjs.com/files/package.json).
+The most important files here are `index.js`, which is where the code for your app will go, and `package.json`, which makes this a standard [npm module](https://docs.npmjs.com/files/package.json).
 
 ## Running the app locally
 

@@ -5,6 +5,7 @@ import nock = require('nock')
 import request = require('supertest')
 import { Application, createProbot, Probot } from '../src'
 import { GitHubAPI } from '../src/github'
+import Webhooks from '@octokit/webhooks'
 
 import path = require('path')
 import helper = require('./apps/helper')
@@ -15,7 +16,7 @@ describe('Probot', () => {
   let event: {
     id: string
     name: string
-    payload: any
+    payload: Webhooks.WebhookPayloadPush
   }
 
   beforeEach(() => {

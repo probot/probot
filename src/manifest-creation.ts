@@ -3,10 +3,11 @@ import yaml from 'js-yaml'
 import path from 'path'
 import updateDotenv from 'update-dotenv'
 import { GitHubAPI } from './github'
+import { PackageJSON } from './package_json';
 
 export class ManifestCreation {
   get pkg () {
-    let pkg: any
+    let pkg: PackageJSON | {}
     try {
       pkg = require(path.join(process.cwd(), 'package.json'))
     } catch (e) {

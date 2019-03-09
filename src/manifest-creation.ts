@@ -3,7 +3,7 @@ import yaml from 'js-yaml'
 import path from 'path'
 import updateDotenv from 'update-dotenv'
 import { GitHubAPI } from './github'
-import { PackageJSON } from './package_json';
+import { PackageJSON } from './package_json'
 
 export class ManifestCreation {
   get pkg () {
@@ -19,7 +19,7 @@ export class ManifestCreation {
   public async createWebhookChannel () {
     try {
       // tslint:disable:no-var-requires
-      const SmeeClient: typeof import('smee-client') = require('smee-client')
+      const SmeeClient: typeof import ('smee-client') = require('smee-client')
       await this.updateEnv({ WEBHOOK_PROXY_URL: await SmeeClient.createChannel() })
     } catch (err) {
       // Smee is not available, so we'll just move on

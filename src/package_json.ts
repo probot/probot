@@ -55,7 +55,9 @@ interface Bugs {
 
 interface Config {
   name?: string
-  config?: Object
+  config?: {
+    [key: string]: string
+  }
 }
 
 /**

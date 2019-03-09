@@ -4,8 +4,7 @@ import { ManifestCreation } from '../src/manifest-creation'
 import response from './fixtures/setup/response.json'
 
 describe('ManifestCreation', () => {
-  let setup
-  let SmeeClient
+  let setup: ManifestCreation
 
   beforeEach(() => {
     setup = new ManifestCreation()
@@ -19,7 +18,7 @@ describe('ManifestCreation', () => {
 
       setup.updateEnv = jest.fn()
 
-      const SmeeClient = require('smee-client')
+      const SmeeClient: typeof import('smee-client') = require('smee-client')
       SmeeClient.createChannel = jest.fn().mockReturnValue('https://smee.io/1234abc')
     })
 

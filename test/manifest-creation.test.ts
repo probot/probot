@@ -1,7 +1,7 @@
-const { ManifestCreation } = require('../src/manifest-creation')
-const nock = require('nock')
-const package = require('../package.json')
-const response = require('./fixtures/setup/response.json')
+import nock from 'nock'
+import pkg from '../package.json'
+import { ManifestCreation } from '../src/manifest-creation'
+import response from './fixtures/setup/response.json'
 
 describe('ManifestCreation', () => {
   let setup
@@ -35,7 +35,7 @@ describe('ManifestCreation', () => {
 
   describe('pkg', () => {
     test('gets pkg from package.json', () => {
-      expect(setup.pkg).toEqual(package)
+      expect(setup.pkg).toEqual(pkg)
     })
   })
 
@@ -80,7 +80,7 @@ describe('ManifestCreation', () => {
   describe('getManifest', () => {
     test('creates an app from a code', () => {
       // checks that getManifest returns a JSON.stringified manifest
-      expect(setup.getManifest(package, 'localhost://3000')).toEqual('{"description":"🤖 A framework for building GitHub Apps to automate and improve your workflow","hook_attributes":{"url":"localhost://3000/"},"name":"probot","public":true,"redirect_url":"localhost://3000/probot/setup","url":"https://probot.github.io","version":"v1"}')
+      expect(setup.getManifest(pkg, 'localhost://3000')).toEqual('{"description":"🤖 A framework for building GitHub Apps to automate and improve your workflow","hook_attributes":{"url":"localhost://3000/"},"name":"probot","public":true,"redirect_url":"localhost://3000/probot/setup","url":"https://probot.github.io","version":"v1"}')
     })
   })
 })

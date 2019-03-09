@@ -4,7 +4,7 @@ import express from 'express'
 
 export const serializers: bunyan.StdSerializers = {
 
-  event: (event: WebhookEvent<any> | any) => {
+  event: (event: WebhookEvent<any>) => {
     if (typeof event !== 'object' || !event.payload) {
       return event
     } else {

@@ -18,7 +18,7 @@ export class ManifestCreation {
   public async createWebhookChannel () {
     try {
       // tslint:disable:no-var-requires
-      const SmeeClient = require('smee-client')
+      const SmeeClient: typeof import('smee-client') = require('smee-client')
       await this.updateEnv({ WEBHOOK_PROXY_URL: await SmeeClient.createChannel() })
     } catch (err) {
       // Smee is not available, so we'll just move on
@@ -75,7 +75,7 @@ export class ManifestCreation {
     return response.data.html_url
   }
 
-  public async updateEnv (env: any) { // Needs to be public due to tests
+  public async updateEnv (env: updateDotenv.Env) {
     return updateDotenv(env)
   }
 

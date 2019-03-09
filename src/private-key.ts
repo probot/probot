@@ -1,7 +1,6 @@
 import fs from 'fs'
 
-// tslint:disable-next-line:no-var-requires
-const isBase64 = require('is-base64')
+import isBase64 from 'is-base64'
 
 const hint = `please use:
   * \`--private-key=/path/to/private-key\` flag, or

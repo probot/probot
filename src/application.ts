@@ -20,7 +20,7 @@ export interface Options {
   Octokit?: Octokit.Static
 }
 
-type OnCallback<T> = (context: Context<T>) => Promise<void>
+export type OnCallback<T> = (context: Context<T>) => Promise<void>
 
 // Some events can't get an authenticated client (#382):
 function isUnauthenticatedEvent (event: Webhooks.WebhookEvent<any>) {

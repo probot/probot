@@ -80,7 +80,7 @@
     "qs": "^6.5.2",
     "raven": "^2.4.2",
     "resolve": "^1.4.0",
-    "semver": "^5.5.0",
+    "semver": "^6.0.0",
     "supports-color": "^6.0.0",
     "update-dotenv": "^1.1.0",
     "uuid": "^3.2.1"

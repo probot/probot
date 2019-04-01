@@ -101,7 +101,7 @@
     "@types/qs": "^6.5.1",
     "@types/raven": "^2.1.5",
     "@types/resolve": "^0.0.4",
-    "@types/semver": "^5.4.0",
+    "@types/semver": "^6.0.0",
     "@types/supertest": "^2.0.4",
     "@types/uuid": "^3.4.3",
     "connect-sse": "^1.2.0",

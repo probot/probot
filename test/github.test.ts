@@ -83,7 +83,7 @@ describe('GitHubAPI', () => {
     it('stops iterating if the done() function is called in the callback', async () => {
       const spy = jest.fn((response, done) => {
         if (response.data[0].id === 2) done()
-      })
+      }) as any
       const res = await github.paginate(github.issues.listForRepo.endpoint.merge({ owner: 'JasonEtco', repo: 'pizza', per_page: 1 }), spy)
       expect(res.length).toBe(3)
       expect(spy).toHaveBeenCalledTimes(3)

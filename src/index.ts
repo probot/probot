@@ -190,7 +190,7 @@ export class Probot {
 
   public setup (appFns: Array<string | ApplicationFunction>) {
     // Log all unhandled rejections
-    process.on('unhandledRejection', this.errorHandler)
+    (process as NodeJS.EventEmitter).on('unhandledRejection', this.errorHandler)
 
     // Load the given appFns along with the default ones
     appFns.concat(defaultAppFns).forEach(appFn => this.load(appFn))

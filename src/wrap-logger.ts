@@ -32,9 +32,9 @@ export const wrapLogger = (logger: Logger, baseLogger?: Logger): LoggerWithTarge
     },
     // Expose target logger
     target: baseLogger || logger
-  })
+  }) as LoggerWithTarget
 
-  return fn as LoggerWithTarget
+  return fn
 }
 
 export interface LoggerWithTarget extends Logger {

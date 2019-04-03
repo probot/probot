@@ -7,7 +7,7 @@ import { Logger } from './'
 //     app.log.trace("verbose details");
 //
 export const wrapLogger = (logger: Logger, baseLogger?: Logger): LoggerWithTarget => {
-  const fn = logger.info.bind(logger)
+  const fn = logger.info.bind(logger) as any
 
   // Add level methods on the logger
   fn.trace = logger.trace.bind(logger)
@@ -35,7 +35,7 @@ export const wrapLogger = (logger: Logger, baseLogger?: Logger): LoggerWithTarge
   // Expose target logger
   fn.target = baseLogger || logger
 
-  return fn
+  return fn as LoggerWithTarget
 }
 
 export interface LoggerWithTarget extends Logger {

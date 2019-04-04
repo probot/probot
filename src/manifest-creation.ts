@@ -59,6 +59,7 @@ export class ManifestCreation {
   public async createAppFromCode (code: any) {
     const github = GitHubAPI()
     const response = await github.request('POST /app-manifests/:code/conversions', {
+      baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api/v3`,
       code,
       headers: { accept: 'application/vnd.github.fury-preview+json' }
     })

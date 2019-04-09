@@ -62,11 +62,25 @@ describe('ManifestCreation', () => {
       delete process.env.APP_ID
       delete process.env.PRIVATE_KEY
       delete process.env.WEBHOOK_SECRET
+      delete process.env.GHE_HOST
     })
 
     test('creates an app from a code', async () => {
       nock('https://api.github.com')
         .post('/app-manifests/123abc/conversions')
+        .reply(200, response)
+
+      const createdApp = await setup.createAppFromCode('123abc')
+      expect(createdApp).toEqual('https://github.com/apps/testerino0000000')
+      // expect dotenv to be called with id, webhook_secret, pem
+      expect(setup.updateEnv).toHaveBeenCalledWith({ 'APP_ID': '6666', 'PRIVATE_KEY': '"-----BEGIN RSA PRIVATE KEY-----\nsecrets\n-----END RSA PRIVATE KEY-----\n"', 'WEBHOOK_SECRET': '12345abcde' })
+    })
+
+    test('creates an app from a code when github host env is set', async () => {
+      process.env.GHE_HOST = 'swinton.github.com'
+
+      nock('https://swinton.github.com')
+        .post('/api/v3/app-manifests/123abc/conversions')
         .reply(200, response)
 
       const createdApp = await setup.createAppFromCode('123abc')

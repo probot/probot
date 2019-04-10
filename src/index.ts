@@ -122,7 +122,9 @@ export class Probot {
     this.server = createServer({ webhook: (this.webhook as any).middleware, logger })
 
     // Log all received webhooks
-    this.webhook.on('*', (event: Webhooks.WebhookEvent<any>) => this.receive(event))
+    this.webhook.on('*', async (event: Webhooks.WebhookEvent<any>) => {
+      await this.receive(event)
+    })
 
     // Log all webhook errors
     this.webhook.on('error', this.errorHandler)

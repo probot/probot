@@ -22,7 +22,7 @@ This will ask you a series of questions about your app, which should look someth
 ```
 Let's create a Probot app!
 ? App name: my-first-app
-? Description of app: A "Hello World" GitHub App built with Probot
+? Description of app: A 'Hello World' GitHub App built with Probot
 ? Author's full name: Katie Horne
 ? Author's email address: katie@auth0.com
 ? Homepage:

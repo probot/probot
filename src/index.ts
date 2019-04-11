@@ -123,11 +123,7 @@ export class Probot {
 
     // Log all received webhooks
     this.webhook.on('*', async (event: Webhooks.WebhookEvent<any>) => {
-      try {
-        await this.receive(event)
-      } catch {
-        // Errors have already been logged.
-      }
+      await this.receive(event)
     })
 
     // Log all webhook errors

@@ -72,7 +72,7 @@
     "hbs": "^4.0.3",
     "ioredis": "^4.5.1",
     "is-base64": "0.1.0",
-    "js-yaml": "^3.9.1",
+    "js-yaml": "^3.13.1",
     "jsonwebtoken": "^8.1.0",
     "octokit-pagination-methods": "1.1.0",
     "pkg-conf": "^3.0.0",

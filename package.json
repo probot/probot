@@ -56,7 +56,7 @@
     "@octokit/plugin-enterprise-compatibility": "^1.0.0",
     "@octokit/plugin-retry": "^2.1.1",
     "@octokit/plugin-throttling": "^2.3.0",
-    "@octokit/rest": "^16.23.2",
+    "@octokit/rest": "^16.25.0",
     "@octokit/webhooks": "^6.0.0",
     "@types/supports-color": "^5.3.0",
     "bottleneck": "^2.15.3",

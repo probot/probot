@@ -50,4 +50,10 @@ export interface LoggerWithTarget extends Logger {
   fatal: LoggerWithTarget
 }
 
-export type ChildArgs = { [key: string]: any }
+export type ChildArgs {
+  options?: object
+  name?: string
+  id?: string | number | string[]
+  installation?: string
+  [key: string]: any
+}

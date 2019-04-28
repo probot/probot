@@ -50,7 +50,7 @@ export interface LoggerWithTarget extends Logger {
   fatal: LoggerWithTarget
 }
 
-export type ChildArgs {
+export interface ChildArgs {
   options?: object
   name?: string
   id?: string | number | string[]

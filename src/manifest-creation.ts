@@ -58,10 +58,12 @@ export class ManifestCreation {
 
   public async createAppFromCode (code: any) {
     const github = GitHubAPI()
-    const response = await github.request('POST /app-manifests/:code/conversions', {
+    const options: any = {
       code,
-      headers: { accept: 'application/vnd.github.fury-preview+json' }
-    })
+      headers: { accept: 'application/vnd.github.fury-preview+json' },
+      ...process.env.GHE_HOST && { baseUrl: `https://${process.env.GHE_HOST}/api/v3` }
+    }
+    const response = await github.request('POST /app-manifests/:code/conversions', options)
 
     const { id, webhook_secret, pem } = response.data
     await this.updateEnv({

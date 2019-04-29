@@ -55,4 +55,5 @@ export interface ChildArgs {
   name?: string
   id?: string | number | string[]
   installation?: string
+  [key: string]: any
 }

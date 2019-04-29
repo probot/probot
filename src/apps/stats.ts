@@ -57,7 +57,7 @@ export = async (app: Application): Promise<void> => {
       const github = await app.auth(installation.id)
 
       const repositories: Repository[] = await github.paginate(github.apps.listRepos.endpoint.merge({ per_page: 100 }), (response: AnyResponse) => {
-        return response.data.repositories.filter((repository: Repository) => !repository.private)
+        return response.data.filter((repository: Repository) => !repository.private)
       })
 
       account.stars = repositories.reduce((stars, repository) => {

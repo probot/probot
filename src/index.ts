@@ -123,11 +123,7 @@ export class Probot {
 
     // Log all received webhooks
     this.webhook.on('*', async (event: Webhooks.WebhookEvent<any>) => {
-      try {
-        await this.receive(event)
-      } catch {
-        // Errors have already been logged.
-      }
+      await this.receive(event)
     })
 
     // Log all webhook errors
@@ -151,7 +147,7 @@ export class Probot {
   }
 
   public errorHandler (err: Error) {
-    const errMessage = err.message.toLowerCase()
+    const errMessage = (err.message || '').toLowerCase()
     if (errMessage.includes('x-hub-signature')) {
       logger.error({ err }, 'Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.')
     } else if (errMessage.includes('pem') || errMessage.includes('json web token')) {

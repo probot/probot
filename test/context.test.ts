@@ -74,18 +74,18 @@ describe('Context', () => {
 
   describe('issue', () => {
     it('returns attributes from repository payload', () => {
-      expect(context.issue()).toEqual({ owner: 'bkeepers', repo: 'probot', number: 4 })
+      expect(context.issue()).toEqual({ owner: 'bkeepers', repo: 'probot', issue_number: 4 })
     })
 
     it('merges attributes', () => {
       expect(context.issue({ foo: 1, bar: 2 })).toEqual({
-        bar: 2, foo: 1, number: 4, owner: 'bkeepers', repo: 'probot'
+        bar: 2, foo: 1, issue_number: 4, owner: 'bkeepers', repo: 'probot'
       })
     })
 
     it('overrides repo attributes', () => {
-      expect(context.issue({ owner: 'muahaha', number: 5 })).toEqual({
-        number: 5, owner: 'muahaha', repo: 'probot'
+      expect(context.issue({ owner: 'muahaha', issue_number: 5 })).toEqual({
+        issue_number: 5, owner: 'muahaha', repo: 'probot'
       })
     })
   })

@@ -73,7 +73,7 @@ export interface GitHubAPI extends Octokit {
   paginate: Paginate
   graphql: Graphql
   /**
-   * .query() is deprecated, use .gaphql() instead
+   * @deprecated `.query()` is deprecated, use `.graphql()` instead
    */
   query: Graphql
 }

@@ -34,6 +34,7 @@ See https://probot.github.io/docs/github-api/#graphql-api`)
 
     return graphql(args[0], args[1])
   }
+  // tslint:disable-next-line:deprecation
   client.query = (...args: any[]): any => {
     // tslint:disable-next-line:no-console
     console.warn('github.query is deprecated. Use github.graphql instead')

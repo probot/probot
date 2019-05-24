@@ -128,6 +128,7 @@ describe('github/graphql', () => {
         .post('/graphql', { query })
         .reply(200, { data })
 
+      // tslint:disable-next-line:deprecation
       expect(await github.query(query)).toEqual(data)
       expect(consoleWarnSpy).toHaveBeenCalled()
     })

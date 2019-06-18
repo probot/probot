@@ -76,7 +76,7 @@ The `dev` script will start your app using [nodemon](https://github.com/remy/nod
 
 ## Configuring a GitHub App
 
-To automatically configure your GitHub App, follow these steps:
+To automatically configure your GitHub App on github.com, follow these steps:
 
 1. Run the app locally by running `npm run dev`.
 1. Next follow instructions to visit localhost:3000 (or your custom Glitch URL).
@@ -87,7 +87,7 @@ To automatically configure your GitHub App, follow these steps:
 1. Install the app on a test repo and try triggering a webhook to activate the bot!
 1. You're all set! Head down to [Debugging](#debugging) to learn more about developing your Probot App.
 
-GitHub App Manifests--otherwise known as easy app creation--make it simple to generate all the settings necessary for a GitHub App. This process abstracts the [Configuring a GitHub App](#configuring-a-github-app) section. You can learn more about how GitHub App Manifests work and how to change your settings for one via the [GitHub Developer Docs](https://developer.github.com/apps/building-github-apps/creating-github-apps-from-a-manifest/).
+GitHub App Manifests--otherwise known as easy app creation--make it simple to generate all the settings necessary for a GitHub App. This process abstracts the [Configuring a GitHub App](#configuring-a-github-app) section. You can learn more about how GitHub App Manifests work and how to change your settings for one via the [GitHub Developer Docs](https://developer.github.com/apps/building-github-apps/creating-github-apps-from-a-manifest/). Please note, you have to configure you GitHub App manually on GitHub Enterprise Server as App Manifests are not supported yet.
 
 ## Manually Configuring a GitHub App
 

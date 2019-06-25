@@ -12,7 +12,7 @@ For our testing examples, we use [jest](https://facebook.github.io/jest/), but t
 const nock = require('nock')
 // Requiring our app implementation
 const myProbotApp = require('..')
-const { Probot } = require('probot')
+const { Probot, createProbot } = require('probot')
 // Requiring our fixtures
 const payload = require('./fixtures/issues.opened')
 const issueCreatedBody = { body: 'Thanks for opening this issue!' }
@@ -23,12 +23,8 @@ describe('My Probot app', () => {
   let probot
 
   beforeEach(() => {
-    probot = new Probot({})
-    // Load our app into probot
-    const app = probot.load(myProbotApp)
-
-    // just return a test token
-    app.app = () => 'test'
+    probot = createProbot({ id: 1, cert: 'test', githubToken: 'test' })
+    probot.load(myProbotApp)
   })
 
   test('creates a passing check', async () => {

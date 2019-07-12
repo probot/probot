@@ -52,7 +52,7 @@
   "license": "ISC",
   "dependencies": {
     "@octokit/app": "^3.0.1",
-    "@octokit/graphql": "2.1.3",
+    "@octokit/graphql": "3.0.0",
     "@octokit/plugin-enterprise-compatibility": "^1.0.0",
     "@octokit/plugin-retry": "^2.1.1",
     "@octokit/plugin-throttling": "^2.3.0",

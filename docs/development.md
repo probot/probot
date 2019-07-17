@@ -82,9 +82,9 @@ To automatically configure your GitHub App, follow these steps:
 1. Next follow instructions to visit localhost:3000 (or your custom Glitch URL).
 1. You should see something like this: <img width="625" alt="screen shot 2018-09-25 at 10 01 28 pm" src="https://user-images.githubusercontent.com/13410355/46052950-a19e2900-c10e-11e8-9e7e-0c803b8ca35c.png">
 1. Go ahead and click the **Register a GitHub App** button.
-1. Next you'll get to decide on an app name that isn't already taken.
-1. After registering your GitHub App, you'll be redirected to install the app on any repos. At the same time, you can check your local `.env` and notice it will be populated with values GitHub sends us in the course of that redirect.
-1. Install the app on a test repo and try triggering a webhook to activate the bot!
+1. Next, you'll get to decide on an app name that isn't already taken.
+1. After registering your GitHub App, you'll be redirected to install the app on any repositories. At the same time, you can check your local `.env` and notice it will be populated with values GitHub sends us in the course of that redirect.
+1. Install the app on a test repository and try triggering a webhook to activate the bot!
 1. You're all set! Head down to [Debugging](#debugging) to learn more about developing your Probot App.
 
 GitHub App Manifests--otherwise known as easy app creation--make it simple to generate all the settings necessary for a GitHub App. This process abstracts the [Configuring a GitHub App](#configuring-a-github-app) section. You can learn more about how GitHub App Manifests work and how to change your settings for one via the [GitHub Developer Docs](https://developer.github.com/apps/building-github-apps/creating-github-apps-from-a-manifest/).
@@ -95,16 +95,16 @@ GitHub App Manifests--otherwise known as easy app creation--make it simple to ge
 
 To run your app in development, you will need to configure a GitHub App to deliver webhooks to your local machine.
 
-1. On your local machine, copy `.env.example` to `.env`.
+1. On your local machine, copy `.env.example` to `.env` in the same directory.
 1. Go to [smee.io](https://smee.io) and click **Start a new channel**. Set `WEBHOOK_PROXY_URL` in `.env` to the URL that you are redirected to.
 1. [Create a new GitHub App](https://github.com/settings/apps/new) with:
     - **Webhook URL**: Use your `WEBHOOK_PROXY_URL` from the previous step.
     - **Webhook Secret:** `development` (Note: For optimal security, Probot apps **require** this secret be set, even though it's optional on GitHub.).
-    - **Permissions & events** is located lower down the page and will depend on what data you want your app to have access to. Note: if, for example, you only enable issue events, you will not be able to listen on pull request webhooks with your app. However, for development we recommend enabling everything.
+    - **Permissions & events** is located lower down the page and will depend on what data you want your app to have access to. Note: if, for example, you only enable issue events, you will not be able to listen on pull request webhooks with your app. However, for development, we recommend enabling everything.
 1. Download the private key and move it to your project's directory. As long as it's in the root of your project, Probot will find it automatically regardless of the filename.
 1. Edit `.env` and set `APP_ID` to the ID of the app you just created. The App ID can be found in your app settings page here <img width="1048" alt="screen shot 2017-08-20 at 8 31 31 am" src="https://user-images.githubusercontent.com/5713670/42248717-f6bf4f10-7edb-11e8-8dd5-387181c771bc.png">
 
-## Installing the app on a repo
+## Installing the app on a repository
 
 You'll need to create a test repository and install your app by clicking the "Install" button on the settings page of your app, e.g. `https://github.com/apps/your-app`
 
@@ -115,11 +115,11 @@ You'll need to create a test repository and install your app by clicking the "In
 ## Debugging
 
 1. Always run `$ npm install` and restart the server if `package.json` has changed.
-1. To turn on verbose logging, start server by running: `$ LOG_LEVEL=trace npm start`
+1. To turn on verbose logging, start the server by running: `$ LOG_LEVEL=trace npm start`
 
 ## Alternate way of running a probot app
 
-If you take a look to the `npm start` script, this is what it runs: `probot run ./index.js`. This is nice, but you sometimes need more control on how your Node.js application is executed. For example if you want to use custom V8 flags, `ts-node`, etc. you need more flexibility. In those cases there's a simple way of executing your probot application programmatically:
+If you take a look to the `npm start` script, this is what it runs: `probot run ./index.js`. This is nice, but you sometimes need more control over how your Node.js application is executed. For example, if you want to use custom V8 flags, `ts-node`, etc. you need more flexibility. In those cases there's a simple way of executing your probot application programmatically:
 
 ```js
 // main.js

@@ -59,3 +59,51 @@ Apps _should_ allow all settings to be customized for each installation.
 ### Store configuration in the repository
 
 Any configuration _should_ be stored in the target repository. Unless the app is using files from an established convention, the configuration _should_ be stored in the `.github` directory. See the [API docs for `context.config`](https://probot.github.io/api/latest/classes/context.html#config).
+
+`context.config` supports sharing configs between repositories. If configuration for your app is not available in the target repository, it will be loaded from the `.github` directory of the target organization's `.github` repository.
+
+User's can also choose their own shared location. Use the `_extends` option in the configuration file to extend settings from another repository.
+
+For example, given `.github/test.yml`:
+
+```yaml
+_extends: github-settings
+# Override values from the extended config or define new values
+name: myrepo
+```
+
+This configuration will be merged with the `.github/test.yml` file from the `github-settings` repository, which might look like this:
+
+```yaml
+shared1: will be merged
+shared2: will also be merged
+```
+
+Just put common configuration keys in a repository within your organization. Then reference this repository from config files with the same name.
+
+You can also reference configurations from other organizations:
+
+```yaml
+_extends: other/probot-settings
+other: DDD
+```
+
+Additionally, you can specify a specific path for the configuration by
+appending a colon after the project.
+
+```yaml
+_extends: probot-settings:.github/other_test.yaml
+other: FFF
+```
+
+Inherited configurations are in the **exact same location** within the
+repositories.
+
+```yaml
+# octocat/repo1:.github/test.yaml
+_extends: .github
+other: GGG
+
+# octocat/.github:test.yaml
+other: HHH
+```

@@ -13,7 +13,7 @@ Probot includes a wrapper for the GitHub API which can enable you to store and m
 - *Comments:* The API can read, write and delete comments on issues and pull requests.
 - *Status:* The API can read and change the status of an issue or pull request.
 - *Search:* GitHub has a powerful search API that can be used
-- *Repository:* Built-in `context.config()` allows storing configuration in the repository.
+- *Repository:* Built-in `context.config()` allows storing configuration in the repository or the organization's `.github` repository.
 - *Labels:* The API can read labels, and add or remove them from issues and pull requests.
 
 If your Probot App needs to store more data than Issues and Pull Requests store normally, you can use the [`probot-metadata` extension](/docs/extensions#metadata) to hide data in comments. It isn't meant to be super secure or scalable, but it's an easy way to manage some data without a full database.

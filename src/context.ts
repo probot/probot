@@ -131,7 +131,7 @@ export class Context<E extends WebhookPayloadWithRepository = any> implements We
   public issue<T> (object?: T) {
     const payload = this.payload
     return Object.assign({
-      number: (payload.issue || payload.pull_request || payload).number
+      issue_number: (payload.issue || payload.pull_request || payload).number
     }, this.repo(object))
   }
 

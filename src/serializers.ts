@@ -1,4 +1,4 @@
-import { PayloadRepository, WebhookEvent } from '@octokit/webhooks'
+import { PayloadRepository } from '@octokit/webhooks'
 import bunyan from 'bunyan'
 import express from 'express'
 

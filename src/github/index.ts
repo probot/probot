@@ -67,7 +67,7 @@ interface Paginate extends Octokit.Paginate {
   ): Promise<any[]>
 }
 
-type Graphql = (query: string, variables?: Variables, headers?: Headers) => Promise<GraphQlQueryResponse>
+type Graphql = (query: string, variables?: Variables, headers?: Headers) => Promise<GraphQlQueryResponse['data']>
 
 export interface GitHubAPI extends Octokit {
   paginate: Paginate

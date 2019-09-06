@@ -16,9 +16,6 @@ export interface GraphQLError {
 }
 
 export function addGraphQL (client: GitHubAPI) {
-  // TODO: We should not be asserting types. The `defaults` method exists on
-  // `client.request`, but is not reflected by the definitions for
-  // `Octokit.Request`
   const graphqlRequest = (client.request as any as typeof request).defaults({
     ...(process.env.GHE_HOST ? { baseUrl: `https://${process.env.GHE_HOST}/api` } : {})
   })

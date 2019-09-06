@@ -1,4 +1,4 @@
-import { withCustomRequest } from '@octokit/graphql'
+import { graphql } from '@octokit/graphql'
 import enterpriseCompatibility from '@octokit/plugin-enterprise-compatibility'
 import retryPlugin from '@octokit/plugin-retry'
 import throttlePlugin from '@octokit/plugin-throttling'
@@ -68,7 +68,7 @@ interface Paginate extends Octokit.Paginate {
   ): Promise<any[]>
 }
 
-type Graphql = (query: string, variables?: Variables, headers?: Headers) => ReturnType<ReturnType<typeof withCustomRequest>>
+type Graphql = (query: string, variables?: Variables, headers?: Headers) => ReturnType<typeof graphql>
 
 export interface GitHubAPI extends Octokit {
   paginate: Paginate

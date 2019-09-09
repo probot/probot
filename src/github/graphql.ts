@@ -1,6 +1,7 @@
 // tslint:disable-next-line
-import octokitGraphqlWithDefaults from '@octokit/graphql/lib/with-defaults'
+import { withCustomRequest } from '@octokit/graphql'
 
+import { request } from '@octokit/request'
 import {
   GitHubAPI
 } from './'
@@ -15,11 +16,11 @@ export interface GraphQLError {
 }
 
 export function addGraphQL (client: GitHubAPI) {
-  const graphql = octokitGraphqlWithDefaults(client.request, {
-    method: 'POST',
-    url: '/graphql',
+  const graphqlRequest = (client.request as any as typeof request).defaults({
     ...(process.env.GHE_HOST ? { baseUrl: `https://${process.env.GHE_HOST}/api` } : {})
   })
+  const graphql = withCustomRequest(graphqlRequest)
+
   client.graphql = (...args: any[]): any => {
     if (args[2]) {
       // tslint:disable-next-line:no-console

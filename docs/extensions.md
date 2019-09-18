@@ -76,8 +76,8 @@ const attachments = require('probot-attachments')
 module.exports = app => {
   app.on('issue_comment.created', context => {
     return attachments(context).add({
-      'title': 'Hello World',
-      'title_link': 'https://example.com/hello'
+      title: 'Hello World',
+      title_link: 'https://example.com/hello'
     })
   })
 }

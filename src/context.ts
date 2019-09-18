@@ -228,6 +228,20 @@ export class Context<E extends WebhookPayloadWithRepository = any> implements We
   private async loadYaml<T> (params: ReposGetContentsParams): Promise<any> {
     try {
       const response = await this.github.repos.getContents(params)
+
+      // Ignore in case path is a folder
+      // - https://developer.github.com/v3/repos/contents/#response-if-content-is-a-directory
+      if (Array.isArray(response.data)) {
+        return null
+      }
+
+      // we don't handle symlinks or submodule
+      // - https://developer.github.com/v3/repos/contents/#response-if-content-is-a-symlink
+      // - https://developer.github.com/v3/repos/contents/#response-if-content-is-a-submodule
+      if (typeof response.data.content !== 'string') {
+        return
+      }
+
       return yaml.safeLoad(Buffer.from(response.data.content, 'base64').toString()) || {}
     } catch (e) {
       if (e.status === 404) {

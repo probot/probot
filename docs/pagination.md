@@ -46,7 +46,7 @@ module.exports = app => {
   app.on('issues.opened', context => {
     const options = context.github.issues.getAll.endpoint.merge(context.repo())
     context.github.paginate(options, (res, done) => {
-      for (let issue of res.data) {
+      for (const issue of res.data) {
         if (issue.body.includes('something')) {
           console.log('found it:', issue)
           done()
@@ -67,7 +67,7 @@ module.exports = app => {
   app.on('issues.opened', async context => {
     const options = context.github.issues.getAll.endpoint.merge(context.repo())
     for await (const response of octokit.paginate.iterator(options)) {
-      for (let issue of res.data) {
+      for (const issue of res.data) {
         if (issue.body.includes('something')) {
           return console.log('found it:', issue)
         }

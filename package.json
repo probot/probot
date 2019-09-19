@@ -57,7 +57,7 @@
     "@octokit/plugin-retry": "^2.1.1",
     "@octokit/plugin-throttling": "^2.3.0",
     "@octokit/request": "^5.1.0",
-    "@octokit/rest": "^16.25.0",
+    "@octokit/rest": "^16.29.0",
     "@octokit/webhooks": "^6.0.0",
     "@types/supports-color": "^5.3.0",
     "bottleneck": "^2.15.3",
@@ -112,7 +112,7 @@
     "jest": "^24.1.0",
     "minami": "^1.1.1",
     "nock": "^11.3.2",
-    "semantic-release": "16.0.0-beta.18",
+    "semantic-release": "^16.0.0-beta.24",
     "smee-client": "^1.0.1",
     "standard": "^14.0.2",
     "standard-markdown": "^5.0.1",
@@ -121,7 +121,7 @@
     "tslint": "^5.9.1",
     "tslint-config-prettier": "^1.10.0",
     "tslint-config-standard": "^8.0.0",
-    "typedoc": "^0.14.0",
+    "typedoc": "^0.15.0",
     "typescript": "^3.4.1"
   },
   "standard": {

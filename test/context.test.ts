@@ -99,26 +99,9 @@ describe('Context', () => {
     let github: GitHubAPI
 
     function responseFromString (content: string) {
-      const data = {
-        content: Buffer.from(content).toString('base64'),
-
-        // add dummy properties to make response compatible with Typecsript definitions
-        _links: {
-          git: '',
-          html: '',
-          self: ''
-        },
-        download_url: '',
-        git_url: '',
-        html_url: '',
-        name: '',
-        path: '',
-        sha: '',
-        size: 1,
-        type: '',
-        url: ''
-      }
-      return createMockResponse(data)
+      return createMockResponse({
+        content: Buffer.from(content).toString('base64')
+      }) as ReturnType<typeof github.repos.getContents>
     }
 
     function responseFromConfig (fileName: string) {

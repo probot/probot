@@ -1,3 +1,6 @@
+// tslint:disable-next-line: no-var-requires
+require('dotenv').config()
+
 import { App as OctokitApp } from '@octokit/app'
 import Octokit from '@octokit/rest'
 import Webhooks from '@octokit/webhooks'
@@ -31,8 +34,6 @@ const defaultAppFns: ApplicationFunction[] = [
 
 export class Probot {
   public static async run (appFn: ApplicationFunction | string[]) {
-    require('dotenv').config()
-
     const pkgConf = require('pkg-conf')
     const program = require('commander')
 

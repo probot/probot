@@ -21,13 +21,15 @@ export const ProbotOctokit = Octokit
  * @see {@link https://github.com/octokit/rest.js}
  */
 export function GitHubAPI (options: Options = {} as any) {
-  const octokit = new options.Octokit(Object.assign(options, {
+  const mergedOptions = Object.assign({
     Octokit: ProbotOctokit,
     throttle: Object.assign({
       onAbuseLimit: (retryAfter: number) => options.logger.warn(`Abuse limit hit, retrying in ${retryAfter} seconds`),
       onRateLimit: (retryAfter: number) => options.logger.warn(`Rate limit hit, retrying in ${retryAfter} seconds`)
     }, options.throttle)
-  })) as GitHubAPI
+  }, options)
+
+  const octokit = new options.Octokit(mergedOptions) as GitHubAPI
 
   addPagination(octokit)
   addLogging(octokit, options.logger)

@@ -3,7 +3,6 @@ import enterpriseCompatibility from '@octokit/plugin-enterprise-compatibility'
 import retryPlugin from '@octokit/plugin-retry'
 import throttlePlugin from '@octokit/plugin-throttling'
 import Octokit from '@octokit/rest'
-import deepmerge from 'deepmerge'
 
 import { addGraphQL } from './graphql'
 import { addLogging, Logger } from './logging'
@@ -22,13 +21,19 @@ export const ProbotOctokit = Octokit
  * @see {@link https://github.com/octokit/rest.js}
  */
 export function GitHubAPI (options: Options = {} as any) {
-  const mergedOptions = deepmerge({
+  const defaults = {
     Octokit: ProbotOctokit,
     throttle: {
       onAbuseLimit: (retryAfter: number) => options.logger.warn(`Abuse limit hit, retrying in ${retryAfter} seconds`),
       onRateLimit: (retryAfter: number) => options.logger.warn(`Rate limit hit, retrying in ${retryAfter} seconds`)
     }
-  }, options)
+  }
+
+  const mergedOptions = Object.assign(
+    defaults,
+    { throttle: Object.assign(defaults.throttle, options.throttle) },
+    options
+  )
 
   const octokit = new mergedOptions.Octokit(mergedOptions) as GitHubAPI
 

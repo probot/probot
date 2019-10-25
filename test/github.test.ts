@@ -30,6 +30,14 @@ describe('GitHubAPI', () => {
     expect((await github.users.getAuthenticated({})).data).toEqual(user)
   })
 
+  test('works without options that do not include Octokit', async () => {
+    github = GitHubAPI({ retry: { enabled: false }, logger })
+    const user = { login: 'ohai' }
+
+    nock('https://api.github.com').get('/user').reply(200, user)
+    expect((await github.users.getAuthenticated({})).data).toEqual(user)
+  })
+
   test('logs request errors', async () => {
     nock('https://api.github.com')
       .get('/')

@@ -64,7 +64,7 @@ export interface OctokitError extends Error {
 interface Paginate extends Octokit.Paginate {
   (
     responsePromise: Promise<Octokit.AnyResponse>,
-    callback?: (response: Octokit.AnyResponse) => any
+    callback?: (response: Octokit.AnyResponse, done: () => void) => any
   ): Promise<any[]>
 }
 

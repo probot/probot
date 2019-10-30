@@ -5,21 +5,21 @@ import { logger } from '../src/logger'
 describe('GitHubAPI', () => {
   let github: GitHubAPI
 
-  beforeEach(() => {
-    const options: Options = {
-      Octokit: ProbotOctokit,
-      logger,
-      retry: {
-        // disable retries to test error states
-        enabled: false
-      },
-      throttle: {
-        // disable throttling, otherwise tests are _slow_
-        enabled: false
-      }
+  const defaultOptions: Options = {
+    Octokit: ProbotOctokit,
+    logger,
+    retry: {
+      // disable retries to test error states
+      enabled: false
+    },
+    throttle: {
+      // disable throttling, otherwise tests are _slow_
+      enabled: false
     }
+  }
 
-    github = GitHubAPI(options)
+  beforeEach(() => {
+    github = GitHubAPI(defaultOptions)
   })
 
   test('works without options', async () => {
@@ -46,14 +46,9 @@ describe('GitHubAPI', () => {
   describe('with retry enabled', () => {
     beforeEach(() => {
       const options: Options = {
-        Octokit: ProbotOctokit,
-        logger,
+        ...defaultOptions,
         retry: {
           enabled: true
-        },
-        throttle: {
-          // disable throttling, otherwise tests are _slow_
-          enabled: false
         }
       }
 
@@ -79,12 +74,7 @@ describe('GitHubAPI', () => {
   describe('with throttling enabled', () => {
     beforeEach(() => {
       const options: Options = {
-        Octokit: ProbotOctokit,
-        logger,
-        retry: {
-          // disable retries to test error states
-          enabled: false
-        },
+        ...defaultOptions,
         throttle: {
           enabled: true,
           minimumAbuseRetryAfter: 1

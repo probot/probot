@@ -43,6 +43,92 @@ describe('GitHubAPI', () => {
     }
   })
 
+  describe('with retry enabled', () => {
+    beforeEach(() => {
+      const options: Options = {
+        Octokit: ProbotOctokit,
+        logger,
+        retry: {
+          enabled: true
+        },
+        throttle: {
+          // disable throttling, otherwise tests are _slow_
+          enabled: false
+        }
+      }
+
+      github = GitHubAPI(options)
+    })
+
+    test('retries failed requests', async () => {
+      nock('https://api.github.com')
+        .get('/')
+        .once()
+        .reply(500, {})
+
+      nock('https://api.github.com')
+        .get('/')
+        .once()
+        .reply(200, {})
+
+      const response = await github.request('/')
+      expect(response.status).toBe(200)
+    })
+  })
+
+  describe('with throttling enabled', () => {
+    beforeEach(() => {
+      const options: Options = {
+        Octokit: ProbotOctokit,
+        logger,
+        retry: {
+          // disable retries to test error states
+          enabled: false
+        },
+        throttle: {
+          enabled: true,
+          minimumAbuseRetryAfter: 1
+        }
+      }
+
+      github = GitHubAPI(options)
+    })
+
+    test('retries requests when being rate limited', async () => {
+      nock('https://api.github.com')
+        .get('/')
+        .once()
+        .reply(403, {}, {
+          'X-RateLimit-Limit': '60',
+          'X-RateLimit-Remaining': '0',
+          'X-RateLimit-Reset': `${new Date().getTime() / 1000}`
+        })
+
+      nock('https://api.github.com')
+        .get('/')
+        .once()
+        .reply(200, {})
+
+      const response = await github.request('/')
+      expect(response.status).toBe(200)
+    })
+
+    test('retries requests when hitting the abuse limiter', async () => {
+      nock('https://api.github.com')
+        .get('/')
+        .once()
+        .reply(403, { message: 'The throttle plugin just looks for the word abuse in the error message' })
+
+      nock('https://api.github.com')
+        .get('/')
+        .once()
+        .reply(200, {})
+
+      const response = await github.request('/')
+      expect(response.status).toBe(200)
+    })
+  })
+
   describe('paginate', () => {
     // Prepare an array of issue objects
     const issues = new Array(5).fill(0).map((_, i, arr) => {

@@ -14,7 +14,7 @@ export function addPagination (octokit: Octokit) {
   )
 }
 
-const defaultCallback = (response: Octokit.AnyResponse, done?: () => void) => response
+const defaultCallback = (response: Octokit.AnyResponse, done: () => void) => response
 
 async function paginate (octokit: Octokit, octokitPaginate: Octokit.Paginate, ...args: any[]) {
   // Until we fully deprecate the old paginate method, we need to check if the

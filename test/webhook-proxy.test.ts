@@ -11,7 +11,7 @@ import { createWebhookProxy } from '../src/webhook-proxy'
 const targetPort = 999999
 
 interface SSEResponse extends Response {
-  json (body: any, status?: string): Response
+  json (body: any, status?: string): this
 }
 
 describe('webhook-proxy', () => {

@@ -120,7 +120,7 @@
     "ts-jest": "^24.0.0",
     "tslint": "^5.9.1",
     "tslint-config-prettier": "^1.10.0",
-    "tslint-config-standard": "^8.0.0",
+    "tslint-config-standard": "^9.0.0",
     "typedoc": "^0.15.0",
     "typescript": "^3.4.1"
   },

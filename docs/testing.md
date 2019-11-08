@@ -17,12 +17,11 @@ const { Probot, createProbot } = require('probot')
 const payload = require('./fixtures/issues.opened')
 const issueCreatedBody = { body: 'Thanks for opening this issue!' }
 
-nock.disableNetConnect()
-
 describe('My Probot app', () => {
   let probot
 
   beforeEach(() => {
+    nock.disableNetConnect()
     probot = createProbot({ id: 1, cert: 'test', githubToken: 'test' })
     probot.load(myProbotApp)
   })
@@ -43,6 +42,11 @@ describe('My Probot app', () => {
 
     // Receive a webhook event
     await probot.receive({ name: 'issues', payload })
+  })
+
+  afterEach(() => {
+    nock.cleanAll()
+    nock.enableNetConnect()
   })
 })
 ```

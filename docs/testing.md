@@ -43,7 +43,7 @@ describe('My Probot app', () => {
     // Receive a webhook event
     await probot.receive({ name: 'issues', payload })
   })
-  
+
   afterEach(() => {
     nock.cleanAll()
     nock.enableNetConnect()

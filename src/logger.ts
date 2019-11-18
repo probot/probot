@@ -65,5 +65,5 @@ export const logger = new Logger({
     color: supportsColor.stdout,
     levelInString: !!process.env.LOG_LEVEL_IN_STRING,
     outputMode: toBunyanFormat(process.env.LOG_FORMAT || 'short')
-  }) as NodeJS.WritableStream
+  })
 })

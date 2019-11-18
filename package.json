@@ -89,7 +89,7 @@
   },
   "devDependencies": {
     "@types/bunyan": "^1.8.4",
-    "@types/bunyan-format": "^0.2.1",
+    "@types/bunyan-format": "^0.2.2",
     "@types/cache-manager": "^2.10.0",
     "@types/dotenv": "^8.2.0",
     "@types/eventsource": "^1.1.0",

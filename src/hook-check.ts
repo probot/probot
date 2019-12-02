@@ -14,7 +14,7 @@ const MESSAGES: {
 let appMetadata: ReturnType<GitHubAPI['apps']['getAuthenticated']> | null = null
 
 let hasDisplayedFeatureDisabledWarning = false
-function disabledHookCheckWarning (app: Application) {
+function displayFeatureDisabledWarning (app: Application) {
   if (!hasDisplayedFeatureDisabledWarning) {
     app.log.debug('DISABLE_WEBHOOK_CHECK is enabled in your environment. You will not be warned if your Probot app is attempting to listen to an event it is not subscribed to.')
   }
@@ -24,7 +24,7 @@ function disabledHookCheckWarning (app: Application) {
 
 async function hookCheck (app: Application, eventName: string) {
   if ((process.env.DISABLE_WEBHOOK_CHECK && process.env.DISABLE_WEBHOOK_CHECK.toLowerCase() === 'true') || process.env.NODE_ENV === 'production') {
-    disabledHookCheckWarning(app)
+    displayFeatureDisabledWarning(app)
     return
   }
 
@@ -50,37 +50,39 @@ async function isSubscribedToEvent (event: string) {
 }
 
 async function retrieveAppMeta (app?: Application) {
-  if (appMetadata === null) {
-    appMetadata = new Promise(async (resolve, reject) => {
-      if (app === undefined) {
-        return reject(new SyntaxError([
-          'Probot is unable to retrieve application metadata information for webhook checking.',
-          ...MESSAGES.ISSUE_REPORT,
-          '',
-          ...MESSAGES.DISABLE_WEBHOOK_CHECK
-        ].join('\n')))
-      }
-
-      try {
-        const api = await app.auth()
-        const meta = await api.apps.getAuthenticated()
-        return resolve(meta)
-      } catch (e) {
-        // If this error occurs, it's most likely because the user has
-        // incorrectly setup authentication between the GitHub API/GitHub
-        // Application and their Probot application.
-        return reject(new SyntaxError([
-          'Probot is unable to retrieve application metadata information for webhook subscription checks.',
-          '',
-          'This may be an error with your application using incorrect authentication configuration.',
-          '',
-          ...MESSAGES.DISABLE_WEBHOOK_CHECK,
-          '',
-          ...MESSAGES.ISSUE_REPORT
-        ].join('\n')))
-      }
-    })
+  if (appMetadata) {
+    return appMetadata
   }
+
+  appMetadata = new Promise(async (resolve, reject) => {
+    if (app === undefined) {
+      return reject(new SyntaxError([
+        'Probot is unable to retrieve application metadata information for webhook checking.',
+        ...MESSAGES.ISSUE_REPORT,
+        '',
+        ...MESSAGES.DISABLE_WEBHOOK_CHECK
+      ].join('\n')))
+    }
+
+    try {
+      const api = await app.auth()
+      const meta = await api.apps.getAuthenticated()
+      return resolve(meta)
+    } catch (e) {
+      // If this error occurs, it's most likely because the user has
+      // incorrectly setup authentication between the GitHub API/GitHub
+      // Application and their Probot application.
+      return reject(new SyntaxError([
+        'Probot is unable to retrieve application metadata information for webhook subscription checks.',
+        '',
+        'This may be an error with your application using incorrect authentication configuration.',
+        '',
+        ...MESSAGES.DISABLE_WEBHOOK_CHECK,
+        '',
+        ...MESSAGES.ISSUE_REPORT
+      ].join('\n')))
+    }
+  })
 
   return appMetadata
 }

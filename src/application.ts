@@ -7,6 +7,7 @@ import { ApplicationFunction } from '.'
 import { Cache } from './cache'
 import { Context } from './context'
 import { GitHubAPI, ProbotOctokit } from './github'
+import hookCheck from './hook-check'
 import { logger } from './logger'
 import { LoggerWithTarget, wrapLogger } from './wrap-logger'
 
@@ -437,6 +438,8 @@ export class Application {
   public on (eventName: string | string[], callback: OnCallback<any>): void
   public on (eventName: string | string[], callback: (context: Context) => Promise<void>) {
     if (typeof eventName === 'string') {
+      // tslint:disable-next-line: no-floating-promises
+      hookCheck(this, eventName)
 
       return this.events.on(eventName, async (event: Webhooks.WebhookEvent<any>) => {
         const log = this.log.child({ name: 'event', id: event.id })

@@ -35,8 +35,8 @@ async function eventCheck (app: Application, eventName: string) {
   }
 
   const baseEventName = eventName.split('.')[0]
-  if (!(await isSubscribedToEvent(app, baseEventName))) {
-    app.log.error(`Your app is attempting to listen to the "${eventName}" event, but your GitHub app is not subscribed to the "${baseEventName}" event.`)
+  if (!(await isSubscribedToEvent(app, baseEventName)) && hasDisplayedWarning.failedRetrievingMeta === false) {
+    app.log.error(`Your app is attempting to listen to the "${eventName}" event, but your GitHub App is not subscribed to the "${baseEventName}" event.`)
   }
 }
 
@@ -77,14 +77,10 @@ async function isSubscribedToEvent (app: Application, baseEventName: string) {
       app.log.warn(e)
     }
     hasDisplayedWarning.failedRetrievingMeta = true
-    return true
+    return false
   }
 
-  if (events.includes(baseEventName)) {
-    return true
-  }
-
-  return false
+  return events.includes(baseEventName)
 }
 
 async function retrieveAppMeta (app: Application) {

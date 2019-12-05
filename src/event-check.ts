@@ -99,20 +99,14 @@ async function retrieveAppMeta (app: Application) {
        * There are a few reasons why Probot might be unable to retrieve
        * application metadata.
        *
-       * * Probot may not be connected to the Internet.
-       * * The GitHub API is not responding to requests (see
+       * - Probot may not be connected to the Internet.
+       * - The GitHub API is not responding to requests (see
        *   https://www.githubstatus.com/).
-       * * The user has incorrectly configured environment variables (e.g.
+       * - The user has incorrectly configured environment variables (e.g.
        *   APP_ID, PRIVATE_KEY, etc.) used for authentication between the Probot
        *   app and the GitHub API.
        */
-      return reject([
-        'Probot is unable to retrieve app information from GitHub for event subscription verification.',
-        '',
-        ...MESSAGES.ISSUE_REPORT,
-        '',
-        ...MESSAGES.DISABLE_EVENT_CHECK
-      ].join('\n'))
+      return reject('Probot is unable to retrieve app information from GitHub for event subscription verification.')
     }
   })
 

@@ -15,15 +15,11 @@ describe('event-check', () => {
   const unsubscribedEventName = 'an-unsubscribed-event.action'
 
   beforeAll(() => {
-    originalNodeEnv = process.env.NODE_ENV as string
+    originalNodeEnv = process.env.NODE_ENV || 'test'
   })
 
   beforeEach(() => {
-    // Clean up env variable
     delete process.env.DISABLE_EVENT_CHECK
-    // event-check is disabled in environments where NODE_ENV is not
-    // `development`. The default NODE_ENV value set by Jest is `test`.
-    process.env.NODE_ENV = 'development'
     nock.cleanAll()
     resetEventCheckCaches()
   })
@@ -66,11 +62,11 @@ describe('event-check', () => {
     test('unable to retrieve app metadata', async () => {
       nock('https://api.github.com')
         .defaultReplyHeaders({ 'Content-Type': 'application/json' })
-        .get('/app').reply(404, {}, { status: '404 not found' })
+        .get('/app').reply(404)
       app = newApp()
       const spyOnLogWarn = jest.spyOn(app.log, 'warn')
-      expect(await eventCheck(app, unsubscribedEventName)).toStrictEqual(false)
-      expect(await eventCheck(app, `another-${unsubscribedEventName}`)).toStrictEqual(false)
+      expect(await eventCheck(app, unsubscribedEventName)).toBeUndefined()
+      expect(await eventCheck(app, `another-${unsubscribedEventName}`)).toBeUndefined()
       expect(spyOnLogWarn).toHaveBeenCalledTimes(1)
       expect(spyOnLogWarn).toMatchSnapshot()
     })
@@ -99,7 +95,7 @@ describe('event-check', () => {
     })
   })
 
-  afterAll(() => {
+  afterEach(() => {
     process.env.NODE_ENV = originalNodeEnv
   })
 })

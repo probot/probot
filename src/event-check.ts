@@ -2,12 +2,7 @@ import { Application } from './application'
 import { GitHubAPI } from './github'
 
 let appMetadata: ReturnType<GitHubAPI['apps']['getAuthenticated']> | null = null
-
-// To avoid displaying a message multiple times, we keep track of which messages
-// have already been displayed.
-const hasDisplayedWarning = {
-  failedRetrievingMeta: false
-}
+let didFailRetrievingAppMeta = false
 
 /**
  * Check if `app` is subscribed to an event.
@@ -24,16 +19,13 @@ async function eventCheck (app: Application, eventName: string) {
   }
 
   const baseEventName = eventName.split('.')[0]
-
   if (await isSubscribedToEvent(app, baseEventName)) {
     return true
   }
-
-  if (hasDisplayedWarning.failedRetrievingMeta === false) {
+  if (didFailRetrievingAppMeta === false) {
     app.log.error(`Your app is attempting to listen to the "${eventName}" event, but your GitHub App is not subscribed to the "${baseEventName}" event.`)
   }
-
-  return false
+  return didFailRetrievingAppMeta ? undefined : false
 }
 
 /**
@@ -56,10 +48,10 @@ async function isSubscribedToEvent (app: Application, baseEventName: string) {
   try {
     events = (await retrieveAppMeta(app)).data.events
   } catch (e) {
-    if (!hasDisplayedWarning.failedRetrievingMeta) {
+    if (!didFailRetrievingAppMeta) {
       app.log.warn(e)
     }
-    hasDisplayedWarning.failedRetrievingMeta = true
+    didFailRetrievingAppMeta = true
     return
   }
 
@@ -102,7 +94,7 @@ async function retrieveAppMeta (app: Application) {
 function isEventCheckEnabled () {
   if (process.env.DISABLE_EVENT_CHECK && process.env.DISABLE_EVENT_CHECK.toLowerCase() === 'true') {
     return false
-  } else if (process.env.NODE_ENV && process.env.NODE_ENV.toLowerCase() !== 'development') {
+  } else if (process.env.NODE_ENV && process.env.NODE_ENV.toLowerCase() === 'production') {
     return false
   }
   return true
@@ -115,5 +107,5 @@ export default eventCheck
  */
 export function resetEventCheckCaches () {
   appMetadata = null
-  hasDisplayedWarning.failedRetrievingMeta = false
+  didFailRetrievingAppMeta = false
 }

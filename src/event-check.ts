@@ -28,44 +28,32 @@ async function eventCheck (app: Application, eventName: string) {
     return
   }
 
-  await retrieveAppMeta(app)
   const baseEventName = eventName.split('.')[0]
-
-  if (!(await isSubscribedToEvent(baseEventName))) {
+  if (!(await isSubscribedToEvent(app, baseEventName))) {
     app.log.warn(`Your app is attempting to listen to the "${eventName}" event, but your GitHub app is not subscribed to the "${baseEventName}" event.`)
     // TODO: Add link to GitHub docs about how to modify the events a GitHub App
     // is subscribed to.
   }
 }
 
-async function isSubscribedToEvent (event: string) {
-  if (event === '*') {
+async function isSubscribedToEvent (app: Application, baseEventName: string) {
+  if (baseEventName === '*') {
     return true
   }
 
-  const events = (await retrieveAppMeta()).data.events
-  console.log('retrieveAppMeta', await retrieveAppMeta())
-  if (events.includes(event)) {
+  const events = (await retrieveAppMeta(app)).data.events
+  if (events.includes(baseEventName)) {
     return true
   }
   return false
 }
 
-async function retrieveAppMeta (app?: Application) {
+async function retrieveAppMeta (app: Application) {
   if (appMetadata) {
     return appMetadata
   }
 
   appMetadata = new Promise(async (resolve, reject) => {
-    if (app === undefined) {
-      return reject(new SyntaxError([
-        'An unexpected error occurred with Probot\'s event-check feature.',
-        ...MESSAGES.ISSUE_REPORT,
-        '',
-        ...MESSAGES.DISABLE_EVENT_CHECK
-      ].join('\n')))
-    }
-
     try {
       const api = await app.auth()
       const meta = await api.apps.getAuthenticated()

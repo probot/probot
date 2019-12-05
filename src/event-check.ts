@@ -4,7 +4,7 @@ import { GitHubAPI } from './github'
 const MESSAGES: {
   [key: string]: string[]
 } = {
-  DISABLE_WEBHOOK_CHECK: ['You can disable webhook checking by setting the environment variable DISABLE_WEBHOOK_CHECK to "true".'],
+  DISABLE_EVENT_CHECK: ['You can disable event checking by setting the environment variable DISABLE_EVENT_CHECK to "true".'],
   ISSUE_REPORT: [
     'If this error persists, you can raise a bug report at:',
     '  - https://github.com/probot/probot/issues'
@@ -16,14 +16,14 @@ let appMetadata: ReturnType<GitHubAPI['apps']['getAuthenticated']> | null = null
 let hasDisplayedFeatureDisabledWarning = false
 function displayFeatureDisabledWarning (app: Application) {
   if (!hasDisplayedFeatureDisabledWarning) {
-    app.log.debug('DISABLE_WEBHOOK_CHECK is enabled in your environment. You will not be warned if your Probot app is attempting to listen to an event it is not subscribed to.')
+    app.log.debug('DISABLE_EVENT_CHECK is enabled in your environment. You will not be warned if your Probot app is attempting to listen to an event it is not subscribed to.')
   }
 
   hasDisplayedFeatureDisabledWarning = true
 }
 
-async function hookCheck (app: Application, eventName: string) {
-  if ((process.env.DISABLE_WEBHOOK_CHECK && process.env.DISABLE_WEBHOOK_CHECK.toLowerCase() === 'true') || process.env.NODE_ENV === 'production') {
+async function eventCheck (app: Application, eventName: string) {
+  if ((process.env.DISABLE_EVENT_CHECK && process.env.DISABLE_EVENT_CHECK.toLowerCase() === 'true') || process.env.NODE_ENV === 'production') {
     displayFeatureDisabledWarning(app)
     return
   }
@@ -32,7 +32,9 @@ async function hookCheck (app: Application, eventName: string) {
   const baseEventName = eventName.split('.')[0]
 
   if (!(await isSubscribedToEvent(baseEventName))) {
-    app.log.warn(`Your app is attempting to listen to the "${eventName}" event, but your app is not subscribed to the "${baseEventName}" webhook.`)
+    app.log.warn(`Your app is attempting to listen to the "${eventName}" event, but your GitHub app is not subscribed to the "${baseEventName}" event.`)
+    // TODO: Add link to GitHub docs about how to modify the events a GitHub App
+    // is subscribed to.
   }
 }
 
@@ -42,7 +44,7 @@ async function isSubscribedToEvent (event: string) {
   }
 
   const events = (await retrieveAppMeta()).data.events
-
+  console.log('retrieveAppMeta', await retrieveAppMeta())
   if (events.includes(event)) {
     return true
   }
@@ -57,10 +59,10 @@ async function retrieveAppMeta (app?: Application) {
   appMetadata = new Promise(async (resolve, reject) => {
     if (app === undefined) {
       return reject(new SyntaxError([
-        'Probot is unable to retrieve application metadata information for webhook checking.',
+        'An unexpected error occurred with Probot\'s event-check feature.',
         ...MESSAGES.ISSUE_REPORT,
         '',
-        ...MESSAGES.DISABLE_WEBHOOK_CHECK
+        ...MESSAGES.DISABLE_EVENT_CHECK
       ].join('\n')))
     }
 
@@ -69,15 +71,16 @@ async function retrieveAppMeta (app?: Application) {
       const meta = await api.apps.getAuthenticated()
       return resolve(meta)
     } catch (e) {
-      // If this error occurs, it's most likely because the user has
-      // incorrectly setup authentication between the GitHub API/GitHub
-      // Application and their Probot application.
+      // If this error occurs, the application was unable to authenticate with
+      // the GitHub API. It's most likely because the user has incorrectly
+      // configured the environment variables (e.g. APP_ID, PRIVATE_KEY, etc.)
+      // used for authentication between the Probot app and the GitHub API.
       return reject(new SyntaxError([
-        'Probot is unable to retrieve application metadata information for webhook subscription checks.',
+        'Probot is unable to retrieve application metadata information for event subscription checks.',
         '',
-        'This may be an error with your application using incorrect authentication configuration.',
+        'This may be an error with your application using incorrect configuration.',
         '',
-        ...MESSAGES.DISABLE_WEBHOOK_CHECK,
+        ...MESSAGES.DISABLE_EVENT_CHECK,
         '',
         ...MESSAGES.ISSUE_REPORT
       ].join('\n')))
@@ -87,4 +90,4 @@ async function retrieveAppMeta (app?: Application) {
   return appMetadata
 }
 
-export default hookCheck
+export default eventCheck

@@ -16,21 +16,11 @@ let appMetadata: ReturnType<GitHubAPI['apps']['getAuthenticated']> | null = null
 // To avoid displaying a message multiple times, we keep track of which messages
 // have already been displayed.
 const hasDisplayedWarning = {
-  failedRetrievingMeta: false,
-  featureDisabled: false
-}
-
-function displayFeatureDisabledWarning (app: Application) {
-  if (!hasDisplayedWarning.featureDisabled) {
-    app.log.debug('DISABLE_EVENT_CHECK is enabled in your environment. You will not be warned if your Probot app is attempting to listen to an event it is not subscribed to.')
-  }
-
-  hasDisplayedWarning.featureDisabled = true
+  failedRetrievingMeta: false
 }
 
 async function eventCheck (app: Application, eventName: string) {
   if (isEventCheckEnabled() === false) {
-    displayFeatureDisabledWarning(app)
     return
   }
 

@@ -88,12 +88,9 @@ async function retrieveAppMeta (app: Application) {
 function isEventCheckEnabled () {
   if (process.env.DISABLE_EVENT_CHECK && process.env.DISABLE_EVENT_CHECK.toLowerCase() === 'true') {
     return false
-  }
-
-  if (process.env.NODE_ENV && process.env.NODE_ENV.toLowerCase() !== 'development') {
+  } else if (process.env.NODE_ENV && process.env.NODE_ENV.toLowerCase() !== 'development') {
     return false
   }
-
   return true
 }
 

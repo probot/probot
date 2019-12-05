@@ -1,16 +1,6 @@
 import { Application } from './application'
 import { GitHubAPI } from './github'
 
-const MESSAGES: {
-  [key: string]: string[]
-} = {
-  DISABLE_EVENT_CHECK: ['You can disable event checking by setting the environment variable DISABLE_EVENT_CHECK to "true".'],
-  ISSUE_REPORT: [
-    'If this error persists, you can raise a bug report at:',
-    '  - https://github.com/probot/probot/issues'
-  ]
-}
-
 let appMetadata: ReturnType<GitHubAPI['apps']['getAuthenticated']> | null = null
 
 // To avoid displaying a message multiple times, we keep track of which messages

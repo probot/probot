@@ -1,6 +1,6 @@
 import nock from 'nock'
 import { Application } from '../src'
-import eventCheck, { resetMetadataCache } from '../src/event-check'
+import eventCheck, { resetEventCheckCaches } from '../src/event-check'
 import { newApp } from './apps/helper'
 
 function mockAppMetaRequest (events: string[] = [ 'issues' ]) {
@@ -21,9 +21,11 @@ describe('event-check', () => {
   beforeEach(() => {
     // Clean up env variable
     delete process.env.DISABLE_EVENT_CHECK
+    // event-check is disabled in environments where NODE_ENV is not
+    // `development`. The default NODE_ENV value set by Jest is `test`.
     process.env.NODE_ENV = 'development'
     nock.cleanAll()
-    resetMetadataCache()
+    resetEventCheckCaches()
   })
 
   test('caches result of /app', async () => {
@@ -32,12 +34,12 @@ describe('event-check', () => {
       .get('/app').reply(200, mockAppMetaRequest(['label', 'star']))
     app = newApp()
     const spyOnLogError = jest.spyOn(app.log, 'error')
-    await eventCheck(app, 'label.edited')
+    expect(await eventCheck(app, 'label.edited')).toStrictEqual(true)
     nock('https://api.github.com')
       .defaultReplyHeaders({ 'Content-Type': 'application/json' })
       .get('/app').reply(200, mockAppMetaRequest(['team']))
-    await eventCheck(app, 'label.deleted')
-    await eventCheck(app, 'team.created')
+    expect(await eventCheck(app, 'label.deleted')).toStrictEqual(true)
+    expect(await eventCheck(app, 'team.created')).toStrictEqual(false)
     expect(spyOnLogError).toMatchSnapshot()
   })
 
@@ -56,9 +58,8 @@ describe('event-check', () => {
         .get('/app').reply(200, mockAppMetaRequest())
       app = newApp()
       const spyOnLogError = jest.spyOn(app.log, 'error')
-      await eventCheck(app, unsubscribedEventName)
+      expect(await eventCheck(app, unsubscribedEventName)).toStrictEqual(false)
       expect(spyOnLogError).toHaveBeenCalledTimes(1)
-      expect(spyOnLogError).toHaveBeenCalledWith(expect.stringContaining('attempting to listen to'))
       expect(spyOnLogError).toMatchSnapshot()
     })
 
@@ -68,8 +69,8 @@ describe('event-check', () => {
         .get('/app').reply(404, {}, { status: '404 not found' })
       app = newApp()
       const spyOnLogWarn = jest.spyOn(app.log, 'warn')
-      await eventCheck(app, unsubscribedEventName)
-      await eventCheck(app, `another-${unsubscribedEventName}`)
+      expect(await eventCheck(app, unsubscribedEventName)).toStrictEqual(false)
+      expect(await eventCheck(app, `another-${unsubscribedEventName}`)).toStrictEqual(false)
       expect(spyOnLogWarn).toHaveBeenCalledTimes(1)
       expect(spyOnLogWarn).toMatchSnapshot()
     })

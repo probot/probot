@@ -14,8 +14,9 @@ const hasDisplayedWarning = {
  *
  * @param {Application} app
  * @param {string} eventName
- * @returns Returns `true` if the app is subscribed to an event. Otherwise,
- * returns `false`. Returns `undefined` if the event-check feature is disabled.
+ * @returns Returns `false` if the app is not subscribed to an event. Otherwise,
+ * returns `true`. Returns `undefined` if the event-check feature is disabled or
+ * failed to retrieve app metadata.
  */
 async function eventCheck (app: Application, eventName: string) {
   if (isEventCheckEnabled() === false) {
@@ -23,12 +24,16 @@ async function eventCheck (app: Application, eventName: string) {
   }
 
   const baseEventName = eventName.split('.')[0]
-  if (!(await isSubscribedToEvent(app, baseEventName)) && !hasDisplayedWarning.failedRetrievingMeta) {
-    app.log.error(`Your app is attempting to listen to the "${eventName}" event, but your GitHub App is not subscribed to the "${baseEventName}" event.`)
-    return false
+
+  if (await isSubscribedToEvent(app, baseEventName)) {
+    return true
   }
 
-  return true
+  if (hasDisplayedWarning.failedRetrievingMeta === false) {
+    app.log.error(`Your app is attempting to listen to the "${eventName}" event, but your GitHub App is not subscribed to the "${baseEventName}" event.`)
+  }
+
+  return false
 }
 
 /**
@@ -39,10 +44,8 @@ async function eventCheck (app: Application, eventName: string) {
  * @returns Returns `true` when the application is subscribed to a webhook
  * event. Otherwise, returns `false`.
  *
- *  **Return Caveat Notice:** This function will return `false` if event-check
- *  fails to retrieve subscribed event data. For that reason, it is recommended
- *  to also check `hasDisplayedWarning.failedRetrievingMeta` when handling
- *  `false` return values.
+ * **Note:** This function returns `undefined` if Probot failed to retrieve
+ * GitHub App metadata.
  */
 async function isSubscribedToEvent (app: Application, baseEventName: string) {
   let events
@@ -57,7 +60,7 @@ async function isSubscribedToEvent (app: Application, baseEventName: string) {
       app.log.warn(e)
     }
     hasDisplayedWarning.failedRetrievingMeta = true
-    return false
+    return
   }
 
   return events.includes(baseEventName)
@@ -110,6 +113,7 @@ export default eventCheck
 /**
  * A helper function used by unit tests to reset the cached result of /app.
  */
-export function resetMetadataCache () {
+export function resetEventCheckCaches () {
   appMetadata = null
+  hasDisplayedWarning.failedRetrievingMeta = false
 }

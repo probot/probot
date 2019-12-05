@@ -23,7 +23,7 @@ function displayFeatureDisabledWarning (app: Application) {
 }
 
 async function eventCheck (app: Application, eventName: string) {
-  if ((process.env.DISABLE_EVENT_CHECK && process.env.DISABLE_EVENT_CHECK.toLowerCase() === 'true') || process.env.NODE_ENV === 'production') {
+  if (isEventCheckEnabled() === false) {
     displayFeatureDisabledWarning(app)
     return
   }
@@ -34,6 +34,18 @@ async function eventCheck (app: Application, eventName: string) {
     // TODO: Add link to GitHub docs about how to modify the events a GitHub App
     // is subscribed to.
   }
+}
+
+function isEventCheckEnabled () {
+  if (process.env.DISABLE_EVENT_CHECK && process.env.DISABLE_EVENT_CHECK.toLowerCase() === 'true') {
+    return false
+  }
+
+  if (process.env.NODE_ENV && process.env.NODE_ENV.toLowerCase() !== 'development') {
+    return false
+  }
+
+  return true
 }
 
 async function isSubscribedToEvent (app: Application, baseEventName: string) {

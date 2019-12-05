@@ -13,13 +13,19 @@ const MESSAGES: {
 
 let appMetadata: ReturnType<GitHubAPI['apps']['getAuthenticated']> | null = null
 
-let hasDisplayedFeatureDisabledWarning = false
+// To avoid displaying a message multiple times, we keep track of which messages
+// have already been displayed.
+const hasDisplayedWarning = {
+  failedRetrievingMeta: false,
+  featureDisabled: false
+}
+
 function displayFeatureDisabledWarning (app: Application) {
-  if (!hasDisplayedFeatureDisabledWarning) {
+  if (!hasDisplayedWarning.featureDisabled) {
     app.log.debug('DISABLE_EVENT_CHECK is enabled in your environment. You will not be warned if your Probot app is attempting to listen to an event it is not subscribed to.')
   }
 
-  hasDisplayedFeatureDisabledWarning = true
+  hasDisplayedWarning.featureDisabled = true
 }
 
 async function eventCheck (app: Application, eventName: string) {
@@ -48,15 +54,38 @@ function isEventCheckEnabled () {
   return true
 }
 
+/**
+ * @param {Application} app
+ * @param {string} baseEventName The base part of an event name refers to the
+ * text of an event name before the first period mark (e.g. the `issues` part in
+ * `issues.opened`).
+ * @returns Returns `false` when it is known the application is not subscribed
+ *  to the `baseEventName` event. Returns `true` in all other instances.
+ *
+ *  **Return Caveat Notice:** This function will return `true` if event-check
+ *  fails to retrieve subscribed event data. For that reason, it is recommended
+ *  to only treat `false` return values as accurate.
+ */
 async function isSubscribedToEvent (app: Application, baseEventName: string) {
+  let events
   if (baseEventName === '*') {
     return true
   }
 
-  const events = (await retrieveAppMeta(app)).data.events
+  try {
+    events = (await retrieveAppMeta(app)).data.events
+  } catch (e) {
+    if (!hasDisplayedWarning.failedRetrievingMeta) {
+      app.log.warn(e)
+    }
+    hasDisplayedWarning.failedRetrievingMeta = true
+    return true
+  }
+
   if (events.includes(baseEventName)) {
     return true
   }
+
   return false
 }
 
@@ -66,24 +95,30 @@ async function retrieveAppMeta (app: Application) {
   }
 
   appMetadata = new Promise(async (resolve, reject) => {
+    const api = await app.auth()
     try {
-      const api = await app.auth()
       const meta = await api.apps.getAuthenticated()
       return resolve(meta)
     } catch (e) {
-      // If this error occurs, the application was unable to authenticate with
-      // the GitHub API. It's most likely because the user has incorrectly
-      // configured the environment variables (e.g. APP_ID, PRIVATE_KEY, etc.)
-      // used for authentication between the Probot app and the GitHub API.
-      return reject(new SyntaxError([
-        'Probot is unable to retrieve application metadata information for event subscription checks.',
+      app.log.trace(e)
+      /**
+       * There are a few reasons why Probot might be unable to retrieve
+       * application metadata.
+       *
+       * * Probot may not be connected to the Internet.
+       * * The GitHub API is not responding to requests (see
+       *   https://www.githubstatus.com/).
+       * * The user has incorrectly configured environment variables (e.g.
+       *   APP_ID, PRIVATE_KEY, etc.) used for authentication between the Probot
+       *   app and the GitHub API.
+       */
+      return reject([
+        'Probot is unable to retrieve event subscription information from GitHub.',
         '',
-        'This may be an error with your application using incorrect configuration.',
+        ...MESSAGES.ISSUE_REPORT,
         '',
-        ...MESSAGES.DISABLE_EVENT_CHECK,
-        '',
-        ...MESSAGES.ISSUE_REPORT
-      ].join('\n')))
+        ...MESSAGES.DISABLE_EVENT_CHECK
+      ].join('\n'))
     }
   })
 

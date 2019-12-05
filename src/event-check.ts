@@ -15,7 +15,7 @@ async function eventCheck (app: Application, eventName: string) {
   }
 
   const baseEventName = eventName.split('.')[0]
-  if (!(await isSubscribedToEvent(app, baseEventName)) && hasDisplayedWarning.failedRetrievingMeta === false) {
+  if (!(await isSubscribedToEvent(app, baseEventName)) && !hasDisplayedWarning.failedRetrievingMeta) {
     app.log.error(`Your app is attempting to listen to the "${eventName}" event, but your GitHub App is not subscribed to the "${baseEventName}" event.`)
   }
 }

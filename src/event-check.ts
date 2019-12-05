@@ -20,18 +20,6 @@ async function eventCheck (app: Application, eventName: string) {
   }
 }
 
-function isEventCheckEnabled () {
-  if (process.env.DISABLE_EVENT_CHECK && process.env.DISABLE_EVENT_CHECK.toLowerCase() === 'true') {
-    return false
-  }
-
-  if (process.env.NODE_ENV && process.env.NODE_ENV.toLowerCase() !== 'development') {
-    return false
-  }
-
-  return true
-}
-
 /**
  * @param {Application} app
  * @param {string} baseEventName The base part of an event name refers to the
@@ -94,6 +82,18 @@ async function retrieveAppMeta (app: Application) {
   })
 
   return appMetadata
+}
+
+function isEventCheckEnabled () {
+  if (process.env.DISABLE_EVENT_CHECK && process.env.DISABLE_EVENT_CHECK.toLowerCase() === 'true') {
+    return false
+  }
+
+  if (process.env.NODE_ENV && process.env.NODE_ENV.toLowerCase() !== 'development') {
+    return false
+  }
+
+  return true
 }
 
 export default eventCheck

@@ -106,3 +106,10 @@ function isEventCheckEnabled () {
 }
 
 export default eventCheck
+
+/**
+ * A helper function used by unit tests to reset the cached result of /app.
+ */
+export function resetMetadataCache () {
+  appMetadata = null
+}

@@ -64,9 +64,7 @@ async function isSubscribedToEvent (app: Application, baseEventName: string) {
 }
 
 async function retrieveAppMeta (app: Application) {
-  if (appMetadata) {
-    return appMetadata
-  }
+  if (appMetadata) return appMetadata
 
   appMetadata = new Promise(async (resolve, reject) => {
     const api = await app.auth()

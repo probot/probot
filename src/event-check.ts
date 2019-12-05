@@ -36,9 +36,7 @@ async function eventCheck (app: Application, eventName: string) {
 
   const baseEventName = eventName.split('.')[0]
   if (!(await isSubscribedToEvent(app, baseEventName))) {
-    app.log.warn(`Your app is attempting to listen to the "${eventName}" event, but your GitHub app is not subscribed to the "${baseEventName}" event.`)
-    // TODO: Add link to GitHub docs about how to modify the events a GitHub App
-    // is subscribed to.
+    app.log.error(`Your app is attempting to listen to the "${eventName}" event, but your GitHub app is not subscribed to the "${baseEventName}" event.`)
   }
 }
 
@@ -113,7 +111,7 @@ async function retrieveAppMeta (app: Application) {
        *   app and the GitHub API.
        */
       return reject([
-        'Probot is unable to retrieve event subscription information from GitHub.',
+        'Probot is unable to retrieve event subscription information from GitHub for verification.',
         '',
         ...MESSAGES.ISSUE_REPORT,
         '',

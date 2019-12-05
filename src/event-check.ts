@@ -25,12 +25,13 @@ async function eventCheck (app: Application, eventName: string) {
  * @param {string} baseEventName The base part of an event name refers to the
  * text of an event name before the first period mark (e.g. the `issues` part in
  * `issues.opened`).
- * @returns Returns `false` when it is known the application is not subscribed
- *  to the `baseEventName` event. Returns `true` in all other instances.
+ * @returns Returns `true` when the application is subscribed to a webhook
+ * event. Otherwise, returns `false`.
  *
- *  **Return Caveat Notice:** This function will return `true` if event-check
+ *  **Return Caveat Notice:** This function will return `false` if event-check
  *  fails to retrieve subscribed event data. For that reason, it is recommended
- *  to only treat `false` return values as accurate.
+ *  to also check `hasDisplayedWarning.failedRetrievingMeta` when handling
+ *  `false` return values.
  */
 async function isSubscribedToEvent (app: Application, baseEventName: string) {
   let events

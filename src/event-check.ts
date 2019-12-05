@@ -79,7 +79,7 @@ async function retrieveAppMeta (app: Application) {
       return reject([
         'Probot is unable to retrieve app information from GitHub for event subscription verification.',
         '',
-        'If this error persists, feel free to report an issue at:',
+        'If this error persists, feel free to raise an issue at:',
         '  - https://github.com/probot/probot/issues'
       ].join('\n'))
     }

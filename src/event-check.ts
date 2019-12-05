@@ -11,7 +11,7 @@ let didFailRetrievingAppMeta = false
  * @param {string} eventName
  * @returns Returns `false` if the app is not subscribed to an event. Otherwise,
  * returns `true`. Returns `undefined` if the event-check feature is disabled or
- * failed to retrieve app metadata.
+ * Probot failed to retrieve app metadata.
  */
 async function eventCheck (app: Application, eventName: string) {
   if (isEventCheckEnabled() === false) {
@@ -21,8 +21,7 @@ async function eventCheck (app: Application, eventName: string) {
   const baseEventName = eventName.split('.')[0]
   if (await isSubscribedToEvent(app, baseEventName)) {
     return true
-  }
-  if (didFailRetrievingAppMeta === false) {
+  } else if (didFailRetrievingAppMeta === false) {
     app.log.error(`Your app is attempting to listen to the "${eventName}" event, but your GitHub App is not subscribed to the "${baseEventName}" event.`)
   }
   return didFailRetrievingAppMeta ? undefined : false
@@ -34,10 +33,8 @@ async function eventCheck (app: Application, eventName: string) {
  * text of an event name before the first period mark (e.g. the `issues` part in
  * `issues.opened`).
  * @returns Returns `true` when the application is subscribed to a webhook
- * event. Otherwise, returns `false`.
- *
- * **Note:** This function returns `undefined` if Probot failed to retrieve
- * GitHub App metadata.
+ * event. Otherwise, returns `false`. Returns `undefined` if Probot failed to
+ * retrieve GitHub App metadata.
  */
 async function isSubscribedToEvent (app: Application, baseEventName: string) {
   let events

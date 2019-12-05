@@ -84,19 +84,17 @@ describe('event-check', () => {
     test('when DISABLE_EVENT_CHECK is true', async () => {
       process.env.DISABLE_EVENT_CHECK = 'true'
       app = newApp()
-      const spyOn = jest.spyOn(app, 'auth')
-      await eventCheck(app, 'issues.opened')
-
-      expect(spyOn).toHaveBeenCalledTimes(0)
+      const spyOnAuth = jest.spyOn(app, 'auth')
+      expect(await eventCheck(app, 'issues.opened')).toBeUndefined()
+      expect(spyOnAuth).toHaveBeenCalledTimes(0)
     })
 
     test('when NODE_ENV is production', async () => {
       process.env.NODE_ENV = 'production'
       app = newApp()
-      const spyOn = jest.spyOn(app, 'auth')
-      await eventCheck(app, 'issues.opened')
-
-      expect(spyOn).toHaveBeenCalledTimes(0)
+      const spyOnAuth = jest.spyOn(app, 'auth')
+      expect(await eventCheck(app, 'issues.opened')).toBeUndefined()
+      expect(spyOnAuth).toHaveBeenCalledTimes(0)
     })
   })
 

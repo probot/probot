@@ -438,8 +438,7 @@ export class Application {
   public on (eventName: string | string[], callback: OnCallback<any>): void
   public on (eventName: string | string[], callback: (context: Context) => Promise<void>) {
     if (typeof eventName === 'string') {
-      // tslint:disable-next-line: no-floating-promises
-      eventCheck(this, eventName)
+      void eventCheck(this, eventName)
 
       return this.events.on(eventName, async (event: Webhooks.WebhookEvent<any>) => {
         const log = this.log.child({ name: 'event', id: event.id })

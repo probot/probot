@@ -9,6 +9,14 @@ const hasDisplayedWarning = {
   failedRetrievingMeta: false
 }
 
+/**
+ * Check if `app` is subscribed to an event.
+ *
+ * @param {Application} app
+ * @param {string} eventName
+ * @returns Returns `true` if the app is subscribed to an event. Otherwise,
+ * returns `false`. Returns `undefined` if the event-check feature is disabled.
+ */
 async function eventCheck (app: Application, eventName: string) {
   if (isEventCheckEnabled() === false) {
     return
@@ -17,7 +25,10 @@ async function eventCheck (app: Application, eventName: string) {
   const baseEventName = eventName.split('.')[0]
   if (!(await isSubscribedToEvent(app, baseEventName)) && !hasDisplayedWarning.failedRetrievingMeta) {
     app.log.error(`Your app is attempting to listen to the "${eventName}" event, but your GitHub App is not subscribed to the "${baseEventName}" event.`)
+    return false
   }
+
+  return true
 }
 
 /**

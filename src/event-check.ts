@@ -84,7 +84,12 @@ async function retrieveAppMeta (app: Application) {
        *   APP_ID, PRIVATE_KEY, etc.) used for authentication between the Probot
        *   app and the GitHub API.
        */
-      return reject('Probot is unable to retrieve app information from GitHub for event subscription verification.')
+      return reject([
+        'Probot is unable to retrieve app information from GitHub for event subscription verification.',
+        '',
+        'If this error persists, feel free to report an issue at:',
+        '  - https://github.com/probot/probot/issues'
+      ].join('\n'))
     }
   })
 

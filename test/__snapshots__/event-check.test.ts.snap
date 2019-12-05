@@ -4,7 +4,7 @@ exports[`event-check caches result of /app 1`] = `
 [MockFunction] {
   "calls": Array [
     Array [
-      "Your app is attempting to listen to the \\"team.created\\" event, but your GitHub App is not subscribed to the \\"team\\" event.",
+      "Your app is attempting to listen to \\"team.created\\", but your GitHub App is not subscribed to the \\"team\\" event.",
     ],
   ],
   "results": Array [
@@ -20,7 +20,7 @@ exports[`event-check warn user when listening to unsubscribed event 1`] = `
 [MockFunction] {
   "calls": Array [
     Array [
-      "Your app is attempting to listen to the \\"an-unsubscribed-event.action\\" event, but your GitHub App is not subscribed to the \\"an-unsubscribed-event\\" event.",
+      "Your app is attempting to listen to \\"an-unsubscribed-event.action\\", but your GitHub App is not subscribed to the \\"an-unsubscribed-event\\" event.",
     ],
   ],
   "results": Array [

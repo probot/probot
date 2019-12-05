@@ -22,7 +22,7 @@ async function eventCheck (app: Application, eventName: string) {
   if (await isSubscribedToEvent(app, baseEventName)) {
     return true
   } else if (didFailRetrievingAppMeta === false) {
-    app.log.error(`Your app is attempting to listen to the "${eventName}" event, but your GitHub App is not subscribed to the "${baseEventName}" event.`)
+    app.log.error(`Your app is attempting to listen to "${eventName}", but your GitHub App is not subscribed to the "${baseEventName}" event.`)
   }
   return didFailRetrievingAppMeta ? undefined : false
 }

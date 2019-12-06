@@ -3,10 +3,8 @@ import { Application } from '../src'
 import eventCheck, { resetEventCheckCaches } from '../src/event-check'
 import { newApp } from './apps/helper'
 
-function mockAppMetaRequest (events: string[] = [ 'issues' ]) {
-  return {
-    events
-  }
+function mockAppMetaRequest (events: string[] = ['issues']) {
+  return { events }
 }
 
 describe('event-check', () => {

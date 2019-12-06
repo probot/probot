@@ -6,9 +6,9 @@ import { EventEmitter } from 'promise-events'
 import { ApplicationFunction } from '.'
 import { Cache } from './cache'
 import { Context } from './context'
-import eventCheck from './event-check'
 import { GitHubAPI, ProbotOctokit } from './github'
 import { logger } from './logger'
+import webhookEventCheck from './webhook-event-check'
 import { LoggerWithTarget, wrapLogger } from './wrap-logger'
 
 export interface Options {
@@ -438,7 +438,7 @@ export class Application {
   public on (eventName: string | string[], callback: OnCallback<any>): void
   public on (eventName: string | string[], callback: (context: Context) => Promise<void>) {
     if (typeof eventName === 'string') {
-      void eventCheck(this, eventName)
+      void webhookEventCheck(this, eventName)
 
       return this.events.on(eventName, async (event: Webhooks.WebhookEvent<any>) => {
         const log = this.log.child({ name: 'event', id: event.id })

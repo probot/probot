@@ -1,20 +1,18 @@
 import { Application } from './application'
 import { GitHubAPI } from './github'
 
-let appMetadata: ReturnType<GitHubAPI['apps']['getAuthenticated']> | null = null
+let appMeta: ReturnType<GitHubAPI['apps']['getAuthenticated']> | null = null
 let didFailRetrievingAppMeta = false
 
 /**
- * Check if `app` is subscribed to an event.
+ * Check if an application is subscribed to an event.
  *
- * @param {Application} app
- * @param {string} eventName
  * @returns Returns `false` if the app is not subscribed to an event. Otherwise,
- * returns `true`. Returns `undefined` if the event-check feature is disabled or
- * Probot failed to retrieve app metadata.
+ * returns `true`. Returns `undefined` if the webhook-event-check feature is
+ * disabled or Probot failed to retrieve the GitHub App's metadata.
  */
-async function eventCheck (app: Application, eventName: string) {
-  if (isEventCheckEnabled() === false) {
+async function webhookEventCheck (app: Application, eventName: string) {
+  if (isWebhookEventCheckEnabled() === false) {
     return
   }
 
@@ -28,7 +26,6 @@ async function eventCheck (app: Application, eventName: string) {
 }
 
 /**
- * @param {Application} app
  * @param {string} baseEventName The base part of an event name refers to the
  * text of an event name before the first period mark (e.g. the `issues` part in
  * `issues.opened`).
@@ -37,11 +34,11 @@ async function eventCheck (app: Application, eventName: string) {
  * retrieve GitHub App metadata.
  */
 async function isSubscribedToEvent (app: Application, baseEventName: string) {
-  let events
   if (baseEventName === '*') {
     return true
   }
 
+  let events
   try {
     events = (await retrieveAppMeta(app)).data.events
   } catch (e) {
@@ -56,9 +53,9 @@ async function isSubscribedToEvent (app: Application, baseEventName: string) {
 }
 
 async function retrieveAppMeta (app: Application) {
-  if (appMetadata) return appMetadata
+  if (appMeta) return appMeta
 
-  appMetadata = new Promise(async (resolve, reject) => {
+  appMeta = new Promise(async (resolve, reject) => {
     const api = await app.auth()
     try {
       const meta = await api.apps.getAuthenticated()
@@ -85,11 +82,11 @@ async function retrieveAppMeta (app: Application) {
     }
   })
 
-  return appMetadata
+  return appMeta
 }
 
-function isEventCheckEnabled () {
-  if (process.env.DISABLE_EVENT_CHECK && process.env.DISABLE_EVENT_CHECK.toLowerCase() === 'true') {
+function isWebhookEventCheckEnabled () {
+  if (process.env.DISABLE_WEBHOOK_EVENT_CHECK && process.env.DISABLE_WEBHOOK_EVENT_CHECK.toLowerCase() === 'true') {
     return false
   } else if (process.env.NODE_ENV && process.env.NODE_ENV.toLowerCase() === 'production') {
     return false
@@ -97,12 +94,12 @@ function isEventCheckEnabled () {
   return true
 }
 
-export default eventCheck
+export default webhookEventCheck
 
 /**
  * A helper function used by unit tests to reset the cached result of /app.
  */
-export function resetEventCheckCaches () {
-  appMetadata = null
+export function clearCache () {
+  appMeta = null
   didFailRetrievingAppMeta = false
 }

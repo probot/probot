@@ -1,13 +1,13 @@
 import nock from 'nock'
 import { Application } from '../src'
-import eventCheck, { resetEventCheckCaches } from '../src/event-check'
+import eventCheck, { clearCache } from '../src/webhook-event-check'
 import { newApp } from './apps/helper'
 
 function mockAppMetaRequest (events: string[] = ['issues']) {
   return { events }
 }
 
-describe('event-check', () => {
+describe('webhook-event-check', () => {
   let app: Application
   let originalNodeEnv: string
   const unsubscribedEventName = 'an-unsubscribed-event.action'
@@ -17,9 +17,9 @@ describe('event-check', () => {
   })
 
   beforeEach(() => {
-    delete process.env.DISABLE_EVENT_CHECK
+    delete process.env.DISABLE_WEBHOOK_EVENT_CHECK
     nock.cleanAll()
-    resetEventCheckCaches()
+    clearCache()
   })
 
   test('caches result of /app', async () => {
@@ -74,12 +74,12 @@ describe('event-check', () => {
 
   describe('can be disabled', () => {
     beforeEach(() => {
-      delete process.env.DISABLE_EVENT_CHECK
+      delete process.env.DISABLE_WEBHOOK_EVENT_CHECK
       delete process.env.NODE_ENV
     })
 
-    test('when DISABLE_EVENT_CHECK is true', async () => {
-      process.env.DISABLE_EVENT_CHECK = 'true'
+    test('when DISABLE_WEBHOOK_EVENT_CHECK is true', async () => {
+      process.env.DISABLE_WEBHOOK_EVENT_CHECK = 'true'
       app = newApp()
       const spyOnAuth = jest.spyOn(app, 'auth')
       expect(await eventCheck(app, 'issues.opened')).toBeUndefined()

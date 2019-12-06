@@ -9,7 +9,7 @@ let didFailRetrievingAppMeta = false
  *
  * @returns Returns `false` if the app is not subscribed to an event. Otherwise,
  * returns `true`. Returns `undefined` if the webhook-event-check feature is
- * disabled or Probot failed to retrieve the GitHub App's metadata.
+ * disabled or if Probot failed to retrieve the GitHub App's metadata.
  */
 async function webhookEventCheck (app: Application, eventName: string) {
   if (isWebhookEventCheckEnabled() === false) {
@@ -26,9 +26,8 @@ async function webhookEventCheck (app: Application, eventName: string) {
 }
 
 /**
- * @param {string} baseEventName The base part of an event name refers to the
- * text of an event name before the first period mark (e.g. the `issues` part in
- * `issues.opened`).
+ * @param {string} baseEventName The base event name refers to the part before
+ * the first period mark (e.g. the `issues` part in `issues.opened`).
  * @returns Returns `true` when the application is subscribed to a webhook
  * event. Otherwise, returns `false`. Returns `undefined` if Probot failed to
  * retrieve GitHub App metadata.
@@ -97,7 +96,7 @@ function isWebhookEventCheckEnabled () {
 export default webhookEventCheck
 
 /**
- * A helper function used by unit tests to reset the cached result of /app.
+ * A helper function used in testing that resets the cached result of /app.
  */
 export function clearCache () {
   appMeta = null

@@ -29,6 +29,7 @@ describe('event-check', () => {
       .defaultReplyHeaders({ 'Content-Type': 'application/json' })
       .get('/app').reply(200, mockAppMetaRequest(['label', 'star']))
     app = newApp()
+    const spyOnAuth = jest.spyOn(app, 'auth')
     const spyOnLogError = jest.spyOn(app.log, 'error')
     expect(await eventCheck(app, 'label.edited')).toStrictEqual(true)
     nock('https://api.github.com')
@@ -36,6 +37,7 @@ describe('event-check', () => {
       .get('/app').reply(200, mockAppMetaRequest(['team']))
     expect(await eventCheck(app, 'label.deleted')).toStrictEqual(true)
     expect(await eventCheck(app, 'team.created')).toStrictEqual(false)
+    expect(spyOnAuth).toHaveBeenCalledTimes(1)
     expect(spyOnLogError).toMatchSnapshot()
   })
 

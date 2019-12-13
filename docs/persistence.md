@@ -99,7 +99,7 @@ module.exports = connection
 
 ```js
 // index.js
-const {sql} = require('@databases/mysql')
+const { sql } = require('@databases/mysql')
 const connection = require('./connection')
 
 module.exports = app => {
@@ -138,7 +138,7 @@ module.exports = connection
 
 ```js
 // index.js
-const {sql} = require('@databases/pg')
+const { sql } = require('@databases/pg')
 const connection = require('./connection')
 
 module.exports = app => {

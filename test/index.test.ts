@@ -1,11 +1,11 @@
 import Octokit = require('@octokit/rest')
+import Webhooks from '@octokit/webhooks'
 import Bottleneck from 'bottleneck'
 import { NextFunction, Request, Response } from 'express'
 import nock = require('nock')
 import request = require('supertest')
 import { Application, createProbot, Probot } from '../src'
 import { GitHubAPI } from '../src/github'
-import Webhooks from '@octokit/webhooks'
 
 import path = require('path')
 import helper = require('./apps/helper')

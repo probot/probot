@@ -85,40 +85,66 @@ module.exports = app => {
 
 ### MySQL
 
-Using the [`mysql`](https://github.com/mysqljs/mysql) module, we can connect to our MySQL database and perform queries.
+Using the [`@databases/mysql`](https://www.atdatabases.org/docs/mysql.html) module, we can connect to our MySQL database and perform queries.
 
 ```js
 // connection.js
-const mysql = require('mysql')
+const mysql = require('@databases/mysql')
 
-const connection = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_DATABASE
-})
+// DATABASE_URL = mysql://my-user:my-password@localhost/my-db
+const connection = connect(process.env.DATABASE_URL)
 
-connection.connect()
 module.exports = connection
 ```
 
 ```js
 // index.js
+const { sql } = require('@databases/mysql')
 const connection = require('./connection')
-
-function performQuery (query) {
-  return new Promise((resolve, reject) => {
-    connection.query(query, function (error, results, fields) {
-      if (error) reject(new Error(error))
-      resolve(results)
-    })
-  })
-}
 
 module.exports = app => {
   app.on('issues.opened', async context => {
     // Find all the people in the database
-    const people = await performQuery('SELECT * FROM `people`')
+    const people = await connection.query(sql`SELECT * FROM people`)
+
+    // Generate a string using all the peoples' names.
+    // It would look like: 'Jason, Jane, James, Jennifer'
+    const peoplesNames = people.map(key => people[key].name).join(', ')
+
+    // `context` extracts information from the event, which can be passed to
+    // GitHub API calls. This will return:
+    //   { owner: 'yourname', repo: 'yourrepo', number: 123, body: 'The following people are in the database: Jason, Jane, James, Jennifer' }
+    const params = context.issue({ body: `The following people are in the database: ${peoplesNames}` })
+
+    // Post a comment on the issue
+    return context.github.issues.createComment(params)
+  })
+}
+```
+
+### Postgres
+
+Using the [`@databases/pg`](https://www.atdatabases.org/docs/pg.html) module, we can connect to our Postgres database and perform queries.
+
+```js
+// connection.js
+const mysql = require('@databases/pg')
+
+// DATABASE_URL = postgresql://my-user:my-password@localhost/my-db
+const connection = connect(process.env.DATABASE_URL)
+
+module.exports = connection
+```
+
+```js
+// index.js
+const { sql } = require('@databases/pg')
+const connection = require('./connection')
+
+module.exports = app => {
+  app.on('issues.opened', async context => {
+    // Find all the people in the database
+    const people = await connection.query(sql`SELECT * FROM people`)
 
     // Generate a string using all the peoples' names.
     // It would look like: 'Jason, Jane, James, Jennifer'

@@ -15,7 +15,6 @@ Every app can either be deployed stand-alone, or combined with other apps in one
     1. [Glitch](#glitch)
     1. [Heroku](#heroku)
     1. [Now](#now)
-    1. [GitHub Actions](#github-actions)
 1. [Share the app](#share-the-app)
 1. [Combining apps](#combining-apps)
 1. [Error tracking](#error-tracking)
@@ -133,51 +132,6 @@ Zeit [Now](http://zeit.co/now) is a great service for running Probot apps. After
 1. You can also keep your app running forever, with instant response to webhooks with:
 
         $ now scale https://a-fancier-url.now.sh 1
-
-### GitHub Actions
-
-> **Heads Up!** [GitHub Actions](https://github.com/features/actions) is still in limited beta.
-
-GitHub Actions allows you to trigger workflows based on GitHub events, which makes it a great fit for running Probot Apps. To run your app on GitHub Actions:
-
-1. Add a `Dockerfile` to your app:
-    ```
-    FROM node:10
-
-    ENV PATH=$PATH:/app/node_modules/.bin
-    WORKDIR /app
-    COPY . .
-    RUN npm install --production
-
-    ENTRYPOINT ["probot", "receive"]
-    CMD ["/app/index.js"]
-    ```
-
-1. In the repository that you want to run the app, create a `.github/main.workflow` file that defines the action and listens for any events that your app depends on. For example, here is the workflow for @jasonetco's [TODO](https://github.com/jasonetco/todo):
-    ```
-    workflow "Check for TODOs in Pull Requests" {
-      on = "pull_request"
-      resolves = "TODO"
-    }
-
-    workflow "Check for TODOs on Push" {
-      on = "push"
-      resolves = "TODO"
-    }
-
-    action "TODO" {
-      uses = "jasonetco/todo@master"
-      secrets = ["GITHUB_TOKEN"]
-    }
-    ```
-
-`uses` inside an `action` must take the form `owner/repo@ref`, where `ref` can be a branch: `jasonetco/todo@master`, a tag: `jasonetco/todo@v1.0.0`, or a commit sha: `jasonetco/todo@f61798f9722c6af9dd12781ea3512306ea451bce`.
-
-There are a few caveats when running Probot Apps on GitHub Actions:
-
-- The GitHub API token available to actions has a [fixed set of permissions](https://developer.github.com/actions/creating-workflows/storing-secrets/#github-token-secret), and only has access to the repository that triggered the action. `app.auth()` will always return a GitHub client authenticated for the current repository.
-- [probot/scheduler](https://github.com/probot/scheduler) and other extensions that require long-running processes are not currently supported.
-- Your app cannot expose [HTTP routes](./http.md)
 
 ## Share the app
 

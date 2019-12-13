@@ -27,6 +27,7 @@ Variable | Description
 `IGNORED_ACCOUNTS` | A comma-separated list of GitHub account names to ignore. This is currently used by the `/probot/stats`. By marking an account as ignored, that account will not be included in data collected on the website. The primary use case for this is spammy or abusive users that the GitHub API sends us but who 404. <p>_(Example: `spammyPerson,abusiveAccount`)_</p>
 `LOG_FORMAT` | By default, logs are formatted for readability in development. You can set this to `short`, `long`, `simple`, `json`, `bunyan`. Default: `short`
 `LOG_LEVEL` | The verbosity of logs to show when running your app, which can be `trace`, `debug`, `info`, `warn`, `error`, or `fatal`. Default: `info`
+`LOG_LEVEL_IN_STRING` | By default, when using the `json` format, the level printed in the log records is an int (`10`, `20`, ..). This option tells the logger to print level as a string: `{"level": "info"}`. Default `false`
 `PORT` | The port to start the local server on. Default: `3000`.
 `SENTRY_DSN` | Set to a [Sentry](https://sentry.io/) DSN to report all errors thrown by your app.  <p>_(Example: `https://1234abcd@sentry.io/12345`)_</p>
 `WEBHOOK_PATH` | The URL path which will receive webhooks. Default: `/`.

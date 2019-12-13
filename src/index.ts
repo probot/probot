@@ -1,3 +1,6 @@
+// tslint:disable-next-line: no-var-requires
+require('dotenv').config()
+
 import { App as OctokitApp } from '@octokit/app'
 import Octokit from '@octokit/rest'
 import Webhooks from '@octokit/webhooks'
@@ -31,8 +34,6 @@ const defaultAppFns: ApplicationFunction[] = [
 
 export class Probot {
   public static async run (appFn: ApplicationFunction | string[]) {
-    require('dotenv').config()
-
     const pkgConf = require('pkg-conf')
     const program = require('commander')
 
@@ -71,6 +72,19 @@ export class Probot {
     const options = readOptions()
     const probot = new Probot(options)
     if (!options.id || !options.cert) {
+      if (process.env.NODE_ENV === 'production') {
+        if (!options.id) {
+          throw new Error(
+            'Application ID is missing, and is required to run in production mode. ' +
+            'To resolve, ensure the APP_ID environment variable is set.'
+          )
+        } else if (!options.cert) {
+          throw new Error(
+            'Certificate is missing, and is required to run in production mode. ' +
+            'To resolve, ensure either the PRIVATE_KEY or PRIVATE_KEY_PATH environment variable is set and contains a valid certificate'
+          )
+        }
+      }
       probot.load(setupApp)
     } else if (Array.isArray(appFn)) {
       const pkg = await pkgConf('probot')

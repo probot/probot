@@ -10,7 +10,7 @@ To develop a Probot app, you will first need a recent version of [Node.js](https
 
 [create-probot-app](https://github.com/probot/create-probot-app) is the best way to start building a new app. It will generate a new app with everything you need to get started and run your app in production.
 
-To get started, run create-probot-app:
+To get started, run:
 
 ```sh
 npx create-probot-app my-first-app

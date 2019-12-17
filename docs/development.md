@@ -12,7 +12,7 @@ To develop a Probot app, you will first need a recent version of [Node.js](https
 
 To get started, run:
 
-```sh
+```
 npx create-probot-app my-first-app
 ```
 
@@ -20,7 +20,7 @@ npx create-probot-app my-first-app
 
 This will ask you a series of questions about your app, which should look something like this:
 
-```sh
+```
 Let's create a Probot app!
 ? App name: my-first-app
 ? Description of app: A 'Hello World' GitHub App built with Probot.

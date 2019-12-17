@@ -10,39 +10,53 @@ To develop a Probot app, you will first need a recent version of [Node.js](https
 
 [create-probot-app](https://github.com/probot/create-probot-app) is the best way to start building a new app. It will generate a new app with everything you need to get started and run your app in production.
 
-To get started, run one of these commands:
+To get started, run create-probot-app:
 
-- If you're using npm: `$ npx create-probot-app my-first-app`
-- or, if you're using Yarn: `$ yarn create probot-app my-first-app`
+```sh
+npx create-probot-app my-first-app
+```
 
-> `create-probot-app` accepts an optional `template` argument which accepts the following values: `basic-js`, `checks-js`, `git-data-js`, `deploy-js` and `basic-ts` (use this one for TypeScript support).
+(npx is available since npm 5.2. If you are using an older version of npm, [follow these instructions](https://gist.github.com/MaximDevoir/3429451ceb7bc65fa1a6da81e07ebfdb))
 
 This will ask you a series of questions about your app, which should look something like this:
 
-```
+```sh
 Let's create a Probot app!
 ? App name: my-first-app
-? Description of app: A 'Hello World' GitHub App built with Probot
+? Description of app: A 'Hello World' GitHub App built with Probot.
 ? Author's full name: Katie Horne
 ? Author's email address: katie@auth0.com
-? Homepage:
 ? GitHub user or org name: khorne3
 ? Repository name: my-first-app
 ? Which template would you like to use? (Use arrow keys)
 ❯ basic-js
+  basic-ts (use this one for TypeScript support)
   checks-js
   git-data-js
   deploy-js
-  basic-ts
-created files...
+
 Finished scaffolding files!
 
-Installing Node dependencies!
+Installing dependencies. This may take a few minutes...
 
-Done! Enjoy building your Probot app!
+Successfully created my-first-app.
+
+Begin using your app with:
+  cd my-first-app
+  npm start
+
+View your app's README for more usage instructions.
+
+Visit the Probot docs:
+  https://probot.github.io/docs/
+
+Get help from the community:
+  https://probot.github.io/community/
+
+Enjoy building your Probot app!
 ```
 
-The most important files here are `index.js`, which is where the code for your app will go, and `package.json`, which makes this a standard [npm module](https://docs.npmjs.com/files/package.json).
+The most important files created are `index.js`, which is where the code for your app will go, and `package.json`, which makes the app a standard [npm module](https://docs.npmjs.com/files/package.json).
 
 ## Running the app locally
 

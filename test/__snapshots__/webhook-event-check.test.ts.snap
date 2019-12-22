@@ -20,7 +20,7 @@ exports[`webhook-event-check warn user when listening to unsubscribed event 1`] 
 [MockFunction] {
   "calls": Array [
     Array [
-      "Your app is attempting to listen to \\"an-unsubscribed-event.action\\", but your GitHub App is not subscribed to the \\"an-unsubscribed-event\\" event.",
+      "Your app is attempting to listen to \\"label.created\\", but your GitHub App is not subscribed to the \\"label\\" event.",
     ],
   ],
   "results": Array [

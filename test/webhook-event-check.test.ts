@@ -3,6 +3,12 @@ import { Application } from '../src'
 import eventCheck, { clearCache } from '../src/webhook-event-check'
 import { newApp } from './apps/helper'
 
+/**
+ * Returns a mocked request for `/meta` with the subscribed `events`.
+ *
+ * By default, the mocked payload indicates the a GitHub App is subscribed to
+ * the `issues` event.
+ */
 function mockAppMetaRequest (events: string[] = ['issues']) {
   return { events }
 }
@@ -10,7 +16,7 @@ function mockAppMetaRequest (events: string[] = ['issues']) {
 describe('webhook-event-check', () => {
   let app: Application
   let originalNodeEnv: string
-  const unsubscribedEventName = 'an-unsubscribed-event.action'
+  const unsubscribedEventName = 'label.created'
 
   beforeAll(() => {
     originalNodeEnv = process.env.NODE_ENV || 'test'
@@ -39,7 +45,7 @@ describe('webhook-event-check', () => {
     expect(spyOnLogError).toMatchSnapshot()
   })
 
-  test('succeeds when event name is wildcard character', async () => {
+  test('returns undefined for that will never be in the payload of /meta', async () => {
     nock('https://api.github.com')
       .defaultReplyHeaders({ 'Content-Type': 'application/json' })
       .get('/app').reply(200, mockAppMetaRequest([]))
@@ -66,7 +72,6 @@ describe('webhook-event-check', () => {
       app = newApp()
       const spyOnLogWarn = jest.spyOn(app.log, 'warn')
       expect(await eventCheck(app, unsubscribedEventName)).toBeUndefined()
-      expect(await eventCheck(app, `another-${unsubscribedEventName}`)).toBeUndefined()
       expect(spyOnLogWarn).toHaveBeenCalledTimes(1)
       expect(spyOnLogWarn).toMatchSnapshot()
     })

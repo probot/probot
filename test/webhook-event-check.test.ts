@@ -60,7 +60,7 @@ describe('webhook-event-check', () => {
         .get('/app').reply(200, mockAppMetaRequest())
       app = newApp()
       const spyOnLogError = jest.spyOn(app.log, 'error')
-      expect(await eventCheck(app, unsubscribedEventName)).toStrictEqual(false)
+      expect(await eventCheck(app, 'pull_request.opened')).toStrictEqual(false)
       expect(spyOnLogError).toHaveBeenCalledTimes(1)
       expect(spyOnLogError).toMatchSnapshot()
     })

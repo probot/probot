@@ -34,12 +34,12 @@ async function webhookEventCheck (app: Application, eventName: string) {
  * retrieve GitHub App metadata.
  *
  * **Note**: Probot  will only check against a list of events known to be in the
- * `/meta` response. Therefore, only the `false` value returned should be
+ * `/app` response. Therefore, only the `false` value returned should be
  * considered truthy.
  */
 async function isSubscribedToEvent (app: Application, baseEventName: string) {
-  // A list of events known to be in the response of `/meta`. This can be
-  // retrieved by calling the `/meta` endpoint on an app subscribed to all
+  // A list of events known to be in the response of `/app`. This can be
+  // retrieved by calling the `/app` endpoint on an app subscribed to all
   // events that has the maximum repository, organization, and user permissions.
   const knownBaseEvents = [
     'check_run',
@@ -80,8 +80,8 @@ async function isSubscribedToEvent (app: Application, baseEventName: string) {
     'watch'
   ]
 
-  // Because `/meta` does not include many events (e.g. `fork`, `installation`,
-  // etc.), we don't want to compare `baseEventName` to the results of `/meta`
+  // Because `/app` does not include many events (e.g. `fork`, `installation`,
+  // etc.), we don't want to compare `baseEventName` to the results of `/app`
   // and instead return `true`.
   if (!knownBaseEvents.includes(baseEventName)) {
     return true

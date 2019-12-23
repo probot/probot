@@ -38,9 +38,9 @@ async function webhookEventCheck (app: Application, eventName: string) {
  * considered truthy.
  */
 async function isSubscribedToEvent (app: Application, baseEventName: string) {
-  // A list of events known to be in the response of `/app`. This can be
-  // retrieved by calling the `/app` endpoint on an app subscribed to all
-  // events that has the maximum repository, organization, and user permissions.
+  // A list of events known to be in the response of `/app`. This list can be
+  // retrieved by calling `GET /app` from an authenticated app that has maximum
+  // permissions and is subscribed to all available webhook events.
   const knownBaseEvents = [
     'check_run',
     'check_suite',
@@ -80,9 +80,10 @@ async function isSubscribedToEvent (app: Application, baseEventName: string) {
     'watch'
   ]
 
-  // Because `/app` does not include many events (e.g. `fork`, `installation`,
-  // etc.), we don't want to compare `baseEventName` to the results of `/app`
-  // and instead return `true`.
+  // Because `/app` does not include many events - such as events that all
+  // GitHub Apps are subscribed to by default (e.g.`installation`, `meta, or
+  // `marketplace_purchase`) - we can't compare `baseEventName` to the results
+  // of `GET /app`. Instead, we will return `true`.
   if (!knownBaseEvents.includes(baseEventName)) {
     return true
   }

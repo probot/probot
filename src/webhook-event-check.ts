@@ -132,7 +132,6 @@ async function retrieveAppMeta (app: Application) {
     }
   })
 
-  console.log(await appMeta)
   return appMeta
 }
 

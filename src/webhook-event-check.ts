@@ -44,9 +44,15 @@ async function isSubscribedToEvent (app: Application, baseEventName: string) {
   const knownBaseEvents = [
     'check_run',
     'check_suite',
+    'commit_comment',
+    'content_reference',
+    'create',
+    'delete',
     'deployment',
     'deployment_status',
     'deploy_key',
+    'fork',
+    'gollum',
     'issues',
     'issue_comment',
     'label',
@@ -56,11 +62,17 @@ async function isSubscribedToEvent (app: Application, baseEventName: string) {
     'organization',
     'org_block',
     'page_build',
+    'project',
+    'project_card',
+    'project_column',
     'public',
     'pull_request',
     'pull_request_review',
     'pull_request_review_comment',
+    'push',
+    'release',
     'repository',
+    'repository_dispatch',
     'star',
     'status',
     'team',
@@ -119,6 +131,7 @@ async function retrieveAppMeta (app: Application) {
     }
   })
 
+  console.log(await appMeta)
   return appMeta
 }
 

@@ -20,7 +20,8 @@ async function webhookEventCheck (app: Application, eventName: string) {
   if (await isSubscribedToEvent(app, baseEventName)) {
     return true
   } else if (didFailRetrievingAppMeta === false) {
-    app.log.error(`Your app is attempting to listen to "${eventName}", but your GitHub App is not subscribed to the "${baseEventName}" event.`)
+    const userFriendlyBaseEventName = baseEventName.split('_').join(' ')
+    app.log.error(`Your app is attempting to listen to "${eventName}", but your GitHub App is not subscribed to the "${userFriendlyBaseEventName}" event.`)
   }
   return didFailRetrievingAppMeta ? undefined : false
 }
@@ -28,12 +29,63 @@ async function webhookEventCheck (app: Application, eventName: string) {
 /**
  * @param {string} baseEventName The base event name refers to the part before
  * the first period mark (e.g. the `issues` part in `issues.opened`).
- * @returns Returns `true` when the application is subscribed to a webhook
- * event. Otherwise, returns `false`. Returns `undefined` if Probot failed to
+ * @returns Returns `false` when the application is not subscribed to a webhook
+ * event. Otherwise, returns `true`. Returns `undefined` if Probot failed to
  * retrieve GitHub App metadata.
+ *
+ * **Note**: Probot will only check against a list of events known to be in the
+ * `GET /app` response. Therefore, only the `false` value should be considered
+ * truthy.
  */
 async function isSubscribedToEvent (app: Application, baseEventName: string) {
-  if (baseEventName === '*') {
+  // A list of events known to be in the response of `GET /app`. This list can
+  // be retrieved by calling `GET /app` from an authenticated app that has
+  // maximum permissions and is subscribed to all available webhook events.
+  const knownBaseEvents = [
+    'check_run',
+    'check_suite',
+    'commit_comment',
+    'content_reference',
+    'create',
+    'delete',
+    'deployment',
+    'deployment_status',
+    'deploy_key',
+    'fork',
+    'gollum',
+    'issues',
+    'issue_comment',
+    'label',
+    'member',
+    'membership',
+    'milestone',
+    'organization',
+    'org_block',
+    'page_build',
+    'project',
+    'project_card',
+    'project_column',
+    'public',
+    'pull_request',
+    'pull_request_review',
+    'pull_request_review_comment',
+    'push',
+    'release',
+    'repository',
+    'repository_dispatch',
+    'star',
+    'status',
+    'team',
+    'team_add',
+    'watch'
+  ]
+
+  // Because `GET /app` does not include all events - such as default events
+  // that all GitHub Apps are subscribed to (e.g.`installation`, `meta`, or
+  // `marketplace_purchase`) - we can only check `baseEventName` if it is known
+  // to be in the `GET /app` response.
+  const eventMayExistInAppResponse = knownBaseEvents.includes(baseEventName)
+  if (!eventMayExistInAppResponse) {
     return true
   }
 

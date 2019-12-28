@@ -15,8 +15,11 @@ program
   .command('run', 'run the bot')
   .command('receive', 'Receive a single event and payload')
 
-// Valid commands and options in scope
-const availableCommands = program.commands.map(cmd => cmd._name).concat(['help', 'help run', 'help receive'])
+// Valid commands in scope
+const helpCmd = ['help', 'help run', 'help receive']
+
+const availableCommands = program.commands.map(cmd => cmd._name)
+availableCommands.push(...helpCmd)
 
 program.on('command:*', () => {
   const cmd = program.args.join(' ')

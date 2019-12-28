@@ -20,16 +20,19 @@ const [, , arg] = process.argv
 const availableCommands = program.commands.map(cmd => cmd._name)
 const availableOptions = ['-V', '--version', '-h', '--help']
 
+const showWarningMessage = (type) => {
+  console.log(`Invalid ${type} ${arg}\n`)
+  program.help()  	
+}
+
 if (arg) {
   if (arg.startsWith('-')) {
     if (!availableOptions.includes(arg)) {
-      console.log(`Invalid option ${arg}\n`)
-      program.help()
+      showWarningMessage('option')
     }
   } else {
     if (!availableCommands.includes(arg)) {
-      console.log(`Invalid command ${arg}\n`)
-      program.help()	
+      showWarningMessage('command')	
     } 
   }
 }

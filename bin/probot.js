@@ -15,10 +15,24 @@ program
   .command('run', 'run the bot')
   .command('receive', 'Receive a single event and payload')
 
-program.on('command:*', (cmd) => {
-  console.log(`\nInvalid command ${cmd}\n`)
-  program.outputHelp()  
-})
+const [, , arg] = process.argv
+
+const availableCommands = program.commands.map(cmd => cmd._name)
+const availableOptions = ['-V', '--version', '-h', '--help']
+
+if (arg) {
+  if (arg.startsWith('-')) {
+    if (!availableOptions.includes(arg)) {
+      console.log(`Invalid option ${arg}\n`)
+      program.help()
+    }
+  } else {
+    if (!availableCommands.includes(arg)) {
+      console.log(`Invalid command ${arg}\n`)
+      program.help()	
+    } 
+  }
+}
 
 program
   .parse(process.argv)

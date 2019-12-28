@@ -15,11 +15,14 @@ program
   .command('run', 'run the bot')
   .command('receive', 'Receive a single event and payload')
 
+// Parsing the exact argument
 const [, , arg] = process.argv
 
+// Valid commands and options in scope
 const availableCommands = program.commands.map(cmd => cmd._name)
 const availableOptions = ['-V', '--version', '-h', '--help']
 
+// Helper method to show suitable warning message
 const showWarningMessage = (type) => {
   console.log(`Invalid ${type} ${arg}\n`)
   program.help()  	

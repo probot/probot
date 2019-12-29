@@ -14,21 +14,13 @@ program
   .usage('<command> [options]')
   .command('run', 'run the bot')
   .command('receive', 'Receive a single event and payload')
-
-// Valid commands in scope
-const helpCmd = ['help', 'help run', 'help receive']
-
-const availableCommands = program.commands.map(cmd => cmd._name)
-availableCommands.push(...helpCmd)
-
-program.on('command:*', () => {
-  const cmd = program.args.join(' ')
-  if (!availableCommands.includes(cmd)) {
-  	console.log(`Invalid command ${cmd}\n`)
-    program.outputHelp()
-    process.exit(1)	
-  }
-})
+  .on('command:*', (cmd) => {
+    if (!program.commands.find(c => c._name == cmd[0])) {
+      console.error(`Invalid command: ${program.args.join(' ')}\n`);
+      program.outputHelp()
+      process.exit(1);
+    }
+  })
 
 program
   .parse(process.argv)

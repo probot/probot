@@ -28,23 +28,23 @@ cd tmp/website
 git pull origin master
 
 # Delete previously generated docs for this version
-rm -rf api/$VERSION
+rm -rf "api/$VERSION"
 
 # Copy over the new docs
-mv ../../out api/$VERSION
+mv ../../out "api/$VERSION"
 
 # Update the /api/latest link to point to this version
-ln -sfn $VERSION api/latest
+ln -sfn "$VERSION" api/latest
 
 # Update the submodule
 git submodule update --init
 cd _submodules/probot
 git fetch
-git checkout $HEAD
+git checkout "$HEAD"
 cd ../..
 
 # Commit and publish
 git add .
 git commit -m "Update docs for v$VERSION"
-git tag -f v$VERSION
+git tag -f "v$VERSION"
 git push --tags origin master

@@ -13,6 +13,8 @@ stages:
   - test
   - name: release
     if: branch =~ /^(\d+\.x|master|next|beta)$/ AND type IN (push)
+  - name: publish-docs
+    if: branch = master AND type = push
 
 jobs:
   include:
@@ -28,3 +30,6 @@ jobs:
       env: semantic-release
       before_script: npm run build
       script: npx semantic-release
+    - stage: publish-docs
+      node_js: lts/*
+      script: ./script/publish-docs

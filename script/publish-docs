@@ -4,7 +4,7 @@
 set -e
 
 # Store the versions
-VERSION=$(node -e "process.stdout.write(require('./package.json').version)")
+VERSION=$(git describe --tags "$(git rev-list --tags='v*' --max-count=1)" | sed 's/^v//')
 HEAD=$(git rev-parse HEAD)
 
 # Generate docs

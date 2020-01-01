@@ -1,5 +1,6 @@
 #!/bin/sh
 
+# Exit if a command returns a non-zero code
 set -e
 
 # Store the versions

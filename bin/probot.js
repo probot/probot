@@ -14,11 +14,13 @@ program
   .usage('<command> [options]')
   .command('run', 'run the bot')
   .command('receive', 'Receive a single event and payload')
-
-program.on('command:*', (cmd) => {
-  console.log(`\nInvalid command ${cmd}\n`)
-  program.outputHelp()  
-})
+  .on('command:*', (cmd) => {
+    if (!program.commands.find(c => c._name == cmd[0])) {
+      console.error(`Invalid command: ${program.args.join(' ')}\n`);
+      program.outputHelp()
+      process.exit(1);
+    }
+  })
 
 program
   .parse(process.argv)

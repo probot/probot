@@ -4,7 +4,7 @@
 set -e
 
 # Store the versions
-VERSION=$(git describe --tags "$(git rev-list --tags='v[0-9]*' --max-count=1)" | sed 's/^v//')
+VERSION=$(git describe --tags --match "v[0-9]*" --abbrev=0 | sed 's/^v//')
 HEAD=$(git rev-parse HEAD)
 
 # Generate docs

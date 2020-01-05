@@ -29,7 +29,7 @@ npm run doc
 cd tmp/website
 git pull origin master
 
-# Allow tagging later on when $VERSION from `probot` repo doesn't exist on `probot.github.io` repo
+# Conditionally check if tagging is required for later
 if [ -z "$(git tag --list "$VERSION")" ]; then
   _CREATE_TAGS_OPTION="--tags"
 fi

@@ -46,5 +46,4 @@ cd ../..
 # Commit and publish
 git add .
 git commit -m "Update docs for v$VERSION"
-git tag -f "v$VERSION"
-git push --tags origin master
+git push origin master

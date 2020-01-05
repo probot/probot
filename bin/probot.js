@@ -2,15 +2,15 @@
 
 const semver = require('semver')
 const program = require('commander')
-const version = require('../package').engines.node
+const pkg = require('../package')
 
-if (!semver.satisfies(process.version, version)) {
-  console.log(`Node.js version ${version} is required. You have ${process.version}.`)
+if (!semver.satisfies(process.version, pkg.engines.node)) {
+  console.log(`Node.js version ${pkg.engines.node} is required. You have ${process.version}.`)
   process.exit(1)
 }
 
 program
-  .version(require('../package').version)
+  .version(pkg.version)
   .usage('<command> [options]')
   .command('run', 'run the bot')
   .command('receive', 'Receive a single event and payload')

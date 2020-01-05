@@ -7,6 +7,8 @@ set -e
 VERSION=$(git describe --tags --match "v[0-9]*" --abbrev=0 | sed 's/^v//')
 HEAD=$(git rev-parse HEAD)
 
+_CREATE_TAGS_OPTION=''
+
 # Generate docs
 npm run doc
 
@@ -27,6 +29,11 @@ npm run doc
 cd tmp/website
 git pull origin master
 
+# Allow tagging later on when $VERSION from `probot` repo doesn't exist on `probot.github.io` repo
+if [ -z "$(git tag --list "$VERSION")" ]; then
+  _CREATE_TAGS_OPTION="--tags"
+fi
+
 # Delete previously generated docs for this version
 rm -rf "api/$VERSION"
 
@@ -46,5 +53,7 @@ cd ../..
 # Commit and publish
 git add .
 git commit -m "Update docs for v$VERSION"
-git tag -f "v$VERSION"
-git push --tags origin master
+if [ -n "$_CREATE_TAGS_OPTION" ]; then
+  git tag "v$VERSION"
+fi
+git push "$_CREATE_TAGS_OPTION" origin master

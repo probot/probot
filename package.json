@@ -85,6 +85,7 @@
     "semver": "^7.0.0",
     "supports-color": "^7.0.0",
     "update-dotenv": "^1.1.0",
+    "update-notifier": "^4.0.0",
     "uuid": "^3.2.1"
   },
   "devDependencies": {

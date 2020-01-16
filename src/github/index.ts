@@ -1,6 +1,6 @@
 import { graphql } from '@octokit/graphql'
 import { enterpriseCompatibility } from '@octokit/plugin-enterprise-compatibility'
-import retryPlugin from '@octokit/plugin-retry'
+import { retry } from '@octokit/plugin-retry'
 import throttlePlugin from '@octokit/plugin-throttling'
 import Octokit from '@octokit/rest'
 
@@ -10,7 +10,7 @@ import { addPagination } from './pagination'
 
 export const ProbotOctokit = Octokit
   .plugin(throttlePlugin)
-  .plugin(retryPlugin)
+  .plugin(retry)
   .plugin(enterpriseCompatibility)
 
 /**

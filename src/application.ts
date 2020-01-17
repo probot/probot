@@ -498,7 +498,7 @@ export class Application {
           const accessToken = await this.app.getInstallationAccessToken({ installationId: id })
           return `token ${accessToken}`
         },
-        baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api/v3`,
+        baseUrl: process.env.GHE_HOST && `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api/v3`,
         logger: log.child({ name: 'github', installation: String(id) })
       }
 
@@ -521,7 +521,7 @@ export class Application {
     const github = GitHubAPI({
       Octokit: this.Octokit,
       auth: `Bearer ${token}`,
-      baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api/v3`,
+      baseUrl: process.env.GHE_HOST && `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api/v3`,
       logger: log.child({ name: 'github' })
     })
 

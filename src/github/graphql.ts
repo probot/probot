@@ -17,7 +17,7 @@ export interface GraphQLError {
 
 export function addGraphQL (client: GitHubAPI) {
   const graphqlRequest = (client.request as any as typeof request).defaults({
-    ...(process.env.GHE_HOST ? { baseUrl: `https://${process.env.GHE_HOST}/api` } : {})
+    ...(process.env.GHE_HOST ? { baseUrl: `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api` } : {})
   })
   const graphql = withCustomRequest(graphqlRequest)
 

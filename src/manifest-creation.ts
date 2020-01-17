@@ -61,7 +61,7 @@ export class ManifestCreation {
     const options: any = {
       code,
       headers: { accept: 'application/vnd.github.fury-preview+json' },
-      ...process.env.GHE_HOST && { baseUrl: `https://${process.env.GHE_HOST}/api/v3` }
+      ...process.env.GHE_HOST && { baseUrl: `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api/v3` }
     }
     const response = await github.request('POST /app-manifests/:code/conversions', options)
 
@@ -81,6 +81,6 @@ export class ManifestCreation {
 
   get createAppUrl () {
     const githubHost = process.env.GHE_HOST || `github.com`
-    return `https://${githubHost}/settings/apps/new`
+    return `${process.env.GHE_PROTOCOL || 'https'}://${githubHost}/settings/apps/new`
   }
 }

@@ -41,6 +41,7 @@ describe('ManifestCreation', () => {
   describe('createAppUrl', () => {
     afterEach(() => {
       delete process.env.GHE_HOST
+      delete process.env.GHE_PROTOCOL
     })
 
     test('creates an app url', () => {
@@ -50,6 +51,12 @@ describe('ManifestCreation', () => {
     test('creates an app url when github host env is set', () => {
       process.env.GHE_HOST = 'hiimbex.github.com'
       expect(setup.createAppUrl).toEqual('https://hiimbex.github.com/settings/apps/new')
+    })
+
+    test('creates an app url when github host env and protocol are set', () => {
+      process.env.GHE_HOST = 'hiimbex.github.com'
+      process.env.GHE_PROTOCOL = 'http'
+      expect(setup.createAppUrl).toEqual('http://hiimbex.github.com/settings/apps/new')
     })
   })
 

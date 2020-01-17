@@ -128,7 +128,7 @@ export class Probot {
       }
 
       this.app = new OctokitApp({
-        baseUrl: process.env.GHE_HOST && `https://${process.env.GHE_HOST}/api/v3`,
+        baseUrl: process.env.GHE_HOST && `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api/v3`,
         id: options.id as number,
         privateKey: options.cert as string
       })

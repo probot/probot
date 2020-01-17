@@ -14,9 +14,9 @@ npm run doc
 [ -d tmp/website ] || {
   REPO=https://github.com/probot/probot.github.io
 
-  # If GITHUB_TOKEN environment variable is present, use that to push.
-  if [[ -n "$GITHUB_TOKEN" ]]; then
-    REPO=${REPO/https:\/\//https://x-access-token:${GITHUB_TOKEN}@}
+  # If OCTOKITBOT_PAT environment variable is present, use that to push.
+  if [[ -n "$OCTOKITBOT_PAT" ]]; then
+    REPO=${REPO/https:\/\//https://${OCTOKITBOT_PAT}@}
   fi
 
   mkdir -p tmp

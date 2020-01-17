@@ -17,4 +17,4 @@ jobs:
       - run: npm run build
       - run: node script/publish-docs
         env:
-          GITHUB_TOKEN: ${{ secrets.OCTOKITBOT_PAT }}
+          OCTOKITBOT_PAT: ${{ secrets.OCTOKITBOT_PAT }}

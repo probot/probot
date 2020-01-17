@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - "greenkeeper/*"
 
   pull_request:
     types: 

@@ -108,6 +108,39 @@ describe('github/graphql', () => {
     })
   })
 
+  describe('ghe support with http', () => {
+    const query = 'query { viewer { login } }'
+    let data
+
+    beforeEach(() => {
+      process.env.GHE_HOST = 'notreallygithub.com'
+      process.env.GHE_PROTOCOL = 'http'
+
+      const options: Options = {
+        Octokit: ProbotOctokit,
+        logger
+      }
+
+      github = GitHubAPI(options)
+    })
+
+    afterEach(() => {
+      delete process.env.GHE_HOST
+      delete process.env.GHE_PROTOCOL
+    })
+
+    test('makes a graphql query', async () => {
+      data = { viewer: { login: 'bkeepers' } }
+
+      nock('http://notreallygithub.com', {
+        reqheaders: { 'content-type': 'application/json; charset=utf-8' }
+      }).post('/api/graphql', { query })
+        .reply(200, { data })
+
+      expect(await github.graphql(query)).toEqual(data)
+    })
+  })
+
   describe('deprecations', () => {
     const query = 'query { viewer { login } }'
     let data: any

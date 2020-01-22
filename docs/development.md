@@ -109,14 +109,17 @@ GitHub App Manifests--otherwise known as easy app creation--make it simple to ge
 
 To run your app in development, you will need to configure a GitHub App to deliver webhooks to your local machine.
 
-1. On your local machine, copy `.env.example` to `.env` in the same directory.
-1. Go to [smee.io](https://smee.io) and click **Start a new channel**. Set `WEBHOOK_PROXY_URL` in `.env` to the URL that you are redirected to.
+1. On your local machine, copy `.env.example` to `.env` in the same directory. We're going to be changing a few things in this new file.
+1. Go to [smee.io](https://smee.io) and click **Start a new channel**. Set `WEBHOOK_PROXY_URL` to the URL that you are redirected to.<br/>
+E.g. `https://smee.io/AbCd1234EfGh5678`
 1. [Create a new GitHub App](https://github.com/settings/apps/new) with:
-    - **Webhook URL**: Use your `WEBHOOK_PROXY_URL` from the previous step.
-    - **Webhook Secret:** `development` (Note: For optimal security, Probot apps **require** this secret be set, even though it's optional on GitHub.).
+    - **Webhook URL**: Use the same `WEBHOOK_PROXY_URL` from the previous step.
+    - **Webhook Secret:** `development`, or whatever you set for this in your `.env` file. (Note: For optimal security, Probot apps **require** this secret be set, even though it's optional on GitHub.).
     - **Permissions & events** is located lower down the page and will depend on what data you want your app to have access to. Note: if, for example, you only enable issue events, you will not be able to listen on pull request webhooks with your app. However, for development, we recommend enabling everything.
-1. Download the private key and move it to your project's directory. As long as it's in the root of your project, Probot will find it automatically regardless of the filename.
-1. Edit `.env` and set `APP_ID` to the ID of the app you just created. The App ID can be found in your app settings page here <img width="1048" alt="screen shot 2017-08-20 at 8 31 31 am" src="https://user-images.githubusercontent.com/5713670/42248717-f6bf4f10-7edb-11e8-8dd5-387181c771bc.png">
+1. You must now set `APP_ID` in your `.env` to the ID of the app you just created. The App ID can be found in your app settings page here <img width="1048" alt="screen shot 2017-08-20 at 8 31 31 am" src="https://user-images.githubusercontent.com/5713670/42248717-f6bf4f10-7edb-11e8-8dd5-387181c771bc.png">
+1. Finally, generate and download a private key file (using the button seen in the image above), then move it to your project's directory. As long as it's in the root of your project, Probot will find it automatically regardless of the filename. 
+
+For more information about these and other available keys, head over to the [environmental configuration documentation](https://probot.github.io/docs/configuration/).
 
 ## Installing the app on a repository
 

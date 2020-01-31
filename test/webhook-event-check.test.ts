@@ -16,14 +16,20 @@ function mockAppMetaRequest (events: string[] = ['issues']) {
 describe('webhook-event-check', () => {
   let app: Application
   let originalNodeEnv: string
+  let originalJestWorkerId: string | undefined
   const unsubscribedEventName = 'label.created'
 
   beforeAll(() => {
     originalNodeEnv = process.env.NODE_ENV || 'test'
+    originalJestWorkerId = process.env.JEST_WORKER_ID
   })
 
   beforeEach(() => {
+    // We need to re-configure environment variables to avoid
+    // webhook-event-check from triggering its smart-disable feature.
     delete process.env.DISABLE_WEBHOOK_EVENT_CHECK
+    delete process.env.JEST_WORKER_ID
+    process.env.NODE_ENV = 'development'
     nock.cleanAll()
     clearCache()
   })
@@ -80,7 +86,16 @@ describe('webhook-event-check', () => {
   describe('can be disabled', () => {
     beforeEach(() => {
       delete process.env.DISABLE_WEBHOOK_EVENT_CHECK
+      delete process.env.JEST_WORKER_ID
       delete process.env.NODE_ENV
+    })
+
+    test('when JEST_WORKER_ID is set', async () => {
+      process.env.JEST_WORKER_ID = 'mocked_id'
+      app = newApp()
+      const spyOnAuth = jest.spyOn(app, 'auth')
+      expect(await eventCheck(app, 'issues.opened')).toBeUndefined()
+      expect(spyOnAuth).toHaveBeenCalledTimes(0)
     })
 
     test('when DISABLE_WEBHOOK_EVENT_CHECK is true', async () => {
@@ -98,9 +113,18 @@ describe('webhook-event-check', () => {
       expect(await eventCheck(app, 'issues.opened')).toBeUndefined()
       expect(spyOnAuth).toHaveBeenCalledTimes(0)
     })
+
+    test('when NODE_ENV starts with "test"', async () => {
+      process.env.NODE_ENV = 'testing'
+      app = newApp()
+      const spyOnAuth = jest.spyOn(app, 'auth')
+      expect(await eventCheck(app, 'issues.opened')).toBeUndefined()
+      expect(spyOnAuth).toHaveBeenCalledTimes(0)
+    })
   })
 
   afterEach(() => {
     process.env.NODE_ENV = originalNodeEnv
+    process.env.JEST_WORKER_ID = originalJestWorkerId
   })
 })

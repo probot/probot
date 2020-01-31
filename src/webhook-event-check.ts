@@ -141,8 +141,25 @@ function isWebhookEventCheckEnabled () {
     return false
   } else if (process.env.NODE_ENV?.toLowerCase() === 'production') {
     return false
+  } else if (inTestEnvironment()) {
+    // We disable the feature in test environments to avoid requiring developers
+    // to add a stub mocking the `GET /app` route this feature calls.
+    return false
   }
   return true
+}
+
+/**
+ * Detects if Probot is likely running in a test environment.
+ *
+ * **Note**: This method only detects Jest environments or when NODE_ENV starts
+ * with `test`.
+ * @returns Returns `true` if Probot is in a test environment.
+ */
+function inTestEnvironment (): boolean {
+  const nodeEnvContainsTest = process.env.NODE_ENV?.substr(0, 4).toLowerCase() === 'test'
+  const isRunningJest = process.env.JEST_WORKER_ID !== undefined
+  return nodeEnvContainsTest || isRunningJest
 }
 
 export default webhookEventCheck

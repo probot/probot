@@ -137,9 +137,9 @@ async function retrieveAppMeta (app: Application) {
 }
 
 function isWebhookEventCheckEnabled () {
-  if (process.env.DISABLE_WEBHOOK_EVENT_CHECK && process.env.DISABLE_WEBHOOK_EVENT_CHECK.toLowerCase() === 'true') {
+  if (process.env.DISABLE_WEBHOOK_EVENT_CHECK?.toLowerCase() === 'true') {
     return false
-  } else if (process.env.NODE_ENV && process.env.NODE_ENV.toLowerCase() === 'production') {
+  } else if (process.env.NODE_ENV?.toLowerCase() === 'production') {
     return false
   }
   return true

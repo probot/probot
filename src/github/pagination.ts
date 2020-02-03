@@ -1,4 +1,4 @@
-import Octokit from '@octokit/rest'
+import { Octokit } from '@octokit/rest'
 
 // tslint:disable-next-line
 const octokitGetNextPage = require('octokit-pagination-methods/lib/get-next-page')

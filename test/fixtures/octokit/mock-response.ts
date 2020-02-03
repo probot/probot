@@ -1,6 +1,6 @@
-import { Response } from '@octokit/rest'
+import { Octokit } from '@octokit/rest'
 
-export const toGitHubResponse = <T = any>(data: T): Response<T> => ({
+export const toGitHubResponse = <T = any>(data: T): Octokit.Response<T> => ({
   data,
   headers: {
     date: '',
@@ -20,5 +20,5 @@ export const toGitHubResponse = <T = any>(data: T): Response<T> => ({
   }
 })
 
-export const createMockResponse = <T>(data: T): Promise<Response<T>> =>
+export const createMockResponse = <T>(data: T): Promise<Octokit.Response<T>> =>
   Promise.resolve(toGitHubResponse(data))

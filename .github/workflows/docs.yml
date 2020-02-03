@@ -15,6 +15,6 @@ jobs:
           node-version: "12.x"
       - run: npm ci
       - run: npm run build
-      - run: node script/publish-docs
+      - run: ./script/publish-docs
         env:
           OCTOKITBOT_PAT: ${{ secrets.OCTOKITBOT_PAT }}

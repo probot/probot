@@ -6,21 +6,15 @@ set -e
 # Store the versions
 VERSION=$(git describe --tags --match "v[0-9]*" --abbrev=0 | sed 's/^v//')
 HEAD=$(git rev-parse HEAD)
+https://${OCTOKITBOT_PAT}@github.com/probot/probot.github.io.git
 
 # Generate docs
 npm run doc
 
 # Checkout the website into the tmp directory
 [ -d tmp/website ] || {
-  REPO=https://github.com/probot/probot.github.io
-
-  # If OCTOKITBOT_PAT environment variable is present, use that to push.
-  if [[ -n "$OCTOKITBOT_PAT" ]]; then
-    REPO=${REPO/https:\/\//https://${OCTOKITBOT_PAT}@}
-  fi
-
   mkdir -p tmp
-  git clone $REPO tmp/website
+  git clone "$REPO" tmp/website
 }
 
 # Update the website checkout
@@ -43,7 +37,9 @@ git fetch
 git checkout "$HEAD"
 cd ../..
 
-# Commit and publish
+# Configure Git and commit, and publish
+git config --global user.email "action@github.com"
+git config --global user.name "GitHub Action"
 git add .
-git commit -m "Update docs for v$VERSION"
-git push origin master
+git commit -m "Update docs from Probot v$VERSION" -m "via $GITHUB_REPOSITORY@$HEAD"
+git push "$REPO" master

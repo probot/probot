@@ -1,4 +1,4 @@
-import { AnyResponse } from '@octokit/rest'
+import { Octokit } from '@octokit/rest'
 import { Request, Response } from 'express'
 import { Application } from '../application'
 
@@ -39,7 +39,7 @@ export = async (app: Application): Promise<void> => {
   async function getInstallations (): Promise<Installation[]> {
     const github = await app.auth()
 
-    return github.paginate(github.apps.listInstallations.endpoint.merge({ per_page: 100 }), (response: AnyResponse) => {
+    return github.paginate(github.apps.listInstallations.endpoint.merge({ per_page: 100 }), (response: Octokit.AnyResponse) => {
       return response.data
     })
   }
@@ -56,7 +56,7 @@ export = async (app: Application): Promise<void> => {
 
       const github = await app.auth(installation.id)
 
-      const repositories: Repository[] = await github.paginate(github.apps.listRepos.endpoint.merge({ per_page: 100 }), (response: AnyResponse) => {
+      const repositories: Repository[] = await github.paginate(github.apps.listRepos.endpoint.merge({ per_page: 100 }), (response: Octokit.AnyResponse) => {
         return response.data.filter((repository: Repository) => !repository.private)
       })
 

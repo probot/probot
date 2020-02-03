@@ -1,4 +1,4 @@
-import Octokit = require('@octokit/rest')
+import { Octokit } from '@octokit/rest'
 import Bottleneck from 'bottleneck'
 import { NextFunction, Request, Response } from 'express'
 import nock = require('nock')

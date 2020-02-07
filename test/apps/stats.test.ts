@@ -33,7 +33,7 @@ describe('stats app', () => {
       server.use(app.router)
     })
 
-    it('returns installation count and popular accounts', () => {
+    it.only('returns installation count and popular accounts', () => {
       return request(server).get('/probot/stats')
         .expect(200, { 'installations': 1, 'popular': [{ login: 'testing', stars: 2 }] })
     })

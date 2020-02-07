@@ -1,8 +1,10 @@
 import { graphql } from '@octokit/graphql'
 import { enterpriseCompatibility } from '@octokit/plugin-enterprise-compatibility'
+
+import { Octokit } from '@octokit/rest'
+import { createAppAuth } from '@octokit/auth-app'
 import { retry } from '@octokit/plugin-retry'
 import { throttling } from '@octokit/plugin-throttling'
-import { Octokit } from '@octokit/rest'
 
 import { addGraphQL } from './graphql'
 import { addLogging, Logger } from './logging'
@@ -10,6 +12,10 @@ import { addPagination } from './pagination'
 
 export const ProbotOctokit = Octokit
   .plugin([throttling, retry, enterpriseCompatibility])
+  .defaults({
+    userAgent: "Probot",
+    authStrategy: createAppAuth
+  })
 
 /**
  * the [@octokit/rest Node.js module](https://github.com/octokit/rest.js),
@@ -18,9 +24,12 @@ export const ProbotOctokit = Octokit
  * browser.
  * @see {@link https://github.com/octokit/rest.js}
  */
-export function GitHubAPI (options: Options = {} as any) {
-  const OctokitFromOptions = options.Octokit || ProbotOctokit
-  const octokit = new OctokitFromOptions(Object.assign(options, {
+export function GitHubAPI (options: Options = { Octokit: ProbotOctokit } as any) {
+
+  // TODO: `option` need the auth options as required by `@octokit/auth-app`
+  //       See: https://github.com/octokit/auth-app.js/#readme
+
+  const octokit = new options.Octokit(Object.assign(options, {
     throttle: Object.assign({
       onAbuseLimit: (retryAfter: number) => {
         options.logger.warn(`Abuse limit hit, retrying in ${retryAfter} seconds`)

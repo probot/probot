@@ -14,7 +14,7 @@ Every app can either be deployed stand-alone, or combined with other apps in one
 1. [Deploy the app](#deploy-the-app)
     1. [Glitch](#glitch)
     1. [Heroku](#heroku)
-    1. [Now](#now)
+    1. [ZEIT Now](#zeit-now)
 1. [Share the app](#share-the-app)
 1. [Combining apps](#combining-apps)
 1. [Error tracking](#error-tracking)

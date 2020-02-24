@@ -2,7 +2,7 @@
 // Copyright (c) Christian Tellnes <christian@tellnes.no>
 // tslint:disable
 import {wrapLogger} from '../wrap-logger'
-import uuid from 'uuid'
+import {v4 as uuidv4} from 'uuid'
 import express from 'express'
 import Logger from 'bunyan'
 
@@ -11,7 +11,7 @@ export const logRequest = function ({logger}: any): express.RequestHandler {
     // Use X-Request-ID from request if it is set, otherwise generate a uuid
     req.id = req.headers['x-request-id'] ||
       req.headers['x-github-delivery'] ||
-      uuid.v4()
+      uuidv4()
     res.setHeader('x-request-id', req.id)
 
     // Make a logger available on the request

@@ -86,7 +86,7 @@
     "supports-color": "^7.0.0",
     "update-dotenv": "^1.1.0",
     "update-notifier": "^4.0.0",
-    "uuid": "^3.2.1"
+    "uuid": "^7.0.0"
   },
   "devDependencies": {
     "@types/bunyan": "^1.8.4",

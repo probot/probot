@@ -248,13 +248,19 @@ You can create the same above functionality on your own Probot app, and host it 
 
   When you create a new account, the setup wizard will direct you to create a new project. Name it, and select a region for the project to be served from.
 
-  
-
 3. Install the Platform.sh CLI
+
+  Run the command
+
+  ```
+  curl -sS https://platform.sh/cli/installer | php
+  ```
 
 4. Initialize the project with the app
 
-  If your app already exists on a GitHub repository, you can find instructions in the public documentation for setting up a new
+  If your app already exists on a GitHub repository, you can find instructions in the public documentation for [setting up a new integration](https://docs.platform.sh/administration/integrations/github.html) to it.
+
+  Otherwise, run
 
 ## Share the app
 

@@ -262,7 +262,7 @@ You can branch the template above, add your application's code to it, and merge 
 
 1. Add Platform.sh configuration files
 
-  Each project on Platform.sh requires at least [three configuration files](https://docs.platform.sh/overview/structure.html) to describe and application. From your project root, run
+  Each project on Platform.sh requires at least [three configuration files](https://docs.platform.sh/overview/structure.html) to describe and application. From your project root, run the following commands to create them:
 
   ```
   mkdir .platform
@@ -270,7 +270,7 @@ You can branch the template above, add your application's code to it, and merge 
   touch .platform.app.yaml
   ```
 
-  Unless your Probot app depends on [database storage](https://probot.github.io/docs/persistence/), the `services.yaml` file can be left empty. If a database is needed, visit Platform.sh [Services documentation](https://docs.platform.sh/configuration/services.html) for more detailed information on how to configure the service your app depends on.
+  Unless your Probot app depends on [database storage](https://probot.github.io/docs/persistence/), the `services.yaml` file can be left empty. If a database is needed, visit the Platform.sh [Services documentation](https://docs.platform.sh/configuration/services.html) for more detailed information on how to configure the service your app depends on.
 
   In your [`routes.yaml`](https://docs.platform.sh/configuration/routes.html) file, copy the following:
 
@@ -284,7 +284,7 @@ You can branch the template above, add your application's code to it, and merge 
       to: "https://{default}/"
   ```
 
-  This configuration directs requests to an application called `app`, and sets an additional redirect for requests that do not include the `www` prefix.
+  This configuration directs requests to an application container called `app`, and sets an additional redirect for requests that do not include the `www` prefix.
 
   Lastly, in the [`.platform.app.yaml`](https://docs.platform.sh/configuration/app-containers.html) file, include the settings below:
 

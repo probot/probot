@@ -238,7 +238,7 @@ You can branch the template above, add your application's code to it, and merge 
 
   When you create a new account, the setup wizard will direct you to create a new project. Name it, and select a region for the project to be served from.
 
-1. Install the Platform.sh CLI
+1. Install the [Platform.sh CLI]([Platform.sh CLI](https://docs.platform.sh/development/cli.html))
 
   Run the command
 
@@ -291,7 +291,7 @@ You can branch the template above, add your application's code to it, and merge 
   ```yaml
   name: app
 
-  type: 'nodejs:12'
+  type: 'nodejs:X'
 
   variables:
       env:
@@ -304,7 +304,10 @@ You can branch the template above, add your application's code to it, and merge 
       start: "npm start"
   ```
 
-  This file defines your Probot app to run in a Node.js 12 application container called `app`, with 256Mb of persistent storage. Feel free to modify the `web.commands.start` to match the start command of your app.
+  This file defines your Probot app to run in a Node.js application container called `app`, with 256Mb of persistent storage. Feel free to modify the `web.commands.start` to match the start command of your app.
+
+  If you would like to run the Probot app on Node.js 12, simply modify the `type` key to read `'nodejs:12'` instead of the `X` placeholder shown above. You can set the application container to use a number of Node.js versions, so visit the [documentation](https://docs.platform.sh/languages/nodejs.html#supported-versions) for a full list of those supported. 
+
 
 1. Register the app on GitHub
 

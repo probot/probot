@@ -14,7 +14,7 @@ Every app can either be deployed stand-alone, or combined with other apps in one
 1. [Deploy the app](#deploy-the-app)
     1. [Glitch](#glitch)
     1. [Heroku](#heroku)
-    1. [Now](#now)
+    1. [ZEIT Now](#zeit-now)
 1. [Share the app](#share-the-app)
 1. [Combining apps](#combining-apps)
 1. [Error tracking](#error-tracking)
@@ -106,32 +106,58 @@ Probot runs like [any other Node app](https://devcenter.heroku.com/articles/depl
         $ heroku config:set LOG_LEVEL=trace
         $ heroku logs --tail
 
-### Now
+### ZEIT Now
 
-Zeit [Now](http://zeit.co/now) is a great service for running Probot apps. After [creating the GitHub App](#create-the-github-app):
+Deploy Probot as a Serverless Function to [ZEIT Now](http://zeit.co). After [creating the GitHub App](#create-the-github-app):
 
-1. Install the now CLI with `npm i -g now`
+1. Install Now CLI with `npm i -g now` and login with `now login`
 
 1. Clone the app that you want to deploy. e.g. `git clone https://github.com/probot/stale`
 
-1. Run `now` to deploy, replacing the `APP_ID` and `WEBHOOK_SECRET` with the values for those variables, and setting the `PRIVATE_KEY`:
+1. Install `probot-serverless-now`
 
-        $ now -e APP_ID=aaa \
-            -e WEBHOOK_SECRET=bbb \
-            -e NODE_ENV=production \
-            -e PRIVATE_KEY="$(cat ~/Downloads/*.private-key.pem | base64)"
+        $ npm install probot-serverless-now
 
-      **NOTE**: Add `-e LOG_LEVEL=trace` to get verbose logging, or add `-e LOG_LEVEL=info` instead to show less details.
+1. Update `package.json` and add `build` script to generate your HTML landing page, for example:
+   ```json
+   {
+     "scripts": {
+       "build": "mkdir public && echo 'Hello World' > public/index.html"
+     }
+   }
+   ```
+
+1. Create a new file `/api/index.js` with the following:
+   ```js
+   const { toLambda } = require('probot-serverless-now');
+   const app = require('./path/to/your/app.js');
+   module.exports = toLambda(app);
+   ```
+
+1. Create a new file `now.json` with the following:
+   ```json
+   {
+     "env": {
+       "APP_ID":"@probot-api-id",
+       "WEBHOOK_SECRET": "@probot-webhook-secret",
+       "PRIVATE_KEY": "@probot-private-key"
+     }
+   }
+   ```
+   
+      **NOTE**: Add `LOG_LEVEL=trace` to get verbose logging, or add `LOG_LEVEL=info` instead to show less details.
+
+1. Run `now secrets add probot-api-id aaa`, `now secrets add probot-webhook-secret bbb`, `now secrets add probot-private-key "$(cat ~/Downloads/*.private-key.pem | base64)"` replacing the `aaa` and `bbb` with the values for those variables.
+      
+1. Deploy with `now` or connect your GitHub repository](https://zeit.co/github) to ZEIT Now and deploy on `git push`.
 
 1. Once the deploy is started, go back to your [app settings page](https://github.com/settings/apps) and update the **Webhook URL** to the URL of your deployment (which `now` has kindly copied to your clipboard).
 
-1. Your app should be up and running! For long term use, create an alias for your app. After making an alias, you can swap to new deploy URLs with no downtime.
+1. You can optionally add a [Custom Domain](https://zeit.co/docs/v2/custom-domains) and deploy to production with the following:
 
-        $ now alias set https://your-generated-url.now.sh https://a-fancier-url.now.sh
+        $ now --prod
 
-1. You can also keep your app running forever, with instant response to webhooks with:
-
-        $ now scale https://a-fancier-url.now.sh 1
+1. Visit `https://your-deployment.now.sh/api` to invoke the serverless function.
 
 ## Share the app
 

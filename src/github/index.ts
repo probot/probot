@@ -10,13 +10,14 @@ import { addGraphQL } from './graphql'
 import { addLogging, Logger } from './logging'
 import { addPagination } from './pagination'
 
+import { VERSION } from './version'
+
 export const ProbotOctokit = Octokit
   .plugin([throttling, retry, enterpriseCompatibility])
   .defaults({
-    userAgent: "Probot",
-    authStrategy: createAppAuth
+    authStrategy: createAppAuth,
+    userAgent: `probot/${VERSION}`
   })
-
 /**
  * the [@octokit/rest Node.js module](https://github.com/octokit/rest.js),
  * which wraps the [GitHub API](https://developer.github.com/v3/) and allows

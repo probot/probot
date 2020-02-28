@@ -1,10 +1,10 @@
 import { graphql } from '@octokit/graphql'
 import { enterpriseCompatibility } from '@octokit/plugin-enterprise-compatibility'
 
-import { Octokit } from '@octokit/rest'
 import { createAppAuth } from '@octokit/auth-app'
 import { retry } from '@octokit/plugin-retry'
 import { throttling } from '@octokit/plugin-throttling'
+import { Octokit } from '@octokit/rest'
 
 import { addGraphQL } from './graphql'
 import { addLogging, Logger } from './logging'

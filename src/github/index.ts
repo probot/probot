@@ -33,21 +33,6 @@ export function GitHubAPI (options: Options = { Octokit: ProbotOctokit } as any)
   // TODO: `option` need the auth options as required by `@octokit/auth-app`
   //       See: https://github.com/octokit/auth-app.js/#readme
 
-  // const octokit = new options.Octokit(Object.assign(options, {
-  //   throttle: Object.assign({
-  //     onAbuseLimit: (retryAfter: number) => {
-  //       options.logger.warn(`Abuse limit hit, retrying in ${retryAfter} seconds`)
-  //       return true
-  //     },
-  //     onRateLimit: (retryAfter: number) => {
-  //       options.logger.warn(`Rate limit hit, retrying in ${retryAfter} seconds`)
-  //       return true
-  //     }
-  //   }, options.throttle)
-  // })) as GitHubAPI
-  // addPagination(octokit)
-  // addLogging(octokit, options.logger)
-  // addGraphQL(octokit)
   const finalOptsChangeVarName = Object.assign(options, {
     throttle: Object.assign({
       onAbuseLimit: (retryAfter: number) => {
@@ -72,7 +57,9 @@ export function GitHubAPI (options: Options = { Octokit: ProbotOctokit } as any)
    */
   const octokit = new options.Octokit(finalOptsChangeVarName)
 
+  // addGraphQL(octokit)
   addLogging(octokit, options.logger)
+  // addPagination(octokit)
 
   return octokit as GitHubAPI
 }

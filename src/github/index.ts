@@ -72,6 +72,8 @@ export function GitHubAPI (options: Options = { Octokit: ProbotOctokit } as any)
    */
   const octokit = new options.Octokit(finalOptsChangeVarName)
 
+  addLogging(octokit, options.logger)
+
   return octokit as GitHubAPI
 }
 

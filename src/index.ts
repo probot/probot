@@ -108,7 +108,7 @@ export class Probot {
 
   private apps: Application[]
   private githubToken?: string
-  private Octokit: Octokit.Static
+  private Octokit: typeof Octokit
 
   constructor (options: Options) {
     options.webhookPath = options.webhookPath || '/'
@@ -237,7 +237,7 @@ export interface Options {
   webhookProxy?: string,
   port?: number,
   redisConfig?: Redis.RedisOptions,
-  Octokit?: Octokit.Static
+  Octokit?: typeof Octokit
 }
 
 export { Logger, Context, Application, Octokit }

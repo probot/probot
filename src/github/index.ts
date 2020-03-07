@@ -79,7 +79,7 @@ export function GitHubAPI (options: Options = { Octokit: ProbotOctokit } as any)
 
 const x = GitHubAPI({
 
-}).
+})
 
 // TODO: Is there a way we can gather the options from Octokit/rest for
 // `OctokitOptions` and not have to refer to the lower core module Octokit/core?
@@ -124,7 +124,7 @@ type z = UnionToIntersection<typeof Octokit>
 
 export interface GitHubAPI extends OctokitImitationWithoutVoid {
   // paginate: Paginate
-  // graphql: Graphql
+  graphql: Graphql
 }
 
 export interface RequestOptions {

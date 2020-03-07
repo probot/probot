@@ -18,7 +18,7 @@ export interface Options {
   catchErrors?: boolean
   githubToken?: string
   throttleOptions?: any
-  Octokit?: Octokit.Static
+  Octokit?: typeof Octokit
 }
 
 export type OnCallback<T> = (context: Context<T>) => Promise<void>
@@ -43,7 +43,7 @@ export class Application {
 
   private githubToken?: string
   private throttleOptions: any
-  private Octokit: Octokit.Static
+  private Octokit: typeof Octokit
 
   constructor (options?: Options) {
     const opts = options || {} as any
@@ -524,6 +524,7 @@ export class Application {
       baseUrl: process.env.GHE_HOST && `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api/v3`,
       logger: log.child({ name: 'github' })
     })
+
 
     return github
   }

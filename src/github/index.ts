@@ -48,7 +48,18 @@ export function GitHubAPI (options: Options = { Octokit: ProbotOctokit } as any)
   // addPagination(octokit)
   // addLogging(octokit, options.logger)
   // addGraphQL(octokit)
-  const finalOptsChangeVarName = Object.assign(options, options.throttle)
+  const finalOptsChangeVarName = Object.assign(options, {
+    throttle: Object.assign({
+      onAbuseLimit: (retryAfter: number) => {
+        options.logger.warn(`Abuse limit hit, retrying in ${retryAfter} seconds.`)
+        return true
+      },
+      onRateLimit: (retryAfter: number) => {
+        options.logger.warn(`Rate limit hit, retrying in ${retryAfter} seconds.`)
+        return true
+      }
+    }, options.throttle)
+  })
   /**
    * TODO: Maxim: The octokit type is missing the `authenticate` and
    * `registerEndpoints` methods that were available in v16. Have these methods

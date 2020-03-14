@@ -65,7 +65,7 @@
     "bunyan-format": "^0.2.1",
     "bunyan-sentry-stream": "^1.1.0",
     "cache-manager": "^3.0.0",
-    "commander": "^4.0.0",
+    "commander": "^5.0.0",
     "deepmerge": "^4.1.0",
     "dotenv": "~8.2.0",
     "eventsource": "^1.0.7",

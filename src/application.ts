@@ -480,11 +480,13 @@ export class Application {
    * client wil authenticate [as the app](https://developer.github.com/apps/building-integrations/setting-up-and-registering-github-apps/about-authentication-options-for-github-apps/#authenticating-as-a-github-app)
    * instead of as a specific installation, which means it can only be used for
    * [app APIs](https://developer.github.com/v3/apps/).
+   * @param accessToken - An access token to use for authentication. Cannot be
+   * used alongside id. Useful for user-authenticated actions.
    *
    * @returns An authenticated GitHub API client
    * @private
    */
-  public async auth (id?: number, log = this.log): Promise<GitHubAPI> {
+  public async auth (id?: number, log = this.log, accessToken?: string): Promise<GitHubAPI> {
     if (process.env.GHE_HOST && /^https?:\/\//.test(process.env.GHE_HOST)) {
       throw new Error('Your \`GHE_HOST\` environment variable should not begin with https:// or http://')
     }
@@ -492,11 +494,15 @@ export class Application {
     // if installation ID passed, instantiate and authenticate Octokit, then cache the instance
     // so that it can be used across received webhook events.
     if (id) {
+      if (accessToken) {
+        throw new Error('accessToken is not compatible with installation ID')
+      }
+
       const options = {
         Octokit: this.Octokit,
         auth: async () => {
-          const accessToken = await this.app.getInstallationAccessToken({ installationId: id })
-          return `token ${accessToken}`
+          const installationAccessToken = await this.app.getInstallationAccessToken({ installationId: id })
+          return `token ${installationAccessToken}`
         },
         baseUrl: process.env.GHE_HOST && `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api/v3`,
         logger: log.child({ name: 'github', installation: String(id) })
@@ -517,10 +523,11 @@ export class Application {
       return this.cache.wrap(`app:${id}`, () => GitHubAPI(options), { ttl: installationTokenTTL })
     }
 
-    const token = this.githubToken || this.app.getSignedJsonWebToken()
+    const token = accessToken || this.githubToken || this.app.getSignedJsonWebToken()
+    const auth = accessToken ? `token ${accessToken}` : `Bearer ${token}`
     const github = GitHubAPI({
       Octokit: this.Octokit,
-      auth: `Bearer ${token}`,
+      auth,
       baseUrl: process.env.GHE_HOST && `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api/v3`,
       logger: log.child({ name: 'github' })
     })

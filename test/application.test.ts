@@ -245,6 +245,19 @@ describe('Application', () => {
       const result = await appWithRedis.auth(1)
       expect(result).toBe('github mock')
     })
+
+    it('accessToken', async () => {
+      const appWithAuth = new Application()
+      Object.defineProperty(GitHubApiModule, 'GitHubAPI', {
+        value (options: any) {
+          expect(options.auth).toBe('token MOCK_TOKEN')
+          return 'github mock'
+        }
+      })
+
+      const result = await appWithAuth.auth(void 0, void 0, 'MOCK_TOKEN')
+      expect(result).toBe('github mock')
+    })
   })
 
   describe('error handling', () => {

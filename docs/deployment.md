@@ -180,31 +180,31 @@ After that, there are only a few steps left to set up and register the app:
 
 1. Install the Platform.sh CLI
 
-  Setting relevant environment variables and retrieving information about the Probot project will be much easier once you install the [Platform.sh CLI](https://docs.platform.sh/development/cli.html). Run the following command:
+   Setting relevant environment variables and retrieving information about the Probot project will be much easier once you install the [Platform.sh CLI](https://docs.platform.sh/development/cli.html). Run the following command:
 
-  ```
-  curl -sS https://platform.sh/cli/installer | php
-  ```
+   ```
+   curl -sS https://platform.sh/cli/installer | php
+   ```
 
-  You can find the system requirements and more information in the [installation instructions on GitHub](https://github.com/platformsh/platformsh-cli/blob/master/README.md#installation).
+   You can find the system requirements and more information in the [installation instructions on GitHub](https://github.com/platformsh/platformsh-cli/blob/master/README.md#installation).
 
 1. Follow the remaining steps in the README
 
-  The template is designed to set the `APP_ID`, `PRIVATE_KEY`, and `WEBHOOK_SECRET` environment variables automatically for you during the registration process, by installing and using the [Platform.sh CLI](https://docs.platform.sh/development/cli.html) within your application container.
+   The template is designed to set the `APP_ID`, `PRIVATE_KEY`, and `WEBHOOK_SECRET` environment variables automatically for you during the registration process, by installing and using the [Platform.sh CLI](https://docs.platform.sh/development/cli.html) within your application container.
 
-  Platform.sh allows you to branch your production application and deploy an exact copy of that application on staging and development environments that themselves can be registered with GitHub, becoming fully testable apps in their own right.
+   Platform.sh allows you to branch your production application and deploy an exact copy of that application on staging and development environments that themselves can be registered with GitHub, becoming fully testable apps in their own right.
 
-  Follow the remaining steps in the [README](https://github.com/platformsh-templates/probot/blob/master/README.md) to finish setting up the template.
+   Follow the remaining steps in the [README](https://github.com/platformsh-templates/probot/blob/master/README.md) to finish setting up the template.
 
 1. Migrate your code
 
-    After you have completed the above steps, you can branch your local repository and move your code onto that branch. You can revert the `NODE_ENV` variable to go through registration again for that environment
+   After you have completed the above steps, you can branch your local repository and move your code onto that branch. You can revert the `NODE_ENV` variable to go through registration again for that environment
 
-    ```
-    echo 'export NODE_ENV="development"' > .environment
-    ```
+   ```
+   echo 'export NODE_ENV="development"' > .environment
+   ```
 
-    and then repeat the steps above to register test the app on that development environment. When you're satisfied that your app is working as expected, merge it into the production application.
+   and then repeat the steps above to register test the app on that development environment. When you're satisfied that your app is working as expected, merge it into the production application.
 
 #### Deploying an existing project
 
@@ -214,127 +214,127 @@ You can branch the template above, add your application's code to it, and merge 
 
 1. Create a new project
 
-  When you create a new account, the setup wizard will direct you to create a new project. Name it, and select a region for the project to be served from.
+   When you create a new account, the setup wizard will direct you to create a new project. Name it, and select a region for the project to be served from.
 
 1. Install the [Platform.sh CLI]([Platform.sh CLI](https://docs.platform.sh/development/cli.html))
 
-  Run the command
+   Run the command
 
-  ```
-  curl -sS https://platform.sh/cli/installer | php
-  ```
+   ```
+   curl -sS https://platform.sh/cli/installer | php
+   ```
 
-  You can find the system requirements and more information in the [installation instructions on GitHub](https://github.com/platformsh/platformsh-cli/blob/master/README.md#installation).
+   You can find the system requirements and more information in the [installation instructions on GitHub](https://github.com/platformsh/platformsh-cli/blob/master/README.md#installation).
 
 1. Importing your application code
 
-  If you are just testing out Platform.sh, feel free to push a local copy of your repository directly.
+   If you are just testing out Platform.sh, feel free to push a local copy of your repository directly.
 
-  First, retrieve the project ID for the project you just created with the command `platform project:list`. Then, set Platform.sh as a remote for your repository:
+   First, retrieve the project ID for the project you just created with the command `platform project:list`. Then, set Platform.sh as a remote for your repository:
 
-  ```
-  platform project:set-remote <PROJECT ID>
-  ```
+   ```
+   platform project:set-remote <PROJECT ID>
+   ```
 
-  Alternatively, you can also set up an integration to GitHub, triggering environment deployments with every pull request. Follow the steps in the [public documentation](https://docs.platform.sh/administration/integrations/github.html) to set up the integration.
+   Alternatively, you can also set up an integration to GitHub, triggering environment deployments with every pull request. Follow the steps in the [public documentation](https://docs.platform.sh/administration/integrations/github.html) to set up the integration.
 
 1. Add Platform.sh configuration files
 
-  Each project on Platform.sh requires at least [three configuration files](https://docs.platform.sh/overview/structure.html) to describe and application. From your project root, run the following commands to create them:
+   Each project on Platform.sh requires at least [three configuration files](https://docs.platform.sh/overview/structure.html) to describe and application. From your project root, run the following commands to create them:
 
-  ```
-  mkdir .platform
-  touch .platform/routes.yaml && touch .platform/services.yaml
-  touch .platform.app.yaml
-  ```
+   ```
+   mkdir .platform
+   touch .platform/routes.yaml && touch .platform/services.yaml
+   touch .platform.app.yaml
+   ```
 
-  Unless your Probot app depends on [database storage](https://probot.github.io/docs/persistence/), the `services.yaml` file can be left empty. If a database is needed, visit the Platform.sh [Services documentation](https://docs.platform.sh/configuration/services.html) for more detailed information on how to configure the service your app depends on.
+   Unless your Probot app depends on [database storage](https://probot.github.io/docs/persistence/), the `services.yaml` file can be left empty. If a database is needed, visit the Platform.sh [Services documentation](https://docs.platform.sh/configuration/services.html) for more detailed information on how to configure the service your app depends on.
 
-  In your [`routes.yaml`](https://docs.platform.sh/configuration/routes.html) file, copy the following:
+   In your [`routes.yaml`](https://docs.platform.sh/configuration/routes.html) file, copy the following:
 
-  ```yaml
-  "https://{default}/":
-    type: upstream
-    upstream: "app:http"
+   ```yaml
+   "https://{default}/":
+      type: upstream
+      upstream: "app:http"
 
-  "https://www.{default}/":
+   "https://www.{default}/":
       type: redirect
       to: "https://{default}/"
-  ```
+   ```
 
-  This configuration directs requests to an application container called `app`, and sets an additional redirect for requests that include the `www` prefix.
+   This configuration directs requests to an application container called `app`, and sets an additional redirect for requests that include the `www` prefix.
 
-  Lastly, in the [`.platform.app.yaml`](https://docs.platform.sh/configuration/app-containers.html) file, include the settings below:
+   Lastly, in the [`.platform.app.yaml`](https://docs.platform.sh/configuration/app-containers.html) file, include the settings below:
 
-  ```yaml
-  name: app
+   ```yaml
+   name: app
 
-  type: 'nodejs:12'
+   type: 'nodejs:12'
 
-  variables:
+   variables:
       env:
-          NODE_ENV: development
+         NODE_ENV: development
 
-  disk: 256
+   disk: 256
 
-  web:
-    commands:
-      start: "npm start"
-  ```
+   web:
+      commands:
+         start: "npm start"
+   ```
 
-  This file defines your Probot app to run in a Node.js application container called `app`, with 256Mb of persistent storage. Feel free to modify the `web.commands.start` to match the start command of your app.
+   This file defines your Probot app to run in a Node.js application container called `app`, with 256Mb of persistent storage. Feel free to modify the `web.commands.start` to match the start command of your app.
 
-  You can set the application container to use a number of Node.js versions (defined in `type`), so visit the [documentation](https://docs.platform.sh/languages/nodejs.html#supported-versions) for a full list of those supported.
+   You can set the application container to use a number of Node.js versions (defined in `type`), so visit the [documentation](https://docs.platform.sh/languages/nodejs.html#supported-versions) for a full list of those supported.
 
 
 1. Register the app on GitHub
 
-  Commit and push these changes. In your Platform.sh management console, when the branch's deployment has finished, you can visit the deployed app by clicking the "URL" dropdown button at the bottom of the page.
+   Commit and push these changes. In your Platform.sh management console, when the branch's deployment has finished, you can visit the deployed app by clicking the "URL" dropdown button at the bottom of the page.
 
-  At this point, you can register the app with GitHub. After you do so however, the registration will fail to complete, because  GitHub is attempting to write to Platform.sh's read-only file system. The template above contains a work-around for this step, so feel free to consult [that project](https://github.com/platformsh-templates/probot) if you'd like to streamline this step.
+   At this point, you can register the app with GitHub. After you do so however, the registration will fail to complete, because  GitHub is attempting to write to Platform.sh's read-only file system. The template above contains a work-around for this step, so feel free to consult [that project](https://github.com/platformsh-templates/probot) if you'd like to streamline this step.
 
-  Visit the settings page for the app you have just registered. You will need the settings there to set your project's environment variables to complete registration.
+   Visit the settings page for the app you have just registered. You will need the settings there to set your project's environment variables to complete registration.
 
 1. Set environment variables
 
-  Using the CLI, set the following environment variables you retrieved from the registration steps:
+   Using the CLI, set the following environment variables you retrieved from the registration steps:
 
-  ```
-  platform variable:create --level environment --environment master env:APP_ID --value <APP_ID> --inheritable false --json false --sensitive false --enabled true --no-wait
-  platform variable:create --level environment --environment $PLATFORM_BRANCH env:WEBHOOK_SECRET --value <WEBHOOK_SECRET> --sensitive true --inheritable false --json false --enabled true --no-wait
-  ```
+   ```
+   platform variable:create --level environment --environment master env:APP_ID --value <APP_ID> --inheritable false --json false --sensitive false --enabled true --no-wait
+   platform variable:create --level environment --environment $PLATFORM_BRANCH env:WEBHOOK_SECRET --value <WEBHOOK_SECRET> --sensitive true --inheritable false --json false --enabled true --no-wait
+   ```
 
-  Write your private key to a temporary file in the project root called `temp-key.txt`. Once you have created the variable for it, you are free to delete it.
+   Write your private key to a temporary file in the project root called `temp-key.txt`. Once you have created the variable for it, you are free to delete it.
 
-  ```
-  platform variable:create --level environment --environment master env:PRIVATE_KEY --value="$(cat registration/temp-key.txt)" --sensitive true --inheritable false --json false --enabled true --no-wait
-  ```
+   ```
+   platform variable:create --level environment --environment master env:PRIVATE_KEY --value="$(cat registration/temp-key.txt)" --sensitive true --inheritable false --json false --enabled true --no-wait
+   ```
 
 1. Set for production
 
-  Each time you add a new variable to the project, the environment will be redeployed. When all of the redeployments have finished, modify the `variables.env.NODE_ENV` variable to read:
+   Each time you add a new variable to the project, the environment will be redeployed. When all of the redeployments have finished, modify the `variables.env.NODE_ENV` variable to read:
 
-  ```yaml
-  variables:
+   ```yaml
+   variables:
       env:
-          NODE_ENV: production
-  ```
+         NODE_ENV: production
+   ```
 
-  Then commit and push the change to the project.
+   Then commit and push the change to the project.
 
 1. Verify
 
-  When the final redeployment has completed, and all of your environment variables have been added, go to your GitHub App's advanced settings.
+   When the final redeployment has completed, and all of your environment variables have been added, go to your GitHub App's advanced settings.
 
-  You will see that the first delivery it attempted to deliver to Platform.sh failed while you were registering.
+   You will see that the first delivery it attempted to deliver to Platform.sh failed while you were registering.
 
-  Expand the previous failed delivery by clicking the three dots, and then click Redeliver and then Yes, repeat this delivery to repeat the delivery. Since you have set up the app for production, it should now show a 200 successful response.
+   Expand the previous failed delivery by clicking the three dots, and then click Redeliver and then Yes, repeat this delivery to repeat the delivery. Since you have set up the app for production, it should now show a 200 successful response.
 
-  Scroll to the bottom of the "General" settings page and click the "Active" checkbox so that GitHub can start sending more deliveries once it's installed on a repository.
+   Scroll to the bottom of the "General" settings page and click the "Active" checkbox so that GitHub can start sending more deliveries once it's installed on a repository.
 
 1. Test on a repository
 
-  Visit your application's public page (https://github.com/apps/APPLICATION_NAME) and click Install. Install it on the repository of your choice, and you will see that once you open a new issue the app will deliver a new response comment onto it.
+   Visit your application's public page (https://github.com/apps/APPLICATION_NAME) and click Install. Install it on the repository of your choice, and you will see that once you open a new issue the app will deliver a new response comment onto it.
 
 ## Share the app
 

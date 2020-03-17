@@ -162,7 +162,7 @@ Deploy Probot as a Serverless Function to [ZEIT Now](http://zeit.co). After [cre
 
 ### Platform.sh
 
-There are two ways to deploy your Probot app to [Platform.sh](https://platform.sh/): [manually](#deploying-an-existing-project) or by modifying an existing [template project](#quickstart-deploying-a-template). Either will work, however the template has been design to set the environment variables retrieved from GitHub during registration automatically, for every branch of your project, and may prove easier for migration in the long run.
+There are two ways to deploy your Probot app to [Platform.sh](https://platform.sh/): [manually](#deploying-an-existing-project) or by modifying an existing [template project](#quickstart-deploying-a-template). Either will work, however the template has been designed to set the environment variables retrieved from GitHub during registration automatically, for every branch of your project, and may prove easier for migration in the long run.
 
 #### Quickstart: Deploying a template
 
@@ -194,29 +194,7 @@ After that, there are only a few steps left to set up and register the app:
 
   Platform.sh allows you to branch your production application and deploy an exact copy of that application on staging and development environments that themselves can be registered with GitHub, becoming fully testable apps in their own right.
 
-  The [README](https://github.com/platformsh-templates/probot/blob/master/README.md) contains all of the commands to set this up, but briefly those steps include:
-
-    1. Cloning the project locally.
-
-      ```
-      git clone --branch master <PROJECT ID>@git.<PROJECT REGION>.platform.sh:<PROJECT ID>.git <PROJECT NAME>
-      ```
-
-    1. [Obtaining an API token](https://docs.platform.sh/development/cli/api-tokens.html#obtaining-a-token) and adding it to the project, which makes automatically setting the GitHub app environment variables across branches possible.
-
-      ```
-      platform variable:create --level project --name env:PLATFORMSH_CLI_TOKEN --sensitive true --value YOUR_API_TOKEN
-      ```
-
-    1. Registering the App with GitHub.
-    1. Setting the "Master" environment for production.
-
-      ```
-      echo 'export NODE_ENV="production"' > .environment
-      git add .environment && git commit -m "Set app for production."
-      ```
-
-    1. Verifying deliveries and installing the app on a repository to test.
+  Follow the remaining steps in the [README](https://github.com/platformsh-templates/probot/blob/master/README.md) to finish setting up the template.
 
 1. Migrate your code
 
@@ -284,14 +262,14 @@ You can branch the template above, add your application's code to it, and merge 
       to: "https://{default}/"
   ```
 
-  This configuration directs requests to an application container called `app`, and sets an additional redirect for requests that do not include the `www` prefix.
+  This configuration directs requests to an application container called `app`, and sets an additional redirect for requests that include the `www` prefix.
 
   Lastly, in the [`.platform.app.yaml`](https://docs.platform.sh/configuration/app-containers.html) file, include the settings below:
 
   ```yaml
   name: app
 
-  type: 'nodejs:X'
+  type: 'nodejs:12'
 
   variables:
       env:
@@ -306,7 +284,7 @@ You can branch the template above, add your application's code to it, and merge 
 
   This file defines your Probot app to run in a Node.js application container called `app`, with 256Mb of persistent storage. Feel free to modify the `web.commands.start` to match the start command of your app.
 
-  If you would like to run the Probot app on Node.js 12, simply modify the `type` key to read `'nodejs:12'` instead of the `X` placeholder shown above. You can set the application container to use a number of Node.js versions, so visit the [documentation](https://docs.platform.sh/languages/nodejs.html#supported-versions) for a full list of those supported. 
+  You can set the application container to use a number of Node.js versions (defined in `type`), so visit the [documentation](https://docs.platform.sh/languages/nodejs.html#supported-versions) for a full list of those supported.
 
 
 1. Register the app on GitHub

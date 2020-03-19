@@ -480,13 +480,11 @@ export class Application {
    * client wil authenticate [as the app](https://developer.github.com/apps/building-integrations/setting-up-and-registering-github-apps/about-authentication-options-for-github-apps/#authenticating-as-a-github-app)
    * instead of as a specific installation, which means it can only be used for
    * [app APIs](https://developer.github.com/v3/apps/).
-   * @param accessToken - An access token to use for authentication. Cannot be
-   * used alongside id. Useful for user-authenticated actions.
    *
    * @returns An authenticated GitHub API client
    * @private
    */
-  public async auth (id?: number, log = this.log, accessToken?: string): Promise<GitHubAPI> {
+  public async auth (id?: number, log = this.log): Promise<GitHubAPI> {
     if (process.env.GHE_HOST && /^https?:\/\//.test(process.env.GHE_HOST)) {
       throw new Error('Your \`GHE_HOST\` environment variable should not begin with https:// or http://')
     }
@@ -494,45 +492,50 @@ export class Application {
     // if installation ID passed, instantiate and authenticate Octokit, then cache the instance
     // so that it can be used across received webhook events.
     if (id) {
-      if (accessToken) {
-        throw new Error('accessToken is not compatible with installation ID')
+      const auth = async () => {
+        const installationAccessToken = await this.app.getInstallationAccessToken({ installationId: id })
+        return `token ${installationAccessToken}`
       }
-
-      const options = {
-        Octokit: this.Octokit,
-        auth: async () => {
-          const installationAccessToken = await this.app.getInstallationAccessToken({ installationId: id })
-          return `token ${installationAccessToken}`
-        },
-        baseUrl: process.env.GHE_HOST && `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api/v3`,
-        logger: log.child({ name: 'github', installation: String(id) })
-      }
+      const childLog = log.child({ name: 'github', installation: String(id) })
 
       if (this.throttleOptions) {
-        return GitHubAPI({
-          ...options,
-          throttle: {
-            id,
-            ...this.throttleOptions
-          }
-        })
+        return this.github(
+          auth,
+          childLog,
+          {
+            throttle: {
+              id,
+              ...this.throttleOptions
+            }
+          })
       }
 
       // Cache for 1 minute less than GitHub expiry
       const installationTokenTTL = parseInt(process.env.INSTALLATION_TOKEN_TTL || '3540', 10)
-      return this.cache.wrap(`app:${id}`, () => GitHubAPI(options), { ttl: installationTokenTTL })
+      return this.cache.wrap(`app:${id}`, () => this.github(auth, childLog), { ttl: installationTokenTTL })
     }
 
-    const token = accessToken || this.githubToken || this.app.getSignedJsonWebToken()
-    const auth = accessToken ? `token ${accessToken}` : `Bearer ${token}`
-    const github = GitHubAPI({
+    const token = this.githubToken || this.app.getSignedJsonWebToken()
+    return this.github(`Bearer ${token}`, log.child({ name: 'github' }))
+  }
+
+  /**
+   * Get an authenticated GitHub client instance. If you need a client for the installation or App itself, use
+   * Application.auth instead.
+   *
+   * @param auth The authentication token or an async function to retrieve one
+   * @param log An optional log instance
+   * @param opts Optional additional options to pass along to the GitHub client (e.g. throttling settings)
+   * @returns An authenticated GitHub API client
+   */
+  public github (auth: string | AsyncOctokitAuth, log?: LoggerWithTarget, opts = {}) {
+    return GitHubAPI({
       Octokit: this.Octokit,
       auth,
       baseUrl: process.env.GHE_HOST && `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api/v3`,
-      logger: log.child({ name: 'github' })
+      logger: log || this.log.child({ name: 'github' }),
+      ...opts
     })
-
-    return github
   }
 
   private authenticateEvent (event: Webhooks.WebhookEvent<any>, log: LoggerWithTarget): Promise<GitHubAPI> {
@@ -548,3 +551,5 @@ export class Application {
     return this.auth(event.payload.installation.id, log)
   }
 }
+
+type AsyncOctokitAuth = () => Promise<string>

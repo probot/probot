@@ -247,20 +247,6 @@ describe('Application', () => {
     })
   })
 
-  describe('github', () => {
-    it('creates a GitHubAPI instance', () => {
-      Object.defineProperty(GitHubApiModule, 'GitHubAPI', {
-        value (options: any) {
-          expect(options.auth).toBe('token MOCK_TOKEN')
-          return 'github mock'
-        }
-      })
-
-      const result = app.github('token MOCK_TOKEN')
-      expect(result).toBe('github mock')
-    })
-  })
-
   describe('error handling', () => {
     let error: any
 

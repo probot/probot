@@ -14,7 +14,7 @@ import { Application } from './application'
 import setupApp from './apps/setup'
 import { createDefaultCache } from './cache'
 import { Context } from './context'
-import { ProbotOctokit } from './github'
+import { GitHubAPI, ProbotOctokit } from './github'
 import { logger } from './logger'
 import { logRequestErrors } from './middleware/log-request-errors'
 import { findPrivateKey } from './private-key'
@@ -240,4 +240,4 @@ export interface Options {
   Octokit?: Octokit.Static
 }
 
-export { Logger, Context, Application, Octokit }
+export { Logger, Context, Application, Octokit, GitHubAPI }

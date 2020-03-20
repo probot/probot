@@ -102,3 +102,23 @@ GHE_HOST=fake.github-enterprise.com
 ```
 
 > GitHub Apps are enabled in GitHub Enterprise 2.12 as an [early access technical preview](https://developer.github.com/enterprise/2.12/apps/) but are generally available in GitHub Enterprise 2.13 and above.
+
+## Using Probot's GitHub API class directly
+
+Sometimes you may need to create your own instance of Probot's GitHub API class, for example when using the
+[OAuth user authorization flow](https://developer.github.com/apps/building-github-apps/identifying-and-authorizing-users-for-github-apps/). You may access the class by importing `GitHubAPI`:
+
+```js
+const { GitHubAPI } = require('probot')
+
+function myProbotApp (app) {
+  const github = GitHubAPI({
+    // any options you'd pass to Octokit
+    auth: 'token <myToken>',
+    // plus throttling settings
+    throttle: throttlingSettings,
+    // and a logger
+    logger: app.log.child({ name: 'my-github' })
+  })
+}
+```

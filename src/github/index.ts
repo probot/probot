@@ -18,8 +18,9 @@ export const ProbotOctokit = Octokit
  * browser.
  * @see {@link https://github.com/octokit/rest.js}
  */
-export function GitHubAPI (options: Options = { Octokit: ProbotOctokit } as any) {
-  const octokit = new options.Octokit(Object.assign(options, {
+export function GitHubAPI (options: Options = {} as any) {
+  const OctokitFromOptions = options.Octokit || ProbotOctokit
+  const octokit = new OctokitFromOptions(Object.assign(options, {
     throttle: Object.assign({
       onAbuseLimit: (retryAfter: number) => {
         options.logger.warn(`Abuse limit hit, retrying in ${retryAfter} seconds`)

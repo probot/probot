@@ -525,7 +525,6 @@ export class Application {
       logger: log.child({ name: 'github' })
     })
 
-
     return github
   }
 

@@ -64,15 +64,13 @@ export function GitHubAPI (options: Options = { Octokit: ProbotOctokit } as any)
   return octokit as GitHubAPI
 }
 
-const x = GitHubAPI({
 
-})
 
 // TODO: Is there a way we can gather the options from Octokit/rest for
 // `OctokitOptions` and not have to refer to the lower core module Octokit/core?
 export interface Options extends OctokitOptions {
   debug?: boolean
-  logger: Logger
+  logger?: Logger
   Octokit: typeof Octokit
 }
 
@@ -84,34 +82,21 @@ declare type UnionToIntersection<Union> = (Union extends any ? (argument: Union)
 
 type OctokitImitation = {
   [x: string]: any;
-} & {
-  [x: string]: any;
-} & OctokitCore & void & {
-  // tslint:disable-next-line: no-implicit-dependencies
-  paginate: import('@octokit/plugin-paginate-rest').PaginateInterface;
-  // tslint:disable-next-line: no-implicit-dependencies no-submodule-imports
-} & import('@octokit/plugin-rest-endpoint-methods/dist-types/generated/types').RestEndpointMethods
-
-type OctokitImitationWithoutVoid = {
-  [x: string]: any;
-} & {
-  [x: string]: any;
 } & OctokitCore & {
   // tslint:disable-next-line: no-implicit-dependencies
   paginate: import('@octokit/plugin-paginate-rest').PaginateInterface;
   // tslint:disable-next-line: no-implicit-dependencies no-submodule-imports
 } & import('@octokit/plugin-rest-endpoint-methods/dist-types/generated/types').RestEndpointMethods
 
-export declare type Constructor<T> = new (...args: any[]) => T
+export declare type Constructor<T> = new (...args: any[]) => T;
 
 type x = InstanceType<UnionToIntersection<typeof Octokit>>
 
 type x1 = OmitThisParameter<x>
-type z = UnionToIntersection<typeof Octokit>
 
-export interface GitHubAPI extends OctokitImitationWithoutVoid {
+export interface GitHubAPI extends OctokitImitation {
   // paginate: Paginate
-  graphql: Graphql
+  // graphql: Graphql
 }
 
 export interface RequestOptions {

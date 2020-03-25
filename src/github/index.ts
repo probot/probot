@@ -5,7 +5,6 @@ import { createAppAuth } from '@octokit/auth-app'
 import { retry } from '@octokit/plugin-retry'
 import { throttling } from '@octokit/plugin-throttling'
 import { Octokit } from '@octokit/rest'
-
 import { addGraphQL } from './graphql'
 import { addLogging, Logger } from './logging'
 import { addPagination } from './pagination'
@@ -23,8 +22,6 @@ export const ProbotOctokit = Octokit
     userAgent: `probot/${VERSION}`
   })
 
-
-
 /**
  * the [@octokit/rest Node.js module](https://github.com/octokit/rest.js),
  * which wraps the [GitHub API](https://developer.github.com/v3/) and allows
@@ -32,7 +29,7 @@ export const ProbotOctokit = Octokit
  * browser.
  * @see {@link https://github.com/octokit/rest.js}
  */
-export function GitHubAPI (options: Options = {} as any) {
+export function GitHubAPI (options: Options = { Octokit: ProbotOctokit } as any) {
   // TODO: `option` need the auth options as required by `@octokit/auth-app`
   //       See: https://github.com/octokit/auth-app.js/#readme
 
@@ -64,7 +61,7 @@ export function GitHubAPI (options: Options = {} as any) {
   // addLogging(octokit, options.logger)
   // addPagination(octokit)
 
-  return octokit
+  return octokit as GitHubAPI
 }
 
 // TODO: Is there a way we can gather the options from Octokit/rest for

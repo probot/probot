@@ -43,7 +43,7 @@ export function GitHubAPI (options: Options = {} as any) {
 export interface Options extends Octokit.Options {
   debug?: boolean
   logger: Logger
-  Octokit: Octokit.Static
+  Octokit?: Octokit.Static
 }
 
 export interface RequestOptions {

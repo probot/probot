@@ -75,25 +75,25 @@ export interface Options extends OctokitOptions {
   Octokit: typeof Octokit
 }
 
-export interface RequestOptions {
-  baseUrl?: string
-  method?: string
-  url?: string
-  headers?: any
-  query?: string
-  variables?: Variables
-  data?: any
-}
+// export interface RequestOptions {
+//   baseUrl?: string
+//   method?: string
+//   url?: string
+//   headers?: any
+//   query?: string
+//   variables?: Variables
+//   data?: any
+// }
 
-export interface Result {
-  headers: {
-    status: string
-  }
-}
+// export interface Result {
+//   headers: {
+//     status: string
+//   }
+// }
 
-export interface OctokitError extends Error {
-  status: number
-}
+// export interface OctokitError extends Error {
+//   status: number
+// }
 
 // interface Paginate extends Octokit.Paginate {
 //   (

@@ -528,7 +528,7 @@ export class Application {
     return github
   }
 
-  private authenticateEvent (event: Webhooks.WebhookEvent<any>, log: LoggerWithTarget): Promise<typeof GitHubAPI> {
+  private authenticateEvent (event: Webhooks.WebhookEvent<any>, log: LoggerWithTarget): Promise<ReturnType<typeof GitHubAPI>> {
     if (this.githubToken) {
       return this.auth()
     }

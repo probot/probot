@@ -113,23 +113,23 @@ export interface OctokitError extends Error {
 //   query: Graphql
 // }
 
-export interface GraphQlQueryResponse {
-  data: { [ key: string ]: any } | null
-  errors?: [{
-    message: string
-    path: [string]
-    extensions: { [ key: string ]: any }
-    locations: [{
-      line: number,
-      column: number
-    }]
-  }]
-}
+// export interface GraphQlQueryResponse {
+//   data: { [ key: string ]: any } | null
+//   errors?: [{
+//     message: string
+//     path: [string]
+//     extensions: { [ key: string ]: any }
+//     locations: [{
+//       line: number,
+//       column: number
+//     }]
+//   }]
+// }
 
-export interface Headers {
-  [key: string]: string
-}
+// export interface Headers {
+//   [key: string]: string
+// }
 
-export interface Variables { [key: string]: any }
+// export interface Variables { [key: string]: any }
 
-export { GraphQLError } from './graphql'
+// export { GraphQLError } from './graphql'

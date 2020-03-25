@@ -1,4 +1,5 @@
 import { Octokit } from '@octokit/rest'
+import { ReposGetContentsParams } from '@octokit/plugin-rest-endpoint-methods/dist-types/generated/types'
 import Webhooks, { PayloadRepository } from '@octokit/webhooks'
 import merge from 'deepmerge'
 import yaml from 'js-yaml'
@@ -71,10 +72,10 @@ export class Context<E extends WebhookPayloadWithRepository = any> implements We
   public host?: string
   public url?: string
 
-  public github: GitHubAPI
+  public github: ReturnType<typeof GitHubAPI>
   public log: LoggerWithTarget
 
-  constructor (event: Webhooks.WebhookEvent<E>, github: GitHubAPI, log: LoggerWithTarget) {
+  constructor (event: Webhooks.WebhookEvent<E>, github: ReturnType<typeof GitHubAPI>, log: LoggerWithTarget) {
     this.name = event.name
     this.id = event.id
     this.payload = event.payload
@@ -225,7 +226,7 @@ export class Context<E extends WebhookPayloadWithRepository = any> implements We
    * @param params Params to fetch the file with
    * @return The parsed YAML file
    */
-  private async loadYaml<T> (params: Octokit.ReposGetContentsParams): Promise<any> {
+  private async loadYaml<T> (params: ReposGetContentsParams): Promise<any> {
     try {
       const response = await this.github.repos.getContents(params)
 
@@ -262,7 +263,7 @@ export class Context<E extends WebhookPayloadWithRepository = any> implements We
    * @param base A string specifying the base repository
    * @return The params of the base configuration
    */
-  private getBaseParams (params: Octokit.ReposGetContentsParams, base: string): Octokit.ReposGetContentsParams {
+  private getBaseParams (params: ReposGetContentsParams, base: string): ReposGetContentsParams {
     const match = base.match(BASE_REGEX)
     if (match === null) {
       throw new Error(`Invalid repository name in key "${BASE_KEY}": ${base}`)

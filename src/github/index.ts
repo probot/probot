@@ -36,11 +36,14 @@ export function GitHubAPI (options: Options = { Octokit: ProbotOctokit } as any)
   const finalOptsChangeVarName = Object.assign(options, {
     throttle: Object.assign({
       onAbuseLimit: (retryAfter: number) => {
-        options.logger.warn(`Abuse limit hit, retrying in ${retryAfter} seconds.`)
+        // TODO: `logger` is not guaranteed to be defined in `options`. Is that
+        // accurate? If so, then why are we ignoring the warning with a `!`
+        // symbol?
+        options.logger!.warn(`Abuse limit hit, retrying in ${retryAfter} seconds.`)
         return true
       },
       onRateLimit: (retryAfter: number) => {
-        options.logger.warn(`Rate limit hit, retrying in ${retryAfter} seconds.`)
+        options.logger!.warn(`Rate limit hit, retrying in ${retryAfter} seconds.`)
         return true
       }
     }, options.throttle)
@@ -61,7 +64,7 @@ export function GitHubAPI (options: Options = { Octokit: ProbotOctokit } as any)
   // addLogging(octokit, options.logger)
   // addPagination(octokit)
 
-  return octokit as GitHubAPI
+  return octokit
 }
 
 // TODO: Is there a way we can gather the options from Octokit/rest for
@@ -92,14 +95,14 @@ export interface OctokitError extends Error {
   status: number
 }
 
-interface Paginate extends Octokit.Paginate {
-  (
-    responsePromise: Promise<Octokit.AnyResponse>,
-    callback?: (response: Octokit.AnyResponse, done: () => void) => any
-  ): Promise<any[]>
-}
+// interface Paginate extends Octokit.Paginate {
+//   (
+//     responsePromise: Promise<Octokit.AnyResponse>,
+//     callback?: (response: Octokit.AnyResponse, done: () => void) => any
+//   ): Promise<any[]>
+// }
 
-type Graphql = (query: string, variables?: Variables, headers?: Headers) => ReturnType<typeof graphql>
+// type Graphql = (query: string, variables?: Variables, headers?: Headers) => ReturnType<typeof graphql>
 
 // export interface GitHubAPI extends Octokit {
 //   paginate: Paginate

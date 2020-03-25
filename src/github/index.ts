@@ -11,9 +11,7 @@ import { addPagination } from './pagination'
 
 import { VERSION } from './version'
 
-import { Octokit as OctokitCore  } from '@octokit/core/dist-types'
-import { OctokitOptions, ReturnTypeOf } from "@octokit/core/dist-types/types"
-
+import { OctokitOptions } from "@octokit/core/dist-types/types"
 
 export const ProbotOctokit = Octokit
   .plugin([throttling, retry, enterpriseCompatibility])
@@ -29,7 +27,7 @@ export const ProbotOctokit = Octokit
  * browser.
  * @see {@link https://github.com/octokit/rest.js}
  */
-export function GitHubAPI (options: Options = { Octokit: ProbotOctokit } as any) {
+export function GitHubAPI (options: Options = { Octokit: ProbotOctokit }) {
   // TODO: `option` need the auth options as required by `@octokit/auth-app`
   //       See: https://github.com/octokit/auth-app.js/#readme
 

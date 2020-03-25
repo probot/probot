@@ -5,6 +5,7 @@ import { createAppAuth } from '@octokit/auth-app'
 import { retry } from '@octokit/plugin-retry'
 import { throttling } from '@octokit/plugin-throttling'
 import { Octokit } from '@octokit/rest'
+
 import { addGraphQL } from './graphql'
 import { addLogging, Logger } from './logging'
 import { addPagination } from './pagination'
@@ -22,6 +23,8 @@ export const ProbotOctokit = Octokit
     userAgent: `probot/${VERSION}`
   })
 
+
+
 /**
  * the [@octokit/rest Node.js module](https://github.com/octokit/rest.js),
  * which wraps the [GitHub API](https://developer.github.com/v3/) and allows
@@ -29,7 +32,7 @@ export const ProbotOctokit = Octokit
  * browser.
  * @see {@link https://github.com/octokit/rest.js}
  */
-export function GitHubAPI (options: Options = { Octokit: ProbotOctokit } as any) {
+export function GitHubAPI (options: Options = {} as any) {
   // TODO: `option` need the auth options as required by `@octokit/auth-app`
   //       See: https://github.com/octokit/auth-app.js/#readme
 
@@ -58,13 +61,11 @@ export function GitHubAPI (options: Options = { Octokit: ProbotOctokit } as any)
   const octokit = new options.Octokit(finalOptsChangeVarName)
 
   // addGraphQL(octokit)
-  addLogging(octokit, options.logger)
+  // addLogging(octokit, options.logger)
   // addPagination(octokit)
 
-  return octokit as GitHubAPI
+  return octokit
 }
-
-
 
 // TODO: Is there a way we can gather the options from Octokit/rest for
 // `OctokitOptions` and not have to refer to the lower core module Octokit/core?
@@ -72,31 +73,6 @@ export interface Options extends OctokitOptions {
   debug?: boolean
   logger?: Logger
   Octokit: typeof Octokit
-}
-
-/**
- * @author https://stackoverflow.com/users/2887218/jcalz
- * @see https://stackoverflow.com/a/50375286/10325032
- */
-declare type UnionToIntersection<Union> = (Union extends any ? (argument: Union) => void : never) extends (argument: infer Intersection) => void ? Intersection : never;
-
-type OctokitImitation = {
-  [x: string]: any;
-} & OctokitCore & {
-  // tslint:disable-next-line: no-implicit-dependencies
-  paginate: import('@octokit/plugin-paginate-rest').PaginateInterface;
-  // tslint:disable-next-line: no-implicit-dependencies no-submodule-imports
-} & import('@octokit/plugin-rest-endpoint-methods/dist-types/generated/types').RestEndpointMethods
-
-export declare type Constructor<T> = new (...args: any[]) => T;
-
-type x = InstanceType<UnionToIntersection<typeof Octokit>>
-
-type x1 = OmitThisParameter<x>
-
-export interface GitHubAPI extends OctokitImitation {
-  // paginate: Paginate
-  // graphql: Graphql
 }
 
 export interface RequestOptions {
@@ -127,6 +103,16 @@ interface Paginate extends Octokit.Paginate {
 }
 
 type Graphql = (query: string, variables?: Variables, headers?: Headers) => ReturnType<typeof graphql>
+
+// export interface GitHubAPI extends Octokit {
+//   paginate: Paginate
+//   graphql: Graphql
+//   /**
+//    * @deprecated `.query()` is deprecated, use `.graphql()` instead
+//    */
+//   query: Graphql
+// }
+
 export interface GraphQlQueryResponse {
   data: { [ key: string ]: any } | null
   errors?: [{

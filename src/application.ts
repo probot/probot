@@ -1,3 +1,6 @@
+  // TODO: @octokit/app is being deprecated in favor of @octokit/app-auth. See
+  // https://github.com/octokit/app.js/blob/deprecate-in-favor-of-octokit-auth-app/README.md
+  // for deprecation info and migration steps.
 import { App as OctokitApp } from '@octokit/app'
 import { Octokit } from '@octokit/rest'
 import Webhooks from '@octokit/webhooks'

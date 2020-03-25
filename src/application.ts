@@ -484,7 +484,7 @@ export class Application {
    * @returns An authenticated GitHub API client
    * @private
    */
-  public async auth (id?: number, log = this.log): Promise<GitHubAPI> {
+  public async auth (id?: number, log = this.log): Promise<ReturnType<typeof GitHubAPI>> {
     if (process.env.GHE_HOST && /^https?:\/\//.test(process.env.GHE_HOST)) {
       throw new Error('Your \`GHE_HOST\` environment variable should not begin with https:// or http://')
     }
@@ -528,7 +528,7 @@ export class Application {
     return github
   }
 
-  private authenticateEvent (event: Webhooks.WebhookEvent<any>, log: LoggerWithTarget): Promise<GitHubAPI> {
+  private authenticateEvent (event: Webhooks.WebhookEvent<any>, log: LoggerWithTarget): Promise<typeof GitHubAPI> {
     if (this.githubToken) {
       return this.auth()
     }

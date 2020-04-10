@@ -1,3 +1,4 @@
+import fs from 'fs'
 import nock from 'nock'
 import pkg from '../package.json'
 import { ManifestCreation } from '../src/manifest-creation'
@@ -101,6 +102,14 @@ describe('ManifestCreation', () => {
     test('creates an app from a code', () => {
       // checks that getManifest returns a JSON.stringified manifest
       expect(setup.getManifest(pkg, 'localhost://3000')).toEqual('{"description":"🤖 A framework for building GitHub Apps to automate and improve your workflow","hook_attributes":{"url":"localhost://3000/"},"name":"probot","public":true,"redirect_url":"localhost://3000/probot/setup","url":"https://probot.github.io","version":"v1"}')
+    })
+
+    test('creates an app from a code with overrided values from app.yml', () => {
+      const appYaml = 'name: cool-app\ndescription: A description for a cool app'
+      jest.spyOn(fs, 'readFileSync').mockReturnValue(appYaml)
+
+      // checks that getManifest returns the correct JSON.stringified manifest
+      expect(setup.getManifest(pkg, 'localhost://3000')).toEqual('{"description":"A description for a cool app","hook_attributes":{"url":"localhost://3000/"},"name":"cool-app","public":true,"redirect_url":"localhost://3000/probot/setup","url":"https://probot.github.io","version":"v1"}')
     })
   })
 })

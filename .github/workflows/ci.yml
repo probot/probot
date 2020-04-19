@@ -31,5 +31,7 @@ jobs:
     - run: npm test
     - name: codecov
       run: npx codecov
+      # run codecov only once
+      if: matrix.os == 'ubuntu-latest' && matrix.node-version == '12.x'
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

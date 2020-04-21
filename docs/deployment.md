@@ -14,7 +14,7 @@ Every app can either be deployed stand-alone, or combined with other apps in one
 1. [Deploy the app](#deploy-the-app)
     1. [Glitch](#glitch)
     1. [Heroku](#heroku)
-    1. [ZEIT Now](#zeit-now)
+    1. [Vercel Now](#vercel-now)
 1. [Share the app](#share-the-app)
 1. [Combining apps](#combining-apps)
 1. [Error tracking](#error-tracking)
@@ -106,9 +106,9 @@ Probot runs like [any other Node app](https://devcenter.heroku.com/articles/depl
         $ heroku config:set LOG_LEVEL=trace
         $ heroku logs --tail
 
-### ZEIT Now
+### Vercel Now
 
-Deploy Probot as a Serverless Function to [ZEIT Now](http://zeit.co). After [creating the GitHub App](#create-the-github-app):
+Deploy Probot as a Serverless Function to [Vercel Now](http://vercel.com). After [creating the GitHub App](#create-the-github-app):
 
 1. Install Now CLI with `npm i -g now` and login with `now login`
 
@@ -149,11 +149,11 @@ Deploy Probot as a Serverless Function to [ZEIT Now](http://zeit.co). After [cre
 
 1. Run `now secrets add probot-api-id aaa`, `now secrets add probot-webhook-secret bbb`, `now secrets add probot-private-key "$(cat ~/Downloads/*.private-key.pem | base64)"` replacing the `aaa` and `bbb` with the values for those variables.
       
-1. Deploy with `now` or connect your GitHub repository](https://zeit.co/github) to ZEIT Now and deploy on `git push`.
+1. Deploy with `now` or connect your GitHub repository](https://vercel.com/github) to Vercel Now and deploy on `git push`.
 
 1. Once the deploy is started, go back to your [app settings page](https://github.com/settings/apps) and update the **Webhook URL** to the URL of your deployment (which `now` has kindly copied to your clipboard).
 
-1. You can optionally add a [Custom Domain](https://zeit.co/docs/v2/custom-domains) and deploy to production with the following:
+1. You can optionally add a [Custom Domain](https://vercel.com/docs/v2/custom-domains) and deploy to production with the following:
 
         $ now --prod
 

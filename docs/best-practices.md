@@ -107,14 +107,3 @@ other: GGG
 # octocat/.github:test.yaml
 other: HHH
 ```
-
-##### Branch/fork configuration context
-
-For security reasons, the context does not take a specific branch or fork 
-of the repository into account when resolving the configuration. This means
-that a pull request or fork will not influence the bot's configuration. 
-
-If you want to allow branch/fork specific bot configuration, fetch and merge
-the configuration file directly from the branch/fork. Be aware that users with
-PR/fork push access may change your bot's configuration which can pose as a
-security risk for the contents of repositories. Document this choice well.

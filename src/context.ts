@@ -181,6 +181,15 @@ export class Context<E extends WebhookPayloadWithRepository = any> implements We
    * Config files can also specify a base that they extend. `deepMergeOptions` can be used
    * to configure how the target config, extended base, and default configs are merged.
    *
+   * For security reasons, the context does not take a specific branch or fork 
+   * of the repository into account when resolving the configuration. This means
+   * that a pull request or fork will not influence the bot's configuration. 
+   *
+   * If you want to allow branch/fork specific bot configuration, fetch and merge
+   * the configuration file directly from the branch/fork. Be aware that users with
+   * PR/fork push access may change your bot's configuration which can pose as a
+   * security risk for the contents of repositories. Document this choice well.
+   *
    * @param fileName - Name of the YAML file in the `.github` directory
    * @param defaultConfig - An object of default config options
    * @param deepMergeOptions - Controls merging configs (from the [deepmerge](https://github.com/TehShrike/deepmerge) module)

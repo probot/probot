@@ -50,4 +50,4 @@ module.exports = app => {
 }
 ```
 
-For more details, explore the [GitHub webhook documentation](https://developer.github.com/webhooks/#events) or see a list of all the named events in the [@octokit/webhooks.js](https://github.com/octokit/webhooks.js/blob/master/lib/webhook-names.json) npm module.
+For more details, explore the [GitHub webhook documentation](https://developer.github.com/webhooks/#events) or see a list of all the named events in the [@octokit/webhooks.js](https://github.com/octokit/webhooks.js/) npm module.

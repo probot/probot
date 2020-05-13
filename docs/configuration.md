@@ -30,9 +30,9 @@ Variable | Description
 `LOG_FORMAT` | By default, logs are formatted for readability in development. You can set this to `short`, `long`, `simple`, `json`, `bunyan`. Default: `short`
 `LOG_LEVEL` | The verbosity of logs to show when running your app, which can be `trace`, `debug`, `info`, `warn`, `error`, or `fatal`. Default: `info`
 `LOG_LEVEL_IN_STRING` | By default, when using the `json` format, the level printed in the log records is an int (`10`, `20`, ..). This option tells the logger to print level as a string: `{"level": "info"}`. Default `false`
-`PORT` | The port to start the local server on. Default: `3000`.
+`PORT` | The port to start the local server on. Default: `3000`
 `SENTRY_DSN` | Set to a [Sentry](https://sentry.io/) DSN to report all errors thrown by your app.  <p>_(Example: `https://1234abcd@sentry.io/12345`)_</p>
-`WEBHOOK_PATH` | The URL path which will receive webhooks. Default: `/`.
+`WEBHOOK_PATH` | The URL path which will receive webhooks. Default: `/`
 `INSTALLATION_TOKEN_TTL` | The length of time installation access tokens are cached by Probot. This may be useful if your app is running long processes before accessing `context.github`. Default: `3540` (59 minutes) <p>_(Example: `3300` or 55 minutes)_</p>
 `REDIS_URL` | Set to a `redis://` url as connection option for [ioredis](https://github.com/luin/ioredis#connect-to-redis) in order to enable [cluster support for request throttling](https://github.com/octokit/plugin-throttling.js#clustering). <p>_(Example: `redis://:secret@redis-123.redislabs.com:12345/0`)_</p>
 

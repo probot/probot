@@ -113,7 +113,7 @@
     "standard": "^14.0.2",
     "standard-markdown": "^6.0.0",
     "supertest": "^4.0.2",
-    "ts-jest": "^25.1.0",
+    "ts-jest": "^26.0.0",
     "tslint": "^5.9.1",
     "tslint-config-prettier": "^1.10.0",
     "tslint-config-standard": "^9.0.0",

@@ -7,7 +7,7 @@ on:
       - "greenkeeper/**"
 
   pull_request:
-    types: 
+    types:
       - opened
       - synchronize
 
@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         node-version: [10.x, 12.x]
-        os: [ubuntu-latest, macOS, windows-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
 
     runs-on: ${{ matrix.os }}
 

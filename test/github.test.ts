@@ -1,9 +1,10 @@
 import nock from 'nock'
-import { GitHubAPI, Options, ProbotOctokit } from '../src/github'
+import { GitHubAPI, Options } from '../src/github'
+import { ProbotOctokit } from '../src/github/octokit'
 import { logger } from '../src/logger'
 
 describe('GitHubAPI', () => {
-  let github: GitHubAPI
+  let github: InstanceType<typeof ProbotOctokit>
 
   const defaultOptions: Options = {
     Octokit: ProbotOctokit,
@@ -168,31 +169,6 @@ describe('GitHubAPI', () => {
     it('maps the responses to data by default', async () => {
       const res = await github.paginate(github.issues.listForRepo.endpoint.merge({ owner: 'JasonEtco', repo: 'pizza', per_page: 1 }))
       expect(res).toEqual(issues)
-    })
-
-    describe('deprecations', () => {
-      let consoleWarnSpy: any
-      beforeEach(() => {
-        consoleWarnSpy = jest.spyOn(global.console, 'warn').mockImplementation(() => null)
-      })
-      afterEach(() => {
-        consoleWarnSpy.mockReset()
-      })
-
-      it('github.paginate(promise)', async () => {
-        const res = await github.paginate(github.issues.listForRepo({ owner: 'JasonEtco', repo: 'pizza', per_page: 1 }))
-        expect(Array.isArray(res)).toBeTruthy()
-        expect(res.length).toBe(5)
-        expect(consoleWarnSpy).toHaveBeenCalled()
-      })
-
-      it('maps to each response by default when using deprecated syntax', async () => {
-        const res = await github.paginate(github.issues.listForRepo({ owner: 'JasonEtco', repo: 'pizza', per_page: 1 }))
-        expect(Array.isArray(res)).toBeTruthy()
-        expect(res.length).toBe(5)
-        expect('headers' in res[0]).toBeTruthy()
-        expect(consoleWarnSpy).toHaveBeenCalled()
-      })
     })
   })
 })

@@ -25,6 +25,7 @@ export interface Options {
   throttleOptions?: any
   Octokit?: typeof ProbotOctokit
   cert?: string
+  id?: number
 }
 
 export type OnCallback<T> = (context: Context<T>) => Promise<void>
@@ -50,6 +51,7 @@ export class Application {
   private githubToken?: string
   private throttleOptions: any
   private Octokit: typeof ProbotOctokit
+  private id?: number
   private privateKey?: string
 
   constructor (options?: Options) {
@@ -57,6 +59,7 @@ export class Application {
     this.events = new EventEmitter()
     this.log = wrapLogger(logger, logger)
     this.app = opts.app
+    this.id = opts.id
     this.privateKey = opts.cert
     this.cache = opts.cache
     this.router = opts.router || express.Router() // you can do this?
@@ -502,10 +505,12 @@ export class Application {
     if (id) {
       const options = {
         Octokit: this.Octokit,
-        auth: async () => {
-          const accessToken = await this.app.getInstallationAccessToken({ installationId: id })
-          return `token ${accessToken}`
+        auth: {
+          id: this.id,
+          privateKey: this.privateKey,
+          installationId: id
         },
+        authStrategy: createAppAuth,
         baseUrl: process.env.GHE_HOST && `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api/v3`,
         logger: log.child({ name: 'github', installation: String(id) })
       }
@@ -527,7 +532,7 @@ export class Application {
 
     const authOptions = this.githubToken ? { auth: this.githubToken } : {
       auth: {
-        id,
+        id: this.id,
         privateKey: this.privateKey
       },
       authStrategy: createAppAuth

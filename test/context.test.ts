@@ -3,9 +3,14 @@ import path = require('path')
 
 import Webhooks from '@octokit/webhooks'
 import { Context, MergeOptions } from '../src/context'
-import { GitHubAPI, OctokitError } from '../src/github'
+import { GitHubAPI } from '../src/github'
+import { ProbotOctokit } from '../src/github/octokit'
 
 import { createMockResponse } from './fixtures/octokit/mock-response'
+
+interface OctokitError extends Error {
+  status: number
+}
 
 describe('Context', () => {
   let event: Webhooks.WebhookEvent<any>
@@ -96,7 +101,7 @@ describe('Context', () => {
   })
 
   describe('config', () => {
-    let github: GitHubAPI
+    let github: InstanceType<typeof ProbotOctokit>
 
     function responseFromString (content: string) {
       return createMockResponse({

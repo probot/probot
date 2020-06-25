@@ -20,12 +20,14 @@ async function webhookEventCheck (app: Application, eventName: string) {
   }
 
   const baseEventName = eventName.split('.')[0]
+
   if (await isSubscribedToEvent(app, baseEventName)) {
     return true
   } else if (didFailRetrievingAppMeta === false) {
     const userFriendlyBaseEventName = baseEventName.split('_').join(' ')
     app.log.error(`Your app is attempting to listen to "${eventName}", but your GitHub App is not subscribed to the "${userFriendlyBaseEventName}" event.`)
   }
+  
   return didFailRetrievingAppMeta ? undefined : false
 }
 
@@ -88,6 +90,7 @@ async function isSubscribedToEvent (app: Application, baseEventName: string) {
   // `marketplace_purchase`) - we can only check `baseEventName` if it is known
   // to be in the `GET /app` response.
   const eventMayExistInAppResponse = knownBaseEvents.includes(baseEventName)
+  
   if (!eventMayExistInAppResponse) {
     return true
   }
@@ -113,6 +116,7 @@ async function retrieveAppMeta (app: Application) {
     const api = await app.auth()
     try {
       const { data } = await api.apps.getAuthenticated()
+      
       return resolve(data)
     } catch (e) {
       app.log.trace(e)

@@ -29,8 +29,7 @@ const cache = createDefaultCache()
 // tslint:disable:no-var-requires
 const defaultAppFns: ApplicationFunction[] = [
   require('./apps/default'),
-  require('./apps/sentry'),
-  require('./apps/stats')
+  require('./apps/sentry')
 ]
 // tslint:enable:no-var-requires
 

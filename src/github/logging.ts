@@ -1,7 +1,7 @@
 import Logger from 'bunyan'
-import { GitHubAPI } from './'
+import { Octokit } from '@octokit/rest'
 
-export function addLogging (client: GitHubAPI, logger: Logger) {
+export function addLogging (client: Octokit, logger: Logger) {
   if (!logger) {
     return
   }

@@ -2,6 +2,7 @@
 require('dotenv').config()
 
 import { App as OctokitApp } from '@octokit/app'
+
 import { Octokit } from '@octokit/rest'
 import Webhooks from '@octokit/webhooks'
 import Bottleneck from 'bottleneck'
@@ -14,7 +15,8 @@ import { Application } from './application'
 import setupApp from './apps/setup'
 import { createDefaultCache } from './cache'
 import { Context } from './context'
-import { GitHubAPI, ProbotOctokit } from './github'
+import { GitHubAPI } from './github'
+import { ProbotOctokit } from './github/octokit'
 import { logger } from './logger'
 import { logRequestErrors } from './middleware/log-request-errors'
 import { findPrivateKey } from './private-key'
@@ -101,6 +103,7 @@ export class Probot {
   public httpServer?: Server
   public webhook: Webhooks
   public logger: Logger
+
   // These 3 need to be public for the tests to work.
   public options: Options
   public app?: OctokitApp
@@ -108,7 +111,7 @@ export class Probot {
 
   private apps: Application[]
   private githubToken?: string
-  private Octokit: typeof Octokit
+  private Octokit: typeof ProbotOctokit
 
   constructor (options: Options) {
     options.webhookPath = options.webhookPath || '/'
@@ -122,6 +125,7 @@ export class Probot {
     })
     this.githubToken = options.githubToken
     this.Octokit = options.Octokit || ProbotOctokit
+
     if (this.options.id) {
       if (process.env.GHE_HOST && /^https?:\/\//.test(process.env.GHE_HOST)) {
         throw new Error('Your \`GHE_HOST\` environment variable should not begin with https:// or http://')
@@ -180,6 +184,7 @@ export class Probot {
     if (typeof appFn === 'string') {
       appFn = resolve(appFn) as ApplicationFunction
     }
+
     const app = new Application({
       Octokit: this.Octokit,
       app: this.app as OctokitApp,
@@ -237,7 +242,7 @@ export interface Options {
   webhookProxy?: string,
   port?: number,
   redisConfig?: Redis.RedisOptions,
-  Octokit?: typeof Octokit
+  Octokit?: typeof ProbotOctokit
 }
 
 export { Logger, Context, Application, Octokit, GitHubAPI }

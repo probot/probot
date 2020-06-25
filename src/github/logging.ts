@@ -1,5 +1,5 @@
-import Logger from 'bunyan'
 import { Octokit } from '@octokit/rest'
+import Logger from 'bunyan'
 
 export function addLogging (client: Octokit, logger: Logger) {
   if (!logger) {

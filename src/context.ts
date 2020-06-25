@@ -1,11 +1,12 @@
-import { Octokit } from '@octokit/rest'
-import { ReposGetContentsParams } from '@octokit/plugin-rest-endpoint-methods/dist-types/generated/types'
+import { Endpoints } from '@octokit/types'
 import Webhooks, { PayloadRepository } from '@octokit/webhooks'
 import merge from 'deepmerge'
 import yaml from 'js-yaml'
 import path from 'path'
 import { GitHubAPI } from './github'
 import { LoggerWithTarget } from './wrap-logger'
+
+type ReposGetContentsParams = Endpoints['GET /repos/:owner/:repo/contents/:path']['parameters']
 
 const CONFIG_PATH = '.github'
 const BASE_KEY = '_extends'
@@ -228,7 +229,7 @@ export class Context<E extends WebhookPayloadWithRepository = any> implements We
    */
   private async loadYaml<T> (params: ReposGetContentsParams): Promise<any> {
     try {
-      const response = await this.github.repos.getContents(params)
+      const response = await this.github.repos.getContent(params)
 
       // Ignore in case path is a folder
       // - https://developer.github.com/v3/repos/contents/#response-if-content-is-a-directory
@@ -239,6 +240,7 @@ export class Context<E extends WebhookPayloadWithRepository = any> implements We
       // we don't handle symlinks or submodule
       // - https://developer.github.com/v3/repos/contents/#response-if-content-is-a-symlink
       // - https://developer.github.com/v3/repos/contents/#response-if-content-is-a-submodule
+      // tslint:disable-next-line
       if (typeof response.data.content !== 'string') {
         return
       }

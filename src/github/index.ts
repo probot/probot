@@ -1,8 +1,10 @@
-import { OctokitOptions } from "@octokit/core/dist-types/types"
+import { Octokit as OctokitRest } from '@octokit/rest'
 
-import { ProbotOctokit } from "./octokit"
-import { Logger } from "./logging"
-import { logger } from "../logger"
+import { logger } from '../logger'
+import { Logger } from './logging'
+import { ProbotOctokit } from './octokit'
+
+type OctokitOptions = ConstructorParameters<typeof OctokitRest>[0]
 
 /**
  * the [@octokit/rest Node.js module](https://github.com/octokit/rest.js),
@@ -12,7 +14,7 @@ import { logger } from "../logger"
  * @see {@link https://github.com/octokit/rest.js}
  */
 export function GitHubAPI (options: Options = { logger, Octokit: ProbotOctokit }) {
-  const { Octokit, ...octokitOptions} = options
+  const { Octokit, ...octokitOptions } = options
 
   const finalOptsChangeVarName = Object.assign(octokitOptions, {
     throttle: Object.assign({
@@ -26,16 +28,7 @@ export function GitHubAPI (options: Options = { logger, Octokit: ProbotOctokit }
       }
     }, options.throttle)
   })
-  /**
-   * TODO: Maxim: The octokit type is missing the `authenticate` and
-   * `registerEndpoints` methods that were available in v16. Have these methods
-   * been deprecated?
-   *
-   * Update: `registerEndpoints` has been removed.
-   * https://github.com/octokit/rest.js/releases/tag/v17.0.0
-   *
-   * Status: What about the `authenticate` method? It looks like `auth` has replaced `authenticate`.
-   */
+
   const octokit = new Octokit(finalOptsChangeVarName)
 
   return octokit
@@ -43,8 +36,7 @@ export function GitHubAPI (options: Options = { logger, Octokit: ProbotOctokit }
 
 // TODO: Is there a way we can gather the options from Octokit/rest for
 // `OctokitOptions` and not have to refer to the lower core module Octokit/core?
-export interface Options extends OctokitOptions {
+export type Options = OctokitOptions & {
   logger: Logger
   Octokit: typeof ProbotOctokit
 }
-

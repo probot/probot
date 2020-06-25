@@ -2,14 +2,16 @@
   // https://github.com/octokit/app.js/blob/deprecate-in-favor-of-octokit-auth-app/README.md
   // for deprecation info and migration steps.
 import { App as OctokitApp } from '@octokit/app'
-import { Octokit } from '@octokit/rest'
+import { createAppAuth } from '@octokit/auth-app'
 import Webhooks from '@octokit/webhooks'
 import express from 'express'
 import { EventEmitter } from 'promise-events'
+
 import { ApplicationFunction } from '.'
 import { Cache } from './cache'
 import { Context } from './context'
-import { GitHubAPI, ProbotOctokit } from './github'
+import { GitHubAPI } from './github'
+import { ProbotOctokit } from './github/octokit'
 import { logger } from './logger'
 import webhookEventCheck from './webhook-event-check'
 import { LoggerWithTarget, wrapLogger } from './wrap-logger'
@@ -21,7 +23,8 @@ export interface Options {
   catchErrors?: boolean
   githubToken?: string
   throttleOptions?: any
-  Octokit?: typeof Octokit
+  Octokit?: typeof ProbotOctokit
+  cert?: string
 }
 
 export type OnCallback<T> = (context: Context<T>) => Promise<void>
@@ -46,13 +49,15 @@ export class Application {
 
   private githubToken?: string
   private throttleOptions: any
-  private Octokit: typeof Octokit
+  private Octokit: typeof ProbotOctokit
+  private privateKey?: string
 
   constructor (options?: Options) {
     const opts = options || {} as any
     this.events = new EventEmitter()
     this.log = wrapLogger(logger, logger)
     this.app = opts.app
+    this.privateKey = opts.cert
     this.cache = opts.cache
     this.router = opts.router || express.Router() // you can do this?
     this.githubToken = opts.githubToken
@@ -520,12 +525,18 @@ export class Application {
       return this.cache.wrap(`app:${id}`, () => GitHubAPI(options), { ttl: installationTokenTTL })
     }
 
-    const token = this.githubToken || this.app.getSignedJsonWebToken()
+    const authOptions = this.githubToken ? { auth: this.githubToken } : {
+      auth: {
+        id,
+        privateKey: this.privateKey
+      },
+      authStrategy: createAppAuth
+    }
     const github = GitHubAPI({
       Octokit: this.Octokit,
-      auth: `Bearer ${token}`,
       baseUrl: process.env.GHE_HOST && `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api/v3`,
-      logger: log.child({ name: 'github' })
+      logger: log.child({ name: 'github' }),
+      ...authOptions
     })
 
     return github

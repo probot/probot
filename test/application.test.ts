@@ -227,8 +227,8 @@ describe('Application', () => {
   })
 
   describe('auth', () => {
-    it.only('throttleOptions', async () => {
-      const app = new Application({
+    it('throttleOptions', async () => {
+      const testApp = new Application({
         Octokit: ProbotOctokit.plugin((octokit: any, options: any) => {
           expect(options.throttle.id).toBe(1)
           expect(options.throttle.foo).toBe('bar')
@@ -239,12 +239,12 @@ describe('Application', () => {
         }),
         throttleOptions: {
           foo: 'bar',
-          onAbuseLimit: () => {},
-          onRateLimit: () => {}
+          onAbuseLimit: () => true,
+          onRateLimit: () => true
         }
       } as any)
 
-      const result = await app.auth(1)
+      const result = await testApp.auth(1)
       expect(result.pluginLoaded).toEqual(true)
     })
   })

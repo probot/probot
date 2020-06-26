@@ -1,4 +1,3 @@
-import { Octokit } from '@octokit/rest'
 import Bottleneck from 'bottleneck'
 import { NextFunction, Request, Response } from 'express'
 import nock = require('nock')
@@ -386,7 +385,7 @@ describe('Probot', () => {
 
   describe('custom Octokit constructor', () => {
     beforeEach(() => {
-      const MyOctokit = Octokit.plugin(function fooBar () {
+      const MyOctokit = ProbotOctokit.plugin(function fooBar () {
         return {
           foo: 'bar'
         }

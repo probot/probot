@@ -1,5 +1,5 @@
 // tslint:disable-next-line
-import { Octokit } from '@octokit/core'
+import type { Octokit } from '@octokit/core'
 
 export function requestLogging (octokit: Octokit) {
   octokit.hook.error('request', (error, options) => {

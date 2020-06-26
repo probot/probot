@@ -16,14 +16,14 @@ r1UQNnUExRh7ZT0kFbMfO9jKYZVlQdCL9Dn93vo=
 -----END RSA PRIVATE KEY-----`
 
 export function newApp (): Application {
-  return new Application({ 
-    id: 1,
-    cert: PRIVATE_KEY,
+  return new Application({
     app: {
       getInstallationAccessToken: jest.fn().mockResolvedValue('test'),
       getSignedJsonWebToken: jest.fn().mockReturnValue('test')
     },
-    cache
+    cache,
+    cert: PRIVATE_KEY,
+    id: 1
   })
 }
 

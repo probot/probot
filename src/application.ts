@@ -507,8 +507,8 @@ export class Application {
         Octokit: this.Octokit,
         auth: {
           id: this.id,
-          privateKey: this.privateKey,
-          installationId: id
+          installationId: id,
+          privateKey: this.privateKey
         },
         authStrategy: createAppAuth,
         baseUrl: process.env.GHE_HOST && `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api/v3`,

@@ -6,7 +6,6 @@ import { EventEmitter } from 'promise-events'
 import { ApplicationFunction } from '.'
 import { Cache } from './cache'
 import { Context } from './context'
-import { GitHubAPI } from './github'
 import { ProbotOctokit } from './github/octokit'
 import { logger } from './logger'
 import webhookEventCheck from './webhook-event-check'
@@ -488,7 +487,7 @@ export class Application {
    * @returns An authenticated GitHub API client
    * @private
    */
-  public async auth (id?: number, log = this.log): Promise<ReturnType<typeof GitHubAPI>> {
+  public async auth (id?: number, log = this.log): Promise<InstanceType<typeof ProbotOctokit>> {
     if (process.env.GHE_HOST && /^https?:\/\//.test(process.env.GHE_HOST)) {
       throw new Error('Your \`GHE_HOST\` environment variable should not begin with https:// or http://')
     }
@@ -497,24 +496,23 @@ export class Application {
     // so that it can be used across received webhook events.
     if (id) {
       const options = {
-        Octokit: this.Octokit,
         auth: {
           id: this.id,
           installationId: id,
           privateKey: this.privateKey
         },
         authStrategy: createAppAuth,
-        baseUrl: process.env.GHE_HOST && `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api/v3`,
-        logger: log.child({ name: 'github', installation: String(id) })
+        baseUrl: process.env.GHE_HOST && `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api/v3`
       }
 
       if (this.throttleOptions) {
-        return GitHubAPI({
+        return new this.Octokit({
           ...options,
           throttle: {
             id,
             ...this.throttleOptions
-          }
+          },
+          log: log.child({ name: 'github', installation: String(id) })
         })
       }
 

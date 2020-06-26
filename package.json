@@ -56,7 +56,7 @@
     "@octokit/graphql": "^4.2.0",
     "@octokit/plugin-enterprise-compatibility": "^1.2.1",
     "@octokit/plugin-paginate-rest": "^2.2.3",
-    "@octokit/plugin-rest-endpoint-methods": "^4.0.0",
+    "@octokit/plugin-rest-endpoint-methods": "^3.17.0",
     "@octokit/plugin-retry": "^3.0.1",
     "@octokit/plugin-throttling": "^3.3.0",
     "@octokit/request": "^5.1.0",

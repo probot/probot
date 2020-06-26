@@ -37,6 +37,6 @@ export function GitHubAPI (options: Options = { logger, Octokit: ProbotOctokit }
 // TODO: Is there a way we can gather the options from Octokit/rest for
 // `OctokitOptions` and not have to refer to the lower core module Octokit/core?
 export type Options = OctokitOptions & {
-  logger: Logger
+  logger: Logger,
   Octokit: typeof ProbotOctokit
 }

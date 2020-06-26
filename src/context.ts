@@ -183,6 +183,9 @@ export class Context<E extends WebhookPayloadWithRepository = any> implements We
    * Config files can also specify a base that they extend. `deepMergeOptions` can be used
    * to configure how the target config, extended base, and default configs are merged.
    *
+   * For security reasons, configuration is only loaded from the repository's default branch,
+   * changes made in pull requests from different branches or forks are ignored.
+   *
    * @param fileName - Name of the YAML file in the `.github` directory
    * @param defaultConfig - An object of default config options
    * @param deepMergeOptions - Controls merging configs (from the [deepmerge](https://github.com/TehShrike/deepmerge) module)

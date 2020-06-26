@@ -51,7 +51,6 @@
   "author": "Brandon Keepers",
   "license": "ISC",
   "dependencies": {
-    "@octokit/app": "^4.0.0",
     "@octokit/auth-app": "^2.4.7",
     "@octokit/graphql": "^4.2.0",
     "@octokit/plugin-enterprise-compatibility": "^1.2.1",
@@ -131,6 +130,6 @@
     ]
   },
   "engines": {
-    "node": ">=7.7"
+    "node": ">=10.21"
   }
 }

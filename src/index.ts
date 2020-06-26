@@ -1,8 +1,6 @@
 // tslint:disable-next-line: no-var-requires
 require('dotenv').config()
 
-import { App as OctokitApp } from '@octokit/app'
-
 import { Octokit } from '@octokit/rest'
 import Webhooks from '@octokit/webhooks'
 import Bottleneck from 'bottleneck'
@@ -105,7 +103,6 @@ export class Probot {
 
   // These 3 need to be public for the tests to work.
   public options: Options
-  public app?: OctokitApp
   public throttleOptions: any
 
   private apps: Application[]
@@ -129,12 +126,6 @@ export class Probot {
       if (process.env.GHE_HOST && /^https?:\/\//.test(process.env.GHE_HOST)) {
         throw new Error('Your \`GHE_HOST\` environment variable should not begin with https:// or http://')
       }
-
-      this.app = new OctokitApp({
-        baseUrl: process.env.GHE_HOST && `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api/v3`,
-        id: options.id as number,
-        privateKey: options.cert as string
-      })
     }
     this.server = createServer({ webhook: (this.webhook as any).middleware, logger })
 
@@ -186,7 +177,6 @@ export class Probot {
 
     const app = new Application({
       Octokit: this.Octokit,
-      app: this.app as OctokitApp,
       cache,
       githubToken: this.githubToken,
       throttleOptions: this.throttleOptions

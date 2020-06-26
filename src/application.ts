@@ -1,7 +1,3 @@
-  // TODO: @octokit/app is being deprecated in favor of @octokit/app-auth. See
-  // https://github.com/octokit/app.js/blob/deprecate-in-favor-of-octokit-auth-app/README.md
-  // for deprecation info and migration steps.
-import { App as OctokitApp } from '@octokit/app'
 import { createAppAuth } from '@octokit/auth-app'
 import Webhooks from '@octokit/webhooks'
 import express from 'express'
@@ -17,7 +13,6 @@ import webhookEventCheck from './webhook-event-check'
 import { LoggerWithTarget, wrapLogger } from './wrap-logger'
 
 export interface Options {
-  app: OctokitApp
   cache: Cache
   router?: express.Router
   catchErrors?: boolean
@@ -43,7 +38,6 @@ function isUnauthenticatedEvent (event: Webhooks.WebhookEvent<any>) {
  */
 export class Application {
   public events: EventEmitter
-  public app: OctokitApp
   public cache: Cache
   public router: express.Router
   public log: LoggerWithTarget
@@ -58,7 +52,6 @@ export class Application {
     const opts = options || {} as any
     this.events = new EventEmitter()
     this.log = wrapLogger(logger, logger)
-    this.app = opts.app
     this.id = opts.id
     this.privateKey = opts.cert
     this.cache = opts.cache

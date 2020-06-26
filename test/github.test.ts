@@ -1,14 +1,12 @@
 import nock from 'nock'
-import { GitHubAPI, Options } from '../src/github'
 import { ProbotOctokit } from '../src/github/octokit'
-import { logger } from '../src/logger'
 
-describe('GitHubAPI', () => {
+type Options = ConstructorParameters<typeof ProbotOctokit>[0]
+
+describe('ProbotOctokit', () => {
   let github: InstanceType<typeof ProbotOctokit>
 
   const defaultOptions: Options = {
-    Octokit: ProbotOctokit,
-    logger,
     retry: {
       // disable retries to test error states
       enabled: false
@@ -20,11 +18,11 @@ describe('GitHubAPI', () => {
   }
 
   beforeEach(() => {
-    github = GitHubAPI(defaultOptions)
+    github = new ProbotOctokit(defaultOptions)
   })
 
   test('works without options', async () => {
-    github = GitHubAPI()
+    github = new ProbotOctokit()
     const user = { login: 'ohai' }
 
     nock('https://api.github.com').get('/user').reply(200, user)
@@ -53,7 +51,7 @@ describe('GitHubAPI', () => {
         }
       }
 
-      github = GitHubAPI(options)
+      github = new ProbotOctokit(options)
     })
 
     test('retries failed requests', async () => {
@@ -78,30 +76,29 @@ describe('GitHubAPI', () => {
         ...defaultOptions,
         throttle: {
           enabled: true,
-          minimumAbuseRetryAfter: 1
+          minimumAbuseRetryAfter: 1,
+          onRateLimit () { return true },
+          onAbuseLimit () { return true }
         }
       }
 
-      github = GitHubAPI(options)
+      github = new ProbotOctokit(options)
     })
 
     test('retries requests when being rate limited', async () => {
       nock('https://api.github.com')
         .get('/')
-        .once()
         .reply(403, {}, {
           'X-RateLimit-Limit': '60',
           'X-RateLimit-Remaining': '0',
           'X-RateLimit-Reset': `${new Date().getTime() / 1000}`
         })
 
-      nock('https://api.github.com')
         .get('/')
-        .once()
         .reply(200, {})
 
-      const response = await github.request('/')
-      expect(response.status).toBe(200)
+      const { status } = await github.request('/')
+      expect(status).toBe(200)
     })
 
     test('retries requests when hitting the abuse limiter', async () => {

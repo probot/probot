@@ -2,7 +2,7 @@ import fs from 'fs'
 import yaml from 'js-yaml'
 import path from 'path'
 import updateDotenv from 'update-dotenv'
-import { GitHubAPI } from './github'
+import { ProbotOctokit } from './github/octokit'
 
 export class ManifestCreation {
   get pkg () {
@@ -57,10 +57,12 @@ export class ManifestCreation {
   }
 
   public async createAppFromCode (code: any) {
-    const github = GitHubAPI()
+    const github = new ProbotOctokit()
     const options: any = {
       code,
-      headers: { accept: 'application/vnd.github.fury-preview+json' },
+      mediaType: {
+        previews: ['fury'] // needed for GHES 2.20 and older
+      },
       ...process.env.GHE_HOST && { baseUrl: `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api/v3` }
     }
     const response = await github.request('POST /app-manifests/:code/conversions', options)

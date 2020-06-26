@@ -3,7 +3,8 @@ import Webhooks, { PayloadRepository } from '@octokit/webhooks'
 import merge from 'deepmerge'
 import yaml from 'js-yaml'
 import path from 'path'
-import { GitHubAPI } from './github'
+
+import { ProbotOctokit } from './github/octokit'
 import { LoggerWithTarget } from './wrap-logger'
 
 type ReposGetContentsParams = Endpoints['GET /repos/:owner/:repo/contents/:path']['parameters']
@@ -73,10 +74,10 @@ export class Context<E extends WebhookPayloadWithRepository = any> implements We
   public host?: string
   public url?: string
 
-  public github: ReturnType<typeof GitHubAPI>
+  public github: InstanceType<typeof ProbotOctokit>
   public log: LoggerWithTarget
 
-  constructor (event: Webhooks.WebhookEvent<E>, github: ReturnType<typeof GitHubAPI>, log: LoggerWithTarget) {
+  constructor (event: Webhooks.WebhookEvent<E>, github: InstanceType<typeof ProbotOctokit>, log: LoggerWithTarget) {
     this.name = event.name
     this.id = event.id
     this.payload = event.payload

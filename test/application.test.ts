@@ -2,7 +2,7 @@ import Webhooks from '@octokit/webhooks'
 
 import { Application } from '../src/application'
 import { Context } from '../src/context'
-import * as GitHubApiModule from '../src/github'
+import { ProbotOctokit } from '../src/github/octokit'
 import { logger } from '../src/logger'
 
 describe('Application', () => {
@@ -227,23 +227,25 @@ describe('Application', () => {
   })
 
   describe('auth', () => {
-    it('throttleOptions', async () => {
-      const appWithRedis = new Application({
+    it.only('throttleOptions', async () => {
+      const app = new Application({
+        Octokit: ProbotOctokit.plugin((octokit: any, options: any) => {
+          expect(options.throttle.id).toBe(1)
+          expect(options.throttle.foo).toBe('bar')
+
+          return {
+            pluginLoaded: true
+          }
+        }),
         throttleOptions: {
-          foo: 'bar'
+          foo: 'bar',
+          onAbuseLimit: () => {},
+          onRateLimit: () => {}
         }
       } as any)
 
-      Object.defineProperty(GitHubApiModule, 'GitHubAPI', {
-        value (options: any) {
-          expect(options.throttle.id).toBe(1)
-          expect(options.throttle.foo).toBe('bar')
-          return 'github mock'
-        }
-      })
-
-      const result = await appWithRedis.auth(1)
-      expect(result).toBe('github mock')
+      const result = await app.auth(1)
+      expect(result.pluginLoaded).toEqual(true)
     })
   })
 

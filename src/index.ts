@@ -1,7 +1,6 @@
 // tslint:disable-next-line: no-var-requires
 require('dotenv').config()
 
-import { Octokit } from '@octokit/rest'
 import Webhooks from '@octokit/webhooks'
 import Bottleneck from 'bottleneck'
 import Logger from 'bunyan'
@@ -13,7 +12,6 @@ import { Application } from './application'
 import setupApp from './apps/setup'
 import { createDefaultCache } from './cache'
 import { Context } from './context'
-import { GitHubAPI } from './github'
 import { ProbotOctokit } from './github/octokit'
 import { logger } from './logger'
 import { logRequestErrors } from './middleware/log-request-errors'
@@ -234,4 +232,4 @@ export interface Options {
   Octokit?: typeof ProbotOctokit
 }
 
-export { Logger, Context, Application, Octokit, GitHubAPI }
+export { Logger, Context, Application, ProbotOctokit as Octokit }

@@ -386,7 +386,7 @@ describe('Probot', () => {
 
   describe('custom Octokit constructor', () => {
     beforeEach(() => {
-      const MyOctokit = Octokit.plugin(() => {
+      const MyOctokit = Octokit.plugin(function fooBar () {
         return {
           foo: 'bar'
         }
@@ -398,10 +398,10 @@ describe('Probot', () => {
       })
     })
 
-    it('is propagated to GithubAPI', async () => {
+    it('is propagated to Octokit', async () => {
       const app = probot.load(() => {})
-      const githubApi: InstanceType<typeof ProbotOctokit> = await app.auth()
-      expect(githubApi.foo).toBe('bar')
+      const octokit: InstanceType<typeof ProbotOctokit> = await app.auth()
+      expect(octokit.foo).toBe('bar')
     })
   })
 })

@@ -52,10 +52,11 @@
   "license": "ISC",
   "dependencies": {
     "@octokit/auth-app": "^2.4.7",
+    "@octokit/core": "^3.1.0",
     "@octokit/graphql": "^4.2.0",
     "@octokit/plugin-enterprise-compatibility": "^1.2.1",
     "@octokit/plugin-retry": "^3.0.1",
-    "@octokit/plugin-throttling": "^3.0.0",
+    "@octokit/plugin-throttling": "^3.3.0",
     "@octokit/request": "^5.1.0",
     "@octokit/rest": "^17.11.1",
     "@octokit/types": "^5.0.1",

@@ -508,17 +508,17 @@ export class Application {
       if (this.throttleOptions) {
         return new this.Octokit({
           ...options,
+          log: log.child({ name: 'github', installation: String(id) }),
           throttle: {
             id,
             ...this.throttleOptions
-          },
-          log: log.child({ name: 'github', installation: String(id) })
+          }
         })
       }
 
       // Cache for 1 minute less than GitHub expiry
       const installationTokenTTL = parseInt(process.env.INSTALLATION_TOKEN_TTL || '3540', 10)
-      return this.cache.wrap(`app:${id}`, () => GitHubAPI(options), { ttl: installationTokenTTL })
+      return this.cache.wrap(`app:${id}`, () => new this.Octokit(options), { ttl: installationTokenTTL })
     }
 
     const authOptions = this.githubToken ? { auth: this.githubToken } : {
@@ -528,17 +528,17 @@ export class Application {
       },
       authStrategy: createAppAuth
     }
-    const github = GitHubAPI({
+    const octokit = new this.Octokit({
       Octokit: this.Octokit,
       baseUrl: process.env.GHE_HOST && `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api/v3`,
       logger: log.child({ name: 'github' }),
       ...authOptions
     })
 
-    return github
+    return octokit
   }
 
-  private authenticateEvent (event: Webhooks.WebhookEvent<any>, log: LoggerWithTarget): Promise<ReturnType<typeof GitHubAPI>> {
+  private authenticateEvent (event: Webhooks.WebhookEvent<any>, log: LoggerWithTarget): Promise<InstanceType<typeof ProbotOctokit>> {
     if (this.githubToken) {
       return this.auth()
     }

@@ -1,5 +1,5 @@
+// tslint:disable-next-line
 import { Octokit } from '@octokit/core'
-import { logger } from '../logger'
 
 export function requestLogging (octokit: Octokit) {
   octokit.hook.error('request', (error, options) => {
@@ -16,6 +16,4 @@ export function requestLogging (octokit: Octokit) {
     // @ts-ignore log.debug is a bunyan log method and accepts a fields object
     octokit.log.debug({ params }, msg)
   })
-
-  return {}
 }

@@ -5,7 +5,6 @@ import { Endpoints } from '@octokit/types'
 import Webhooks from '@octokit/webhooks'
 
 import { Context, MergeOptions } from '../src/context'
-import { GitHubAPI } from '../src/github'
 import { ProbotOctokit } from '../src/github/octokit'
 
 import { createMockResponse } from './fixtures/octokit/mock-response'
@@ -120,7 +119,7 @@ describe('Context', () => {
     }
 
     beforeEach(() => {
-      github = GitHubAPI()
+      github = new ProbotOctokit()
       context = new Context(event, github, {} as any)
     })
 

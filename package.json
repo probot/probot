@@ -56,7 +56,7 @@
     "@octokit/plugin-enterprise-compatibility": "^1.2.4",
     "@octokit/plugin-retry": "^3.0.1",
     "@octokit/plugin-throttling": "^3.0.0",
-    "@octokit/request": "^5.1.0",
+    "@octokit/request": "^5.4.4",
     "@octokit/rest": "^16.43.1",
     "@octokit/webhooks": "^6.0.0",
     "@types/bunyan": "^1.8.4",

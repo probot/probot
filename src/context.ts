@@ -145,7 +145,7 @@ export class Context<E extends WebhookPayloadWithRepository = any> implements We
 
   /**
    * Reads the app configuration from the given YAML file in the `.github`
-   * directory of the repository.
+   * directory of the repository's default branch.
    *
    * For example, given a file named `.github/config.yml`:
    *

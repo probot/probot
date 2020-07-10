@@ -1,5 +1,6 @@
----
-next: docs/hello-world.md
+--- منصة-شليله
+shliilhplatform 
+التالي: docs /hello-world.mdمنصة-شليله 
 permalink: /docs/
 ---
 

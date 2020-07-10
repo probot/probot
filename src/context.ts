@@ -192,7 +192,7 @@ export class Context<E extends WebhookPayloadWithRepository = any> implements We
    * @param deepMergeOptions - Controls merging configs (from the [deepmerge](https://github.com/TehShrike/deepmerge) module)
    * @return Configuration object read from the file
    */
-  public async config<T> (fileName: string, defaultConfig?: T, deepMergeOptions?: MergeOptions): Promise<object | null> {
+  public async config<T> (fileName: string, defaultConfig?: T, deepMergeOptions?: MergeOptions): Promise<T | null> {
     const params = this.repo({ path: path.posix.join(CONFIG_PATH, fileName) })
     const config = await this.loadYaml(params)
 
@@ -222,7 +222,7 @@ export class Context<E extends WebhookPayloadWithRepository = any> implements We
       // filter out null configs
       [defaultConfig, baseConfig, config].filter(conf => conf),
       deepMergeOptions
-    )
+    ) as unknown as T
   }
 
   /**

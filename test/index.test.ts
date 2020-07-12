@@ -403,4 +403,38 @@ describe('Probot', () => {
       expect(octokit.foo).toBe('bar')
     })
   })
+
+  describe('start', () => {
+
+    beforeEach(() => {
+      process.exit = jest.fn() as any // we dont want to terminate the test
+    })
+    it('should expect the correct error if port already in use', (next) => {
+      expect.assertions(2)
+
+      // block port 3001
+      const http = require('http')
+      const blockade = http.createServer().listen(3001, () => {
+
+        const testApp = createProbot({ port: 3001 })
+        testApp.logger.error = jest.fn()
+
+        const server = testApp.start().addListener('error', () => {
+          expect(testApp.logger.error).toHaveBeenCalledWith('Port 3001 is already in use. You can define the PORT environment variable to use a different port.')
+          expect(process.exit).toHaveBeenCalledWith(1)
+          server.close(() => blockade.close(() => next()))
+        })
+      })
+    })
+
+    it('should listen to port when not in use', (next) => {
+      expect.assertions(1)
+      const testApp = createProbot({ port: 3001, webhookProxy: undefined })
+      testApp.logger.info = jest.fn()
+      const server = testApp.start().on('listening', () => {
+        expect(testApp.logger.info).toHaveBeenCalledWith('Listening on http://localhost:3001')
+        server.close(() => next())
+      })
+    })
+  })
 })

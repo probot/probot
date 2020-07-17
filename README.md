@@ -17,7 +17,7 @@ If you've ever thought, "wouldn't it be cool if GitHub could…"; I'm going to s
 module.exports = (app) => {
   app.on('issues.opened', async context => {
     const issueComment = context.issue({ body: 'Thanks for opening this issue!' })
-    return context.github.issues.createComment(issueComment)
+    await context.github.issues.createComment(issueComment)
   })
 }
 ```

@@ -194,6 +194,7 @@ export class Context<E extends WebhookPayloadWithRepository = any> implements We
    */
   public async config<T> (fileName: string, defaultConfig?: T, deepMergeOptions?: MergeOptions): Promise<T | null> {
     const params = this.repo({ path: path.posix.join(CONFIG_PATH, fileName) })
+
     const config = await this.loadYaml(params)
 
     let baseRepo
@@ -233,7 +234,8 @@ export class Context<E extends WebhookPayloadWithRepository = any> implements We
    */
   private async loadYaml<T> (params: ReposGetContentsParams): Promise<any> {
     try {
-      const response = await this.github.repos.getContent(params)
+      // https://docs.github.com/en/rest/reference/repos#get-repository-content
+      const response = await this.github.request('GET /repos/{owner}/{repo}/contents/{path}', params)
 
       // Ignore in case path is a folder
       // - https://developer.github.com/v3/repos/contents/#response-if-content-is-a-directory

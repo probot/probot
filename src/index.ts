@@ -1,6 +1,16 @@
 // tslint:disable-next-line: no-var-requires
 require('dotenv').config()
 
+// TODO: remove in v11
+if ('DISABLE_STATS' in process.env) {
+  // tslint:disable:no-console
+  console.warn('[probot] "DISABLE_STATS" is no longer used since v10')
+}
+if ('IGNORED_ACCOUNTS' in process.env) {
+  // tslint:disable:no-console
+  console.warn('[probot] "IGNORED_ACCOUNTS" is no longer used since v10')
+}
+
 import Webhooks from '@octokit/webhooks'
 import Bottleneck from 'bottleneck'
 import Logger from 'bunyan'

@@ -43,7 +43,6 @@ describe('Probot', () => {
       process.env.APP_ID = '1'
       process.env.PRIVATE_KEY_PATH = path.join(__dirname, 'test-private-key.pem')
       process.env.WEBHOOK_PROXY_URL = 'https://smee.io/EfHXC9BFfGAxbM6J'
-      process.env.DISABLE_STATS = 'true'
     })
 
     afterAll(() => {

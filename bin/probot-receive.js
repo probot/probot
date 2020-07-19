@@ -2,7 +2,16 @@
 // Usage: probot receive -e push -p path/to/payload app.js
 
 require('dotenv').config()
-process.env.DISABLE_STATS = 'true'
+
+// TODO: remove in v11
+if ('DISABLE_STATS' in process.env) {
+  // tslint:disable:no-console
+  console.warn('[probot] "DISABLE_STATS" is no longer used since v10')
+}
+if ('IGNORED_ACCOUNTS' in process.env) {
+  // tslint:disable:no-console
+  console.warn('[probot] "IGNORED_ACCOUNTS" is no longer used since v10')
+}
 
 const path = require('path')
 const uuid = require('uuid')

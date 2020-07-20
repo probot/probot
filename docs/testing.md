@@ -12,7 +12,7 @@ For our testing examples, we use [jest](https://facebook.github.io/jest/), but t
 const nock = require('nock')
 // Requiring our app implementation
 const myProbotApp = require('..')
-const { Probot, createProbot } = require('probot')
+const { Probot } = require('probot')
 // Requiring our fixtures
 const payload = require('./fixtures/issues.opened')
 const issueCreatedBody = { body: 'Thanks for opening this issue!' }
@@ -22,7 +22,12 @@ describe('My Probot app', () => {
 
   beforeEach(() => {
     nock.disableNetConnect()
-    probot = createProbot({ id: 1, cert: 'test', githubToken: 'test' })
+    probot = new Probot({
+      id: 1,
+      githubToken: 'test',
+      // disable all request throttling to make tests faster
+      throttleOptions: { enabled: false }
+    })
     probot.load(myProbotApp)
   })
 

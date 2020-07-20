@@ -24,6 +24,12 @@ export = async (app: Application): Promise<void> => {
 
   // Setup /probot/stats endpoint to return cached stats
   app.router.get('/probot/stats', async (req: Request, res: Response) => {
+    // Deprecated since 9.12.0
+    // tslint:disable-next-line:no-console
+    console.warn(
+      `[Probot] "GET /probot/stats" is deprecated and will be removed in Probot v10. See https://github.com/probot/probot/issues/1267 for an alternative`
+    )
+
     // ensure stats are loaded
     await initializing
     res.json(stats)

@@ -518,11 +518,20 @@ export class Application {
     }
 
     const token = this.githubToken || this.app.getSignedJsonWebToken()
+
+    // we assume that if throttling is disabled, retrying requests should be disabled, too.
+    const retryOptions =
+      this.throttleOptions && this.throttleOptions.enabled === false
+      ? this.throttleOptions
+       : undefined
+
     const github = GitHubAPI({
       Octokit: this.Octokit,
       auth: `Bearer ${token}`,
       baseUrl: process.env.GHE_HOST && `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api/v3`,
-      logger: log.child({ name: 'github' })
+      logger: log.child({ name: 'github' }),
+      retry: retryOptions,
+      throttle: this.throttleOptions
     })
 
     return github

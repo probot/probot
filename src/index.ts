@@ -133,6 +133,8 @@ export class Probot {
         privateKey: options.cert as string
       })
     }
+    this.throttleOptions = options.throttleOptions
+
     this.server = createServer({ webhook: (this.webhook as any).middleware, logger })
 
     // Log all received webhooks
@@ -153,10 +155,10 @@ export class Probot {
       const connection = new Bottleneck.IORedisConnection({ client })
       connection.on('error', this.logger.error)
 
-      this.throttleOptions = {
+      this.throttleOptions = Object.assign({
         Bottleneck,
         connection
-      }
+      }, this.throttleOptions)
     }
   }
 
@@ -245,6 +247,7 @@ export interface Options {
   port?: number,
   redisConfig?: Redis.RedisOptions,
   Octokit?: Octokit.Static
+  throttleOptions?: any
 }
 
 export { Logger, Context, Application, Octokit, GitHubAPI }

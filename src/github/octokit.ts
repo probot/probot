@@ -10,8 +10,11 @@ import { throttling } from '@octokit/plugin-throttling'
 import { requestLogging } from './logging'
 import { VERSION } from './version'
 
-export const ProbotOctokit = Octokit
-  .plugin(paginateRest, restEndpointMethods, throttling, retry, enterpriseCompatibility, requestLogging)
+export const ProbotOctokitCore = Octokit
+  .plugin(paginateRest, restEndpointMethods, enterpriseCompatibility, requestLogging)
+
+export const ProbotOctokit = ProbotOctokitCore
+  .plugin(throttling, retry)
   .defaults({
     throttle: {
       onAbuseLimit: (retryAfter: number, options: RequestOptions, octokit: Octokit) => {

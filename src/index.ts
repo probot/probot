@@ -22,7 +22,7 @@ import { Application } from './application'
 import setupApp from './apps/setup'
 import { createDefaultCache } from './cache'
 import { Context } from './context'
-import { ProbotOctokit } from './github/octokit'
+import { ProbotOctokit, ProbotOctokitCore } from './github/octokit'
 import { logger } from './logger'
 import { logRequestErrors } from './middleware/log-request-errors'
 import { findPrivateKey } from './private-key'
@@ -249,4 +249,4 @@ export interface Options {
   Octokit?: typeof ProbotOctokit
 }
 
-export { Logger, Context, Application, ProbotOctokit as Octokit }
+export { Logger, Context, Application, ProbotOctokit, ProbotOctokitCore }

@@ -528,14 +528,12 @@ export class Application {
       },
       authStrategy: createAppAuth
     }
-    const octokit = new this.Octokit({
-      Octokit: this.Octokit,
+
+    return new this.Octokit({
       baseUrl: process.env.GHE_HOST && `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api/v3`,
-      logger: log.child({ name: 'github' }),
+      log: log.child({ name: 'github' }),
       ...authOptions
     })
-
-    return octokit
   }
 
   private authenticateEvent (event: Webhooks.WebhookEvent<any>, log: LoggerWithTarget): Promise<InstanceType<typeof ProbotOctokit>> {

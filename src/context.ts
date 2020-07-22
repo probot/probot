@@ -1,10 +1,13 @@
-import { Octokit } from '@octokit/rest'
+import { Endpoints } from '@octokit/types'
 import Webhooks, { PayloadRepository } from '@octokit/webhooks'
 import merge from 'deepmerge'
 import yaml from 'js-yaml'
 import path from 'path'
-import { GitHubAPI } from './github'
+
+import { ProbotOctokit } from './github/octokit'
 import { LoggerWithTarget } from './wrap-logger'
+
+type ReposGetContentsParams = Endpoints['GET /repos/:owner/:repo/contents/:path']['parameters']
 
 const CONFIG_PATH = '.github'
 const BASE_KEY = '_extends'
@@ -71,10 +74,10 @@ export class Context<E extends WebhookPayloadWithRepository = any> implements We
   public host?: string
   public url?: string
 
-  public github: GitHubAPI
+  public github: InstanceType<typeof ProbotOctokit>
   public log: LoggerWithTarget
 
-  constructor (event: Webhooks.WebhookEvent<E>, github: GitHubAPI, log: LoggerWithTarget) {
+  constructor (event: Webhooks.WebhookEvent<E>, github: InstanceType<typeof ProbotOctokit>, log: LoggerWithTarget) {
     this.name = event.name
     this.id = event.id
     this.payload = event.payload
@@ -191,6 +194,7 @@ export class Context<E extends WebhookPayloadWithRepository = any> implements We
    */
   public async config<T> (fileName: string, defaultConfig?: T, deepMergeOptions?: MergeOptions): Promise<T | null> {
     const params = this.repo({ path: path.posix.join(CONFIG_PATH, fileName) })
+
     const config = await this.loadYaml(params)
 
     let baseRepo
@@ -228,9 +232,10 @@ export class Context<E extends WebhookPayloadWithRepository = any> implements We
    * @param params Params to fetch the file with
    * @return The parsed YAML file
    */
-  private async loadYaml<T> (params: Octokit.ReposGetContentsParams): Promise<any> {
+  private async loadYaml<T> (params: ReposGetContentsParams): Promise<any> {
     try {
-      const response = await this.github.repos.getContents(params)
+      // https://docs.github.com/en/rest/reference/repos#get-repository-content
+      const response = await this.github.request('GET /repos/{owner}/{repo}/contents/{path}', params)
 
       // Ignore in case path is a folder
       // - https://developer.github.com/v3/repos/contents/#response-if-content-is-a-directory
@@ -241,6 +246,7 @@ export class Context<E extends WebhookPayloadWithRepository = any> implements We
       // we don't handle symlinks or submodule
       // - https://developer.github.com/v3/repos/contents/#response-if-content-is-a-symlink
       // - https://developer.github.com/v3/repos/contents/#response-if-content-is-a-submodule
+      // tslint:disable-next-line
       if (typeof response.data.content !== 'string') {
         return
       }
@@ -265,7 +271,7 @@ export class Context<E extends WebhookPayloadWithRepository = any> implements We
    * @param base A string specifying the base repository
    * @return The params of the base configuration
    */
-  private getBaseParams (params: Octokit.ReposGetContentsParams, base: string): Octokit.ReposGetContentsParams {
+  private getBaseParams (params: ReposGetContentsParams, base: string): ReposGetContentsParams {
     const match = base.match(BASE_REGEX)
     if (match === null) {
       throw new Error(`Invalid repository name in key "${BASE_KEY}": ${base}`)

@@ -22,11 +22,9 @@ Some less common environment variables are:
 
 Variable | Description
 ---|---
-`DISABLE_STATS` | Set to `true` to disable the the `/probot/stats` endpoint, which gathers data about each app. Recommend for apps with a lot of installations. <p>_(Example: `true`)_</p>
 `DISABLE_WEBHOOK_EVENT_CHECK` | Set to `true` to disable Probot's webhook-event-check feature. While the feature is enabled, Probot will warn you when your application is attempting to listen to an event that your GitHub App is not subscribed to. <br> Note: webhook-event-check is automatically disabled when `NODE_ENV` is set to `production`. <p>_(Default: `false`)_</p>
 `GHE_HOST` | The hostname of your GitHub Enterprise instance. <p>_(Example: `github.mycompany.com`)_</p>
 `GHE_PROTOCOL` | The protocol of your GitHub Enterprise instance. Defaults to HTTPS. Do not change unless you are certain. <p>_(Example: `https`)_</p>
-`IGNORED_ACCOUNTS` | A comma-separated list of GitHub account names to ignore. This is currently used by the `/probot/stats`. By marking an account as ignored, that account will not be included in data collected on the website. The primary use case for this is spammy or abusive users that the GitHub API sends us but who 404. <p>_(Example: `spammyPerson,abusiveAccount`)_</p>
 `LOG_FORMAT` | By default, logs are formatted for readability in development. You can set this to `short`, `long`, `simple`, `json`, `bunyan`. Default: `short`
 `LOG_LEVEL` | The verbosity of logs to show when running your app, which can be `trace`, `debug`, `info`, `warn`, `error`, or `fatal`. Default: `info`
 `LOG_LEVEL_IN_STRING` | By default, when using the `json` format, the level printed in the log records is an int (`10`, `20`, ..). This option tells the logger to print level as a string: `{"level": "info"}`. Default `false`

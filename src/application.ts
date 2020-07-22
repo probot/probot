@@ -1,24 +1,25 @@
-import { App as OctokitApp } from '@octokit/app'
-import { Octokit } from '@octokit/rest'
+import { createAppAuth } from '@octokit/auth-app'
 import Webhooks from '@octokit/webhooks'
 import express from 'express'
 import { EventEmitter } from 'promise-events'
+
 import { ApplicationFunction } from '.'
 import { Cache } from './cache'
 import { Context } from './context'
-import { GitHubAPI, ProbotOctokit } from './github'
+import { ProbotOctokit } from './github/octokit'
 import { logger } from './logger'
 import webhookEventCheck from './webhook-event-check'
 import { LoggerWithTarget, wrapLogger } from './wrap-logger'
 
 export interface Options {
-  app: OctokitApp
   cache: Cache
   router?: express.Router
   catchErrors?: boolean
   githubToken?: string
   throttleOptions?: any
-  Octokit?: Octokit.Static
+  Octokit?: typeof ProbotOctokit
+  cert?: string
+  id?: number
 }
 
 export type OnCallback<T> = (context: Context<T>) => Promise<void>
@@ -36,20 +37,22 @@ function isUnauthenticatedEvent (event: Webhooks.WebhookEvent<any>) {
  */
 export class Application {
   public events: EventEmitter
-  public app: OctokitApp
   public cache: Cache
   public router: express.Router
   public log: LoggerWithTarget
 
   private githubToken?: string
   private throttleOptions: any
-  private Octokit: Octokit.Static
+  private Octokit: typeof ProbotOctokit
+  private id?: number
+  private privateKey?: string
 
   constructor (options?: Options) {
     const opts = options || {} as any
     this.events = new EventEmitter()
     this.log = wrapLogger(logger, logger)
-    this.app = opts.app
+    this.id = opts.id
+    this.privateKey = opts.cert
     this.cache = opts.cache
     this.router = opts.router || express.Router() // you can do this?
     this.githubToken = opts.githubToken
@@ -484,7 +487,7 @@ export class Application {
    * @returns An authenticated GitHub API client
    * @private
    */
-  public async auth (id?: number, log = this.log): Promise<GitHubAPI> {
+  public async auth (id?: number, log = this.log): Promise<InstanceType<typeof ProbotOctokit>> {
     if (process.env.GHE_HOST && /^https?:\/\//.test(process.env.GHE_HOST)) {
       throw new Error('Your \`GHE_HOST\` environment variable should not begin with https:// or http://')
     }
@@ -493,18 +496,19 @@ export class Application {
     // so that it can be used across received webhook events.
     if (id) {
       const options = {
-        Octokit: this.Octokit,
-        auth: async () => {
-          const accessToken = await this.app.getInstallationAccessToken({ installationId: id })
-          return `token ${accessToken}`
+        auth: {
+          id: this.id,
+          installationId: id,
+          privateKey: this.privateKey
         },
-        baseUrl: process.env.GHE_HOST && `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api/v3`,
-        logger: log.child({ name: 'github', installation: String(id) })
+        authStrategy: createAppAuth,
+        baseUrl: process.env.GHE_HOST && `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api/v3`
       }
 
       if (this.throttleOptions) {
-        return GitHubAPI({
+        return new this.Octokit({
           ...options,
+          log: log.child({ name: 'github', installation: String(id) }),
           throttle: {
             id,
             ...this.throttleOptions
@@ -514,30 +518,25 @@ export class Application {
 
       // Cache for 1 minute less than GitHub expiry
       const installationTokenTTL = parseInt(process.env.INSTALLATION_TOKEN_TTL || '3540', 10)
-      return this.cache.wrap(`app:${id}`, () => GitHubAPI(options), { ttl: installationTokenTTL })
+      return this.cache.wrap(`app:${id}`, () => new this.Octokit(options), { ttl: installationTokenTTL })
     }
 
-    const token = this.githubToken || this.app.getSignedJsonWebToken()
+    const authOptions = this.githubToken ? { auth: this.githubToken } : {
+      auth: {
+        id: this.id,
+        privateKey: this.privateKey
+      },
+      authStrategy: createAppAuth
+    }
 
-    // we assume that if throttling is disabled, retrying requests should be disabled, too.
-    const retryOptions =
-      this.throttleOptions && this.throttleOptions.enabled === false
-      ? this.throttleOptions
-       : undefined
-
-    const github = GitHubAPI({
-      Octokit: this.Octokit,
-      auth: `Bearer ${token}`,
+    return new this.Octokit({
       baseUrl: process.env.GHE_HOST && `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api/v3`,
-      logger: log.child({ name: 'github' }),
-      retry: retryOptions,
-      throttle: this.throttleOptions
+      log: log.child({ name: 'github' }),
+      ...authOptions
     })
-
-    return github
   }
 
-  private authenticateEvent (event: Webhooks.WebhookEvent<any>, log: LoggerWithTarget): Promise<GitHubAPI> {
+  private authenticateEvent (event: Webhooks.WebhookEvent<any>, log: LoggerWithTarget): Promise<InstanceType<typeof ProbotOctokit>> {
     if (this.githubToken) {
       return this.auth()
     }

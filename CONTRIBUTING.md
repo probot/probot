@@ -4,12 +4,6 @@ Hi there! We're thrilled that you'd like to contribute to this project. Your hel
 
 Please note that this project is released with a [Contributor Code of Conduct][code-of-conduct]. By participating in this project you agree to abide by its terms.
 
-# 🏗 Probot v8 beta
-
-Heads up: we are currently working on version 8. If you submit a pull request, please select the `beta` branch as your base.
-
-If you need a fix in v7, please submit the fix to the `beta` branch first (if applicable). Then create another pull request against the `v7.x` branch.
-
 ## Submitting a pull request
 
 1. [Fork][fork] and clone the repository

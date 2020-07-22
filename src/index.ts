@@ -1,8 +1,16 @@
 // tslint:disable-next-line: no-var-requires
 require('dotenv').config()
 
-import { App as OctokitApp } from '@octokit/app'
-import { Octokit } from '@octokit/rest'
+// TODO: remove in v11
+if ('DISABLE_STATS' in process.env) {
+  // tslint:disable:no-console
+  console.warn('[probot] "DISABLE_STATS" is no longer used since v10')
+}
+if ('IGNORED_ACCOUNTS' in process.env) {
+  // tslint:disable:no-console
+  console.warn('[probot] "IGNORED_ACCOUNTS" is no longer used since v10')
+}
+
 import Webhooks from '@octokit/webhooks'
 import Bottleneck from 'bottleneck'
 import Logger from 'bunyan'
@@ -14,7 +22,7 @@ import { Application } from './application'
 import setupApp from './apps/setup'
 import { createDefaultCache } from './cache'
 import { Context } from './context'
-import { GitHubAPI, ProbotOctokit } from './github'
+import { ProbotOctokit, ProbotOctokitCore } from './github/octokit'
 import { logger } from './logger'
 import { logRequestErrors } from './middleware/log-request-errors'
 import { findPrivateKey } from './private-key'
@@ -27,8 +35,7 @@ const cache = createDefaultCache()
 // tslint:disable:no-var-requires
 const defaultAppFns: ApplicationFunction[] = [
   require('./apps/default'),
-  require('./apps/sentry'),
-  require('./apps/stats')
+  require('./apps/sentry')
 ]
 // tslint:enable:no-var-requires
 
@@ -101,14 +108,14 @@ export class Probot {
   public httpServer?: Server
   public webhook: Webhooks
   public logger: Logger
+
   // These 3 need to be public for the tests to work.
   public options: Options
-  public app?: OctokitApp
   public throttleOptions: any
 
   private apps: Application[]
   private githubToken?: string
-  private Octokit: Octokit.Static
+  private Octokit: typeof ProbotOctokit
 
   constructor (options: Options) {
     options.webhookPath = options.webhookPath || '/'
@@ -122,18 +129,12 @@ export class Probot {
     })
     this.githubToken = options.githubToken
     this.Octokit = options.Octokit || ProbotOctokit
+
     if (this.options.id) {
       if (process.env.GHE_HOST && /^https?:\/\//.test(process.env.GHE_HOST)) {
         throw new Error('Your \`GHE_HOST\` environment variable should not begin with https:// or http://')
       }
-
-      this.app = new OctokitApp({
-        baseUrl: process.env.GHE_HOST && `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api/v3`,
-        id: options.id as number,
-        privateKey: options.cert as string
-      })
     }
-    this.throttleOptions = options.throttleOptions
 
     this.server = createServer({ webhook: (this.webhook as any).middleware, logger })
 
@@ -155,10 +156,10 @@ export class Probot {
       const connection = new Bottleneck.IORedisConnection({ client })
       connection.on('error', this.logger.error)
 
-      this.throttleOptions = Object.assign({
+      this.throttleOptions = {
         Bottleneck,
         connection
-      }, this.throttleOptions)
+      }
     }
   }
 
@@ -182,9 +183,9 @@ export class Probot {
     if (typeof appFn === 'string') {
       appFn = resolve(appFn) as ApplicationFunction
     }
+
     const app = new Application({
       Octokit: this.Octokit,
-      app: this.app as OctokitApp,
       cache,
       githubToken: this.githubToken,
       throttleOptions: this.throttleOptions
@@ -246,8 +247,7 @@ export interface Options {
   webhookProxy?: string,
   port?: number,
   redisConfig?: Redis.RedisOptions,
-  Octokit?: Octokit.Static
-  throttleOptions?: any
+  Octokit?: typeof ProbotOctokit
 }
 
-export { Logger, Context, Application, Octokit, GitHubAPI }
+export { Logger, Context, Application, ProbotOctokit, ProbotOctokitCore }

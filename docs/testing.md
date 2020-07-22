@@ -12,7 +12,7 @@ For our testing examples, we use [jest](https://facebook.github.io/jest/), but t
 const nock = require('nock')
 // Requiring our app implementation
 const myProbotApp = require('..')
-const { Probot } = require('probot')
+const { Probot, ProbotOctokitCore } = require('probot')
 // Requiring our fixtures
 const payload = require('./fixtures/issues.opened')
 const issueCreatedBody = { body: 'Thanks for opening this issue!' }
@@ -25,8 +25,8 @@ describe('My Probot app', () => {
     probot = new Probot({
       id: 1,
       githubToken: 'test',
-      // disable all request throttling to make tests faster
-      throttleOptions: { enabled: false }
+      // Use Probot's Octokit Constructor without the throttle & retry plugins
+      Octokit: ProbotOctokitCore
     })
     probot.load(myProbotApp)
   })

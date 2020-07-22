@@ -1,22 +1,19 @@
-import Logger from 'bunyan'
-import { GitHubAPI } from './'
+// tslint:disable-next-line
+import type { Octokit } from '@octokit/core'
 
-export function addLogging (client: GitHubAPI, logger: Logger) {
-  if (!logger) {
-    return
-  }
-
-  client.hook.error('request', (error, options) => {
-    const { method, url, headers, ...params } = options
+export function requestLogging (octokit: Octokit) {
+  octokit.hook.error('request', (error, options) => {
+    const { method, url, ...params } = options
     const msg = `GitHub request: ${method} ${url} - ${error.status}`
-    logger.debug({ params }, msg)
+    // @ts-ignore log.debug is a bunyan log method and accepts a fields object
+    octokit.log.debug({ params }, msg)
     throw error
   })
-  client.hook.after('request', (result, options) => {
+
+  octokit.hook.after('request', (result, options) => {
     const { method, url, headers, ...params } = options
     const msg = `GitHub request: ${method} ${url} - ${result.headers.status}`
-    logger.debug({ params }, msg)
+    // @ts-ignore log.debug is a bunyan log method and accepts a fields object
+    octokit.log.debug({ params }, msg)
   })
 }
-
-export { Logger }

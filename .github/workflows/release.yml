@@ -3,6 +3,9 @@ on:
   push:
     branches:
       - master
+      - next
+      - beta
+      - "*.x" # maintenance releases such as 15.x
 
 jobs:
   release:
@@ -12,7 +15,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
+          node-version: 12
       - run: npm ci
       - run: npm run build
       - run: npx semantic-release

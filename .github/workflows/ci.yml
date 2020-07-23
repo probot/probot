@@ -3,8 +3,8 @@ name: CI
 on:
   push:
     branches:
-      - master
-      - "greenkeeper/**"
+      # https://github.blog/changelog/2020-07-22-github-actions-better-support-for-alternative-default-branch-names/
+      - $default-branch
 
   pull_request:
     types:
@@ -15,7 +15,10 @@ jobs:
   build:
     strategy:
       matrix:
-        node-version: [10.x, 12.x]
+        node-version:
+          - 10
+          - 12
+          - 14
         os: [ubuntu-latest, macos-latest, windows-latest]
 
     runs-on: ${{ matrix.os }}

@@ -2,7 +2,8 @@ name: Release
 on:
   push:
     branches:
-      - master
+      # https://github.blog/changelog/2020-07-22-github-actions-better-support-for-alternative-default-branch-names/
+      - $default_branch
       - next
       - beta
       - "*.x" # maintenance releases such as 15.x

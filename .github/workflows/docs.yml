@@ -2,7 +2,8 @@ name: Docs
 on:
   push:
     branches:
-      - master
+      # https://github.blog/changelog/2020-07-22-github-actions-better-support-for-alternative-default-branch-names/
+      - $default_branch
 
 jobs:
   docs:
@@ -13,7 +14,7 @@ jobs:
       - run: git fetch --depth=20 origin +refs/tags/*:refs/tags/*
       - uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
+          node-version: 12
       - run: npm ci
       - run: npm run build
       - run: ./script/publish-docs

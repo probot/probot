@@ -94,6 +94,7 @@
     "uuid": "^7.0.0"
   },
   "devDependencies": {
+    "@tsconfig/node10": "^1.0.3",
     "@types/bunyan-format": "^0.2.2",
     "@types/cache-manager": "^2.10.0",
     "@types/eventsource": "^1.1.0",

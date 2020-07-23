@@ -120,13 +120,13 @@ export class Context<E extends WebhookPayloadWithRepository = any> implements We
   }
 
   /**
-   * Return the `owner`, `repo`, and `number` params for making API requests
-   * against an issue or pull request. The object passed in will be merged with
-   * the repo params.
+   * Return the `owner`, `repo`, and `issue_number` params for making API requests
+   * against an issue. The object passed in will be merged with the repo params.
+   *
    *
    * ```js
    * const params = context.issue({body: 'Hello World!'})
-   * // Returns: {owner: 'username', repo: 'reponame', number: 123, body: 'Hello World!'}
+   * // Returns: {owner: 'username', repo: 'reponame', issue_number: 123, body: 'Hello World!'}
    * ```
    *
    * @param object - Params to be merged with the issue params.
@@ -134,7 +134,26 @@ export class Context<E extends WebhookPayloadWithRepository = any> implements We
   public issue<T> (object?: T) {
     const payload = this.payload
     return Object.assign({
-      number: (payload.issue || payload.pull_request || payload).number
+      issue_number: (payload.issue || payload.pull_request || payload).number
+    }, this.repo(object))
+  }
+
+  /**
+   * Return the `owner`, `repo`, and `issue_number` params for making API requests
+   * against an issue. The object passed in will be merged with the repo params.
+   *
+   *
+   * ```js
+   * const params = context.pullRequest({body: 'Hello World!'})
+   * // Returns: {owner: 'username', repo: 'reponame', pull_number: 123, body: 'Hello World!'}
+   * ```
+   *
+   * @param object - Params to be merged with the pull request params.
+   */
+  public pullRequest<T> (object?: T) {
+    const payload = this.payload
+    return Object.assign({
+      pull_number: (payload.issue || payload.pull_request || payload).number
     }, this.repo(object))
   }
 

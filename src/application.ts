@@ -14,7 +14,6 @@ import { LoggerWithTarget, wrapLogger } from './wrap-logger'
 export interface Options {
   cache: Cache
   router?: express.Router
-  catchErrors?: boolean
   githubToken?: string
   throttleOptions?: any
   Octokit?: typeof ProbotOctokit

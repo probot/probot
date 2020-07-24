@@ -1,5 +1,5 @@
 import { Endpoints } from '@octokit/types'
-import Webhooks, { PayloadRepository } from '@octokit/webhooks'
+import Webhooks from '@octokit/webhooks'
 import merge from 'deepmerge'
 import yaml from 'js-yaml'
 import path from 'path'
@@ -25,7 +25,7 @@ export type MergeOptions = merge.Options
 
 interface WebhookPayloadWithRepository {
   [key: string]: any
-  repository?: PayloadRepository
+  repository?: Webhooks.PayloadRepository
   issue?: {
     [key: string]: any
     number: number

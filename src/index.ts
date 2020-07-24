@@ -16,11 +16,11 @@ import Bottleneck from 'bottleneck'
 import Logger from 'bunyan'
 import express from 'express'
 import Redis from 'ioredis'
+import LRUCache from 'lru-cache'
 
 import { Server } from 'http'
 import { Application } from './application'
 import setupApp from './apps/setup'
-import { createDefaultCache } from './cache'
 import { Context } from './context'
 import { ProbotOctokit, ProbotOctokitCore } from './github/octokit'
 import { logger } from './logger'
@@ -29,8 +29,6 @@ import { findPrivateKey } from './private-key'
 import { resolve } from './resolver'
 import { createServer } from './server'
 import { createWebhookProxy } from './webhook-proxy'
-
-const cache = createDefaultCache()
 
 // tslint:disable:no-var-requires
 const defaultAppFns: ApplicationFunction[] = [
@@ -116,6 +114,7 @@ export class Probot {
   private apps: Application[]
   private githubToken?: string
   private Octokit: typeof ProbotOctokit
+  private cache: LRUCache<number, string>
 
   constructor (options: Options) {
     options.webhookPath = options.webhookPath || '/'
@@ -137,6 +136,14 @@ export class Probot {
     }
 
     this.server = createServer({ webhook: (this.webhook as any).middleware, logger })
+
+    // TODO: support redis backend for access token cache if `options.redisConfig || process.env.REDIS_URL`
+    this.cache = new LRUCache<number, string>({
+      // cache max. 15000 tokens, that will use less than 10mb memory
+      max: 15000,
+      // Cache for 1 minute less than GitHub expiry
+      maxAge: Number(process.env.INSTALLATION_TOKEN_TTL) || 1000 * 60 * 59
+    })
 
     // Log all received webhooks
     this.webhook.on('*', async (event: Webhooks.WebhookEvent<any>) => {
@@ -186,7 +193,7 @@ export class Probot {
 
     const app = new Application({
       Octokit: this.Octokit,
-      cache,
+      cache: this.cache,
       githubToken: this.githubToken,
       throttleOptions: this.throttleOptions
     })

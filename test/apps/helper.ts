@@ -1,9 +1,9 @@
 // FIXME: move this to a test helper that can be used by other apps
 
-import cacheManager from 'cache-manager'
+import LRUCache from 'lru-cache'
 import { Application, ApplicationFunction } from '../../src'
 
-const cache = cacheManager.caching({ store: 'memory', ttl: 0 })
+const cache = new LRUCache<number, string>()
 
 const PRIVATE_KEY = `-----BEGIN RSA PRIVATE KEY-----
 MIIBOQIBAAJBAIILhiN9IFpaE0pUXsesuuoaj6eeDiAqCiE49WB1tMB8ZMhC37kY

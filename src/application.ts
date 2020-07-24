@@ -1,10 +1,10 @@
 import { createAppAuth } from '@octokit/auth-app'
 import { Webhooks } from '@octokit/webhooks'
 import express from 'express'
+import LRUCache from 'lru-cache'
 import { EventEmitter } from 'promise-events'
 
 import { ApplicationFunction } from '.'
-import { Cache } from './cache'
 import { Context } from './context'
 import { ProbotOctokit } from './github/octokit'
 import { logger } from './logger'
@@ -12,7 +12,7 @@ import webhookEventCheck from './webhook-event-check'
 import { LoggerWithTarget, wrapLogger } from './wrap-logger'
 
 export interface Options {
-  cache: Cache
+  cache: LRUCache<number, string>
   router?: express.Router
   githubToken?: string
   throttleOptions?: any
@@ -36,7 +36,7 @@ function isUnauthenticatedEvent (event: Webhooks.WebhookEvent<any>) {
  */
 export class Application {
   public events: EventEmitter
-  public cache: Cache
+  public cache: LRUCache<number, string>
   public router: express.Router
   public log: LoggerWithTarget
 
@@ -491,48 +491,30 @@ export class Application {
       throw new Error('Your \`GHE_HOST\` environment variable should not begin with https:// or http://')
     }
 
-    // if installation ID passed, instantiate and authenticate Octokit, then cache the instance
-    // so that it can be used across received webhook events.
-    if (id) {
-      const options = {
-        auth: {
-          id: this.id,
-          installationId: id,
-          privateKey: this.privateKey
-        },
-        authStrategy: createAppAuth,
-        baseUrl: process.env.GHE_HOST && `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api/v3`
-      }
-
-      if (this.throttleOptions) {
-        return new this.Octokit({
-          ...options,
-          log: log.child({ name: 'github', installation: String(id) }),
-          throttle: {
-            id,
-            ...this.throttleOptions
-          }
-        })
-      }
-
-      // Cache for 1 minute less than GitHub expiry
-      const installationTokenTTL = parseInt(process.env.INSTALLATION_TOKEN_TTL || '3540', 10)
-      return this.cache.wrap(`app:${id}`, () => new this.Octokit(options), { ttl: installationTokenTTL })
-    }
-
+    const installationAuthOptions = id ? { installationId: id } : {}
     const authOptions = this.githubToken ? { auth: this.githubToken } : {
       auth: {
+        cache: this.cache,
         id: this.id,
-        privateKey: this.privateKey
+        privateKey: this.privateKey,
+        ...installationAuthOptions
       },
       authStrategy: createAppAuth
     }
 
-    return new this.Octokit({
+    const throttleOptions = this.throttleOptions ? { throttle: {
+      id,
+      ...this.throttleOptions
+    } } : {}
+
+    const options = {
       baseUrl: process.env.GHE_HOST && `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api/v3`,
       log: log.child({ name: 'github' }),
-      ...authOptions
-    })
+      ...authOptions,
+      ...throttleOptions
+    }
+
+    return new this.Octokit(options)
   }
 
   private authenticateEvent (event: Webhooks.WebhookEvent<any>, log: LoggerWithTarget): Promise<InstanceType<typeof ProbotOctokit>> {

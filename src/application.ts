@@ -2,9 +2,9 @@ import { createAppAuth } from '@octokit/auth-app'
 import { Webhooks } from '@octokit/webhooks'
 import express from 'express'
 import { EventEmitter } from 'promise-events'
+import LRUCache from 'lru-cache'
 
 import { ApplicationFunction } from '.'
-import { Cache } from './cache'
 import { Context } from './context'
 import { ProbotOctokit } from './github/octokit'
 import { logger } from './logger'
@@ -36,7 +36,7 @@ function isUnauthenticatedEvent (event: Webhooks.WebhookEvent<any>) {
  */
 export class Application {
   public events: EventEmitter
-  public cache: Cache
+  public cache: LRUCache<number, string>
   public router: express.Router
   public log: LoggerWithTarget
 
@@ -494,30 +494,25 @@ export class Application {
     // if installation ID passed, instantiate and authenticate Octokit, then cache the instance
     // so that it can be used across received webhook events.
     if (id) {
+      const throttleOptions = this.throttleOptions ? { throttle: {
+        id,
+        ...this.throttleOptions
+      } } : {}
+
       const options = {
         auth: {
           id: this.id,
           installationId: id,
-          privateKey: this.privateKey
+          privateKey: this.privateKey,
+          cache: this.cache
         },
         authStrategy: createAppAuth,
-        baseUrl: process.env.GHE_HOST && `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api/v3`
+        baseUrl: process.env.GHE_HOST && `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api/v3`,
+        log: log.child({ name: 'github' }),
+        ...throttleOptions
       }
 
-      if (this.throttleOptions) {
-        return new this.Octokit({
-          ...options,
-          log: log.child({ name: 'github', installation: String(id) }),
-          throttle: {
-            id,
-            ...this.throttleOptions
-          }
-        })
-      }
-
-      // Cache for 1 minute less than GitHub expiry
-      const installationTokenTTL = parseInt(process.env.INSTALLATION_TOKEN_TTL || '3540', 10)
-      return this.cache.wrap(`app:${id}`, () => new this.Octokit(options), { ttl: installationTokenTTL })
+      return new this.Octokit(options)
     }
 
     const authOptions = this.githubToken ? { auth: this.githubToken } : {

@@ -1,12 +1,10 @@
 import Bottleneck from 'bottleneck'
 import { NextFunction, Request, Response } from 'express'
-import nock = require('nock')
 import request = require('supertest')
 import { Application, createProbot, Probot } from '../src'
 import { ProbotOctokit } from '../src/github/octokit'
 
 import path = require('path')
-import helper = require('./apps/helper')
 
 // tslint:disable:no-empty
 describe('Probot', () => {
@@ -254,17 +252,8 @@ describe('Probot', () => {
   })
 
   describe('ghe support', () => {
-    let app: Application
-
     beforeEach(() => {
       process.env.GHE_HOST = 'notreallygithub.com'
-
-      nock('https://notreallygithub.com/api/v3')
-        .defaultReplyHeaders({ 'Content-Type': 'application/json' })
-        .get('/app/installations').reply(200, ['I work!'])
-        .post('/app/installations/5/access_tokens').reply(200, { token: 'github_token' })
-
-      app = helper.createApp()
     })
 
     afterEach(() => {
@@ -272,27 +261,16 @@ describe('Probot', () => {
     })
 
     it('requests from the correct API URL', async () => {
-      const spy = jest.fn()
-
       const appFn = async (appl: Application) => {
         const github = await appl.auth()
-        const res = await github.apps.listInstallations({})
-        return spy(res)
+        expect(github.request.endpoint.DEFAULTS.baseUrl).toEqual('https://notreallygithub.com/api/v3')
       }
 
-      await appFn(app)
-      await app.receive(event)
-      expect(spy.mock.calls[0][0].data[0]).toBe('I work!')
+      createProbot({}).load(appFn)
     })
 
     it('throws if the GHE host includes a protocol', async () => {
       process.env.GHE_HOST = 'https://notreallygithub.com'
-
-      try {
-        await app.auth()
-      } catch (e) {
-        expect(e).toMatchSnapshot()
-      }
 
       try {
         createProbot({ id: 1234, cert: 'xxxx' })
@@ -303,18 +281,9 @@ describe('Probot', () => {
   })
 
   describe('ghe support with http', () => {
-    let app: Application
-
     beforeEach(() => {
       process.env.GHE_HOST = 'notreallygithub.com'
       process.env.GHE_PROTOCOL = 'http'
-
-      nock('http://notreallygithub.com/api/v3')
-        .defaultReplyHeaders({ 'Content-Type': 'application/json' })
-        .get('/app/installations').reply(200, ['I work!'])
-        .post('/app/installations/5/access_tokens').reply(200, { token: 'github_token' })
-
-      app = helper.createApp()
     })
 
     afterEach(() => {
@@ -323,27 +292,16 @@ describe('Probot', () => {
     })
 
     it('requests from the correct API URL', async () => {
-      const spy = jest.fn()
-
       const appFn = async (appl: Application) => {
         const github = await appl.auth()
-        const res = await github.apps.listInstallations({})
-        return spy(res)
+        expect(github.request.endpoint.DEFAULTS.baseUrl).toEqual('http://notreallygithub.com/api/v3')
       }
 
-      await appFn(app)
-      await app.receive(event)
-      expect(spy.mock.calls[0][0].data[0]).toBe('I work!')
+      createProbot({}).load(appFn)
     })
 
     it('throws if the GHE host includes a protocol', async () => {
       process.env.GHE_HOST = 'http://notreallygithub.com'
-
-      try {
-        await app.auth()
-      } catch (e) {
-        expect(e).toMatchSnapshot()
-      }
 
       try {
         createProbot({ id: 1234, cert: 'xxxx' })

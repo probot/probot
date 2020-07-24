@@ -2,7 +2,7 @@ import fs = require('fs')
 import path = require('path')
 
 import { Endpoints } from '@octokit/types'
-import Webhooks from '@octokit/webhooks'
+import { EventPayloads } from '@octokit/webhooks'
 
 import { Context, MergeOptions } from '../src/context'
 import { ProbotOctokit } from '../src/github/octokit'
@@ -16,7 +16,7 @@ interface OctokitError extends Error {
 }
 
 describe('Context', () => {
-  let event: Webhooks.WebhookEvent<any>
+  let event: EventPayloads.WebhookEvent<any>
   let context: Context
   const notFoundError: OctokitError = {
     message: 'An error occurred',

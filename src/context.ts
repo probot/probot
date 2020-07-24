@@ -1,5 +1,5 @@
 import { Endpoints } from '@octokit/types'
-import Webhooks from '@octokit/webhooks'
+import { EventPayloads } from '@octokit/webhooks'
 import merge from 'deepmerge'
 import yaml from 'js-yaml'
 import path from 'path'
@@ -25,7 +25,7 @@ export type MergeOptions = merge.Options
 
 interface WebhookPayloadWithRepository {
   [key: string]: any
-  repository?: Webhooks.PayloadRepository
+  repository?: EventPayloads.PayloadRepository
   issue?: {
     [key: string]: any
     number: number
@@ -66,7 +66,7 @@ interface WebhookPayloadWithRepository {
  * @property {logger} log - A logger
  */
 
-export class Context<E extends WebhookPayloadWithRepository = any> implements Webhooks.WebhookEvent<E> {
+export class Context<E extends WebhookPayloadWithRepository = any> implements EventPayloads.WebhookEvent<E> {
   public name: string
   public id: string
   public payload: E
@@ -77,7 +77,7 @@ export class Context<E extends WebhookPayloadWithRepository = any> implements We
   public github: InstanceType<typeof ProbotOctokit>
   public log: LoggerWithTarget
 
-  constructor (event: Webhooks.WebhookEvent<E>, github: InstanceType<typeof ProbotOctokit>, log: LoggerWithTarget) {
+  constructor (event: EventPayloads.WebhookEvent<E>, github: InstanceType<typeof ProbotOctokit>, log: LoggerWithTarget) {
     this.name = event.name
     this.id = event.id
     this.payload = event.payload

@@ -11,7 +11,7 @@ if ('IGNORED_ACCOUNTS' in process.env) {
   console.warn('[probot] "IGNORED_ACCOUNTS" is no longer used since v10')
 }
 
-import Webhooks from '@octokit/webhooks'
+import { EventPayloads, Webhooks } from '@octokit/webhooks'
 import Bottleneck from 'bottleneck'
 import Logger from 'bunyan'
 import express from 'express'
@@ -50,7 +50,7 @@ export class Probot {
           .usage('[options] <apps...>')
           .option('-p, --port <n>', 'Port to start the server on', process.env.PORT || 3000)
           .option('-W, --webhook-proxy <url>', 'URL of the webhook proxy service.`', process.env.WEBHOOK_PROXY_URL)
-          .option('-w, --webhook-path <path>', 'URL path which receives webhooks. Ex: `/webhook`', process.env.WEBHOOK_PATH)
+          .option('-w, --webhook-path <path>', 'URL path which receives EventPayloads. Ex: `/webhook`', process.env.WEBHOOK_PATH)
           .option('-a, --app <id>', 'ID of the GitHub App', process.env.APP_ID)
           .option('-s, --secret <secret>', 'Webhook secret of the GitHub App', process.env.WEBHOOK_SECRET)
           .option('-P, --private-key <file>', 'Path to certificate of the GitHub App', process.env.PRIVATE_KEY_PATH)
@@ -139,7 +139,7 @@ export class Probot {
     this.server = createServer({ webhook: (this.webhook as any).middleware, logger })
 
     // Log all received webhooks
-    this.webhook.on('*', async (event: Webhooks.WebhookEvent<any>) => {
+    this.webhook.on('*', async (event: EventPayloads.WebhookEvent<any>) => {
       await this.receive(event)
     })
 
@@ -174,7 +174,7 @@ export class Probot {
     }
   }
 
-  public receive (event: Webhooks.WebhookEvent<any>) {
+  public receive (event: EventPayloads.WebhookEvent<any>) {
     this.logger.debug({ event }, 'Webhook received')
     return Promise.all(this.apps.map(app => app.receive(event)))
   }

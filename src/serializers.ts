@@ -1,10 +1,10 @@
-import Webhooks from '@octokit/webhooks'
+import { EventPayloads } from '@octokit/webhooks'
 import bunyan from 'bunyan'
 import express from 'express'
 
 export const serializers: bunyan.StdSerializers = {
 
-  event: (event: Webhooks.WebhookEvent<any> | any) => {
+  event: (event: EventPayloads.WebhookEvent<any> | any) => {
     if (typeof event !== 'object' || !event.payload) {
       return event
     } else {
@@ -31,7 +31,7 @@ export const serializers: bunyan.StdSerializers = {
 
   err: bunyan.stdSerializers.err,
 
-  repository: (repository: Webhooks.PayloadRepository) => repository.full_name,
+  repository: (repository: EventPayloads.PayloadRepository) => repository.full_name,
 
   req: bunyan.stdSerializers.req,
 

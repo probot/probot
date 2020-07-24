@@ -16,7 +16,7 @@ import Bottleneck from 'bottleneck'
 import Logger from 'bunyan'
 import express from 'express'
 import Redis from 'ioredis'
-import LRUCache from "lru-cache"
+import LRUCache from 'lru-cache'
 
 import { Server } from 'http'
 import { Application } from './application'
@@ -142,8 +142,8 @@ export class Probot {
       // cache max. 15000 tokens, that will use less than 10mb memory
       max: 15000,
       // Cache for 1 minute less than GitHub expiry
-      maxAge: 1000 * 60 * 59,
-    });
+      maxAge: Number(process.env.INSTALLATION_TOKEN_TTL) || 1000 * 60 * 59
+    })
 
     // Log all received webhooks
     this.webhook.on('*', async (event: Webhooks.WebhookEvent<any>) => {

@@ -487,10 +487,6 @@ export class Application {
    * @private
    */
   public async auth (id?: number, log = this.log): Promise<InstanceType<typeof ProbotOctokit>> {
-    if (process.env.GHE_HOST && /^https?:\/\//.test(process.env.GHE_HOST)) {
-      throw new Error('Your \`GHE_HOST\` environment variable should not begin with https:// or http://')
-    }
-
     const installationAuthOptions = id ? { installationId: id } : {}
     const authOptions = this.githubToken ? { auth: this.githubToken } : {
       auth: {
@@ -508,7 +504,6 @@ export class Application {
     } } : {}
 
     const options = {
-      baseUrl: process.env.GHE_HOST && `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api/v3`,
       log: log.child({ name: 'github' }),
       ...authOptions,
       ...throttleOptions

@@ -117,6 +117,10 @@ export class Probot {
   private cache: LRUCache<number, string>
 
   constructor (options: Options) {
+    if (process.env.GHE_HOST && /^https?:\/\//.test(process.env.GHE_HOST)) {
+      throw new Error('Your \`GHE_HOST\` environment variable should not begin with https:// or http://')
+    }
+
     options.webhookPath = options.webhookPath || '/'
     options.secret = options.secret || 'development'
     this.options = options
@@ -127,13 +131,11 @@ export class Probot {
       secret: options.secret
     })
     this.githubToken = options.githubToken
-    this.Octokit = options.Octokit || ProbotOctokit
 
-    if (this.options.id) {
-      if (process.env.GHE_HOST && /^https?:\/\//.test(process.env.GHE_HOST)) {
-        throw new Error('Your \`GHE_HOST\` environment variable should not begin with https:// or http://')
-      }
-    }
+    const Octokit = options.Octokit || ProbotOctokit
+    this.Octokit = Octokit.defaults({
+      baseUrl: process.env.GHE_HOST && `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api/v3`
+    })
 
     this.server = createServer({ webhook: (this.webhook as any).middleware, logger })
 

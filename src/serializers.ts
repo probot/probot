@@ -1,4 +1,4 @@
-import Webhooks from '@octokit/webhooks'
+import { Webhooks } from '@octokit/webhooks'
 import bunyan from 'bunyan'
 import express from 'express'
 

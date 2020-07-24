@@ -1,5 +1,5 @@
 import { Endpoints } from '@octokit/types'
-import Webhooks from '@octokit/webhooks'
+import { Webhooks } from '@octokit/webhooks'
 import merge from 'deepmerge'
 import yaml from 'js-yaml'
 import path from 'path'

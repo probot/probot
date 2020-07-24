@@ -1,4 +1,4 @@
-import Webhooks from '@octokit/webhooks'
+import { Webhooks } from '@octokit/webhooks'
 
 import { Application } from '../src/application'
 import { Context } from '../src/context'

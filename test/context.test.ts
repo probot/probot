@@ -2,7 +2,7 @@ import fs = require('fs')
 import path = require('path')
 
 import { Endpoints } from '@octokit/types'
-import Webhooks from '@octokit/webhooks'
+import { Webhooks } from '@octokit/webhooks'
 
 import { Context, MergeOptions } from '../src/context'
 import { ProbotOctokit } from '../src/github/octokit'

@@ -11,7 +11,7 @@ if ('IGNORED_ACCOUNTS' in process.env) {
   console.warn('[probot] "IGNORED_ACCOUNTS" is no longer used since v10')
 }
 
-import Webhooks from '@octokit/webhooks'
+import { Webhooks } from '@octokit/webhooks'
 import Bottleneck from 'bottleneck'
 import Logger from 'bunyan'
 import express from 'express'

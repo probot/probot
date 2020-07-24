@@ -1,5 +1,5 @@
 import { createAppAuth } from '@octokit/auth-app'
-import Webhooks from '@octokit/webhooks'
+import { Webhooks } from '@octokit/webhooks'
 import express from 'express'
 import { EventEmitter } from 'promise-events'
 

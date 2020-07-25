@@ -1,22 +1,24 @@
-import express from 'express'
 import request from 'supertest'
-import { Application } from '../../src'
-import appFn = require('../../src/apps/default')
-import { createApp } from './helper'
+import { Probot } from '../../src'
+import defaultApp = require('../../src/apps/default')
 
 describe('default app', () => {
-  let server: express.Application
-  let app: Application
+  let probot: Probot
 
   beforeEach(async () => {
-    app = createApp(appFn)
-    server = express()
-    server.use(app.router)
+    probot = new Probot({
+      id: 1,
+      cert: 'private key'
+    })
+    probot.load(defaultApp)
+
+    // there is currently no way to await probot.load, so we do hacky hack hack
+    await new Promise(resolve => setTimeout(resolve, 100))
   })
 
   describe('GET /probot', () => {
     it('returns a 200 response', () => {
-      return request(server).get('/probot').expect(200)
+      return request(probot.server).get('/probot').expect(200)
     })
 
     describe('get info from package.json', () => {
@@ -26,7 +28,7 @@ describe('default app', () => {
       })
 
       it('returns the correct HTML with values', async () => {
-        const actual = await request(server).get('/probot').expect(200)
+        const actual = await request(probot.server).get('/probot').expect(200)
         expect(actual.text).toMatch('Welcome to probot')
         expect(actual.text).toMatch('A framework for building GitHub Apps')
         expect(actual.text).toMatch(/v\d+\.\d+\.\d+/)
@@ -34,7 +36,7 @@ describe('default app', () => {
 
       it('returns the correct HTML without values', async () => {
         process.chdir(__dirname)
-        const actual = await request(server).get('/probot').expect(200)
+        const actual = await request(probot.server).get('/probot').expect(200)
         expect(actual.text).toMatch('Welcome to your Probot App')
       })
 
@@ -46,7 +48,7 @@ describe('default app', () => {
 
   describe('GET /', () => {
     it('redirects to /probot', () => {
-      return request(server).get('/').expect(302).expect('location', '/probot')
+      return request(probot.server).get('/').expect(302).expect('location', '/probot')
     })
   })
 })

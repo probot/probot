@@ -8,7 +8,9 @@ import { ManifestCreation } from '../manifest-creation'
 const domain = process.env.PROJECT_DOMAIN || `http://localhost:${process.env.PORT || 3000}`
 const welcomeMessage = `\nWelcome to Probot! Go to ${domain} to get started.\n`
 
-export = async (app: Application, setup: ManifestCreation = new ManifestCreation()) => {
+export async function setupApp (app: Application) {
+  const setup: ManifestCreation = new ManifestCreation()
+
   // If not on Glitch or Production, create a smee URL
   if (process.env.NODE_ENV !== 'production' && !(process.env.PROJECT_DOMAIN || process.env.WEBHOOK_PROXY_URL)) {
     await setup.createWebhookChannel()

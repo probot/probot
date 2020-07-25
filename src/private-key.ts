@@ -24,6 +24,7 @@ export function findPrivateKey (filepath?: string): string | null {
   if (filepath) {
     return fs.readFileSync(filepath, 'utf8')
   }
+
   if (process.env.PRIVATE_KEY) {
     let cert = process.env.PRIVATE_KEY
 
@@ -41,6 +42,7 @@ export function findPrivateKey (filepath?: string): string | null {
 
     throw new Error('The contents of `PRIVATE_KEY` could not be validated. Please check to ensure you have copied the contents of the .pem file correctly.')
   }
+
   if (process.env.PRIVATE_KEY_PATH) {
     if (fs.existsSync(process.env.PRIVATE_KEY_PATH)) {
       return fs.readFileSync(process.env.PRIVATE_KEY_PATH, 'utf8')

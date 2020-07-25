@@ -1,4 +1,3 @@
-import { createAppAuth } from '@octokit/auth-app'
 import { Webhooks } from '@octokit/webhooks'
 import express from 'express'
 import LRUCache from 'lru-cache'
@@ -17,8 +16,7 @@ export interface Options {
   githubToken?: string
   throttleOptions?: any
   Octokit?: typeof ProbotOctokit
-  cert?: string
-  id?: number
+  octokit: InstanceType<typeof ProbotOctokit>
 }
 
 export type OnCallback<T> = (context: Context<T>) => Promise<void>
@@ -43,20 +41,18 @@ export class Application {
   private githubToken?: string
   private throttleOptions: any
   private Octokit: typeof ProbotOctokit
-  private id?: number
-  private privateKey?: string
+  private octokit: InstanceType<typeof ProbotOctokit>
 
   constructor (options?: Options) {
     const opts = options || {} as any
     this.events = new EventEmitter()
     this.log = wrapLogger(logger, logger)
-    this.id = opts.id
-    this.privateKey = opts.cert
     this.cache = opts.cache
     this.router = opts.router || express.Router() // you can do this?
     this.githubToken = opts.githubToken
     this.throttleOptions = opts.throttleOptions
     this.Octokit = opts.Octokit || ProbotOctokit
+    this.octokit = opts.octokit
   }
 
   /**
@@ -487,17 +483,9 @@ export class Application {
    * @private
    */
   public async auth (id?: number, log = this.log): Promise<InstanceType<typeof ProbotOctokit>> {
-    const installationAuthOptions = id ? { installationId: id } : {}
-    const authOptions = this.githubToken ? { auth: this.githubToken } : {
-      auth: {
-        cache: this.cache,
-        id: this.id,
-        privateKey: this.privateKey,
-        ...installationAuthOptions
-      },
-      authStrategy: createAppAuth
-    }
+    if (!id) return this.octokit
 
+    const authOptions = this.githubToken ? {} : { auth: { installationId: id } }
     const throttleOptions = this.throttleOptions ? { throttle: {
       id,
       ...this.throttleOptions

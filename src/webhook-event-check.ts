@@ -170,11 +170,3 @@ function inTestEnvironment (): boolean {
 }
 
 export default webhookEventCheck
-
-/**
- * A helper function used in testing that resets the cached result of /app.
- */
-export function clearCache () {
-  appMeta = null
-  didFailRetrievingAppMeta = false
-}

@@ -1,3 +1,4 @@
+import { createAppAuth } from '@octokit/auth-app'
 import { Webhooks } from '@octokit/webhooks'
 
 import { Application } from '../src/application'
@@ -235,6 +236,12 @@ describe('Application', () => {
 
           return {
             pluginLoaded: true
+          }
+        }).defaults({
+          authStrategy: createAppAuth,
+          auth: {
+            id: 1,
+            cert: 'cert'
           }
         }),
         throttleOptions: {

@@ -122,7 +122,7 @@ wB98bfAGtcuCZWzgjgL67CS0pcNxadFA/TFo/NnynLBC4qRXSfFslKVE+Og=
 ",
   "id": "1",
   "port": "3003",
-  "secret": "development",
+  "secret": "webhook_secret",
   "webhookPath": "/",
   "webhookProxy": "https://smee.io/EfHXC9BFfGAxbM6J",
 }

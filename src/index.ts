@@ -11,6 +11,7 @@ if ('IGNORED_ACCOUNTS' in process.env) {
   console.warn('[probot] "IGNORED_ACCOUNTS" is no longer used since v10')
 }
 
+import { createAppAuth } from '@octokit/auth-app'
 import { Webhooks } from '@octokit/webhooks'
 import Bottleneck from 'bottleneck'
 import Logger from 'bunyan'
@@ -20,7 +21,7 @@ import LRUCache from 'lru-cache'
 
 import { Server } from 'http'
 import { Application } from './application'
-import setupApp from './apps/setup'
+import { setupApp } from './apps/setup'
 import { Context } from './context'
 import { ProbotOctokit, ProbotOctokitCore } from './github/octokit'
 import { logger } from './logger'
@@ -76,6 +77,7 @@ export class Probot {
 
     const options = readOptions()
     const probot = new Probot(options)
+
     if (!options.id || !options.cert) {
       if (process.env.NODE_ENV === 'production') {
         if (!options.id) {
@@ -114,6 +116,7 @@ export class Probot {
   private apps: Application[]
   private githubToken?: string
   private Octokit: typeof ProbotOctokit
+  private octokit: InstanceType<typeof ProbotOctokit>
   private cache: LRUCache<number, string>
 
   constructor (options: Options) {
@@ -132,20 +135,7 @@ export class Probot {
     })
     this.githubToken = options.githubToken
 
-    const Octokit = options.Octokit || ProbotOctokit
-    this.Octokit = Octokit.defaults({
-      baseUrl: process.env.GHE_HOST && `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api/v3`
-    })
-
     this.server = createServer({ webhook: (this.webhook as any).middleware, logger })
-
-    // TODO: support redis backend for access token cache if `options.redisConfig || process.env.REDIS_URL`
-    this.cache = new LRUCache<number, string>({
-      // cache max. 15000 tokens, that will use less than 10mb memory
-      max: 15000,
-      // Cache for 1 minute less than GitHub expiry
-      maxAge: Number(process.env.INSTALLATION_TOKEN_TTL) || 1000 * 60 * 59
-    })
 
     // Log all received webhooks
     this.webhook.on('*', async (event: Webhooks.WebhookEvent<any>) => {
@@ -170,6 +160,32 @@ export class Probot {
         connection
       }
     }
+
+    const Octokit = options.Octokit || ProbotOctokit
+
+    // TODO: support redis backend for access token cache if `options.redisConfig || process.env.REDIS_URL`
+    this.cache = new LRUCache<number, string>({
+      // cache max. 15000 tokens, that will use less than 10mb memory
+      max: 15000,
+      // Cache for 1 minute less than GitHub expiry
+      maxAge: Number(process.env.INSTALLATION_TOKEN_TTL) || 1000 * 60 * 59
+    })
+
+    const authOptions = this.githubToken ? { auth: this.githubToken } : {
+      auth: {
+        cache: this.cache,
+        id: options.id,
+        privateKey: options.cert
+      },
+      authStrategy: createAppAuth
+    }
+
+    this.Octokit = Octokit.defaults({
+      baseUrl: process.env.GHE_HOST && `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api/v3`,
+      ...authOptions
+    })
+
+    this.octokit = new this.Octokit()
   }
 
   public errorHandler (err: Error) {
@@ -194,9 +210,10 @@ export class Probot {
     }
 
     const app = new Application({
-      Octokit: this.Octokit,
       cache: this.cache,
       githubToken: this.githubToken,
+      Octokit: this.Octokit,
+      octokit: this.octokit,
       throttleOptions: this.throttleOptions
     })
 

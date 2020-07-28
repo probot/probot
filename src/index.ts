@@ -184,9 +184,9 @@ export class Probot {
       ...authOptions
     }
 
-    this.Octokit = Octokit.defaults((options: any) => {
-      return Object.assign({}, defaultOptions, options, {
-        auth: Object.assign({}, defaultOptions.auth, options.auth)
+    this.Octokit = Octokit.defaults((instanceOptions: any) => {
+      return Object.assign({}, defaultOptions, instanceOptions, {
+        auth: Object.assign({}, defaultOptions.auth, instanceOptions.auth)
       })
     })
 

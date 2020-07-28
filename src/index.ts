@@ -190,7 +190,7 @@ export class Probot {
       })
     })
 
-    this.octokit = new this.Octokit()
+    this.octokit = new Octokit(defaultOptions)
   }
 
   public errorHandler (err: Error) {

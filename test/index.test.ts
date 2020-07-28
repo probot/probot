@@ -52,13 +52,14 @@ describe('Probot', () => {
       process.env.APP_ID = '1'
       process.env.PRIVATE_KEY_PATH = path.join(__dirname, 'test-private-key.pem')
       process.env.WEBHOOK_PROXY_URL = 'https://smee.io/EfHXC9BFfGAxbM6J'
+      process.env.WEBHOOK_SECRET = 'secret'
     })
 
     afterAll(() => {
       process.env = env
     })
 
-    it.only('runs with a function as argument', async () => {
+    it('runs with a function as argument', async () => {
       process.env.PORT = '3003'
       let initialized = false
       probot = await Probot.run((app) => {

@@ -87,18 +87,36 @@ describe('Context', () => {
 
   describe('issue', () => {
     it('returns attributes from repository payload', () => {
-      expect(context.issue()).toEqual({ owner: 'bkeepers', repo: 'probot', number: 4 })
+      expect(context.issue()).toEqual({ owner: 'bkeepers', repo: 'probot', issue_number: 4 })
     })
 
     it('merges attributes', () => {
       expect(context.issue({ foo: 1, bar: 2 })).toEqual({
-        bar: 2, foo: 1, number: 4, owner: 'bkeepers', repo: 'probot'
+        bar: 2, foo: 1, issue_number: 4, owner: 'bkeepers', repo: 'probot'
       })
     })
 
     it('overrides repo attributes', () => {
-      expect(context.issue({ owner: 'muahaha', number: 5 })).toEqual({
-        number: 5, owner: 'muahaha', repo: 'probot'
+      expect(context.issue({ owner: 'muahaha', issue_number: 5 })).toEqual({
+        issue_number: 5, owner: 'muahaha', repo: 'probot'
+      })
+    })
+  })
+
+  describe('pullRequest', () => {
+    it('returns attributes from repository payload', () => {
+      expect(context.pullRequest()).toEqual({ owner: 'bkeepers', repo: 'probot', pull_number: 4 })
+    })
+
+    it('merges attributes', () => {
+      expect(context.pullRequest({ foo: 1, bar: 2 })).toEqual({
+        bar: 2, foo: 1, owner: 'bkeepers', pull_number: 4, repo: 'probot'
+      })
+    })
+
+    it('overrides repo attributes', () => {
+      expect(context.pullRequest({ owner: 'muahaha', pull_number: 5 })).toEqual({
+        owner: 'muahaha', pull_number: 5, repo: 'probot'
       })
     })
   })

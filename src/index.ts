@@ -179,10 +179,15 @@ export class Probot {
       },
       authStrategy: createAppAuth
     }
-
-    this.Octokit = Octokit.defaults({
+    const defaultOptions = {
       baseUrl: process.env.GHE_HOST && `${process.env.GHE_PROTOCOL || 'https'}://${process.env.GHE_HOST}/api/v3`,
       ...authOptions
+    }
+
+    this.Octokit = Octokit.defaults((options: any) => {
+      return Object.assign({}, defaultOptions, options, {
+        auth: Object.assign({}, defaultOptions.auth, options.auth)
+      })
     })
 
     this.octokit = new this.Octokit()

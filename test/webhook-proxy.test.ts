@@ -14,6 +14,8 @@ interface SSEResponse extends Response {
   json (body: any, status?: string): this
 }
 
+jest.setTimeout(10000)
+
 describe('webhook-proxy', () => {
   // tslint:disable-next-line:one-variable-per-declaration
   let emit: SSEResponse['json'],

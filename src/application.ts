@@ -447,7 +447,20 @@ export class Application {
 
           await callback(context)
         } catch (err) {
-          log.error({ err, event })
+          // avoid the error.code deprecation message
+          // can be replaced with `log.error({ err, event, ...err })` once @octokit/request-error v3 is used
+          const { name, message, stack, headers, request, status } = err
+          log.error({
+            err: {
+              name,
+              message,
+              stack
+            },
+            event,
+            headers,
+            request,
+            status
+          })
           throw err
         }
       })

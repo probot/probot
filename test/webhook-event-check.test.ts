@@ -25,6 +25,8 @@ function mockAppMetaRequest (events: string[] = ['issues']) {
   return { events }
 }
 
+jest.setTimeout(10000)
+
 describe('webhook-event-check', () => {
   let originalNodeEnv: string
   let originalJestWorkerId: string | undefined
@@ -64,7 +66,7 @@ describe('webhook-event-check', () => {
     })
 
     // let's give the event check a moment to send its request
-    await new Promise(resolve => setTimeout(resolve, 100))
+    await new Promise(resolve => setTimeout(resolve, 500))
 
     expect(spyOnLogError).toHaveBeenCalledTimes(1)
     expect(spyOnLogError).toMatchSnapshot()
@@ -84,7 +86,7 @@ describe('webhook-event-check', () => {
     })
 
     // let's give the event check a moment to send its request
-    await new Promise(resolve => setTimeout(resolve, 100))
+    await new Promise(resolve => setTimeout(resolve, 500))
 
     expect(spyOnLogError).not.toHaveBeenCalled()
   })
@@ -105,7 +107,7 @@ describe('webhook-event-check', () => {
       })
 
       // let's give the event check a moment to send its request
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await new Promise(resolve => setTimeout(resolve, 500))
 
       expect(spyOnLogError).toHaveBeenCalledTimes(1)
       expect(spyOnLogError).toMatchSnapshot()
@@ -126,7 +128,7 @@ describe('webhook-event-check', () => {
       })
 
       // let's give the event check a moment to send its request
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await new Promise(resolve => setTimeout(resolve, 500))
 
       expect(spyOnLogError).toHaveBeenCalledTimes(1)
       expect(spyOnLogError).toMatchSnapshot()
@@ -152,7 +154,7 @@ describe('webhook-event-check', () => {
       })
 
       // let's give probot setup a moment
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await new Promise(resolve => setTimeout(resolve, 500))
 
       expect(spyOnLogError).not.toHaveBeenCalled()
     })
@@ -169,7 +171,7 @@ describe('webhook-event-check', () => {
       })
 
       // let's give probot setup a moment
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await new Promise(resolve => setTimeout(resolve, 500))
 
       expect(spyOnLogError).not.toHaveBeenCalled()
     })
@@ -186,7 +188,7 @@ describe('webhook-event-check', () => {
       })
 
       // let's give probot setup a moment
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await new Promise(resolve => setTimeout(resolve, 500))
 
       expect(spyOnLogError).not.toHaveBeenCalled()
     })
@@ -203,7 +205,7 @@ describe('webhook-event-check', () => {
       })
 
       // let's give probot setup a moment
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await new Promise(resolve => setTimeout(resolve, 500))
 
       expect(spyOnLogError).not.toHaveBeenCalled()
     })

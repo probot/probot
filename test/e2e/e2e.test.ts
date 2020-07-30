@@ -7,6 +7,8 @@ import bodyParser from 'body-parser'
 import express from 'express'
 import got from 'got'
 
+jest.setTimeout(10000)
+
 /**
  * In these tests we are starting probot apps by running "npm run [path to app.js]" using ghub.io/execa.
  * This allows us to pass dynamic environment variables for configuration.
@@ -81,7 +83,7 @@ describe('end-to-end-tests', () => {
     )
 
     // give probot a moment to start
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await new Promise((resolve) => setTimeout(resolve, 3000))
 
     // send webhook event request
     const body = JSON.stringify({

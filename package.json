@@ -13,7 +13,9 @@
     "start": "node ./bin/probot run",
     "lint": "prettier --check 'src/**/*.ts' 'test/**/*.ts' *.md package.json tsconfig.json",
     "lint:fix": "prettier --write 'src/**/*.ts' 'test/**/*.ts' *.md package.json tsconfig.json",
-    "test": "tsc --noEmit -p test && jest --coverage && npm run lint && npm run doc-lint",
+    "pretest": "tsc --noEmit -p test",
+    "test": "jest --coverage",
+    "posttest": "npm run lint",
     "doc": "typedoc --options .typedoc.json",
     "prepare": "npm run build"
   },

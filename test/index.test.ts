@@ -1,6 +1,8 @@
+import { EventNames } from '@octokit/webhooks'
 import Bottleneck from 'bottleneck'
 import { NextFunction, Request, Response } from 'express'
 import request = require('supertest')
+
 import { Application, createProbot, Probot } from '../src'
 import { ProbotOctokit } from '../src/github/octokit'
 
@@ -22,7 +24,7 @@ describe('Probot', () => {
   let probot: Probot
   let event: {
     id: string
-    name: string
+    name: EventNames.StringNames
     payload: any
   }
 

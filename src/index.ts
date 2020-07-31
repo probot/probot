@@ -12,7 +12,7 @@ if ('IGNORED_ACCOUNTS' in process.env) {
 }
 
 import { createAppAuth } from '@octokit/auth-app'
-import { Webhooks } from '@octokit/webhooks'
+import { WebhookEvent, Webhooks } from '@octokit/webhooks'
 import Bottleneck from 'bottleneck'
 import Logger from 'bunyan'
 import express from 'express'
@@ -138,7 +138,7 @@ export class Probot {
     this.server = createServer({ webhook: (this.webhook as any).middleware, logger })
 
     // Log all received webhooks
-    this.webhook.on('*', async (event: Webhooks.WebhookEvent<any>) => {
+    this.webhook.on('*', async (event: WebhookEvent) => {
       await this.receive(event)
     })
 
@@ -204,7 +204,7 @@ export class Probot {
     }
   }
 
-  public receive (event: Webhooks.WebhookEvent<any>) {
+  public receive (event: WebhookEvent) {
     this.logger.debug({ event }, 'Webhook received')
     return Promise.all(this.apps.map(app => app.receive(event)))
   }

@@ -9,7 +9,7 @@ describe('webhooks', () => {
   beforeEach(() => {
     logger = jest.fn()
 
-    probot = createProbot({ id: 1, cert: 'bexo🥪' })
+    probot = createProbot({ id: 1, cert: 'bexo🥪', secret: 'secret' })
     probot.logger.addStream({
       level: 'trace',
       stream: { write: logger } as any,
@@ -18,11 +18,13 @@ describe('webhooks', () => {
   })
 
   test('it works when all headers are properly passed onto the event', async () => {
+    const dataString = JSON.stringify(data)
+
     await request(probot.server)
       .post('/')
-      .send(data)
+      .send(dataString)
       .set('x-github-event', 'push')
-      .set('x-hub-signature', probot.webhook.sign(data))
+      .set('x-hub-signature', probot.webhook.sign(dataString))
       .set('x-github-delivery', '3sw4d5f6g7h8')
       .expect(200)
   })

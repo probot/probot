@@ -1,4 +1,4 @@
-import { Webhooks } from '@octokit/webhooks'
+import { EventPayloads, WebhookEvent } from '@octokit/webhooks'
 import express from 'express'
 import LRUCache from 'lru-cache'
 import { EventEmitter } from 'promise-events'
@@ -22,7 +22,7 @@ export interface Options {
 export type OnCallback<T> = (context: Context<T>) => Promise<void>
 
 // Some events can't get an authenticated client (#382):
-function isUnauthenticatedEvent (event: Webhooks.WebhookEvent<any>) {
+function isUnauthenticatedEvent (event: WebhookEvent) {
   return !event.payload.installation ||
     (event.name === 'installation' && event.payload.action === 'deleted')
 }
@@ -69,7 +69,7 @@ export class Application {
     return this
   }
 
-  public async receive (event: Webhooks.WebhookEvent<any>) {
+  public async receive (event: WebhookEvent) {
     return Promise.all([
       this.events.emit('*', event),
       this.events.emit(event.name, event),
@@ -143,7 +143,7 @@ export class Application {
       | 'check_run.created'
       | 'check_run.requested_action'
       | 'check_run.rerequested',
-    callback: OnCallback<Webhooks.WebhookPayloadCheckRun>
+    callback: OnCallback<EventPayloads.WebhookPayloadCheckRun>
   ): void
 
   public on (
@@ -152,52 +152,52 @@ export class Application {
       | 'check_suite.completed'
       | 'check_suite.requested'
       | 'check_suite.rerequested',
-    callback: OnCallback<Webhooks.WebhookPayloadCheckSuite>
+    callback: OnCallback<EventPayloads.WebhookPayloadCheckSuite>
   ): void
 
   public on (
     event: 'commit_comment' | 'commit_comment.created',
-    callback: OnCallback<Webhooks.WebhookPayloadCommitComment>
+    callback: OnCallback<EventPayloads.WebhookPayloadCommitComment>
   ): void
 
   public on (
     event: 'create',
-    callback: OnCallback<Webhooks.WebhookPayloadCreate>
+    callback: OnCallback<EventPayloads.WebhookPayloadCreate>
   ): void
 
   public on (
     event: 'delete',
-    callback: OnCallback<Webhooks.WebhookPayloadDelete>
+    callback: OnCallback<EventPayloads.WebhookPayloadDelete>
   ): void
 
   public on (
     event: 'deployment',
-    callback: OnCallback<Webhooks.WebhookPayloadDeployment>
+    callback: OnCallback<EventPayloads.WebhookPayloadDeployment>
   ): void
 
   public on (
     event: 'deployment_status',
-    callback: OnCallback<Webhooks.WebhookPayloadDeploymentStatus>
+    callback: OnCallback<EventPayloads.WebhookPayloadDeploymentStatus>
   ): void
 
   public on (
     event: 'fork',
-    callback: OnCallback<Webhooks.WebhookPayloadFork>
+    callback: OnCallback<EventPayloads.WebhookPayloadFork>
   ): void
 
   public on (
     event: 'github_app_authorization',
-    callback: OnCallback<Webhooks.WebhookPayloadGithubAppAuthorization>
+    callback: OnCallback<EventPayloads.WebhookPayloadGithubAppAuthorization>
   ): void
 
   public on (
     event: 'gollum',
-    callback: OnCallback<Webhooks.WebhookPayloadGollum>
+    callback: OnCallback<EventPayloads.WebhookPayloadGollum>
   ): void
 
   public on (
     event: 'installation' | 'installation.created' | 'installation.deleted',
-    callback: OnCallback<Webhooks.WebhookPayloadInstallation>
+    callback: OnCallback<EventPayloads.WebhookPayloadInstallation>
   ): void
 
   public on (
@@ -205,7 +205,7 @@ export class Application {
       | 'installation_repositories'
       | 'installation_repositories.added'
       | 'installation_repositories.removed',
-    callback: OnCallback<Webhooks.WebhookPayloadInstallationRepositories>
+    callback: OnCallback<EventPayloads.WebhookPayloadInstallationRepositories>
   ): void
 
   public on (
@@ -214,7 +214,7 @@ export class Application {
       | 'issue_comment.created'
       | 'issue_comment.deleted'
       | 'issue_comment.edited',
-    callback: OnCallback<Webhooks.WebhookPayloadIssueComment>
+    callback: OnCallback<EventPayloads.WebhookPayloadIssueComment>
   ): void
 
   public on (
@@ -232,12 +232,12 @@ export class Application {
       | 'issues.transferred'
       | 'issues.unassigned'
       | 'issues.unlabeled',
-    callback: OnCallback<Webhooks.WebhookPayloadIssues>
+    callback: OnCallback<EventPayloads.WebhookPayloadIssues>
   ): void
 
   public on (
     event: 'label' | 'label.created' | 'label.deleted' | 'label.edited',
-    callback: OnCallback<Webhooks.WebhookPayloadLabel>
+    callback: OnCallback<EventPayloads.WebhookPayloadLabel>
   ): void
 
   public on (
@@ -248,17 +248,17 @@ export class Application {
       | 'marketplace_purchase.pending_change'
       | 'marketplace_purchase.pending_change_cancelled'
       | 'marketplace_purchase.purchased',
-    callback: OnCallback<Webhooks.WebhookPayloadMarketplacePurchase>
+    callback: OnCallback<EventPayloads.WebhookPayloadMarketplacePurchase>
   ): void
 
   public on (
     event: 'member' | 'member.added' | 'member.deleted' | 'member.edited',
-    callback: OnCallback<Webhooks.WebhookPayloadMember>
+    callback: OnCallback<EventPayloads.WebhookPayloadMember>
   ): void
 
   public on (
     event: 'membership' | 'membership.added' | 'membership.removed',
-    callback: OnCallback<Webhooks.WebhookPayloadMembership>
+    callback: OnCallback<EventPayloads.WebhookPayloadMembership>
   ): void
 
   public on (
@@ -269,7 +269,7 @@ export class Application {
       | 'milestone.deleted'
       | 'milestone.edited'
       | 'milestone.opened',
-    callback: OnCallback<Webhooks.WebhookPayloadMilestone>
+    callback: OnCallback<EventPayloads.WebhookPayloadMilestone>
   ): void
 
   public on (
@@ -278,17 +278,17 @@ export class Application {
       | 'organization.member_added'
       | 'organization.member_invited'
       | 'organization.member_removed',
-    callback: OnCallback<Webhooks.WebhookPayloadOrganization>
+    callback: OnCallback<EventPayloads.WebhookPayloadOrganization>
   ): void
 
   public on (
     event: 'org_block' | 'org_block.blocked' | 'org_block.unblocked',
-    callback: OnCallback<Webhooks.WebhookPayloadOrgBlock>
+    callback: OnCallback<EventPayloads.WebhookPayloadOrgBlock>
   ): void
 
   public on (
     event: 'page_build',
-    callback: OnCallback<Webhooks.WebhookPayloadPageBuild>
+    callback: OnCallback<EventPayloads.WebhookPayloadPageBuild>
   ): void
 
   public on (
@@ -299,7 +299,7 @@ export class Application {
       | 'project_card.deleted'
       | 'project_card.edited'
       | 'project_card.moved',
-    callback: OnCallback<Webhooks.WebhookPayloadProjectCard>
+    callback: OnCallback<EventPayloads.WebhookPayloadProjectCard>
   ): void
 
   public on (
@@ -309,7 +309,7 @@ export class Application {
       | 'project_column.deleted'
       | 'project_column.edited'
       | 'project_column.moved',
-    callback: OnCallback<Webhooks.WebhookPayloadProjectColumn>
+    callback: OnCallback<EventPayloads.WebhookPayloadProjectColumn>
   ): void
 
   public on (
@@ -320,12 +320,12 @@ export class Application {
       | 'project.deleted'
       | 'project.edited'
       | 'project.reopened',
-    callback: OnCallback<Webhooks.WebhookPayloadProject>
+    callback: OnCallback<EventPayloads.WebhookPayloadProject>
   ): void
 
   public on (
     event: 'public',
-    callback: OnCallback<Webhooks.WebhookPayloadPublic>
+    callback: OnCallback<EventPayloads.WebhookPayloadPublic>
   ): void
 
   public on (
@@ -342,7 +342,7 @@ export class Application {
       | 'pull_request.unassigned'
       | 'pull_request.unlabeled'
       | 'pull_request.synchronize',
-    callback: OnCallback<Webhooks.WebhookPayloadPullRequest>
+    callback: OnCallback<EventPayloads.WebhookPayloadPullRequest>
   ): void
 
   public on (
@@ -351,7 +351,7 @@ export class Application {
       | 'pull_request_review.dismissed'
       | 'pull_request_review.edited'
       | 'pull_request_review.submitted',
-    callback: OnCallback<Webhooks.WebhookPayloadPullRequestReview>
+    callback: OnCallback<EventPayloads.WebhookPayloadPullRequestReview>
   ): void
 
   public on (
@@ -360,17 +360,17 @@ export class Application {
       | 'pull_request_review_comment.created'
       | 'pull_request_review_comment.deleted'
       | 'pull_request_review_comment.edited',
-    callback: OnCallback<Webhooks.WebhookPayloadPullRequestReviewComment>
+    callback: OnCallback<EventPayloads.WebhookPayloadPullRequestReviewComment>
   ): void
 
   public on (
     event: 'push',
-    callback: OnCallback<Webhooks.WebhookPayloadPush>
+    callback: OnCallback<EventPayloads.WebhookPayloadPush>
   ): void
 
   public on (
     event: 'release' | 'release.published',
-    callback: OnCallback<Webhooks.WebhookPayloadRelease>
+    callback: OnCallback<EventPayloads.WebhookPayloadRelease>
   ): void
 
   public on (
@@ -382,12 +382,12 @@ export class Application {
       | 'repository.privatized'
       | 'repository.publicized'
       | 'repository.unarchived',
-    callback: OnCallback<Webhooks.WebhookPayloadRepository>
+    callback: OnCallback<EventPayloads.WebhookPayloadRepository>
   ): void
 
   public on (
     event: 'repository_import',
-    callback: OnCallback<Webhooks.WebhookPayloadRepositoryImport>
+    callback: OnCallback<EventPayloads.WebhookPayloadRepositoryImport>
   ): void
 
   public on (
@@ -396,7 +396,7 @@ export class Application {
       | 'repository_vulnerability_alert.create'
       | 'repository_vulnerability_alert.dismiss'
       | 'repository_vulnerability_alert.resolve',
-    callback: OnCallback<Webhooks.WebhookPayloadRepositoryVulnerabilityAlert>
+    callback: OnCallback<EventPayloads.WebhookPayloadRepositoryVulnerabilityAlert>
   ): void
 
   public on (
@@ -405,12 +405,12 @@ export class Application {
       | 'security_advisory.performed'
       | 'security_advisory.published'
       | 'security_advisory.updated',
-    callback: OnCallback<Webhooks.WebhookPayloadSecurityAdvisory>
+    callback: OnCallback<EventPayloads.WebhookPayloadSecurityAdvisory>
   ): void
 
   public on (
     event: 'status',
-    callback: OnCallback<Webhooks.WebhookPayloadStatus>
+    callback: OnCallback<EventPayloads.WebhookPayloadStatus>
   ): void
 
   public on (
@@ -421,24 +421,24 @@ export class Application {
       | 'team.deleted'
       | 'team.edited'
       | 'team.removed_from_repository',
-    callback: OnCallback<Webhooks.WebhookPayloadTeam>
+    callback: OnCallback<EventPayloads.WebhookPayloadTeam>
   ): void
 
   public on (
     event: 'team_add',
-    callback: OnCallback<Webhooks.WebhookPayloadTeamAdd>
+    callback: OnCallback<EventPayloads.WebhookPayloadTeamAdd>
   ): void
 
   public on (
     event: 'watch' | 'watch.started',
-    callback: OnCallback<Webhooks.WebhookPayloadWatch>
+    callback: OnCallback<EventPayloads.WebhookPayloadWatch>
   ): void
   public on (eventName: string | string[], callback: OnCallback<any>): void
   public on (eventName: string | string[], callback: (context: Context) => Promise<void>) {
     if (typeof eventName === 'string') {
       void webhookEventCheck(this, eventName)
 
-      return this.events.on(eventName, async (event: Webhooks.WebhookEvent<any>) => {
+      return this.events.on(eventName, async (event: WebhookEvent) => {
         const log = this.log.child({ name: 'event', id: event.id })
 
         try {
@@ -513,7 +513,7 @@ export class Application {
     return new this.Octokit(options)
   }
 
-  private authenticateEvent (event: Webhooks.WebhookEvent<any>, log: LoggerWithTarget): Promise<InstanceType<typeof ProbotOctokit>> {
+  private authenticateEvent (event: WebhookEvent, log: LoggerWithTarget): Promise<InstanceType<typeof ProbotOctokit>> {
     if (this.githubToken) {
       return this.auth()
     }

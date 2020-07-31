@@ -1,5 +1,5 @@
 import { createAppAuth } from '@octokit/auth-app'
-import { Webhooks } from '@octokit/webhooks'
+import { WebhookEvent } from '@octokit/webhooks'
 
 import { Application } from '../src/application'
 import { Context } from '../src/context'
@@ -8,7 +8,7 @@ import { logger } from '../src/logger'
 
 describe('Application', () => {
   let app: Application
-  let event: Webhooks.WebhookEvent<any>
+  let event: WebhookEvent
   let output: any
 
   beforeAll(() => {
@@ -30,7 +30,7 @@ describe('Application', () => {
 
     event = {
       id: '123-456',
-      name: 'test',
+      name: 'ping',
       payload: {
         action: 'foo',
         installation: { id: 1 }
@@ -41,7 +41,7 @@ describe('Application', () => {
   describe('on', () => {
     it('calls callback when no action is specified', async () => {
       const spy = jest.fn()
-      app.on('test', spy)
+      app.on('ping', spy)
 
       expect(spy).toHaveBeenCalledTimes(0)
       await app.receive(event)
@@ -52,7 +52,7 @@ describe('Application', () => {
 
     it('calls callback with same action', async () => {
       const spy = jest.fn()
-      app.on('test.foo', spy)
+      app.on('ping.foo', spy)
 
       await app.receive(event)
       expect(spy).toHaveBeenCalled()
@@ -60,7 +60,7 @@ describe('Application', () => {
 
     it('does not call callback with different action', async () => {
       const spy = jest.fn()
-      app.on('test.nope', spy)
+      app.on('ping.nope', spy)
 
       await app.receive(event)
       expect(spy).toHaveBeenCalledTimes(0)
@@ -75,9 +75,9 @@ describe('Application', () => {
     })
 
     it('calls callback x amount of times when an array of x actions is passed', async () => {
-      const event2: Webhooks.WebhookEvent<any> = {
+      const event2: WebhookEvent = {
         id: '123',
-        name: 'arrayTest',
+        name: 'issues',
         payload: {
           action: 'bar',
           installation: { id: 2 }
@@ -85,7 +85,7 @@ describe('Application', () => {
       }
 
       const spy = jest.fn()
-      app.on(['test.foo', 'arrayTest.bar'], spy)
+      app.on(['ping.foo', 'issues.bar'], spy)
 
       await app.receive(event)
       await app.receive(event2)
@@ -103,7 +103,7 @@ describe('Application', () => {
         }))
       })
 
-      app.on('test', handler)
+      app.on('ping', handler)
       await app.receive(event)
       expect(handler).toHaveBeenCalled()
     })
@@ -149,11 +149,11 @@ describe('Application', () => {
     it('returns an authenticated client for events without an installation', async () => {
       event = {
         id: '123-456',
-        name: 'foobar',
+        name: 'check_run',
         payload: { /* no installation */ }
       }
 
-      app.on('foobar', async context => {
+      app.on('check_run', async context => {
         // no-op
       })
 
@@ -166,7 +166,7 @@ describe('Application', () => {
   describe('receive', () => {
     it('delivers the event', async () => {
       const spy = jest.fn()
-      app.on('test', spy)
+      app.on('ping', spy)
 
       await app.receive(event)
 
@@ -176,7 +176,7 @@ describe('Application', () => {
     it('waits for async events to resolve', async () => {
       const spy = jest.fn()
 
-      app.on('test', () => {
+      app.on('ping', () => {
         return new Promise(resolve => {
           setTimeout(() => {
             spy()
@@ -191,7 +191,7 @@ describe('Application', () => {
     })
 
     it('returns a reject errors thrown in apps', async () => {
-      app.on('test', () => {
+      app.on('ping', () => {
         throw new Error('error from app')
       })
 
@@ -207,7 +207,7 @@ describe('Application', () => {
   describe('load', () => {
     it('loads one app', async () => {
       const spy = jest.fn()
-      const myApp = (a: any) => a.on('test', spy)
+      const myApp = (a: any) => a.on('ping', spy)
 
       app.load(myApp)
       await app.receive(event)
@@ -217,8 +217,8 @@ describe('Application', () => {
     it('loads multiple apps', async () => {
       const spy = jest.fn()
       const spy2 = jest.fn()
-      const myApp = (a: any) => a.on('test', spy)
-      const myApp2 = (a: any) => a.on('test', spy2)
+      const myApp = (a: any) => a.on('ping', spy)
+      const myApp2 = (a: any) => a.on('ping', spy2)
 
       app.load([myApp, myApp2])
       await app.receive(event)
@@ -265,7 +265,7 @@ describe('Application', () => {
     })
 
     it('logs errors thrown from handlers', async () => {
-      app.on('test', () => {
+      app.on('ping', () => {
         throw error
       })
 
@@ -281,7 +281,7 @@ describe('Application', () => {
     })
 
     it('logs errors from rejected promises', async () => {
-      app.on('test', () => Promise.reject(error))
+      app.on('ping', () => Promise.reject(error))
 
       try {
         await app.receive(event)

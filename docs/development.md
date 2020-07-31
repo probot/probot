@@ -127,7 +127,7 @@ You'll need to create a test repository and install your app by clicking the "In
 
 **Other available scripts**
 * `$ npm start` to start your app without watching files.
-* `$ npm run lint` to lint your code using [standard](https://www.npmjs.com/package/standard).
+* `$ npm run lint` to lint your code using [Prettier](https://prettier.io/).
 
 ## Debugging
 

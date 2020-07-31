@@ -23,47 +23,47 @@
  * ```
  */
 
-import Logger from 'bunyan'
-import bunyanFormat from 'bunyan-format'
-import supportsColor from 'supports-color'
-import { serializers } from './serializers'
+import Logger from "bunyan";
+import bunyanFormat from "bunyan-format";
+import supportsColor from "supports-color";
+import { serializers } from "./serializers";
 
-function toBunyanLogLevel (level: string) {
+function toBunyanLogLevel(level: string) {
   switch (level) {
-    case 'info':
-    case 'trace':
-    case 'debug':
-    case 'warn':
-    case 'error':
-    case 'fatal':
+    case "info":
+    case "trace":
+    case "debug":
+    case "warn":
+    case "error":
+    case "fatal":
     case undefined:
-      return level
+      return level;
     default:
-      throw new Error('Invalid log level')
+      throw new Error("Invalid log level");
   }
 }
 
-function toBunyanFormat (format: string) {
+function toBunyanFormat(format: string) {
   switch (format) {
-    case 'short':
-    case 'long':
-    case 'simple':
-    case 'json':
-    case 'bunyan':
+    case "short":
+    case "long":
+    case "simple":
+    case "json":
+    case "bunyan":
     case undefined:
-      return format
+      return format;
     default:
-      throw new Error('Invalid log format')
+      throw new Error("Invalid log format");
   }
 }
 
 export const logger = new Logger({
-  level: toBunyanLogLevel(process.env.LOG_LEVEL || 'info'),
-  name: 'probot',
+  level: toBunyanLogLevel(process.env.LOG_LEVEL || "info"),
+  name: "probot",
   serializers,
   stream: new bunyanFormat({
     color: supportsColor.stdout,
     levelInString: !!process.env.LOG_LEVEL_IN_STRING,
-    outputMode: toBunyanFormat(process.env.LOG_FORMAT || 'short')
-  })
-})
+    outputMode: toBunyanFormat(process.env.LOG_FORMAT || "short"),
+  }),
+});

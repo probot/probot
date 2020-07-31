@@ -25,15 +25,9 @@
         "email": "noreply@github.com",
         "username": "web-flow"
       },
-      "added": [
-
-      ],
-      "removed": [
-
-      ],
-      "modified": [
-        "README.md"
-      ]
+      "added": [],
+      "removed": [],
+      "modified": ["README.md"]
     }
   ],
   "head_commit": {
@@ -53,15 +47,9 @@
       "email": "noreply@github.com",
       "username": "web-flow"
     },
-    "added": [
-
-    ],
-    "removed": [
-
-    ],
-    "modified": [
-      "README.md"
-    ]
+    "added": [],
+    "removed": [],
+    "modified": ["README.md"]
   },
   "repository": {
     "id": 68474533,

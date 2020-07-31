@@ -1,37 +1,39 @@
-import { EventPayloads, WebhookEvent } from '@octokit/webhooks'
-import bunyan from 'bunyan'
-import express from 'express'
+import { EventPayloads, WebhookEvent } from "@octokit/webhooks";
+import bunyan from "bunyan";
+import express from "express";
 
 export const serializers: bunyan.StdSerializers = {
-
   event: (event: WebhookEvent | any) => {
-    if (typeof event !== 'object' || !event.payload) {
-      return event
+    if (typeof event !== "object" || !event.payload) {
+      return event;
     } else {
-      let name = event.name
+      let name = event.name;
       if (event.payload && event.payload.action) {
-        name = `${name}.${event.payload.action}`
+        name = `${name}.${event.payload.action}`;
       }
 
       return {
         event: name,
         id: event.id,
-        installation: event.payload.installation && event.payload.installation.id,
-        repository: event.payload.repository && event.payload.repository.full_name
-      }
+        installation:
+          event.payload.installation && event.payload.installation.id,
+        repository:
+          event.payload.repository && event.payload.repository.full_name,
+      };
     }
   },
   installation: (installation: Installation) => {
     if (installation.account) {
-      return installation.account.login
+      return installation.account.login;
     } else {
-      return installation
+      return installation;
     }
   },
 
   err: bunyan.stdSerializers.err,
 
-  repository: (repository: EventPayloads.PayloadRepository) => repository.full_name,
+  repository: (repository: EventPayloads.PayloadRepository) =>
+    repository.full_name,
 
   req: bunyan.stdSerializers.req,
 
@@ -40,23 +42,23 @@ export const serializers: bunyan.StdSerializers = {
   // https://github.com/trentm/node-bunyan/blob/fe31b83e42d9c7f784e83fdcc528a7c76e0dacae/lib/bunyan.js#L1105-L1113
   res: (res: ExpressResponseWithDuration) => {
     if (!res || !res.statusCode) {
-      return res
+      return res;
     } else {
       return {
         duration: res.duration,
         headers: res.getHeaders(),
-        statusCode: res.statusCode
-      }
+        statusCode: res.statusCode,
+      };
     }
-  }
-}
+  },
+};
 
 interface Installation {
   account: {
-    login: string
-  }
+    login: string;
+  };
 }
 
 interface ExpressResponseWithDuration extends express.Response {
-  duration: any
+  duration: any;
 }

@@ -1,52 +1,52 @@
-import { Endpoints } from '@octokit/types'
-import { EventNames, EventPayloads, WebhookEvent } from '@octokit/webhooks'
-import merge from 'deepmerge'
-import yaml from 'js-yaml'
-import path from 'path'
+import { Endpoints } from "@octokit/types";
+import { EventNames, EventPayloads, WebhookEvent } from "@octokit/webhooks";
+import merge from "deepmerge";
+import yaml from "js-yaml";
+import path from "path";
 
-import { ProbotOctokit } from './github/octokit'
-import { LoggerWithTarget } from './wrap-logger'
+import { ProbotOctokit } from "./github/octokit";
+import { LoggerWithTarget } from "./wrap-logger";
 
-type ReposGetContentsParams = Endpoints['GET /repos/:owner/:repo/contents/:path']['parameters']
+type ReposGetContentsParams = Endpoints["GET /repos/:owner/:repo/contents/:path"]["parameters"];
 
-const CONFIG_PATH = '.github'
-const BASE_KEY = '_extends'
+const CONFIG_PATH = ".github";
+const BASE_KEY = "_extends";
 const BASE_REGEX = new RegExp(
-  '^' +
-  '(?:([a-z\\d](?:[a-z\\d]|-(?=[a-z\\d])){0,38})/)?' + // org
-  '([-_.\\w\\d]+)' + // project
-  '(?::([-_./\\w\\d]+\\.ya?ml))?' + // filename
-    '$',
-  'i'
-)
-const DEFAULT_BASE = '.github'
+  "^" +
+  "(?:([a-z\\d](?:[a-z\\d]|-(?=[a-z\\d])){0,38})/)?" + // org
+  "([-_.\\w\\d]+)" + // project
+  "(?::([-_./\\w\\d]+\\.ya?ml))?" + // filename
+    "$",
+  "i"
+);
+const DEFAULT_BASE = ".github";
 
-export type MergeOptions = merge.Options
+export type MergeOptions = merge.Options;
 
 interface WebhookPayloadWithRepository {
-  [key: string]: any
-  repository?: EventPayloads.PayloadRepository
+  [key: string]: any;
+  repository?: EventPayloads.PayloadRepository;
   issue?: {
-    [key: string]: any
-    number: number
-    html_url?: string
-    body?: string
-  }
+    [key: string]: any;
+    number: number;
+    html_url?: string;
+    body?: string;
+  };
   pull_request?: {
-    [key: string]: any
-    number: number
-    html_url?: string
-    body?: string
-  }
+    [key: string]: any;
+    number: number;
+    html_url?: string;
+    body?: string;
+  };
   sender?: {
-    [key: string]: any
-    type: string
-  }
-  action?: string
+    [key: string]: any;
+    type: string;
+  };
+  action?: string;
   installation?: {
-    id: number
-    [key: string]: any
-  }
+    id: number;
+    [key: string]: any;
+  };
 }
 
 /**
@@ -65,26 +65,31 @@ interface WebhookPayloadWithRepository {
  * @property {payload} payload - The webhook event payload
  * @property {logger} log - A logger
  */
-export class Context<E extends WebhookPayloadWithRepository = any> implements WebhookEvent<E> {
-  public name: EventNames.StringNames
-  public id: string
-  public payload: E
+export class Context<E extends WebhookPayloadWithRepository = any>
+  implements WebhookEvent<E> {
+  public name: EventNames.StringNames;
+  public id: string;
+  public payload: E;
 
-  public github: InstanceType<typeof ProbotOctokit>
-  public log: LoggerWithTarget
+  public github: InstanceType<typeof ProbotOctokit>;
+  public log: LoggerWithTarget;
 
-  constructor (event: WebhookEvent<E>, github: InstanceType<typeof ProbotOctokit>, log: LoggerWithTarget) {
-    this.name = event.name
-    this.id = event.id
-    this.payload = event.payload
+  constructor(
+    event: WebhookEvent<E>,
+    github: InstanceType<typeof ProbotOctokit>,
+    log: LoggerWithTarget
+  ) {
+    this.name = event.name;
+    this.id = event.id;
+    this.payload = event.payload;
 
-    this.github = github
-    this.log = log
+    this.github = github;
+    this.log = log;
   }
 
   // Maintain backward compatibility
-  public get event (): string {
-    return this.name
+  public get event(): string {
+    return this.name;
   }
 
   /**
@@ -99,17 +104,22 @@ export class Context<E extends WebhookPayloadWithRepository = any> implements We
    * @param object - Params to be merged with the repo params.
    *
    */
-  public repo<T> (object?: T) {
-    const repo = this.payload.repository
+  public repo<T>(object?: T) {
+    const repo = this.payload.repository;
 
     if (!repo) {
-      throw new Error('context.repo() is not supported for this webhook event.')
+      throw new Error(
+        "context.repo() is not supported for this webhook event."
+      );
     }
 
-    return Object.assign({
-      owner: repo.owner.login || repo.owner.name!,
-      repo: repo.name
-    }, object)
+    return Object.assign(
+      {
+        owner: repo.owner.login || repo.owner.name!,
+        repo: repo.name,
+      },
+      object
+    );
   }
 
   /**
@@ -124,11 +134,14 @@ export class Context<E extends WebhookPayloadWithRepository = any> implements We
    *
    * @param object - Params to be merged with the issue params.
    */
-  public issue<T> (object?: T) {
-    const payload = this.payload
-    return Object.assign({
-      issue_number: (payload.issue || payload.pull_request || payload).number
-    }, this.repo(object))
+  public issue<T>(object?: T) {
+    const payload = this.payload;
+    return Object.assign(
+      {
+        issue_number: (payload.issue || payload.pull_request || payload).number,
+      },
+      this.repo(object)
+    );
   }
 
   /**
@@ -143,19 +156,22 @@ export class Context<E extends WebhookPayloadWithRepository = any> implements We
    *
    * @param object - Params to be merged with the pull request params.
    */
-  public pullRequest<T> (object?: T) {
-    const payload = this.payload
-    return Object.assign({
-      pull_number: (payload.issue || payload.pull_request || payload).number
-    }, this.repo(object))
+  public pullRequest<T>(object?: T) {
+    const payload = this.payload;
+    return Object.assign(
+      {
+        pull_number: (payload.issue || payload.pull_request || payload).number,
+      },
+      this.repo(object)
+    );
   }
 
   /**
    * Returns a boolean if the actor on the event was a bot.
    * @type {boolean}
    */
-  get isBot () {
-    return this.payload.sender!.type === 'Bot'
+  get isBot() {
+    return this.payload.sender!.type === "Bot";
   }
 
   /**
@@ -204,38 +220,42 @@ export class Context<E extends WebhookPayloadWithRepository = any> implements We
    * @param deepMergeOptions - Controls merging configs (from the [deepmerge](https://github.com/TehShrike/deepmerge) module)
    * @return Configuration object read from the file
    */
-  public async config<T> (fileName: string, defaultConfig?: T, deepMergeOptions?: MergeOptions): Promise<T | null> {
-    const params = this.repo({ path: path.posix.join(CONFIG_PATH, fileName) })
+  public async config<T>(
+    fileName: string,
+    defaultConfig?: T,
+    deepMergeOptions?: MergeOptions
+  ): Promise<T | null> {
+    const params = this.repo({ path: path.posix.join(CONFIG_PATH, fileName) });
 
-    const config = await this.loadYaml(params)
+    const config = await this.loadYaml(params);
 
-    let baseRepo
+    let baseRepo;
     if (config == null) {
-      baseRepo = DEFAULT_BASE
+      baseRepo = DEFAULT_BASE;
     } else if (config != null && BASE_KEY in config) {
-      baseRepo = config[BASE_KEY]
-      delete config[BASE_KEY]
+      baseRepo = config[BASE_KEY];
+      delete config[BASE_KEY];
     }
 
-    let baseConfig
+    let baseConfig;
     if (baseRepo) {
-      if (typeof baseRepo !== 'string') {
-        throw new Error(`Invalid repository name in key "${BASE_KEY}"`)
+      if (typeof baseRepo !== "string") {
+        throw new Error(`Invalid repository name in key "${BASE_KEY}"`);
       }
 
-      const baseParams = this.getBaseParams(params, baseRepo)
-      baseConfig = await this.loadYaml(baseParams)
+      const baseParams = this.getBaseParams(params, baseRepo);
+      baseConfig = await this.loadYaml(baseParams);
     }
 
     if (config == null && baseConfig == null && !defaultConfig) {
-      return null
+      return null;
     }
 
-    return merge.all(
+    return (merge.all(
       // filter out null configs
-      [defaultConfig, baseConfig, config].filter(conf => conf),
+      [defaultConfig, baseConfig, config].filter((conf) => conf),
       deepMergeOptions
-    ) as unknown as T
+    ) as unknown) as T;
   }
 
   /**
@@ -244,32 +264,39 @@ export class Context<E extends WebhookPayloadWithRepository = any> implements We
    * @param params Params to fetch the file with
    * @return The parsed YAML file
    */
-  private async loadYaml<T> (params: ReposGetContentsParams): Promise<any> {
+  private async loadYaml<T>(params: ReposGetContentsParams): Promise<any> {
     try {
       // https://docs.github.com/en/rest/reference/repos#get-repository-content
-      const response = await this.github.request('GET /repos/{owner}/{repo}/contents/{path}', params)
+      const response = await this.github.request(
+        "GET /repos/{owner}/{repo}/contents/{path}",
+        params
+      );
 
       // Ignore in case path is a folder
       // - https://developer.github.com/v3/repos/contents/#response-if-content-is-a-directory
       if (Array.isArray(response.data)) {
-        return null
+        return null;
       }
 
       // we don't handle symlinks or submodule
       // - https://developer.github.com/v3/repos/contents/#response-if-content-is-a-symlink
       // - https://developer.github.com/v3/repos/contents/#response-if-content-is-a-submodule
       // tslint:disable-next-line
-      if (typeof response.data.content !== 'string') {
-        return
+      if (typeof response.data.content !== "string") {
+        return;
       }
 
-      return yaml.safeLoad(Buffer.from(response.data.content, 'base64').toString()) || {}
+      return (
+        yaml.safeLoad(
+          Buffer.from(response.data.content, "base64").toString()
+        ) || {}
+      );
     } catch (e) {
       if (e.status === 404) {
-        return null
+        return null;
       }
 
-      throw e
+      throw e;
     }
   }
 
@@ -283,16 +310,19 @@ export class Context<E extends WebhookPayloadWithRepository = any> implements We
    * @param base A string specifying the base repository
    * @return The params of the base configuration
    */
-  private getBaseParams (params: ReposGetContentsParams, base: string): ReposGetContentsParams {
-    const match = base.match(BASE_REGEX)
+  private getBaseParams(
+    params: ReposGetContentsParams,
+    base: string
+  ): ReposGetContentsParams {
+    const match = base.match(BASE_REGEX);
     if (match === null) {
-      throw new Error(`Invalid repository name in key "${BASE_KEY}": ${base}`)
+      throw new Error(`Invalid repository name in key "${BASE_KEY}": ${base}`);
     }
 
     return {
       owner: match[1] || params.owner,
       path: match[3] || params.path,
-      repo: match[2]
-    }
+      repo: match[2],
+    };
   }
 }

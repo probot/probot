@@ -1,19 +1,19 @@
 // tslint:disable-next-line
-import type { Octokit } from '@octokit/core'
+import type { Octokit } from "@octokit/core";
 
-export function requestLogging (octokit: Octokit) {
-  octokit.hook.error('request', (error, options) => {
-    const { method, url, ...params } = options
-    const msg = `GitHub request: ${method} ${url} - ${error.status}`
+export function requestLogging(octokit: Octokit) {
+  octokit.hook.error("request", (error, options) => {
+    const { method, url, ...params } = options;
+    const msg = `GitHub request: ${method} ${url} - ${error.status}`;
     // @ts-ignore log.debug is a bunyan log method and accepts a fields object
-    octokit.log.debug({ params }, msg)
-    throw error
-  })
+    octokit.log.debug({ params }, msg);
+    throw error;
+  });
 
-  octokit.hook.after('request', (result, options) => {
-    const { method, url, ...params } = options
-    const msg = `GitHub request: ${method} ${url} - ${result.status}`
+  octokit.hook.after("request", (result, options) => {
+    const { method, url, ...params } = options;
+    const msg = `GitHub request: ${method} ${url} - ${result.status}`;
     // @ts-ignore log.debug is a bunyan log method and accepts a fields object
-    octokit.log.debug({ params }, msg)
-  })
+    octokit.log.debug({ params }, msg);
+  });
 }

@@ -1,9 +1,14 @@
-import { ErrorRequestHandler, NextFunction } from 'express'
-import { Request, Response } from './logging'
+import { ErrorRequestHandler, NextFunction } from "express";
+import { Request, Response } from "./logging";
 
-export const logRequestErrors: ErrorRequestHandler = (err: Error, req: Request, res: Response, next: NextFunction): void => {
+export const logRequestErrors: ErrorRequestHandler = (
+  err: Error,
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
   if (req.log) {
-    req.log.error(err)
+    req.log.error(err);
   }
-  next()
-}
+  next();
+};

@@ -8,7 +8,7 @@ Please note that this project is released with a [Contributor Code of Conduct][c
 
 1. [Fork][fork] and clone the repository
 1. Configure and install the dependencies: `npm install`
-1. Make sure the tests pass on your machine: `npm test`, note: these tests also apply the [linter][linter] and run the TypeScript compiler (`tsc`) to check for type errors, so there's no need to run these commands separately.
+1. Make sure the tests pass on your machine: `npm test`, note: these tests also run the TypeScript compiler (`tsc`) to check for type errors, so there's no need to run these commands separately.
 1. Create a new branch: `git checkout -b my-branch-name`
 1. Make your change, add tests, and make sure the tests still pass
 1. Push to your fork and [submit a pull request][pr]
@@ -16,7 +16,7 @@ Please note that this project is released with a [Contributor Code of Conduct][c
 
 Here are a few things you can do that will increase the likelihood of your pull request being accepted:
 
-- Follow the [style guide][style] which is using standard. Any linting errors should be shown when running `npm test`
+- Follow the [style guide][style] which is using Prettier. Any linting errors should be shown when running `npm test`
 - Write and update tests.
 - Keep your change as focused as possible. If there are multiple changes you would like to make that are not dependent upon each other, consider submitting them as separate pull requests.
 - Write a [good commit message](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html).
@@ -32,7 +32,7 @@ The following three commit message conventions determine which version is releas
 
 1. `fix: ...` or `fix(scope name): ...` prefix in subject: bumps fix version, e.g. `1.2.3` → `1.2.4`
 2. `feat: ...` or `feat(scope name): ...` prefix in subject: bumps feature version, e.g. `1.2.3` → `1.3.0`
-3. `BREAKING CHANGE: ` in body: bumps breaking version, e.g. `1.2.3` → `2.0.0`
+3. `BREAKING CHANGE:` in body: bumps breaking version, e.g. `1.2.3` → `2.0.0`
 
 Only one version number is bumped at a time, the highest version change trumps the others. Besides publishing a new version to npm, semantic-release also creates a git tag and release on GitHub, generates changelogs from the commit messages and puts them into the release notes.
 
@@ -57,7 +57,7 @@ Use [this search][good-first-issue-search] to find Probot apps that have issues 
 
 [fork]: https://github.com/probot/probot/fork
 [pr]: https://github.com/probot/probot/compare
-[style]: https://standardjs.com/
+[style]: https://prettier.io/
 [code-of-conduct]: CODE_OF_CONDUCT.md
 [good-first-issue-search]: https://github.com/search?utf8=%E2%9C%93&q=topic%3Aprobot+topic%3Aprobot-app+good-first-issues%3A%3E0&type=
 [linter]: https://github.com/probot/probot/blob/ts-readme/tslint.json

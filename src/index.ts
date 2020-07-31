@@ -18,6 +18,7 @@ import Logger from "bunyan";
 import express from "express";
 import Redis from "ioredis";
 import LRUCache from "lru-cache";
+import { Deprecation } from "deprecation";
 
 import { Server } from "http";
 import { Application } from "./application";
@@ -312,7 +313,14 @@ export class Probot {
   }
 }
 
-export const createProbot = (options: Options) => new Probot(options);
+export const createProbot = (options: Options) => {
+  console.warn(
+    new Deprecation(
+      `[probot] "createProbot(options)" is deprecated, use "new Probot(options)" instead`
+    )
+  );
+  return new Probot(options);
+};
 
 export type ApplicationFunction = (app: Application) => void;
 

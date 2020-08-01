@@ -1,5 +1,5 @@
 import request from "supertest";
-import { createProbot, Probot } from "../../src";
+import { Probot } from "../../src";
 import * as data from "../fixtures/webhook/push.json";
 
 describe("webhooks", () => {
@@ -9,7 +9,7 @@ describe("webhooks", () => {
   beforeEach(() => {
     logger = jest.fn();
 
-    probot = createProbot({ id: 1, cert: "bexo🥪", secret: "secret" });
+    probot = new Probot({ id: 1, cert: "bexo🥪", secret: "secret" });
     probot.logger.addStream({
       level: "trace",
       stream: { write: logger } as any,

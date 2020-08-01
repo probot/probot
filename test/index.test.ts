@@ -3,7 +3,7 @@ import Bottleneck from "bottleneck";
 import { NextFunction, Request, Response } from "express";
 import request = require("supertest");
 
-import { Application, createProbot, Probot } from "../src";
+import { Application, Probot } from "../src";
 import { ProbotOctokit } from "../src/github/octokit";
 
 import path = require("path");
@@ -29,7 +29,7 @@ describe("Probot", () => {
   };
 
   beforeEach(() => {
-    probot = createProbot({ githubToken: "faketoken" });
+    probot = new Probot({ githubToken: "faketoken" });
 
     event = {
       id: "0",
@@ -40,9 +40,9 @@ describe("Probot", () => {
 
   it("constructor", () => {
     // probot with token. Should not throw
-    createProbot({ githubToken: "faketoken" });
+    new Probot({ githubToken: "faketoken" });
     // probot with id/cert
-    createProbot({ id, cert });
+    new Probot({ id, cert });
   });
 
   describe("run", () => {
@@ -236,7 +236,7 @@ describe("Probot", () => {
     });
 
     it("allows users to configure webhook paths", async () => {
-      probot = createProbot({
+      probot = new Probot({
         webhookPath: "/webhook",
         githubToken: "faketoken",
       });
@@ -316,14 +316,14 @@ describe("Probot", () => {
         );
       };
 
-      createProbot({}).load(appFn);
+      new Probot({}).load(appFn);
     });
 
     it("throws if the GHE host includes a protocol", async () => {
       process.env.GHE_HOST = "https://notreallygithub.com";
 
       try {
-        createProbot({ id, cert });
+        new Probot({ id, cert });
       } catch (e) {
         expect(e).toMatchSnapshot();
       }
@@ -349,14 +349,14 @@ describe("Probot", () => {
         );
       };
 
-      createProbot({}).load(appFn);
+      new Probot({}).load(appFn);
     });
 
     it("throws if the GHE host includes a protocol", async () => {
       process.env.GHE_HOST = "http://notreallygithub.com";
 
       try {
-        createProbot({ id, cert });
+        new Probot({ id, cert });
       } catch (e) {
         expect(e).toMatchSnapshot();
       }
@@ -373,7 +373,7 @@ describe("Probot", () => {
     });
 
     it("sets throttleOptions", async () => {
-      probot = createProbot({
+      probot = new Probot({
         webhookPath: "/webhook",
         githubToken: "faketoken",
       });
@@ -390,7 +390,7 @@ describe("Probot", () => {
       const redisConfig = {
         host: "test",
       };
-      probot = createProbot({
+      probot = new Probot({
         webhookPath: "/webhook",
         githubToken: "faketoken",
         redisConfig,
@@ -411,7 +411,7 @@ describe("Probot", () => {
         };
       });
 
-      probot = createProbot({
+      probot = new Probot({
         Octokit: MyOctokit,
         githubToken: "faketoken",
       });
@@ -434,7 +434,7 @@ describe("Probot", () => {
       // block port 3001
       const http = require("http");
       const blockade = http.createServer().listen(3001, () => {
-        const testApp = createProbot({ port: 3001 });
+        const testApp = new Probot({ port: 3001 });
         testApp.logger.error = jest.fn();
 
         const server = testApp.start().addListener("error", () => {
@@ -449,7 +449,7 @@ describe("Probot", () => {
 
     it("should listen to port when not in use", (next) => {
       expect.assertions(1);
-      const testApp = createProbot({ port: 3001, webhookProxy: undefined });
+      const testApp = new Probot({ port: 3001, webhookProxy: undefined });
       testApp.logger.info = jest.fn();
       const server = testApp.start().on("listening", () => {
         expect(testApp.logger.info).toHaveBeenCalledWith(
@@ -470,7 +470,7 @@ describe("Probot", () => {
       // block port 3001
       const http = require("http");
       const blockade = http.createServer().listen(3001, () => {
-        const testApp = createProbot({ port: 3001 });
+        const testApp = new Probot({ port: 3001 });
         testApp.logger.error = jest.fn();
 
         const server = testApp.start().addListener("error", () => {
@@ -485,7 +485,7 @@ describe("Probot", () => {
 
     it("should listen to port when not in use", (next) => {
       expect.assertions(1);
-      const testApp = createProbot({ port: 3001, webhookProxy: undefined });
+      const testApp = new Probot({ port: 3001, webhookProxy: undefined });
       testApp.logger.info = jest.fn();
       const server = testApp.start().on("listening", () => {
         expect(testApp.logger.info).toHaveBeenCalledWith(

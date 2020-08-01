@@ -71,13 +71,13 @@ describe("Probot", () => {
       });
       expect(probot.options).toMatchSnapshot();
       expect(initialized).toBeTruthy();
-      probot.httpServer!.close();
+      probot.stop();
     });
 
     it("runs with an array of strings", async () => {
       probot = await Probot.run(["run", "file.js"]);
       expect(probot.options).toMatchSnapshot();
-      probot.httpServer!.close();
+      probot.stop();
     });
 
     it("runs without config and loads the setup app", async () => {
@@ -88,7 +88,7 @@ describe("Probot", () => {
       });
       expect(probot.options).toMatchSnapshot();
       expect(initialized).toBeFalsy();
-      probot.httpServer!.close();
+      probot.stop();
     });
   });
 

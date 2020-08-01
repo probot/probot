@@ -126,7 +126,6 @@ export class Probot {
   }
 
   public server: express.Application;
-  public httpServer?: Server;
   public webhook: Webhooks;
   public logger: Logger;
 
@@ -134,6 +133,7 @@ export class Probot {
   public options: Options;
   public throttleOptions: any;
 
+  private httpServer?: Server;
   private apps: Application[];
   private githubToken?: string;
   private Octokit: typeof ProbotOctokit;
@@ -288,7 +288,7 @@ export class Probot {
   }
 
   public start() {
-    return (this.httpServer = this.server
+    this.httpServer = this.server
       .listen(this.options.port, () => {
         if (this.options.webhookProxy) {
           createWebhookProxy({
@@ -309,7 +309,15 @@ export class Probot {
           logger.error(err);
         }
         process.exit(1);
-      }));
+      });
+
+    return this.httpServer;
+  }
+
+  public stop() {
+    if (!this.httpServer) return;
+
+    this.httpServer.close();
   }
 }
 

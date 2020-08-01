@@ -31,6 +31,7 @@ import { findPrivateKey } from "./private-key";
 import { resolve } from "./resolver";
 import { createServer } from "./server";
 import { createWebhookProxy } from "./webhook-proxy";
+import { errorHandler } from "./error-handler";
 
 // tslint:disable:no-var-requires
 const defaultAppFns: ApplicationFunction[] = [
@@ -169,7 +170,7 @@ export class Probot {
     });
 
     // Log all webhook errors
-    this.webhook.on("error", this.errorHandler);
+    this.webhook.on("error", errorHandler);
 
     if (options.redisConfig || process.env.REDIS_URL) {
       let client;
@@ -225,26 +226,6 @@ export class Probot {
     this.octokit = new Octokit(defaultOptions);
   }
 
-  public errorHandler(err: Error) {
-    const errMessage = (err.message || "").toLowerCase();
-    if (errMessage.includes("x-hub-signature")) {
-      logger.error(
-        { err },
-        "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable."
-      );
-    } else if (
-      errMessage.includes("pem") ||
-      errMessage.includes("json web token")
-    ) {
-      logger.error(
-        { err },
-        "Your private key (usually a .pem file) is not correct. Go to https://github.com/settings/apps/YOUR_APP and generate a new PEM file. If you're deploying to Now, visit https://probot.github.io/docs/deployment/#now."
-      );
-    } else {
-      logger.error(err);
-    }
-  }
-
   public receive(event: WebhookEvent) {
     this.logger.debug({ event }, "Webhook received");
     return Promise.all(this.apps.map((app) => app.receive(event)));
@@ -275,10 +256,7 @@ export class Probot {
 
   public setup(appFns: Array<string | ApplicationFunction>) {
     // Log all unhandled rejections
-    (process as NodeJS.EventEmitter).on(
-      "unhandledRejection",
-      this.errorHandler
-    );
+    (process as NodeJS.EventEmitter).on("unhandledRejection", errorHandler);
 
     // Load the given appFns along with the default ones
     appFns.concat(defaultAppFns).forEach((appFn) => this.load(appFn));

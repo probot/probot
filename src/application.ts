@@ -45,8 +45,8 @@ export class Application {
   private Octokit: typeof ProbotOctokit;
   private octokit: InstanceType<typeof ProbotOctokit>;
 
-  constructor(options?: Options) {
-    const opts = options || ({} as any);
+  constructor(options: Options) {
+    const opts = options;
     this.events = new EventEmitter();
     this.log = wrapLogger(logger, logger);
     this.cache = opts.cache;

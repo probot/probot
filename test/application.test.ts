@@ -1,4 +1,3 @@
-import { createAppAuth } from "@octokit/auth-app";
 import { WebhookEvent } from "@octokit/webhooks";
 
 import { Application } from "../src/application";
@@ -25,7 +24,7 @@ describe("Application", () => {
     // Clear log output
     output = [];
 
-    app = new Application({} as any);
+    app = new Application({});
     app.auth = jest.fn().mockReturnValue({});
 
     event = {
@@ -235,19 +234,16 @@ describe("Application", () => {
     it("throttleOptions", async () => {
       const testApp = new Application({
         Octokit: ProbotOctokit.plugin((octokit: any, options: any) => {
-          expect(options.throttle.id).toBe(1);
-          expect(options.throttle.foo).toBe("bar");
-
           return {
             pluginLoaded: true,
+            test() {
+              expect(options.throttle.id).toBe(1);
+              expect(options.throttle.foo).toBe("bar");
+            },
           };
-        }).defaults({
-          authStrategy: createAppAuth,
-          auth: {
-            id: 1,
-            cert: "cert",
-          },
         }),
+        id: 1,
+        cert: "cert",
         throttleOptions: {
           foo: "bar",
           onAbuseLimit: () => true,
@@ -257,6 +253,7 @@ describe("Application", () => {
 
       const result = await testApp.auth(1);
       expect(result.pluginLoaded).toEqual(true);
+      result.test();
     });
   });
 

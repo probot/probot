@@ -148,29 +148,32 @@ export class Probot {
       );
     }
 
+    //
+    // Probot class-specific options (Express server & Webhooks)
+    //
     options.webhookPath = options.webhookPath || "/";
     options.secret = options.secret || "development";
-    this.options = options;
     this.logger = logger;
     this.apps = [];
     this.webhook = new Webhooks({
       path: options.webhookPath,
       secret: options.secret,
     });
-    this.githubToken = options.githubToken;
-
+    this.webhook.on("*", async (event: WebhookEvent) => {
+      await this.receive(event);
+    });
+    this.webhook.on("error", errorHandler);
     this.server = createServer({
       webhook: (this.webhook as any).middleware,
       logger,
     });
 
-    // Log all received webhooks
-    this.webhook.on("*", async (event: WebhookEvent) => {
-      await this.receive(event);
-    });
-
-    // Log all webhook errors
-    this.webhook.on("error", errorHandler);
+    //
+    // TODO: These are the same for both the Probot class and
+    //       the Application class and should be abstracted away
+    //
+    this.options = options;
+    this.githubToken = options.githubToken;
 
     if (options.redisConfig || process.env.REDIS_URL) {
       let client;
@@ -311,15 +314,18 @@ export const createProbot = (options: Options) => {
 export type ApplicationFunction = (app: Application) => void;
 
 export interface Options {
-  webhookPath?: string;
-  secret?: string;
-  id?: number;
+  // same options as Application class
   cert?: string;
   githubToken?: string;
-  webhookProxy?: string;
-  port?: number;
-  redisConfig?: Redis.RedisOptions;
+  id?: number;
   Octokit?: typeof ProbotOctokit;
+  redisConfig?: Redis.RedisOptions;
+
+  // Probot class-specific options
+  port?: number;
+  secret?: string;
+  webhookPath?: string;
+  webhookProxy?: string;
 }
 
 export { Logger, Context, Application, ProbotOctokit, ProbotOctokitCore };

@@ -1,5 +1,8 @@
+import { createAppAuth } from "@octokit/auth-app";
 import { EventPayloads, WebhookEvent } from "@octokit/webhooks";
+import Bottleneck from "bottleneck";
 import express from "express";
+import Redis from "ioredis";
 import LRUCache from "lru-cache";
 import { EventEmitter } from "promise-events";
 
@@ -11,12 +14,20 @@ import webhookEventCheck from "./webhook-event-check";
 import { LoggerWithTarget, wrapLogger } from "./wrap-logger";
 
 export interface Options {
-  cache: LRUCache<number, string>;
-  router?: express.Router;
+  // same options as Probot class
+  cert?: string;
   githubToken?: string;
-  throttleOptions?: any;
+  id?: number;
   Octokit?: typeof ProbotOctokit;
-  octokit: InstanceType<typeof ProbotOctokit>;
+  redisConfig?: Redis.RedisOptions;
+
+  // Application class specific options
+  cache?: LRUCache<number, string>;
+  octokit?: InstanceType<typeof ProbotOctokit>;
+  throttleOptions?: any;
+
+  // TODO: what is this for?
+  router?: express.Router;
 }
 
 export type OnCallback<T> = (context: Context<T>) => Promise<void>;
@@ -47,14 +58,67 @@ export class Application {
 
   constructor(options: Options) {
     const opts = options;
+
     this.events = new EventEmitter();
     this.log = wrapLogger(logger, logger);
-    this.cache = opts.cache;
+
     this.router = opts.router || express.Router(); // you can do this?
     this.githubToken = opts.githubToken;
-    this.throttleOptions = opts.throttleOptions;
-    this.Octokit = opts.Octokit || ProbotOctokit;
-    this.octokit = opts.octokit;
+
+    if (opts.throttleOptions) {
+      this.throttleOptions = opts.throttleOptions;
+    } else if (options.redisConfig || process.env.REDIS_URL) {
+      let client;
+      if (options.redisConfig) {
+        client = new Redis(options.redisConfig);
+      } else if (process.env.REDIS_URL) {
+        client = new Redis(process.env.REDIS_URL);
+      }
+      const connection = new Bottleneck.IORedisConnection({ client });
+      connection.on("error", logger.error);
+
+      this.throttleOptions = {
+        Bottleneck,
+        connection,
+      };
+    }
+
+    const Octokit = options.Octokit || ProbotOctokit;
+
+    // TODO: support redis backend for access token cache if `options.redisConfig || process.env.REDIS_URL`
+    this.cache = new LRUCache<number, string>({
+      // cache max. 15000 tokens, that will use less than 10mb memory
+      max: 15000,
+      // Cache for 1 minute less than GitHub expiry
+      maxAge: Number(process.env.INSTALLATION_TOKEN_TTL) || 1000 * 60 * 59,
+    });
+
+    const authOptions = this.githubToken
+      ? { auth: this.githubToken }
+      : {
+          auth: {
+            cache: this.cache,
+            id: options.id,
+            privateKey: options.cert,
+          },
+          authStrategy: createAppAuth,
+        };
+    const defaultOptions = {
+      baseUrl:
+        process.env.GHE_HOST &&
+        `${process.env.GHE_PROTOCOL || "https"}://${
+          process.env.GHE_HOST
+        }/api/v3`,
+      ...authOptions,
+    };
+
+    this.Octokit = Octokit.defaults((instanceOptions: any) => {
+      return Object.assign({}, defaultOptions, instanceOptions, {
+        auth: Object.assign({}, defaultOptions.auth, instanceOptions.auth),
+      });
+    });
+
+    this.octokit = opts.octokit || new Octokit(defaultOptions);
   }
 
   /**

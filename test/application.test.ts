@@ -243,7 +243,7 @@ describe("Application", () => {
           };
         }),
         id: 1,
-        cert: "cert",
+        privateKey: "private key",
         throttleOptions: {
           foo: "bar",
           onAbuseLimit: () => true,

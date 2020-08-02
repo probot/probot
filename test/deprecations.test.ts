@@ -39,4 +39,18 @@ describe("Deprecations", () => {
       )
     );
   });
+
+  it("new Probot({ cert })", () => {
+    new Probot({
+      id: 1,
+      cert: "private key",
+    });
+
+    expect(consoleWarn).toHaveBeenCalledTimes(1);
+    expect(consoleWarn).toHaveBeenCalledWith(
+      new Deprecation(
+        `[probot] "cert" option is deprecated. Use "privateKey" instead`
+      )
+    );
+  });
 });

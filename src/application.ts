@@ -15,7 +15,7 @@ import { LoggerWithTarget, wrapLogger } from "./wrap-logger";
 
 export interface Options {
   // same options as Probot class
-  cert?: string;
+  privateKey?: string;
   githubToken?: string;
   id?: number;
   Octokit?: typeof ProbotOctokit;
@@ -99,7 +99,7 @@ export class Application {
           auth: {
             cache: this.cache,
             id: options.id,
-            privateKey: options.cert,
+            privateKey: options.privateKey,
           },
           authStrategy: createAppAuth,
         };

@@ -9,7 +9,7 @@ describe("webhooks", () => {
   beforeEach(() => {
     logger = jest.fn();
 
-    probot = new Probot({ id: 1, cert: "bexo🥪", secret: "secret" });
+    probot = new Probot({ id: 1, privateKey: "bexo🥪", secret: "secret" });
     probot.logger.addStream({
       level: "trace",
       stream: { write: logger } as any,

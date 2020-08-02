@@ -6,7 +6,9 @@ exports[`Probot ghe support with http throws if the GHE host includes a protocol
 
 exports[`Probot run runs with a function as argument 1`] = `
 Object {
-  "cert": "-----BEGIN RSA PRIVATE KEY-----
+  "id": 1,
+  "port": 3003,
+  "privateKey": "-----BEGIN RSA PRIVATE KEY-----
 MIIJKAIBAAKCAgEAu0E+tR6wfOAJZ4lASzRUmvorCgbI5nQyvZl3WLu6ko2pcEnq
 1t1/W/Yaovt9W8eMFVfoFXKhsHOAM5dFlktxOlcaUQiRYSO7fBbZYVNYoawnCRqD
 HKQ1oKC6B23EKfW5NH8NLaI/+QJFG7fpr0P4HkHghLsOe7rIUDt7EjRsSSRhM2+Y
@@ -58,8 +60,6 @@ bHNB2yFIuUmmT92T7Pw28wJZ6Wd/3T+5s4CBe+FWplQcgquPGIFkq4dVxPpVg6uq
 wB98bfAGtcuCZWzgjgL67CS0pcNxadFA/TFo/NnynLBC4qRXSfFslKVE+Og=
 -----END RSA PRIVATE KEY-----
 ",
-  "id": 1,
-  "port": 3003,
   "secret": "secret",
   "webhookPath": "/",
   "webhookProxy": "https://smee.io/EfHXC9BFfGAxbM6J",
@@ -68,7 +68,9 @@ wB98bfAGtcuCZWzgjgL67CS0pcNxadFA/TFo/NnynLBC4qRXSfFslKVE+Og=
 
 exports[`Probot run runs with an array of strings 1`] = `
 Object {
-  "cert": "-----BEGIN RSA PRIVATE KEY-----
+  "id": "1",
+  "port": "3003",
+  "privateKey": "-----BEGIN RSA PRIVATE KEY-----
 MIIJKAIBAAKCAgEAu0E+tR6wfOAJZ4lASzRUmvorCgbI5nQyvZl3WLu6ko2pcEnq
 1t1/W/Yaovt9W8eMFVfoFXKhsHOAM5dFlktxOlcaUQiRYSO7fBbZYVNYoawnCRqD
 HKQ1oKC6B23EKfW5NH8NLaI/+QJFG7fpr0P4HkHghLsOe7rIUDt7EjRsSSRhM2+Y
@@ -120,8 +122,6 @@ bHNB2yFIuUmmT92T7Pw28wJZ6Wd/3T+5s4CBe+FWplQcgquPGIFkq4dVxPpVg6uq
 wB98bfAGtcuCZWzgjgL67CS0pcNxadFA/TFo/NnynLBC4qRXSfFslKVE+Og=
 -----END RSA PRIVATE KEY-----
 ",
-  "id": "1",
-  "port": "3003",
   "secret": "secret",
   "webhookPath": "/",
   "webhookProxy": "https://smee.io/EfHXC9BFfGAxbM6J",
@@ -130,9 +130,9 @@ wB98bfAGtcuCZWzgjgL67CS0pcNxadFA/TFo/NnynLBC4qRXSfFslKVE+Og=
 
 exports[`Probot run runs without config and loads the setup app 1`] = `
 Object {
-  "cert": undefined,
   "id": 1,
   "port": 3003,
+  "privateKey": undefined,
   "secret": "secret",
   "webhookPath": "/",
   "webhookProxy": "https://smee.io/EfHXC9BFfGAxbM6J",

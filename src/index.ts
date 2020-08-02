@@ -78,7 +78,7 @@ export class Probot {
           .parse(appFn);
 
         return {
-          cert: findPrivateKey(program.privateKey) || undefined,
+          privateKey: findPrivateKey(program.privateKey) || undefined,
           id: program.app,
           port: program.port,
           secret: program.secret,
@@ -88,7 +88,7 @@ export class Probot {
       }
       const privateKey = findPrivateKey();
       return {
-        cert: (privateKey && privateKey.toString()) || undefined,
+        privateKey: (privateKey && privateKey.toString()) || undefined,
         id: Number(process.env.APP_ID),
         port: Number(process.env.PORT) || 3000,
         secret: process.env.WEBHOOK_SECRET,
@@ -100,14 +100,14 @@ export class Probot {
     const options = readOptions();
     const probot = new Probot(options);
 
-    if (!options.id || !options.cert) {
+    if (!options.id || !options.privateKey) {
       if (process.env.NODE_ENV === "production") {
         if (!options.id) {
           throw new Error(
             "Application ID is missing, and is required to run in production mode. " +
               "To resolve, ensure the APP_ID environment variable is set."
           );
-        } else if (!options.cert) {
+        } else if (!options.privateKey) {
           throw new Error(
             "Certificate is missing, and is required to run in production mode. " +
               "To resolve, ensure either the PRIVATE_KEY or PRIVATE_KEY_PATH environment variable is set and contains a valid certificate"
@@ -146,6 +146,15 @@ export class Probot {
       throw new Error(
         "Your `GHE_HOST` environment variable should not begin with https:// or http://"
       );
+    }
+
+    if (options.cert) {
+      console.warn(
+        new Deprecation(
+          `[probot] "cert" option is deprecated. Use "privateKey" instead`
+        )
+      );
+      options.privateKey = options.cert;
     }
 
     //
@@ -207,7 +216,7 @@ export class Probot {
           auth: {
             cache: this.cache,
             id: options.id,
-            privateKey: options.cert,
+            privateKey: options.privateKey,
           },
           authStrategy: createAppAuth,
         };
@@ -328,13 +337,17 @@ export type ApplicationFunction = (app: Application) => void;
 
 export interface Options {
   // same options as Application class
-  cert?: string;
+  privateKey?: string;
   githubToken?: string;
   id?: number;
   Octokit?: typeof ProbotOctokit;
   redisConfig?: Redis.RedisOptions;
 
   // Probot class-specific options
+  /**
+   * @deprecated `cert` options is deprecated. Use `privateKey` instead
+   */
+  cert?: string;
   port?: number;
   secret?: string;
   webhookPath?: string;

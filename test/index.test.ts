@@ -9,7 +9,7 @@ import { ProbotOctokit } from "../src/github/octokit";
 import path = require("path");
 
 const id = 1;
-const cert = `-----BEGIN RSA PRIVATE KEY-----
+const privateKey = `-----BEGIN RSA PRIVATE KEY-----
 MIIBOQIBAAJBAIILhiN9IFpaE0pUXsesuuoaj6eeDiAqCiE49WB1tMB8ZMhC37kY
 Fl52NUYbUxb7JEf6pH5H9vqw1Wp69u78XeUCAwEAAQJAb88urnaXiXdmnIK71tuo
 /TyHBKt9I6Rhfzz0o9Gv7coL7a537FVDvV5UCARXHJMF41tKwj+zlt9EEUw7a1HY
@@ -41,8 +41,8 @@ describe("Probot", () => {
   it("constructor", () => {
     // probot with token. Should not throw
     new Probot({ githubToken: "faketoken" });
-    // probot with id/cert
-    new Probot({ id, cert });
+    // probot with id/privateKey
+    new Probot({ id, privateKey });
   });
 
   describe("run", () => {
@@ -323,7 +323,7 @@ describe("Probot", () => {
       process.env.GHE_HOST = "https://notreallygithub.com";
 
       try {
-        new Probot({ id, cert });
+        new Probot({ id, privateKey });
       } catch (e) {
         expect(e).toMatchSnapshot();
       }
@@ -356,7 +356,7 @@ describe("Probot", () => {
       process.env.GHE_HOST = "http://notreallygithub.com";
 
       try {
-        new Probot({ id, cert });
+        new Probot({ id, privateKey });
       } catch (e) {
         expect(e).toMatchSnapshot();
       }

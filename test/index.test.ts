@@ -96,18 +96,18 @@ describe("Probot", () => {
     it("forwards webhooks to the app", async () => {
       const app = probot.load(() => {});
       app.receive = jest.fn();
-      await probot.webhook.receive(event);
+      await probot.webhooks.receive(event);
       expect(app.receive).toHaveBeenCalledWith(event);
     });
 
     it("responds with the correct error if webhook secret does not match", async () => {
       probot.logger.error = jest.fn();
-      probot.webhook.on("push", () => {
+      probot.webhooks.on("push", () => {
         throw new Error("X-Hub-Signature does not match blob signature");
       });
 
       try {
-        await probot.webhook.receive(event);
+        await probot.webhooks.receive(event);
       } catch (e) {
         expect(
           (probot.logger.error as jest.Mock).mock.calls[0]
@@ -117,12 +117,12 @@ describe("Probot", () => {
 
     it("responds with the correct error if webhook secret is not found", async () => {
       probot.logger.error = jest.fn();
-      probot.webhook.on("push", () => {
+      probot.webhooks.on("push", () => {
         throw new Error("No X-Hub-Signature found on request");
       });
 
       try {
-        await probot.webhook.receive(event);
+        await probot.webhooks.receive(event);
       } catch (e) {
         expect(
           (probot.logger.error as jest.Mock).mock.calls[0]
@@ -132,14 +132,14 @@ describe("Probot", () => {
 
     it("responds with the correct error if webhook secret is wrong", async () => {
       probot.logger.error = jest.fn();
-      probot.webhook.on("push", () => {
+      probot.webhooks.on("push", () => {
         throw new Error(
           "webhooks:receiver ignored: POST / due to missing headers: x-hub-signature"
         );
       });
 
       try {
-        await probot.webhook.receive(event);
+        await probot.webhooks.receive(event);
       } catch (e) {
         expect(
           (probot.logger.error as jest.Mock).mock.calls[0]
@@ -149,14 +149,14 @@ describe("Probot", () => {
 
     it("responds with the correct error if the PEM file is missing", async () => {
       probot.logger.error = jest.fn();
-      probot.webhook.on("*", () => {
+      probot.webhooks.on("*", () => {
         throw new Error(
           "error:0906D06C:PEM routines:PEM_read_bio:no start line"
         );
       });
 
       try {
-        await probot.webhook.receive(event);
+        await probot.webhooks.receive(event);
       } catch (e) {
         expect(
           (probot.logger.error as jest.Mock).mock.calls[0]
@@ -166,14 +166,14 @@ describe("Probot", () => {
 
     it("responds with the correct error if the jwt could not be decoded", async () => {
       probot.logger.error = jest.fn();
-      probot.webhook.on("*", () => {
+      probot.webhooks.on("*", () => {
         throw new Error(
           '{"message":"A JSON web token could not be decoded","documentation_url":"https://developer.github.com/v3"}'
         );
       });
 
       try {
-        await probot.webhook.receive(event);
+        await probot.webhooks.receive(event);
       } catch (e) {
         expect(
           (probot.logger.error as jest.Mock).mock.calls[0]

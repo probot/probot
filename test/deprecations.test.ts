@@ -1,4 +1,5 @@
 import { Deprecation } from "deprecation";
+import { Webhooks } from "@octokit/webhooks";
 
 import { createProbot, Probot } from "../src";
 
@@ -21,6 +22,20 @@ describe("Deprecations", () => {
     expect(consoleWarn).toHaveBeenCalledWith(
       new Deprecation(
         `[probot] "createProbot(options)" is deprecated, use "new Probot(options)" instead`
+      )
+    );
+  });
+
+  it("probot.webhook", () => {
+    const probot = new Probot({});
+    expect(probot).toBeInstanceOf(Probot);
+
+    expect(probot.webhook).toBeInstanceOf(Webhooks);
+
+    expect(consoleWarn).toHaveBeenCalledTimes(1);
+    expect(consoleWarn).toHaveBeenCalledWith(
+      new Deprecation(
+        `[probot] "probot.webhook" is deprecated. Use "probot.webhooks" instead instead`
       )
     );
   });

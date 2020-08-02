@@ -127,7 +127,7 @@ export class Probot {
   }
 
   public server: express.Application;
-  public webhook: Webhooks;
+  public webhooks: Webhooks;
   public logger: Logger;
 
   // These 3 need to be public for the tests to work.
@@ -155,16 +155,16 @@ export class Probot {
     options.secret = options.secret || "development";
     this.logger = logger;
     this.apps = [];
-    this.webhook = new Webhooks({
+    this.webhooks = new Webhooks({
       path: options.webhookPath,
       secret: options.secret,
     });
-    this.webhook.on("*", async (event: WebhookEvent) => {
+    this.webhooks.on("*", async (event: WebhookEvent) => {
       await this.receive(event);
     });
-    this.webhook.on("error", errorHandler);
+    this.webhooks.on("error", errorHandler);
     this.server = createServer({
-      webhook: (this.webhook as any).middleware,
+      webhook: (this.webhooks as any).middleware,
       logger,
     });
 
@@ -227,6 +227,19 @@ export class Probot {
     });
 
     this.octokit = new Octokit(defaultOptions);
+  }
+
+  /**
+   * @deprecated `probot.webhook` is deprecated. Use `probot.webhooks` instead
+   */
+  public get webhook(): Webhooks {
+    console.warn(
+      new Deprecation(
+        `[probot] "probot.webhook" is deprecated. Use "probot.webhooks" instead instead`
+      )
+    );
+
+    return this.webhooks;
   }
 
   public receive(event: WebhookEvent) {

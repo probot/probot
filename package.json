@@ -53,7 +53,7 @@
   "author": "Brandon Keepers",
   "license": "ISC",
   "dependencies": {
-    "@octokit/auth-app": "^2.4.7",
+    "@octokit/auth-app": "^2.4.12",
     "@octokit/auth-unauthenticated": "^1.0.0",
     "@octokit/core": "^3.1.0",
     "@octokit/graphql": "^4.2.0",

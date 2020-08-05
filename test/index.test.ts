@@ -104,9 +104,10 @@ describe("Probot", () => {
       try {
         await probot.webhooks.receive(event);
       } catch (e) {
-        expect(
-          (probot.logger.error as jest.Mock).mock.calls[0]
-        ).toMatchSnapshot();
+        const [error] = Array.from(
+          (probot.logger.error as jest.Mock).mock.calls[0][0].err
+        ) as Error[];
+        expect(error.message).toMatchSnapshot();
       }
     });
 
@@ -119,9 +120,10 @@ describe("Probot", () => {
       try {
         await probot.webhooks.receive(event);
       } catch (e) {
-        expect(
-          (probot.logger.error as jest.Mock).mock.calls[0]
-        ).toMatchSnapshot();
+        const [error] = Array.from(
+          (probot.logger.error as jest.Mock).mock.calls[0][0].err
+        ) as Error[];
+        expect(error.message).toMatchSnapshot();
       }
     });
 
@@ -136,9 +138,10 @@ describe("Probot", () => {
       try {
         await probot.webhooks.receive(event);
       } catch (e) {
-        expect(
-          (probot.logger.error as jest.Mock).mock.calls[0]
-        ).toMatchSnapshot();
+        const [error] = Array.from(
+          (probot.logger.error as jest.Mock).mock.calls[0][0].err
+        ) as Error[];
+        expect(error.message).toMatchSnapshot();
       }
     });
 
@@ -153,9 +156,10 @@ describe("Probot", () => {
       try {
         await probot.webhooks.receive(event);
       } catch (e) {
-        expect(
-          (probot.logger.error as jest.Mock).mock.calls[0]
-        ).toMatchSnapshot();
+        const [error] = Array.from(
+          (probot.logger.error as jest.Mock).mock.calls[0][0].err
+        ) as Error[];
+        expect(error.message).toMatchSnapshot();
       }
     });
 
@@ -170,9 +174,10 @@ describe("Probot", () => {
       try {
         await probot.webhooks.receive(event);
       } catch (e) {
-        expect(
-          (probot.logger.error as jest.Mock).mock.calls[0]
-        ).toMatchSnapshot();
+        const [error] = Array.from(
+          (probot.logger.error as jest.Mock).mock.calls[0][0].err
+        ) as Error[];
+        expect(error.message).toMatchSnapshot();
       }
     });
   });

@@ -11,9 +11,6 @@ export async function webhookTransform(state: State, event: WebhookEvent) {
     const github = await getAuthenticatedOctokitForEvent(state, event);
     return new Context(event, github, log);
   } catch (err) {
-    console.log(`err`);
-    console.log(err);
-
     // avoid the error.code deprecation message
     // can be replaced with `log.error({ err, event, ...err })` once @octokit/request-error v3 is used
     const { name, message, stack, headers, request, status } = err;

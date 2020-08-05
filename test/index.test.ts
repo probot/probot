@@ -29,6 +29,7 @@ describe("Probot", () => {
   };
 
   beforeEach(() => {
+    // process.env.DISABLE_WEBHOOK_EVENT_CHECK = "true";
     probot = new Probot({ githubToken: "faketoken" });
 
     event = {
@@ -41,6 +42,7 @@ describe("Probot", () => {
   it("constructor", () => {
     // probot with token. Should not throw
     new Probot({ githubToken: "faketoken" });
+
     // probot with id/privateKey
     new Probot({ id, privateKey });
   });
@@ -93,13 +95,6 @@ describe("Probot", () => {
   });
 
   describe("webhook delivery", () => {
-    it("forwards webhooks to the app", async () => {
-      const app = probot.load(() => {});
-      app.receive = jest.fn();
-      await probot.webhooks.receive(event);
-      expect(app.receive).toHaveBeenCalledWith(event);
-    });
-
     it("responds with the correct error if webhook secret does not match", async () => {
       probot.logger.error = jest.fn();
       probot.webhooks.on("push", () => {
@@ -290,12 +285,12 @@ describe("Probot", () => {
   describe("receive", () => {
     it("forwards events to each app", async () => {
       const spy = jest.fn();
-      const app = probot.load((appl) => appl.on("push", spy));
-      app.auth = jest.fn().mockReturnValue(Promise.resolve({}));
+
+      probot.load((app) => app.on("push", spy));
 
       await probot.receive(event);
 
-      expect(spy).toHaveBeenCalled();
+      expect(spy).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -421,42 +416,6 @@ describe("Probot", () => {
       const app = probot.load(() => {});
       const octokit: InstanceType<typeof ProbotOctokit> = await app.auth();
       expect(octokit.foo).toBe("bar");
-    });
-  });
-
-  describe("start", () => {
-    beforeEach(() => {
-      process.exit = jest.fn() as any; // we dont want to terminate the test
-    });
-    it("should expect the correct error if port already in use", (next) => {
-      expect.assertions(2);
-
-      // block port 3001
-      const http = require("http");
-      const blockade = http.createServer().listen(3001, () => {
-        const testApp = new Probot({ port: 3001 });
-        testApp.logger.error = jest.fn();
-
-        const server = testApp.start().addListener("error", () => {
-          expect(testApp.logger.error).toHaveBeenCalledWith(
-            "Port 3001 is already in use. You can define the PORT environment variable to use a different port."
-          );
-          expect(process.exit).toHaveBeenCalledWith(1);
-          server.close(() => blockade.close(() => next()));
-        });
-      });
-    });
-
-    it("should listen to port when not in use", (next) => {
-      expect.assertions(1);
-      const testApp = new Probot({ port: 3001, webhookProxy: undefined });
-      testApp.logger.info = jest.fn();
-      const server = testApp.start().on("listening", () => {
-        expect(testApp.logger.info).toHaveBeenCalledWith(
-          "Listening on http://localhost:3001"
-        );
-        server.close(() => next());
-      });
     });
   });
 

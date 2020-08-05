@@ -11,9 +11,7 @@ if ("IGNORED_ACCOUNTS" in process.env) {
   console.warn('[probot] "IGNORED_ACCOUNTS" is no longer used since v10');
 }
 
-import { createAppAuth } from "@octokit/auth-app";
 import { WebhookEvent, Webhooks } from "@octokit/webhooks";
-import Bottleneck from "bottleneck";
 import Logger from "bunyan";
 import express from "express";
 import Redis from "ioredis";
@@ -32,6 +30,30 @@ import { resolve } from "./resolver";
 import { createServer } from "./server";
 import { createWebhookProxy } from "./webhook-proxy";
 import { errorHandler } from "./error-handler";
+import { ProbotWebhooks, State } from "./types";
+import { webhookTransform } from "./webhook-transform";
+import { wrapLogger } from "./wrap-logger";
+import { getThrottleOptions } from "./get-throttle-options";
+import { getProbotOctokitWithDefaults } from "./get-probot-octokit-with-defaults";
+
+export interface Options {
+  // same options as Application class
+  privateKey?: string;
+  githubToken?: string;
+  id?: number;
+  Octokit?: typeof ProbotOctokit;
+  redisConfig?: Redis.RedisOptions;
+  secret?: string;
+  webhookPath?: string;
+
+  // Probot class-specific options
+  /**
+   * @deprecated `cert` options is deprecated. Use `privateKey` instead
+   */
+  cert?: string;
+  port?: number;
+  webhookProxy?: string;
+}
 
 // tslint:disable:no-var-requires
 const defaultAppFns: ApplicationFunction[] = [
@@ -127,7 +149,7 @@ export class Probot {
   }
 
   public server: express.Application;
-  public webhooks: Webhooks;
+  public webhooks: ProbotWebhooks;
   public logger: Logger;
 
   // These 3 need to be public for the tests to work.
@@ -136,10 +158,7 @@ export class Probot {
 
   private httpServer?: Server;
   private apps: Application[];
-  private githubToken?: string;
-  private Octokit: typeof ProbotOctokit;
-  private octokit: InstanceType<typeof ProbotOctokit>;
-  private cache: LRUCache<number, string>;
+  private state: State;
 
   constructor(options: Options) {
     if (process.env.GHE_HOST && /^https?:\/\//.test(process.env.GHE_HOST)) {
@@ -162,80 +181,59 @@ export class Probot {
     //
     options.webhookPath = options.webhookPath || "/";
     options.secret = options.secret || "development";
+
+    // TODO: deprecate probot.logger in favor of probot.log.
+    //       Use `this.log = wrapLogger(logger)` like in application.ts
     this.logger = logger;
     this.apps = [];
-    this.webhooks = new Webhooks({
-      path: options.webhookPath,
-      secret: options.secret,
-    });
-    this.webhooks.on("*", async (event: WebhookEvent) => {
-      await this.receive(event);
-    });
-    this.webhooks.on("error", errorHandler);
-    this.server = createServer({
-      webhook: (this.webhooks as any).middleware,
-      logger,
-    });
 
-    //
-    // TODO: These are the same for both the Probot class and
-    //       the Application class and should be abstracted away
-    //
+    // TODO: Why is this public?
     this.options = options;
-    this.githubToken = options.githubToken;
-
-    if (options.redisConfig || process.env.REDIS_URL) {
-      let client;
-      if (options.redisConfig) {
-        client = new Redis(options.redisConfig);
-      } else if (process.env.REDIS_URL) {
-        client = new Redis(process.env.REDIS_URL);
-      }
-      const connection = new Bottleneck.IORedisConnection({ client });
-      connection.on("error", this.logger.error);
-
-      this.throttleOptions = {
-        Bottleneck,
-        connection,
-      };
-    }
-
-    const Octokit = options.Octokit || ProbotOctokit;
 
     // TODO: support redis backend for access token cache if `options.redisConfig || process.env.REDIS_URL`
-    this.cache = new LRUCache<number, string>({
+    const cache = new LRUCache<number, string>({
       // cache max. 15000 tokens, that will use less than 10mb memory
       max: 15000,
       // Cache for 1 minute less than GitHub expiry
       maxAge: Number(process.env.INSTALLATION_TOKEN_TTL) || 1000 * 60 * 59,
     });
 
-    const authOptions = this.githubToken
-      ? { auth: this.githubToken }
-      : {
-          auth: {
-            cache: this.cache,
-            id: options.id,
-            privateKey: options.privateKey,
-          },
-          authStrategy: createAppAuth,
-        };
-    const defaultOptions = {
-      baseUrl:
-        process.env.GHE_HOST &&
-        `${process.env.GHE_PROTOCOL || "https"}://${
-          process.env.GHE_HOST
-        }/api/v3`,
-      ...authOptions,
-    };
+    const Octokit = getProbotOctokitWithDefaults({
+      githubToken: options.githubToken,
+      Octokit: options.Octokit || ProbotOctokit,
+      appId: options.id,
+      privateKey: options.privateKey,
+      cache,
+    });
+    const octokit = new Octokit();
 
-    this.Octokit = Octokit.defaults((instanceOptions: any) => {
-      return Object.assign({}, defaultOptions, instanceOptions, {
-        auth: Object.assign({}, defaultOptions.auth, instanceOptions.auth),
-      });
+    const log = wrapLogger(logger);
+    this.throttleOptions = getThrottleOptions({
+      log,
+      redisConfig: options.redisConfig,
     });
 
-    this.octokit = new Octokit(defaultOptions);
+    this.state = {
+      cache,
+      githubToken: options.githubToken,
+      log,
+      Octokit,
+      octokit,
+      throttleOptions: this.throttleOptions,
+    };
+
+    this.webhooks = new Webhooks({
+      path: options.webhookPath,
+      secret: options.secret,
+      transform: webhookTransform.bind(null, this.state),
+    });
+    // TODO: normalize error handler with code in application.ts
+    this.webhooks.on("error", errorHandler);
+
+    this.server = createServer({
+      webhook: (this.webhooks as any).middleware,
+      logger,
+    });
   }
 
   /**
@@ -262,11 +260,12 @@ export class Probot {
     }
 
     const app = new Application({
-      cache: this.cache,
-      githubToken: this.githubToken,
-      Octokit: this.Octokit,
-      octokit: this.octokit,
+      cache: this.state.cache,
+      githubToken: this.state.githubToken,
+      Octokit: this.state.Octokit,
+      octokit: this.state.octokit,
       throttleOptions: this.throttleOptions,
+      webhooks: this.webhooks,
     });
 
     // Connect the router from the app to the server
@@ -334,24 +333,5 @@ export const createProbot = (options: Options) => {
 };
 
 export type ApplicationFunction = (app: Application) => void;
-
-export interface Options {
-  // same options as Application class
-  privateKey?: string;
-  githubToken?: string;
-  id?: number;
-  Octokit?: typeof ProbotOctokit;
-  redisConfig?: Redis.RedisOptions;
-
-  // Probot class-specific options
-  /**
-   * @deprecated `cert` options is deprecated. Use `privateKey` instead
-   */
-  cert?: string;
-  port?: number;
-  secret?: string;
-  webhookPath?: string;
-  webhookProxy?: string;
-}
 
 export { Logger, Context, Application, ProbotOctokit, ProbotOctokitCore };

@@ -102,15 +102,20 @@ describe("end-to-end-tests", () => {
       },
     });
 
-    await got.post(`http://127.0.0.1:${probotPort}`, {
-      headers: {
-        "content-type": "application/json",
-        "x-github-event": "issues",
-        "x-github-delivery": "1",
-        "x-hub-signature": sign("test", body),
-      },
-      body,
-    });
+    try {
+      await got.post(`http://127.0.0.1:${probotPort}`, {
+        headers: {
+          "content-type": "application/json",
+          "x-github-event": "issues",
+          "x-github-delivery": "1",
+          "x-hub-signature": sign("test", body),
+        },
+        body,
+      });
+    } catch (error) {
+      probotProcess.cancel();
+      console.log((await probotProcess).stdout);
+    }
 
     expect(httpMock).toHaveBeenCalledTimes(2);
   });

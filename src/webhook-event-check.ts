@@ -1,6 +1,5 @@
 import { Endpoints } from "@octokit/types";
-
-import { Application } from "./application";
+import { State } from "./types";
 
 type AppsGetAuthenticatedResponse = Endpoints["GET /app"]["response"]["data"];
 
@@ -14,20 +13,37 @@ let didFailRetrievingAppMeta = false;
  * returns `true`. Returns `undefined` if the webhook-event-check feature is
  * disabled or if Probot failed to retrieve the GitHub App's metadata.
  */
-async function webhookEventCheck(app: Application, eventName: string) {
+export async function webhookEventCheck(
+  state: State,
+  eventNameOrNames: string | string[]
+) {
   if (isWebhookEventCheckEnabled() === false) {
     return;
   }
 
-  const baseEventName = eventName.split(".")[0];
+  const eventNames = Array.isArray(eventNameOrNames)
+    ? eventNameOrNames
+    : [eventNameOrNames];
 
-  if (await isSubscribedToEvent(app, baseEventName)) {
+  const uniqueBaseEventNames = [
+    ...new Set(eventNames.map((name) => name.split(".")[0])),
+  ];
+
+  let subscribedCount = 0;
+  for (const baseEventName of uniqueBaseEventNames) {
+    if (await isSubscribedToEvent(state, baseEventName)) {
+      subscribedCount++;
+    } else if (didFailRetrievingAppMeta === false) {
+      const subscribedTo = JSON.stringify(eventNameOrNames);
+      const humanName = baseEventName.split(/_/).join(" ");
+      state.log.error(
+        `Your app is attempting to listen to ${subscribedTo}, but your GitHub App is not subscribed to the "${humanName}" event.`
+      );
+    }
+  }
+
+  if (subscribedCount === uniqueBaseEventNames.length) {
     return true;
-  } else if (didFailRetrievingAppMeta === false) {
-    const userFriendlyBaseEventName = baseEventName.split("_").join(" ");
-    app.log.error(
-      `Your app is attempting to listen to "${eventName}", but your GitHub App is not subscribed to the "${userFriendlyBaseEventName}" event.`
-    );
   }
 
   return didFailRetrievingAppMeta ? undefined : false;
@@ -44,7 +60,7 @@ async function webhookEventCheck(app: Application, eventName: string) {
  * `GET /app` response. Therefore, only the `false` value should be considered
  * truthy.
  */
-async function isSubscribedToEvent(app: Application, baseEventName: string) {
+async function isSubscribedToEvent(state: State, baseEventName: string) {
   // A list of events known to be in the response of `GET /app`. This list can
   // be retrieved by calling `GET /app` from an authenticated app that has
   // maximum permissions and is subscribed to all available webhook events.
@@ -99,10 +115,10 @@ async function isSubscribedToEvent(app: Application, baseEventName: string) {
 
   let events;
   try {
-    events = (await retrieveAppMeta(app)).events;
+    events = (await retrieveAppMeta(state)).events;
   } catch (e) {
     if (!didFailRetrievingAppMeta) {
-      app.log.warn(e);
+      state.log.warn(e);
     }
     didFailRetrievingAppMeta = true;
     return;
@@ -111,17 +127,16 @@ async function isSubscribedToEvent(app: Application, baseEventName: string) {
   return events.includes(baseEventName);
 }
 
-async function retrieveAppMeta(app: Application) {
+async function retrieveAppMeta(state: State) {
   if (appMeta) return appMeta;
 
   appMeta = new Promise(async (resolve, reject) => {
-    const api = await app.auth();
     try {
-      const { data } = await api.apps.getAuthenticated();
+      const { data } = await state.octokit.apps.getAuthenticated();
 
       return resolve(data);
     } catch (e) {
-      app.log.trace(e);
+      state.log.trace(e);
       /**
        * There are a few reasons why Probot might be unable to retrieve
        * application metadata.
@@ -173,5 +188,3 @@ function inTestEnvironment(): boolean {
   const isRunningJest = process.env.JEST_WORKER_ID !== undefined;
   return nodeEnvContainsTest || isRunningJest;
 }
-
-export default webhookEventCheck;

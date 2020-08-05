@@ -142,7 +142,12 @@ Object {
 exports[`Probot webhook delivery responds with the correct error if the PEM file is missing 1`] = `
 Array [
   Object {
-    "err": [Error: error:0906D06C:PEM routines:PEM_read_bio:no start line],
+    "err": [AggregateError: 
+    Error: error:0906D06C:PEM routines:PEM_read_bio:no start line
+        at handler (/Users/gregor/Projects/probot/probot/test/index.test.ts:148:15)
+        at /Users/gregor/Projects/octokit/webhooks.js/pkg/dist-src/event-handler/receive.js:41:20
+        at async Promise.all (index 0)
+        at Object.<anonymous> (/Users/gregor/Projects/probot/probot/test/index.test.ts:154:9)],
   },
   "Your private key (usually a .pem file) is not correct. Go to https://github.com/settings/apps/YOUR_APP and generate a new PEM file. If you're deploying to Now, visit https://probot.github.io/docs/deployment/#now.",
 ]
@@ -151,7 +156,12 @@ Array [
 exports[`Probot webhook delivery responds with the correct error if the jwt could not be decoded 1`] = `
 Array [
   Object {
-    "err": [Error: {"message":"A JSON web token could not be decoded","documentation_url":"https://developer.github.com/v3"}],
+    "err": [AggregateError: 
+    Error: {"message":"A JSON web token could not be decoded","documentation_url":"https://developer.github.com/v3"}
+        at handler (/Users/gregor/Projects/probot/probot/test/index.test.ts:165:15)
+        at /Users/gregor/Projects/octokit/webhooks.js/pkg/dist-src/event-handler/receive.js:41:20
+        at async Promise.all (index 0)
+        at Object.<anonymous> (/Users/gregor/Projects/probot/probot/test/index.test.ts:171:9)],
   },
   "Your private key (usually a .pem file) is not correct. Go to https://github.com/settings/apps/YOUR_APP and generate a new PEM file. If you're deploying to Now, visit https://probot.github.io/docs/deployment/#now.",
 ]
@@ -160,7 +170,12 @@ Array [
 exports[`Probot webhook delivery responds with the correct error if webhook secret does not match 1`] = `
 Array [
   Object {
-    "err": [Error: X-Hub-Signature does not match blob signature],
+    "err": [AggregateError: 
+    Error: X-Hub-Signature does not match blob signature
+        at handler (/Users/gregor/Projects/probot/probot/test/index.test.ts:101:15)
+        at /Users/gregor/Projects/octokit/webhooks.js/pkg/dist-src/event-handler/receive.js:41:20
+        at async Promise.all (index 0)
+        at Object.<anonymous> (/Users/gregor/Projects/probot/probot/test/index.test.ts:105:9)],
   },
   "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
 ]
@@ -169,7 +184,12 @@ Array [
 exports[`Probot webhook delivery responds with the correct error if webhook secret is not found 1`] = `
 Array [
   Object {
-    "err": [Error: No X-Hub-Signature found on request],
+    "err": [AggregateError: 
+    Error: No X-Hub-Signature found on request
+        at handler (/Users/gregor/Projects/probot/probot/test/index.test.ts:116:15)
+        at /Users/gregor/Projects/octokit/webhooks.js/pkg/dist-src/event-handler/receive.js:41:20
+        at async Promise.all (index 0)
+        at Object.<anonymous> (/Users/gregor/Projects/probot/probot/test/index.test.ts:120:9)],
   },
   "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
 ]
@@ -178,7 +198,12 @@ Array [
 exports[`Probot webhook delivery responds with the correct error if webhook secret is wrong 1`] = `
 Array [
   Object {
-    "err": [Error: webhooks:receiver ignored: POST / due to missing headers: x-hub-signature],
+    "err": [AggregateError: 
+    Error: webhooks:receiver ignored: POST / due to missing headers: x-hub-signature
+        at handler (/Users/gregor/Projects/probot/probot/test/index.test.ts:131:15)
+        at /Users/gregor/Projects/octokit/webhooks.js/pkg/dist-src/event-handler/receive.js:41:20
+        at async Promise.all (index 0)
+        at Object.<anonymous> (/Users/gregor/Projects/probot/probot/test/index.test.ts:137:9)],
   },
   "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
 ]

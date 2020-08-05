@@ -34,6 +34,11 @@ describe("webhook-event-check", () => {
   beforeAll(() => {
     originalNodeEnv = process.env.NODE_ENV || "test";
     originalJestWorkerId = process.env.JEST_WORKER_ID;
+    nock.disableNetConnect();
+  });
+
+  afterAll(() => {
+    nock.restore();
   });
 
   beforeEach(() => {
@@ -67,7 +72,7 @@ describe("webhook-event-check", () => {
     });
 
     // let's give the event check a moment to send its request
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 2500));
 
     expect(spyOnLogError).toHaveBeenCalledTimes(1);
     expect(spyOnLogError).toMatchSnapshot();

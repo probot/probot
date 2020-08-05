@@ -9,7 +9,7 @@ describe("webhooks", () => {
   beforeEach(() => {
     logger = jest.fn();
 
-    probot = new Probot({ id: 1, cert: "bexo🥪", secret: "secret" });
+    probot = new Probot({ id: 1, privateKey: "bexo🥪", secret: "secret" });
     probot.logger.addStream({
       level: "trace",
       stream: { write: logger } as any,
@@ -24,7 +24,7 @@ describe("webhooks", () => {
       .post("/")
       .send(dataString)
       .set("x-github-event", "push")
-      .set("x-hub-signature", probot.webhook.sign(dataString))
+      .set("x-hub-signature", probot.webhooks.sign(dataString))
       .set("x-github-delivery", "3sw4d5f6g7h8")
       .expect(200);
   });

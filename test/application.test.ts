@@ -1,9 +1,9 @@
-import { createAppAuth } from "@octokit/auth-app";
 import { WebhookEvent } from "@octokit/webhooks";
+import nock from "nock";
 
 import { Application } from "../src/application";
 import { Context } from "../src/context";
-import { ProbotOctokit } from "../src/github/octokit";
+import { ProbotOctokit, ProbotOctokitCore } from "../src/github/octokit";
 import { logger } from "../src/logger";
 
 describe("Application", () => {
@@ -25,23 +25,36 @@ describe("Application", () => {
     // Clear log output
     output = [];
 
-    app = new Application({} as any);
-    app.auth = jest.fn().mockReturnValue({});
+    app = new Application({
+      secret: "secret",
+      id: 1,
+      privateKey:
+        "-----BEGIN RSA PRIVATE KEY-----\nMIIBOQIBAAJBAIILhiN9IFpaE0pUXsesuuoaj6eeDiAqCiE49WB1tMB8ZMhC37kY\nFl52NUYbUxb7JEf6pH5H9vqw1Wp69u78XeUCAwEAAQJAb88urnaXiXdmnIK71tuo\n/TyHBKt9I6Rhfzz0o9Gv7coL7a537FVDvV5UCARXHJMF41tKwj+zlt9EEUw7a1HY\nwQIhAL4F/VHWSPHeTgXYf4EaX2OlpSOk/n7lsFtL/6bWRzRVAiEArzJs2vopJitv\nA1yBjz3q2nX+zthk+GLXrJQkYOnIk1ECIHfeFV8TWm5gej1LxZquBTA5pINoqDVq\nNKZSuZEHqGEFAiB6EDrxkovq8SYGhIQsJeqkTMO8n94xhMRZlFmIQDokEQIgAq5U\nr1UQNnUExRh7ZT0kFbMfO9jKYZVlQdCL9Dn93vo=\n-----END RSA PRIVATE KEY-----",
+      Octokit: ProbotOctokitCore,
+    });
 
     event = {
       id: "123-456",
-      name: "ping",
+      name: "pull_request",
       payload: {
-        action: "foo",
+        action: "opened",
         installation: { id: 1 },
       },
     };
   });
 
+  beforeAll(() => {
+    nock.disableNetConnect();
+  });
+
+  afterAll(() => {
+    nock.restore();
+  });
+
   describe("on", () => {
     it("calls callback when no action is specified", async () => {
       const spy = jest.fn();
-      app.on("ping", spy);
+      app.on("pull_request", spy);
 
       expect(spy).toHaveBeenCalledTimes(0);
       await app.receive(event);
@@ -52,7 +65,7 @@ describe("Application", () => {
 
     it("calls callback with same action", async () => {
       const spy = jest.fn();
-      app.on("ping.foo", spy);
+      app.on("pull_request.opened", spy);
 
       await app.receive(event);
       expect(spy).toHaveBeenCalled();
@@ -60,7 +73,7 @@ describe("Application", () => {
 
     it("does not call callback with different action", async () => {
       const spy = jest.fn();
-      app.on("ping.nope", spy);
+      app.on("pull_request.closed", spy);
 
       await app.receive(event);
       expect(spy).toHaveBeenCalledTimes(0);
@@ -79,13 +92,13 @@ describe("Application", () => {
         id: "123",
         name: "issues",
         payload: {
-          action: "bar",
+          action: "opened",
           installation: { id: 2 },
         },
       };
 
       const spy = jest.fn();
-      app.on(["ping.foo", "issues.bar"], spy);
+      app.on(["pull_request.opened", "issues.opened"], spy);
 
       await app.receive(event);
       await app.receive(event2);
@@ -105,8 +118,8 @@ describe("Application", () => {
         );
       });
 
-      app.on("ping", handler);
-      await app.receive(event);
+      app.on("pull_request", handler);
+      await app.receive(event).catch(console.error);
       expect(handler).toHaveBeenCalled();
     });
 
@@ -120,13 +133,26 @@ describe("Application", () => {
         },
       };
 
+      const mock = nock("https://api.github.com")
+        .post("/app/installations/1/access_tokens")
+        .reply(201, {
+          token: "v1.1f699f1069f60xxx",
+          permissions: {
+            issues: "write",
+            contents: "read",
+          },
+        })
+        .get("/")
+        .matchHeader("authorization", "token v1.1f699f1069f60xxx")
+        .reply(200, {});
+
       app.on("installation.created", async (context) => {
-        // no-op
+        await context.github.request("/");
       });
 
       await app.receive(event);
 
-      expect(app.auth).toHaveBeenCalledWith(1, expect.anything());
+      expect(mock.activeMocks()).toStrictEqual([]);
     });
 
     it("returns an unauthenticated client for installation.deleted", async () => {
@@ -139,13 +165,18 @@ describe("Application", () => {
         },
       };
 
+      const mock = nock("https://api.github.com")
+        .get("/")
+        .matchHeader("authorization", (value) => value === undefined)
+        .reply(200, {});
+
       app.on("installation.deleted", async (context) => {
-        // no-op
+        await context.github.request("/");
       });
 
-      await app.receive(event);
+      await app.receive(event).catch(console.log);
 
-      expect(app.auth).toHaveBeenCalledWith();
+      expect(mock.activeMocks()).toStrictEqual([]);
     });
 
     it("returns an authenticated client for events without an installation", async () => {
@@ -157,20 +188,25 @@ describe("Application", () => {
         },
       };
 
+      const mock = nock("https://api.github.com")
+        .get("/")
+        .matchHeader("authorization", (value) => value === undefined)
+        .reply(200, {});
+
       app.on("check_run", async (context) => {
-        // no-op
+        await context.github.request("/");
       });
 
-      await app.receive(event);
+      await app.receive(event).catch(console.log);
 
-      expect(app.auth).toHaveBeenCalledWith();
+      expect(mock.activeMocks()).toStrictEqual([]);
     });
   });
 
   describe("receive", () => {
     it("delivers the event", async () => {
       const spy = jest.fn();
-      app.on("ping", spy);
+      app.on("pull_request", spy);
 
       await app.receive(event);
 
@@ -180,7 +216,7 @@ describe("Application", () => {
     it("waits for async events to resolve", async () => {
       const spy = jest.fn();
 
-      app.on("ping", () => {
+      app.on("pull_request", () => {
         return new Promise((resolve) => {
           setTimeout(() => {
             spy();
@@ -195,7 +231,7 @@ describe("Application", () => {
     });
 
     it("returns a reject errors thrown in apps", async () => {
-      app.on("ping", () => {
+      app.on("pull_request", () => {
         throw new Error("error from app");
       });
 
@@ -203,7 +239,7 @@ describe("Application", () => {
         await app.receive(event);
         throw new Error("expected error to be raised from app");
       } catch (err) {
-        expect(err.message).toEqual("error from app");
+        expect(err.message).toMatch(/error from app/);
       }
     });
   });
@@ -211,7 +247,7 @@ describe("Application", () => {
   describe("load", () => {
     it("loads one app", async () => {
       const spy = jest.fn();
-      const myApp = (a: any) => a.on("ping", spy);
+      const myApp = (a: any) => a.on("pull_request", spy);
 
       app.load(myApp);
       await app.receive(event);
@@ -221,8 +257,8 @@ describe("Application", () => {
     it("loads multiple apps", async () => {
       const spy = jest.fn();
       const spy2 = jest.fn();
-      const myApp = (a: any) => a.on("ping", spy);
-      const myApp2 = (a: any) => a.on("ping", spy2);
+      const myApp = (a: any) => a.on("pull_request", spy);
+      const myApp2 = (a: any) => a.on("pull_request", spy2);
 
       app.load([myApp, myApp2]);
       await app.receive(event);
@@ -235,19 +271,17 @@ describe("Application", () => {
     it("throttleOptions", async () => {
       const testApp = new Application({
         Octokit: ProbotOctokit.plugin((octokit: any, options: any) => {
-          expect(options.throttle.id).toBe(1);
-          expect(options.throttle.foo).toBe("bar");
-
           return {
             pluginLoaded: true,
+            test() {
+              expect(options.throttle.id).toBe(1);
+              expect(options.throttle.foo).toBe("bar");
+            },
           };
-        }).defaults({
-          authStrategy: createAppAuth,
-          auth: {
-            id: 1,
-            cert: "cert",
-          },
         }),
+        id: 1,
+        privateKey: "private key",
+        secret: "secret",
         throttleOptions: {
           foo: "bar",
           onAbuseLimit: () => true,
@@ -257,6 +291,7 @@ describe("Application", () => {
 
       const result = await testApp.auth(1);
       expect(result.pluginLoaded).toEqual(true);
+      result.test();
     });
   });
 
@@ -269,7 +304,7 @@ describe("Application", () => {
     });
 
     it("logs errors thrown from handlers", async () => {
-      app.on("ping", () => {
+      app.on("pull_request", () => {
         throw error;
       });
 
@@ -280,12 +315,12 @@ describe("Application", () => {
       }
 
       expect(output.length).toBe(1);
-      expect(output[0].err.message).toEqual("testing");
+      expect(output[0].err.message).toMatch(/testing/);
       expect(output[0].event.id).toEqual(event.id);
     });
 
     it("logs errors from rejected promises", async () => {
-      app.on("ping", () => Promise.reject(error));
+      app.on("pull_request", () => Promise.reject(error));
 
       try {
         await app.receive(event);
@@ -294,7 +329,7 @@ describe("Application", () => {
       }
 
       expect(output.length).toBe(1);
-      expect(output[0].err.message).toEqual("testing");
+      expect(output[0].err.message).toMatch(/testing/);
       expect(output[0].event.id).toEqual(event.id);
     });
   });

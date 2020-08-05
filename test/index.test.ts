@@ -9,7 +9,7 @@ import { ProbotOctokit } from "../src/github/octokit";
 import path = require("path");
 
 const id = 1;
-const cert = `-----BEGIN RSA PRIVATE KEY-----
+const privateKey = `-----BEGIN RSA PRIVATE KEY-----
 MIIBOQIBAAJBAIILhiN9IFpaE0pUXsesuuoaj6eeDiAqCiE49WB1tMB8ZMhC37kY
 Fl52NUYbUxb7JEf6pH5H9vqw1Wp69u78XeUCAwEAAQJAb88urnaXiXdmnIK71tuo
 /TyHBKt9I6Rhfzz0o9Gv7coL7a537FVDvV5UCARXHJMF41tKwj+zlt9EEUw7a1HY
@@ -29,6 +29,7 @@ describe("Probot", () => {
   };
 
   beforeEach(() => {
+    // process.env.DISABLE_WEBHOOK_EVENT_CHECK = "true";
     probot = new Probot({ githubToken: "faketoken" });
 
     event = {
@@ -41,8 +42,9 @@ describe("Probot", () => {
   it("constructor", () => {
     // probot with token. Should not throw
     new Probot({ githubToken: "faketoken" });
-    // probot with id/cert
-    new Probot({ id, cert });
+
+    // probot with id/privateKey
+    new Probot({ id, privateKey });
   });
 
   describe("run", () => {
@@ -93,91 +95,89 @@ describe("Probot", () => {
   });
 
   describe("webhook delivery", () => {
-    it("forwards webhooks to the app", async () => {
-      const app = probot.load(() => {});
-      app.receive = jest.fn();
-      await probot.webhook.receive(event);
-      expect(app.receive).toHaveBeenCalledWith(event);
-    });
-
     it("responds with the correct error if webhook secret does not match", async () => {
       probot.logger.error = jest.fn();
-      probot.webhook.on("push", () => {
+      probot.webhooks.on("push", () => {
         throw new Error("X-Hub-Signature does not match blob signature");
       });
 
       try {
-        await probot.webhook.receive(event);
+        await probot.webhooks.receive(event);
       } catch (e) {
-        expect(
-          (probot.logger.error as jest.Mock).mock.calls[0]
-        ).toMatchSnapshot();
+        const [error] = Array.from(
+          (probot.logger.error as jest.Mock).mock.calls[0][0].err
+        ) as Error[];
+        expect(error.message).toMatchSnapshot();
       }
     });
 
     it("responds with the correct error if webhook secret is not found", async () => {
       probot.logger.error = jest.fn();
-      probot.webhook.on("push", () => {
+      probot.webhooks.on("push", () => {
         throw new Error("No X-Hub-Signature found on request");
       });
 
       try {
-        await probot.webhook.receive(event);
+        await probot.webhooks.receive(event);
       } catch (e) {
-        expect(
-          (probot.logger.error as jest.Mock).mock.calls[0]
-        ).toMatchSnapshot();
+        const [error] = Array.from(
+          (probot.logger.error as jest.Mock).mock.calls[0][0].err
+        ) as Error[];
+        expect(error.message).toMatchSnapshot();
       }
     });
 
     it("responds with the correct error if webhook secret is wrong", async () => {
       probot.logger.error = jest.fn();
-      probot.webhook.on("push", () => {
+      probot.webhooks.on("push", () => {
         throw new Error(
           "webhooks:receiver ignored: POST / due to missing headers: x-hub-signature"
         );
       });
 
       try {
-        await probot.webhook.receive(event);
+        await probot.webhooks.receive(event);
       } catch (e) {
-        expect(
-          (probot.logger.error as jest.Mock).mock.calls[0]
-        ).toMatchSnapshot();
+        const [error] = Array.from(
+          (probot.logger.error as jest.Mock).mock.calls[0][0].err
+        ) as Error[];
+        expect(error.message).toMatchSnapshot();
       }
     });
 
     it("responds with the correct error if the PEM file is missing", async () => {
       probot.logger.error = jest.fn();
-      probot.webhook.on("*", () => {
+      probot.webhooks.on("*", () => {
         throw new Error(
           "error:0906D06C:PEM routines:PEM_read_bio:no start line"
         );
       });
 
       try {
-        await probot.webhook.receive(event);
+        await probot.webhooks.receive(event);
       } catch (e) {
-        expect(
-          (probot.logger.error as jest.Mock).mock.calls[0]
-        ).toMatchSnapshot();
+        const [error] = Array.from(
+          (probot.logger.error as jest.Mock).mock.calls[0][0].err
+        ) as Error[];
+        expect(error.message).toMatchSnapshot();
       }
     });
 
     it("responds with the correct error if the jwt could not be decoded", async () => {
       probot.logger.error = jest.fn();
-      probot.webhook.on("*", () => {
+      probot.webhooks.on("*", () => {
         throw new Error(
           '{"message":"A JSON web token could not be decoded","documentation_url":"https://developer.github.com/v3"}'
         );
       });
 
       try {
-        await probot.webhook.receive(event);
+        await probot.webhooks.receive(event);
       } catch (e) {
-        expect(
-          (probot.logger.error as jest.Mock).mock.calls[0]
-        ).toMatchSnapshot();
+        const [error] = Array.from(
+          (probot.logger.error as jest.Mock).mock.calls[0][0].err
+        ) as Error[];
+        expect(error.message).toMatchSnapshot();
       }
     });
   });
@@ -290,12 +290,12 @@ describe("Probot", () => {
   describe("receive", () => {
     it("forwards events to each app", async () => {
       const spy = jest.fn();
-      const app = probot.load((appl) => appl.on("push", spy));
-      app.auth = jest.fn().mockReturnValue(Promise.resolve({}));
+
+      probot.load((app) => app.on("push", spy));
 
       await probot.receive(event);
 
-      expect(spy).toHaveBeenCalled();
+      expect(spy).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -323,7 +323,7 @@ describe("Probot", () => {
       process.env.GHE_HOST = "https://notreallygithub.com";
 
       try {
-        new Probot({ id, cert });
+        new Probot({ id, privateKey });
       } catch (e) {
         expect(e).toMatchSnapshot();
       }
@@ -356,7 +356,7 @@ describe("Probot", () => {
       process.env.GHE_HOST = "http://notreallygithub.com";
 
       try {
-        new Probot({ id, cert });
+        new Probot({ id, privateKey });
       } catch (e) {
         expect(e).toMatchSnapshot();
       }
@@ -421,42 +421,6 @@ describe("Probot", () => {
       const app = probot.load(() => {});
       const octokit: InstanceType<typeof ProbotOctokit> = await app.auth();
       expect(octokit.foo).toBe("bar");
-    });
-  });
-
-  describe("start", () => {
-    beforeEach(() => {
-      process.exit = jest.fn() as any; // we dont want to terminate the test
-    });
-    it("should expect the correct error if port already in use", (next) => {
-      expect.assertions(2);
-
-      // block port 3001
-      const http = require("http");
-      const blockade = http.createServer().listen(3001, () => {
-        const testApp = new Probot({ port: 3001 });
-        testApp.logger.error = jest.fn();
-
-        const server = testApp.start().addListener("error", () => {
-          expect(testApp.logger.error).toHaveBeenCalledWith(
-            "Port 3001 is already in use. You can define the PORT environment variable to use a different port."
-          );
-          expect(process.exit).toHaveBeenCalledWith(1);
-          server.close(() => blockade.close(() => next()));
-        });
-      });
-    });
-
-    it("should listen to port when not in use", (next) => {
-      expect.assertions(1);
-      const testApp = new Probot({ port: 3001, webhookProxy: undefined });
-      testApp.logger.info = jest.fn();
-      const server = testApp.start().on("listening", () => {
-        expect(testApp.logger.info).toHaveBeenCalledWith(
-          "Listening on http://localhost:3001"
-        );
-        server.close(() => next());
-      });
     });
   });
 

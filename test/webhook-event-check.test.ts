@@ -2,7 +2,7 @@ import nock from "nock";
 import { Probot } from "../src";
 
 const id = 1;
-const cert = `-----BEGIN RSA PRIVATE KEY-----
+const privateKey = `-----BEGIN RSA PRIVATE KEY-----
 MIIBOQIBAAJBAIILhiN9IFpaE0pUXsesuuoaj6eeDiAqCiE49WB1tMB8ZMhC37kY
 Fl52NUYbUxb7JEf6pH5H9vqw1Wp69u78XeUCAwEAAQJAb88urnaXiXdmnIK71tuo
 /TyHBKt9I6Rhfzz0o9Gv7coL7a537FVDvV5UCARXHJMF41tKwj+zlt9EEUw7a1HY
@@ -34,6 +34,11 @@ describe("webhook-event-check", () => {
   beforeAll(() => {
     originalNodeEnv = process.env.NODE_ENV || "test";
     originalJestWorkerId = process.env.JEST_WORKER_ID;
+    nock.disableNetConnect();
+  });
+
+  afterAll(() => {
+    nock.restore();
   });
 
   beforeEach(() => {
@@ -55,7 +60,7 @@ describe("webhook-event-check", () => {
       .get("/app")
       .reply(200, mockAppMetaRequest(["label", "star"]));
 
-    const probot = new Probot({ id, cert });
+    const probot = new Probot({ id, privateKey });
 
     let spyOnLogError;
     probot.load(async (app) => {
@@ -67,7 +72,7 @@ describe("webhook-event-check", () => {
     });
 
     // let's give the event check a moment to send its request
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 2500));
 
     expect(spyOnLogError).toHaveBeenCalledTimes(1);
     expect(spyOnLogError).toMatchSnapshot();
@@ -78,7 +83,7 @@ describe("webhook-event-check", () => {
       .get("/app")
       .reply(200, mockAppMetaRequest([]));
 
-    const probot = new Probot({ id, cert });
+    const probot = new Probot({ id, privateKey });
     let spyOnLogError;
 
     probot.load(async (app) => {
@@ -100,7 +105,7 @@ describe("webhook-event-check", () => {
         .get("/app")
         .reply(200, mockAppMetaRequest());
 
-      const probot = new Probot({ id, cert });
+      const probot = new Probot({ id, privateKey });
       let spyOnLogError;
 
       probot.load(async (app) => {
@@ -122,7 +127,7 @@ describe("webhook-event-check", () => {
         .get("/app")
         .reply(404);
 
-      const probot = new Probot({ id, cert });
+      const probot = new Probot({ id, privateKey });
       let spyOnLogError;
 
       probot.load(async (app) => {
@@ -149,7 +154,7 @@ describe("webhook-event-check", () => {
     test("when JEST_WORKER_ID is set", async () => {
       process.env.JEST_WORKER_ID = "mocked_id";
 
-      const probot = new Probot({ id, cert });
+      const probot = new Probot({ id, privateKey });
       let spyOnLogError;
 
       probot.load(async (app) => {
@@ -166,7 +171,7 @@ describe("webhook-event-check", () => {
     test("when DISABLE_WEBHOOK_EVENT_CHECK is true", async () => {
       process.env.DISABLE_WEBHOOK_EVENT_CHECK = "true";
 
-      const probot = new Probot({ id, cert });
+      const probot = new Probot({ id, privateKey });
       let spyOnLogError;
 
       probot.load(async (app) => {
@@ -183,7 +188,7 @@ describe("webhook-event-check", () => {
     test("when NODE_ENV is production", async () => {
       process.env.NODE_ENV = "production";
 
-      const probot = new Probot({ id, cert });
+      const probot = new Probot({ id, privateKey });
       let spyOnLogError;
 
       probot.load(async (app) => {
@@ -200,7 +205,7 @@ describe("webhook-event-check", () => {
     test('when NODE_ENV starts with "test"', async () => {
       process.env.NODE_ENV = "testing";
 
-      const probot = new Probot({ id, cert });
+      const probot = new Probot({ id, privateKey });
       let spyOnLogError;
 
       probot.load(async (app) => {

@@ -51,8 +51,8 @@ if (!program.event || !program.payloadPath) {
   program.help();
 }
 
-const cert = findPrivateKey();
-if (!githubToken && (!program.app || !cert)) {
+const privateKey = findPrivateKey();
+if (!githubToken && (!program.app || !privateKey)) {
   console.warn(
     "No token specified and no certificate found, which means you will not be able to do authenticated requests to GitHub"
   );
@@ -62,7 +62,7 @@ const payload = require(path.resolve(program.payloadPath));
 
 const probot = new Probot({
   id: program.app,
-  cert,
+  privateKey,
   githubToken: githubToken,
 });
 

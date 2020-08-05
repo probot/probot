@@ -8,7 +8,7 @@ describe("default app", () => {
   beforeEach(async () => {
     probot = new Probot({
       id: 1,
-      cert: "private key",
+      privateKey: "private key",
     });
     probot.load(defaultApp);
 

@@ -26,18 +26,18 @@ export function findPrivateKey(filepath?: string): string | null {
   }
 
   if (process.env.PRIVATE_KEY) {
-    let cert = process.env.PRIVATE_KEY;
+    let privateKey = process.env.PRIVATE_KEY;
 
-    if (isBase64(cert)) {
+    if (isBase64(privateKey)) {
       // Decode base64-encoded certificate
-      cert = Buffer.from(cert, "base64").toString();
+      privateKey = Buffer.from(privateKey, "base64").toString();
     }
 
     const begin = "-----BEGIN RSA PRIVATE KEY-----";
     const end = "-----END RSA PRIVATE KEY-----";
-    if (cert.includes(begin) && cert.includes(end)) {
+    if (privateKey.includes(begin) && privateKey.includes(end)) {
       // Full key with new lines
-      return cert.replace(/\\n/g, "\n");
+      return privateKey.replace(/\\n/g, "\n");
     }
 
     throw new Error(

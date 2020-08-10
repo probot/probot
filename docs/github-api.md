@@ -15,17 +15,17 @@ Your app has access to an authenticated GitHub client that can be used to make A
 Here is an example of an autoresponder app that comments on opened issues:
 
 ```js
-module.exports = app => {
-  app.on('issues.opened', async context => {
+module.exports = (app) => {
+  app.on("issues.opened", async (context) => {
     // `context` extracts information from the event, which can be passed to
     // GitHub API calls. This will return:
     //   { owner: 'yourname', repo: 'yourrepo', number: 123, body: 'Hello World! }
-    const params = context.issue({ body: 'Hello World!' })
+    const params = context.issue({ body: "Hello World!" });
 
     // Post a comment on the issue
-    return context.github.issues.createComment(params)
-  })
-}
+    return context.github.issues.createComment(params);
+  });
+};
 ```
 
 See the [full API docs](https://octokit.github.io/rest.js/) to see all the ways you can interact with GitHub. Some API endpoints are not available on GitHub Apps yet, so check [which ones are available](https://developer.github.com/v3/apps/available-endpoints/) first.
@@ -44,17 +44,17 @@ const addComment = `
       clientMutationId
     }
   }
-`
+`;
 
-module.exports = app => {
-  app.on('issues.opened', async context => {
+module.exports = (app) => {
+  app.on("issues.opened", async (context) => {
     // Post a comment on the issue
     context.github.graphql(addComment, {
       id: context.payload.issue.node_id,
-      body: 'Hello World'
-    })
-  })
-}
+      body: "Hello World",
+    });
+  });
+};
 ```
 
 The options in the 2nd argument will be passed as variables to the query. You can pass custom headers by using the `headers` key:
@@ -67,18 +67,18 @@ const pinIssue = `
       clientMutationId
     }
   }
-`
+`;
 
-module.exports = app => {
-  app.on('issues.opened', async context => {
+module.exports = (app) => {
+  app.on("issues.opened", async (context) => {
     context.github.graphql(pinIssue, {
       id: context.payload.issue.node_id,
       headers: {
-        accept: 'application/vnd.github.elektra-preview+json'
-      }
-    })
-  })
-}
+        accept: "application/vnd.github.elektra-preview+json",
+      },
+    });
+  });
+};
 ```
 
 Check out the [GitHub GraphQL API docs](https://developer.github.com/v4/) to learn more.
@@ -109,16 +109,16 @@ Sometimes you may need to create your own instance of Probot's GitHub API class,
 [OAuth user authorization flow](https://developer.github.com/apps/building-github-apps/identifying-and-authorizing-users-for-github-apps/). You may access the class by importing `GitHubAPI`:
 
 ```js
-const { GitHubAPI } = require('probot')
+const { GitHubAPI } = require("probot");
 
-function myProbotApp (app) {
+function myProbotApp(app) {
   const github = GitHubAPI({
     // any options you'd pass to Octokit
-    auth: 'token <myToken>',
+    auth: "token <myToken>",
     // plus throttling settings
     throttle: throttlingSettings,
     // and a logger
-    logger: app.log.child({ name: 'my-github' })
-  })
+    logger: app.log.child({ name: "my-github" }),
+  });
 }
 ```

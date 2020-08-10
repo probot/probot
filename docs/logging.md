@@ -9,21 +9,21 @@ A good logger is a good developer's secret weapon. Probot comes with [bunyan](ht
 `app.log`, `context.log` in an event handler, and `req.log` in an HTTP request are all loggers that you can use to get more information about what your app is doing.
 
 ```js
-module.exports = app => {
-  app.log('Yay, my app is loaded')
+module.exports = (app) => {
+  app.log("Yay, my app is loaded");
 
-  app.on('issues.opened', context => {
+  app.on("issues.opened", (context) => {
     if (context.payload.issue.body.match(/bacon/)) {
-      context.log('This issue is about bacon')
+      context.log("This issue is about bacon");
     } else {
-      context.log('Sadly, this issue is not about bacon')
+      context.log("Sadly, this issue is not about bacon");
     }
-  })
+  });
 
-  app.route().get('/hello-world', (req, res) => {
-    req.log('Someone is saying hello')
-  })
-}
+  app.route().get("/hello-world", (req, res) => {
+    req.log("Someone is saying hello");
+  });
+};
 ```
 
 When you start up your app with `npm start`, You should see your log message appear in your terminal.
@@ -33,17 +33,17 @@ When you start up your app with `npm start`, You should see your log message app
 `app.log` will log messages at the `info` level, which is what your app should use for most relevant messages. Occasionally you will want to log more detailed information that is useful for debugging, but you might not want to see it all the time.
 
 ```js
-module.exports = app => {
+module.exports = (app) => {
   // …
-  app.log.trace('Really low-level logging')
-  app.log.debug({ data: 'here' }, 'End-line specs on the rotary girder')
-  app.log.info('Same as using `app.log`')
+  app.log.trace("Really low-level logging");
+  app.log.debug({ data: "here" }, "End-line specs on the rotary girder");
+  app.log.info("Same as using `app.log`");
 
-  const err = new Error('Some error')
-  app.log.warn(err, 'Uh-oh, this may not be good')
-  app.log.error(err, 'Yeah, it was bad')
-  app.log.fatal(err, 'Goodbye, cruel world!')
-}
+  const err = new Error("Some error");
+  app.log.warn(err, "Uh-oh, this may not be good");
+  app.log.error(err, "Yeah, it was bad");
+  app.log.fatal(err, "Goodbye, cruel world!");
+};
 ```
 
 By default, messages that are `info` and above will show in your logs, but you can change it by setting the
@@ -62,11 +62,11 @@ Set `LOG_FORMAT=json` to show log messages as structured JSON, which can then be
 For example, given this log:
 
 ```js
-module.exports = app => {
-  app.on('issue_comment.created', context => {
-    context.log('Comment created')
-  })
-}
+module.exports = (app) => {
+  app.on("issue_comment.created", (context) => {
+    context.log("Comment created");
+  });
+};
 ```
 
 You'll see this output:

@@ -11,8 +11,8 @@
   "scripts": {
     "build": "rimraf lib && tsc -p tsconfig.json",
     "start": "node ./bin/probot run",
-    "lint": "prettier --check 'src/**/*.ts' 'test/**/*.ts' *.md package.json tsconfig.json",
-    "lint:fix": "prettier --write 'src/**/*.ts' 'test/**/*.ts' *.md package.json tsconfig.json",
+    "lint": "prettier --check 'src/**/*.ts' 'test/**/*.ts' 'docs/*.md' *.md package.json tsconfig.json",
+    "lint:fix": "prettier --write 'src/**/*.ts' 'test/**/*.ts' 'docs/*.md' *.md package.json tsconfig.json",
     "pretest": "tsc --noEmit -p test",
     "test": "jest --coverage",
     "posttest": "npm run lint",

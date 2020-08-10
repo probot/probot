@@ -13,15 +13,15 @@ While Probot doesn't have an official extension API (yet), there are a handful o
 For example, users could add labels from comments by typing `/label in-progress`.
 
 ```js
-const commands = require('probot-commands')
+const commands = require("probot-commands");
 
-module.exports = app => {
+module.exports = (app) => {
   // Type `/label foo, bar` in a comment box for an Issue or Pull Request
-  commands(app, 'label', (context, command) => {
-    const labels = command.arguments.split(/, */)
-    return context.github.issues.addLabels(context.issue({ labels }))
-  })
-}
+  commands(app, "label", (context, command) => {
+    const labels = command.arguments.split(/, */);
+    return context.github.issues.addLabels(context.issue({ labels }));
+  });
+};
 ```
 
 ## Metadata
@@ -31,21 +31,23 @@ module.exports = app => {
 For example, here is a contrived app that stores the number of times that comments were edited in a discussion and comments with the edit count when the issue is closed.
 
 ```js
-const metadata = require('probot-metadata')
+const metadata = require("probot-metadata");
 
-module.exports = app => {
-  app.on(['issues.edited', 'issue_comment.edited'], async context => {
-    const kv = await metadata(context)
-    await kv.set('edits', await kv.get('edits') || 1)
-  })
+module.exports = (app) => {
+  app.on(["issues.edited", "issue_comment.edited"], async (context) => {
+    const kv = await metadata(context);
+    await kv.set("edits", (await kv.get("edits")) || 1);
+  });
 
-  app.on('issues.closed', async context => {
-    const edits = await metadata(context).get('edits')
-    context.github.issues.createComment(context.issue({
-      body: `There were ${edits} edits to issues in this thread.`
-    }))
-  })
-}
+  app.on("issues.closed", async (context) => {
+    const edits = await metadata(context).get("edits");
+    context.github.issues.createComment(
+      context.issue({
+        body: `There were ${edits} edits to issues in this thread.`,
+      })
+    );
+  });
+};
 ```
 
 ## Scheduler
@@ -53,15 +55,15 @@ module.exports = app => {
 [probot-scheduler](https://github.com/probot/scheduler) is an extension to trigger events on a periodic schedule. It triggers a `schedule.repository` event every hour for each repository it has access to.
 
 ```js
-const createScheduler = require('probot-scheduler')
+const createScheduler = require("probot-scheduler");
 
-module.exports = app => {
-  createScheduler(app)
+module.exports = (app) => {
+  createScheduler(app);
 
-  app.on('schedule.repository', context => {
+  app.on("schedule.repository", (context) => {
     // this event is triggered on an interval, which is 1 hr by default
-  })
-}
+  });
+};
 ```
 
 Check out [stale](https://github.com/probot/stale) to see it in action.
@@ -71,16 +73,16 @@ Check out [stale](https://github.com/probot/stale) to see it in action.
 [probot-attachments](https://github.com/probot/attachments) adds message attachments to comments on GitHub. This extension should be used any time an app is appending content to user comments.
 
 ```js
-const attachments = require('probot-attachments')
+const attachments = require("probot-attachments");
 
-module.exports = app => {
-  app.on('issue_comment.created', context => {
+module.exports = (app) => {
+  app.on("issue_comment.created", (context) => {
     return attachments(context).add({
-      title: 'Hello World',
-      title_link: 'https://example.com/hello'
-    })
-  })
-}
+      title: "Hello World",
+      title_link: "https://example.com/hello",
+    });
+  });
+};
 ```
 
 Check out [probot/unfurl](https://github.com/probot/unfurl) to see it in action.

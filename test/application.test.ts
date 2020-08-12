@@ -1,25 +1,22 @@
 import { WebhookEvent } from "@octokit/webhooks";
 import nock from "nock";
+import pino from "pino";
 
 import { Application } from "../src/application";
 import { Context } from "../src/context";
 import { ProbotOctokit, ProbotOctokitCore } from "../src/github/octokit";
-import { logger } from "../src/logger";
+import Stream from "stream";
 
 describe("Application", () => {
   let app: Application;
   let event: WebhookEvent;
   let output: any;
 
-  beforeAll(() => {
-    // Add a new stream for testing the logger
-    // https://github.com/trentm/node-bunyan#adding-a-stream
-    logger.addStream({
-      level: "trace",
-      stream: { write: (log: any) => output.push(log) },
-      type: "raw",
-    } as any);
-  });
+  const streamLogsToOutput = new Stream.Writable({ objectMode: true });
+  streamLogsToOutput._write = (object, encoding, done) => {
+    output.push(JSON.parse(object));
+    done();
+  };
 
   beforeEach(() => {
     // Clear log output
@@ -31,6 +28,7 @@ describe("Application", () => {
       privateKey:
         "-----BEGIN RSA PRIVATE KEY-----\nMIIBOQIBAAJBAIILhiN9IFpaE0pUXsesuuoaj6eeDiAqCiE49WB1tMB8ZMhC37kY\nFl52NUYbUxb7JEf6pH5H9vqw1Wp69u78XeUCAwEAAQJAb88urnaXiXdmnIK71tuo\n/TyHBKt9I6Rhfzz0o9Gv7coL7a537FVDvV5UCARXHJMF41tKwj+zlt9EEUw7a1HY\nwQIhAL4F/VHWSPHeTgXYf4EaX2OlpSOk/n7lsFtL/6bWRzRVAiEArzJs2vopJitv\nA1yBjz3q2nX+zthk+GLXrJQkYOnIk1ECIHfeFV8TWm5gej1LxZquBTA5pINoqDVq\nNKZSuZEHqGEFAiB6EDrxkovq8SYGhIQsJeqkTMO8n94xhMRZlFmIQDokEQIgAq5U\nr1UQNnUExRh7ZT0kFbMfO9jKYZVlQdCL9Dn93vo=\n-----END RSA PRIVATE KEY-----",
       Octokit: ProbotOctokitCore,
+      log: pino(streamLogsToOutput),
     });
 
     event = {
@@ -107,8 +105,8 @@ describe("Application", () => {
 
     it("adds a logger on the context", async () => {
       const handler = jest.fn().mockImplementation((context) => {
-        expect(context.log).toBeDefined();
-        context.log("testing");
+        expect(context.log.info).toBeDefined();
+        context.log.info("testing");
 
         expect(output[0]).toEqual(
           expect.objectContaining({
@@ -315,6 +313,7 @@ describe("Application", () => {
       }
 
       expect(output.length).toBe(1);
+
       expect(output[0].err.message).toMatch(/testing/);
       expect(output[0].event.id).toEqual(event.id);
     });

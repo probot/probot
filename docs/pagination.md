@@ -10,10 +10,11 @@ Many GitHub API endpoints are paginated. The `github.paginate` method can be use
 module.exports = (app) => {
   app.on("issues.opened", (context) => {
     context.github.paginate(
-      context.github.issues.getAll.endpoint.merge(context.repo()),
+      context.github.issues.getAll,
+      context.repo(),
       (res) => {
         res.data.issues.forEach((issue) => {
-          context.log("Issue: %s", issue.title);
+          context.log.info("Issue: %s", issue.title);
         });
       }
     );
@@ -29,7 +30,8 @@ The return value of the `github.paginate` callback will be used to accumulate re
 module.exports = (app) => {
   app.on("issues.opened", async (context) => {
     const allIssues = await context.github.paginate(
-      context.github.issues.getAll.endpoint.merge(context.repo()),
+      context.github.issues.getAll,
+      context.repo(),
       (res) => res.data
     );
     console.log(allIssues);
@@ -44,16 +46,19 @@ Sometimes it is desirable to stop fetching pages after a certain condition has b
 ```js
 module.exports = (app) => {
   app.on("issues.opened", (context) => {
-    const options = context.github.issues.getAll.endpoint.merge(context.repo());
-    context.github.paginate(options, (res, done) => {
-      for (const issue of res.data) {
-        if (issue.body.includes("something")) {
-          console.log("found it:", issue);
-          done();
-          break;
+    context.github.paginate(
+      context.github.issues.getAll,
+      context.repo(),
+      (res, done) => {
+        for (const issue of res.data) {
+          if (issue.body.includes("something")) {
+            console.log("found it:", issue);
+            done();
+            break;
+          }
         }
       }
-    });
+    );
   });
 };
 ```
@@ -65,8 +70,10 @@ If your runtime environment supports async iterators (such as Node 10+), you can
 ```js
 module.exports = (app) => {
   app.on("issues.opened", async (context) => {
-    const options = context.github.issues.getAll.endpoint.merge(context.repo());
-    for await (const response of octokit.paginate.iterator(options)) {
+    for await (const response of octokit.paginate.iterator(
+      context.github.issues.getAll,
+      context.repo()
+    )) {
       for (const issue of res.data) {
         if (issue.body.includes("something")) {
           return console.log("found it:", issue);

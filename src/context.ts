@@ -1,11 +1,13 @@
+import path from "path";
+
 import { Endpoints } from "@octokit/types";
 import { EventNames, EventPayloads, WebhookEvent } from "@octokit/webhooks";
 import merge from "deepmerge";
 import yaml from "js-yaml";
-import path from "path";
+
+import type { Logger } from "pino";
 
 import { ProbotOctokit } from "./github/octokit";
-import { LoggerWithTarget } from "./wrap-logger";
 
 type ReposGetContentsParams = Endpoints["GET /repos/:owner/:repo/contents/:path"]["parameters"];
 
@@ -56,7 +58,7 @@ interface WebhookPayloadWithRepository {
  *  ```js
  *  module.exports = app => {
  *    app.on('push', context => {
- *      context.log('Code was pushed to the repo, what should we do with it?');
+ *      context.log.info('Code was pushed to the repo, what should we do with it?');
  *    });
  *  };
  *  ```
@@ -72,12 +74,12 @@ export class Context<E extends WebhookPayloadWithRepository = any>
   public payload: E;
 
   public github: InstanceType<typeof ProbotOctokit>;
-  public log: LoggerWithTarget;
+  public log: Logger;
 
   constructor(
     event: WebhookEvent<E>,
     github: InstanceType<typeof ProbotOctokit>,
-    log: LoggerWithTarget
+    log: Logger
   ) {
     this.name = event.name;
     this.id = event.id;

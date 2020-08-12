@@ -1,22 +1,24 @@
-import Logger from "bunyan";
-import express from "express";
 import path from "path";
+
+import express from "express";
+
+import { getLoggingMiddleware } from "./middleware/logging";
+
+import type { Logger } from "pino";
 
 // Teach express to properly handle async errors
 // tslint:disable-next-line:no-var-requires
 require("express-async-errors");
 
-import { logRequest } from "./middleware/logging";
-
-export const createServer = (args: ServerArgs) => {
+export const createServer = (options: ServerOptions) => {
   const app: express.Application = express();
 
-  app.use(logRequest({ logger: args.logger }));
+  app.use(getLoggingMiddleware(options.logger));
   app.use(
     "/probot/static/",
     express.static(path.join(__dirname, "..", "static"))
   );
-  app.use(args.webhook);
+  app.use(options.webhook);
   app.set("view engine", "hbs");
   app.set("views", path.join(__dirname, "..", "views"));
   app.get("/ping", (req, res) => res.end("PONG"));
@@ -24,7 +26,7 @@ export const createServer = (args: ServerArgs) => {
   return app;
 };
 
-export interface ServerArgs {
+export interface ServerOptions {
   webhook: express.Application;
   logger: Logger;
 }

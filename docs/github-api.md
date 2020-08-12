@@ -101,24 +101,20 @@ If you want to run a Probot App against a GitHub Enterprise instance, you'll nee
 GHE_HOST=fake.github-enterprise.com
 ```
 
-> GitHub Apps are enabled in GitHub Enterprise 2.12 as an [early access technical preview](https://developer.github.com/enterprise/2.12/apps/) but are generally available in GitHub Enterprise 2.13 and above.
+## Using Probot's customized Octokit class directly
 
-## Using Probot's GitHub API class directly
-
-Sometimes you may need to create your own instance of Probot's GitHub API class, for example when using the
-[OAuth user authorization flow](https://developer.github.com/apps/building-github-apps/identifying-and-authorizing-users-for-github-apps/). You may access the class by importing `GitHubAPI`:
+Sometimes you may need to create your own instance of Probot's internally used Octokit class, for example when using the
+[OAuth user authorization flow](https://developer.github.com/apps/building-github-apps/identifying-and-authorizing-users-for-github-apps/). You may access the class by importing `ProbotOctokit`:
 
 ```js
-const { GitHubAPI } = require("probot");
+const { ProbotOctokit } = require("probot");
 
 function myProbotApp(app) {
-  const github = GitHubAPI({
+  const github = new ProbotOctokit({
     // any options you'd pass to Octokit
     auth: "token <myToken>",
-    // plus throttling settings
-    throttle: throttlingSettings,
     // and a logger
-    logger: app.log.child({ name: "my-github" }),
+    log: app.log.child({ name: "my-github" }),
   });
 }
 ```

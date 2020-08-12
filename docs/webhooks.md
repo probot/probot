@@ -12,7 +12,7 @@ Many apps will spend their entire day responding to these actions. `app.on` will
 module.exports = (app) => {
   app.on("push", async (context) => {
     // Code was pushed to the repo, what should we do with it?
-    app.log(context);
+    app.log.info(context);
   });
 };
 ```
@@ -35,7 +35,7 @@ Sometimes you want to handle multiple webhook events the same way. `app.on` can 
 module.exports = (app) => {
   app.on(["issues.opened", "issues.edited"], async (context) => {
     // An issue was opened or edited, what should we do with it?
-    app.log(context);
+    app.log.info(context);
   });
 };
 ```
@@ -45,7 +45,7 @@ You can also use the wildcard event (`*`) to listen for any event that your app 
 ```js
 module.exports = (app) => {
   app.on("*", async (context) => {
-    context.log({ event: context.event, action: context.payload.action });
+    context.log.info({ event: context.event, action: context.payload.action });
   });
 };
 ```

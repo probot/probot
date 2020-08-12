@@ -7,7 +7,7 @@ import { ManifestCreation } from "../manifest-creation";
 // https://glitch.com/help/project/
 const domain =
   process.env.PROJECT_DOMAIN || `http://localhost:${process.env.PORT || 3000}`;
-const welcomeMessage = `\nWelcome to Probot! Go to ${domain} to get started.\n`;
+const welcomeMessage = `Welcome to Probot! Go to ${domain} to get started.`;
 
 export async function setupApp(app: Application) {
   const setup: ManifestCreation = new ManifestCreation();

@@ -3,12 +3,13 @@ import express from "express";
 import Redis from "ioredis";
 import LRUCache from "lru-cache";
 
+import type { Logger } from "pino";
+
 import { ApplicationFunction } from ".";
 import { Context } from "./context";
 import { getAuthenticatedOctokit } from "./get-authenticated-octokit";
 import { ProbotOctokit } from "./github/octokit";
-import { logger } from "./logger";
-import { LoggerWithTarget, wrapLogger } from "./wrap-logger";
+import { getLog } from "./get-log";
 import { getThrottleOptions } from "./get-throttle-options";
 import { getProbotOctokitWithDefaults } from "./get-probot-octokit-with-defaults";
 import { webhookTransform } from "./webhook-transform";
@@ -21,13 +22,14 @@ export interface Options {
   githubToken?: string;
   id?: number;
   Octokit?: typeof ProbotOctokit;
-  octokit?: InstanceType<typeof ProbotOctokit>;
+  log?: Logger;
   redisConfig?: Redis.RedisOptions;
   secret?: string;
   webhookPath?: string;
 
   // Application class specific options
   cache?: LRUCache<number, string>;
+  octokit?: InstanceType<typeof ProbotOctokit>;
   throttleOptions?: any;
   webhooks?: Webhooks;
 
@@ -44,7 +46,7 @@ export type OnCallback<T> = (context: Context<T>) => Promise<void>;
  */
 export class Application {
   public router: express.Router;
-  public log: LoggerWithTarget;
+  public log: Logger;
   public on: ProbotWebhooks["on"];
   public receive: ProbotWebhooks["receive"];
 
@@ -53,7 +55,7 @@ export class Application {
 
   constructor(options: Options) {
     const opts = options;
-    this.log = wrapLogger(logger);
+    this.log = options.log || getLog();
 
     // TODO: support redis backend for access token cache if `options.redisConfig || process.env.REDIS_URL`
     const cache =
@@ -217,7 +219,7 @@ export class Application {
    */
   public async auth(
     installationId?: number,
-    log?: LoggerWithTarget
+    log?: Logger
   ): Promise<InstanceType<typeof ProbotOctokit>> {
     return getAuthenticatedOctokit(
       Object.assign({}, this.state, log ? { log } : null),

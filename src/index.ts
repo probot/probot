@@ -1,40 +1,33 @@
 // tslint:disable-next-line: no-var-requires
 require("dotenv").config();
 
-// TODO: remove in v11
-if ("DISABLE_STATS" in process.env) {
-  // tslint:disable:no-console
-  console.warn('[probot] "DISABLE_STATS" is no longer used since v10');
-}
-if ("IGNORED_ACCOUNTS" in process.env) {
-  // tslint:disable:no-console
-  console.warn('[probot] "IGNORED_ACCOUNTS" is no longer used since v10');
-}
-
 import { WebhookEvent, Webhooks } from "@octokit/webhooks";
-import Logger from "bunyan";
 import express from "express";
 import Redis from "ioredis";
 import LRUCache from "lru-cache";
 import { Deprecation } from "deprecation";
+import pinoHttp from "pino-http";
+
+import type { Logger } from "pino";
 
 import { Server } from "http";
 import { Application } from "./application";
 import { setupApp } from "./apps/setup";
 import { Context } from "./context";
 import { ProbotOctokit, ProbotOctokitCore } from "./github/octokit";
-import { logger } from "./logger";
-import { logRequestErrors } from "./middleware/log-request-errors";
+import { getLog } from "./get-log";
 import { findPrivateKey } from "./private-key";
 import { resolve } from "./resolver";
 import { createServer } from "./server";
 import { createWebhookProxy } from "./webhook-proxy";
-import { errorHandler } from "./error-handler";
+import { getErrorHandler } from "./error-handler";
 import { ProbotWebhooks, State } from "./types";
 import { webhookTransform } from "./webhook-transform";
-import { wrapLogger } from "./wrap-logger";
 import { getThrottleOptions } from "./get-throttle-options";
 import { getProbotOctokitWithDefaults } from "./get-probot-octokit-with-defaults";
+
+import { handleDeprecatedEnvironmentVariables } from "./handle-deprecated-environment-variables";
+handleDeprecatedEnvironmentVariables();
 
 export interface Options {
   // same options as Application class
@@ -42,6 +35,7 @@ export interface Options {
   githubToken?: string;
   id?: number;
   Octokit?: typeof ProbotOctokit;
+  log?: Logger;
   redisConfig?: Redis.RedisOptions;
   secret?: string;
   webhookPath?: string;
@@ -56,10 +50,7 @@ export interface Options {
 }
 
 // tslint:disable:no-var-requires
-const defaultAppFns: ApplicationFunction[] = [
-  require("./apps/default"),
-  require("./apps/sentry"),
-];
+const defaultAppFns: ApplicationFunction[] = [require("./apps/default")];
 // tslint:enable:no-var-requires
 
 export class Probot {
@@ -167,15 +158,6 @@ export class Probot {
       );
     }
 
-    if (options.cert) {
-      console.warn(
-        new Deprecation(
-          `[probot] "cert" option is deprecated. Use "privateKey" instead`
-        )
-      );
-      options.privateKey = options.cert;
-    }
-
     //
     // Probot class-specific options (Express server & Webhooks)
     //
@@ -183,8 +165,17 @@ export class Probot {
     options.secret = options.secret || "development";
 
     // TODO: deprecate probot.logger in favor of probot.log.
-    //       Use `this.log = wrapLogger(logger)` like in application.ts
-    this.logger = logger;
+    this.logger = options.log || getLog();
+
+    if (options.cert) {
+      this.logger.warn(
+        new Deprecation(
+          `[probot] "cert" option is deprecated. Use "privateKey" instead`
+        )
+      );
+      options.privateKey = options.cert;
+    }
+
     this.apps = [];
 
     // TODO: Why is this public?
@@ -207,16 +198,15 @@ export class Probot {
     });
     const octokit = new Octokit();
 
-    const log = wrapLogger(logger);
     this.throttleOptions = getThrottleOptions({
-      log,
+      log: this.logger,
       redisConfig: options.redisConfig,
     });
 
     this.state = {
       cache,
       githubToken: options.githubToken,
-      log,
+      log: this.logger,
       Octokit,
       octokit,
       throttleOptions: this.throttleOptions,
@@ -228,11 +218,11 @@ export class Probot {
       transform: webhookTransform.bind(null, this.state),
     });
     // TODO: normalize error handler with code in application.ts
-    this.webhooks.on("error", errorHandler);
+    this.webhooks.on("error", getErrorHandler(this.logger));
 
     this.server = createServer({
       webhook: (this.webhooks as any).middleware,
-      logger,
+      logger: this.logger,
     });
   }
 
@@ -240,7 +230,7 @@ export class Probot {
    * @deprecated `probot.webhook` is deprecated. Use `probot.webhooks` instead
    */
   public get webhook(): Webhooks {
-    console.warn(
+    this.logger.warn(
       new Deprecation(
         `[probot] "probot.webhook" is deprecated. Use "probot.webhooks" instead instead`
       )
@@ -280,13 +270,17 @@ export class Probot {
 
   public setup(appFns: Array<string | ApplicationFunction>) {
     // Log all unhandled rejections
-    (process as NodeJS.EventEmitter).on("unhandledRejection", errorHandler);
+    (process as NodeJS.EventEmitter).on("unhandledRejection", getErrorHandler);
 
     // Load the given appFns along with the default ones
     appFns.concat(defaultAppFns).forEach((appFn) => this.load(appFn));
 
     // Register error handler as the last middleware
-    this.server.use(logRequestErrors);
+    this.server.use(
+      pinoHttp({
+        logger: this.logger,
+      })
+    );
   }
 
   public start() {
@@ -294,21 +288,21 @@ export class Probot {
       .listen(this.options.port, () => {
         if (this.options.webhookProxy) {
           createWebhookProxy({
-            logger,
+            logger: this.logger,
             path: this.options.webhookPath,
             port: this.options.port,
             url: this.options.webhookProxy,
           });
         }
-        logger.info("Listening on http://localhost:" + this.options.port);
+        this.logger.info("Listening on http://localhost:" + this.options.port);
       })
       .on("error", (err: NodeJS.ErrnoException) => {
         if (err.code === "EADDRINUSE") {
-          logger.error(
+          this.logger.error(
             `Port ${this.options.port} is already in use. You can define the PORT environment variable to use a different port.`
           );
         } else {
-          logger.error(err);
+          this.logger.error(err);
         }
         process.exit(1);
       });
@@ -324,7 +318,8 @@ export class Probot {
 }
 
 export const createProbot = (options: Options) => {
-  console.warn(
+  options.log = options.log || getLog();
+  options.log.warn(
     new Deprecation(
       `[probot] "createProbot(options)" is deprecated, use "new Probot(options)" instead`
     )

@@ -3,22 +3,17 @@
 
 require("dotenv").config();
 
-// TODO: remove in v11
-if ("DISABLE_STATS" in process.env) {
-  // tslint:disable:no-console
-  console.warn('[probot] "DISABLE_STATS" is no longer used since v10');
-}
-if ("IGNORED_ACCOUNTS" in process.env) {
-  // tslint:disable:no-console
-  console.warn('[probot] "IGNORED_ACCOUNTS" is no longer used since v10');
-}
-
 const path = require("path");
 const uuid = require("uuid");
 const program = require("commander");
 
 const { findPrivateKey } = require("../lib/private-key");
+const {
+  handleDeprecatedEnvironmentVariables,
+} = require("../lib/handle-deprecated-environment-variables");
 const { Probot } = require("../");
+
+handleDeprecatedEnvironmentVariables();
 
 program
   .usage("[options] [path/to/app.js...]")

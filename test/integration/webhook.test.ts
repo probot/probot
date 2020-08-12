@@ -1,19 +1,29 @@
+import Stream from "stream";
+
 import request from "supertest";
+import pino from "pino";
+
 import { Probot } from "../../src";
 import * as data from "../fixtures/webhook/push.json";
 
 describe("webhooks", () => {
-  let logger: any;
   let probot: Probot;
+  let output: any;
+
+  const streamLogsToOutput = new Stream.Writable({ objectMode: true });
+  streamLogsToOutput._write = (object, encoding, done) => {
+    output.push(JSON.parse(object));
+    done();
+  };
 
   beforeEach(() => {
-    logger = jest.fn();
+    output = [];
 
-    probot = new Probot({ id: 1, privateKey: "bexo🥪", secret: "secret" });
-    probot.logger.addStream({
-      level: "trace",
-      stream: { write: logger } as any,
-      type: "raw",
+    probot = new Probot({
+      id: 1,
+      privateKey: "bexo🥪",
+      secret: "secret",
+      log: pino(streamLogsToOutput),
     });
   });
 
@@ -38,7 +48,7 @@ describe("webhooks", () => {
       .set("x-github-delivery", "3sw4d5f6g7h8")
       .expect(400);
 
-    expect(logger).toHaveBeenCalledWith(
+    expect(output[0]).toEqual(
       expect.objectContaining({
         msg:
           "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",

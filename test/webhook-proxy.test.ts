@@ -9,7 +9,7 @@ import EventSource from "eventsource";
 import http from "http";
 import net from "net";
 import nock from "nock";
-import { logger } from "../src/logger";
+import { getLog } from "../src/get-log";
 import { createWebhookProxy } from "../src/webhook-proxy";
 
 const targetPort = 999999;
@@ -46,7 +46,7 @@ describe("webhook-proxy", () => {
           url,
           port: targetPort,
           path: "/test",
-          logger,
+          logger: getLog(),
         })!;
 
         // Wait for proxy to be ready
@@ -74,7 +74,7 @@ describe("webhook-proxy", () => {
     const url = "http://bad.proxy/events";
     nock("http://bad.proxy").get("/events").reply(404);
 
-    const log = logger.child({});
+    const log = getLog().child({});
     log.error = jest.fn();
 
     proxy = createWebhookProxy({ url, logger: log })!;

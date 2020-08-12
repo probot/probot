@@ -1,6 +1,8 @@
+console.log("waddafugg");
+
 module.exports = (app) => {
   // Your code here
-  app.log("Yay! The app was loaded!");
+  app.log.info("Yay! The app was loaded!");
 
   // example of probot responding 'Hello World' to a new issue being opened
   app.on("issues.opened", async (context) => {

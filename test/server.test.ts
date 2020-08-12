@@ -1,6 +1,6 @@
 import { Application, NextFunction, Request, Response } from "express";
 import request from "supertest";
-import { logger } from "../src/logger";
+import { getLog } from "../src/get-log";
 import { createServer } from "../src/server";
 
 describe("server", () => {
@@ -9,7 +9,7 @@ describe("server", () => {
 
   beforeEach(() => {
     webhook = jest.fn((req, res, next) => next());
-    server = createServer({ webhook, logger });
+    server = createServer({ webhook, logger: getLog() });
 
     // Error handler to avoid printing logs
     server.use(

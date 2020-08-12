@@ -1,10 +1,9 @@
 import Bottleneck from "bottleneck";
 import Redis from "ioredis";
-
-import { LoggerWithTarget } from "./wrap-logger";
+import type { Logger } from "pino";
 
 type Options = {
-  log: LoggerWithTarget;
+  log: Logger;
   throttleOptions?: any;
   redisConfig?: Redis.RedisOptions;
 };

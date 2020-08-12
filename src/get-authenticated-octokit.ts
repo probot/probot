@@ -20,8 +20,16 @@ export async function getAuthenticatedOctokit(
       }
     : {};
 
+  const pinoLog = log.child({ name: "github" });
   const options = {
-    log: log.child({ name: "github" }),
+    log: {
+      fatal: pinoLog.fatal.bind(pinoLog),
+      error: pinoLog.error.bind(pinoLog),
+      warn: pinoLog.warn.bind(pinoLog),
+      info: pinoLog.info.bind(pinoLog),
+      debug: pinoLog.debug.bind(pinoLog),
+      trace: pinoLog.trace.bind(pinoLog),
+    },
     ...constructorAuthOptions,
     ...constructorThrottleOptions,
   };

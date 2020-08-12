@@ -1,42 +1,42 @@
-import { Deprecation } from "deprecation";
+import Stream from "stream";
+
 import { Webhooks } from "@octokit/webhooks";
+import pino from "pino";
 
 import { createProbot, Probot } from "../src";
 
 describe("Deprecations", () => {
-  let consoleWarn: jest.SpiedFunction<typeof console.warn>;
+  let output: any;
+
+  const streamLogsToOutput = new Stream.Writable({ objectMode: true });
+  streamLogsToOutput._write = (object, encoding, done) => {
+    output.push(JSON.parse(object));
+    done();
+  };
 
   beforeEach(() => {
-    consoleWarn = jest.spyOn(global.console, "warn").mockImplementation();
-  });
-
-  afterEach(() => {
-    consoleWarn.mockRestore();
+    output = [];
   });
 
   it("createProbot", () => {
-    const probot = createProbot({});
+    const probot = createProbot({ log: pino(streamLogsToOutput) });
     expect(probot).toBeInstanceOf(Probot);
 
-    expect(consoleWarn).toHaveBeenCalledTimes(1);
-    expect(consoleWarn).toHaveBeenCalledWith(
-      new Deprecation(
-        `[probot] "createProbot(options)" is deprecated, use "new Probot(options)" instead`
-      )
+    expect(output.length).toEqual(1);
+    expect(output[0].msg).toContain(
+      `[probot] "createProbot(options)" is deprecated, use "new Probot(options)" instead`
     );
   });
 
   it("probot.webhook", () => {
-    const probot = new Probot({});
+    const probot = new Probot({ log: pino(streamLogsToOutput) });
     expect(probot).toBeInstanceOf(Probot);
 
     expect(probot.webhook).toBeInstanceOf(Webhooks);
 
-    expect(consoleWarn).toHaveBeenCalledTimes(1);
-    expect(consoleWarn).toHaveBeenCalledWith(
-      new Deprecation(
-        `[probot] "probot.webhook" is deprecated. Use "probot.webhooks" instead instead`
-      )
+    expect(output.length).toEqual(1);
+    expect(output[0].msg).toContain(
+      `[probot] "probot.webhook" is deprecated. Use "probot.webhooks" instead instead`
     );
   });
 
@@ -44,13 +44,12 @@ describe("Deprecations", () => {
     new Probot({
       id: 1,
       cert: "private key",
+      log: pino(streamLogsToOutput),
     });
 
-    expect(consoleWarn).toHaveBeenCalledTimes(1);
-    expect(consoleWarn).toHaveBeenCalledWith(
-      new Deprecation(
-        `[probot] "cert" option is deprecated. Use "privateKey" instead`
-      )
+    expect(output.length).toEqual(1);
+    expect(output[0].msg).toContain(
+      `[probot] "cert" option is deprecated. Use "privateKey" instead`
     );
   });
 });

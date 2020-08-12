@@ -1,5 +1,6 @@
-import Logger from "bunyan";
 import EventSource from "eventsource";
+
+import type { Logger } from "pino";
 
 export const createWebhookProxy = (
   opts: WebhookProxyOptions

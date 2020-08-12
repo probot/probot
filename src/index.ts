@@ -14,7 +14,7 @@ import { Server } from "http";
 import { Application } from "./application";
 import { setupApp } from "./apps/setup";
 import { Context } from "./context";
-import { ProbotOctokit, ProbotOctokitCore } from "./github/octokit";
+import { ProbotOctokit } from "./github/octokit";
 import { getLog } from "./get-log";
 import { findPrivateKey } from "./private-key";
 import { resolve } from "./resolver";
@@ -341,4 +341,4 @@ export const createProbot = (options: Options) => {
 
 export type ApplicationFunction = (app: Application) => void;
 
-export { Logger, Context, Application, ProbotOctokit, ProbotOctokitCore };
+export { Logger, Context, Application, ProbotOctokit };

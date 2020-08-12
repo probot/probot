@@ -41,7 +41,7 @@ export function getLog() {
         "req",
         "res",
         "responseTime",
-      ].join(),
+      ].join(","),
     };
     // TODO: single-line extras: https://github.com/pinojs/pino-pretty/issues/97
   }

@@ -141,7 +141,7 @@ export class Probot {
 
   public server: express.Application;
   public webhooks: ProbotWebhooks;
-  public logger: Logger;
+  public log: Logger;
 
   // These 3 need to be public for the tests to work.
   public options: Options;
@@ -150,6 +150,18 @@ export class Probot {
   private httpServer?: Server;
   private apps: Application[];
   private state: State;
+
+  /**
+   * @deprecated use probot.log instead
+   */
+  public get logger() {
+    this.log.warn(
+      new Deprecation(
+        `[probot] "probot.logger" is deprecated. Use "probot.log" instead`
+      )
+    );
+    return this.log;
+  }
 
   constructor(options: Options) {
     if (process.env.GHE_HOST && /^https?:\/\//.test(process.env.GHE_HOST)) {
@@ -164,11 +176,11 @@ export class Probot {
     options.webhookPath = options.webhookPath || "/";
     options.secret = options.secret || "development";
 
-    // TODO: deprecate probot.logger in favor of probot.log.
-    this.logger = options.log || getLog();
+    // TODO: deprecate probot.log in favor of probot.log.
+    this.log = options.log || getLog();
 
     if (options.cert) {
-      this.logger.warn(
+      this.log.warn(
         new Deprecation(
           `[probot] "cert" option is deprecated. Use "privateKey" instead`
         )
@@ -199,14 +211,14 @@ export class Probot {
     const octokit = new Octokit();
 
     this.throttleOptions = getThrottleOptions({
-      log: this.logger,
+      log: this.log,
       redisConfig: options.redisConfig,
     });
 
     this.state = {
       cache,
       githubToken: options.githubToken,
-      log: this.logger,
+      log: this.log,
       Octokit,
       octokit,
       throttleOptions: this.throttleOptions,
@@ -218,11 +230,11 @@ export class Probot {
       transform: webhookTransform.bind(null, this.state),
     });
     // TODO: normalize error handler with code in application.ts
-    this.webhooks.on("error", getErrorHandler(this.logger));
+    this.webhooks.on("error", getErrorHandler(this.log));
 
     this.server = createServer({
       webhook: (this.webhooks as any).middleware,
-      logger: this.logger,
+      logger: this.log,
     });
   }
 
@@ -230,7 +242,7 @@ export class Probot {
    * @deprecated `probot.webhook` is deprecated. Use `probot.webhooks` instead
    */
   public get webhook(): Webhooks {
-    this.logger.warn(
+    this.log.warn(
       new Deprecation(
         `[probot] "probot.webhook" is deprecated. Use "probot.webhooks" instead instead`
       )
@@ -240,7 +252,7 @@ export class Probot {
   }
 
   public receive(event: WebhookEvent) {
-    this.logger.debug({ event }, "Webhook received");
+    this.log.debug({ event }, "Webhook received");
     return Promise.all(this.apps.map((app) => app.receive(event)));
   }
 
@@ -278,7 +290,7 @@ export class Probot {
     // Register error handler as the last middleware
     this.server.use(
       pinoHttp({
-        logger: this.logger,
+        logger: this.log,
       })
     );
   }
@@ -288,21 +300,21 @@ export class Probot {
       .listen(this.options.port, () => {
         if (this.options.webhookProxy) {
           createWebhookProxy({
-            logger: this.logger,
+            logger: this.log,
             path: this.options.webhookPath,
             port: this.options.port,
             url: this.options.webhookProxy,
           });
         }
-        this.logger.info("Listening on http://localhost:" + this.options.port);
+        this.log.info("Listening on http://localhost:" + this.options.port);
       })
       .on("error", (err: NodeJS.ErrnoException) => {
         if (err.code === "EADDRINUSE") {
-          this.logger.error(
+          this.log.error(
             `Port ${this.options.port} is already in use. You can define the PORT environment variable to use a different port.`
           );
         } else {
-          this.logger.error(err);
+          this.log.error(err);
         }
         process.exit(1);
       });

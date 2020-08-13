@@ -21,10 +21,11 @@ import { resolve } from "./resolver";
 import { createServer } from "./server";
 import { createWebhookProxy } from "./webhook-proxy";
 import { getErrorHandler } from "./error-handler";
-import { ProbotWebhooks, State } from "./types";
+import { DeprecatedLogger, ProbotWebhooks, State } from "./types";
 import { webhookTransform } from "./webhook-transform";
 import { getThrottleOptions } from "./get-throttle-options";
 import { getProbotOctokitWithDefaults } from "./get-probot-octokit-with-defaults";
+import { deprecateLog } from "./deprecate-log";
 
 import { handleDeprecatedEnvironmentVariables } from "./handle-deprecated-environment-variables";
 handleDeprecatedEnvironmentVariables();
@@ -141,7 +142,7 @@ export class Probot {
 
   public server: express.Application;
   public webhooks: ProbotWebhooks;
-  public log: Logger;
+  public log: DeprecatedLogger;
 
   // These 3 need to be public for the tests to work.
   public options: Options;
@@ -176,8 +177,7 @@ export class Probot {
     options.webhookPath = options.webhookPath || "/";
     options.secret = options.secret || "development";
 
-    // TODO: deprecate probot.log in favor of probot.log.
-    this.log = options.log || getLog();
+    this.log = deprecateLog(options.log || getLog());
 
     if (options.cert) {
       this.log.warn(

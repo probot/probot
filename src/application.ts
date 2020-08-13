@@ -13,8 +13,9 @@ import { getLog } from "./get-log";
 import { getThrottleOptions } from "./get-throttle-options";
 import { getProbotOctokitWithDefaults } from "./get-probot-octokit-with-defaults";
 import { webhookTransform } from "./webhook-transform";
-import { ProbotWebhooks, State } from "./types";
+import { DeprecatedLogger, ProbotWebhooks, State } from "./types";
 import { webhookEventCheck } from "./webhook-event-check";
+import { deprecateLog } from "./deprecate-log";
 
 export interface Options {
   // same options as Probot class
@@ -46,7 +47,7 @@ export type OnCallback<T> = (context: Context<T>) => Promise<void>;
  */
 export class Application {
   public router: express.Router;
-  public log: Logger;
+  public log: DeprecatedLogger;
   public on: ProbotWebhooks["on"];
   public receive: ProbotWebhooks["receive"];
 
@@ -55,7 +56,7 @@ export class Application {
 
   constructor(options: Options) {
     const opts = options;
-    this.log = options.log || getLog();
+    this.log = deprecateLog(options.log || getLog());
 
     // TODO: support redis backend for access token cache if `options.redisConfig || process.env.REDIS_URL`
     const cache =

@@ -4,7 +4,7 @@ import LRUCache from "lru-cache";
 import { Context } from "./context";
 import { ProbotOctokit } from "./github/octokit";
 
-import type { Logger } from "pino";
+import type { Logger, LogFn } from "pino";
 
 export type State = {
   githubToken?: string;
@@ -16,3 +16,5 @@ export type State = {
 };
 
 export type ProbotWebhooks = Webhooks<Context>;
+
+export type DeprecatedLogger = LogFn & Logger;

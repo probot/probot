@@ -8,6 +8,8 @@ import yaml from "js-yaml";
 import type { Logger } from "pino";
 
 import { ProbotOctokit } from "./github/octokit";
+import { deprecateLog } from "./deprecate-log";
+import { DeprecatedLogger } from "./types";
 
 type ReposGetContentsParams = Endpoints["GET /repos/:owner/:repo/contents/:path"]["parameters"];
 
@@ -74,7 +76,7 @@ export class Context<E extends WebhookPayloadWithRepository = any>
   public payload: E;
 
   public github: InstanceType<typeof ProbotOctokit>;
-  public log: Logger;
+  public log: DeprecatedLogger;
 
   constructor(
     event: WebhookEvent<E>,
@@ -86,7 +88,7 @@ export class Context<E extends WebhookPayloadWithRepository = any>
     this.payload = event.payload;
 
     this.github = github;
-    this.log = log;
+    this.log = deprecateLog(log);
   }
 
   // Maintain backward compatibility

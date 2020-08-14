@@ -17,36 +17,17 @@
  * app.log.fatal("Goodbye, cruel world!");
  * ```
  */
-
 import pino from "pino";
 import type { LoggerOptions } from "pino";
+import { getTransformStream } from "@probot/pino";
 
 export function getLog() {
-  const isDevelopmentEnvironment =
-    !process.env.NODE_ENV || process.env.NODE_ENV === "development";
-
   const pinoOptions: LoggerOptions = {
     level: process.env.LOG_LEVEL || "info",
     name: "probot",
   };
 
-  if (isDevelopmentEnvironment) {
-    pinoOptions.prettyPrint = {
-      ignore: [
-        // default pino keys
-        "time",
-        "pid",
-        "hostname",
-        // remove keys from pino-http
-        "req",
-        "res",
-        "responseTime",
-      ].join(","),
-    };
-    // TODO: single-line extras: https://github.com/pinojs/pino-pretty/issues/97
-  }
-
-  const log = pino(pinoOptions);
-
-  return log;
+  const transform = getTransformStream();
+  transform.pipe(pino.destination(1));
+  return pino(pinoOptions, transform);
 }

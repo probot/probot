@@ -26,6 +26,7 @@
     "views"
   ],
   "jest": {
+    "testEnvironment": "node",
     "setupFiles": [
       "<rootDir>/test/setup.ts"
     ],

@@ -1,5 +1,5 @@
 import { Endpoints } from "@octokit/types";
-import { State } from "./types";
+import { State } from "../types";
 
 type AppsGetAuthenticatedResponse = Endpoints["GET /app"]["response"]["data"];
 

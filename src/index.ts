@@ -14,21 +14,21 @@ import { Server } from "http";
 import { Application } from "./application";
 import { setupApp } from "./apps/setup";
 import { Context } from "./context";
-import { ProbotOctokit } from "./github/octokit";
-import { getLog } from "./get-log";
-import { findPrivateKey } from "./private-key";
-import { resolve } from "./resolver";
-import { createServer } from "./server";
-import { createWebhookProxy } from "./webhook-proxy";
-import { getErrorHandler } from "./error-handler";
+import { ProbotOctokit } from "./octokit/probot-octokit";
+import { getLog } from "./helpers/get-log";
+import { findPrivateKey } from "./helpers/get-private-key";
+import { resolveAppFunction } from "./helpers/resolve-app-function";
+import { createServer } from "./server/create-server";
+import { createWebhookProxy } from "./helpers/webhook-proxy";
+import { getErrorHandler } from "./helpers/get-error-handler";
 import { DeprecatedLogger, ProbotWebhooks, State } from "./types";
-import { webhookTransform } from "./webhook-transform";
-import { getThrottleOptions } from "./get-throttle-options";
-import { getProbotOctokitWithDefaults } from "./get-probot-octokit-with-defaults";
-import { deprecateLog } from "./deprecate-log";
+import { webhookTransform } from "./octokit/octokit-webhooks-transform";
+import { getOctokitThrottleOptions } from "./octokit/get-octokit-throttle-options";
+import { getProbotOctokitWithDefaults } from "./octokit/get-probot-octokit-with-defaults";
+import { deprecateLog } from "./helpers/deprecate-log";
+import { logWarningsForObsoleteEnvironmentVariables } from "./helpers/log-warnings-for-obsolete-environment-variables";
 
-import { handleDeprecatedEnvironmentVariables } from "./handle-deprecated-environment-variables";
-handleDeprecatedEnvironmentVariables();
+logWarningsForObsoleteEnvironmentVariables();
 
 export interface Options {
   // same options as Application class
@@ -210,7 +210,7 @@ export class Probot {
     });
     const octokit = new Octokit();
 
-    this.throttleOptions = getThrottleOptions({
+    this.throttleOptions = getOctokitThrottleOptions({
       log: this.log,
       redisConfig: options.redisConfig,
     });
@@ -258,7 +258,7 @@ export class Probot {
 
   public load(appFn: string | ApplicationFunction) {
     if (typeof appFn === "string") {
-      appFn = resolve(appFn) as ApplicationFunction;
+      appFn = resolveAppFunction(appFn) as ApplicationFunction;
     }
 
     const app = new Application({

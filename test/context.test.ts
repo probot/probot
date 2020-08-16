@@ -5,7 +5,7 @@ import { Endpoints } from "@octokit/types";
 import { WebhookEvent } from "@octokit/webhooks";
 
 import { Context, MergeOptions } from "../src/context";
-import { ProbotOctokit } from "../src/github/octokit";
+import { ProbotOctokit } from "../src/octokit/probot-octokit";
 
 import { createMockResponse } from "./fixtures/octokit/mock-response";
 

@@ -25,22 +25,6 @@
     "static",
     "views"
   ],
-  "jest": {
-    "testEnvironment": "node",
-    "setupFiles": [
-      "<rootDir>/test/setup.ts"
-    ],
-    "coveragePathIgnorePatterns": [
-      "<rootDir>/lib/"
-    ],
-    "moduleFileExtensions": [
-      "ts",
-      "js",
-      "json",
-      "node"
-    ],
-    "preset": "ts-jest"
-  },
   "keywords": [
     "probot",
     "github-apps",
@@ -131,5 +115,37 @@
   },
   "engines": {
     "node": ">=10.21"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "setupFiles": [
+      "<rootDir>/test/setup.ts"
+    ],
+    "coveragePathIgnorePatterns": [
+      "<rootDir>/lib/"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "js",
+      "json",
+      "node"
+    ],
+    "preset": "ts-jest"
+  },
+  "release": {
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/github",
+      "@semantic-release/npm",
+      [
+        "semantic-release-plugin-update-version-in-files",
+        {
+          "files": [
+            "pkg/*/version.*"
+          ]
+        }
+      ]
+    ]
   }
 }

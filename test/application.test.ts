@@ -4,7 +4,7 @@ import pino from "pino";
 
 import { Application } from "../src/application";
 import { Context } from "../src/context";
-import { ProbotOctokit } from "../src/github/octokit";
+import { ProbotOctokit } from "../src/octokit/probot-octokit";
 import Stream from "stream";
 
 describe("Application", () => {

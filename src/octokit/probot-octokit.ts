@@ -7,8 +7,8 @@ import { restEndpointMethods } from "@octokit/plugin-rest-endpoint-methods";
 import { retry } from "@octokit/plugin-retry";
 import { throttling } from "@octokit/plugin-throttling";
 
-import { requestLogging } from "./logging";
-import { VERSION } from "./version";
+import { probotRequestLogging } from "./octokit-plugin-probot-request-logging";
+import { VERSION } from "../version";
 
 export const ProbotOctokit = Octokit.plugin(
   throttling,
@@ -16,7 +16,7 @@ export const ProbotOctokit = Octokit.plugin(
   paginateRest,
   restEndpointMethods,
   enterpriseCompatibility,
-  requestLogging
+  probotRequestLogging
 ).defaults({
   throttle: {
     onAbuseLimit: (

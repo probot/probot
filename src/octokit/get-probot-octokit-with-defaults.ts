@@ -1,6 +1,6 @@
 import { createAppAuth } from "@octokit/auth-app";
 import LRUCache from "lru-cache";
-import { ProbotOctokit } from "./github/octokit";
+import { ProbotOctokit } from "./probot-octokit";
 
 type Options = {
   cache: LRUCache<number, string>;

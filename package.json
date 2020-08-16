@@ -14,7 +14,7 @@
     "lint": "prettier --check 'src/**/*.ts' 'test/**/*.ts' 'docs/*.md' *.md package.json tsconfig.json",
     "lint:fix": "prettier --write 'src/**/*.ts' 'test/**/*.ts' 'docs/*.md' *.md package.json tsconfig.json",
     "pretest": "tsc --noEmit -p test",
-    "test": "jest --coverage --forceExit",
+    "test": "jest",
     "posttest": "npm run lint",
     "doc": "typedoc --options .typedoc.json",
     "prepare": "npm run build"

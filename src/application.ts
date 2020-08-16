@@ -33,9 +33,6 @@ export interface Options {
   octokit?: InstanceType<typeof ProbotOctokit>;
   throttleOptions?: any;
   webhooks?: Webhooks;
-
-  // TODO: what is this for?
-  router?: express.Router;
 }
 
 export type OnCallback<T> = (context: Context<T>) => Promise<void>;
@@ -94,7 +91,7 @@ export class Application {
       },
     };
 
-    this.router = options.router || express.Router(); // you can do this?
+    this.router = express.Router();
 
     this.webhooks = options.webhooks || getWebhooks(this.state);
 

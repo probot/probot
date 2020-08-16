@@ -1,7 +1,7 @@
 import type { Logger } from "pino";
 import { Deprecation } from "deprecation";
 
-import type { DeprecatedLogger } from "./types";
+import type { DeprecatedLogger } from "../types";
 
 /**
  * `app.log()` and `context.log()` were aliases for `.log.info()`.

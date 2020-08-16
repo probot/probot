@@ -7,8 +7,8 @@ import yaml from "js-yaml";
 
 import type { Logger } from "pino";
 
-import { ProbotOctokit } from "./github/octokit";
-import { deprecateLog } from "./deprecate-log";
+import { ProbotOctokit } from "./octokit/probot-octokit";
+import { deprecateLog } from "./helpers/deprecate-log";
 import { DeprecatedLogger } from "./types";
 
 type ReposGetContentsParams = Endpoints["GET /repos/:owner/:repo/contents/:path"]["parameters"];

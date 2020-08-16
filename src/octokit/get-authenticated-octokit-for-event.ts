@@ -3,7 +3,7 @@ import { createUnauthenticatedAuth } from "@octokit/auth-unauthenticated";
 
 import { getAuthenticatedOctokit } from "./get-authenticated-octokit";
 
-import { State } from "./types";
+import { State } from "../types";
 
 export function getAuthenticatedOctokitForEvent(
   state: State,

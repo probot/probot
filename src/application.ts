@@ -7,15 +7,15 @@ import type { Logger } from "pino";
 
 import { ApplicationFunction } from ".";
 import { Context } from "./context";
-import { getAuthenticatedOctokit } from "./get-authenticated-octokit";
-import { ProbotOctokit } from "./github/octokit";
-import { getLog } from "./get-log";
-import { getThrottleOptions } from "./get-throttle-options";
-import { getProbotOctokitWithDefaults } from "./get-probot-octokit-with-defaults";
-import { webhookTransform } from "./webhook-transform";
+import { getAuthenticatedOctokit } from "./octokit/get-authenticated-octokit";
+import { ProbotOctokit } from "./octokit/probot-octokit";
+import { getLog } from "./helpers/get-log";
+import { getOctokitThrottleOptions } from "./octokit/get-octokit-throttle-options";
+import { getProbotOctokitWithDefaults } from "./octokit/get-probot-octokit-with-defaults";
+import { webhookTransform } from "./octokit/octokit-webhooks-transform";
 import { DeprecatedLogger, ProbotWebhooks, State } from "./types";
-import { webhookEventCheck } from "./webhook-event-check";
-import { deprecateLog } from "./deprecate-log";
+import { webhookEventCheck } from "./helpers/webhook-event-check";
+import { deprecateLog } from "./helpers/deprecate-log";
 
 export interface Options {
   // same options as Probot class
@@ -82,11 +82,13 @@ export class Application {
       log: this.log,
       Octokit,
       octokit: opts.octokit || new Octokit(),
-      throttleOptions: getThrottleOptions({
-        log: this.log,
-        throttleOptions: opts.throttleOptions,
-        redisConfig: options.redisConfig,
-      }),
+      throttleOptions:
+        opts.throttleOptions ||
+        getOctokitThrottleOptions({
+          log: this.log,
+          throttleOptions: opts.throttleOptions,
+          redisConfig: options.redisConfig,
+        }),
     };
 
     this.router = opts.router || express.Router(); // you can do this?

@@ -3,6 +3,8 @@ import { Request, Response } from "express";
 import { Application } from "../application";
 import { ManifestCreation } from "../manifest-creation";
 
+import { getLoggingMiddleware } from "../server/logging-middleware";
+
 // use glitch env to get correct domain welcome message
 // https://glitch.com/help/project/
 const domain =
@@ -21,6 +23,8 @@ export async function setupApp(app: Application) {
   }
 
   const route = app.route();
+
+  route.use(getLoggingMiddleware(app.log));
 
   app.log.info(welcomeMessage);
 

@@ -9,8 +9,8 @@ import EventSource from "eventsource";
 import http from "http";
 import net from "net";
 import nock from "nock";
-import { getLog } from "../src/get-log";
-import { createWebhookProxy } from "../src/webhook-proxy";
+import { getLog } from "../src/helpers/get-log";
+import { createWebhookProxy } from "../src/helpers/webhook-proxy";
 
 const targetPort = 999999;
 

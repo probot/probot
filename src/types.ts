@@ -2,7 +2,7 @@ import { Webhooks } from "@octokit/webhooks";
 import LRUCache from "lru-cache";
 
 import { Context } from "./context";
-import { ProbotOctokit } from "./github/octokit";
+import { ProbotOctokit } from "./octokit/probot-octokit";
 
 import type { Logger, LogFn } from "pino";
 

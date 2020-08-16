@@ -1,7 +1,7 @@
 import { Application, NextFunction, Request, Response } from "express";
 import request from "supertest";
-import { getLog } from "../src/get-log";
-import { createServer } from "../src/server";
+import { getLog } from "../src/helpers/get-log";
+import { createServer } from "../src/server/create-server";
 
 describe("server", () => {
   let server: Application;

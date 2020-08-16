@@ -4,7 +4,7 @@ import { NextFunction, Request, Response } from "express";
 import request = require("supertest");
 
 import { Application, Probot } from "../src";
-import { ProbotOctokit } from "../src/github/octokit";
+import { ProbotOctokit } from "../src/octokit/probot-octokit";
 
 import path = require("path");
 

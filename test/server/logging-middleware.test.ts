@@ -4,7 +4,7 @@ import express from "express";
 import request from "supertest";
 import pino from "pino";
 
-import { getLoggingMiddleware } from "../../src/middleware/logging";
+import { getLoggingMiddleware } from "../../src/server/logging-middleware";
 
 describe("logging", () => {
   let server: express.Express;

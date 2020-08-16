@@ -3,7 +3,7 @@ const readFileSync = fs.readFileSync;
 const existsSync = fs.existsSync;
 const readdirSync = fs.readdirSync;
 
-import { findPrivateKey } from "../src/private-key";
+import { findPrivateKey } from "../src/helpers/get-private-key";
 
 describe("private-key", () => {
   let privateKey: string;

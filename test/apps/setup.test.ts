@@ -27,8 +27,6 @@ describe("Setup app", () => {
   describe("GET /probot", () => {
     it("returns a 200 response", async () => {
       await request(probot.server).get("/probot").expect(200);
-
-      expect(createChannel).toHaveBeenCalledTimes(1);
     });
   });
 

@@ -1,5 +1,5 @@
 import nock from "nock";
-import { ProbotOctokit } from "../src/github/octokit";
+import { ProbotOctokit } from "../src/octokit/probot-octokit";
 
 type Options = ConstructorParameters<typeof ProbotOctokit>[0];
 

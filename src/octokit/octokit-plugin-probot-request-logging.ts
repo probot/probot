@@ -1,7 +1,7 @@
 // tslint:disable-next-line
 import type { Octokit } from "@octokit/core";
 
-export function requestLogging(octokit: Octokit) {
+export function probotRequestLogging(octokit: Octokit) {
   octokit.hook.error("request", (error, options) => {
     const { method, url, request, ...params } = octokit.request.endpoint.parse(
       options

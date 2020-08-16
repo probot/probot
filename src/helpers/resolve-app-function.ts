@@ -2,7 +2,7 @@ import { sync } from "resolve";
 
 const defaultOptions: ResolveOptions = {};
 
-export const resolve = (appFnId: string, opts?: ResolveOptions) => {
+export const resolveAppFunction = (appFnId: string, opts?: ResolveOptions) => {
   opts = opts || defaultOptions;
   // These are mostly to ease testing
   const basedir = opts.basedir || process.cwd();

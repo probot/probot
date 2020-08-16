@@ -23,7 +23,7 @@ export class ManifestCreation {
       await this.updateEnv({
         WEBHOOK_PROXY_URL: await SmeeClient.createChannel(),
       });
-    } catch (err) {
+    } catch (error) {
       // Smee is not available, so we'll just move on
       // tslint:disable:no-console
       console.warn("Unable to connect to smee.io, try restarting your server.");
@@ -35,10 +35,10 @@ export class ManifestCreation {
     try {
       const file = fs.readFileSync(path.join(process.cwd(), "app.yml"), "utf8");
       manifest = yaml.safeLoad(file);
-    } catch (err) {
+    } catch (error) {
       // App config does not exist, which is ok.
-      if (err.code !== "ENOENT") {
-        throw err;
+      if (error.code !== "ENOENT") {
+        throw error;
       }
     }
 

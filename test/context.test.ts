@@ -431,8 +431,8 @@ describe("Context", () => {
       let contents;
       try {
         contents = await context.config("test-file.yml");
-      } catch (err) {
-        e = err;
+      } catch (error) {
+        e = error;
       }
 
       expect(contents).toBeUndefined();
@@ -449,8 +449,8 @@ describe("Context", () => {
       let config;
       try {
         config = await context.config("evil.yml");
-      } catch (err) {
-        e = err;
+      } catch (error) {
+        e = error;
       }
 
       expect(config).toBeUndefined();
@@ -469,8 +469,8 @@ describe("Context", () => {
       let config;
       try {
         config = await context.config("test-file.yml");
-      } catch (err) {
-        e = err;
+      } catch (error) {
+        e = error;
       }
 
       expect(config).toBeUndefined();
@@ -489,8 +489,8 @@ describe("Context", () => {
       let config;
       try {
         config = await context.config("test-file.yml");
-      } catch (err) {
-        e = err;
+      } catch (error) {
+        e = error;
       }
 
       expect(config).toBeUndefined();

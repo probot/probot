@@ -1,13 +1,13 @@
 // tslint:disable-next-line: no-var-requires
 require("dotenv").config();
 
-import { WebhookEvent, Webhooks } from "@octokit/webhooks";
 import express from "express";
 import Redis from "ioredis";
 import LRUCache from "lru-cache";
 import { Deprecation } from "deprecation";
 import pinoHttp from "pino-http";
 
+import type { WebhookEvent, Webhooks } from "@octokit/webhooks";
 import type { Logger } from "pino";
 
 import { Server } from "http";
@@ -22,11 +22,11 @@ import { createServer } from "./server/create-server";
 import { createWebhookProxy } from "./helpers/webhook-proxy";
 import { getErrorHandler } from "./helpers/get-error-handler";
 import { DeprecatedLogger, ProbotWebhooks, State } from "./types";
-import { webhookTransform } from "./octokit/octokit-webhooks-transform";
 import { getOctokitThrottleOptions } from "./octokit/get-octokit-throttle-options";
 import { getProbotOctokitWithDefaults } from "./octokit/get-probot-octokit-with-defaults";
 import { deprecateLog } from "./helpers/deprecate-log";
 import { logWarningsForObsoleteEnvironmentVariables } from "./helpers/log-warnings-for-obsolete-environment-variables";
+import { getWebhooks } from "./octokit/get-webhooks";
 
 logWarningsForObsoleteEnvironmentVariables();
 
@@ -190,7 +190,7 @@ export class Probot {
 
     this.apps = [];
 
-    // TODO: Why is this public?
+    // TODO: Refactor tests so we don't need to make this public
     this.options = options;
 
     // TODO: support redis backend for access token cache if `options.redisConfig || process.env.REDIS_URL`
@@ -222,15 +222,13 @@ export class Probot {
       Octokit,
       octokit,
       throttleOptions: this.throttleOptions,
+      webhooks: {
+        path: options.webhookPath,
+        secret: options.secret,
+      },
     };
 
-    this.webhooks = new Webhooks({
-      path: options.webhookPath,
-      secret: options.secret,
-      transform: webhookTransform.bind(null, this.state),
-    });
-    // TODO: normalize error handler with code in application.ts
-    this.webhooks.on("error", getErrorHandler(this.log));
+    this.webhooks = getWebhooks(this.state);
 
     this.server = createServer({
       webhook: (this.webhooks as any).middleware,
@@ -262,6 +260,7 @@ export class Probot {
     }
 
     const app = new Application({
+      log: this.state.log.child({ name: "app" }),
       cache: this.state.cache,
       githubToken: this.state.githubToken,
       Octokit: this.state.Octokit,
@@ -311,13 +310,13 @@ export class Probot {
         }
         this.log.info("Listening on http://localhost:" + this.options.port);
       })
-      .on("error", (err: NodeJS.ErrnoException) => {
-        if (err.code === "EADDRINUSE") {
+      .on("error", (error: NodeJS.ErrnoException) => {
+        if (error.code === "EADDRINUSE") {
           this.log.error(
             `Port ${this.options.port} is already in use. You can define the PORT environment variable to use a different port.`
           );
         } else {
-          this.log.error(err);
+          this.log.error(error);
         }
         process.exit(1);
       });

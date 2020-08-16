@@ -1,8 +1,8 @@
-import { Webhooks } from "@octokit/webhooks";
 import express from "express";
 import Redis from "ioredis";
 import LRUCache from "lru-cache";
 
+import type { Webhooks } from "@octokit/webhooks";
 import type { Logger } from "pino";
 
 import { ApplicationFunction } from ".";
@@ -12,10 +12,10 @@ import { ProbotOctokit } from "./octokit/probot-octokit";
 import { getLog } from "./helpers/get-log";
 import { getOctokitThrottleOptions } from "./octokit/get-octokit-throttle-options";
 import { getProbotOctokitWithDefaults } from "./octokit/get-probot-octokit-with-defaults";
-import { webhookTransform } from "./octokit/octokit-webhooks-transform";
 import { DeprecatedLogger, ProbotWebhooks, State } from "./types";
 import { webhookEventCheck } from "./helpers/webhook-event-check";
 import { deprecateLog } from "./helpers/deprecate-log";
+import { getWebhooks } from "./octokit/get-webhooks";
 
 export interface Options {
   // same options as Probot class
@@ -33,9 +33,6 @@ export interface Options {
   octokit?: InstanceType<typeof ProbotOctokit>;
   throttleOptions?: any;
   webhooks?: Webhooks;
-
-  // TODO: what is this for?
-  router?: express.Router;
 }
 
 export type OnCallback<T> = (context: Context<T>) => Promise<void>;
@@ -55,7 +52,6 @@ export class Application {
   private state: State;
 
   constructor(options: Options) {
-    const opts = options;
     this.log = deprecateLog(options.log || getLog());
 
     // TODO: support redis backend for access token cache if `options.redisConfig || process.env.REDIS_URL`
@@ -69,37 +65,35 @@ export class Application {
       });
 
     const Octokit = getProbotOctokitWithDefaults({
-      githubToken: opts.githubToken,
-      Octokit: opts.Octokit || ProbotOctokit,
-      appId: opts.id,
-      privateKey: opts.privateKey,
+      githubToken: options.githubToken,
+      Octokit: options.Octokit || ProbotOctokit,
+      appId: options.id,
+      privateKey: options.privateKey,
       cache,
     });
 
     this.state = {
       cache,
-      githubToken: opts.githubToken,
+      githubToken: options.githubToken,
       log: this.log,
       Octokit,
-      octokit: opts.octokit || new Octokit(),
+      octokit: options.octokit || new Octokit(),
       throttleOptions:
-        opts.throttleOptions ||
+        options.throttleOptions ||
         getOctokitThrottleOptions({
           log: this.log,
-          throttleOptions: opts.throttleOptions,
+          throttleOptions: options.throttleOptions,
           redisConfig: options.redisConfig,
         }),
-    };
-
-    this.router = opts.router || express.Router(); // you can do this?
-
-    this.webhooks =
-      opts.webhooks ||
-      new Webhooks<Context>({
+      webhooks: {
         path: options.webhookPath,
         secret: options.secret,
-        transform: webhookTransform.bind(null, this.state),
-      });
+      },
+    };
+
+    this.router = express.Router();
+
+    this.webhooks = options.webhooks || getWebhooks(this.state);
 
     this.on = (eventNameOrNames, callback) => {
       // when an app subscribes to an event using `app.on(event, callback)`, Probot sends a request to `GET /app` and
@@ -111,42 +105,6 @@ export class Application {
       return this.webhooks.on(eventNameOrNames, callback);
     };
     this.receive = this.webhooks.receive;
-
-    // TODO: do not add error handler if `opts.webhooks` was passed
-    this.webhooks.on("error", (error) => {
-      // avoid the error.code deprecation message
-      // can be replaced with `log.error({ err, event, ...err })` once @octokit/request-error v3 is used
-
-      const { name, message, stack, event } = error;
-
-      if (!event) {
-        const log = this.log.child({ name: "event" });
-        log.error({
-          err: {
-            name,
-            message,
-            stack,
-          },
-        });
-        return;
-      }
-
-      for (const { headers, request, status } of error) {
-        const log = this.log.child({ name: "event", id: event.id });
-
-        log.error({
-          err: {
-            name,
-            message,
-            stack,
-          },
-          event,
-          headers,
-          request,
-          status,
-        });
-      }
-    });
   }
 
   /**

@@ -48,9 +48,9 @@ export async function setupApp(app: Application) {
 
     // If using glitch, restart the app
     if (process.env.PROJECT_DOMAIN) {
-      exec("refresh", (err, stdout, stderr) => {
-        if (err) {
-          app.log.error(err, stderr);
+      exec("refresh", (error) => {
+        if (error) {
+          app.log.error(error);
         }
       });
     }

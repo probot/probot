@@ -239,8 +239,8 @@ describe("Application", () => {
       try {
         await app.receive(event);
         throw new Error("expected error to be raised from app");
-      } catch (err) {
-        expect(err.message).toMatch(/error from app/);
+      } catch (error) {
+        expect(error.message).toMatch(/error from app/);
       }
     });
   });
@@ -311,13 +311,13 @@ describe("Application", () => {
 
       try {
         await app.receive(event);
-      } catch (err) {
+      } catch (error) {
         // Expected
       }
 
       expect(output.length).toBe(1);
 
-      expect(output[0].err.message).toMatch(/testing/);
+      expect(output[0].msg).toMatch(/testing/);
       expect(output[0].event.id).toEqual(event.id);
     });
 
@@ -326,12 +326,12 @@ describe("Application", () => {
 
       try {
         await app.receive(event);
-      } catch (err) {
+      } catch (error) {
         // Expected
       }
 
       expect(output.length).toBe(1);
-      expect(output[0].err.message).toMatch(/testing/);
+      expect(output[0].msg).toMatch(/testing/);
       expect(output[0].event.id).toEqual(event.id);
     });
   });

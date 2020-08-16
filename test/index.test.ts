@@ -96,7 +96,7 @@ describe("Probot", () => {
 
   describe("webhook delivery", () => {
     it("responds with the correct error if webhook secret does not match", async () => {
-      probot.logger.error = jest.fn();
+      probot.log.error = jest.fn();
       probot.webhooks.on("push", () => {
         throw new Error("X-Hub-Signature does not match blob signature");
       });
@@ -104,15 +104,14 @@ describe("Probot", () => {
       try {
         await probot.webhooks.receive(event);
       } catch (e) {
-        const [error] = Array.from(
-          (probot.logger.error as jest.Mock).mock.calls[0][0].err
-        ) as Error[];
-        expect(error.message).toMatchSnapshot();
+        expect(
+          (probot.log.error as jest.Mock).mock.calls[0][1]
+        ).toMatchSnapshot();
       }
     });
 
     it("responds with the correct error if webhook secret is not found", async () => {
-      probot.logger.error = jest.fn();
+      probot.log.error = jest.fn();
       probot.webhooks.on("push", () => {
         throw new Error("No X-Hub-Signature found on request");
       });
@@ -120,15 +119,14 @@ describe("Probot", () => {
       try {
         await probot.webhooks.receive(event);
       } catch (e) {
-        const [error] = Array.from(
-          (probot.logger.error as jest.Mock).mock.calls[0][0].err
-        ) as Error[];
-        expect(error.message).toMatchSnapshot();
+        expect(
+          (probot.log.error as jest.Mock).mock.calls[0][1]
+        ).toMatchSnapshot();
       }
     });
 
     it("responds with the correct error if webhook secret is wrong", async () => {
-      probot.logger.error = jest.fn();
+      probot.log.error = jest.fn();
       probot.webhooks.on("push", () => {
         throw new Error(
           "webhooks:receiver ignored: POST / due to missing headers: x-hub-signature"
@@ -138,15 +136,14 @@ describe("Probot", () => {
       try {
         await probot.webhooks.receive(event);
       } catch (e) {
-        const [error] = Array.from(
-          (probot.logger.error as jest.Mock).mock.calls[0][0].err
-        ) as Error[];
-        expect(error.message).toMatchSnapshot();
+        expect(
+          (probot.log.error as jest.Mock).mock.calls[0][1]
+        ).toMatchSnapshot();
       }
     });
 
     it("responds with the correct error if the PEM file is missing", async () => {
-      probot.logger.error = jest.fn();
+      probot.log.error = jest.fn();
       probot.webhooks.on("*", () => {
         throw new Error(
           "error:0906D06C:PEM routines:PEM_read_bio:no start line"
@@ -156,15 +153,14 @@ describe("Probot", () => {
       try {
         await probot.webhooks.receive(event);
       } catch (e) {
-        const [error] = Array.from(
-          (probot.logger.error as jest.Mock).mock.calls[0][0].err
-        ) as Error[];
-        expect(error.message).toMatchSnapshot();
+        expect(
+          (probot.log.error as jest.Mock).mock.calls[0][1]
+        ).toMatchSnapshot();
       }
     });
 
     it("responds with the correct error if the jwt could not be decoded", async () => {
-      probot.logger.error = jest.fn();
+      probot.log.error = jest.fn();
       probot.webhooks.on("*", () => {
         throw new Error(
           '{"message":"A JSON web token could not be decoded","documentation_url":"https://developer.github.com/v3"}'
@@ -174,10 +170,9 @@ describe("Probot", () => {
       try {
         await probot.webhooks.receive(event);
       } catch (e) {
-        const [error] = Array.from(
-          (probot.logger.error as jest.Mock).mock.calls[0][0].err
-        ) as Error[];
-        expect(error.message).toMatchSnapshot();
+        expect(
+          (probot.log.error as jest.Mock).mock.calls[0][1]
+        ).toMatchSnapshot();
       }
     });
   });
@@ -241,9 +236,9 @@ describe("Probot", () => {
         githubToken: "faketoken",
       });
       // Error handler to avoid printing logs
-      // tslint:disable-next-line handle-callback-err
+      // tslint:disable-next-line handle-callback-error
       probot.server.use(
-        (err: any, req: Request, res: Response, next: NextFunction) => {}
+        (error: any, req: Request, res: Response, next: NextFunction) => {}
       );
 
       probot.load((app) => {
@@ -261,9 +256,9 @@ describe("Probot", () => {
 
     it("defaults webhook path to `/`", async () => {
       // Error handler to avoid printing logs
-      // tslint:disable-next-line handle-callback-err
+      // tslint:disable-next-line handle-callback-error
       probot.server.use(
-        (err: any, req: Request, res: Response, next: NextFunction) => {}
+        (error: any, req: Request, res: Response, next: NextFunction) => {}
       );
 
       // POST requests to `/` should 400 b/c webhook signature will fail

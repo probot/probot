@@ -236,9 +236,9 @@ describe("Probot", () => {
         githubToken: "faketoken",
       });
       // Error handler to avoid printing logs
-      // tslint:disable-next-line handle-callback-err
+      // tslint:disable-next-line handle-callback-error
       probot.server.use(
-        (err: any, req: Request, res: Response, next: NextFunction) => {}
+        (error: any, req: Request, res: Response, next: NextFunction) => {}
       );
 
       probot.load((app) => {
@@ -256,9 +256,9 @@ describe("Probot", () => {
 
     it("defaults webhook path to `/`", async () => {
       // Error handler to avoid printing logs
-      // tslint:disable-next-line handle-callback-err
+      // tslint:disable-next-line handle-callback-error
       probot.server.use(
-        (err: any, req: Request, res: Response, next: NextFunction) => {}
+        (error: any, req: Request, res: Response, next: NextFunction) => {}
       );
 
       // POST requests to `/` should 400 b/c webhook signature will fail

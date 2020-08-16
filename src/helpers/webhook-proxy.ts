@@ -13,7 +13,7 @@ export const createWebhookProxy = (
       target: `http://localhost:${opts.port}${opts.path}`,
     });
     return smee.start();
-  } catch (err) {
+  } catch (error) {
     opts.logger.warn(
       "Run `npm install --save-dev smee-client` to proxy webhooks to localhost."
     );

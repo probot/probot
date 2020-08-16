@@ -13,7 +13,7 @@ declare module "smee-client" {
     constructor({ source, target, logger }: Options);
     public onmessage(msg: any): void;
     public onopen(): void;
-    public onerror(err: any): void;
+    public onerror(error: any): void;
     public start(): EventSource;
     public static createChannel(): Promise<string>;
   }

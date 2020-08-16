@@ -239,8 +239,8 @@ describe("Application", () => {
       try {
         await app.receive(event);
         throw new Error("expected error to be raised from app");
-      } catch (err) {
-        expect(err.message).toMatch(/error from app/);
+      } catch (error) {
+        expect(error.message).toMatch(/error from app/);
       }
     });
   });
@@ -311,7 +311,7 @@ describe("Application", () => {
 
       try {
         await app.receive(event);
-      } catch (err) {
+      } catch (error) {
         // Expected
       }
 
@@ -326,7 +326,7 @@ describe("Application", () => {
 
       try {
         await app.receive(event);
-      } catch (err) {
+      } catch (error) {
         // Expected
       }
 

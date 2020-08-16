@@ -13,8 +13,8 @@ describe("server", () => {
 
     // Error handler to avoid printing logs
     server.use(
-      (err: Error, req: Request, res: Response, next: NextFunction) => {
-        res.status(500).send(err.message);
+      (error: Error, req: Request, res: Response, next: NextFunction) => {
+        res.status(500).send(error.message);
       }
     );
   });

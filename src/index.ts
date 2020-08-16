@@ -310,13 +310,13 @@ export class Probot {
         }
         this.log.info("Listening on http://localhost:" + this.options.port);
       })
-      .on("error", (err: NodeJS.ErrnoException) => {
-        if (err.code === "EADDRINUSE") {
+      .on("error", (error: NodeJS.ErrnoException) => {
+        if (error.code === "EADDRINUSE") {
           this.log.error(
             `Port ${this.options.port} is already in use. You can define the PORT environment variable to use a different port.`
           );
         } else {
-          this.log.error(err);
+          this.log.error(error);
         }
         process.exit(1);
       });

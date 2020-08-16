@@ -317,7 +317,7 @@ describe("Application", () => {
 
       expect(output.length).toBe(1);
 
-      expect(output[0].err.message).toMatch(/testing/);
+      expect(output[0].msg).toMatch(/testing/);
       expect(output[0].event.id).toEqual(event.id);
     });
 
@@ -331,7 +331,7 @@ describe("Application", () => {
       }
 
       expect(output.length).toBe(1);
-      expect(output[0].err.message).toMatch(/testing/);
+      expect(output[0].msg).toMatch(/testing/);
       expect(output[0].event.id).toEqual(event.id);
     });
   });

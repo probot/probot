@@ -260,6 +260,7 @@ export class Probot {
     }
 
     const app = new Application({
+      log: this.state.log.child({ name: "app" }),
       cache: this.state.cache,
       githubToken: this.state.githubToken,
       Octokit: this.state.Octokit,

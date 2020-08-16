@@ -56,7 +56,7 @@ describe("webhooks", () => {
     );
   });
 
-  test.only("logs webhook error once", async () => {
+  test.only("logs webhook error exactly once", async () => {
     probot.load(() => {});
 
     await request(probot.server)
@@ -67,8 +67,7 @@ describe("webhooks", () => {
       .set("x-github-delivery", "3sw4d5f6g7h8")
       .expect(400);
 
-    console.log(`output`);
-    console.log(output);
-    expect(output.length).toEqual(1);
+    const errorLogs = output.filter((output: any) => output.level === 50);
+    expect(errorLogs.length).toEqual(1);
   });
 });

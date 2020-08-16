@@ -108,42 +108,6 @@ export class Application {
       return this.webhooks.on(eventNameOrNames, callback);
     };
     this.receive = this.webhooks.receive;
-
-    // TODO: do not add error handler if `options.webhooks` was passed
-    this.webhooks.on("error", (error) => {
-      // avoid the error.code deprecation message
-      // can be replaced with `log.error({ err, event, ...err })` once @octokit/request-error v3 is used
-
-      const { name, message, stack, event } = error;
-
-      if (!event) {
-        const log = this.log.child({ name: "event" });
-        log.error({
-          err: {
-            name,
-            message,
-            stack,
-          },
-        });
-        return;
-      }
-
-      for (const { headers, request, status } of error) {
-        const log = this.log.child({ name: "event", id: event.id });
-
-        log.error({
-          err: {
-            name,
-            message,
-            stack,
-          },
-          event,
-          headers,
-          request,
-          status,
-        });
-      }
-    });
   }
 
   /**

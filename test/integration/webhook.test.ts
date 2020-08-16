@@ -55,4 +55,20 @@ describe("webhooks", () => {
       })
     );
   });
+
+  test.only("logs webhook error once", async () => {
+    probot.load(() => {});
+
+    await request(probot.server)
+      .post("/")
+      .send(data)
+      .set("x-github-event", "push")
+      // Note: 'x-hub-signature' is missing
+      .set("x-github-delivery", "3sw4d5f6g7h8")
+      .expect(400);
+
+    console.log(`output`);
+    console.log(output);
+    expect(output.length).toEqual(1);
+  });
 });

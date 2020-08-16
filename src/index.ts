@@ -190,7 +190,7 @@ export class Probot {
 
     this.apps = [];
 
-    // TODO: Why is this public?
+    // TODO: Refactor tests so we don't need to make this public
     this.options = options;
 
     // TODO: support redis backend for access token cache if `options.redisConfig || process.env.REDIS_URL`

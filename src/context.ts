@@ -8,7 +8,7 @@ import yaml from "js-yaml";
 import type { Logger } from "pino";
 
 import { ProbotOctokit } from "./octokit/probot-octokit";
-import { deprecateLog } from "./helpers/deprecate-log";
+import { aliasLog } from "./helpers/alias-log";
 import { DeprecatedLogger } from "./types";
 
 type ReposGetContentsParams = Endpoints["GET /repos/:owner/:repo/contents/:path"]["parameters"];
@@ -88,7 +88,7 @@ export class Context<E extends WebhookPayloadWithRepository = any>
     this.payload = event.payload;
 
     this.github = github;
-    this.log = deprecateLog(log);
+    this.log = aliasLog(log);
   }
 
   // Maintain backward compatibility

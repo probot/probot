@@ -24,7 +24,7 @@ import { getErrorHandler } from "./helpers/get-error-handler";
 import { DeprecatedLogger, ProbotWebhooks, State } from "./types";
 import { getOctokitThrottleOptions } from "./octokit/get-octokit-throttle-options";
 import { getProbotOctokitWithDefaults } from "./octokit/get-probot-octokit-with-defaults";
-import { deprecateLog } from "./helpers/deprecate-log";
+import { aliasLog } from "./helpers/alias-log";
 import { logWarningsForObsoleteEnvironmentVariables } from "./helpers/log-warnings-for-obsolete-environment-variables";
 import { getWebhooks } from "./octokit/get-webhooks";
 
@@ -177,7 +177,7 @@ export class Probot {
     options.webhookPath = options.webhookPath || "/";
     options.secret = options.secret || "development";
 
-    this.log = deprecateLog(options.log || getLog());
+    this.log = aliasLog(options.log || getLog());
 
     if (options.cert) {
       this.log.warn(

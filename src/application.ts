@@ -14,7 +14,7 @@ import { getOctokitThrottleOptions } from "./octokit/get-octokit-throttle-option
 import { getProbotOctokitWithDefaults } from "./octokit/get-probot-octokit-with-defaults";
 import { DeprecatedLogger, ProbotWebhooks, State } from "./types";
 import { webhookEventCheck } from "./helpers/webhook-event-check";
-import { deprecateLog } from "./helpers/deprecate-log";
+import { aliasLog } from "./helpers/alias-log";
 import { getWebhooks } from "./octokit/get-webhooks";
 
 export interface Options {
@@ -52,7 +52,7 @@ export class Application {
   private state: State;
 
   constructor(options: Options) {
-    this.log = deprecateLog(options.log || getLog());
+    this.log = aliasLog(options.log || getLog());
 
     // TODO: support redis backend for access token cache if `options.redisConfig || process.env.REDIS_URL`
     const cache =

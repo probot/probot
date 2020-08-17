@@ -430,10 +430,10 @@ describe("Probot", () => {
       const http = require("http");
       const blockade = http.createServer().listen(3001, () => {
         const testApp = new Probot({ port: 3001 });
-        testApp.logger.error = jest.fn();
+        testApp.log.error = jest.fn();
 
         const server = testApp.start().addListener("error", () => {
-          expect(testApp.logger.error).toHaveBeenCalledWith(
+          expect(testApp.log.error).toHaveBeenCalledWith(
             "Port 3001 is already in use. You can define the PORT environment variable to use a different port."
           );
           expect(process.exit).toHaveBeenCalledWith(1);
@@ -445,9 +445,9 @@ describe("Probot", () => {
     it("should listen to port when not in use", (next) => {
       expect.assertions(1);
       const testApp = new Probot({ port: 3001, webhookProxy: undefined });
-      testApp.logger.info = jest.fn();
+      testApp.log.info = jest.fn();
       const server = testApp.start().on("listening", () => {
-        expect(testApp.logger.info).toHaveBeenCalledWith(
+        expect(testApp.log.info).toHaveBeenCalledWith(
           "Listening on http://localhost:3001"
         );
         server.close(() => next());

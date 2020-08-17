@@ -14,7 +14,9 @@ export function getOctokitThrottleOptions(options: Options) {
   const connection = new Bottleneck.IORedisConnection({
     client: getRedisClient(options.redisConfig),
   });
-  connection.on("error", options.log.error);
+  connection.on("error", (error) => {
+    options.log.error(Object.assign(error, { source: "bottleneck" }));
+  });
 
   return {
     Bottleneck,

@@ -107,7 +107,7 @@
     "prettier": "^2.0.5",
     "rimraf": "^3.0.2",
     "semantic-release": "^17.0.0",
-    "semantic-release-plugin-update-version-in-files": "^1.0.0",
+    "semantic-release-plugin-update-version-in-files": "^1.1.0",
     "smee-client": "^1.0.1",
     "supertest": "^4.0.2",
     "ts-jest": "^26.1.1",

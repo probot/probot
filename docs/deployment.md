@@ -12,8 +12,8 @@ Every app can either be deployed stand-alone, or combined with other apps in one
 
 1. [Create the GitHub App](#create-the-github-app)
 1. [Deploy the app](#deploy-the-app)
-    1. [Glitch](#glitch)
-    1. [Heroku](#heroku)
+   1. [Glitch](#glitch)
+   1. [Heroku](#heroku)
 1. [Share the app](#share-the-app)
 1. [Combining apps](#combining-apps)
 1. [Error tracking](#error-tracking)
@@ -24,9 +24,10 @@ Every app can either be deployed stand-alone, or combined with other apps in one
 Every deployment will need an [App](https://developer.github.com/apps/).
 
 1. [Create a new GitHub App](https://github.com/settings/apps/new) with:
-    - **Homepage URL**: the URL to the GitHub repository for your app
-    - **Webhook URL**: Use `https://example.com/` for now, we'll come back in a minute to update this with the URL of your deployed app.
-    - **Webhook Secret**: Generate a unique secret with `openssl rand -base64 32` and save it because you'll need it in a minute to configure your deployed app.
+
+   - **Homepage URL**: the URL to the GitHub repository for your app
+   - **Webhook URL**: Use `https://example.com/` for now, we'll come back in a minute to update this with the URL of your deployed app.
+   - **Webhook Secret**: Generate a unique secret with `openssl rand -base64 32` and save it because you'll need it in a minute to configure your deployed app.
 
 1. Download the private key from the app.
 
@@ -71,26 +72,26 @@ Enjoy!
 
 Probot runs like [any other Node app](https://devcenter.heroku.com/articles/deploying-nodejs) on Heroku. After [creating the GitHub App](#create-the-github-app):
 
-1. Make sure you have the [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli) client installed.
+1.  Make sure you have the [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli) client installed.
 
-1. Clone the app that you want to deploy. e.g. `git clone https://github.com/probot/stale`
+1.  Clone the app that you want to deploy. e.g. `git clone https://github.com/probot/stale`
 
-1. Create the Heroku app with the `heroku create` command:
+1.  Create the Heroku app with the `heroku create` command:
 
         $ heroku create
         Creating arcane-lowlands-8408... done, stack is cedar
         http://arcane-lowlands-8408.herokuapp.com/ | git@heroku.com:arcane-lowlands-8408.git
         Git remote heroku added
 
-1. Go back to your [app settings page](https://github.com/settings/apps) and update the **Webhook URL** to the URL of your deployment, e.g. `http://arcane-lowlands-8408.herokuapp.com/`.
+1.  Go back to your [app settings page](https://github.com/settings/apps) and update the **Webhook URL** to the URL of your deployment, e.g. `http://arcane-lowlands-8408.herokuapp.com/`.
 
-1. Configure the Heroku app, replacing the `APP_ID` and `WEBHOOK_SECRET` with the values for those variables, and setting the path for the `PRIVATE_KEY`:
+1.  Configure the Heroku app, replacing the `APP_ID` and `WEBHOOK_SECRET` with the values for those variables, and setting the path for the `PRIVATE_KEY`:
 
         $ heroku config:set APP_ID=aaa \
             WEBHOOK_SECRET=bbb \
             PRIVATE_KEY="$(cat ~/Downloads/*.private-key.pem)"
 
-1. Deploy the app to heroku with `git push`:
+1.  Deploy the app to heroku with `git push`:
 
         $ git push heroku master
         ...
@@ -99,16 +100,15 @@ Probot runs like [any other Node app](https://devcenter.heroku.com/articles/depl
         -----> Launching... done
               http://arcane-lowlands-8408.herokuapp.com deployed to Heroku
 
-1. Your app should be up and running! To verify that your app
-   is receiving webhook data, you can tail your app's logs:
+1.  Your app should be up and running! To verify that your app
+    is receiving webhook data, you can tail your app's logs:
 
-        $ heroku config:set LOG_LEVEL=trace
-        $ heroku logs --tail
+         $ heroku config:set LOG_LEVEL=trace
+         $ heroku logs --tail
 
 ## Share the app
 
-The Probot website includes a list of [featured apps](https://probot.github.io/apps). Consider [adding your app to the website](https://github.com/probot/probot.github.io/blob/master/CONTRIBUTING.md#adding-your-app
-) so others can discover and use it.
+The Probot website includes a list of [featured apps](https://probot.github.io/apps). Consider [adding your app to the website](https://github.com/probot/probot.github.io/blob/master/CONTRIBUTING.md#adding-your-app) so others can discover and use it.
 
 ## Combining apps
 
@@ -124,23 +124,17 @@ To deploy multiple apps in one instance, create a new app that has the existing 
   },
   "scripts": {
     "start": "probot run"
- },
- "probot": {
-   "apps": [
-     "probot-autoresponder",
-     "probot-settings"
-   ]
- }
+  },
+  "probot": {
+    "apps": ["probot-autoresponder", "probot-settings"]
+  }
 }
 ```
 
 ## Error tracking
 
-Probot comes bundled with a client for the [Sentry](https://github.com/getsentry/sentry) exception tracking platform. To enable Sentry:
-
-  1. [Install Sentry from Marketplace](https://github.com/marketplace/sentry) (with [10k events/month free](https://github.com/marketplace/sentry/plan/MDIyOk1hcmtldHBsYWNlTGlzdGluZ1BsYW40Nw==#pricing-and-setup)) or [host your own instance](https://github.com/getsentry/sentry) (Students can get [extra Sentry credit](https://education.github.com/pack))
-  2. Follow the setup instructions to find your DSN.
-  3. Set the `SENTRY_DSN` environment variable with the DSN you retrieved.
+Probot logs messages using [pino](https://getpino.io/). There is a growing number of tools that consume these logs and send them to error tracking services: https://getpino.io/#/docs/transports.
 
 ## Serverless
+
 Serverless abstracts away the most menial parts of building an application, leaving developers to write code and not actively manage scaling for their applications. The [Serverless Deployment](./serverless-deployment.md) section will show you how to deploy you application using functions instead of servers.

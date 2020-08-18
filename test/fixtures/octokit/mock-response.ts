@@ -1,24 +1,22 @@
-import { Octokit } from '@octokit/rest'
+import { OctokitResponse } from "@octokit/types";
 
-export const toGitHubResponse = <T = any>(data: T): Octokit.Response<T> => ({
+export const toGitHubResponse = <T = any>(data: T): OctokitResponse<T> => ({
   data,
   headers: {
-    date: '',
-    etag: '',
-    'last-modified': '',
-    link: '',
-    status: '',
-    'x-Octokit-media-type': '',
-    'x-Octokit-request-id': '',
-    'x-ratelimit-limit': '',
-    'x-ratelimit-remaining': '',
-    'x-ratelimit-reset': ''
+    date: "",
+    etag: "",
+    "last-modified": "",
+    link: "",
+    status: "",
+    "x-Octokit-media-type": "",
+    "x-Octokit-request-id": "",
+    "x-ratelimit-limit": "",
+    "x-ratelimit-remaining": "",
+    "x-ratelimit-reset": "",
   },
   status: 200,
-  *[Symbol.iterator] () {
-    yield 0
-  }
-})
+  url: "",
+});
 
-export const createMockResponse = <T>(data: T): Promise<Octokit.Response<T>> =>
-  Promise.resolve(toGitHubResponse(data))
+export const createMockResponse = <T>(data: T): Promise<OctokitResponse<T>> =>
+  Promise.resolve(toGitHubResponse(data));

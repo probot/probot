@@ -3,7 +3,7 @@ import Stream from "stream";
 import { Webhooks } from "@octokit/webhooks";
 import pino from "pino";
 
-import { createProbot, Probot } from "../src";
+import { createProbot, Probot, ProbotOctokit } from "../src";
 
 describe("Deprecations", () => {
   let output: any;
@@ -60,6 +60,31 @@ describe("Deprecations", () => {
     expect(output.length).toEqual(2);
     expect(output[0].msg).toContain(
       `[probot] "probot.logger" is deprecated. Use "probot.log" instead`
+    );
+  });
+
+  it("octokit.repos.createStatus()", () => {
+    const log = pino(streamLogsToOutput);
+    const octokit = new ProbotOctokit({
+      log: {
+        error: log.error.bind(log),
+        warn: log.warn.bind(log),
+        info: log.info.bind(log),
+        debug: log.debug.bind(log),
+      },
+    });
+
+    octokit.hook.wrap("request", () => {});
+
+    try {
+      octokit.repos.createStatus();
+    } catch (error) {
+      console.log(error);
+    }
+
+    expect(output.length).toEqual(1);
+    expect(output[0].msg).toContain(
+      `octokit.repos.createStatus() has been renamed to octokit.repos.createCommitStatus()`
     );
   });
 });

@@ -1,6 +1,8 @@
 import Bottleneck from "bottleneck";
 import Redis from "ioredis";
 import type { Logger } from "pino";
+import { Octokit } from "@octokit/core";
+import { RequestOptions } from "@octokit/types";
 
 type Options = {
   log: Logger;
@@ -21,6 +23,26 @@ export function getOctokitThrottleOptions(options: Options) {
   return {
     Bottleneck,
     connection,
+    onAbuseLimit: (
+      retryAfter: number,
+      options: RequestOptions,
+      octokit: Octokit
+    ) => {
+      octokit.log.warn(
+        `Abuse limit hit with "${options.method} ${options.url}", retrying in ${retryAfter} seconds.`
+      );
+      return true;
+    },
+    onRateLimit: (
+      retryAfter: number,
+      options: RequestOptions,
+      octokit: Octokit
+    ) => {
+      octokit.log.warn(
+        `Rate limit hit with "${options.method} ${options.url}", retrying in ${retryAfter} seconds.`
+      );
+      return true;
+    },
   };
 }
 

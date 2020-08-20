@@ -10,14 +10,7 @@ import { throttling } from "@octokit/plugin-throttling";
 import { probotRequestLogging } from "./octokit-plugin-probot-request-logging";
 import { VERSION } from "../version";
 
-export const ProbotOctokit = Octokit.plugin(
-  throttling,
-  retry,
-  paginateRest,
-  restEndpointMethods,
-  enterpriseCompatibility,
-  probotRequestLogging
-).defaults({
+const defaultOptions = {
   throttle: {
     onAbuseLimit: (
       retryAfter: number,
@@ -41,4 +34,22 @@ export const ProbotOctokit = Octokit.plugin(
     },
   },
   userAgent: `probot/${VERSION}`,
+};
+
+export const ProbotOctokit = Octokit.plugin(
+  throttling,
+  retry,
+  paginateRest,
+  restEndpointMethods,
+  enterpriseCompatibility,
+  probotRequestLogging
+).defaults((instanceOptions: any) => {
+  // merge throttle options deeply
+  const options = Object.assign({}, defaultOptions, instanceOptions, {
+    throttle: instanceOptions.throttle
+      ? Object.assign({}, defaultOptions.throttle, instanceOptions.throttle)
+      : defaultOptions.throttle,
+  });
+
+  return options;
 });

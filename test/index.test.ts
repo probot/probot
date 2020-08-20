@@ -65,32 +65,56 @@ describe("Probot", () => {
       process.env = env;
     });
 
-    it("runs with a function as argument", async () => {
-      process.env.PORT = "3003";
+    it("runs with a function as argument", () => {
       let initialized = false;
-      probot = await Probot.run((app) => {
-        initialized = true;
+
+      return new Promise(async (resolve) => {
+        probot = await Probot.run((app) => {
+          initialized = true;
+        });
+        expect(probot.options).toMatchSnapshot();
+        expect(initialized).toBeTruthy();
+        probot.stop();
+
+        resolve();
       });
-      expect(probot.options).toMatchSnapshot();
-      expect(initialized).toBeTruthy();
-      probot.stop();
     });
 
-    it("runs with an array of strings", async () => {
-      probot = await Probot.run(["run", "file.js"]);
-      expect(probot.options).toMatchSnapshot();
-      probot.stop();
+    it("runs with an array of strings", () => {
+      return new Promise(async (resolve) => {
+        probot = await Probot.run(["run", "file.js"]);
+        expect(probot.options).toMatchSnapshot();
+        probot.stop();
+        resolve();
+      });
+    });
+
+    it("works with REDIS_URL configuration", () => {
+      process.env.REDIS_URL = "redis://test:test@localhost:6379";
+
+      return new Promise(async (resolve, reject) => {
+        const probot = await Probot.run((app) => {
+          app.auth(1).then(resolve, reject);
+        });
+        probot.stop();
+      });
     });
 
     it("runs without config and loads the setup app", async () => {
       let initialized = false;
       delete process.env.PRIVATE_KEY_PATH;
-      probot = await Probot.run((app) => {
-        initialized = true;
+      process.env.PORT = "3003";
+
+      return new Promise(async (resolve) => {
+        probot = await Probot.run((app) => {
+          initialized = true;
+        });
+        expect(probot.options).toMatchSnapshot();
+        expect(initialized).toBeFalsy();
+        probot.stop();
+
+        resolve();
       });
-      expect(probot.options).toMatchSnapshot();
-      expect(initialized).toBeFalsy();
-      probot.stop();
     });
   });
 

@@ -1,73 +1,43 @@
-import Stream from "stream";
+import request from 'supertest'
+import { createProbot, Probot } from '../../src'
+import * as data from '../fixtures/webhook/push.json'
 
-import request from "supertest";
-import pino from "pino";
-
-import { Probot } from "../../src";
-import * as data from "../fixtures/webhook/push.json";
-
-describe("webhooks", () => {
-  let probot: Probot;
-  let output: any;
-
-  const streamLogsToOutput = new Stream.Writable({ objectMode: true });
-  streamLogsToOutput._write = (object, encoding, done) => {
-    output.push(JSON.parse(object));
-    done();
-  };
+describe('webhooks', () => {
+  let logger: any
+  let probot: Probot
 
   beforeEach(() => {
-    output = [];
+    logger = jest.fn()
 
-    probot = new Probot({
-      id: 1,
-      privateKey: "bexo🥪",
-      secret: "secret",
-      log: pino(streamLogsToOutput),
-    });
-  });
+    probot = createProbot({ id: 1, cert: 'bexo🥪' })
+    probot.logger.addStream({
+      level: 'trace',
+      stream: { write: logger } as any,
+      type: 'raw'
+    })
+  })
 
-  test("it works when all headers are properly passed onto the event", async () => {
-    const dataString = JSON.stringify(data);
-
+  test('it works when all headers are properly passed onto the event', async () => {
     await request(probot.server)
-      .post("/")
-      .send(dataString)
-      .set("x-github-event", "push")
-      .set("x-hub-signature", probot.webhooks.sign(dataString))
-      .set("x-github-delivery", "3sw4d5f6g7h8")
-      .expect(200);
-  });
-
-  test("shows a friendly error when x-hub-signature is missing", async () => {
-    await request(probot.server)
-      .post("/")
+      .post('/')
       .send(data)
-      .set("x-github-event", "push")
-      // Note: 'x-hub-signature' is missing
-      .set("x-github-delivery", "3sw4d5f6g7h8")
-      .expect(400);
+      .set('x-github-event', 'push')
+      .set('x-hub-signature', probot.webhook.sign(data))
+      .set('x-github-delivery', '3sw4d5f6g7h8')
+      .expect(200)
+  })
 
-    expect(output[0]).toEqual(
-      expect.objectContaining({
-        msg:
-          "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
-      })
-    );
-  });
-
-  test.only("logs webhook error exactly once", async () => {
-    probot.load(() => {});
-
+  test('shows a friendly error when x-hub-signature is missing', async () => {
     await request(probot.server)
-      .post("/")
+      .post('/')
       .send(data)
-      .set("x-github-event", "push")
+      .set('x-github-event', 'push')
       // Note: 'x-hub-signature' is missing
-      .set("x-github-delivery", "3sw4d5f6g7h8")
-      .expect(400);
+      .set('x-github-delivery', '3sw4d5f6g7h8')
+      .expect(400)
 
-    const errorLogs = output.filter((output: any) => output.level === 50);
-    expect(errorLogs.length).toEqual(1);
-  });
-});
+    expect(logger).toHaveBeenCalledWith(expect.objectContaining({
+      msg: 'Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.'
+    }))
+  })
+})

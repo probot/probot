@@ -1,19 +1,7 @@
-import nock from "nock";
-import { Probot } from "../src";
-
-const id = 1;
-const privateKey = `-----BEGIN RSA PRIVATE KEY-----
-MIIBOQIBAAJBAIILhiN9IFpaE0pUXsesuuoaj6eeDiAqCiE49WB1tMB8ZMhC37kY
-Fl52NUYbUxb7JEf6pH5H9vqw1Wp69u78XeUCAwEAAQJAb88urnaXiXdmnIK71tuo
-/TyHBKt9I6Rhfzz0o9Gv7coL7a537FVDvV5UCARXHJMF41tKwj+zlt9EEUw7a1HY
-wQIhAL4F/VHWSPHeTgXYf4EaX2OlpSOk/n7lsFtL/6bWRzRVAiEArzJs2vopJitv
-A1yBjz3q2nX+zthk+GLXrJQkYOnIk1ECIHfeFV8TWm5gej1LxZquBTA5pINoqDVq
-NKZSuZEHqGEFAiB6EDrxkovq8SYGhIQsJeqkTMO8n94xhMRZlFmIQDokEQIgAq5U
-r1UQNnUExRh7ZT0kFbMfO9jKYZVlQdCL9Dn93vo=
------END RSA PRIVATE KEY-----`;
-
-// tslint:disable-next-line
-const noop = async () => {};
+import nock from 'nock'
+import { Application } from '../src'
+import eventCheck, { clearCache } from '../src/webhook-event-check'
+import { newApp } from './apps/helper'
 
 /**
  * Returns a mocked request for `/meta` with the subscribed `events`.
@@ -21,202 +9,122 @@ const noop = async () => {};
  * By default, the mocked payload indicates the a GitHub App is subscribed to
  * the `issues` event.
  */
-function mockAppMetaRequest(events: string[] = ["issues"]) {
-  return { events };
+function mockAppMetaRequest (events: string[] = ['issues']) {
+  return { events }
 }
 
-jest.setTimeout(10000);
-
-describe("webhook-event-check", () => {
-  let originalNodeEnv: string;
-  let originalJestWorkerId: string | undefined;
+describe('webhook-event-check', () => {
+  let app: Application
+  let originalNodeEnv: string
+  let originalJestWorkerId: string | undefined
+  const unsubscribedEventName = 'label.created'
 
   beforeAll(() => {
-    originalNodeEnv = process.env.NODE_ENV || "test";
-    originalJestWorkerId = process.env.JEST_WORKER_ID;
-    nock.disableNetConnect();
-  });
-
-  afterAll(() => {
-    nock.restore();
-  });
+    originalNodeEnv = process.env.NODE_ENV || 'test'
+    originalJestWorkerId = process.env.JEST_WORKER_ID
+  })
 
   beforeEach(() => {
     // We need to re-configure environment variables to avoid
     // webhook-event-check from triggering its smart-disable feature.
-    delete process.env.DISABLE_WEBHOOK_EVENT_CHECK;
-    delete process.env.JEST_WORKER_ID;
-    process.env.NODE_ENV = "development";
-    nock.cleanAll();
-  });
+    delete process.env.DISABLE_WEBHOOK_EVENT_CHECK
+    delete process.env.JEST_WORKER_ID
+    process.env.NODE_ENV = 'development'
+    nock.cleanAll()
+    clearCache()
+  })
 
-  afterEach(() => {
-    process.env.NODE_ENV = originalNodeEnv;
-    process.env.JEST_WORKER_ID = originalJestWorkerId;
-  });
+  test('caches result of /app', async () => {
+    nock('https://api.github.com')
+      .defaultReplyHeaders({ 'Content-Type': 'application/json' })
+      .get('/app').reply(200, mockAppMetaRequest(['label', 'star']))
+    app = newApp()
+    const spyOnAuth = jest.spyOn(app, 'auth')
+    const spyOnLogError = jest.spyOn(app.log, 'error')
+    expect(await eventCheck(app, 'label.edited')).toStrictEqual(true)
+    nock('https://api.github.com')
+      .defaultReplyHeaders({ 'Content-Type': 'application/json' })
+      .get('/app').reply(200, mockAppMetaRequest(['team']))
+    expect(await eventCheck(app, 'label.deleted')).toStrictEqual(true)
+    expect(await eventCheck(app, 'team.created')).toStrictEqual(false)
+    expect(spyOnAuth).toHaveBeenCalledTimes(1)
+    expect(spyOnLogError).toMatchSnapshot()
+  })
 
-  test("caches result of /app, logs error for event that the app is not subscribed to", async () => {
-    nock("https://api.github.com")
-      .get("/app")
-      .reply(200, mockAppMetaRequest(["label", "star"]));
+  test('returns undefined for that will never be in the payload of /meta', async () => {
+    nock('https://api.github.com')
+      .defaultReplyHeaders({ 'Content-Type': 'application/json' })
+      .get('/app').reply(200, mockAppMetaRequest([]))
+    app = newApp()
+    expect(await eventCheck(app, '*')).toStrictEqual(true)
+  })
 
-    const probot = new Probot({ id, privateKey });
+  describe('warn user when', () => {
+    test('listening to unsubscribed event', async () => {
+      nock('https://api.github.com')
+        .defaultReplyHeaders({ 'Content-Type': 'application/json' })
+        .get('/app').reply(200, mockAppMetaRequest())
+      app = newApp()
+      const spyOnLogError = jest.spyOn(app.log, 'error')
+      expect(await eventCheck(app, 'pull_request.opened')).toStrictEqual(false)
+      expect(spyOnLogError).toHaveBeenCalledTimes(1)
+      expect(spyOnLogError).toMatchSnapshot()
+    })
 
-    let spyOnLogError;
-    probot.load(async (app) => {
-      spyOnLogError = jest.spyOn(app.log, "error");
+    test('unable to retrieve app metadata', async () => {
+      nock('https://api.github.com')
+        .defaultReplyHeaders({ 'Content-Type': 'application/json' })
+        .get('/app').reply(404)
+      app = newApp()
+      const spyOnLogWarn = jest.spyOn(app.log, 'warn')
+      expect(await eventCheck(app, unsubscribedEventName)).toBeUndefined()
+      expect(spyOnLogWarn).toHaveBeenCalledTimes(1)
+      expect(spyOnLogWarn).toMatchSnapshot()
+    })
+  })
 
-      app.on("label.edited", noop);
-      app.on("label.deleted", noop);
-      app.on("team.created", noop);
-    });
-
-    // let's give the event check a moment to send its request
-    await new Promise((resolve) => setTimeout(resolve, 2500));
-
-    expect(spyOnLogError).toHaveBeenCalledTimes(1);
-    expect(spyOnLogError).toMatchSnapshot();
-  });
-
-  test('logs no error when listening to special "*" event', async () => {
-    nock("https://api.github.com")
-      .get("/app")
-      .reply(200, mockAppMetaRequest([]));
-
-    const probot = new Probot({ id, privateKey });
-    let spyOnLogError;
-
-    probot.load(async (app) => {
-      spyOnLogError = jest.spyOn(app.log, "error");
-
-      app.on("*", noop);
-    });
-
-    // let's give the event check a moment to send its request
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    expect(spyOnLogError).not.toHaveBeenCalled();
-  });
-
-  describe("warn user when", () => {
-    test("listening to unsubscribed event", async () => {
-      nock("https://api.github.com")
-        .defaultReplyHeaders({ "Content-Type": "application/json" })
-        .get("/app")
-        .reply(200, mockAppMetaRequest());
-
-      const probot = new Probot({ id, privateKey });
-      let spyOnLogError;
-
-      probot.load(async (app) => {
-        spyOnLogError = jest.spyOn(app.log, "error");
-
-        app.on("pull_request.opened", noop);
-      });
-
-      // let's give the event check a moment to send its request
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      expect(spyOnLogError).toHaveBeenCalledTimes(1);
-      expect(spyOnLogError).toMatchSnapshot();
-    });
-
-    test("unable to retrieve app metadata", async () => {
-      nock("https://api.github.com")
-        .defaultReplyHeaders({ "Content-Type": "application/json" })
-        .get("/app")
-        .reply(404);
-
-      const probot = new Probot({ id, privateKey });
-      let spyOnLogError;
-
-      probot.load(async (app) => {
-        spyOnLogError = jest.spyOn(app.log, "error");
-
-        app.on("pull_request.opened", noop);
-      });
-
-      // let's give the event check a moment to send its request
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      expect(spyOnLogError).toHaveBeenCalledTimes(1);
-      expect(spyOnLogError).toMatchSnapshot();
-    });
-  });
-
-  describe("can be disabled", () => {
+  describe('can be disabled', () => {
     beforeEach(() => {
-      delete process.env.DISABLE_WEBHOOK_EVENT_CHECK;
-      delete process.env.JEST_WORKER_ID;
-      delete process.env.NODE_ENV;
-    });
+      delete process.env.DISABLE_WEBHOOK_EVENT_CHECK
+      delete process.env.JEST_WORKER_ID
+      delete process.env.NODE_ENV
+    })
 
-    test("when JEST_WORKER_ID is set", async () => {
-      process.env.JEST_WORKER_ID = "mocked_id";
+    test('when JEST_WORKER_ID is set', async () => {
+      process.env.JEST_WORKER_ID = 'mocked_id'
+      app = newApp()
+      const spyOnAuth = jest.spyOn(app, 'auth')
+      expect(await eventCheck(app, 'issues.opened')).toBeUndefined()
+      expect(spyOnAuth).toHaveBeenCalledTimes(0)
+    })
 
-      const probot = new Probot({ id, privateKey });
-      let spyOnLogError;
+    test('when DISABLE_WEBHOOK_EVENT_CHECK is true', async () => {
+      process.env.DISABLE_WEBHOOK_EVENT_CHECK = 'true'
+      app = newApp()
+      const spyOnAuth = jest.spyOn(app, 'auth')
+      expect(await eventCheck(app, 'issues.opened')).toBeUndefined()
+      expect(spyOnAuth).toHaveBeenCalledTimes(0)
+    })
 
-      probot.load(async (app) => {
-        spyOnLogError = jest.spyOn(app.log, "error");
-        app.on("pull_request.opened", noop);
-      });
-
-      // let's give probot setup a moment
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      expect(spyOnLogError).not.toHaveBeenCalled();
-    });
-
-    test("when DISABLE_WEBHOOK_EVENT_CHECK is true", async () => {
-      process.env.DISABLE_WEBHOOK_EVENT_CHECK = "true";
-
-      const probot = new Probot({ id, privateKey });
-      let spyOnLogError;
-
-      probot.load(async (app) => {
-        spyOnLogError = jest.spyOn(app.log, "error");
-        app.on("pull_request.opened", noop);
-      });
-
-      // let's give probot setup a moment
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      expect(spyOnLogError).not.toHaveBeenCalled();
-    });
-
-    test("when NODE_ENV is production", async () => {
-      process.env.NODE_ENV = "production";
-
-      const probot = new Probot({ id, privateKey });
-      let spyOnLogError;
-
-      probot.load(async (app) => {
-        spyOnLogError = jest.spyOn(app.log, "error");
-        app.on("pull_request.opened", noop);
-      });
-
-      // let's give probot setup a moment
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      expect(spyOnLogError).not.toHaveBeenCalled();
-    });
+    test('when NODE_ENV is production', async () => {
+      process.env.NODE_ENV = 'production'
+      app = newApp()
+      const spyOnAuth = jest.spyOn(app, 'auth')
+      expect(await eventCheck(app, 'issues.opened')).toBeUndefined()
+      expect(spyOnAuth).toHaveBeenCalledTimes(0)
+    })
 
     test('when NODE_ENV starts with "test"', async () => {
-      process.env.NODE_ENV = "testing";
+      process.env.NODE_ENV = 'testing'
+      app = newApp()
+      const spyOnAuth = jest.spyOn(app, 'auth')
+      expect(await eventCheck(app, 'issues.opened')).toBeUndefined()
+      expect(spyOnAuth).toHaveBeenCalledTimes(0)
+    })
+  })
 
-      const probot = new Probot({ id, privateKey });
-      let spyOnLogError;
-
-      probot.load(async (app) => {
-        spyOnLogError = jest.spyOn(app.log, "error");
-        app.on("pull_request.opened", noop);
-      });
-
-      // let's give probot setup a moment
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      expect(spyOnLogError).not.toHaveBeenCalled();
-    });
-  });
-});
+  afterEach(() => {
+    process.env.NODE_ENV = originalNodeEnv
+    process.env.JEST_WORKER_ID = originalJestWorkerId
+  })
+})

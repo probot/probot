@@ -1,0 +1,23 @@
+{
+  "name": "Probot",
+  "description": "a trainable robot that responds to activity on GitHub",
+  "keywords": ["Probot", "node", "github"],
+  "repository": "https://github.com/probot/probot",
+  "logo": "https://github.com/probot.png",
+  "env": {
+    "PRIVATE_KEY": {
+      "description": "the private key you downloaded when creating the GitHub App"
+    },
+    "APP_ID": {
+      "description": "the ID of your GitHub App"
+    },
+    "WEBHOOK_SECRET": {
+      "description": "the secret configured for your GitHub App"
+    },
+    "LOG_LEVEL": {
+      "required": false,
+      "value": "info",
+      "description": "trace, debug, info, warn, error, or fatal; default: info"
+    }
+  }
+}

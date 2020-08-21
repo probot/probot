@@ -54,4 +54,4 @@ Amazing! Be sure to include it in your application.
 
 ## Application Requirements
 
-* You must have created the ["Hello World" app](./hello-world.md), and provided a link to a comment that it has posted.
+- You must have created the ["Hello World" app](./hello-world.md), and provided a link to a comment that it has posted.

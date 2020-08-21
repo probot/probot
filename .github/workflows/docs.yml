@@ -13,7 +13,7 @@ jobs:
       - run: git fetch --depth=20 origin +refs/tags/*:refs/tags/*
       - uses: actions/setup-node@v1
         with:
-          node-version: 12
+          node-version: "12.x"
       - run: npm ci
       - run: npm run build
       - run: ./script/publish-docs

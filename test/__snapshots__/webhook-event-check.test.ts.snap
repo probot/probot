@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`webhook-event-check caches result of /app, logs error for event that the app is not subscribed to 1`] = `
+exports[`webhook-event-check caches result of /app 1`] = `
 [MockFunction] {
   "calls": Array [
     Array [
@@ -36,7 +36,10 @@ exports[`webhook-event-check warn user when unable to retrieve app metadata 1`] 
 [MockFunction] {
   "calls": Array [
     Array [
-      "Your app is attempting to listen to \\"pull_request.opened\\", but your GitHub App is not subscribed to the \\"pull request\\" event.",
+      "Probot is unable to retrieve app information from GitHub for event subscription verification.
+
+If this error persists, feel free to raise an issue at:
+  - https://github.com/probot/probot/issues",
     ],
   ],
   "results": Array [

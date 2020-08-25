@@ -10,7 +10,7 @@ Many GitHub API endpoints are paginated. The `github.paginate` method can be use
 module.exports = (app) => {
   app.on("issues.opened", (context) => {
     context.github.paginate(
-      context.github.issues.getAll,
+      context.github.issues.list,
       context.repo(),
       (res) => {
         res.data.issues.forEach((issue) => {
@@ -30,7 +30,7 @@ The return value of the `github.paginate` callback will be used to accumulate re
 module.exports = (app) => {
   app.on("issues.opened", async (context) => {
     const allIssues = await context.github.paginate(
-      context.github.issues.getAll,
+      context.github.issues.list,
       context.repo(),
       (res) => res.data
     );
@@ -47,7 +47,7 @@ Sometimes it is desirable to stop fetching pages after a certain condition has b
 module.exports = (app) => {
   app.on("issues.opened", (context) => {
     context.github.paginate(
-      context.github.issues.getAll,
+      context.github.issues.list,
       context.repo(),
       (res, done) => {
         for (const issue of res.data) {
@@ -71,7 +71,7 @@ If your runtime environment supports async iterators (such as Node 10+), you can
 module.exports = (app) => {
   app.on("issues.opened", async (context) => {
     for await (const response of octokit.paginate.iterator(
-      context.github.issues.getAll,
+      context.github.issues.list,
       context.repo()
     )) {
       for (const issue of res.data) {

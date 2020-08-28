@@ -116,6 +116,16 @@ describe("Probot", () => {
         resolve();
       });
     });
+
+    it("has version", async () => {
+      return new Promise(async (resolve) => {
+        probot = await Probot.run((app) => {});
+        expect(probot.version).toBe("0.0.0-development");
+        probot.stop();
+
+        resolve();
+      });
+    });
   });
 
   describe("webhook delivery", () => {

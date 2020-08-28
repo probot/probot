@@ -7,7 +7,6 @@ import { Application, Probot } from "../src";
 import { ProbotOctokit } from "../src/octokit/probot-octokit";
 
 import path = require("path");
-import { version } from "../package.json";
 
 const id = 1;
 const privateKey = `-----BEGIN RSA PRIVATE KEY-----
@@ -121,7 +120,7 @@ describe("Probot", () => {
     it("has version", async () => {
       return new Promise(async (resolve) => {
         probot = await Probot.run((app) => {});
-        expect(probot.version).toBe(version);
+        expect(probot.version).toBe("0.0.0-development");
         probot.stop();
 
         resolve();

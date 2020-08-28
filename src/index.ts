@@ -145,8 +145,7 @@ export class Probot {
   public log: DeprecatedLogger;
   public version: String;
 
-  // These 3 need to be public for the tests to work.
-  // FIXME the above comment is not clear about which these 3 are, only two `public` follow
+  // These need to be public for the tests to work.
   public options: Options;
   public throttleOptions: any;
 

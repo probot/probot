@@ -143,8 +143,10 @@ export class Probot {
   public server: express.Application;
   public webhooks: ProbotWebhooks;
   public log: DeprecatedLogger;
+  public version: String;
 
   // These 3 need to be public for the tests to work.
+  // FIXME the above comment is not clear about which these 3 are, only two `public` follow
   public options: Options;
   public throttleOptions: any;
 
@@ -234,6 +236,9 @@ export class Probot {
       webhook: (this.webhooks as any).middleware,
       logger: this.log,
     });
+
+    const { version } = require("../package.json");
+    this.version = version;
   }
 
   /**
@@ -298,6 +303,7 @@ export class Probot {
   }
 
   public start() {
+    this.log.info(`Running Probot v${this.version}`);
     this.httpServer = this.server
       .listen(this.options.port, () => {
         if (this.options.webhookProxy) {

@@ -7,6 +7,8 @@ import { ProbotOctokit } from "./octokit/probot-octokit";
 import type { Logger, LogFn } from "pino";
 
 export type State = {
+  id?: number;
+  privateKey?: string;
   githubToken?: string;
   log: Logger;
   Octokit: typeof ProbotOctokit;

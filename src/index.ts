@@ -217,6 +217,8 @@ export class Probot {
     });
 
     this.state = {
+      id: options.id,
+      privateKey: options.privateKey,
       cache,
       githubToken: options.githubToken,
       log: this.log,
@@ -264,6 +266,8 @@ export class Probot {
     }
 
     const app = new Application({
+      id: this.state.id,
+      privateKey: this.state.privateKey,
       log: this.state.log.child({ name: "app" }),
       cache: this.state.cache,
       githubToken: this.state.githubToken,

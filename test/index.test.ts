@@ -2,6 +2,7 @@ import { EventNames } from "@octokit/webhooks";
 import Bottleneck from "bottleneck";
 import { NextFunction, Request, Response } from "express";
 import request = require("supertest");
+import nock from "nock";
 
 import { Application, Probot } from "../src";
 import { ProbotOctokit } from "../src/octokit/probot-octokit";
@@ -29,7 +30,7 @@ describe("Probot", () => {
   };
 
   beforeEach(() => {
-    // process.env.DISABLE_WEBHOOK_EVENT_CHECK = "true";
+    process.env.DISABLE_WEBHOOK_EVENT_CHECK = "true";
     probot = new Probot({ githubToken: "faketoken" });
 
     event = {
@@ -485,6 +486,56 @@ describe("Probot", () => {
           "Listening on http://localhost:3001"
         );
         server.close(() => next());
+      });
+    });
+  });
+
+  describe("load", () => {
+    it("app sends request with JWT authentication", async () => {
+      expect.assertions(3);
+
+      const mock = nock("https://api.github.com")
+        .get("/app")
+        .reply(200, {
+          id: 1,
+        })
+        .post("/app/installations/1/access_tokens")
+        .reply(201, {
+          token: "v1.123",
+          permissions: {},
+        })
+        .get("/repos/octocat/hello-world")
+        .matchHeader("authorization", "token v1.123")
+        .reply(200, { id: 4 });
+
+      const probot = new Probot({
+        id,
+        privateKey,
+      });
+
+      await new Promise((resolve, reject) => {
+        probot.load(async (app) => {
+          const octokit = await app.auth();
+          try {
+            const { data: appData } = await octokit.apps.getAuthenticated();
+
+            expect(appData.id).toEqual(1);
+
+            const installationOctokit = await app.auth(1);
+
+            const { data: repoData } = await installationOctokit.repos.get({
+              owner: "octocat",
+              repo: "hello-world",
+            });
+
+            expect(repoData.id).toEqual(4);
+            expect(mock.activeMocks()).toStrictEqual([]);
+
+            resolve();
+          } catch (error) {
+            reject(error);
+          }
+        });
       });
     });
   });

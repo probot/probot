@@ -1,6 +1,10 @@
 {
-  "extends": "@tsconfig/node10/tsconfig.json",
   "compilerOptions": {
+    "allowJs": false,
+    "lib": ["es2015", "es2017"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "es5",
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
@@ -11,9 +15,11 @@
     "skipLibCheck": true,
     "noImplicitAny": true,
     "esModuleInterop": true,
-    "declaration": true,
+    "declaration": true, // enable this once all files are .ts and we can remove allowJs
     "resolveJsonModule": true
   },
-  "include": ["src/**/*"],
+  "include": [
+    "src/**/*"
+  ],
   "compileOnSave": false
 }

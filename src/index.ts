@@ -135,6 +135,13 @@ export class Probot {
     } else {
       probot.load(appFn);
     }
+    probot.log.info(
+      {
+        env: process.env.NODE_ENV || "development",
+        logLevel: probot.log.level,
+      },
+      `Running Probot v${probot.version}`
+    );
     probot.start();
 
     return probot;
@@ -306,7 +313,6 @@ export class Probot {
   }
 
   public start() {
-    this.log.info(`Running Probot v${this.version}`);
     this.httpServer = this.server
       .listen(this.options.port, () => {
         if (this.options.webhookProxy) {

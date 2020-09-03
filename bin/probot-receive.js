@@ -7,13 +7,13 @@ const path = require("path");
 const uuid = require("uuid");
 const program = require("commander");
 
-const { findPrivateKey } = require("../lib/private-key");
+const { findPrivateKey } = require("../lib/helpers/get-private-key");
 const {
-  handleDeprecatedEnvironmentVariables,
-} = require("../lib/handle-deprecated-environment-variables");
+  logWarningsForObsoleteEnvironmentVariables,
+} = require("../lib/helpers/log-warnings-for-obsolete-environment-variables");
 const { Probot } = require("../");
 
-handleDeprecatedEnvironmentVariables();
+logWarningsForObsoleteEnvironmentVariables();
 
 program
   .usage("[options] [path/to/app.js...]")

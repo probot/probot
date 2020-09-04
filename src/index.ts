@@ -47,6 +47,7 @@ export interface Options {
    */
   cert?: string;
   port?: number;
+  bindAddress?: string;
   webhookProxy?: string;
 }
 
@@ -67,6 +68,11 @@ export class Probot {
             "-p, --port <n>",
             "Port to start the server on",
             process.env.PORT || 3000
+          )
+          .option(
+            "--bind-address <ip/host>",
+            "IP address/hostname to start the server on",
+            process.env.BIND_ADDRESS || "0.0.0.0"
           )
           .option(
             "-W, --webhook-proxy <url>",
@@ -95,6 +101,7 @@ export class Probot {
           privateKey: findPrivateKey(program.privateKey) || undefined,
           id: program.app,
           port: program.port,
+          bindAddress: program.bindAddress,
           secret: program.secret,
           webhookPath: program.webhookPath,
           webhookProxy: program.webhookProxy,
@@ -105,6 +112,7 @@ export class Probot {
         privateKey: (privateKey && privateKey.toString()) || undefined,
         id: Number(process.env.APP_ID),
         port: Number(process.env.PORT) || 3000,
+        bindAddress: process.env.BIND_ADDRESS || "0.0.0.0",
         secret: process.env.WEBHOOK_SECRET,
         webhookPath: process.env.WEBHOOK_PATH,
         webhookProxy: process.env.WEBHOOK_PROXY_URL,
@@ -229,6 +237,8 @@ export class Probot {
         path: options.webhookPath,
         secret: options.secret,
       },
+      port: options.port || 3000,
+      bindAddress: options.bindAddress || "0.0.0.0"
     };
 
     this.webhooks = getWebhooks(this.state);
@@ -308,21 +318,27 @@ export class Probot {
   public start() {
     this.log.info(`Running Probot v${this.version}`);
     this.httpServer = this.server
-      .listen(this.options.port, () => {
-        if (this.options.webhookProxy) {
-          createWebhookProxy({
-            logger: this.log,
-            path: this.options.webhookPath,
-            port: this.options.port,
-            url: this.options.webhookProxy,
-          });
+      .listen(
+        this.state.port,
+        this.state.bindAddress,
+        () => {
+          if (this.options.webhookProxy) {
+            createWebhookProxy({
+              logger: this.log,
+              path: this.options.webhookPath,
+              port: this.options.port,
+              url: this.options.webhookProxy,
+            });
+          }
+          this.log.info(
+            `Listening on http://${this.options.bindAddress}:${this.options.port}`
+          );
         }
-        this.log.info("Listening on http://localhost:" + this.options.port);
-      })
+      )
       .on("error", (error: NodeJS.ErrnoException) => {
         if (error.code === "EADDRINUSE") {
           this.log.error(
-            `Port ${this.options.port} is already in use. You can define the PORT environment variable to use a different port.`
+            `Address:port ${this.options.bindAddress}:${this.options.port} is already in use. You can define the BIND_ADDRESS and PORT environment variables to use a different IP address and/or port.`
           );
         } else {
           this.log.error(error);

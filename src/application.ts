@@ -33,6 +33,8 @@ export interface Options {
   octokit?: InstanceType<typeof ProbotOctokit>;
   throttleOptions?: any;
   webhooks?: Webhooks;
+  port?: number;
+  bindAddress?: string;
 }
 
 export type OnCallback<T> = (context: Context<T>) => Promise<void>;
@@ -89,6 +91,8 @@ export class Application {
         path: options.webhookPath,
         secret: options.secret,
       },
+      port: options.port || 3000,
+      bindAddress: options.bindAddress || "0.0.0.0"
     };
 
     this.router = express.Router();

@@ -248,7 +248,7 @@ export class Probot {
   public get webhook(): Webhooks {
     this.log.warn(
       new Deprecation(
-        `[probot] "probot.webhook" is deprecated. Use "probot.webhooks" instead instead`
+        `[probot] "probot.webhook" is deprecated. Use "probot.webhooks" instead`
       )
     );
 

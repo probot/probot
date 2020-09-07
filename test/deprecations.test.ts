@@ -36,7 +36,7 @@ describe("Deprecations", () => {
 
     expect(output.length).toEqual(1);
     expect(output[0].msg).toContain(
-      `[probot] "probot.webhook" is deprecated. Use "probot.webhooks" instead instead`
+      `[probot] "probot.webhook" is deprecated. Use "probot.webhooks" instead`
     );
   });
 

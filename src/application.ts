@@ -91,8 +91,6 @@ export class Application {
         path: options.webhookPath,
         secret: options.secret,
       },
-      port: options.port || 3000,
-      bindAddress: options.bindAddress || "0.0.0.0"
     };
 
     this.router = express.Router();

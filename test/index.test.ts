@@ -469,7 +469,8 @@ describe("Probot", () => {
 
         const server = testApp.start().addListener("error", () => {
           expect(testApp.log.error).toHaveBeenCalledWith(
-            "Port 3001 is already in use. You can define the PORT environment variable to use a different port."
+            "Address:port localhost:3001 is already in use. " +
+              "You can define the BIND_ADDRESS and PORT environment variables to use a different IP address and/or port."
           );
           expect(process.exit).toHaveBeenCalledWith(1);
           server.close(() => blockade.close(() => next()));

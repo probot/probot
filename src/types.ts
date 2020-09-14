@@ -18,9 +18,7 @@ export type State = {
   webhooks: {
     path?: string;
     secret?: string;
-  },
-  port: number,
-  bindAddress: string;
+  };
 };
 
 export type ProbotWebhooks = Webhooks<Context>;

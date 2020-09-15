@@ -34,7 +34,7 @@ export interface Options {
   throttleOptions?: any;
   webhooks?: Webhooks;
   port?: number;
-  bindAddress?: string;
+  host?: string;
 }
 
 export type OnCallback<T> = (context: Context<T>) => Promise<void>;

@@ -6,7 +6,7 @@ exports[`Probot ghe support with http throws if the GHE host includes a protocol
 
 exports[`Probot run runs with a function as argument 1`] = `
 Object {
-  "bindAddress": undefined,
+  "host": undefined,
   "id": 1,
   "port": 3000,
   "privateKey": "-----BEGIN RSA PRIVATE KEY-----
@@ -69,7 +69,7 @@ wB98bfAGtcuCZWzgjgL67CS0pcNxadFA/TFo/NnynLBC4qRXSfFslKVE+Og=
 
 exports[`Probot run runs with an array of strings 1`] = `
 Object {
-  "bindAddress": undefined,
+  "host": undefined,
   "id": "1",
   "port": 3000,
   "privateKey": "-----BEGIN RSA PRIVATE KEY-----
@@ -132,7 +132,7 @@ wB98bfAGtcuCZWzgjgL67CS0pcNxadFA/TFo/NnynLBC4qRXSfFslKVE+Og=
 
 exports[`Probot run runs without config and loads the setup app 1`] = `
 Object {
-  "bindAddress": undefined,
+  "host": undefined,
   "id": 1,
   "port": 3003,
   "privateKey": undefined,

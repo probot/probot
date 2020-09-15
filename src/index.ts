@@ -47,7 +47,7 @@ export interface Options {
    */
   cert?: string;
   port?: number;
-  bindAddress?: string;
+  host?: string;
   webhookProxy?: string;
 }
 
@@ -70,9 +70,9 @@ export class Probot {
             process.env.PORT || 3000
           )
           .option(
-            "--bind-address <ip/host>",
-            "IP address/hostname to start the server on",
-            process.env.BIND_ADDRESS
+            "-H --host <host>",
+            "Host to start the server on",
+            process.env.HOST
           )
           .option(
             "-W, --webhook-proxy <url>",
@@ -101,7 +101,7 @@ export class Probot {
           privateKey: findPrivateKey(program.privateKey) || undefined,
           id: program.app,
           port: program.port,
-          bindAddress: program.bindAddress,
+          host: program.host,
           secret: program.secret,
           webhookPath: program.webhookPath,
           webhookProxy: program.webhookProxy,
@@ -112,7 +112,7 @@ export class Probot {
         privateKey: (privateKey && privateKey.toString()) || undefined,
         id: Number(process.env.APP_ID),
         port: Number(process.env.PORT) || 3000,
-        bindAddress: process.env.BIND_ADDRESS,
+        host: process.env.HOST,
         secret: process.env.WEBHOOK_SECRET,
         webhookPath: process.env.WEBHOOK_PATH,
         webhookProxy: process.env.WEBHOOK_PROXY_URL,
@@ -316,11 +316,11 @@ export class Probot {
   public start() {
     this.log.info(`Running Probot v${this.version}`);
     const port = this.options.port || 3000;
-    const { bindAddress } = this.options;
-    const printableAddress = bindAddress ?? "localhost";
+    const { host } = this.options;
+    const printableHost = host ?? "localhost";
 
     this.httpServer = this.server
-      .listen(port, ...((bindAddress ? [bindAddress] : []) as any), () => {
+      .listen(port, ...((host ? [host] : []) as any), () => {
         if (this.options.webhookProxy) {
           createWebhookProxy({
             logger: this.log,
@@ -329,13 +329,13 @@ export class Probot {
             url: this.options.webhookProxy,
           });
         }
-        this.log.info(`Listening on http://${printableAddress}:${port}`);
+        this.log.info(`Listening on http://${printableHost}:${port}`);
       })
       .on("error", (error: NodeJS.ErrnoException) => {
         if (error.code === "EADDRINUSE") {
           this.log.error(
-            `Address:port ${printableAddress}:${port} is already in use. ` +
-              `You can define the BIND_ADDRESS and PORT environment variables to use a different IP address and/or port.`
+            `Host:port ${printableHost}:${port} is already in use. ` +
+              `You can define the HOST and PORT environment variables to use a different host and/or port.`
           );
         } else {
           this.log.error(error);

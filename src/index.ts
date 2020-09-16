@@ -12,7 +12,7 @@ import type { Logger } from "pino";
 
 import { Server } from "http";
 import { Application } from "./application";
-import { setupApp } from "./apps/setup";
+import { setupAppFactory } from "./apps/setup";
 import { Context } from "./context";
 import { ProbotOctokit } from "./octokit/probot-octokit";
 import { getLog } from "./helpers/get-log";
@@ -128,7 +128,8 @@ export class Probot {
           );
         }
       }
-      probot.load(setupApp);
+      // TODO: after #1335 is merged, pass 'probot.options.host' as well
+      probot.load(setupAppFactory(probot.options.port));
     } else if (Array.isArray(appFn)) {
       const pkg = await pkgConf("probot");
       probot.setup(program.args.concat(pkg.apps || pkg.plugins || []));

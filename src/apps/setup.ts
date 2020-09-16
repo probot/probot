@@ -5,62 +5,63 @@ import { ManifestCreation } from "../manifest-creation";
 
 import { getLoggingMiddleware } from "../server/logging-middleware";
 
-// use glitch env to get correct domain welcome message
-// https://glitch.com/help/project/
-const domain =
-  process.env.PROJECT_DOMAIN || `http://localhost:${process.env.PORT || 3000}`;
-const welcomeMessage = `Welcome to Probot! Go to ${domain} to get started.`;
+// TODO: after #1335 is merged, pass 'host' as well
+export const setupAppFactory = (port: number | undefined) =>
+  async function setupApp(app: Application) {
+    const setup: ManifestCreation = new ManifestCreation();
 
-export async function setupApp(app: Application) {
-  const setup: ManifestCreation = new ManifestCreation();
-
-  // If not on Glitch or Production, create a smee URL
-  if (
-    process.env.NODE_ENV !== "production" &&
-    !(process.env.PROJECT_DOMAIN || process.env.WEBHOOK_PROXY_URL)
-  ) {
-    await setup.createWebhookChannel();
-  }
-
-  const route = app.route();
-
-  route.use(getLoggingMiddleware(app.log));
-
-  app.log.info(welcomeMessage);
-
-  route.get("/probot", async (req, res) => {
-    const protocols = req.headers["x-forwarded-proto"] || req.protocol;
-    const protocol =
-      typeof protocols === "string" ? protocols.split(",")[0] : protocols[0];
-    const host = req.headers["x-forwarded-host"] || req.get("host");
-    const baseUrl = `${protocol}://${host}`;
-
-    const pkg = setup.pkg;
-    const manifest = setup.getManifest(pkg, baseUrl);
-    const createAppUrl = setup.createAppUrl;
-    // Pass the manifest to be POST'd
-    res.render("setup.hbs", { pkg, createAppUrl, manifest });
-  });
-
-  route.get("/probot/setup", async (req: Request, res: Response) => {
-    const { code } = req.query;
-    const response = await setup.createAppFromCode(code);
-
-    // If using glitch, restart the app
-    if (process.env.PROJECT_DOMAIN) {
-      exec("refresh", (error) => {
-        if (error) {
-          app.log.error(error);
-        }
-      });
+    // If not on Glitch or Production, create a smee URL
+    if (
+      process.env.NODE_ENV !== "production" &&
+      !(process.env.PROJECT_DOMAIN || process.env.WEBHOOK_PROXY_URL)
+    ) {
+      await setup.createWebhookChannel();
     }
 
-    res.redirect(`${response}/installations/new`);
-  });
+    const route = app.route();
 
-  route.get("/probot/success", async (req, res) => {
-    res.render("success.hbs");
-  });
+    route.use(getLoggingMiddleware(app.log));
 
-  route.get("/", (req, res, next) => res.redirect("/probot"));
-}
+    // use glitch env to get correct domain welcome message
+    // https://glitch.com/help/project/
+    const domain =
+      process.env.PROJECT_DOMAIN || `http://localhost:${port || 3000}`;
+    const welcomeMessage = `Welcome to Probot! Go to ${domain} to get started.`;
+    app.log.info(welcomeMessage);
+
+    route.get("/probot", async (req, res) => {
+      const protocols = req.headers["x-forwarded-proto"] || req.protocol;
+      const protocol =
+        typeof protocols === "string" ? protocols.split(",")[0] : protocols[0];
+      const host = req.headers["x-forwarded-host"] || req.get("host");
+      const baseUrl = `${protocol}://${host}`;
+
+      const pkg = setup.pkg;
+      const manifest = setup.getManifest(pkg, baseUrl);
+      const createAppUrl = setup.createAppUrl;
+      // Pass the manifest to be POST'd
+      res.render("setup.hbs", { pkg, createAppUrl, manifest });
+    });
+
+    route.get("/probot/setup", async (req: Request, res: Response) => {
+      const { code } = req.query;
+      const response = await setup.createAppFromCode(code);
+
+      // If using glitch, restart the app
+      if (process.env.PROJECT_DOMAIN) {
+        exec("refresh", (error) => {
+          if (error) {
+            app.log.error(error);
+          }
+        });
+      }
+
+      res.redirect(`${response}/installations/new`);
+    });
+
+    route.get("/probot/success", async (req, res) => {
+      res.render("success.hbs");
+    });
+
+    route.get("/", (req, res, next) => res.redirect("/probot"));
+  };

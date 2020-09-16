@@ -37,11 +37,22 @@ describe("Setup app", () => {
 
   describe("logs", () => {
     it("should log welcome message", () => {
-      const expMsg = `Welcome to Probot! Go to http://localhost:3000 to get started.`;
+      const expMsgs = [
+        "",
+        "Welcome to Probot!",
+        "Probot is in setup mode, webhooks cannot be received and",
+        "custom routes will not work until APP_ID and PRIVATE_KEY",
+        "are configured in .env.",
+        "Please follow the instructions at http://localhost:3000 to configure .env.",
+        "Once you are done, restart the server.",
+        "",
+      ];
+
       const infoLogs = logOutput
         .filter((output: any) => output.level === pino.levels.values.info)
         .map((o) => o.msg);
-      expect(infoLogs).toContain(expMsg);
+
+      expect(infoLogs).toEqual(expect.arrayContaining(expMsgs));
     });
 
     it("should log welcome message with custom port", async () => {
@@ -51,7 +62,9 @@ describe("Setup app", () => {
       // there is currently no way to await probot.load, so we do hacky hack hack
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      const expMsg = `Welcome to Probot! Go to http://localhost:8080 to get started.`;
+      const expMsg =
+        "Please follow the instructions at http://localhost:8080 to configure .env.";
+
       const infoLogs = logOutput
         .filter((output: any) => output.level === pino.levels.values.info)
         .map((o) => o.msg);

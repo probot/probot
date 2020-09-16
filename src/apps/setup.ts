@@ -22,12 +22,7 @@ export const setupAppFactory = (port: number | undefined) =>
 
     route.use(getLoggingMiddleware(app.log));
 
-    // use glitch env to get correct domain welcome message
-    // https://glitch.com/help/project/
-    const domain =
-      process.env.PROJECT_DOMAIN || `http://localhost:${port || 3000}`;
-    const welcomeMessage = `Welcome to Probot! Go to ${domain} to get started.`;
-    app.log.info(welcomeMessage);
+    printWelcomeMessage(app, port);
 
     route.get("/probot", async (req, res) => {
       const protocols = req.headers["x-forwarded-proto"] || req.protocol;
@@ -65,3 +60,23 @@ export const setupAppFactory = (port: number | undefined) =>
 
     route.get("/", (req, res, next) => res.redirect("/probot"));
   };
+
+function printWelcomeMessage(app: Application, port: number | undefined) {
+  // use glitch env to get correct domain welcome message
+  // https://glitch.com/help/project/
+  const domain =
+    process.env.PROJECT_DOMAIN || `http://localhost:${port || 3000}`;
+
+  [
+    ``,
+    `Welcome to Probot!`,
+    `Probot is in setup mode, webhooks cannot be received and`,
+    `custom routes will not work until APP_ID and PRIVATE_KEY`,
+    `are configured in .env.`,
+    `Please follow the instructions at ${domain} to configure .env.`,
+    `Once you are done, restart the server.`,
+    ``,
+  ].forEach((line) => {
+    app.log.info(line);
+  });
+}

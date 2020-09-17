@@ -334,8 +334,7 @@ export class Probot {
       .on("error", (error: NodeJS.ErrnoException) => {
         if (error.code === "EADDRINUSE") {
           this.log.error(
-            `Host:port ${printableHost}:${port} is already in use. ` +
-              `You can define the HOST and PORT environment variables to use a different host and/or port.`
+            `Port ${this.options.port} is already in use. You can define the PORT environment variable to use a different port.`
           );
         } else {
           this.log.error(error);

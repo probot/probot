@@ -33,8 +33,6 @@ export interface Options {
   octokit?: InstanceType<typeof ProbotOctokit>;
   throttleOptions?: any;
   webhooks?: Webhooks;
-  port?: number;
-  host?: string;
 }
 
 export type OnCallback<T> = (context: Context<T>) => Promise<void>;

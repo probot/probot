@@ -31,8 +31,9 @@
           <p>To start building a GitHub App, you'll need to register a new app on GitHub.</p>
           <br>
 
-          <form action="{{ createAppUrl }}" method="post" target="_blank">
+          <form action="{{ createAppUrl }}" method="post" target="_blank" class="d-flex flex-items-center">
             <button class="btn btn-outline" name="manifest" id="manifest" value='{{ manifest }}' >Register GitHub App</button>
+            <a href="/probot/import" class="ml-2">or use an existing Github App</a>
           </form>
         </div>
       </div>

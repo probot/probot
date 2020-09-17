@@ -489,6 +489,17 @@ describe("Probot", () => {
         server.close(() => next());
       });
     });
+
+    it("respects host/ip config when starting up HTTP server", (next) => {
+      const testApp = new Probot({ port: 3002, host: "127.0.0.1" });
+      const spy = jest.spyOn(testApp.server, "listen");
+      const server = testApp.start().on("listening", () => {
+        expect(spy.mock.calls[0][0]).toBe(3002);
+        expect(spy.mock.calls[0][1]).toBe("127.0.0.1");
+        spy.mockRestore();
+        server.close(() => next());
+      });
+    });
   });
 
   describe("load", () => {

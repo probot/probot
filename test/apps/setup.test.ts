@@ -4,17 +4,28 @@ jest.mock("smee-client", () => ({ createChannel }));
 jest.mock("update-dotenv", () => updateDotenv);
 
 import nock from "nock";
+import { Stream } from "stream";
 import request from "supertest";
+import pino from "pino";
 import { Probot } from "../../src";
-import { setupApp } from "../../src/apps/setup";
+import { setupAppFactory } from "../../src/apps/setup";
 
 describe("Setup app", () => {
   let probot: Probot;
+  let logOutput: any[] = [];
+
+  const streamLogsToOutput = new Stream.Writable({ objectMode: true });
+  streamLogsToOutput._write = (msg, _encoding, done) => {
+    logOutput.push(JSON.parse(msg));
+    done();
+  };
 
   beforeEach(async () => {
     delete process.env.WEBHOOK_PROXY_URL;
-    probot = new Probot({});
-    probot.load(setupApp);
+    probot = new Probot({
+      log: pino(streamLogsToOutput),
+    });
+    probot.load(setupAppFactory(undefined));
 
     // there is currently no way to await probot.load, so we do hacky hack hack
     await new Promise((resolve) => setTimeout(resolve, 100));
@@ -22,6 +33,43 @@ describe("Setup app", () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+  });
+
+  describe("logs", () => {
+    it("should log welcome message", () => {
+      const expMsgs = [
+        "",
+        "Welcome to Probot!",
+        "Probot is in setup mode, webhooks cannot be received and",
+        "custom routes will not work until APP_ID and PRIVATE_KEY",
+        "are configured in .env.",
+        "Please follow the instructions at http://localhost:3000 to configure .env.",
+        "Once you are done, restart the server.",
+        "",
+      ];
+
+      const infoLogs = logOutput
+        .filter((output: any) => output.level === pino.levels.values.info)
+        .map((o) => o.msg);
+
+      expect(infoLogs).toEqual(expect.arrayContaining(expMsgs));
+    });
+
+    it("should log welcome message with custom port", async () => {
+      logOutput.length = 0; // clear array
+      probot.load(setupAppFactory(8080));
+
+      // there is currently no way to await probot.load, so we do hacky hack hack
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      const expMsg =
+        "Please follow the instructions at http://localhost:8080 to configure .env.";
+
+      const infoLogs = logOutput
+        .filter((output: any) => output.level === pino.levels.values.info)
+        .map((o) => o.msg);
+      expect(infoLogs).toContain(expMsg);
+    });
   });
 
   describe("GET /probot", () => {

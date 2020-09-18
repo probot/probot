@@ -52,8 +52,9 @@ export const setupAppFactory = (port: number | undefined) =>
     });
 
     route.get("/probot/import", async (_req, res) => {
-      const { WEBHOOK_PROXY_URL } = process.env;
-      res.render("import.hbs", { WEBHOOK_PROXY_URL });
+      const { WEBHOOK_PROXY_URL, GHE_HOST } = process.env;
+      const GH_HOST = `https://${GHE_HOST ?? "github.com"}`;
+      res.render("import.hbs", { WEBHOOK_PROXY_URL, GH_HOST });
     });
 
     route.post("/probot/import", bodyParser.json(), async (req, res) => {

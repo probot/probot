@@ -136,8 +136,7 @@ export class Probot {
           );
         }
       }
-      // TODO: after #1335 is merged, pass 'probot.options.host' as well
-      probot.load(setupAppFactory(probot.options.port));
+      probot.load(setupAppFactory(probot.options.host, probot.options.port));
     } else if (Array.isArray(appFn)) {
       const pkg = await pkgConf("probot");
       probot.setup(program.args.concat(pkg.apps || pkg.plugins || []));

@@ -25,7 +25,7 @@ describe("Setup app", () => {
     probot = new Probot({
       log: pino(streamLogsToOutput),
     });
-    probot.load(setupAppFactory(undefined));
+    probot.load(setupAppFactory(undefined, undefined));
 
     // there is currently no way to await probot.load, so we do hacky hack hack
     await new Promise((resolve) => setTimeout(resolve, 100));
@@ -55,15 +55,15 @@ describe("Setup app", () => {
       expect(infoLogs).toEqual(expect.arrayContaining(expMsgs));
     });
 
-    it("should log welcome message with custom port", async () => {
+    it("should log welcome message with custom host and port", async () => {
       logOutput.length = 0; // clear array
-      probot.load(setupAppFactory(8080));
+      probot.load(setupAppFactory("127.0.0.1", 8080));
 
       // there is currently no way to await probot.load, so we do hacky hack hack
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       const expMsg =
-        "Please follow the instructions at http://localhost:8080 to configure .env.";
+        "Please follow the instructions at http://127.0.0.1:8080 to configure .env.";
 
       const infoLogs = logOutput
         .filter((output: any) => output.level === pino.levels.values.info)

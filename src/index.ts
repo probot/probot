@@ -47,6 +47,7 @@ export interface Options {
    */
   cert?: string;
   port?: number;
+  host?: string;
   webhookProxy?: string;
 }
 
@@ -67,6 +68,11 @@ export class Probot {
             "-p, --port <n>",
             "Port to start the server on",
             process.env.PORT || 3000
+          )
+          .option(
+            "-H --host <host>",
+            "Host to start the server on",
+            process.env.HOST
           )
           .option(
             "-W, --webhook-proxy <url>",
@@ -95,6 +101,7 @@ export class Probot {
           privateKey: findPrivateKey(program.privateKey) || undefined,
           id: program.app,
           port: program.port,
+          host: program.host,
           secret: program.secret,
           webhookPath: program.webhookPath,
           webhookProxy: program.webhookProxy,
@@ -105,6 +112,7 @@ export class Probot {
         privateKey: (privateKey && privateKey.toString()) || undefined,
         id: Number(process.env.APP_ID),
         port: Number(process.env.PORT) || 3000,
+        host: process.env.HOST,
         secret: process.env.WEBHOOK_SECRET,
         webhookPath: process.env.WEBHOOK_PATH,
         webhookProxy: process.env.WEBHOOK_PROXY_URL,
@@ -308,8 +316,12 @@ export class Probot {
 
   public start() {
     this.log.info(`Running Probot v${this.version}`);
+    const port = this.options.port || 3000;
+    const { host } = this.options;
+    const printableHost = host ?? "localhost";
+
     this.httpServer = this.server
-      .listen(this.options.port, () => {
+      .listen(port, ...((host ? [host] : []) as any), () => {
         if (this.options.webhookProxy) {
           createWebhookProxy({
             logger: this.log,
@@ -318,7 +330,7 @@ export class Probot {
             url: this.options.webhookProxy,
           });
         }
-        this.log.info("Listening on http://localhost:" + this.options.port);
+        this.log.info(`Listening on http://${printableHost}:${port}`);
       })
       .on("error", (error: NodeJS.ErrnoException) => {
         if (error.code === "EADDRINUSE") {

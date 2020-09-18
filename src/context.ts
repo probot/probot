@@ -27,7 +27,7 @@ const DEFAULT_BASE = ".github";
 
 export type MergeOptions = merge.Options;
 
-interface WebhookPayloadWithRepository {
+export interface WebhookPayloadWithRepository {
   [key: string]: any;
   repository?: EventPayloads.PayloadRepository;
   issue?: {

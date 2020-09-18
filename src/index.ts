@@ -13,7 +13,7 @@ import type { Logger } from "pino";
 import { Server } from "http";
 import { Application } from "./application";
 import { setupAppFactory } from "./apps/setup";
-import { Context } from "./context";
+import { Context, WebhookPayloadWithRepository } from "./context";
 import { ProbotOctokit } from "./octokit/probot-octokit";
 import { getLog } from "./helpers/get-log";
 import { findPrivateKey } from "./helpers/get-private-key";
@@ -367,3 +367,6 @@ export const createProbot = (options: Options) => {
 export type ApplicationFunction = (app: Application) => void;
 
 export { Logger, Context, Application, ProbotOctokit };
+
+/** NOTE: exported types might change at any point in time */
+export { WebhookPayloadWithRepository };

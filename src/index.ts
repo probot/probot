@@ -316,7 +316,7 @@ export class Probot {
 
   public start() {
     this.log.info(
-      `Running Probot v${this.version} - Node.js ${process.version}`
+      `Running Probot v${this.version} (Node.js: v${process.version})`
     );
     const port = this.options.port || 3000;
     const { host } = this.options;

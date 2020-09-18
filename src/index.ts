@@ -365,10 +365,7 @@ export const createProbot = (options: Options) => {
 
 export type ApplicationFunction = (app: Application) => void;
 
-export {
-  Logger,
-  Context,
-  Application,
-  ProbotOctokit,
-  WebhookPayloadWithRepository,
-};
+export { Logger, Context, Application, ProbotOctokit };
+
+/** NOTE: exported types might change at any point in time */
+export { WebhookPayloadWithRepository };

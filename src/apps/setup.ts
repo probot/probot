@@ -5,8 +5,10 @@ import { ManifestCreation } from "../manifest-creation";
 
 import { getLoggingMiddleware } from "../server/logging-middleware";
 
-// TODO: after #1335 is merged, pass 'host' as well
-export const setupAppFactory = (port: number | undefined) =>
+export const setupAppFactory = (
+  host: string | undefined,
+  port: number | undefined
+) =>
   async function setupApp(app: Application) {
     const setup: ManifestCreation = new ManifestCreation();
 
@@ -22,7 +24,7 @@ export const setupAppFactory = (port: number | undefined) =>
 
     route.use(getLoggingMiddleware(app.log));
 
-    printWelcomeMessage(app, port);
+    printWelcomeMessage(app, host, port);
 
     route.get("/probot", async (req, res) => {
       const protocols = req.headers["x-forwarded-proto"] || req.protocol;
@@ -61,11 +63,16 @@ export const setupAppFactory = (port: number | undefined) =>
     route.get("/", (req, res, next) => res.redirect("/probot"));
   };
 
-function printWelcomeMessage(app: Application, port: number | undefined) {
+function printWelcomeMessage(
+  app: Application,
+  host: string | undefined,
+  port: number | undefined
+) {
   // use glitch env to get correct domain welcome message
   // https://glitch.com/help/project/
   const domain =
-    process.env.PROJECT_DOMAIN || `http://localhost:${port || 3000}`;
+    process.env.PROJECT_DOMAIN ||
+    `http://${host ?? "localhost"}:${port || 3000}`;
 
   [
     ``,

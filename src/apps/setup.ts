@@ -39,7 +39,14 @@ export const setupAppFactory = (port: number | undefined) =>
       const { code } = req.query;
       const response = await setup.createAppFromCode(code);
 
-      restartGlitchApp(app);
+      // If using glitch, restart the app
+      if (process.env.PROJECT_DOMAIN) {
+        exec("refresh", (error) => {
+          if (error) {
+            app.log.error(error);
+          }
+        });
+      }
 
       res.redirect(`${response}/installations/new`);
     });
@@ -61,7 +68,6 @@ export const setupAppFactory = (port: number | undefined) =>
         WEBHOOK_SECRET: webhook_secret,
       });
       res.end();
-      restartGlitchApp(app);
     });
 
     route.get("/probot/success", async (req, res) => {
@@ -98,15 +104,4 @@ function getBaseUrl(req: Request): string {
   const host = req.headers["x-forwarded-host"] || req.get("host");
   const baseUrl = `${protocol}://${host}`;
   return baseUrl;
-}
-
-function restartGlitchApp(app: Application) {
-  // If using glitch, restart the app
-  if (process.env.PROJECT_DOMAIN) {
-    exec("refresh", (error) => {
-      if (error) {
-        app.log.error(error);
-      }
-    });
-  }
 }

@@ -1,5 +1,7 @@
+import bodyParser from "body-parser";
 import { exec } from "child_process";
 import { Request, Response } from "express";
+import updateDotenv from "update-dotenv";
 import { Application } from "../application";
 import { ManifestCreation } from "../manifest-creation";
 
@@ -27,12 +29,7 @@ export const setupAppFactory = (
     printWelcomeMessage(app, host, port);
 
     route.get("/probot", async (req, res) => {
-      const protocols = req.headers["x-forwarded-proto"] || req.protocol;
-      const protocol =
-        typeof protocols === "string" ? protocols.split(",")[0] : protocols[0];
-      const host = req.headers["x-forwarded-host"] || req.get("host");
-      const baseUrl = `${protocol}://${host}`;
-
+      const baseUrl = getBaseUrl(req);
       const pkg = setup.pkg;
       const manifest = setup.getManifest(pkg, baseUrl);
       const createAppUrl = setup.createAppUrl;
@@ -54,6 +51,26 @@ export const setupAppFactory = (
       }
 
       res.redirect(`${response}/installations/new`);
+    });
+
+    route.get("/probot/import", async (_req, res) => {
+      const { WEBHOOK_PROXY_URL, GHE_HOST } = process.env;
+      const GH_HOST = `https://${GHE_HOST ?? "github.com"}`;
+      res.render("import.hbs", { WEBHOOK_PROXY_URL, GH_HOST });
+    });
+
+    route.post("/probot/import", bodyParser.json(), async (req, res) => {
+      const { appId, pem, webhook_secret } = req.body;
+      if (!appId || !pem || !webhook_secret) {
+        res.status(400).send("appId and/or pem and/or webhook_secret missing");
+        return;
+      }
+      updateDotenv({
+        APP_ID: appId,
+        PRIVATE_KEY: `"${pem}"`,
+        WEBHOOK_SECRET: webhook_secret,
+      });
+      res.end();
     });
 
     route.get("/probot/success", async (req, res) => {
@@ -86,4 +103,13 @@ function printWelcomeMessage(
   ].forEach((line) => {
     app.log.info(line);
   });
+}
+
+function getBaseUrl(req: Request): string {
+  const protocols = req.headers["x-forwarded-proto"] || req.protocol;
+  const protocol =
+    typeof protocols === "string" ? protocols.split(",")[0] : protocols[0];
+  const host = req.headers["x-forwarded-host"] || req.get("host");
+  const baseUrl = `${protocol}://${host}`;
+  return baseUrl;
 }

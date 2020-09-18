@@ -100,6 +100,45 @@ describe("Setup app", () => {
     });
   });
 
+  describe("GET /probot/import", () => {
+    it("renders import.hbs", async () => {
+      await request(probot.server).get("/probot/import").expect(200);
+    });
+  });
+
+  describe("POST /probot/import", () => {
+    it("updates .env", async () => {
+      const body = JSON.stringify({
+        appId: "foo",
+        pem: "bar",
+        webhook_secret: "baz",
+      });
+
+      await request(probot.server)
+        .post("/probot/import")
+        .set("content-type", "application/json")
+        .send(body)
+        .expect(200)
+        .expect("");
+
+      expect(updateDotenv.mock.calls).toMatchSnapshot();
+    });
+
+    it("400 when keys are missing", async () => {
+      const body = JSON.stringify({
+        appId: "foo",
+        /* no pem */
+        webhook_secret: "baz",
+      });
+
+      await request(probot.server)
+        .post("/probot/import")
+        .set("content-type", "application/json")
+        .send(body)
+        .expect(400);
+    });
+  });
+
   describe("GET /probot/success", () => {
     it("returns a 200 response", async () => {
       await request(probot.server).get("/probot/success").expect(200);

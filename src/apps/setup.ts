@@ -48,6 +48,8 @@ export const setupAppFactory = (
             app.log.error(error);
           }
         });
+      } else {
+        printRestartMessage(app);
       }
 
       res.redirect(`${response}/installations/new`);
@@ -71,6 +73,7 @@ export const setupAppFactory = (
         WEBHOOK_SECRET: webhook_secret,
       });
       res.end();
+      printRestartMessage(app);
     });
 
     route.get("/probot/success", async (req, res) => {
@@ -103,6 +106,12 @@ function printWelcomeMessage(
   ].forEach((line) => {
     app.log.info(line);
   });
+}
+
+function printRestartMessage(app: Application) {
+  app.log.info("");
+  app.log.info("Probot has been set up, please restart the server!");
+  app.log.info("");
 }
 
 function getBaseUrl(req: Request): string {

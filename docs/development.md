@@ -60,7 +60,7 @@ The most important files created are `index.js`, which is where the code for you
 
 ## Running the app locally
 
-Now you're ready to run the app on your local machine. Run `npm run dev` to start the server:
+Now you're ready to run the app on your local machine. Run `npm start` to start the server:
 
 > Note: If you're building a TypeScript app, be sure to run `npm run build` first!
 
@@ -91,22 +91,23 @@ The `dev` script will start your app using [nodemon](https://github.com/remy/nod
 
 To automatically configure your GitHub App, follow these steps:
 
-1. Run the app locally by running `npm run dev`.
+1. Run the app locally by running `npm start` in your terminal.
 1. Next follow instructions to visit localhost:3000 (or your custom Glitch URL).
-1. You should see something like this: <img width="625" alt="screen shot 2018-09-25 at 10 01 28 pm" src="https://user-images.githubusercontent.com/13410355/46052950-a19e2900-c10e-11e8-9e7e-0c803b8ca35c.png">
+1. You should see something like this: ![Screenshot of Probot's setup wizzard](/docs/assets/probot-setup-wizzard.png)
 1. Go ahead and click the **Register a GitHub App** button.
-1. Next, you'll get to decide on an app name that isn't already taken.
+1. Next, you'll get to decide on an app name that isn't already taken. Note: if you see a message "Name is already in use" although no such app exists, it means that a GitHub organization with that name exists and cannot be used as an app name.
 1. After registering your GitHub App, you'll be redirected to install the app on any repositories. At the same time, you can check your local `.env` and notice it will be populated with values GitHub sends us in the course of that redirect.
 1. Install the app on a test repository and try triggering a webhook to activate the bot!
+1. Restart the server in your terminal (press <kbd>ctrl</kbd> + <kbd>c</kbd> to stop the server)
 1. You're all set! Head down to [Debugging](#debugging) to learn more about developing your Probot App.
 
-GitHub App Manifests--otherwise known as easy app creation--make it simple to generate all the settings necessary for a GitHub App. This process abstracts the [Configuring a GitHub App](#configuring-a-github-app) section. You can learn more about how GitHub App Manifests work and how to change your settings for one via the [GitHub Developer Docs](https://developer.github.com/apps/building-github-apps/creating-github-apps-from-a-manifest/).
+GitHub App Manifests--otherwise known as easy app creation--make it simple to generate all the settings necessary for a GitHub App. This process abstracts the [Configuring a GitHub App](#configuring-a-github-app) section. You can learn more about how GitHub App Manifests work and how to change your settings for one via the [GitHub Developer Docs](https://docs.github.com/en/developers/apps/creating-a-github-app-from-a-manifest/).
 
 ## Manually Configuring a GitHub App
 
-> If you created an App with a manifest, you can skip this section; your app is already configured! If you ever need to edit those settings, you can visit `https://github.com/settings/apps/your-app-name`
+> If you created an App with a manifest, you can skip this section; your app is already configured! If you ever need to edit those settings, you can visit `https://github.com/settings/apps/[your-app-name]`
 
-To run your app in development, you will need to configure a GitHub App to deliver webhooks to your local machine.
+To run your app in development, you will need to configure a GitHub App's `APP_ID`, `PRIVATE_KEY`, `WEBHOOK_SECRET`, and `WEBHOOK_PROXY_URL` in order to receive webhooks to your local machine.
 
 1. On your local machine, copy `.env.example` to `.env` in the same directory. We're going to be changing a few things in this new file.
 1. Go to [smee.io](https://smee.io) and click **Start a new channel**. Set `WEBHOOK_PROXY_URL` to the URL that you are redirected to.<br/>
@@ -115,7 +116,7 @@ To run your app in development, you will need to configure a GitHub App to deliv
    - **Webhook URL**: Use the same `WEBHOOK_PROXY_URL` from the previous step.
    - **Webhook Secret:** `development`, or whatever you set for this in your `.env` file. (Note: For optimal security, Probot apps **require** this secret be set, even though it's optional on GitHub.).
    - **Permissions & events** is located lower down the page and will depend on what data you want your app to have access to. Note: if, for example, you only enable issue events, you will not be able to listen on pull request webhooks with your app. However, for development, we recommend enabling everything.
-1. You must now set `APP_ID` in your `.env` to the ID of the app you just created. The App ID can be found in your app settings page here <img width="1048" alt="screen shot 2017-08-20 at 8 31 31 am" src="https://user-images.githubusercontent.com/5713670/42248717-f6bf4f10-7edb-11e8-8dd5-387181c771bc.png">
+1. You must now set `APP_ID` in your `.env` to the ID of the app you just created. The App ID can be found in on top of your apps settings page.
 1. Finally, generate and download a private key file (using the button seen in the image above), then move it to your project's directory. As long as it's in the root of your project, Probot will find it automatically regardless of the filename.
 
 For more information about these and other available keys, head over to the [environmental configuration documentation](https://probot.github.io/docs/configuration/).
@@ -123,11 +124,6 @@ For more information about these and other available keys, head over to the [env
 ## Installing the app on a repository
 
 You'll need to create a test repository and install your app by clicking the "Install" button on the settings page of your app, e.g. `https://github.com/apps/your-app`
-
-**Other available scripts**
-
-- `$ npm start` to start your app without watching files.
-- `$ npm run lint` to lint your code using [Prettier](https://prettier.io/).
 
 ## Debugging
 

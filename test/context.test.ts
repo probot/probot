@@ -597,6 +597,37 @@ describe("Context", () => {
       });
     });
 
+    it("does not defaults to .github repo if no config found and loadBaseWhenMissing is false", async () => {
+      jest
+        .spyOn(github, "request")
+        .mockReturnValueOnce(Promise.reject(notFoundError))
+        .mockReturnValueOnce(responseFromConfig("basic.yml"));
+      const config = await context.config(
+        "test-file.yml",
+        undefined,
+        undefined,
+        false
+      );
+
+      expect(github.request).toHaveBeenCalledWith(
+        "GET /repos/{owner}/{repo}/contents/{path}",
+        {
+          owner: "bkeepers",
+          path: ".github/test-file.yml",
+          repo: "probot",
+        }
+      );
+      expect(github.request).not.toHaveBeenCalledWith(
+        "GET /repos/{owner}/{repo}/contents/{path}",
+        {
+          owner: "bkeepers",
+          path: ".github/test-file.yml",
+          repo: ".github",
+        }
+      );
+      expect(config).toEqual(null);
+    });
+
     it("deep merges the base config", async () => {
       jest
         .spyOn(github, "request")

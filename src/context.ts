@@ -216,25 +216,31 @@ export class Context<E extends WebhookPayloadWithRepository = any>
    * Config files can also specify a base that they extend. `deepMergeOptions` can be used
    * to configure how the target config, extended base, and default configs are merged.
    *
+   * Additionally, if there is no config file, but there is a repo in the org named .github,
+   * it will be used as a base repository and file from there will be loaded. This can be
+   * opted-out by setting `loadBaseWhenMissing` to false
+   *
    * For security reasons, configuration is only loaded from the repository's default branch,
    * changes made in pull requests from different branches or forks are ignored.
    *
    * @param fileName - Name of the YAML file in the `.github` directory
    * @param defaultConfig - An object of default config options
    * @param deepMergeOptions - Controls merging configs (from the [deepmerge](https://github.com/TehShrike/deepmerge) module)
+   * @param loadBaseWhenMissing - Controls whether to load default base config from `.github` repository when the given fileName is not found in current repo
    * @return Configuration object read from the file
    */
   public async config<T>(
     fileName: string,
     defaultConfig?: T,
-    deepMergeOptions?: MergeOptions
+    deepMergeOptions?: MergeOptions,
+    loadBaseWhenMissing: boolean = true
   ): Promise<T | null> {
     const params = this.repo({ path: path.posix.join(CONFIG_PATH, fileName) });
 
     const config = await this.loadYaml(params);
 
     let baseRepo;
-    if (config == null) {
+    if (config == null && loadBaseWhenMissing) {
       baseRepo = DEFAULT_BASE;
     } else if (config != null && BASE_KEY in config) {
       baseRepo = config[BASE_KEY];
@@ -260,6 +266,23 @@ export class Context<E extends WebhookPayloadWithRepository = any>
       [defaultConfig, baseConfig, config].filter((conf) => conf),
       deepMergeOptions
     ) as unknown) as T;
+  }
+
+  /**
+   * config without fallback when file does not exist
+   * @see config
+   *
+   * @param fileName - Name of the YAML file in the `.github` directory
+   * @param defaultConfig - An object of default config options
+   * @param deepMergeOptions - Controls merging configs (from the [deepmerge](https://github.com/TehShrike/deepmerge) module)
+   * @return Configuration object read from the file
+   */
+  public configStrict<T>(
+    fileName: string,
+    defaultConfig?: T,
+    deepMergeOptions?: MergeOptions
+  ): Promise<T | null> {
+    return this.config(fileName, defaultConfig, deepMergeOptions, false);
   }
 
   /**

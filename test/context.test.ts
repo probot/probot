@@ -1,28 +1,15 @@
 import fs = require("fs");
 import path = require("path");
 
-import { Endpoints } from "@octokit/types";
 import { WebhookEvent } from "@octokit/webhooks";
+import nock from "nock";
 
-import { Context, MergeOptions } from "../src/context";
+import { Context } from "../src";
 import { ProbotOctokit } from "../src/octokit/probot-octokit";
-
-import { createMockResponse } from "./fixtures/octokit/mock-response";
-
-type ReposGetContentResponse = Endpoints["GET /repos/:owner/:repo/contents/:path"]["response"];
-
-interface OctokitError extends Error {
-  status: number;
-}
 
 describe("Context", () => {
   let event: WebhookEvent;
   let context: Context;
-  const notFoundError: OctokitError = {
-    message: "An error occurred",
-    name: "OctokitError",
-    status: 404,
-  };
 
   beforeEach(() => {
     event = {
@@ -150,73 +137,55 @@ describe("Context", () => {
   describe("config", () => {
     let github: InstanceType<typeof ProbotOctokit>;
 
-    function responseFromString(content: string) {
-      return createMockResponse({
-        content: Buffer.from(content).toString("base64"),
-      }) as Promise<ReposGetContentResponse>;
-    }
-
-    function responseFromConfig(fileName: string) {
+    function nockConfigResponseDataFile(fileName: string) {
       const configPath = path.join(__dirname, "fixtures", "config", fileName);
       const content = fs.readFileSync(configPath, { encoding: "utf8" });
-      return responseFromString(content);
+
+      return {
+        content: Buffer.from(content).toString("base64"),
+      };
     }
 
     beforeEach(() => {
-      github = new ProbotOctokit();
+      github = new ProbotOctokit({
+        retry: { enabled: false },
+        throttle: { enabled: false },
+      });
       context = new Context(event, github, {} as any);
     });
 
     it("gets a valid configuration", async () => {
-      jest
-        .spyOn(github, "request")
-        .mockReturnValue(responseFromConfig("basic.yml"));
-      const config = await context.config("test-file.yml");
+      const mock = nock("https://api.github.com")
+        .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
+        .reply(200, nockConfigResponseDataFile("basic.yml"));
 
-      expect(github.request).toHaveBeenCalledTimes(1);
-      expect(github.request).toHaveBeenCalledWith(
-        "GET /repos/{owner}/{repo}/contents/{path}",
-        {
-          owner: "bkeepers",
-          path: ".github/test-file.yml",
-          repo: "probot",
-        }
-      );
+      const config = await context.config("test-file.yml");
       expect(config).toEqual({
         bar: 7,
         baz: 11,
         foo: 5,
       });
+      expect(mock.activeMocks()).toStrictEqual([]);
     });
 
     it("returns null when the file and base repository are missing", async () => {
-      jest
-        .spyOn(github, "request")
-        .mockReturnValue(Promise.reject(notFoundError));
+      const mock = nock("https://api.github.com")
+        .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
+        .reply(404)
+        .get("/repos/bkeepers/.github/contents/.github%2Ftest-file.yml")
+        .reply(404);
 
       expect(await context.config("test-file.yml")).toBe(null);
-      expect(github.request).toHaveBeenCalledWith(
-        "GET /repos/{owner}/{repo}/contents/{path}",
-        {
-          owner: "bkeepers",
-          path: ".github/test-file.yml",
-          repo: "probot",
-        }
-      );
-      expect(github.request).toHaveBeenCalledWith(
-        "GET /repos/{owner}/{repo}/contents/{path}",
-        {
-          owner: "bkeepers",
-          path: ".github/test-file.yml",
-          repo: ".github",
-        }
-      );
+      expect(mock.activeMocks()).toStrictEqual([]);
     });
 
     it("returns the default config when the file and base repository are missing and default config is passed", async () => {
-      jest
-        .spyOn(github, "request")
-        .mockReturnValue(Promise.reject(notFoundError));
+      const mock = nock("https://api.github.com")
+        .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
+        .reply(404)
+        .get("/repos/bkeepers/.github/contents/.github%2Ftest-file.yml")
+        .reply(404);
+
       const defaultConfig = {
         bar: 7,
         baz: 11,
@@ -224,95 +193,61 @@ describe("Context", () => {
       };
       const contents = await context.config("test-file.yml", defaultConfig);
       expect(contents).toEqual(defaultConfig);
+      expect(mock.activeMocks()).toStrictEqual([]);
     });
 
     it("merges the default config", async () => {
-      jest
-        .spyOn(github, "request")
-        .mockReturnValue(responseFromConfig("basic.yml"));
+      const mock = nock("https://api.github.com")
+        .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
+        .reply(200, nockConfigResponseDataFile("basic.yml"));
 
       const config = await context.config("test-file.yml", { bar: 1, boa: 6 });
-
-      expect(github.request).toHaveBeenCalledTimes(1);
-      expect(github.request).toHaveBeenCalledWith(
-        "GET /repos/{owner}/{repo}/contents/{path}",
-        {
-          owner: "bkeepers",
-          path: ".github/test-file.yml",
-          repo: "probot",
-        }
-      );
       expect(config).toEqual({
         bar: 7,
         baz: 11,
         boa: 6,
         foo: 5,
       });
+      expect(mock.activeMocks()).toStrictEqual([]);
     });
 
     it("merges a base config", async () => {
-      jest
-        .spyOn(github, "request")
-        .mockReturnValueOnce(
-          responseFromString("boa: 6\nfoo: 0\n_extends: base")
-        )
-        .mockReturnValueOnce(responseFromConfig("basic.yml"));
+      const mock = nock("https://api.github.com")
+        .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
+        .reply(200, {
+          content: Buffer.from("boa: 6\nfoo: 0\n_extends: base").toString(
+            "base64"
+          ),
+        })
+        .get("/repos/bkeepers/base/contents/.github%2Ftest-file.yml")
+        .reply(200, nockConfigResponseDataFile("basic.yml"));
 
       const config = await context.config("test-file.yml", { bar: 1, boa: 6 });
 
-      expect(github.request).toHaveBeenCalledWith(
-        "GET /repos/{owner}/{repo}/contents/{path}",
-        {
-          owner: "bkeepers",
-          path: ".github/test-file.yml",
-          repo: "probot",
-        }
-      );
-      expect(github.request).toHaveBeenCalledWith(
-        "GET /repos/{owner}/{repo}/contents/{path}",
-        {
-          owner: "bkeepers",
-          path: ".github/test-file.yml",
-          repo: "base",
-        }
-      );
       expect(config).toEqual({
         bar: 7,
         baz: 11,
         boa: 6,
         foo: 0,
       });
+      expect(mock.activeMocks()).toStrictEqual([]);
     });
 
     it("merges the base and default config", async () => {
-      jest
-        .spyOn(github, "request")
-        .mockReturnValueOnce(
-          responseFromString("boa: 6\nfoo: 0\n_extends: base")
-        )
-        .mockReturnValueOnce(responseFromConfig("basic.yml"));
+      const mock = nock("https://api.github.com")
+        .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
+        .reply(200, {
+          content: Buffer.from("boa: 6\nfoo: 0\n_extends: base").toString(
+            "base64"
+          ),
+        })
+        .get("/repos/bkeepers/base/contents/.github%2Ftest-file.yml")
+        .reply(200, nockConfigResponseDataFile("basic.yml"));
 
       const config = await context.config("test-file.yml", {
         bar: 1,
         new: true,
       });
-
-      expect(github.request).toHaveBeenCalledWith(
-        "GET /repos/{owner}/{repo}/contents/{path}",
-        {
-          owner: "bkeepers",
-          path: ".github/test-file.yml",
-          repo: "probot",
-        }
-      );
-      expect(github.request).toHaveBeenCalledWith(
-        "GET /repos/{owner}/{repo}/contents/{path}",
-        {
-          owner: "bkeepers",
-          path: ".github/test-file.yml",
-          repo: "base",
-        }
-      );
       expect(config).toEqual({
         bar: 7,
         baz: 11,
@@ -320,294 +255,236 @@ describe("Context", () => {
         foo: 0,
         new: true,
       });
+      expect(mock.activeMocks()).toStrictEqual([]);
     });
 
     it("merges a base config from another organization", async () => {
-      jest
-        .spyOn(github, "request")
-        .mockReturnValueOnce(
-          responseFromString("boa: 6\nfoo: 0\n_extends: other/base")
-        )
-        .mockReturnValueOnce(responseFromConfig("basic.yml"));
+      const mock = nock("https://api.github.com")
+        .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
+        .reply(200, {
+          content: Buffer.from("boa: 6\nfoo: 0\n_extends: other/base").toString(
+            "base64"
+          ),
+        })
+        .get("/repos/other/base/contents/.github%2Ftest-file.yml")
+        .reply(200, nockConfigResponseDataFile("basic.yml"));
 
       const config = await context.config("test-file.yml");
 
-      expect(github.request).toHaveBeenCalledWith(
-        "GET /repos/{owner}/{repo}/contents/{path}",
-        {
-          owner: "bkeepers",
-          path: ".github/test-file.yml",
-          repo: "probot",
-        }
-      );
-      expect(github.request).toHaveBeenCalledWith(
-        "GET /repos/{owner}/{repo}/contents/{path}",
-        {
-          owner: "other",
-          path: ".github/test-file.yml",
-          repo: "base",
-        }
-      );
       expect(config).toEqual({
         bar: 7,
         baz: 11,
         boa: 6,
         foo: 0,
       });
+      expect(mock.activeMocks()).toStrictEqual([]);
     });
 
     it("merges a base config with a custom path", async () => {
-      jest
-        .spyOn(github, "request")
-        .mockReturnValueOnce(
-          responseFromString("boa: 6\nfoo: 0\n_extends: base:test.yml")
-        )
-        .mockReturnValueOnce(responseFromConfig("basic.yml"));
+      const mock = nock("https://api.github.com")
+        .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
+        .reply(200, {
+          content: Buffer.from(
+            "boa: 6\nfoo: 0\n_extends: base:test.yml"
+          ).toString("base64"),
+        })
+        .get("/repos/bkeepers/base/contents/test.yml")
+        .reply(200, nockConfigResponseDataFile("basic.yml"));
 
       const config = await context.config("test-file.yml");
-
-      expect(github.request).toHaveBeenCalledWith(
-        "GET /repos/{owner}/{repo}/contents/{path}",
-        {
-          owner: "bkeepers",
-          path: ".github/test-file.yml",
-          repo: "probot",
-        }
-      );
-      expect(github.request).toHaveBeenCalledWith(
-        "GET /repos/{owner}/{repo}/contents/{path}",
-        {
-          owner: "bkeepers",
-          path: "test.yml",
-          repo: "base",
-        }
-      );
       expect(config).toEqual({
         bar: 7,
         baz: 11,
         boa: 6,
         foo: 0,
       });
+      expect(mock.activeMocks()).toStrictEqual([]);
     });
 
     it("ignores a missing base config", async () => {
-      jest
-        .spyOn(github, "request")
-        .mockReturnValueOnce(
-          responseFromString("boa: 6\nfoo: 0\n_extends: base")
-        )
-        .mockReturnValueOnce(Promise.reject(notFoundError));
+      const mock = nock("https://api.github.com")
+        .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
+        .reply(200, {
+          content: Buffer.from("boa: 6\nfoo: 0\n_extends: base").toString(
+            "base64"
+          ),
+        })
+        .get("/repos/bkeepers/base/contents/.github%2Ftest-file.yml")
+        .reply(404);
 
       const config = await context.config("test-file.yml");
 
-      expect(github.request).toHaveBeenCalledWith(
-        "GET /repos/{owner}/{repo}/contents/{path}",
-        {
-          owner: "bkeepers",
-          path: ".github/test-file.yml",
-          repo: "probot",
-        }
-      );
-      expect(github.request).toHaveBeenCalledWith(
-        "GET /repos/{owner}/{repo}/contents/{path}",
-        {
-          owner: "bkeepers",
-          path: ".github/test-file.yml",
-          repo: "base",
-        }
-      );
       expect(config).toEqual({
         boa: 6,
         foo: 0,
       });
+      expect(mock.activeMocks()).toStrictEqual([]);
     });
 
     it("throws when the configuration file is malformed", async () => {
-      jest
-        .spyOn(github, "request")
-        .mockReturnValue(responseFromConfig("malformed.yml"));
+      expect.assertions(2);
 
-      let e;
-      let contents;
+      const mock = nock("https://api.github.com")
+        .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
+        .reply(200, nockConfigResponseDataFile("malformed.yml"));
+
       try {
-        contents = await context.config("test-file.yml");
+        await context.config("test-file.yml");
       } catch (error) {
-        e = error;
+        expect(error.message).toMatch(
+          /^end of the stream or a document separator/
+        );
+        expect(mock.activeMocks()).toStrictEqual([]);
       }
-
-      expect(contents).toBeUndefined();
-      expect(e).toBeDefined();
-      expect(e.message).toMatch(/^end of the stream or a document separator/);
     });
 
     it("throws when loading unsafe yaml", async () => {
-      jest
-        .spyOn(github, "request")
-        .mockReturnValue(responseFromConfig("evil.yml"));
+      expect.assertions(2);
 
-      let e;
-      let config;
+      const mock = nock("https://api.github.com")
+        .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
+        .reply(200, nockConfigResponseDataFile("evil.yml"));
+
       try {
-        config = await context.config("evil.yml");
+        await context.config("test-file.yml");
       } catch (error) {
-        e = error;
+        expect(error.message).toMatch(/unknown tag/);
+        expect(mock.activeMocks()).toStrictEqual([]);
       }
-
-      expect(config).toBeUndefined();
-      expect(e).toBeDefined();
-      expect(e.message).toMatch(/unknown tag/);
     });
 
     it("throws on a non-string base", async () => {
-      jest
-        .spyOn(github, "request")
-        .mockReturnValue(
-          responseFromString("boa: 6\nfoo: 0\n_extends: { nope }")
-        );
+      expect.assertions(2);
 
-      let e;
-      let config;
+      const mock = nock("https://api.github.com")
+        .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
+        .reply(200, {
+          content: Buffer.from("boa: 6\nfoo: 0\n_extends: { nope }").toString(
+            "base64"
+          ),
+        });
+
       try {
-        config = await context.config("test-file.yml");
+        await context.config("test-file.yml");
       } catch (error) {
-        e = error;
+        expect(error.message).toMatch(/invalid/i);
+        expect(mock.activeMocks()).toStrictEqual([]);
       }
-
-      expect(config).toBeUndefined();
-      expect(e).toBeDefined();
-      expect(e.message).toMatch(/invalid/i);
     });
 
     it("throws on an invalid base", async () => {
-      jest
-        .spyOn(github, "request")
-        .mockReturnValue(
-          responseFromString('boa: 6\nfoo: 0\n_extends: "nope:"')
-        );
+      expect.assertions(2);
 
-      let e;
-      let config;
+      const mock = nock("https://api.github.com")
+        .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
+        .reply(200, {
+          content: Buffer.from('boa: 6\nfoo: 0\n_extends: "nope:"').toString(
+            "base64"
+          ),
+        });
+
       try {
-        config = await context.config("test-file.yml");
+        await context.config("test-file.yml");
       } catch (error) {
-        e = error;
+        expect(error.message).toMatch(/nope:/);
+        expect(mock.activeMocks()).toStrictEqual([]);
       }
-
-      expect(config).toBeUndefined();
-      expect(e).toBeDefined();
-      expect(e.message).toMatch(/nope:/);
     });
 
     it("returns an empty object when the file is empty", async () => {
-      jest
-        .spyOn(github, "request")
-        .mockReturnValue(responseFromConfig("empty.yml"));
+      const mock = nock("https://api.github.com")
+        .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
+        .reply(200, nockConfigResponseDataFile("empty.yml"));
 
       const contents = await context.config("test-file.yml");
 
-      expect(github.request).toHaveBeenCalledTimes(1);
       expect(contents).toEqual({});
+      expect(mock.activeMocks()).toStrictEqual([]);
     });
 
     it("overwrites default config settings", async () => {
-      jest
-        .spyOn(github, "request")
-        .mockReturnValue(responseFromConfig("basic.yml"));
+      const mock = nock("https://api.github.com")
+        .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
+        .reply(200, nockConfigResponseDataFile("basic.yml"));
+
       const config = await context.config("test-file.yml", { foo: 10 });
 
-      expect(github.request).toHaveBeenCalledTimes(1);
       expect(config).toEqual({
         bar: 7,
         baz: 11,
         foo: 5,
       });
+      expect(mock.activeMocks()).toStrictEqual([]);
     });
 
     it("uses default settings to fill in missing options", async () => {
-      jest
-        .spyOn(github, "request")
-        .mockReturnValue(responseFromConfig("missing.yml"));
+      const mock = nock("https://api.github.com")
+        .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
+        .reply(200, nockConfigResponseDataFile("basic.yml"));
+
       const config = await context.config("test-file.yml", { bar: 7 });
 
-      expect(github.request).toHaveBeenCalledTimes(1);
       expect(config).toEqual({
         bar: 7,
         baz: 11,
         foo: 5,
       });
+      expect(mock.activeMocks()).toStrictEqual([]);
     });
 
     it("uses the .github directory on a .github repo", async () => {
-      jest
-        .spyOn(github, "request")
-        .mockReturnValueOnce(responseFromString("foo: foo\n_extends: .github"))
-        .mockReturnValueOnce(responseFromConfig("basic.yml"));
+      const mock = nock("https://api.github.com")
+        .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
+        .reply(200, {
+          content: Buffer.from("foo: foo\n_extends: .github").toString(
+            "base64"
+          ),
+        })
+        .get("/repos/bkeepers/.github/contents/.github%2Ftest-file.yml")
+        .reply(200, nockConfigResponseDataFile("basic.yml"));
+
       const config = await context.config("test-file.yml");
 
-      expect(github.request).toHaveBeenCalledWith(
-        "GET /repos/{owner}/{repo}/contents/{path}",
-        {
-          owner: "bkeepers",
-          path: ".github/test-file.yml",
-          repo: "probot",
-        }
-      );
-      expect(github.request).toHaveBeenCalledWith(
-        "GET /repos/{owner}/{repo}/contents/{path}",
-        {
-          owner: "bkeepers",
-          path: ".github/test-file.yml",
-          repo: ".github",
-        }
-      );
       expect(config).toEqual({
         bar: 7,
         baz: 11,
         foo: "foo",
       });
+      expect(mock.activeMocks()).toStrictEqual([]);
     });
 
     it("defaults to .github repo if no config found", async () => {
-      jest
-        .spyOn(github, "request")
-        .mockReturnValueOnce(Promise.reject(notFoundError))
-        .mockReturnValueOnce(responseFromConfig("basic.yml"));
+      const mock = nock("https://api.github.com")
+        .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
+        .reply(404)
+        .get("/repos/bkeepers/.github/contents/.github%2Ftest-file.yml")
+        .reply(200, nockConfigResponseDataFile("basic.yml"));
+
       const config = await context.config("test-file.yml");
 
-      expect(github.request).toHaveBeenCalledWith(
-        "GET /repos/{owner}/{repo}/contents/{path}",
-        {
-          owner: "bkeepers",
-          path: ".github/test-file.yml",
-          repo: "probot",
-        }
-      );
-      expect(github.request).toHaveBeenCalledWith(
-        "GET /repos/{owner}/{repo}/contents/{path}",
-        {
-          owner: "bkeepers",
-          path: ".github/test-file.yml",
-          repo: ".github",
-        }
-      );
       expect(config).toEqual({
         bar: 7,
         baz: 11,
         foo: 5,
       });
+      expect(mock.activeMocks()).toStrictEqual([]);
     });
 
     it("deep merges the base config", async () => {
-      jest
-        .spyOn(github, "request")
-        .mockReturnValueOnce(
-          responseFromString(
+      const mock = nock("https://api.github.com")
+        .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
+        .reply(200, {
+          content: Buffer.from(
             "obj:\n  foo:\n  - name: master\n_extends: .github"
-          )
-        )
-        .mockReturnValueOnce(
-          responseFromString("obj:\n  foo:\n  - name: develop")
-        );
+          ).toString("base64"),
+        })
+        .get("/repos/bkeepers/.github/contents/.github%2Ftest-file.yml")
+        .reply(200, {
+          content: Buffer.from("obj:\n  foo:\n  - name: develop").toString(
+            "base64"
+          ),
+        });
+
       const config = await context.config("test-file.yml");
 
       expect(config).toEqual({
@@ -615,31 +492,30 @@ describe("Context", () => {
           foo: [{ name: "develop" }, { name: "master" }],
         },
       });
+      expect(mock.activeMocks()).toStrictEqual([]);
     });
 
     it("accepts deepmerge options", async () => {
-      jest
-        .spyOn(github, "request")
-        .mockReturnValueOnce(
-          responseFromString(
+      const mock = nock("https://api.github.com")
+        .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
+        .reply(200, {
+          content: Buffer.from(
             "foo:\n  - name: master\n    shouldChange: changed\n_extends: .github"
-          )
-        )
-        .mockReturnValueOnce(
-          responseFromString(
+          ).toString("base64"),
+        })
+        .get("/repos/bkeepers/.github/contents/.github%2Ftest-file.yml")
+        .reply(200, {
+          content: Buffer.from(
             "foo:\n  - name: develop\n  - name: master\n    shouldChange: should"
-          )
-        );
+          ).toString("base64"),
+        });
 
       const customMerge = jest.fn(
-        (
-          _target: any[],
-          _source: any[],
-          _options: MergeOptions | undefined
-        ): any[] => []
+        (_target: any[], _source: any[], _options: any): any[] => []
       );
       await context.config("test-file.yml", {}, { arrayMerge: customMerge });
       expect(customMerge).toHaveBeenCalled();
+      expect(mock.activeMocks()).toStrictEqual([]);
     });
   });
 

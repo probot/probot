@@ -139,11 +139,7 @@ describe("Context", () => {
 
     function nockConfigResponseDataFile(fileName: string) {
       const configPath = path.join(__dirname, "fixtures", "config", fileName);
-      const content = fs.readFileSync(configPath, { encoding: "utf8" });
-
-      return {
-        content: Buffer.from(content).toString("base64"),
-      };
+      return fs.readFileSync(configPath, { encoding: "utf8" });
     }
 
     beforeEach(() => {
@@ -214,11 +210,7 @@ describe("Context", () => {
     it("merges a base config", async () => {
       const mock = nock("https://api.github.com")
         .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
-        .reply(200, {
-          content: Buffer.from("boa: 6\nfoo: 0\n_extends: base").toString(
-            "base64"
-          ),
-        })
+        .reply(200, "boa: 6\nfoo: 0\n_extends: base")
         .get("/repos/bkeepers/base/contents/.github%2Ftest-file.yml")
         .reply(200, nockConfigResponseDataFile("basic.yml"));
 
@@ -236,11 +228,7 @@ describe("Context", () => {
     it("merges the base and default config", async () => {
       const mock = nock("https://api.github.com")
         .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
-        .reply(200, {
-          content: Buffer.from("boa: 6\nfoo: 0\n_extends: base").toString(
-            "base64"
-          ),
-        })
+        .reply(200, "boa: 6\nfoo: 0\n_extends: base")
         .get("/repos/bkeepers/base/contents/.github%2Ftest-file.yml")
         .reply(200, nockConfigResponseDataFile("basic.yml"));
 
@@ -261,11 +249,7 @@ describe("Context", () => {
     it("merges a base config from another organization", async () => {
       const mock = nock("https://api.github.com")
         .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
-        .reply(200, {
-          content: Buffer.from("boa: 6\nfoo: 0\n_extends: other/base").toString(
-            "base64"
-          ),
-        })
+        .reply(200, "boa: 6\nfoo: 0\n_extends: other/base")
         .get("/repos/other/base/contents/.github%2Ftest-file.yml")
         .reply(200, nockConfigResponseDataFile("basic.yml"));
 
@@ -283,11 +267,7 @@ describe("Context", () => {
     it("merges a base config with a custom path", async () => {
       const mock = nock("https://api.github.com")
         .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
-        .reply(200, {
-          content: Buffer.from(
-            "boa: 6\nfoo: 0\n_extends: base:test.yml"
-          ).toString("base64"),
-        })
+        .reply(200, "boa: 6\nfoo: 0\n_extends: base:test.yml")
         .get("/repos/bkeepers/base/contents/test.yml")
         .reply(200, nockConfigResponseDataFile("basic.yml"));
 
@@ -304,11 +284,7 @@ describe("Context", () => {
     it("ignores a missing base config", async () => {
       const mock = nock("https://api.github.com")
         .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
-        .reply(200, {
-          content: Buffer.from("boa: 6\nfoo: 0\n_extends: base").toString(
-            "base64"
-          ),
-        })
+        .reply(200, "boa: 6\nfoo: 0\n_extends: base")
         .get("/repos/bkeepers/base/contents/.github%2Ftest-file.yml")
         .reply(404);
 
@@ -331,9 +307,7 @@ describe("Context", () => {
       try {
         await context.config("test-file.yml");
       } catch (error) {
-        expect(error.message).toMatch(
-          /^end of the stream or a document separator/
-        );
+        expect(error.message).toMatch(/invalid YAML/);
         expect(mock.activeMocks()).toStrictEqual([]);
       }
     });
@@ -348,7 +322,7 @@ describe("Context", () => {
       try {
         await context.config("test-file.yml");
       } catch (error) {
-        expect(error.message).toMatch(/unknown tag/);
+        expect(error.message).toMatch(/unsafe YAML/);
         expect(mock.activeMocks()).toStrictEqual([]);
       }
     });
@@ -358,11 +332,7 @@ describe("Context", () => {
 
       const mock = nock("https://api.github.com")
         .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
-        .reply(200, {
-          content: Buffer.from("boa: 6\nfoo: 0\n_extends: { nope }").toString(
-            "base64"
-          ),
-        });
+        .reply(200, "boa: 6\nfoo: 0\n_extends: { nope }");
 
       try {
         await context.config("test-file.yml");
@@ -377,11 +347,7 @@ describe("Context", () => {
 
       const mock = nock("https://api.github.com")
         .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
-        .reply(200, {
-          content: Buffer.from('boa: 6\nfoo: 0\n_extends: "nope:"').toString(
-            "base64"
-          ),
-        });
+        .reply(200, 'boa: 6\nfoo: 0\n_extends: "nope:"');
 
       try {
         await context.config("test-file.yml");
@@ -435,11 +401,7 @@ describe("Context", () => {
     it("uses the .github directory on a .github repo", async () => {
       const mock = nock("https://api.github.com")
         .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
-        .reply(200, {
-          content: Buffer.from("foo: foo\n_extends: .github").toString(
-            "base64"
-          ),
-        })
+        .reply(200, "foo: foo\n_extends: .github")
         .get("/repos/bkeepers/.github/contents/.github%2Ftest-file.yml")
         .reply(200, nockConfigResponseDataFile("basic.yml"));
 
@@ -473,17 +435,9 @@ describe("Context", () => {
     it("deep merges the base config", async () => {
       const mock = nock("https://api.github.com")
         .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
-        .reply(200, {
-          content: Buffer.from(
-            "obj:\n  foo:\n  - name: master\n_extends: .github"
-          ).toString("base64"),
-        })
+        .reply(200, "obj:\n  foo:\n  - name: master\n_extends: .github")
         .get("/repos/bkeepers/.github/contents/.github%2Ftest-file.yml")
-        .reply(200, {
-          content: Buffer.from("obj:\n  foo:\n  - name: develop").toString(
-            "base64"
-          ),
-        });
+        .reply(200, "obj:\n  foo:\n  - name: develop");
 
       const config = await context.config("test-file.yml");
 
@@ -498,17 +452,15 @@ describe("Context", () => {
     it("accepts deepmerge options", async () => {
       const mock = nock("https://api.github.com")
         .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
-        .reply(200, {
-          content: Buffer.from(
-            "foo:\n  - name: master\n    shouldChange: changed\n_extends: .github"
-          ).toString("base64"),
-        })
+        .reply(
+          200,
+          "foo:\n  - name: master\n    shouldChange: changed\n_extends: .github"
+        )
         .get("/repos/bkeepers/.github/contents/.github%2Ftest-file.yml")
-        .reply(200, {
-          content: Buffer.from(
-            "foo:\n  - name: develop\n  - name: master\n    shouldChange: should"
-          ).toString("base64"),
-        });
+        .reply(
+          200,
+          "foo:\n  - name: develop\n  - name: master\n    shouldChange: should"
+        );
 
       const customMerge = jest.fn(
         (_target: any[], _source: any[], _options: any): any[] => []

@@ -1,29 +1,13 @@
 import path from "path";
 
-import { Endpoints } from "@octokit/types";
 import { EventNames, EventPayloads, WebhookEvent } from "@octokit/webhooks";
 import merge from "deepmerge";
-import yaml from "js-yaml";
 
 import type { Logger } from "pino";
 
 import { ProbotOctokit } from "./octokit/probot-octokit";
 import { aliasLog } from "./helpers/alias-log";
 import { DeprecatedLogger } from "./types";
-
-type ReposGetContentsParams = Endpoints["GET /repos/:owner/:repo/contents/:path"]["parameters"];
-
-const CONFIG_PATH = ".github";
-const BASE_KEY = "_extends";
-const BASE_REGEX = new RegExp(
-  "^" +
-  "(?:([a-z\\d](?:[a-z\\d]|-(?=[a-z\\d])){0,38})/)?" + // org
-  "([-_.\\w\\d]+)" + // project
-  "(?::([-_./\\w\\d]+\\.ya?ml))?" + // filename
-    "$",
-  "i"
-);
-const DEFAULT_BASE = ".github";
 
 export type MergeOptions = merge.Options;
 
@@ -219,6 +203,9 @@ export class Context<E extends WebhookPayloadWithRepository = any>
    * For security reasons, configuration is only loaded from the repository's default branch,
    * changes made in pull requests from different branches or forks are ignored.
    *
+   * If you need more lower-level control over reading and merging configuration files,
+   * you can `context.github.config.get(options)`, see https://github.com/probot/octokit-plugin-config.
+   *
    * @param fileName - Name of the YAML file in the `.github` directory
    * @param defaultConfig - An object of default config options
    * @param deepMergeOptions - Controls merging configs (from the [deepmerge](https://github.com/TehShrike/deepmerge) module)
@@ -229,104 +216,26 @@ export class Context<E extends WebhookPayloadWithRepository = any>
     defaultConfig?: T,
     deepMergeOptions?: MergeOptions
   ): Promise<T | null> {
-    const params = this.repo({ path: path.posix.join(CONFIG_PATH, fileName) });
+    const params = this.repo({
+      path: path.posix.join(".github", fileName),
+      defaults(configs: object[]) {
+        const result = merge.all(
+          [defaultConfig || {}, ...configs],
+          deepMergeOptions
+        );
 
-    const config = await this.loadYaml(params);
+        return result;
+      },
+    });
 
-    let baseRepo;
-    if (config == null) {
-      baseRepo = DEFAULT_BASE;
-    } else if (config != null && BASE_KEY in config) {
-      baseRepo = config[BASE_KEY];
-      delete config[BASE_KEY];
-    }
+    // @ts-ignore
+    const { config, files } = await this.github.config.get(params);
 
-    let baseConfig;
-    if (baseRepo) {
-      if (typeof baseRepo !== "string") {
-        throw new Error(`Invalid repository name in key "${BASE_KEY}"`);
-      }
-
-      const baseParams = this.getBaseParams(params, baseRepo);
-      baseConfig = await this.loadYaml(baseParams);
-    }
-
-    if (config == null && baseConfig == null && !defaultConfig) {
+    // if no default config is set, and no config files are found, return null
+    if (!defaultConfig && !files.find((file: any) => file.config !== null)) {
       return null;
     }
 
-    return (merge.all(
-      // filter out null configs
-      [defaultConfig, baseConfig, config].filter((conf) => conf),
-      deepMergeOptions
-    ) as unknown) as T;
-  }
-
-  /**
-   * Loads a file from GitHub
-   *
-   * @param params Params to fetch the file with
-   * @return The parsed YAML file
-   */
-  private async loadYaml<T>(params: ReposGetContentsParams): Promise<any> {
-    try {
-      // https://docs.github.com/en/rest/reference/repos#get-repository-content
-      const response = await this.github.request(
-        "GET /repos/{owner}/{repo}/contents/{path}",
-        params
-      );
-
-      // Ignore in case path is a folder
-      // - https://developer.github.com/v3/repos/contents/#response-if-content-is-a-directory
-      if (Array.isArray(response.data)) {
-        return null;
-      }
-
-      // we don't handle symlinks or submodule
-      // - https://developer.github.com/v3/repos/contents/#response-if-content-is-a-symlink
-      // - https://developer.github.com/v3/repos/contents/#response-if-content-is-a-submodule
-      // tslint:disable-next-line
-      if (typeof response.data.content !== "string") {
-        return;
-      }
-
-      return (
-        yaml.safeLoad(
-          Buffer.from(response.data.content, "base64").toString()
-        ) || {}
-      );
-    } catch (e) {
-      if (e.status === 404) {
-        return null;
-      }
-
-      throw e;
-    }
-  }
-
-  /**
-   * Computes parameters for the repository specified in base
-   *
-   * Base can either be the name of a repository in the same organization or
-   * a full slug "organization/repo".
-   *
-   * @param params An object containing owner, repo and path
-   * @param base A string specifying the base repository
-   * @return The params of the base configuration
-   */
-  private getBaseParams(
-    params: ReposGetContentsParams,
-    base: string
-  ): ReposGetContentsParams {
-    const match = base.match(BASE_REGEX);
-    if (match === null) {
-      throw new Error(`Invalid repository name in key "${BASE_KEY}": ${base}`);
-    }
-
-    return {
-      owner: match[1] || params.owner,
-      path: match[3] || params.path,
-      repo: match[2],
-    };
+    return config as T;
   }
 }

@@ -6,6 +6,7 @@ import { paginateRest } from "@octokit/plugin-paginate-rest";
 import { restEndpointMethods } from "@octokit/plugin-rest-endpoint-methods";
 import { retry } from "@octokit/plugin-retry";
 import { throttling } from "@octokit/plugin-throttling";
+import { config } from "@probot/octokit-plugin-config";
 
 import { probotRequestLogging } from "./octokit-plugin-probot-request-logging";
 import { VERSION } from "../version";
@@ -42,7 +43,8 @@ export const ProbotOctokit = Octokit.plugin(
   paginateRest,
   restEndpointMethods,
   enterpriseCompatibility,
-  probotRequestLogging
+  probotRequestLogging,
+  config
 ).defaults((instanceOptions: any) => {
   // merge throttle options deeply
   const options = Object.assign({}, defaultOptions, instanceOptions, {

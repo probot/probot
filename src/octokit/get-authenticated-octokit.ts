@@ -4,21 +4,13 @@ export async function getAuthenticatedOctokit(
   state: State,
   installationId?: number
 ) {
-  const { githubToken, log, Octokit, octokit, throttleOptions } = state;
+  const { githubToken, log, Octokit, octokit } = state;
 
   if (!installationId) return octokit;
 
   const constructorAuthOptions = githubToken
     ? {}
     : { auth: { installationId: installationId } };
-  const constructorThrottleOptions = throttleOptions
-    ? {
-        throttle: {
-          id: installationId,
-          ...throttleOptions,
-        },
-      }
-    : {};
 
   const pinoLog = log.child({ name: "github" });
   const options = {
@@ -30,8 +22,10 @@ export async function getAuthenticatedOctokit(
       debug: pinoLog.debug.bind(pinoLog),
       trace: pinoLog.trace.bind(pinoLog),
     },
+    throttle: {
+      id: installationId,
+    },
     ...constructorAuthOptions,
-    ...constructorThrottleOptions,
   };
 
   return new Octokit(options);

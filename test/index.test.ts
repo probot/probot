@@ -66,34 +66,27 @@ describe("Probot", () => {
       process.env = env;
     });
 
-    it("runs with a function as argument", () => {
+    it("runs with a function as argument", async () => {
       let initialized = false;
 
-      return new Promise(async (resolve) => {
-        probot = await Probot.run((app) => {
-          initialized = true;
-        });
-        expect(probot.options).toMatchSnapshot();
-        expect(initialized).toBeTruthy();
-        probot.stop();
-
-        resolve();
+      probot = await Probot.run((app) => {
+        initialized = true;
       });
+      expect(probot.options).toMatchSnapshot();
+      expect(initialized).toBeTruthy();
+      probot.stop();
     });
 
-    it("runs with an array of strings", () => {
-      return new Promise(async (resolve) => {
-        probot = await Probot.run(["run", "file.js"]);
-        expect(probot.options).toMatchSnapshot();
-        probot.stop();
-        resolve();
-      });
+    it("runs with an array of strings", async () => {
+      probot = await Probot.run(["run", "file.js"]);
+      expect(probot.options).toMatchSnapshot();
+      probot.stop();
     });
 
-    it("works with REDIS_URL configuration", () => {
+    it("works with REDIS_URL configuration", async () => {
       process.env.REDIS_URL = "redis://test:test@localhost:6379";
 
-      return new Promise(async (resolve, reject) => {
+      await new Promise(async (resolve, reject) => {
         const probot = await Probot.run((app) => {
           app.auth(1).then(resolve, reject);
         });
@@ -403,33 +396,39 @@ describe("Probot", () => {
     });
 
     it("sets throttleOptions", async () => {
+      expect.assertions(2);
+
       probot = new Probot({
         webhookPath: "/webhook",
         githubToken: "faketoken",
+        Octokit: ProbotOctokit.plugin((octokit, options) => {
+          expect(options.throttle.Bottleneck).toBe(Bottleneck);
+          expect(options.throttle.connection).toBeInstanceOf(
+            Bottleneck.IORedisConnection
+          );
+        }),
       });
-
-      expect(probot.throttleOptions.Bottleneck).toBe(Bottleneck);
-      expect(probot.throttleOptions.connection).toBeInstanceOf(
-        Bottleneck.IORedisConnection
-      );
     });
   });
 
   describe("redis configuration object", () => {
     it("sets throttleOptions", async () => {
+      expect.assertions(2);
       const redisConfig = {
         host: "test",
       };
+
       probot = new Probot({
         webhookPath: "/webhook",
         githubToken: "faketoken",
         redisConfig,
+        Octokit: ProbotOctokit.plugin((octokit, options) => {
+          expect(options.throttle.Bottleneck).toBe(Bottleneck);
+          expect(options.throttle.connection).toBeInstanceOf(
+            Bottleneck.IORedisConnection
+          );
+        }),
       });
-
-      expect(probot.throttleOptions.Bottleneck).toBe(Bottleneck);
-      expect(probot.throttleOptions.connection).toBeInstanceOf(
-        Bottleneck.IORedisConnection
-      );
     });
   });
 

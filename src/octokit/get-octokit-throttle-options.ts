@@ -4,7 +4,6 @@ import type { Logger } from "pino";
 
 type Options = {
   log: Logger;
-  throttleOptions?: any;
   redisConfig?: Redis.RedisOptions;
 };
 

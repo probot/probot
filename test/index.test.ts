@@ -403,33 +403,39 @@ describe("Probot", () => {
     });
 
     it("sets throttleOptions", async () => {
+      expect.assertions(2);
+
       probot = new Probot({
         webhookPath: "/webhook",
         githubToken: "faketoken",
+        Octokit: ProbotOctokit.plugin((octokit, options) => {
+          expect(options.throttle.Bottleneck).toBe(Bottleneck);
+          expect(options.throttle.connection).toBeInstanceOf(
+            Bottleneck.IORedisConnection
+          );
+        }),
       });
-
-      expect(probot.throttleOptions.Bottleneck).toBe(Bottleneck);
-      expect(probot.throttleOptions.connection).toBeInstanceOf(
-        Bottleneck.IORedisConnection
-      );
     });
   });
 
   describe("redis configuration object", () => {
     it("sets throttleOptions", async () => {
+      expect.assertions(2);
       const redisConfig = {
         host: "test",
       };
+
       probot = new Probot({
         webhookPath: "/webhook",
         githubToken: "faketoken",
         redisConfig,
+        Octokit: ProbotOctokit.plugin((octokit, options) => {
+          expect(options.throttle.Bottleneck).toBe(Bottleneck);
+          expect(options.throttle.connection).toBeInstanceOf(
+            Bottleneck.IORedisConnection
+          );
+        }),
       });
-
-      expect(probot.throttleOptions.Bottleneck).toBe(Bottleneck);
-      expect(probot.throttleOptions.connection).toBeInstanceOf(
-        Bottleneck.IORedisConnection
-      );
     });
   });
 

@@ -22,7 +22,6 @@ import { createServer } from "./server/create-server";
 import { createWebhookProxy } from "./helpers/webhook-proxy";
 import { getErrorHandler } from "./helpers/get-error-handler";
 import { DeprecatedLogger, ProbotWebhooks, State } from "./types";
-import { getOctokitThrottleOptions } from "./octokit/get-octokit-throttle-options";
 import { getProbotOctokitWithDefaults } from "./octokit/get-probot-octokit-with-defaults";
 import { aliasLog } from "./helpers/alias-log";
 import { logWarningsForObsoleteEnvironmentVariables } from "./helpers/log-warnings-for-obsolete-environment-variables";
@@ -244,10 +243,6 @@ export class Probot {
 
     // TODO: Refactor tests so we we can remove these
     this.options = options;
-    this.throttleOptions = getOctokitThrottleOptions({
-      log: this.log,
-      redisConfig: options.redisConfig,
-    });
   }
 
   /**

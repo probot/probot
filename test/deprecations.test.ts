@@ -3,7 +3,7 @@ import Stream from "stream";
 import { Webhooks } from "@octokit/webhooks";
 import pino from "pino";
 
-import { createProbot, Probot, ProbotOctokit } from "../src";
+import { Application, createProbot, Probot, ProbotOctokit } from "../src";
 
 describe("Deprecations", () => {
   let output: any;
@@ -85,6 +85,51 @@ describe("Deprecations", () => {
     expect(output.length).toEqual(1);
     expect(output[0].msg).toContain(
       `octokit.repos.createStatus() has been renamed to octokit.repos.createCommitStatus()`
+    );
+  });
+
+  it("throttleOptions", async () => {
+    expect.assertions(4);
+
+    const testLog = pino(streamLogsToOutput);
+    const log = ({
+      fatal: testLog.fatal.bind(testLog),
+      error: testLog.error.bind(testLog),
+      warn: testLog.warn.bind(testLog),
+      info: testLog.info.bind(testLog),
+      debug: testLog.debug.bind(testLog),
+      trace: testLog.trace.bind(testLog),
+      child: () => log,
+    } as unknown) as pino.Logger;
+    const Octokit = ProbotOctokit.plugin((octokit: any, options: any) => {
+      return {
+        pluginLoaded: true,
+        test() {
+          expect(options.throttle.id).toBe(1);
+          expect(options.throttle.foo).toBe("bar");
+        },
+      };
+    }).defaults({ log });
+
+    const app = new Application({
+      Octokit,
+      id: 1,
+      privateKey: "private key",
+      secret: "secret",
+      throttleOptions: {
+        foo: "bar",
+        onAbuseLimit: () => true,
+        onRateLimit: () => true,
+      },
+      log,
+    });
+
+    const installationOctokit = await app.auth(1);
+    installationOctokit.test();
+
+    expect(output.length).toEqual(1);
+    expect(output[0].msg).toContain(
+      `[probot] "new Application({ throttleOptions })" is deprecated. Use "new Application({Octokit: ProbotOctokit.defaults({ throttle }) })" instead`
     );
   });
 });

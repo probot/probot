@@ -13,7 +13,6 @@ export type State = {
   log: Logger;
   Octokit: typeof ProbotOctokit;
   octokit: InstanceType<typeof ProbotOctokit>;
-  throttleOptions: any;
   cache?: LRUCache<number, string>;
   webhooks: {
     path?: string;

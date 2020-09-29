@@ -10,7 +10,6 @@ import { Context } from "./context";
 import { getAuthenticatedOctokit } from "./octokit/get-authenticated-octokit";
 import { ProbotOctokit } from "./octokit/probot-octokit";
 import { getLog } from "./helpers/get-log";
-import { getOctokitThrottleOptions } from "./octokit/get-octokit-throttle-options";
 import { getProbotOctokitWithDefaults } from "./octokit/get-probot-octokit-with-defaults";
 import { DeprecatedLogger, ProbotWebhooks, State } from "./types";
 import { webhookEventCheck } from "./helpers/webhook-event-check";
@@ -31,8 +30,12 @@ export interface Options {
   // Application class specific options
   cache?: LRUCache<number, string>;
   octokit?: InstanceType<typeof ProbotOctokit>;
-  throttleOptions?: any;
   webhooks?: Webhooks;
+
+  /**
+   * @deprecated set `Octokit` to `ProbotOctokit.defaults({ throttle })` instead
+   */
+  throttleOptions?: any;
 }
 
 export type OnCallback<T> = (context: Context<T>) => Promise<void>;
@@ -70,7 +73,16 @@ export class Application {
       appId: options.id,
       privateKey: options.privateKey,
       cache,
+      log: this.log,
+      redisConfig: options.redisConfig,
+      throttleOptions: options.throttleOptions,
     });
+
+    if (options.throttleOptions) {
+      this.log.warn(
+        `[probot] "new Application({ throttleOptions })" is deprecated. Use "new Application({Octokit: ProbotOctokit.defaults({ throttle }) })" instead`
+      );
+    }
 
     this.state = {
       cache,
@@ -78,13 +90,6 @@ export class Application {
       log: this.log,
       Octokit,
       octokit: options.octokit || new Octokit(),
-      throttleOptions:
-        options.throttleOptions ||
-        getOctokitThrottleOptions({
-          log: this.log,
-          throttleOptions: options.throttleOptions,
-          redisConfig: options.redisConfig,
-        }),
       webhooks: {
         path: options.webhookPath,
         secret: options.secret,

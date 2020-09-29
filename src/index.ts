@@ -199,9 +199,6 @@ export class Probot {
 
     this.apps = [];
 
-    // TODO: Refactor tests so we don't need to make this public
-    this.options = options;
-
     // TODO: support redis backend for access token cache if `options.redisConfig || process.env.REDIS_URL`
     const cache = new LRUCache<number, string>({
       // cache max. 15000 tokens, that will use less than 10mb memory
@@ -216,13 +213,10 @@ export class Probot {
       appId: options.id,
       privateKey: options.privateKey,
       cache,
-    });
-    const octokit = new Octokit();
-
-    this.throttleOptions = getOctokitThrottleOptions({
       log: this.log,
       redisConfig: options.redisConfig,
     });
+    const octokit = new Octokit();
 
     this.state = {
       id: options.id,
@@ -232,7 +226,6 @@ export class Probot {
       log: this.log,
       Octokit,
       octokit,
-      throttleOptions: this.throttleOptions,
       webhooks: {
         path: options.webhookPath,
         secret: options.secret,
@@ -248,6 +241,13 @@ export class Probot {
 
     const { version } = require("../package.json");
     this.version = version;
+
+    // TODO: Refactor tests so we we can remove these
+    this.options = options;
+    this.throttleOptions = getOctokitThrottleOptions({
+      log: this.log,
+      redisConfig: options.redisConfig,
+    });
   }
 
   /**

@@ -39,37 +39,41 @@ export function getProbotOctokitWithDefaults(options: Options) {
         },
         authStrategy: createAppAuth,
       };
-  const defaultOptions = {
+
+  const octokitThrottleOptions = getOctokitThrottleOptions({
+    log: options.log,
+    redisConfig: options.redisConfig,
+  });
+
+  const defaultOptions: any = {
     baseUrl:
       process.env.GHE_HOST &&
       `${process.env.GHE_PROTOCOL || "https"}://${process.env.GHE_HOST}/api/v3`,
-    throttle: Object.assign(
-      {},
-      options.throttleOptions,
-      getOctokitThrottleOptions({
-        log: options.log,
-        redisConfig: options.redisConfig,
-      })
-    ),
     ...authOptions,
   };
 
-  return options.Octokit.defaults((instanceOptions: any) => {
-    const options = Object.assign(
+  if (options.throttleOptions || octokitThrottleOptions) {
+    defaultOptions.throttle = Object.assign(
       {},
-      defaultOptions,
-      instanceOptions,
-      {
-        auth: instanceOptions.auth
-          ? Object.assign({}, defaultOptions.auth, instanceOptions.auth)
-          : defaultOptions.auth,
-      },
-      {
-        throttle: instanceOptions.throttle
-          ? Object.assign({}, defaultOptions.throttle, instanceOptions.throttle)
-          : defaultOptions.throttle,
-      }
+      options.throttleOptions,
+      octokitThrottleOptions
     );
+  }
+
+  return options.Octokit.defaults((instanceOptions: any) => {
+    const options = Object.assign({}, defaultOptions, instanceOptions, {
+      auth: instanceOptions.auth
+        ? Object.assign({}, defaultOptions.auth, instanceOptions.auth)
+        : defaultOptions.auth,
+    });
+
+    if (instanceOptions.throttle) {
+      options.throttle = Object.assign(
+        {},
+        defaultOptions.throttle,
+        instanceOptions.throttle
+      );
+    }
 
     return options;
   });

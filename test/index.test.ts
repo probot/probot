@@ -4,8 +4,7 @@ import { NextFunction, Request, Response } from "express";
 import request = require("supertest");
 import nock from "nock";
 
-import { Application, Probot } from "../src";
-import { ProbotOctokit } from "../src/octokit/probot-octokit";
+import { Application, Probot, ProbotOctokit } from "../src";
 
 import path = require("path");
 
@@ -40,12 +39,29 @@ describe("Probot", () => {
     };
   });
 
-  it("constructor", () => {
-    // probot with token. Should not throw
-    new Probot({ githubToken: "faketoken" });
+  describe("constructor", () => {
+    it('{ githubToken: "faketoken" }', () => {
+      // probot with token. Should not throw
+      new Probot({ githubToken: "faketoken" });
+    });
+    it('{ id, privateKey" }', () => {
+      // probot with id/privateKey
+      new Probot({ id, privateKey });
+    });
 
-    // probot with id/privateKey
-    new Probot({ id, privateKey });
+    it.only("shouldn't overwrite `options.throttle` passed to `{Octokit: ProbotOctokit.defaults(optiosn)}`", () => {
+      expect.assertions(1);
+
+      const MyOctokit = ProbotOctokit.plugin((octokit, options) => {
+        expect(options.throttle.enabled).toEqual(false);
+      }).defaults({
+        throttle: {
+          enabled: false,
+        },
+      });
+
+      new Probot({ Octokit: MyOctokit });
+    });
   });
 
   describe("run", () => {

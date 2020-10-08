@@ -7,7 +7,7 @@ import { webhookTransform } from "./octokit-webhooks-transform";
 import { Context } from "../context";
 
 export function getWebhooks(state: State) {
-  const webhooks = new Webhooks<WebhookEvent, Pick<Context, "github" | "log">>({
+  const webhooks = new Webhooks<WebhookEvent, Context>({
     path: state.webhooks.path,
     secret: state.webhooks.secret,
     transform: webhookTransform.bind(null, state),

@@ -1,4 +1,4 @@
-import { Webhooks } from "@octokit/webhooks";
+import { WebhookEvent, Webhooks } from "@octokit/webhooks";
 import LRUCache from "lru-cache";
 
 import { Context } from "./context";
@@ -20,6 +20,9 @@ export type State = {
   };
 };
 
-export type ProbotWebhooks = Webhooks<Context>;
+export type ProbotWebhooks = Webhooks<
+  WebhookEvent,
+  Pick<Context, "github" | "log">
+>;
 
 export type DeprecatedLogger = LogFn & Logger;

@@ -22,7 +22,7 @@ export type State = {
 
 export type ProbotWebhooks = Webhooks<
   WebhookEvent,
-  Pick<Context, "github" | "log">
+  Context
 >;
 
 export type DeprecatedLogger = LogFn & Logger;

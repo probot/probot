@@ -1,4 +1,3 @@
-import { EventNames } from "@octokit/webhooks";
 import Bottleneck from "bottleneck";
 import { NextFunction, Request, Response } from "express";
 import request = require("supertest");
@@ -7,6 +6,7 @@ import nock from "nock";
 import { Application, Probot, ProbotOctokit } from "../src";
 
 import path = require("path");
+import { All } from "@octokit/webhooks/dist-types/generated/get-webhook-payload-type-from-event";
 
 const id = 1;
 const privateKey = `-----BEGIN RSA PRIVATE KEY-----
@@ -24,7 +24,7 @@ describe("Probot", () => {
   let probot: Probot;
   let event: {
     id: string;
-    name: EventNames.StringNames;
+    name: All;
     payload: any;
   };
 

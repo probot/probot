@@ -26,7 +26,3 @@ export type ProbotWebhooks = Webhooks<
 >;
 
 export type DeprecatedLogger = LogFn & Logger;
-
-interface Blah {
-  a: number;
-}

@@ -20,9 +20,6 @@ export type State = {
   };
 };
 
-export type ProbotWebhooks = Webhooks<
-  WebhookEvent,
-  Context
->;
+export type ProbotWebhooks = Webhooks<WebhookEvent, Context>;
 
 export type DeprecatedLogger = LogFn & Logger;

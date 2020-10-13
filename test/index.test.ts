@@ -6,7 +6,7 @@ import nock from "nock";
 import { Application, Probot, ProbotOctokit } from "../src";
 
 import path = require("path");
-import { All } from "@octokit/webhooks/dist-types/generated/get-webhook-payload-type-from-event";
+import { WebhookEvents } from "@octokit/webhooks";
 
 const id = 1;
 const privateKey = `-----BEGIN RSA PRIVATE KEY-----
@@ -24,7 +24,7 @@ describe("Probot", () => {
   let probot: Probot;
   let event: {
     id: string;
-    name: All;
+    name: WebhookEvents;
     payload: any;
   };
 

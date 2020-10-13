@@ -8,7 +8,7 @@ import type { Logger } from "pino";
 import { ProbotOctokit } from "./octokit/probot-octokit";
 import { aliasLog } from "./helpers/alias-log";
 import { DeprecatedLogger } from "./types";
-import { All } from "@octokit/webhooks/dist-types/generated/get-webhook-payload-type-from-event";
+import { WebhookEvents } from "@octokit/webhooks";
 
 export type MergeOptions = merge.Options;
 
@@ -56,7 +56,7 @@ export interface WebhookPayloadWithRepository {
  */
 export class Context<E extends WebhookPayloadWithRepository = any>
   implements WebhookEvent<E> {
-  public name: All;
+  public name: WebhookEvents;
   public id: string;
   public payload: E;
 

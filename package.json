@@ -47,7 +47,7 @@
     "@octokit/plugin-throttling": "^3.3.0",
     "@octokit/request": "^5.1.0",
     "@octokit/types": "^5.0.1",
-    "@octokit/webhooks": "^7.11.0",
+    "@octokit/webhooks": "^7.13.0",
     "@probot/octokit-plugin-config": "^1.0.0",
     "@probot/pino": "^1.1.2",
     "@types/express": "^4.17.2",

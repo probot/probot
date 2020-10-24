@@ -10,8 +10,8 @@
   },
   "scripts": {
     "build": "rimraf lib && tsc -p tsconfig.json",
-    "lint": "prettier --check 'src/**/*.ts' 'test/**/*.ts' 'docs/*.md' *.md package.json tsconfig.json",
-    "lint:fix": "prettier --write 'src/**/*.ts' 'test/**/*.ts' 'docs/*.md' *.md package.json tsconfig.json",
+    "lint": "prettier --check 'src/**/*.ts' 'test/**/*.ts' 'test-d/**/*.ts' 'docs/*.md' *.md package.json tsconfig.json",
+    "lint:fix": "prettier --write 'src/**/*.ts' 'test/**/*.ts' 'test-d/**/*.ts' 'docs/*.md' *.md package.json tsconfig.json",
     "pretest": "tsc --noEmit -p test",
     "test": "jest",
     "posttest": "npm run lint",
@@ -109,6 +109,7 @@
     "semantic-release-plugin-update-version-in-files": "^1.1.0",
     "smee-client": "^1.2.2",
     "supertest": "^4.0.2",
+    "tsd": "^0.13.1",
     "ts-jest": "^26.1.1",
     "typedoc": "^0.17.0",
     "typescript": "^3.9.3"

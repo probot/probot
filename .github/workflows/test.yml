@@ -30,6 +30,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: npm ci
       - run: npm run build
+      - run: npx tsd
       - run: npx jest --forceExit
 
   # separate job to set as required in branch protection,
@@ -43,6 +44,7 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run build
+      - run: npx tsd
       - run: npx jest --coverage --force-exit
       - name: codecov
         run: npx codecov

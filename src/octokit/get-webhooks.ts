@@ -12,6 +12,6 @@ export function getWebhooks(state: State) {
     secret: state.webhooks.secret,
     transform: webhookTransform.bind(null, state),
   });
-  webhooks.on("error", getErrorHandler(state.log));
+  webhooks.onError(getErrorHandler(state.log));
   return webhooks;
 }

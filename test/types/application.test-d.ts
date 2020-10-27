@@ -1,6 +1,6 @@
 import { EventPayloads } from "@octokit/webhooks";
 import { expectType } from "tsd";
-import { Application } from "../lib";
+import { Application } from "../../lib";
 
 const app = new Application({});
 

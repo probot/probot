@@ -36,8 +36,6 @@
   "author": "Brandon Keepers",
   "license": "ISC",
   "dependencies": {
-    "@octokit/auth-app": "^2.4.14",
-    "@octokit/auth-unauthenticated": "^1.0.0",
     "@octokit/core": "^3.1.0",
     "@octokit/graphql": "^4.2.0",
     "@octokit/plugin-enterprise-compatibility": "^1.2.1",
@@ -69,6 +67,7 @@
     "js-yaml": "^3.13.1",
     "jsonwebtoken": "^8.1.0",
     "lru-cache": "^6.0.0",
+    "octokit-auth-probot": "^1.2.0",
     "octokit-pagination-methods": "1.1.0",
     "pino": "^6.5.0",
     "pino-http": "^5.2.0",

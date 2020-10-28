@@ -1,17 +1,18 @@
 import { Octokit } from "@octokit/core";
 import { enterpriseCompatibility } from "@octokit/plugin-enterprise-compatibility";
 import { RequestOptions } from "@octokit/types";
-
 import { paginateRest } from "@octokit/plugin-paginate-rest";
 import { restEndpointMethods } from "@octokit/plugin-rest-endpoint-methods";
 import { retry } from "@octokit/plugin-retry";
 import { throttling } from "@octokit/plugin-throttling";
 import { config } from "@probot/octokit-plugin-config";
+import { createProbotAuth } from "octokit-auth-probot";
 
 import { probotRequestLogging } from "./octokit-plugin-probot-request-logging";
 import { VERSION } from "../version";
 
 const defaultOptions = {
+  authStrategy: createProbotAuth,
   throttle: {
     onAbuseLimit: (
       retryAfter: number,

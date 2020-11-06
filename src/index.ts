@@ -157,7 +157,6 @@ export class Probot {
   public throttleOptions: any;
 
   private httpServer?: Server;
-  private apps: Application[];
   private state: State;
 
   /**
@@ -195,8 +194,6 @@ export class Probot {
       );
       options.privateKey = options.cert;
     }
-
-    this.apps = [];
 
     // TODO: support redis backend for access token cache if `options.redisConfig || process.env.REDIS_URL`
     const cache = new LRUCache<number, string>({
@@ -260,7 +257,7 @@ export class Probot {
 
   public receive(event: WebhookEvent) {
     this.log.debug({ event }, "Webhook received");
-    return Promise.all(this.apps.map((app) => app.receive(event)));
+    return this.webhooks.receive(event);
   }
 
   public load(appFn: string | ApplicationFunction) {
@@ -285,7 +282,6 @@ export class Probot {
 
     // Initialize the ApplicationFunction
     app.load(appFn);
-    this.apps.push(app);
 
     return app;
   }

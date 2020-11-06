@@ -138,7 +138,7 @@ export class Probot {
       probot.load(setupAppFactory(probot.options.host, probot.options.port));
     } else if (Array.isArray(appFn)) {
       const pkg = await pkgConf("probot");
-      probot.setup(program.args.concat(pkg.apps || pkg.plugins || []));
+      probot.setup(program.args.concat(pkg.apps || []));
     } else {
       probot.load(appFn);
     }

@@ -75,15 +75,19 @@ describe("webhook-event-check", () => {
     expect(spyOnLogError).toMatchSnapshot();
   });
 
-  test('logs no error when listening to special "*" event', async () => {
+  test("logs no error when listening with app.webhooks.onAny", async () => {
     nock("https://api.github.com")
       .get("/app")
       .reply(200, mockAppMetaRequest([]));
 
-    const app = new Probot({ appId, privateKey });
-    const spyOnLogError = jest.spyOn(app.log, "error");
+    const probot = new Probot({ appId, privateKey });
+    let spyOnLogError;
 
-    app.on("*", noop);
+    probot.load(async ({ app }) => {
+      spyOnLogError = jest.spyOn(app.log, "error");
+
+      app.webhooks.onAny(noop);
+    });
 
     // let's give the event check a moment to send its request
     await new Promise((resolve) => setTimeout(resolve, 500));

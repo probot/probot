@@ -260,7 +260,7 @@ export class Probot {
     return this.webhooks.receive(event);
   }
 
-  public load(appFn: string | ApplicationFunction) {
+  public load(appFn: string | ApplicationFunction | ApplicationFunction[]) {
     if (typeof appFn === "string") {
       appFn = resolveAppFunction(appFn) as ApplicationFunction;
     }

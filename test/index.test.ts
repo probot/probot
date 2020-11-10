@@ -49,7 +49,7 @@ describe("Probot", () => {
       new Probot({ id, privateKey });
     });
 
-    it.only("shouldn't overwrite `options.throttle` passed to `{Octokit: ProbotOctokit.defaults(optiosn)}`", () => {
+    it("shouldn't overwrite `options.throttle` passed to `{Octokit: ProbotOctokit.defaults(optiosn)}`", () => {
       expect.assertions(1);
 
       const MyOctokit = ProbotOctokit.plugin((octokit, options) => {
@@ -563,6 +563,21 @@ describe("Probot", () => {
           }
         });
       });
+    });
+
+    it("accepts an array of app functions", () => {
+      expect.assertions(2);
+
+      const probot = new Probot({
+        id,
+        privateKey,
+      });
+
+      const app = (app: Application) => {
+        expect(app).toBeInstanceOf(Application);
+      };
+
+      probot.load([app, app]);
     });
   });
 });

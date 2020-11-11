@@ -21,7 +21,12 @@ import { resolveAppFunction } from "./helpers/resolve-app-function";
 import { createServer } from "./server/create-server";
 import { createWebhookProxy } from "./helpers/webhook-proxy";
 import { getErrorHandler } from "./helpers/get-error-handler";
-import { DeprecatedLogger, ProbotWebhooks, State } from "./types";
+import {
+  ApplicationFunction,
+  DeprecatedLogger,
+  ProbotWebhooks,
+  State,
+} from "./types";
 import { getProbotOctokitWithDefaults } from "./octokit/get-probot-octokit-with-defaults";
 import { aliasLog } from "./helpers/alias-log";
 import { logWarningsForObsoleteEnvironmentVariables } from "./helpers/log-warnings-for-obsolete-environment-variables";
@@ -354,8 +359,6 @@ export const createProbot = (options: Options) => {
   );
   return new Probot(options);
 };
-
-export type ApplicationFunction = (app: Application) => void;
 
 export { Logger, Context, Application, ProbotOctokit };
 

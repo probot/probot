@@ -5,16 +5,22 @@ import LRUCache from "lru-cache";
 import type { Webhooks } from "@octokit/webhooks";
 import type { Logger } from "pino";
 
-import { ApplicationFunction } from ".";
 import { Context } from "./context";
-import { getAuthenticatedOctokit } from "./octokit/get-authenticated-octokit";
 import { ProbotOctokit } from "./octokit/probot-octokit";
 import { getLog } from "./helpers/get-log";
 import { getProbotOctokitWithDefaults } from "./octokit/get-probot-octokit-with-defaults";
-import { DeprecatedLogger, ProbotWebhooks, State } from "./types";
+import {
+  DeprecatedLogger,
+  ProbotWebhooks,
+  State,
+  ApplicationFunction,
+} from "./types";
 import { webhookEventCheck } from "./helpers/webhook-event-check";
 import { aliasLog } from "./helpers/alias-log";
 import { getWebhooks } from "./octokit/get-webhooks";
+import { load } from "./load";
+import { route } from "./route";
+import { auth } from "./auth";
 
 export interface Options {
   // same options as Probot class
@@ -50,6 +56,14 @@ export class Application {
   public log: DeprecatedLogger;
   public on: ProbotWebhooks["on"];
   public receive: ProbotWebhooks["receive"];
+  public load: (
+    appFn: ApplicationFunction | ApplicationFunction[]
+  ) => Application;
+  public route: (path?: string) => express.Router;
+  public auth: (
+    installationId?: number,
+    log?: Logger
+  ) => Promise<InstanceType<typeof ProbotOctokit>>;
 
   private webhooks: ProbotWebhooks;
   private state: State;
@@ -115,86 +129,9 @@ export class Application {
       return this.webhooks.on(eventNameOrNames, callback);
     };
     this.receive = this.webhooks.receive;
-  }
 
-  /**
-   * Loads an ApplicationFunction into the current Application
-   * @param appFn - Probot application function to load
-   */
-  public load(appFn: ApplicationFunction | ApplicationFunction[]): Application {
-    if (Array.isArray(appFn)) {
-      appFn.forEach((a) => this.load(a));
-    } else {
-      appFn(this);
-    }
-
-    return this;
-  }
-
-  /**
-   * Get an {@link http://expressjs.com|express} router that can be used to
-   * expose HTTP endpoints
-   *
-   * ```
-   * module.exports = app => {
-   *   // Get an express router to expose new HTTP endpoints
-   *   const route = app.route('/my-app');
-   *
-   *   // Use any middleware
-   *   route.use(require('express').static(__dirname + '/public'));
-   *
-   *   // Add a new route
-   *   route.get('/hello-world', (req, res) => {
-   *     res.end('Hello World');
-   *   });
-   * };
-   * ```
-   *
-   * @param path - the prefix for the routes
-   * @returns an [express.Router](http://expressjs.com/en/4x/api.html#router)
-   */
-  public route(path?: string): express.Router {
-    if (path) {
-      const router = express.Router();
-      this.router.use(path, router);
-      return router;
-    } else {
-      return this.router;
-    }
-  }
-
-  /**
-   * Authenticate and get a GitHub client that can be used to make API calls.
-   *
-   * You'll probably want to use `context.github` instead.
-   *
-   * **Note**: `app.auth` is asynchronous, so it needs to be prefixed with a
-   * [`await`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await)
-   * to wait for the magic to happen.
-   *
-   * ```js
-   *  module.exports = ({ app }) => {
-   *    app.on('issues.opened', async context => {
-   *      const github = await app.auth();
-   *    });
-   *  };
-   * ```
-   *
-   * @param id - ID of the installation, which can be extracted from
-   * `context.payload.installation.id`. If called without this parameter, the
-   * client wil authenticate [as the app](https://developer.github.com/apps/building-integrations/setting-up-and-registering-github-apps/about-authentication-options-for-github-apps/#authenticating-as-a-github-app)
-   * instead of as a specific installation, which means it can only be used for
-   * [app APIs](https://developer.github.com/v3/apps/).
-   *
-   * @returns An authenticated GitHub API client
-   */
-  public async auth(
-    installationId?: number,
-    log?: Logger
-  ): Promise<InstanceType<typeof ProbotOctokit>> {
-    return getAuthenticatedOctokit(
-      Object.assign({}, this.state, log ? { log } : null),
-      installationId
-    );
+    this.load = load.bind(null, this);
+    this.route = route.bind(null, this);
+    this.auth = auth.bind(null, this.state);
   }
 }

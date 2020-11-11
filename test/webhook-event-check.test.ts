@@ -63,7 +63,7 @@ describe("webhook-event-check", () => {
     const probot = new Probot({ id, privateKey });
 
     let spyOnLogError;
-    probot.load(async (app) => {
+    probot.load(async ({ app }) => {
       spyOnLogError = jest.spyOn(app.log, "error");
 
       app.on("label.edited", noop);
@@ -86,7 +86,7 @@ describe("webhook-event-check", () => {
     const probot = new Probot({ id, privateKey });
     let spyOnLogError;
 
-    probot.load(async (app) => {
+    probot.load(async ({ app }) => {
       spyOnLogError = jest.spyOn(app.log, "error");
 
       app.on("*", noop);
@@ -108,7 +108,7 @@ describe("webhook-event-check", () => {
       const probot = new Probot({ id, privateKey });
       let spyOnLogError;
 
-      probot.load(async (app) => {
+      probot.load(async ({ app }) => {
         spyOnLogError = jest.spyOn(app.log, "error");
 
         app.on("pull_request.opened", noop);
@@ -130,7 +130,7 @@ describe("webhook-event-check", () => {
       const probot = new Probot({ id, privateKey });
       let spyOnLogError;
 
-      probot.load(async (app) => {
+      probot.load(async ({ app }) => {
         spyOnLogError = jest.spyOn(app.log, "error");
 
         app.on("pull_request.opened", noop);
@@ -157,7 +157,7 @@ describe("webhook-event-check", () => {
       const probot = new Probot({ id, privateKey });
       let spyOnLogError;
 
-      probot.load(async (app) => {
+      probot.load(async ({ app }) => {
         spyOnLogError = jest.spyOn(app.log, "error");
         app.on("pull_request.opened", noop);
       });
@@ -174,7 +174,7 @@ describe("webhook-event-check", () => {
       const probot = new Probot({ id, privateKey });
       let spyOnLogError;
 
-      probot.load(async (app) => {
+      probot.load(async ({ app }) => {
         spyOnLogError = jest.spyOn(app.log, "error");
         app.on("pull_request.opened", noop);
       });
@@ -191,7 +191,7 @@ describe("webhook-event-check", () => {
       const probot = new Probot({ id, privateKey });
       let spyOnLogError;
 
-      probot.load(async (app) => {
+      probot.load(async ({ app }) => {
         spyOnLogError = jest.spyOn(app.log, "error");
         app.on("pull_request.opened", noop);
       });
@@ -208,7 +208,7 @@ describe("webhook-event-check", () => {
       const probot = new Probot({ id, privateKey });
       let spyOnLogError;
 
-      probot.load(async (app) => {
+      probot.load(async ({ app }) => {
         spyOnLogError = jest.spyOn(app.log, "error");
         app.on("pull_request.opened", noop);
       });

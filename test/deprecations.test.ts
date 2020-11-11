@@ -150,4 +150,18 @@ describe("Deprecations", () => {
       `Using the \"*\" event with the regular Webhooks.on() function is deprecated. Please use the Webhooks.onAny() method instead`
     );
   });
+
+  it("(app) => { app.on(event, handler) }", () => {
+    const probot = new Probot({ log: pino(streamLogsToOutput) });
+    probot.load((app) => {
+      // test that deprecation is only logged once
+      app.auth();
+      app.on("push", () => {});
+    });
+
+    expect(output.length).toEqual(1);
+    expect(output[0].msg).toContain(
+      `[probot] "(app) => {}" is deprecated. Use "({ app }) => {}" instead`
+    );
+  });
 });

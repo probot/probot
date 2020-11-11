@@ -3,6 +3,7 @@ import LRUCache from "lru-cache";
 
 import { Context } from "./context";
 import { ProbotOctokit } from "./octokit/probot-octokit";
+import { Application } from "./application";
 
 import type { Logger, LogFn } from "pino";
 
@@ -26,3 +27,19 @@ export type ProbotWebhooks = Webhooks<
 >;
 
 export type DeprecatedLogger = LogFn & Logger;
+
+type deprecatedKeys =
+  | "router"
+  | "log"
+  | "on"
+  | "receive"
+  | "load"
+  | "route"
+  | "auth";
+export type ApplicationFunctionOptions = {
+  /**
+   * @deprecated "(app) => {}" is deprecated. Use "({ app }) => {}" instead.
+   */
+  [K in deprecatedKeys]: Application[K];
+} & { app: Application };
+export type ApplicationFunction = (options: ApplicationFunctionOptions) => void;

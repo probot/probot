@@ -11,7 +11,7 @@ export const setupAppFactory = (
   host: string | undefined,
   port: number | undefined
 ) =>
-  async function setupApp(app: Application) {
+  async function setupApp({ app }: { app: Application }) {
     const setup: ManifestCreation = new ManifestCreation();
 
     // If not on Glitch or Production, create a smee URL

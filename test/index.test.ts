@@ -85,7 +85,7 @@ describe("Probot", () => {
     it("runs with a function as argument", async () => {
       let initialized = false;
 
-      probot = await Probot.run((app) => {
+      probot = await Probot.run(({ app }) => {
         initialized = true;
       });
       expect(probot.options).toMatchSnapshot();
@@ -103,7 +103,7 @@ describe("Probot", () => {
       process.env.REDIS_URL = "redis://test:test@localhost:6379";
 
       await new Promise(async (resolve, reject) => {
-        const probot = await Probot.run((app) => {
+        const probot = await Probot.run(({ app }) => {
           app.auth(1).then(resolve, reject);
         });
         probot.stop();
@@ -116,7 +116,7 @@ describe("Probot", () => {
       process.env.PORT = "3003";
 
       return new Promise(async (resolve) => {
-        probot = await Probot.run((app) => {
+        probot = await Probot.run(({ app }) => {
           initialized = true;
         });
         expect(probot.options).toMatchSnapshot();
@@ -129,7 +129,7 @@ describe("Probot", () => {
 
     it("has version", async () => {
       return new Promise(async (resolve) => {
-        probot = await Probot.run((app) => {});
+        probot = await Probot.run(({ app }) => {});
         expect(probot.version).toBe("0.0.0-development");
         probot.stop();
 
@@ -223,7 +223,7 @@ describe("Probot", () => {
 
   describe("server", () => {
     it("prefixes paths with route name", () => {
-      probot.load((app) => {
+      probot.load(({ app }) => {
         const route = app.route("/my-app");
         route.get("/foo", (req, res) => res.end("foo"));
       });
@@ -232,7 +232,7 @@ describe("Probot", () => {
     });
 
     it("allows routes with no path", () => {
-      probot.load((app) => {
+      probot.load(({ app }) => {
         const route = app.route();
         route.get("/foo", (req, res) => res.end("foo"));
       });
@@ -241,7 +241,7 @@ describe("Probot", () => {
     });
 
     it("allows you to overwrite the root path", () => {
-      probot.load((app) => {
+      probot.load(({ app }) => {
         const route = app.route();
         route.get("/", (req, res) => res.end("foo"));
       });
@@ -251,7 +251,7 @@ describe("Probot", () => {
 
     it("isolates apps from affecting eachother", async () => {
       ["foo", "bar"].forEach((name) => {
-        probot.load((app) => {
+        probot.load(({ app }) => {
           const route = app.route("/" + name);
 
           route.use((req, res, next) => {
@@ -285,7 +285,7 @@ describe("Probot", () => {
         (error: any, req: Request, res: Response, next: NextFunction) => {}
       );
 
-      probot.load((app) => {
+      probot.load(({ app }) => {
         const route = app.route();
         route.get("/webhook", (req, res) => res.end("get-webhook"));
         route.post("/webhook", (req, res) => res.end("post-webhook"));
@@ -330,7 +330,7 @@ describe("Probot", () => {
     it("forwards events to each app", async () => {
       const spy = jest.fn();
 
-      probot.load((app) => app.on("push", spy));
+      probot.load(({ app }) => app.on("push", spy));
 
       await probot.receive(event);
 
@@ -348,8 +348,8 @@ describe("Probot", () => {
     });
 
     it("requests from the correct API URL", async () => {
-      const appFn = async (appl: Application) => {
-        const github = await appl.auth();
+      const appFn = async ({ app }: { app: Application }) => {
+        const github = await app.auth();
         expect(github.request.endpoint.DEFAULTS.baseUrl).toEqual(
           "https://notreallygithub.com/api/v3"
         );
@@ -381,8 +381,8 @@ describe("Probot", () => {
     });
 
     it("requests from the correct API URL", async () => {
-      const appFn = async (appl: Application) => {
-        const github = await appl.auth();
+      const appFn = async ({ app }: { app: Application }) => {
+        const github = await app.auth();
         expect(github.request.endpoint.DEFAULTS.baseUrl).toEqual(
           "http://notreallygithub.com/api/v3"
         );
@@ -540,7 +540,7 @@ describe("Probot", () => {
       });
 
       await new Promise((resolve, reject) => {
-        probot.load(async (app) => {
+        probot.load(async ({ app }) => {
           const octokit = await app.auth();
           try {
             const { data: appData } = await octokit.apps.getAuthenticated();
@@ -573,7 +573,7 @@ describe("Probot", () => {
         privateKey,
       });
 
-      const app = (app: Application) => {
+      const app = ({ app }: { app: Application }) => {
         expect(app).toBeInstanceOf(Application);
       };
 

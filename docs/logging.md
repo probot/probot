@@ -9,7 +9,7 @@ A good logger is a good developer's secret weapon. Probot comes with [pino](http
 `app.log`, `context.log` in an event handler, and `req.log` in an HTTP request are all loggers that you can use to get more information about what your app is doing.
 
 ```js
-module.exports = (app) => {
+module.exports = ({ app }) => {
   app.log.info("Yay, my app is loaded");
 
   app.on("issues.opened", (context) => {
@@ -33,7 +33,7 @@ When you start up your app with `npm start`, You should see your log message app
 `app.log` will log messages at the `info` level, which is what your app should use for most relevant messages. Occasionally you will want to log more detailed information that is useful for debugging, but you might not want to see it all the time.
 
 ```js
-module.exports = (app) => {
+module.exports = ({ app }) => {
   // …
   app.log.trace("Really low-level logging");
   app.log.debug({ data: "here" }, "End-line specs on the rotary girder");
@@ -62,7 +62,7 @@ When `NODE_ENV` is set (as it should be in production), the log output is struct
 For example, given this log:
 
 ```js
-module.exports = (app) => {
+module.exports = ({ app }) => {
   app.on("issue_comment.created", (context) => {
     context.log.info("Comment created");
   });

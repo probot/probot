@@ -1,6 +1,6 @@
 console.log("waddafugg");
 
-module.exports = (app) => {
+module.exports = ({ app }) => {
   // Your code here
   app.log.info("Yay! The app was loaded!");
 

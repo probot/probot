@@ -7,7 +7,7 @@ next: docs/simulating-webhooks.md
 Calling `app.route('/my-app')` will return an [express](http://expressjs.com/) router that you can use to expose HTTP endpoints from your app.
 
 ```js
-module.exports = (app) => {
+module.exports = ({ app }) => {
   // Get an express router to expose new HTTP endpoints
   const router = app.route("/my-app");
 

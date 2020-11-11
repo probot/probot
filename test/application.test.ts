@@ -248,7 +248,8 @@ describe("Application", () => {
   describe("load", () => {
     it("loads one app", async () => {
       const spy = jest.fn();
-      const myApp = (a: any) => a.on("pull_request", spy);
+      const myApp = ({ app }: { app: Application }) =>
+        app.on("pull_request", spy);
 
       app.load(myApp);
       await app.receive(event);
@@ -258,8 +259,10 @@ describe("Application", () => {
     it("loads multiple apps", async () => {
       const spy = jest.fn();
       const spy2 = jest.fn();
-      const myApp = (a: any) => a.on("pull_request", spy);
-      const myApp2 = (a: any) => a.on("pull_request", spy2);
+      const myApp = ({ app }: { app: Application }) =>
+        app.on("pull_request", spy);
+      const myApp2 = ({ app }: { app: Application }) =>
+        app.on("pull_request", spy2);
 
       app.load([myApp, myApp2]);
       await app.receive(event);

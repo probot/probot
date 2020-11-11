@@ -132,4 +132,22 @@ describe("Deprecations", () => {
       `[probot] "new Application({ throttleOptions })" is deprecated. Use "new Application({Octokit: ProbotOctokit.defaults({ throttle }) })" instead`
     );
   });
+
+  it("probot.webhooks.on('*', handler)", () => {
+    const probot = new Probot({
+      id: 1,
+      privateKey: "private key",
+      log: pino(streamLogsToOutput),
+    });
+
+    console.warn = jest.fn();
+
+    probot.webhooks.on("*", () => {});
+
+    expect(console.warn).toHaveBeenCalledTimes(1);
+    // @ts-ignore
+    expect(console.warn.mock.calls[0][0]).toContain(
+      `Using the \"*\" event with the regular Webhooks.on() function is deprecated. Please use the Webhooks.onAny() method instead`
+    );
+  });
 });

@@ -107,6 +107,11 @@ export class Application {
       // This feature will be moved out of Probot core as it has side effects and does not work in a stateless environment.
       webhookEventCheck(this.state, eventNameOrNames);
 
+      if (eventNameOrNames === "*") {
+        // @ts-ignore this workaround is only to surpress a warning. The `.on()` method will be deprecated soon anyway.
+        return this.webhooks.onAny(callback);
+      }
+
       return this.webhooks.on(eventNameOrNames, callback);
     };
     this.receive = this.webhooks.receive;

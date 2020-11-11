@@ -188,7 +188,7 @@ describe("Probot", () => {
 
     it("responds with the correct error if the PEM file is missing", async () => {
       probot.log.error = jest.fn();
-      probot.webhooks.on("*", () => {
+      probot.webhooks.onAny(() => {
         throw new Error(
           "error:0906D06C:PEM routines:PEM_read_bio:no start line"
         );
@@ -205,7 +205,7 @@ describe("Probot", () => {
 
     it("responds with the correct error if the jwt could not be decoded", async () => {
       probot.log.error = jest.fn();
-      probot.webhooks.on("*", () => {
+      probot.webhooks.onAny(() => {
         throw new Error(
           '{"message":"A JSON web token could not be decoded","documentation_url":"https://developer.github.com/v3"}'
         );

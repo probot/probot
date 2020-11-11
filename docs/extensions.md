@@ -15,7 +15,7 @@ For example, users could add labels from comments by typing `/label in-progress`
 ```js
 const commands = require("probot-commands");
 
-module.exports = (app) => {
+module.exports = ({ app }) => {
   // Type `/label foo, bar` in a comment box for an Issue or Pull Request
   commands(app, "label", (context, command) => {
     const labels = command.arguments.split(/, */);
@@ -33,7 +33,7 @@ For example, here is a contrived app that stores the number of times that commen
 ```js
 const metadata = require("probot-metadata");
 
-module.exports = (app) => {
+module.exports = ({ app }) => {
   app.on(["issues.edited", "issue_comment.edited"], async (context) => {
     const kv = await metadata(context);
     await kv.set("edits", (await kv.get("edits")) || 1);
@@ -57,7 +57,7 @@ module.exports = (app) => {
 ```js
 const createScheduler = require("probot-scheduler");
 
-module.exports = (app) => {
+module.exports = ({ app }) => {
   createScheduler(app);
 
   app.on("schedule.repository", (context) => {
@@ -75,7 +75,7 @@ Check out [stale](https://github.com/probot/stale) to see it in action.
 ```js
 const attachments = require("probot-attachments");
 
-module.exports = (app) => {
+module.exports = ({ app }) => {
   app.on("issue_comment.created", (context) => {
     return attachments(context).add({
       title: "Hello World",

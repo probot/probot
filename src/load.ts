@@ -1,16 +1,11 @@
 import { Deprecation } from "deprecation";
+import { Router } from "express";
 
 import { Application } from "./application";
 import { ApplicationFunction, ApplicationFunctionOptions } from "./types";
+import { getRouter } from "./get-router";
 
-type DeprecatedKey =
-  | "auth"
-  | "load"
-  | "log"
-  | "on"
-  | "receive"
-  | "route"
-  | "router";
+type DeprecatedKey = "auth" | "load" | "log" | "on" | "receive" | "router";
 
 const DEPRECATED_APP_KEYS: DeprecatedKey[] = [
   "auth",
@@ -18,7 +13,6 @@ const DEPRECATED_APP_KEYS: DeprecatedKey[] = [
   "log",
   "on",
   "receive",
-  "route",
   "router",
 ];
 let didDeprecate = false;
@@ -29,6 +23,7 @@ let didDeprecate = false;
  */
 export function load(
   app: Application,
+  router: Router | null,
   appFn: ApplicationFunction | ApplicationFunction[]
 ) {
   const deprecatedApp = DEPRECATED_APP_KEYS.reduce(
@@ -54,11 +49,12 @@ export function load(
   );
 
   if (Array.isArray(appFn)) {
-    appFn.forEach((fn) => load(app, fn));
+    appFn.forEach((fn) => load(app, router, fn));
   } else {
     appFn(
       (Object.assign(deprecatedApp, {
         app,
+        getRouter: getRouter.bind(null, router || app.router),
       }) as unknown) as ApplicationFunctionOptions
     );
   }

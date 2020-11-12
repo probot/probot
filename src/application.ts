@@ -1,6 +1,7 @@
-import express from "express";
+import { Router } from "express";
 import Redis from "ioredis";
 import LRUCache from "lru-cache";
+import { Deprecation } from "deprecation";
 
 import type { Webhooks } from "@octokit/webhooks";
 import type { Logger } from "pino";
@@ -19,7 +20,7 @@ import { webhookEventCheck } from "./helpers/webhook-event-check";
 import { aliasLog } from "./helpers/alias-log";
 import { getWebhooks } from "./octokit/get-webhooks";
 import { load } from "./load";
-import { route } from "./route";
+import { getRouter } from "./get-router";
 import { auth } from "./auth";
 
 export interface Options {
@@ -37,6 +38,7 @@ export interface Options {
   cache?: LRUCache<number, string>;
   octokit?: InstanceType<typeof ProbotOctokit>;
   webhooks?: Webhooks;
+  router?: Router;
 
   /**
    * @deprecated set `Octokit` to `ProbotOctokit.defaults({ throttle })` instead
@@ -52,14 +54,12 @@ export type OnCallback<T> = (context: Context<T>) => Promise<void>;
  * @property {logger} log - A logger
  */
 export class Application {
-  public router: express.Router;
   public log: DeprecatedLogger;
   public on: ProbotWebhooks["on"];
   public receive: ProbotWebhooks["receive"];
   public load: (
     appFn: ApplicationFunction | ApplicationFunction[]
   ) => Application;
-  public route: (path?: string) => express.Router;
   public auth: (
     installationId?: number,
     log?: Logger
@@ -67,6 +67,7 @@ export class Application {
 
   private webhooks: ProbotWebhooks;
   private state: State;
+  private internalRouter: Router;
 
   constructor(options: Options) {
     this.log = aliasLog(options.log || getLog());
@@ -110,8 +111,6 @@ export class Application {
       },
     };
 
-    this.router = express.Router();
-
     this.webhooks = options.webhooks || getWebhooks(this.state);
 
     this.on = (eventNameOrNames, callback) => {
@@ -130,8 +129,56 @@ export class Application {
     };
     this.receive = this.webhooks.receive;
 
-    this.load = load.bind(null, this);
-    this.route = route.bind(null, this);
+    const router = options.router || Router();
+    this.load = load.bind(null, this, router);
     this.auth = auth.bind(null, this.state);
+
+    this.internalRouter = router;
+  }
+
+  /**
+   * @deprecated "app.router" is deprecated, use "getRouter()" from the app function instead: "({ app, getRouter }) => { ... }"
+   */
+  public get router() {
+    this.log.warn(
+      new Deprecation(
+        `[probot] "app.router" is deprecated, use "getRouter()" from the app function instead: "({ app, getRouter }) => { ... }"`
+      )
+    );
+
+    return this.internalRouter;
+  }
+
+  /**
+   * Get an {@link http://expressjs.com|express} router that can be used to
+   * expose HTTP endpoints
+   *
+   * ```
+   * module.exports = ({ app, getRouter }) => {
+   *   // Get an express router to expose new HTTP endpoints
+   *   const router = getRouter('/my-app');
+   *
+   *   // Use any middleware
+   *   router.use(require('express').static(__dirname + '/public'));
+   *
+   *   // Add a new route
+   *   router.get('/hello-world', (req, res) => {
+   *     res.end('Hello World');
+   *   });
+   * };
+   * ```
+   *
+   * @param path - the prefix for the routes* @param path
+   *
+   * @deprecated "app.route()" is deprecated, use the "getRouter()" argument from the app function instead: "({ app, getRouter }) => { ... }"
+   */
+  route(path?: string) {
+    this.log.warn(
+      new Deprecation(
+        `[probot] "app.route()" is deprecated, use the "getRouter()" argument from the app function instead: "({ app, getRouter }) => { ... }"`
+      )
+    );
+
+    return getRouter(this.internalRouter, path);
   }
 }

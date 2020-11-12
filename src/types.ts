@@ -1,3 +1,4 @@
+import express from "express";
 import { WebhookEvent, Webhooks } from "@octokit/webhooks";
 import LRUCache from "lru-cache";
 
@@ -41,5 +42,5 @@ export type ApplicationFunctionOptions = {
    * @deprecated "(app) => {}" is deprecated. Use "({ app }) => {}" instead.
    */
   [K in deprecatedKeys]: Application[K];
-} & { app: Application };
+} & { app: Application; getRouter: (path?: string) => express.Router };
 export type ApplicationFunction = (options: ApplicationFunctionOptions) => void;

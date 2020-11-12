@@ -1,10 +1,17 @@
 import path from "path";
+import express from "express";
 import { Application } from "../application";
 
-export = ({ app }: { app: Application }) => {
-  const route = app.route();
+export = ({
+  app,
+  getRouter,
+}: {
+  app: Application;
+  getRouter: () => express.Router;
+}) => {
+  const router = getRouter();
 
-  route.get("/probot", (req, res) => {
+  router.get("/probot", (req, res) => {
     let pkg;
     try {
       pkg = require(path.join(process.cwd(), "package.json"));
@@ -14,5 +21,5 @@ export = ({ app }: { app: Application }) => {
 
     res.render("probot.hbs", pkg);
   });
-  route.get("/", (req, res, next) => res.redirect("/probot"));
+  router.get("/", (req, res, next) => res.redirect("/probot"));
 };

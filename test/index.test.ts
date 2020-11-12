@@ -7,7 +7,7 @@ import request = require("supertest");
 import nock from "nock";
 import pino from "pino";
 
-import { Application, Probot, ProbotOctokit, Context } from "../src";
+import { Probot, ProbotOctokit, Context } from "../src";
 
 import path = require("path");
 import { WebhookEvents } from "@octokit/webhooks";
@@ -361,7 +361,7 @@ describe("Probot", () => {
     });
 
     it("requests from the correct API URL", async () => {
-      const appFn = async ({ app }: { app: Application }) => {
+      const appFn = async ({ app }: { app: Probot }) => {
         const github = await app.auth();
         expect(github.request.endpoint.DEFAULTS.baseUrl).toEqual(
           "https://notreallygithub.com/api/v3"
@@ -394,7 +394,7 @@ describe("Probot", () => {
     });
 
     it("requests from the correct API URL", async () => {
-      const appFn = async ({ app }: { app: Application }) => {
+      const appFn = async ({ app }: { app: Probot }) => {
         const github = await app.auth();
         expect(github.request.endpoint.DEFAULTS.baseUrl).toEqual(
           "http://notreallygithub.com/api/v3"
@@ -586,8 +586,8 @@ describe("Probot", () => {
         privateKey,
       });
 
-      const app = ({ app }: { app: Application }) => {
-        expect(app).toBeInstanceOf(Application);
+      const app = ({ app }: { app: Probot }) => {
+        expect(app).toBeInstanceOf(Probot);
       };
 
       probot.load([app, app]);

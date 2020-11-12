@@ -1,8 +1,9 @@
+import express from "express";
 import bodyParser from "body-parser";
 import { exec } from "child_process";
 import { Request, Response } from "express";
 import updateDotenv from "update-dotenv";
-import { Application } from "../application";
+import { Probot } from "../index";
 import { ManifestCreation } from "../manifest-creation";
 
 import { getLoggingMiddleware } from "../server/logging-middleware";
@@ -11,7 +12,13 @@ export const setupAppFactory = (
   host: string | undefined,
   port: number | undefined
 ) =>
-  async function setupApp({ app }: { app: Application }) {
+  async function setupApp({
+    app,
+    getRouter,
+  }: {
+    app: Probot;
+    getRouter: () => express.Router;
+  }) {
     const setup: ManifestCreation = new ManifestCreation();
 
     // If not on Glitch or Production, create a smee URL
@@ -22,7 +29,7 @@ export const setupAppFactory = (
       await setup.createWebhookChannel();
     }
 
-    const route = app.route();
+    const route = getRouter();
 
     route.use(getLoggingMiddleware(app.log));
 
@@ -84,7 +91,7 @@ export const setupAppFactory = (
   };
 
 function printWelcomeMessage(
-  app: Application,
+  app: Probot,
   host: string | undefined,
   port: number | undefined
 ) {
@@ -108,7 +115,7 @@ function printWelcomeMessage(
   });
 }
 
-function printRestartMessage(app: Application) {
+function printRestartMessage(app: Probot) {
   app.log.info("");
   app.log.info("Probot has been set up, please restart the server!");
   app.log.info("");

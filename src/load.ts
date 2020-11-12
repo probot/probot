@@ -1,6 +1,7 @@
 import { Deprecation } from "deprecation";
 import { Router } from "express";
 
+import { Probot } from "./index";
 import { Application } from "./application";
 import { ApplicationFunction, ApplicationFunctionOptions } from "./types";
 import { getRouter } from "./get-router";
@@ -22,7 +23,7 @@ let didDeprecate = false;
  * @param appFn - Probot application function to load
  */
 export function load(
-  app: Application,
+  app: Application | Probot,
   router: Router | null,
   appFn: ApplicationFunction | ApplicationFunction[]
 ) {

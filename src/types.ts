@@ -2,6 +2,7 @@ import express from "express";
 import { WebhookEvent, Webhooks } from "@octokit/webhooks";
 import LRUCache from "lru-cache";
 
+import { Probot } from "./index";
 import { Context } from "./context";
 import { ProbotOctokit } from "./octokit/probot-octokit";
 import { Application } from "./application";
@@ -37,10 +38,11 @@ type deprecatedKeys =
   | "load"
   | "route"
   | "auth";
+
 export type ApplicationFunctionOptions = {
   /**
    * @deprecated "(app) => {}" is deprecated. Use "({ app }) => {}" instead.
    */
   [K in deprecatedKeys]: Application[K];
-} & { app: Application; getRouter: (path?: string) => express.Router };
+} & { app: Probot; getRouter: (path?: string) => express.Router };
 export type ApplicationFunction = (options: ApplicationFunctionOptions) => void;

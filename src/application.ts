@@ -38,8 +38,11 @@ export interface Options {
   cache?: LRUCache<number, string>;
   octokit?: InstanceType<typeof ProbotOctokit>;
   webhooks?: Webhooks;
-  router?: Router;
 
+  /**
+   * @deprecated "app.router" is deprecated, use "getRouter()" from the app function instead: "({ app, getRouter }) => { ... }"
+   */
+  router?: Router;
   /**
    * @deprecated set `Octokit` to `ProbotOctokit.defaults({ throttle })` instead
    */
@@ -71,6 +74,10 @@ export class Application {
 
   constructor(options: Options) {
     this.log = aliasLog(options.log || getLog());
+
+    this.log.warn(
+      `[probot] "import { Application } from 'probot'" is deprecated. Use "import { Probot } from 'probot'" instead, the APIs are the same.`
+    );
 
     // TODO: support redis backend for access token cache if `options.redisConfig || process.env.REDIS_URL`
     const cache =
@@ -130,6 +137,7 @@ export class Application {
     this.receive = this.webhooks.receive;
 
     const router = options.router || Router();
+    // @ts-ignore
     this.load = load.bind(null, this, router);
     this.auth = auth.bind(null, this.state);
 

@@ -1,9 +1,13 @@
+import Stream from "stream";
+
+import { WebhookEvent } from "@octokit/webhooks";
 import Bottleneck from "bottleneck";
 import { NextFunction, Request, Response } from "express";
 import request = require("supertest");
 import nock from "nock";
+import pino from "pino";
 
-import { Application, Probot, ProbotOctokit } from "../src";
+import { Application, Probot, ProbotOctokit, Context } from "../src";
 
 import path = require("path");
 import { WebhookEvents } from "@octokit/webhooks";
@@ -27,8 +31,17 @@ describe("Probot", () => {
     name: WebhookEvents;
     payload: any;
   };
+  let output: any;
+
+  const streamLogsToOutput = new Stream.Writable({ objectMode: true });
+  streamLogsToOutput._write = (object, encoding, done) => {
+    output.push(JSON.parse(object));
+    done();
+  };
 
   beforeEach(() => {
+    // Clear log output
+    output = [];
     process.env.DISABLE_WEBHOOK_EVENT_CHECK = "true";
     probot = new Probot({ githubToken: "faketoken" });
 
@@ -249,7 +262,7 @@ describe("Probot", () => {
       return request(probot.server).get("/").expect(200, "foo");
     });
 
-    it("isolates apps from affecting eachother", async () => {
+    it("isolates apps from affecting each other", async () => {
       ["foo", "bar"].forEach((name) => {
         probot.load(({ app, getRouter }) => {
           const router = getRouter("/" + name);
@@ -578,6 +591,281 @@ describe("Probot", () => {
       };
 
       probot.load([app, app]);
+    });
+  });
+
+  describe("on", () => {
+    beforeEach(() => {
+      event = {
+        id: "123-456",
+        name: "pull_request",
+        payload: {
+          action: "opened",
+          installation: { id: 1 },
+        },
+      };
+    });
+
+    it("calls callback when no action is specified", async () => {
+      const probot = new Probot({
+        id,
+        privateKey,
+      });
+
+      const spy = jest.fn();
+      probot.on("pull_request", spy);
+
+      expect(spy).toHaveBeenCalledTimes(0);
+      await probot.receive(event);
+      expect(spy).toHaveBeenCalled();
+      expect(spy.mock.calls[0][0]).toBeInstanceOf(Context);
+      expect(spy.mock.calls[0][0].payload).toBe(event.payload);
+    });
+
+    it("calls callback with same action", async () => {
+      const probot = new Probot({
+        id,
+        privateKey,
+      });
+
+      const spy = jest.fn();
+      probot.on("pull_request.opened", spy);
+
+      await probot.receive(event);
+      expect(spy).toHaveBeenCalled();
+    });
+
+    it("does not call callback with different action", async () => {
+      const probot = new Probot({
+        id,
+        privateKey,
+      });
+
+      const spy = jest.fn();
+      probot.on("pull_request.closed", spy);
+
+      await probot.receive(event);
+      expect(spy).toHaveBeenCalledTimes(0);
+    });
+
+    it("calls callback with *", async () => {
+      const probot = new Probot({
+        id,
+        privateKey,
+      });
+
+      const spy = jest.fn();
+      probot.on("*", spy);
+
+      await probot.receive(event);
+      expect(spy).toHaveBeenCalled();
+    });
+
+    it("calls callback x amount of times when an array of x actions is passed", async () => {
+      const probot = new Probot({
+        id,
+        privateKey,
+      });
+
+      const event2: WebhookEvent = {
+        id: "123",
+        name: "issues",
+        payload: {
+          action: "opened",
+          installation: { id: 2 },
+        },
+      };
+
+      const spy = jest.fn();
+      probot.on(["pull_request.opened", "issues.opened"], spy);
+
+      await probot.receive(event);
+      await probot.receive(event2);
+      expect(spy.mock.calls.length).toEqual(2);
+    });
+
+    it("adds a logger on the context", async () => {
+      const probot = new Probot({
+        id,
+        privateKey,
+        log: pino(streamLogsToOutput),
+      });
+
+      const handler = jest.fn().mockImplementation((context) => {
+        expect(context.log.info).toBeDefined();
+        context.log.info("testing");
+
+        expect(output[0]).toEqual(
+          expect.objectContaining({
+            id: context.id,
+            msg: "testing",
+          })
+        );
+      });
+
+      probot.on("pull_request", handler);
+      await probot.receive(event).catch(console.error);
+      expect(handler).toHaveBeenCalled();
+    });
+
+    it("returns an authenticated client for installation.created", async () => {
+      const probot = new Probot({
+        id,
+        privateKey,
+      });
+
+      event = {
+        id: "123-456",
+        name: "installation",
+        payload: {
+          action: "created",
+          installation: { id: 1 },
+        },
+      };
+
+      const mock = nock("https://api.github.com")
+        .post("/app/installations/1/access_tokens")
+        .reply(201, {
+          token: "v1.1f699f1069f60xxx",
+          permissions: {
+            issues: "write",
+            contents: "read",
+          },
+        })
+        .get("/")
+        .matchHeader("authorization", "token v1.1f699f1069f60xxx")
+        .reply(200, {});
+
+      probot.on("installation.created", async (context) => {
+        await context.github.request("/");
+      });
+
+      await probot.receive(event);
+
+      expect(mock.activeMocks()).toStrictEqual([]);
+    });
+
+    it("returns an unauthenticated client for installation.deleted", async () => {
+      const probot = new Probot({
+        id,
+        privateKey,
+      });
+
+      event = {
+        id: "123-456",
+        name: "installation",
+        payload: {
+          action: "deleted",
+          installation: { id: 1 },
+        },
+      };
+
+      const mock = nock("https://api.github.com")
+        .get("/")
+        .matchHeader("authorization", (value) => value === undefined)
+        .reply(200, {});
+
+      probot.on("installation.deleted", async (context) => {
+        await context.github.request("/");
+      });
+
+      await probot.receive(event).catch(console.log);
+
+      expect(mock.activeMocks()).toStrictEqual([]);
+    });
+
+    it("returns an authenticated client for events without an installation", async () => {
+      const probot = new Probot({
+        id,
+        privateKey,
+      });
+
+      event = {
+        id: "123-456",
+        name: "check_run",
+        payload: {
+          /* no installation */
+        },
+      };
+
+      const mock = nock("https://api.github.com")
+        .get("/")
+        .matchHeader("authorization", (value) => value === undefined)
+        .reply(200, {});
+
+      probot.on("check_run", async (context) => {
+        await context.github.request("/");
+      });
+
+      await probot.receive(event).catch(console.log);
+
+      expect(mock.activeMocks()).toStrictEqual([]);
+    });
+  });
+
+  describe("receive", () => {
+    beforeEach(() => {
+      event = {
+        id: "123-456",
+        name: "pull_request",
+        payload: {
+          action: "opened",
+          installation: { id: 1 },
+        },
+      };
+    });
+
+    it("delivers the event", async () => {
+      const probot = new Probot({
+        id,
+        privateKey,
+      });
+
+      const spy = jest.fn();
+      probot.on("pull_request", spy);
+
+      await probot.receive(event);
+
+      expect(spy).toHaveBeenCalled();
+    });
+
+    it("waits for async events to resolve", async () => {
+      const probot = new Probot({
+        id,
+        privateKey,
+      });
+
+      const spy = jest.fn();
+      probot.on("pull_request", () => {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            spy();
+            resolve();
+          }, 1);
+        });
+      });
+
+      await probot.receive(event);
+
+      expect(spy).toHaveBeenCalled();
+    });
+
+    it("returns a reject errors thrown in apps", async () => {
+      const probot = new Probot({
+        id,
+        privateKey,
+      });
+
+      probot.on("pull_request", () => {
+        throw new Error("error from app");
+      });
+
+      try {
+        await probot.receive(event);
+        throw new Error("expected error to be raised from app");
+      } catch (error) {
+        expect(error.message).toMatch(/error from app/);
+      }
     });
   });
 });

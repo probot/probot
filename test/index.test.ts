@@ -223,27 +223,27 @@ describe("Probot", () => {
 
   describe("server", () => {
     it("prefixes paths with route name", () => {
-      probot.load(({ app }) => {
-        const route = app.route("/my-app");
-        route.get("/foo", (req, res) => res.end("foo"));
+      probot.load(({ app, getRouter }) => {
+        const router = getRouter("/my-app");
+        router.get("/foo", (req, res) => res.end("foo"));
       });
 
       return request(probot.server).get("/my-app/foo").expect(200, "foo");
     });
 
     it("allows routes with no path", () => {
-      probot.load(({ app }) => {
-        const route = app.route();
-        route.get("/foo", (req, res) => res.end("foo"));
+      probot.load(({ app, getRouter }) => {
+        const router = getRouter();
+        router.get("/foo", (req, res) => res.end("foo"));
       });
 
       return request(probot.server).get("/foo").expect(200, "foo");
     });
 
     it("allows you to overwrite the root path", () => {
-      probot.load(({ app }) => {
-        const route = app.route();
-        route.get("/", (req, res) => res.end("foo"));
+      probot.load(({ app, getRouter }) => {
+        const router = getRouter();
+        router.get("/", (req, res) => res.end("foo"));
       });
 
       return request(probot.server).get("/").expect(200, "foo");
@@ -251,15 +251,15 @@ describe("Probot", () => {
 
     it("isolates apps from affecting eachother", async () => {
       ["foo", "bar"].forEach((name) => {
-        probot.load(({ app }) => {
-          const route = app.route("/" + name);
+        probot.load(({ app, getRouter }) => {
+          const router = getRouter("/" + name);
 
-          route.use((req, res, next) => {
+          router.use((req, res, next) => {
             res.append("X-Test", name);
             next();
           });
 
-          route.get("/hello", (req, res) => res.end(name));
+          router.get("/hello", (req, res) => res.end(name));
         });
       });
 
@@ -285,10 +285,10 @@ describe("Probot", () => {
         (error: any, req: Request, res: Response, next: NextFunction) => {}
       );
 
-      probot.load(({ app }) => {
-        const route = app.route();
-        route.get("/webhook", (req, res) => res.end("get-webhook"));
-        route.post("/webhook", (req, res) => res.end("post-webhook"));
+      probot.load(({ getRouter }) => {
+        const router = getRouter();
+        router.get("/webhook", (req, res) => res.end("get-webhook"));
+        router.post("/webhook", (req, res) => res.end("post-webhook"));
       });
 
       // GET requests should succeed

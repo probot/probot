@@ -868,4 +868,32 @@ describe("Probot", () => {
       }
     });
   });
+
+  describe("auth", () => {
+    it.only("throttleOptions", async () => {
+      const probot = new Probot({
+        Octokit: ProbotOctokit.plugin((octokit: any, options: any) => {
+          return {
+            pluginLoaded: true,
+            test() {
+              expect(options.throttle.id).toBe(1);
+              expect(options.throttle.foo).toBe("bar");
+            },
+          };
+        }),
+        id: 1,
+        privateKey: "private key",
+        secret: "secret",
+        throttleOptions: {
+          foo: "bar",
+          onAbuseLimit: () => true,
+          onRateLimit: () => true,
+        },
+      } as any);
+
+      const result = await probot.auth(1);
+      expect(result.pluginLoaded).toEqual(true);
+      result.test();
+    });
+  });
 });

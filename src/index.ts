@@ -31,6 +31,8 @@ import { getProbotOctokitWithDefaults } from "./octokit/get-probot-octokit-with-
 import { aliasLog } from "./helpers/alias-log";
 import { logWarningsForObsoleteEnvironmentVariables } from "./helpers/log-warnings-for-obsolete-environment-variables";
 import { getWebhooks } from "./octokit/get-webhooks";
+import { webhookEventCheck } from "./helpers/webhook-event-check";
+import { auth } from "./auth";
 
 logWarningsForObsoleteEnvironmentVariables();
 
@@ -53,6 +55,10 @@ export interface Options {
   port?: number;
   host?: string;
   webhookProxy?: string;
+  /**
+   * @deprecated set `Octokit` to `ProbotOctokit.defaults({ throttle })` instead
+   */
+  throttleOptions?: any;
 }
 
 // tslint:disable:no-var-requires
@@ -156,6 +162,11 @@ export class Probot {
   public webhooks: ProbotWebhooks;
   public log: DeprecatedLogger;
   public version: String;
+  public on: ProbotWebhooks["on"];
+  public auth: (
+    installationId?: number,
+    log?: Logger
+  ) => Promise<InstanceType<typeof ProbotOctokit>>;
 
   // These need to be public for the tests to work.
   public options: Options;
@@ -216,12 +227,11 @@ export class Probot {
       cache,
       log: this.log,
       redisConfig: options.redisConfig,
+      throttleOptions: options.throttleOptions,
     });
     const octokit = new Octokit();
 
     this.state = {
-      id: options.id,
-      privateKey: options.privateKey,
       cache,
       githubToken: options.githubToken,
       log: this.log,
@@ -231,9 +241,28 @@ export class Probot {
         path: options.webhookPath,
         secret: options.secret,
       },
+      id: options.id,
+      privateKey: options.privateKey,
     };
 
+    this.auth = auth.bind(null, this.state);
+
     this.webhooks = getWebhooks(this.state);
+
+    this.on = (eventNameOrNames, callback) => {
+      // when an app subscribes to an event using `app.on(event, callback)`, Probot sends a request to `GET /app` and
+      // verifies if the app is subscribed to the event and logs a warning if it is not.
+      //
+      // This feature will be moved out of Probot core as it has side effects and does not work in a stateless environment.
+      webhookEventCheck(this.state, eventNameOrNames);
+
+      if (eventNameOrNames === "*") {
+        // @ts-ignore this workaround is only to surpress a warning. The `.on()` method will be deprecated soon anyway.
+        return this.webhooks.onAny(callback);
+      }
+
+      return this.webhooks.on(eventNameOrNames, callback);
+    };
 
     this.server = createServer({
       webhook: (this.webhooks as any).middleware,

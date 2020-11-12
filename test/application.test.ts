@@ -2,6 +2,7 @@ import { WebhookEvent } from "@octokit/webhooks";
 import nock from "nock";
 import pino from "pino";
 
+import { Probot } from "../src/";
 import { Application } from "../src/application";
 import { Context } from "../src/context";
 import { ProbotOctokit } from "../src/octokit/probot-octokit";
@@ -111,7 +112,7 @@ describe("Application", () => {
         expect(context.log.info).toBeDefined();
         context.log.info("testing");
 
-        expect(output[0]).toEqual(
+        expect(output[1]).toEqual(
           expect.objectContaining({
             id: context.id,
             msg: "testing",
@@ -248,8 +249,7 @@ describe("Application", () => {
   describe("load", () => {
     it("loads one app", async () => {
       const spy = jest.fn();
-      const myApp = ({ app }: { app: Application }) =>
-        app.on("pull_request", spy);
+      const myApp = ({ app }: { app: Probot }) => app.on("pull_request", spy);
 
       app.load(myApp);
       await app.receive(event);
@@ -259,10 +259,8 @@ describe("Application", () => {
     it("loads multiple apps", async () => {
       const spy = jest.fn();
       const spy2 = jest.fn();
-      const myApp = ({ app }: { app: Application }) =>
-        app.on("pull_request", spy);
-      const myApp2 = ({ app }: { app: Application }) =>
-        app.on("pull_request", spy2);
+      const myApp = ({ app }: { app: Probot }) => app.on("pull_request", spy);
+      const myApp2 = ({ app }: { app: Probot }) => app.on("pull_request", spy2);
 
       app.load([myApp, myApp2]);
       await app.receive(event);
@@ -318,10 +316,10 @@ describe("Application", () => {
         // Expected
       }
 
-      expect(output.length).toBe(1);
+      expect(output.length).toEqual(2); // 2 because the Application constructor logs a deprecation message
 
-      expect(output[0].msg).toMatch(/testing/);
-      expect(output[0].event.id).toEqual(event.id);
+      expect(output[1].msg).toMatch(/testing/);
+      expect(output[1].event.id).toEqual(event.id);
     });
 
     it("logs errors from rejected promises", async () => {
@@ -333,9 +331,10 @@ describe("Application", () => {
         // Expected
       }
 
-      expect(output.length).toBe(1);
-      expect(output[0].msg).toMatch(/testing/);
-      expect(output[0].event.id).toEqual(event.id);
+      expect(output.length).toEqual(2); // 2 because the Application constructor logs a deprecation message
+
+      expect(output[1].msg).toMatch(/testing/);
+      expect(output[1].event.id).toEqual(event.id);
     });
   });
 });

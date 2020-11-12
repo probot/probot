@@ -33,6 +33,8 @@ import { logWarningsForObsoleteEnvironmentVariables } from "./helpers/log-warnin
 import { getWebhooks } from "./octokit/get-webhooks";
 import { webhookEventCheck } from "./helpers/webhook-event-check";
 import { auth } from "./auth";
+import { load } from "./load";
+import { getRouter } from "./get-router";
 
 logWarningsForObsoleteEnvironmentVariables();
 
@@ -176,6 +178,11 @@ export class Probot {
   private state: State;
 
   /**
+   * @deprecated this.internalRouter can be removed once we remove the Application class
+   */
+  private internalRouter: express.Router;
+
+  /**
    * @deprecated use probot.log instead
    */
   public get logger() {
@@ -185,6 +192,19 @@ export class Probot {
       )
     );
     return this.log;
+  }
+
+  /**
+   * @deprecated "app.router" is deprecated, use "getRouter()" from the app function instead: "({ app, getRouter }) => { ... }"
+   */
+  public get router() {
+    this.log.warn(
+      new Deprecation(
+        `[probot] "app.router" is deprecated, use "getRouter()" from the app function instead: "({ app, getRouter }) => { ... }"`
+      )
+    );
+
+    return this.internalRouter;
   }
 
   constructor(options: Options) {
@@ -272,6 +292,9 @@ export class Probot {
     const { version } = require("../package.json");
     this.version = version;
 
+    // TODO: remove once Application class was removed
+    this.internalRouter = express.Router();
+
     // TODO: Refactor tests so we we can remove these
     this.options = options;
   }
@@ -300,26 +323,14 @@ export class Probot {
     }
 
     const router = express.Router();
-    const app = new Application({
-      id: this.state.id,
-      privateKey: this.state.privateKey,
-      log: this.state.log.child({ name: "app" }),
-      cache: this.state.cache,
-      githubToken: this.state.githubToken,
-      Octokit: this.state.Octokit,
-      octokit: this.state.octokit,
-      throttleOptions: this.throttleOptions,
-      webhooks: this.webhooks,
-      router,
-    });
 
     // Connect the router from the app to the server
     this.server.use(router);
 
     // Initialize the ApplicationFunction
-    app.load(appFn);
+    load(this, router, appFn);
 
-    return app;
+    return this;
   }
 
   public setup(appFns: Array<string | ApplicationFunction>) {
@@ -378,6 +389,39 @@ export class Probot {
     if (!this.httpServer) return;
 
     this.httpServer.close();
+  }
+
+  /**
+   * Get an {@link http://expressjs.com|express} router that can be used to
+   * expose HTTP endpoints
+   *
+   * ```
+   * module.exports = ({ app, getRouter }) => {
+   *   // Get an express router to expose new HTTP endpoints
+   *   const router = getRouter('/my-app');
+   *
+   *   // Use any middleware
+   *   router.use(require('express').static(__dirname + '/public'));
+   *
+   *   // Add a new route
+   *   router.get('/hello-world', (req, res) => {
+   *     res.end('Hello World');
+   *   });
+   * };
+   * ```
+   *
+   * @param path - the prefix for the routes* @param path
+   *
+   * @deprecated "app.route()" is deprecated, use the "getRouter()" argument from the app function instead: "({ app, getRouter }) => { ... }"
+   */
+  route(path?: string) {
+    this.log.warn(
+      new Deprecation(
+        `[probot] "app.route()" is deprecated, use the "getRouter()" argument from the app function instead: "({ app, getRouter }) => { ... }"`
+      )
+    );
+
+    return getRouter(this.internalRouter, path);
   }
 }
 

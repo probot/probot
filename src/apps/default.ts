@@ -1,12 +1,12 @@
 import path from "path";
 import express from "express";
-import { Application } from "../application";
+import { Probot } from "../index";
 
 export = ({
   app,
   getRouter,
 }: {
-  app: Application;
+  app: Probot;
   getRouter: () => express.Router;
 }) => {
   const router = getRouter();

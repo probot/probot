@@ -20,7 +20,7 @@ module.exports = ({ app }) => {
     }
   });
 
-  app.route().get("/hello-world", (req, res) => {
+  route().get("/hello-world", (req, res) => {
     req.log.info("Someone is saying hello");
   });
 };

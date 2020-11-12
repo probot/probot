@@ -24,7 +24,7 @@ describe("Deprecations", () => {
 
     expect(output.length).toEqual(1);
     expect(output[0].msg).toContain(
-      `[probot] "createProbot(options)" is deprecated, use "new Probot(options)" instead`
+      '[probot] "createProbot(options)" is deprecated, use "new Probot(options)" instead'
     );
   });
 
@@ -36,7 +36,7 @@ describe("Deprecations", () => {
 
     expect(output.length).toEqual(1);
     expect(output[0].msg).toContain(
-      `[probot] "probot.webhook" is deprecated. Use "probot.webhooks" instead`
+      '[probot] "probot.webhook" is deprecated. Use "probot.webhooks" instead'
     );
   });
 
@@ -49,7 +49,7 @@ describe("Deprecations", () => {
 
     expect(output.length).toEqual(1);
     expect(output[0].msg).toContain(
-      `[probot] "cert" option is deprecated. Use "privateKey" instead`
+      '[probot] "cert" option is deprecated. Use "privateKey" instead'
     );
   });
 
@@ -59,7 +59,7 @@ describe("Deprecations", () => {
 
     expect(output.length).toEqual(2);
     expect(output[0].msg).toContain(
-      `[probot] "probot.logger" is deprecated. Use "probot.log" instead`
+      '[probot] "probot.logger" is deprecated. Use "probot.log" instead'
     );
   });
 
@@ -84,7 +84,7 @@ describe("Deprecations", () => {
 
     expect(output.length).toEqual(1);
     expect(output[0].msg).toContain(
-      `octokit.repos.createStatus() has been renamed to octokit.repos.createCommitStatus()`
+      "octokit.repos.createStatus() has been renamed to octokit.repos.createCommitStatus()"
     );
   });
 
@@ -129,7 +129,7 @@ describe("Deprecations", () => {
 
     expect(output.length).toEqual(1);
     expect(output[0].msg).toContain(
-      `[probot] "new Application({ throttleOptions })" is deprecated. Use "new Application({Octokit: ProbotOctokit.defaults({ throttle }) })" instead`
+      '[probot] "new Application({ throttleOptions })" is deprecated. Use "new Application({Octokit: ProbotOctokit.defaults({ throttle }) })" instead'
     );
   });
 
@@ -147,7 +147,7 @@ describe("Deprecations", () => {
     expect(console.warn).toHaveBeenCalledTimes(1);
     // @ts-ignore
     expect(console.warn.mock.calls[0][0]).toContain(
-      `Using the \"*\" event with the regular Webhooks.on() function is deprecated. Please use the Webhooks.onAny() method instead`
+      'Using the "*" event with the regular Webhooks.on() function is deprecated. Please use the Webhooks.onAny() method instead'
     );
   });
 
@@ -161,7 +161,31 @@ describe("Deprecations", () => {
 
     expect(output.length).toEqual(1);
     expect(output[0].msg).toContain(
-      `[probot] "(app) => {}" is deprecated. Use "({ app }) => {}" instead`
+      '[probot] "(app) => {}" is deprecated. Use "({ app }) => {}" instead'
+    );
+  });
+
+  it("app.router", () => {
+    const probot = new Probot({ log: pino(streamLogsToOutput) });
+    probot.load(({ app }) => {
+      expect(app.router).toBeInstanceOf(Function);
+    });
+
+    expect(output.length).toEqual(1);
+    expect(output[0].msg).toContain(
+      '[probot] "app.router" is deprecated, use "getRouter()" from the app function instead: "({ app, getRouter }) => { ... }"'
+    );
+  });
+
+  it("app.route", () => {
+    const probot = new Probot({ log: pino(streamLogsToOutput) });
+    probot.load(({ app }) => {
+      expect(app.route()).toBeInstanceOf(Function);
+    });
+
+    expect(output.length).toEqual(1);
+    expect(output[0].msg).toContain(
+      '[probot] "app.route()" is deprecated, use the "getRouter()" argument from the app function instead: "({ app, getRouter }) => { ... }"'
     );
   });
 });

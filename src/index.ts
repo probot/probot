@@ -270,6 +270,7 @@ export class Probot {
       appFn = resolveAppFunction(appFn) as ApplicationFunction;
     }
 
+    const router = express.Router();
     const app = new Application({
       id: this.state.id,
       privateKey: this.state.privateKey,
@@ -280,10 +281,11 @@ export class Probot {
       octokit: this.state.octokit,
       throttleOptions: this.throttleOptions,
       webhooks: this.webhooks,
+      router,
     });
 
     // Connect the router from the app to the server
-    this.server.use(app.router);
+    this.server.use(router);
 
     // Initialize the ApplicationFunction
     app.load(appFn);

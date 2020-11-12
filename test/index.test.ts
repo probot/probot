@@ -870,7 +870,7 @@ describe("Probot", () => {
   });
 
   describe("auth", () => {
-    it.only("throttleOptions", async () => {
+    it("throttleOptions", async () => {
       const probot = new Probot({
         Octokit: ProbotOctokit.plugin((octokit: any, options: any) => {
           return {

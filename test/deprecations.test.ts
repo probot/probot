@@ -244,4 +244,14 @@ describe("Deprecations", () => {
       `[probot] "context.github" is deprecated. Use "context.octokit" instead.`
     );
   });
+
+  it("INSTALLATION_TOKEN_TTL", () => {
+    process.env.INSTALLATION_TOKEN_TTL = "123";
+    new Probot({ log: pino(streamLogsToOutput) });
+    expect(output.length).toEqual(1);
+    expect(output[0].msg).toContain(
+      '[probot] "INSTALLATION_TOKEN_TTL" environment variable is no longer used. Tokens are renewed as needed at the time of the request now.'
+    );
+    delete process.env.INSTALLATION_TOKEN_TTL;
+  });
 });

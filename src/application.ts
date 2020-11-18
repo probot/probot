@@ -79,7 +79,6 @@ export class Application {
       `[probot] "import { Application } from 'probot'" is deprecated. Use "import { Probot } from 'probot'" instead, the APIs are the same.`
     );
 
-    // TODO: support redis backend for access token cache if `options.redisConfig || process.env.REDIS_URL`
     const cache =
       options.cache ||
       new LRUCache<number, string>({

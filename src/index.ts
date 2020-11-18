@@ -1,22 +1,23 @@
 // tslint:disable-next-line: no-var-requires
 require("dotenv").config();
 
+import { Server } from "http";
+
 import express from "express";
 import Redis from "ioredis";
 import LRUCache from "lru-cache";
 import { Deprecation } from "deprecation";
 import pinoHttp from "pino-http";
+import { getPrivateKey } from "@probot/get-private-key";
 
 import type { WebhookEvent, Webhooks } from "@octokit/webhooks";
 import type { Logger } from "pino";
 
-import { Server } from "http";
 import { Application } from "./application";
 import { setupAppFactory } from "./apps/setup";
 import { Context, WebhookPayloadWithRepository } from "./context";
 import { ProbotOctokit } from "./octokit/probot-octokit";
 import { getLog } from "./helpers/get-log";
-import { findPrivateKey } from "./helpers/get-private-key";
 import { resolveAppFunction } from "./helpers/resolve-app-function";
 import { createServer } from "./server/create-server";
 import { createWebhookProxy } from "./helpers/webhook-proxy";
@@ -110,7 +111,8 @@ export class Probot {
           .parse(appFn);
 
         return {
-          privateKey: findPrivateKey(program.privateKey) || undefined,
+          privateKey:
+            getPrivateKey({ filepath: program.privateKey }) || undefined,
           id: program.app,
           port: program.port,
           host: program.host,
@@ -119,7 +121,7 @@ export class Probot {
           webhookProxy: program.webhookProxy,
         };
       }
-      const privateKey = findPrivateKey();
+      const privateKey = getPrivateKey();
       return {
         privateKey: (privateKey && privateKey.toString()) || undefined,
         id: Number(process.env.APP_ID),

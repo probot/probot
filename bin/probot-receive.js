@@ -6,8 +6,8 @@ require("dotenv").config();
 const path = require("path");
 const uuid = require("uuid");
 const program = require("commander");
+const { getPrivateKey } = require("@probot/get-private-key");
 
-const { findPrivateKey } = require("../lib/helpers/get-private-key");
 const {
   logWarningsForObsoleteEnvironmentVariables,
 } = require("../lib/helpers/log-warnings-for-obsolete-environment-variables");
@@ -36,7 +36,7 @@ program
   .option(
     "-P, --private-key <file>",
     "Path to certificate of the GitHub App",
-    findPrivateKey
+    getPrivateKey
   )
   .parse(process.argv);
 
@@ -46,7 +46,7 @@ if (!program.event || !program.payloadPath) {
   program.help();
 }
 
-const privateKey = findPrivateKey();
+const privateKey = getPrivateKey();
 if (!githubToken && (!program.app || !privateKey)) {
   console.warn(
     "No token specified and no certificate found, which means you will not be able to do authenticated requests to GitHub"

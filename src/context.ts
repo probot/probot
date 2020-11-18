@@ -50,7 +50,7 @@ export interface WebhookPayloadWithRepository {
  *  };
  *  ```
  *
- * @property {github} github - A GitHub API client
+ * @property {octokit} octokit - An Octokit instance
  * @property {payload} payload - The webhook event payload
  * @property {logger} log - A logger
  */
@@ -60,25 +60,20 @@ export class Context<E extends WebhookPayloadWithRepository = any>
   public id: string;
   public payload: E;
 
-  public github: InstanceType<typeof ProbotOctokit>;
+  public octokit: InstanceType<typeof ProbotOctokit>;
   public log: DeprecatedLogger;
 
   constructor(
     event: WebhookEvent<E>,
-    github: InstanceType<typeof ProbotOctokit>,
+    octokit: InstanceType<typeof ProbotOctokit>,
     log: Logger
   ) {
     this.name = event.name;
     this.id = event.id;
     this.payload = event.payload;
 
-    this.github = github;
+    this.octokit = octokit;
     this.log = aliasLog(log);
-  }
-
-  // Maintain backward compatibility
-  public get event(): string {
-    return this.name;
   }
 
   /**
@@ -181,8 +176,8 @@ export class Context<E extends WebhookPayloadWithRepository = any>
    * const config = await context.config('config.yml')
    *
    * if (config.close) {
-   *   context.github.issues.comment(context.issue({body: config.comment}))
-   *   context.github.issues.edit(context.issue({state: 'closed'}))
+   *   context.octokit.issues.comment(context.issue({body: config.comment}))
+   *   context.octokit.issues.edit(context.issue({state: 'closed'}))
    * }
    * ```
    *
@@ -193,8 +188,8 @@ export class Context<E extends WebhookPayloadWithRepository = any>
    * const config = await context.config('config.yml', {comment: 'Make sure to check all the specs.'})
    *
    * if (config.close) {
-   *   context.github.issues.comment(context.issue({body: config.comment}));
-   *   context.github.issues.edit(context.issue({state: 'closed'}))
+   *   context.octokit.issues.comment(context.issue({body: config.comment}));
+   *   context.octokit.issues.edit(context.issue({state: 'closed'}))
    * }
    * ```
    *
@@ -205,7 +200,7 @@ export class Context<E extends WebhookPayloadWithRepository = any>
    * changes made in pull requests from different branches or forks are ignored.
    *
    * If you need more lower-level control over reading and merging configuration files,
-   * you can `context.github.config.get(options)`, see https://github.com/probot/octokit-plugin-config.
+   * you can `context.octokit.config.get(options)`, see https://github.com/probot/octokit-plugin-config.
    *
    * @param fileName - Name of the YAML file in the `.github` directory
    * @param defaultConfig - An object of default config options
@@ -230,7 +225,7 @@ export class Context<E extends WebhookPayloadWithRepository = any>
     });
 
     // @ts-ignore
-    const { config, files } = await this.github.config.get(params);
+    const { config, files } = await this.octokit.config.get(params);
 
     // if no default config is set, and no config files are found, return null
     if (!defaultConfig && !files.find((file: any) => file.config !== null)) {
@@ -238,5 +233,25 @@ export class Context<E extends WebhookPayloadWithRepository = any>
     }
 
     return config as T;
+  }
+
+  /**
+   * @deprecated `context.event` is deprecated, use `context.name` instead.
+   */
+  public get event() {
+    this.log.warn(
+      `[probot] "context.event" is deprecated. Use "context.name" instead.`
+    );
+    return this.name;
+  }
+
+  /**
+   * @deprecated `context.github` is deprecated. Use `context.octokit` instead.
+   */
+  public get github() {
+    this.log.warn(
+      `[probot] "context.github" is deprecated. Use "context.octokit" instead.`
+    );
+    return this.octokit;
   }
 }

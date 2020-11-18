@@ -3,7 +3,15 @@ import Stream from "stream";
 import { Webhooks } from "@octokit/webhooks";
 import pino from "pino";
 
-import { Application, createProbot, Probot, ProbotOctokit } from "../src";
+import {
+  Application,
+  createProbot,
+  Probot,
+  ProbotOctokit,
+  Context,
+} from "../src";
+
+const pushEvent = require("./fixtures/webhook/push.json");
 
 describe("Deprecations", () => {
   let output: any;
@@ -190,17 +198,6 @@ describe("Deprecations", () => {
   });
 
   it("Application", () => {
-    // const testLog = pino(streamLogsToOutput);
-    // const log = ({
-    //   fatal: testLog.fatal.bind(testLog),
-    //   error: testLog.error.bind(testLog),
-    //   warn: testLog.warn.bind(testLog),
-    //   info: testLog.info.bind(testLog),
-    //   debug: testLog.debug.bind(testLog),
-    //   trace: testLog.trace.bind(testLog),
-    //   child: () => log,
-    // } as unknown) as pino.Logger;
-
     new Application({
       secret: "secret",
       id: 1,
@@ -215,6 +212,36 @@ describe("Deprecations", () => {
     expect(output.length).toEqual(1);
     expect(output[0].msg).toContain(
       `[probot] "import { Application } from 'probot'" is deprecated. Use "import { Probot } from 'probot'" instead, the APIs are the same.`
+    );
+  });
+
+  it("context.event", () => {
+    const octokit = new ProbotOctokit({});
+    const context = new Context(
+      { name: "push", id: "1", payload: pushEvent },
+      octokit,
+      pino(streamLogsToOutput)
+    );
+
+    expect(context.event).toEqual("push");
+    expect(output.length).toEqual(1);
+    expect(output[0].msg).toContain(
+      `[probot] "context.event" is deprecated. Use "context.name" instead.`
+    );
+  });
+
+  it("context.github", () => {
+    const octokit = new ProbotOctokit({});
+    const context = new Context(
+      { name: "push", id: "1", payload: pushEvent },
+      octokit,
+      pino(streamLogsToOutput)
+    );
+
+    expect(context.github).toBeInstanceOf(ProbotOctokit);
+    expect(output.length).toEqual(1);
+    expect(output[0].msg).toContain(
+      `[probot] "context.github" is deprecated. Use "context.octokit" instead.`
     );
   });
 });

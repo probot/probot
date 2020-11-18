@@ -31,11 +31,6 @@ describe("Context", () => {
     expect(context.payload).toBe(event.payload);
   });
 
-  it("aliases the event name", () => {
-    expect(context.name).toEqual("push");
-    expect(context.event).toEqual("push");
-  });
-
   describe("repo", () => {
     it("returns attributes from repository payload", () => {
       expect(context.repo()).toEqual({ owner: "bkeepers", repo: "probot" });
@@ -135,7 +130,7 @@ describe("Context", () => {
   });
 
   describe("config", () => {
-    let github: InstanceType<typeof ProbotOctokit>;
+    let octokit: InstanceType<typeof ProbotOctokit>;
 
     function nockConfigResponseDataFile(fileName: string) {
       const configPath = path.join(__dirname, "fixtures", "config", fileName);
@@ -143,11 +138,11 @@ describe("Context", () => {
     }
 
     beforeEach(() => {
-      github = new ProbotOctokit({
+      octokit = new ProbotOctokit({
         retry: { enabled: false },
         throttle: { enabled: false },
       });
-      context = new Context(event, github, {} as any);
+      context = new Context(event, octokit, {} as any);
     });
 
     it("gets a valid configuration", async () => {

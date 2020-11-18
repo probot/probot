@@ -1,6 +1,5 @@
 import execa from "execa";
 import getPort from "get-port";
-// import nock from 'nock'
 
 import { sign } from "@octokit/webhooks";
 import bodyParser from "body-parser";

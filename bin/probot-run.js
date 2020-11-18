@@ -1,5 +1,3 @@
 #!/usr/bin/env node
 
-const { Probot } = require('../')
-
-Probot.run(process.argv)
+require("../lib/bin/probot-run");

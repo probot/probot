@@ -20,6 +20,7 @@ export interface Options {
   redisConfig?: Redis.RedisOptions;
   secret?: string;
   webhookPath?: string;
+  logLevel?: "trace" | "debug" | "info" | "warn" | "error" | "fatal";
 
   // Probot class-specific options
   /**

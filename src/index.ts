@@ -4,16 +4,13 @@ import { Logger } from "pino";
 import { Application } from "./application";
 import { Context, WebhookPayloadWithRepository } from "./context";
 import { getLog } from "./helpers/get-log";
-import { logWarningsForObsoleteEnvironmentVariables } from "./helpers/log-warnings-for-obsolete-environment-variables";
 import { Options } from "./types";
 import { Probot } from "./probot";
 import { ProbotOctokit } from "./octokit/probot-octokit";
 import { run } from "./run";
 
-logWarningsForObsoleteEnvironmentVariables();
-
 export const createProbot = (options: Options) => {
-  options.log = options.log || getLog();
+  options.log = options.log || getLog(process.env.LOG_LEVEL);
   options.log.warn(
     new Deprecation(
       `[probot] "createProbot(options)" is deprecated, use "new Probot(options)" instead`

@@ -412,21 +412,14 @@ describe("Probot", () => {
     });
   });
 
-  describe("process.env.REDIS_URL", () => {
-    beforeEach(() => {
-      process.env.REDIS_URL = "test";
-    });
-
-    afterEach(() => {
-      delete process.env.REDIS_URL;
-    });
-
+  describe("options.redisConfig as string", () => {
     it("sets throttleOptions", async () => {
       expect.assertions(2);
 
       probot = new Probot({
         webhookPath: "/webhook",
         githubToken: "faketoken",
+        redisConfig: "test",
         Octokit: ProbotOctokit.plugin((octokit, options) => {
           expect(options.throttle.Bottleneck).toBe(Bottleneck);
           expect(options.throttle.connection).toBeInstanceOf(

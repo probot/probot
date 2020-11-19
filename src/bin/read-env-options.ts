@@ -16,5 +16,6 @@ export function readEnvOptions() {
     logFormat: process.env.LOG_FORMAT as PinoOptions["logFormat"],
     logLevelInString: process.env.LOG_LEVEL_IN_STRING === "true",
     sentryDsn: process.env.SENTRY_DSN,
+    redisConfig: process.env.REDIS_URL,
   };
 }

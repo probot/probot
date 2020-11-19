@@ -31,7 +31,7 @@ export function readCliOptions(argv: string[]): Options & PinoOptions {
     )
     .option(
       "-P, --private-key <file>",
-      "Path to certificate of the GitHub App",
+      "Path to private key file (.pem) for the GitHub App",
       process.env.PRIVATE_KEY_PATH
     )
     .option(
@@ -54,13 +54,19 @@ export function readCliOptions(argv: string[]): Options & PinoOptions {
       'Set to your Sentry DSN, e.g. "https://1234abcd@sentry.io/12345"',
       process.env.SENTRY_DSN
     )
+    .option(
+      "--redis-url <url>",
+      'Set to a "redis://" url in order to enable cluster support for request throttling. Example: "redis://:secret@redis-123.redislabs.com:12345/0"',
+      process.env.REDIS_URL
+    )
     .parse(argv);
 
-  const { app: id, privateKey: privateKeyPath, ...options } = program;
+  const { app: id, privateKey: privateKeyPath, redisUrl, ...options } = program;
 
   return {
     privateKey: getPrivateKey({ filepath: privateKeyPath }) || undefined,
     id,
+    redisConfig: redisUrl,
     ...options,
   };
 }

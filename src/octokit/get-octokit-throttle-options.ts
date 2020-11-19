@@ -1,20 +1,32 @@
 import Bottleneck from "bottleneck";
 import Redis from "ioredis";
-import type { Logger } from "pino";
+import { Logger } from "pino";
+import { Deprecation } from "deprecation";
 
 type Options = {
   log: Logger;
-  redisConfig?: Redis.RedisOptions;
+  redisConfig?: Redis.RedisOptions | string;
 };
 
 export function getOctokitThrottleOptions(options: Options) {
-  if (!options.redisConfig && !process.env.REDIS_URL) return;
+  let { log, redisConfig } = options;
+
+  if (!redisConfig && process.env.REDIS_URL) {
+    redisConfig = process.env.REDIS_URL;
+    log.warn(
+      new Deprecation(
+        `[probot] "REDIS_URL" is deprecated when using with the Probot constructor. Use "new Probot({ redisConfig: 'redis://...' })" instead`
+      )
+    );
+  }
+
+  if (!redisConfig) return;
 
   const connection = new Bottleneck.IORedisConnection({
-    client: getRedisClient(options.redisConfig),
+    client: getRedisClient(options),
   });
   connection.on("error", (error) => {
-    options.log.error(Object.assign(error, { source: "bottleneck" }));
+    log.error(Object.assign(error, { source: "bottleneck" }));
   });
 
   return {
@@ -23,7 +35,6 @@ export function getOctokitThrottleOptions(options: Options) {
   };
 }
 
-function getRedisClient(redisConfig?: Redis.RedisOptions): Redis.Redis | void {
-  if (redisConfig) return new Redis(redisConfig);
-  if (process.env.REDIS_URL) return new Redis(process.env.REDIS_URL);
+function getRedisClient({ log, redisConfig }: Options): Redis.Redis | void {
+  if (redisConfig) return new Redis(redisConfig as Redis.RedisOptions);
 }

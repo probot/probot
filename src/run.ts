@@ -2,85 +2,30 @@ require("dotenv").config();
 
 import pkgConf from "pkg-conf";
 import program from "commander";
-import { getPrivateKey } from "@probot/get-private-key";
 
-import { ApplicationFunction, Options } from "./types";
+import { ApplicationFunction } from "./types";
 import { Probot } from "./index";
 import { setupAppFactory } from "./apps/setup";
 import { logWarningsForObsoleteEnvironmentVariables } from "./helpers/log-warnings-for-obsolete-environment-variables";
+import { getLog } from "./helpers/get-log";
+import { readCliOptions } from "./bin/read-cli-options";
+import { readEnvOptions } from "./bin/read-env-options";
 
-export async function run(appFn: ApplicationFunction | string[]) {
-  logWarningsForObsoleteEnvironmentVariables();
+export async function run(appFnOrArgv: ApplicationFunction | string[]) {
+  const {
+    logLevel: level,
+    logFormat,
+    logLevelInString,
+    sentryDsn,
+    ...options
+  } = Array.isArray(appFnOrArgv)
+    ? readCliOptions(appFnOrArgv)
+    : readEnvOptions();
 
-  const readOptions = (): Options => {
-    if (Array.isArray(appFn)) {
-      program
-        .usage("[options] <apps...>")
-        .option(
-          "-p, --port <n>",
-          "Port to start the server on",
-          String(process.env.PORT || 3000)
-        )
-        .option(
-          "-H --host <host>",
-          "Host to start the server on",
-          process.env.HOST
-        )
-        .option(
-          "-W, --webhook-proxy <url>",
-          "URL of the webhook proxy service.`",
-          process.env.WEBHOOK_PROXY_URL
-        )
-        .option(
-          "-w, --webhook-path <path>",
-          "URL path which receives webhooks. Ex: `/webhook`",
-          process.env.WEBHOOK_PATH
-        )
-        .option("-a, --app <id>", "ID of the GitHub App", process.env.APP_ID)
-        .option(
-          "-s, --secret <secret>",
-          "Webhook secret of the GitHub App",
-          process.env.WEBHOOK_SECRET
-        )
-        .option(
-          "-P, --private-key <file>",
-          "Path to certificate of the GitHub App",
-          process.env.PRIVATE_KEY_PATH
-        )
-        .option(
-          "-L, --log-level <level>",
-          'One of: "trace" | "debug" | "info" | "warn" | "error" | "fatal"',
-          process.env.LOG_LEVEL
-        )
-        .parse(appFn);
+  const log = getLog({ level, logFormat, logLevelInString, sentryDsn });
+  logWarningsForObsoleteEnvironmentVariables(log);
 
-      return {
-        privateKey:
-          getPrivateKey({ filepath: program.privateKey }) || undefined,
-        id: program.app,
-        port: program.port,
-        host: program.host,
-        secret: program.secret,
-        webhookPath: program.webhookPath,
-        webhookProxy: program.webhookProxy,
-        logLevel: program.logLevel,
-      };
-    }
-
-    const privateKey = getPrivateKey();
-    return {
-      privateKey: (privateKey && privateKey.toString()) || undefined,
-      id: Number(process.env.APP_ID),
-      port: Number(process.env.PORT) || 3000,
-      host: process.env.HOST,
-      secret: process.env.WEBHOOK_SECRET,
-      webhookPath: process.env.WEBHOOK_PATH,
-      webhookProxy: process.env.WEBHOOK_PROXY_URL,
-    };
-  };
-
-  const options = readOptions();
-  const probot = new Probot(options);
+  const probot = new Probot({ log, ...options });
 
   if (!options.id || !options.privateKey) {
     if (process.env.NODE_ENV === "production") {
@@ -96,12 +41,12 @@ export async function run(appFn: ApplicationFunction | string[]) {
         );
       }
     }
-    probot.load(setupAppFactory(probot.options.host, probot.options.port));
-  } else if (Array.isArray(appFn)) {
+    probot.load(setupAppFactory(options.host, options.port));
+  } else if (Array.isArray(appFnOrArgv)) {
     const pkg = await pkgConf("probot");
     probot.setup(program.args.concat((pkg.apps as string[]) || []));
   } else {
-    probot.load(appFn);
+    probot.load(appFnOrArgv);
   }
   probot.start();
 

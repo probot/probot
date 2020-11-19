@@ -6,11 +6,10 @@ import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import program from "commander";
 import { getPrivateKey } from "@probot/get-private-key";
+import { getLog } from "../helpers/get-log";
 
 import { Probot } from "../";
 import { logWarningsForObsoleteEnvironmentVariables } from "../helpers/log-warnings-for-obsolete-environment-variables";
-
-logWarningsForObsoleteEnvironmentVariables();
 
 program
   .usage("[options] [path/to/app.js...]")
@@ -40,6 +39,21 @@ program
     'One of: "trace" | "debug" | "info" | "warn" | "error" | "fatal"',
     process.env.LOG_LEVEL
   )
+  .option(
+    "--log-format <format>",
+    'One of: "pretty", "json"',
+    process.env.LOG_LEVEL || "pretty"
+  )
+  .option(
+    "--log-level-in-string",
+    "Set to log levels (trace, debug, info, ...) as words instead of numbers (10, 20, 30, ...)",
+    process.env.LOG_LEVEL_IN_STRING === "true"
+  )
+  .option(
+    "--sentry-dsn <dsn>",
+    'Set to your Sentry DSN, e.g. "https://1234abcd@sentry.io/12345"',
+    process.env.SENTRY_DSN
+  )
   .parse(process.argv);
 
 const githubToken = program.token;
@@ -56,12 +70,19 @@ if (!githubToken && (!program.app || !privateKey)) {
 }
 
 const payload = require(path.resolve(program.payloadPath));
+const log = getLog({
+  level: program.logLevel,
+  logFormat: program.logFormat,
+  logLevelInString: program.logLevelInString,
+  sentryDsn: program.sentryDsn,
+});
+logWarningsForObsoleteEnvironmentVariables(log);
 
 const probot = new Probot({
   id: program.app,
   privateKey: String(privateKey),
   githubToken: githubToken,
-  logLevel: program.logLevel,
+  log,
 });
 
 probot.setup(program.args);

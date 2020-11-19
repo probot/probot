@@ -1,8 +1,6 @@
-import { getLog } from "./get-log";
+import { Logger } from "pino";
 
-export function logWarningsForObsoleteEnvironmentVariables() {
-  const log = getLog({ level: process.env.LOG_LEVEL });
-
+export function logWarningsForObsoleteEnvironmentVariables(log: Logger) {
   // TODO: remove deprecation warning in v11
   if ("DISABLE_STATS" in process.env) {
     // tslint:disable:no-console

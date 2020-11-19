@@ -2,9 +2,9 @@ import { Router } from "express";
 import Redis from "ioredis";
 import LRUCache from "lru-cache";
 import { Deprecation } from "deprecation";
-
-import type { Webhooks } from "@octokit/webhooks";
-import type { Logger } from "pino";
+import { Webhooks } from "@octokit/webhooks";
+import { Logger } from "pino";
+import { LogLevel } from "@probot/pino";
 
 import { Context } from "./context";
 import { ProbotOctokit } from "./octokit/probot-octokit";
@@ -74,7 +74,7 @@ export class Application {
 
   constructor(options: Options) {
     this.log = aliasLog(
-      options.log || getLog({ level: process.env.LOG_LEVEL })
+      options.log || getLog({ level: process.env.LOG_LEVEL as LogLevel })
     );
 
     this.log.warn(

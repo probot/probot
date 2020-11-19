@@ -71,6 +71,7 @@ exports[`Probot run runs with an array of strings 1`] = `
 Object {
   "host": undefined,
   "id": "1",
+  "logLevel": "fatal",
   "port": "3000",
   "privateKey": "-----BEGIN RSA PRIVATE KEY-----
 MIIJKAIBAAKCAgEAu0E+tR6wfOAJZ4lASzRUmvorCgbI5nQyvZl3WLu6ko2pcEnq

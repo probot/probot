@@ -16,6 +16,7 @@ const pushEvent = require("./fixtures/webhook/push.json");
 
 describe("Deprecations", () => {
   let output: any;
+  let env: any;
 
   const streamLogsToOutput = new Stream.Writable({ objectMode: true });
   streamLogsToOutput._write = (object, encoding, done) => {
@@ -25,6 +26,11 @@ describe("Deprecations", () => {
 
   beforeEach(() => {
     output = [];
+
+    env = { ...process.env };
+  });
+  afterEach(() => {
+    process.env = env;
   });
 
   it("createProbot", () => {
@@ -253,13 +259,11 @@ describe("Deprecations", () => {
     expect(output[0].msg).toContain(
       '[probot] "INSTALLATION_TOKEN_TTL" environment variable is no longer used. Tokens are renewed as needed at the time of the request now.'
     );
-    delete process.env.INSTALLATION_TOKEN_TTL;
   });
 
   it("Probot.run()", async () => {
     let initialized = false;
 
-    const env = { ...process.env };
     process.env.APP_ID = "1";
     process.env.PRIVATE_KEY_PATH = join(__dirname, "test-private-key.pem");
     process.env.WEBHOOK_PROXY_URL = "https://smee.io/EfHXC9BFfGAxbM6J";
@@ -271,6 +275,14 @@ describe("Deprecations", () => {
     expect(initialized).toBeTruthy();
 
     probot.stop();
-    process.env = env;
+  });
+
+  it("LOG_LEVEL and Probot constructor", () => {
+    process.env.LOG_LEVEL = "debug";
+    const probot = new Probot({});
+    // passing { log: pino(streamLogsToOutput) } disables the deprecation message,
+    // so this is just a reminder
+
+    expect(probot.log.level).toEqual("debug");
   });
 });

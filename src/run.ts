@@ -7,8 +7,11 @@ import { getPrivateKey } from "@probot/get-private-key";
 import { ApplicationFunction, Options } from "./types";
 import { Probot } from "./index";
 import { setupAppFactory } from "./apps/setup";
+import { logWarningsForObsoleteEnvironmentVariables } from "./helpers/log-warnings-for-obsolete-environment-variables";
 
 export async function run(appFn: ApplicationFunction | string[]) {
+  logWarningsForObsoleteEnvironmentVariables();
+
   const readOptions = (): Options => {
     if (Array.isArray(appFn)) {
       program
@@ -44,6 +47,11 @@ export async function run(appFn: ApplicationFunction | string[]) {
           "Path to certificate of the GitHub App",
           process.env.PRIVATE_KEY_PATH
         )
+        .option(
+          "-L, --log-level <level>",
+          'One of: "trace" | "debug" | "info" | "warn" | "error" | "fatal"',
+          process.env.LOG_LEVEL
+        )
         .parse(appFn);
 
       return {
@@ -55,6 +63,7 @@ export async function run(appFn: ApplicationFunction | string[]) {
         secret: program.secret,
         webhookPath: program.webhookPath,
         webhookProxy: program.webhookProxy,
+        logLevel: program.logLevel,
       };
     }
 

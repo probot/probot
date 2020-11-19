@@ -35,6 +35,11 @@ program
     "Path to certificate of the GitHub App",
     process.env.PRIVATE_KEY_PATH
   )
+  .option(
+    "-L, --log-level <level>",
+    'One of: "trace" | "debug" | "info" | "warn" | "error" | "fatal"',
+    process.env.LOG_LEVEL
+  )
   .parse(process.argv);
 
 const githubToken = program.token;
@@ -56,6 +61,7 @@ const probot = new Probot({
   id: program.app,
   privateKey: String(privateKey),
   githubToken: githubToken,
+  logLevel: program.logLevel,
 });
 
 probot.setup(program.args);

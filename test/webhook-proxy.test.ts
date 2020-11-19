@@ -46,7 +46,7 @@ describe("webhook-proxy", () => {
           url,
           port: targetPort,
           path: "/test",
-          logger: getLog(),
+          logger: getLog("fatal"),
         })!;
 
         // Wait for proxy to be ready
@@ -74,7 +74,7 @@ describe("webhook-proxy", () => {
     const url = "http://bad.proxy/events";
     nock("http://bad.proxy").get("/events").reply(404);
 
-    const log = getLog().child({});
+    const log = getLog("fatal").child({});
     log.error = jest.fn();
 
     proxy = createWebhookProxy({ url, logger: log })!;

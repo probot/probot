@@ -35,7 +35,7 @@ const defaultAppFns: ApplicationFunction[] = [defaultApp];
 
 export class Probot {
   public static async run(appFn: ApplicationFunction | string[]) {
-    const log = getLog();
+    const log = getLog(process.env.LOG_LEVEL);
     log.warn(
       new Deprecation(
         '[probot] "Probot.run" is deprecate. Import { run } from "probot" instead'
@@ -104,7 +104,19 @@ export class Probot {
     options.webhookPath = options.webhookPath || "/";
     options.secret = options.secret || "development";
 
-    this.log = aliasLog(options.log || getLog());
+    let logEnvVariableDeprecation;
+    let level = options.logLevel;
+    if (!options.log && !level && process.env.LOG_LEVEL) {
+      logEnvVariableDeprecation =
+        '[probot] "LOG_LEVEL" environment variable is deprecated. Use "new Probot({ logLevel })" instead';
+      level = process.env.LOG_LEVEL as Options["logLevel"];
+    }
+
+    this.log = aliasLog(options.log || getLog(level));
+
+    if (logEnvVariableDeprecation) {
+      this.log.warn(logEnvVariableDeprecation);
+    }
 
     if (options.cert) {
       this.log.warn(

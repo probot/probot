@@ -73,7 +73,9 @@ export class Application {
   private internalRouter: Router;
 
   constructor(options: Options) {
-    this.log = aliasLog(options.log || getLog(process.env.LOG_LEVEL));
+    this.log = aliasLog(
+      options.log || getLog({ level: process.env.LOG_LEVEL })
+    );
 
     this.log.warn(
       `[probot] "import { Application } from 'probot'" is deprecated. Use "import { Probot } from 'probot'" instead, the APIs are the same.`

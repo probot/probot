@@ -1,7 +1,7 @@
 import { getLog } from "./get-log";
 
 export function logWarningsForObsoleteEnvironmentVariables() {
-  const log = getLog(process.env.LOG_LEVEL);
+  const log = getLog({ level: process.env.LOG_LEVEL });
 
   // TODO: remove deprecation warning in v11
   if ("DISABLE_STATS" in process.env) {

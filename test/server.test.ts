@@ -9,7 +9,7 @@ describe("server", () => {
 
   beforeEach(() => {
     webhook = jest.fn((req, res, next) => next());
-    server = createServer({ webhook, logger: getLog("fatal") });
+    server = createServer({ webhook, logger: getLog({ level: "fatal" }) });
 
     // Error handler to avoid printing logs
     server.use(

@@ -277,12 +277,25 @@ describe("Deprecations", () => {
     probot.stop();
   });
 
-  it("LOG_LEVEL and Probot constructor", () => {
+  it("LOG_LEVEL/LOG_FORMAT/LOG_LEVEL_IN_STRING/SENTRY_DSN and Probot constructor", () => {
     process.env.LOG_LEVEL = "debug";
+    process.env.LOG_FORMAT = "pretty";
+    process.env.LOG_LEVEL_IN_STRING = "true";
+    process.env.SENTRY_DSN = "https://1234abcd@sentry.io/12345";
     const probot = new Probot({});
     // passing { log: pino(streamLogsToOutput) } disables the deprecation message,
     // so this is just a reminder
 
     expect(probot.log.level).toEqual("debug");
+  });
+
+  it("REDIS_URL and Probot construtor", () => {
+    process.env.REDIS_URL = "test";
+    new Probot({ log: pino(streamLogsToOutput) });
+
+    expect(output.length).toEqual(1);
+    expect(output[0].msg).toContain(
+      `[probot] "REDIS_URL" is deprecated when using with the Probot constructor. Use "new Probot({ redisConfig: 'redis://...' })" instead`
+    );
   });
 });

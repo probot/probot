@@ -31,7 +31,7 @@ program
   .option("-a, --app <id>", "ID of the GitHub App", process.env.APP_ID)
   .option(
     "-P, --private-key <file>",
-    "Path to certificate of the GitHub App",
+    "Path to private key file (.pem) for the GitHub App",
     process.env.PRIVATE_KEY_PATH
   )
   .option(

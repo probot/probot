@@ -17,7 +17,7 @@ export interface Options {
   id?: number;
   Octokit?: typeof ProbotOctokit;
   log?: Logger;
-  redisConfig?: Redis.RedisOptions;
+  redisConfig?: Redis.RedisOptions | string;
   secret?: string;
   webhookPath?: string;
   logLevel?: "trace" | "debug" | "info" | "warn" | "error" | "fatal";

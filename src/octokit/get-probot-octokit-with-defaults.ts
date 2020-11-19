@@ -13,7 +13,7 @@ type Options = {
   githubToken?: string;
   appId?: number;
   privateKey?: string;
-  redisConfig?: Redis.RedisOptions;
+  redisConfig?: Redis.RedisOptions | string;
   throttleOptions?: any;
 };
 

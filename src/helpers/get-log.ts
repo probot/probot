@@ -41,9 +41,9 @@ export function getLog(options: GetLogOptions = { level: "info" }) {
   const log = pino(pinoOptions, transform);
 
   if (deprecated.length) {
-    log.warn(`[probot] ${deprecated.join(
+    log.warn(`[probot] Using the following environment variable(s) with the Probot constructor is deprecated: ${deprecated.join(
       ", "
-    )} environment variable is deprecated. Pass a custom log instance instead
+    )}. Pass a custom log instance instead:
       
 import { Probot } from "probot";
 import pino from "pino";

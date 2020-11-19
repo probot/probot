@@ -4,17 +4,14 @@ require("dotenv").config();
 import { Server } from "http";
 
 import express from "express";
-import Redis from "ioredis";
 import LRUCache from "lru-cache";
 import { Deprecation } from "deprecation";
 import pinoHttp from "pino-http";
-import { getPrivateKey } from "@probot/get-private-key";
 
 import type { WebhookEvent, Webhooks } from "@octokit/webhooks";
 import type { Logger } from "pino";
 
 import { Application } from "./application";
-import { setupAppFactory } from "./apps/setup";
 import { Context, WebhookPayloadWithRepository } from "./context";
 import { ProbotOctokit } from "./octokit/probot-octokit";
 import { getLog } from "./helpers/get-log";
@@ -25,6 +22,7 @@ import { getErrorHandler } from "./helpers/get-error-handler";
 import {
   ApplicationFunction,
   DeprecatedLogger,
+  Options,
   ProbotWebhooks,
   State,
 } from "./types";
@@ -36,33 +34,10 @@ import { webhookEventCheck } from "./helpers/webhook-event-check";
 import { auth } from "./auth";
 import { load } from "./load";
 import { getRouter } from "./get-router";
+import { run } from "./run";
+import { VERSION } from "./version";
 
 logWarningsForObsoleteEnvironmentVariables();
-
-export interface Options {
-  // same options as Application class
-  privateKey?: string;
-  githubToken?: string;
-  id?: number;
-  Octokit?: typeof ProbotOctokit;
-  log?: Logger;
-  redisConfig?: Redis.RedisOptions;
-  secret?: string;
-  webhookPath?: string;
-
-  // Probot class-specific options
-  /**
-   * @deprecated `cert` options is deprecated. Use `privateKey` instead
-   */
-  cert?: string;
-  port?: number;
-  host?: string;
-  webhookProxy?: string;
-  /**
-   * @deprecated set `Octokit` to `ProbotOctokit.defaults({ throttle })` instead
-   */
-  throttleOptions?: any;
-}
 
 // tslint:disable:no-var-requires
 const defaultAppFns: ApplicationFunction[] = [require("./apps/default")];
@@ -70,96 +45,13 @@ const defaultAppFns: ApplicationFunction[] = [require("./apps/default")];
 
 export class Probot {
   public static async run(appFn: ApplicationFunction | string[]) {
-    const pkgConf = require("pkg-conf");
-    const program = require("commander");
-
-    const readOptions = (): Options => {
-      if (Array.isArray(appFn)) {
-        program
-          .usage("[options] <apps...>")
-          .option(
-            "-p, --port <n>",
-            "Port to start the server on",
-            process.env.PORT || 3000
-          )
-          .option(
-            "-H --host <host>",
-            "Host to start the server on",
-            process.env.HOST
-          )
-          .option(
-            "-W, --webhook-proxy <url>",
-            "URL of the webhook proxy service.`",
-            process.env.WEBHOOK_PROXY_URL
-          )
-          .option(
-            "-w, --webhook-path <path>",
-            "URL path which receives webhooks. Ex: `/webhook`",
-            process.env.WEBHOOK_PATH
-          )
-          .option("-a, --app <id>", "ID of the GitHub App", process.env.APP_ID)
-          .option(
-            "-s, --secret <secret>",
-            "Webhook secret of the GitHub App",
-            process.env.WEBHOOK_SECRET
-          )
-          .option(
-            "-P, --private-key <file>",
-            "Path to certificate of the GitHub App",
-            process.env.PRIVATE_KEY_PATH
-          )
-          .parse(appFn);
-
-        return {
-          privateKey:
-            getPrivateKey({ filepath: program.privateKey }) || undefined,
-          id: program.app,
-          port: program.port,
-          host: program.host,
-          secret: program.secret,
-          webhookPath: program.webhookPath,
-          webhookProxy: program.webhookProxy,
-        };
-      }
-      const privateKey = getPrivateKey();
-      return {
-        privateKey: (privateKey && privateKey.toString()) || undefined,
-        id: Number(process.env.APP_ID),
-        port: Number(process.env.PORT) || 3000,
-        host: process.env.HOST,
-        secret: process.env.WEBHOOK_SECRET,
-        webhookPath: process.env.WEBHOOK_PATH,
-        webhookProxy: process.env.WEBHOOK_PROXY_URL,
-      };
-    };
-
-    const options = readOptions();
-    const probot = new Probot(options);
-
-    if (!options.id || !options.privateKey) {
-      if (process.env.NODE_ENV === "production") {
-        if (!options.id) {
-          throw new Error(
-            "Application ID is missing, and is required to run in production mode. " +
-              "To resolve, ensure the APP_ID environment variable is set."
-          );
-        } else if (!options.privateKey) {
-          throw new Error(
-            "Certificate is missing, and is required to run in production mode. " +
-              "To resolve, ensure either the PRIVATE_KEY or PRIVATE_KEY_PATH environment variable is set and contains a valid certificate"
-          );
-        }
-      }
-      probot.load(setupAppFactory(probot.options.host, probot.options.port));
-    } else if (Array.isArray(appFn)) {
-      const pkg = await pkgConf("probot");
-      probot.setup(program.args.concat(pkg.apps || []));
-    } else {
-      probot.load(appFn);
-    }
-    probot.start();
-
-    return probot;
+    const log = getLog();
+    log.warn(
+      new Deprecation(
+        '[probot] "Probot.run" is deprecate. Import { run } from "probot" instead'
+      )
+    );
+    return run(appFn);
   }
 
   public server: express.Application;
@@ -297,8 +189,7 @@ export class Probot {
       logger: this.log,
     });
 
-    const { version } = require("../package.json");
-    this.version = version;
+    this.version = VERSION;
 
     // TODO: remove once Application class was removed
     this.internalRouter = express.Router();
@@ -443,7 +334,7 @@ export const createProbot = (options: Options) => {
   return new Probot(options);
 };
 
-export { Logger, Context, Application, ProbotOctokit };
+export { Logger, Context, Application, ProbotOctokit, Options, run };
 
 /** NOTE: exported types might change at any point in time */
 export { WebhookPayloadWithRepository };

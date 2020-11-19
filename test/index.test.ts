@@ -7,7 +7,7 @@ import request = require("supertest");
 import nock from "nock";
 import pino from "pino";
 
-import { Probot, ProbotOctokit, Context } from "../src";
+import { Probot, ProbotOctokit, Context, run } from "../src";
 
 import path = require("path");
 import { WebhookEvents } from "@octokit/webhooks";
@@ -98,7 +98,7 @@ describe("Probot", () => {
     it("runs with a function as argument", async () => {
       let initialized = false;
 
-      probot = await Probot.run(({ app }) => {
+      probot = await run(({ app }) => {
         initialized = true;
       });
       expect(probot.options).toMatchSnapshot();
@@ -107,7 +107,7 @@ describe("Probot", () => {
     });
 
     it("runs with an array of strings", async () => {
-      probot = await Probot.run(["run", "file.js"]);
+      probot = await run(["run", "file.js"]);
       expect(probot.options).toMatchSnapshot();
       probot.stop();
     });
@@ -116,7 +116,7 @@ describe("Probot", () => {
       process.env.REDIS_URL = "redis://test:test@localhost:6379";
 
       await new Promise(async (resolve, reject) => {
-        const probot = await Probot.run(({ app }) => {
+        const probot = await run(({ app }) => {
           app.auth(1).then(resolve, reject);
         });
         probot.stop();
@@ -129,7 +129,7 @@ describe("Probot", () => {
       process.env.PORT = "3003";
 
       return new Promise(async (resolve) => {
-        probot = await Probot.run(({ app }) => {
+        probot = await run(({ app }) => {
           initialized = true;
         });
         expect(probot.options).toMatchSnapshot();
@@ -142,7 +142,7 @@ describe("Probot", () => {
 
     it("has version", async () => {
       return new Promise(async (resolve) => {
-        probot = await Probot.run(({ app }) => {});
+        probot = await run(({ app }) => {});
         expect(probot.version).toBe("0.0.0-development");
         probot.stop();
 

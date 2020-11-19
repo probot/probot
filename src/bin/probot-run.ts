@@ -1,3 +1,3 @@
-import { Probot } from "../";
+import { run } from "../";
 
-Probot.run(process.argv);
+run(process.argv);

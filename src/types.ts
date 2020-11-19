@@ -1,6 +1,7 @@
 import express from "express";
 import { WebhookEvent, Webhooks } from "@octokit/webhooks";
 import LRUCache from "lru-cache";
+import Redis from "ioredis";
 
 import { Probot } from "./index";
 import { Context } from "./context";
@@ -8,6 +9,31 @@ import { ProbotOctokit } from "./octokit/probot-octokit";
 import { Application } from "./application";
 
 import type { Logger, LogFn } from "pino";
+
+export interface Options {
+  // same options as Application class
+  privateKey?: string;
+  githubToken?: string;
+  id?: number;
+  Octokit?: typeof ProbotOctokit;
+  log?: Logger;
+  redisConfig?: Redis.RedisOptions;
+  secret?: string;
+  webhookPath?: string;
+
+  // Probot class-specific options
+  /**
+   * @deprecated `cert` options is deprecated. Use `privateKey` instead
+   */
+  cert?: string;
+  port?: number;
+  host?: string;
+  webhookProxy?: string;
+  /**
+   * @deprecated set `Octokit` to `ProbotOctokit.defaults({ throttle })` instead
+   */
+  throttleOptions?: any;
+}
 
 export type State = {
   id?: number;

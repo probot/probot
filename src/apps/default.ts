@@ -2,13 +2,13 @@ import path from "path";
 import express from "express";
 import { Probot } from "../index";
 
-export = ({
+export function defaultApp({
   app,
   getRouter,
 }: {
   app: Probot;
   getRouter: () => express.Router;
-}) => {
+}) {
   const router = getRouter();
 
   router.get("/probot", (req, res) => {
@@ -22,4 +22,4 @@ export = ({
     res.render("probot.hbs", pkg);
   });
   router.get("/", (req, res, next) => res.redirect("/probot"));
-};
+}

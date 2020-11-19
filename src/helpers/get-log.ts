@@ -18,7 +18,11 @@ import pino from "pino";
 import type { LoggerOptions } from "pino";
 import { getTransformStream } from "@probot/pino";
 
-export function getLog(level: string = "info") {
+type Options = {
+  level?: string;
+};
+
+export function getLog({ level }: Options = { level: "info" }) {
   const pinoOptions: LoggerOptions = { level, name: "probot" };
   const transform = getTransformStream();
   transform.pipe(pino.destination(1));

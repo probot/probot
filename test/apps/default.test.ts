@@ -1,6 +1,6 @@
 import request from "supertest";
 import { Probot } from "../../src";
-import defaultApp = require("../../src/apps/default");
+import { defaultApp } from "../../src/apps/default";
 
 describe("default app", () => {
   let probot: Probot;

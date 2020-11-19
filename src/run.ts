@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 import pkgConf from "pkg-conf";
 import program from "commander";
 import { getPrivateKey } from "@probot/get-private-key";

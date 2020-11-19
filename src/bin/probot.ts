@@ -2,6 +2,8 @@ import semver from "semver";
 import program from "commander";
 import updateNotifier from "update-notifier";
 
+require("dotenv").config();
+
 const pkg = require("../../package");
 
 if (!semver.satisfies(process.version, pkg.engines.node)) {

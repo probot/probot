@@ -1,4 +1,5 @@
 import Stream from "stream";
+import { join } from "path";
 
 import { Webhooks } from "@octokit/webhooks";
 import pino from "pino";
@@ -253,5 +254,23 @@ describe("Deprecations", () => {
       '[probot] "INSTALLATION_TOKEN_TTL" environment variable is no longer used. Tokens are renewed as needed at the time of the request now.'
     );
     delete process.env.INSTALLATION_TOKEN_TTL;
+  });
+
+  it("Probot.run()", async () => {
+    let initialized = false;
+
+    const env = { ...process.env };
+    process.env.APP_ID = "1";
+    process.env.PRIVATE_KEY_PATH = join(__dirname, "test-private-key.pem");
+    process.env.WEBHOOK_PROXY_URL = "https://smee.io/EfHXC9BFfGAxbM6J";
+    process.env.WEBHOOK_SECRET = "secret";
+
+    const probot = await Probot.run(({ app }) => {
+      initialized = true;
+    });
+    expect(initialized).toBeTruthy();
+
+    probot.stop();
+    process.env = env;
   });
 });

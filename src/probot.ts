@@ -6,6 +6,7 @@ import LRUCache from "lru-cache";
 import { Logger } from "pino";
 import pinoHttp from "pino-http";
 import { WebhookEvent, Webhooks } from "@octokit/webhooks";
+import { LogLevel, Options as PinoOptions } from "@probot/pino";
 
 import { aliasLog } from "./helpers/alias-log";
 import { auth } from "./auth";
@@ -35,7 +36,12 @@ const defaultAppFns: ApplicationFunction[] = [defaultApp];
 
 export class Probot {
   public static async run(appFn: ApplicationFunction | string[]) {
-    const log = getLog({ level: process.env.LOG_LEVEL });
+    const log = getLog({
+      level: process.env.LOG_LEVEL as LogLevel,
+      logFormat: process.env.LOG_FORMAT as PinoOptions["logFormat"],
+      logLevelInString: process.env.LOG_LEVEL_IN_STRING === "true",
+      sentryDsn: process.env.SENTRY_DSN,
+    });
     log.warn(
       new Deprecation(
         '[probot] "Probot.run" is deprecate. Import { run } from "probot" instead'
@@ -55,7 +61,6 @@ export class Probot {
   ) => Promise<InstanceType<typeof ProbotOctokit>>;
 
   // These need to be public for the tests to work.
-  public options: Options;
   public throttleOptions: any;
 
   private httpServer?: Server;
@@ -115,7 +120,7 @@ export class Probot {
     this.log = aliasLog(options.log || getLog({ level }));
 
     if (logEnvVariableDeprecation) {
-      this.log.warn(logEnvVariableDeprecation);
+      this.log.warn(new Deprecation(logEnvVariableDeprecation));
     }
 
     if (options.cert) {
@@ -165,6 +170,10 @@ export class Probot {
       },
       id: options.id,
       privateKey: options.privateKey,
+      host: options.host,
+      webhookPath: options.webhookPath,
+      port: options.port,
+      webhookProxy: options.webhookProxy,
     };
 
     this.auth = auth.bind(null, this.state);
@@ -195,9 +204,6 @@ export class Probot {
 
     // TODO: remove once Application class was removed
     this.internalRouter = express.Router();
-
-    // TODO: Refactor tests so we we can remove these
-    this.options = options;
   }
 
   /**
@@ -236,10 +242,7 @@ export class Probot {
 
   public setup(appFns: Array<string | ApplicationFunction>) {
     // Log all unhandled rejections
-    (process as NodeJS.EventEmitter).on(
-      "unhandledRejection",
-      getErrorHandler(this.log)
-    );
+    process.on("unhandledRejection", getErrorHandler(this.log));
 
     // Load the given appFns along with the default ones
     appFns.concat(defaultAppFns).forEach((appFn) => this.load(appFn));
@@ -256,18 +259,18 @@ export class Probot {
     this.log.info(
       `Running Probot v${this.version} (Node.js: ${process.version})`
     );
-    const port = this.options.port || 3000;
-    const { host } = this.options;
+    const port = this.state.port || 3000;
+    const { host, webhookPath, webhookProxy } = this.state;
     const printableHost = host ?? "localhost";
 
     this.httpServer = this.server
       .listen(port, ...((host ? [host] : []) as any), () => {
-        if (this.options.webhookProxy) {
+        if (webhookProxy) {
           createWebhookProxy({
             logger: this.log,
-            path: this.options.webhookPath,
-            port: this.options.port,
-            url: this.options.webhookProxy,
+            path: webhookPath,
+            port: port,
+            url: webhookProxy,
           });
         }
         this.log.info(`Listening on http://${printableHost}:${port}`);
@@ -275,7 +278,7 @@ export class Probot {
       .on("error", (error: NodeJS.ErrnoException) => {
         if (error.code === "EADDRINUSE") {
           this.log.error(
-            `Port ${this.options.port} is already in use. You can define the PORT environment variable to use a different port.`
+            `Port ${port} is already in use. You can define the PORT environment variable to use a different port.`
           );
         } else {
           this.log.error(error);

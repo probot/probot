@@ -21,15 +21,15 @@ export interface Options {
   secret?: string;
   webhookPath?: string;
   logLevel?: "trace" | "debug" | "info" | "warn" | "error" | "fatal";
+  port?: number;
+  host?: string;
+  webhookProxy?: string;
 
   // Probot class-specific options
   /**
    * @deprecated `cert` options is deprecated. Use `privateKey` instead
    */
   cert?: string;
-  port?: number;
-  host?: string;
-  webhookProxy?: string;
   /**
    * @deprecated set `Octokit` to `ProbotOctokit.defaults({ throttle })` instead
    */
@@ -48,6 +48,10 @@ export type State = {
     path?: string;
     secret?: string;
   };
+  port?: number;
+  host?: string;
+  webhookProxy?: string;
+  webhookPath?: string;
 };
 
 export type ProbotWebhooks = Webhooks<

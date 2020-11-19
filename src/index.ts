@@ -1,5 +1,6 @@
 import { Deprecation } from "deprecation";
 import { Logger } from "pino";
+import { LogLevel, Options as PinoOptions } from "@probot/pino";
 
 import { Application } from "./application";
 import { Context, WebhookPayloadWithRepository } from "./context";
@@ -10,7 +11,14 @@ import { ProbotOctokit } from "./octokit/probot-octokit";
 import { run } from "./run";
 
 export const createProbot = (options: Options) => {
-  options.log = options.log || getLog({ level: process.env.LOG_LEVEL });
+  options.log =
+    options.log ||
+    getLog({
+      level: process.env.LOG_LEVEL as LogLevel,
+      logFormat: process.env.LOG_FORMAT as PinoOptions["logFormat"],
+      logLevelInString: process.env.LOG_LEVEL_IN_STRING === "true",
+      sentryDsn: process.env.SENTRY_DSN,
+    });
   options.log.warn(
     new Deprecation(
       `[probot] "createProbot(options)" is deprecated, use "new Probot(options)" instead`

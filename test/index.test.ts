@@ -98,17 +98,15 @@ describe("Probot", () => {
     it("runs with a function as argument", async () => {
       let initialized = false;
 
-      probot = await run(({ app }) => {
+      probot = await run(() => {
         initialized = true;
       });
-      expect(probot.options).toMatchSnapshot();
       expect(initialized).toBeTruthy();
       probot.stop();
     });
 
     it("runs with an array of strings", async () => {
       probot = await run(["run", "file.js"]);
-      expect(probot.options).toMatchSnapshot();
       probot.stop();
     });
 
@@ -116,7 +114,7 @@ describe("Probot", () => {
       process.env.REDIS_URL = "redis://test:test@localhost:6379";
 
       await new Promise(async (resolve, reject) => {
-        const probot = await run(({ app }) => {
+        const probot = await run(({ app }: { app: Probot }) => {
           app.auth(1).then(resolve, reject);
         });
         probot.stop();
@@ -129,10 +127,9 @@ describe("Probot", () => {
       process.env.PORT = "3003";
 
       return new Promise(async (resolve) => {
-        probot = await run(({ app }) => {
+        probot = await run(({ app }: { app: Probot }) => {
           initialized = true;
         });
-        expect(probot.options).toMatchSnapshot();
         expect(initialized).toBeFalsy();
         probot.stop();
 
@@ -142,7 +139,7 @@ describe("Probot", () => {
 
     it("has version", async () => {
       return new Promise(async (resolve) => {
-        probot = await run(({ app }) => {});
+        probot = await run(({ app }: { app: Probot }) => {});
         expect(probot.version).toBe("0.0.0-development");
         probot.stop();
 
@@ -343,7 +340,7 @@ describe("Probot", () => {
     it("forwards events to each app", async () => {
       const spy = jest.fn();
 
-      probot.load(({ app }) => app.on("push", spy));
+      probot.load(({ app }: { app: Probot }) => app.on("push", spy));
 
       await probot.receive(event);
 
@@ -553,7 +550,7 @@ describe("Probot", () => {
       });
 
       await new Promise((resolve, reject) => {
-        probot.load(async ({ app }) => {
+        probot.load(async ({ app }: { app: Probot }) => {
           const octokit = await app.auth();
           try {
             const { data: appData } = await octokit.apps.getAuthenticated();

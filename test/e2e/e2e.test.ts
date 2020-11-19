@@ -77,6 +77,7 @@ describe("end-to-end-tests", () => {
           GHE_HOST: `127.0.0.1:${mockServerPort}`,
           GHE_PROTOCOL: "http",
           DISABLE_WEBHOOK_EVENT_CHECK: "true",
+          LOG_LEVEL: "trace",
         },
       }
     );

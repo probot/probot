@@ -222,7 +222,7 @@ describe("Application", () => {
         return new Promise((resolve) => {
           setTimeout(() => {
             spy();
-            resolve();
+            resolve(null);
           }, 1);
         });
       });

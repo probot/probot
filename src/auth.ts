@@ -7,7 +7,7 @@ import { State } from "./types";
 /**
  * Authenticate and get a GitHub client that can be used to make API calls.
  *
- * You'll probably want to use `context.github` instead.
+ * You'll probably want to use `context.octokit` instead.
  *
  * **Note**: `app.auth` is asynchronous, so it needs to be prefixed with a
  * [`await`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await)

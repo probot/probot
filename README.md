@@ -19,7 +19,7 @@ module.exports = ({ app }) => {
     const issueComment = context.issue({
       body: "Thanks for opening this issue!",
     });
-    return context.github.issues.createComment(issueComment);
+    return context.octokit.issues.createComment(issueComment);
   });
 };
 ```

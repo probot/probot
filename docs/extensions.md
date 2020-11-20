@@ -19,7 +19,7 @@ module.exports = ({ app }) => {
   // Type `/label foo, bar` in a comment box for an Issue or Pull Request
   commands(app, "label", (context, command) => {
     const labels = command.arguments.split(/, */);
-    return context.github.issues.addLabels(context.issue({ labels }));
+    return context.octokit.issues.addLabels(context.issue({ labels }));
   });
 };
 ```
@@ -41,7 +41,7 @@ module.exports = ({ app }) => {
 
   app.on("issues.closed", async (context) => {
     const edits = await metadata(context).get("edits");
-    context.github.issues.createComment(
+    context.octokit.issues.createComment(
       context.issue({
         body: `There were ${edits} edits to issues in this thread.`,
       })

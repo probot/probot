@@ -237,7 +237,7 @@ describe("Deprecations", () => {
     );
   });
 
-  it("context.github", () => {
+  it("context.octokit", () => {
     const octokit = new ProbotOctokit({});
     const context = new Context(
       { name: "push", id: "1", payload: pushEvent },

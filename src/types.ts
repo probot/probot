@@ -52,7 +52,6 @@ export type State = {
   port?: number;
   host?: string;
   webhookProxy?: string;
-  webhookPath?: string;
   baseUrl?: string;
 };
 

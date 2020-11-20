@@ -19,7 +19,7 @@ import { getTransformStream, Options, LogLevel } from "@probot/pino";
 
 type GetLogOptions = { level?: LogLevel } & Options;
 
-export function getLog(options: GetLogOptions = { level: "info" }) {
+export function getLog(options: GetLogOptions = {}) {
   const deprecated = [];
   if (process.env.LOG_FORMAT && !options.logFormat) {
     deprecated.push('"LOG_FORMAT"');
@@ -35,7 +35,7 @@ export function getLog(options: GetLogOptions = { level: "info" }) {
   }
   const { level, ...getTransformStreamOptions } = options;
 
-  const pinoOptions: LoggerOptions = { level, name: "probot" };
+  const pinoOptions: LoggerOptions = { level: level || "info", name: "probot" };
   const transform = getTransformStream(getTransformStreamOptions);
   transform.pipe(pino.destination(1));
   const log = pino(pinoOptions, transform);

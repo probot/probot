@@ -149,7 +149,7 @@ describe("Application", () => {
         .reply(200, {});
 
       app.on("installation.created", async (context) => {
-        await context.github.request("/");
+        await context.octokit.request("/");
       });
 
       await app.receive(event);
@@ -173,7 +173,7 @@ describe("Application", () => {
         .reply(200, {});
 
       app.on("installation.deleted", async (context) => {
-        await context.github.request("/");
+        await context.octokit.request("/");
       });
 
       await app.receive(event).catch(console.log);
@@ -196,7 +196,7 @@ describe("Application", () => {
         .reply(200, {});
 
       app.on("check_run", async (context) => {
-        await context.github.request("/");
+        await context.octokit.request("/");
       });
 
       await app.receive(event).catch(console.log);

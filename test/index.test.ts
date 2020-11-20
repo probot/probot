@@ -727,7 +727,7 @@ describe("Probot", () => {
         .reply(200, {});
 
       probot.on("installation.created", async (context) => {
-        await context.github.request("/");
+        await context.octokit.request("/");
       });
 
       await probot.receive(event);
@@ -756,7 +756,7 @@ describe("Probot", () => {
         .reply(200, {});
 
       probot.on("installation.deleted", async (context) => {
-        await context.github.request("/");
+        await context.octokit.request("/");
       });
 
       await probot.receive(event).catch(console.log);
@@ -784,7 +784,7 @@ describe("Probot", () => {
         .reply(200, {});
 
       probot.on("check_run", async (context) => {
-        await context.github.request("/");
+        await context.octokit.request("/");
       });
 
       await probot.receive(event).catch(console.log);

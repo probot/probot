@@ -59,6 +59,15 @@ export function readCliOptions(argv: string[]): Options & PinoOptions {
       'Set to a "redis://" url in order to enable cluster support for request throttling. Example: "redis://:secret@redis-123.redislabs.com:12345/0"',
       process.env.REDIS_URL
     )
+    .option(
+      "--base-url <url>",
+      'GitHub API base URL. If you use GitHub Enterprise Server, and your hostname is "https://github.acme-inc.com", then the root URL is "https://github.acme-inc.com/api/v3"',
+      process.env.GHE_HOST
+        ? `${process.env.GHE_PROTOCOL || "https"}://${
+            process.env.GHE_HOST
+          }/api/v3`
+        : "https://api.github.com"
+    )
     .parse(argv);
 
   const { app: id, privateKey: privateKeyPath, redisUrl, ...options } = program;

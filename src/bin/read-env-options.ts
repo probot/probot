@@ -17,5 +17,10 @@ export function readEnvOptions() {
     logLevelInString: process.env.LOG_LEVEL_IN_STRING === "true",
     sentryDsn: process.env.SENTRY_DSN,
     redisConfig: process.env.REDIS_URL,
+    baseUrl: process.env.GHE_HOST
+      ? `${process.env.GHE_PROTOCOL || "https"}://${
+          process.env.GHE_HOST
+        }/api/v3`
+      : "https://api.github.com",
   };
 }

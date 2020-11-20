@@ -372,7 +372,7 @@ describe("Probot", () => {
       process.env.GHE_HOST = "https://notreallygithub.com";
 
       try {
-        new Probot({ id, privateKey });
+        require("../src/bin/probot");
       } catch (e) {
         expect(e).toMatchSnapshot();
       }
@@ -405,7 +405,7 @@ describe("Probot", () => {
       process.env.GHE_HOST = "http://notreallygithub.com";
 
       try {
-        new Probot({ id, privateKey });
+        require("../src/bin/probot");
       } catch (e) {
         expect(e).toMatchSnapshot();
       }

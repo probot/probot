@@ -97,12 +97,6 @@ export class Probot {
   }
 
   constructor(options: Options) {
-    if (process.env.GHE_HOST && /^https?:\/\//.test(process.env.GHE_HOST)) {
-      throw new Error(
-        "Your `GHE_HOST` environment variable should not begin with https:// or http://"
-      );
-    }
-
     //
     // Probot class-specific options (Express server & Webhooks)
     //

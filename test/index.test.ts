@@ -133,7 +133,7 @@ describe("Probot", () => {
         expect(initialized).toBeFalsy();
         probot.stop();
 
-        resolve();
+        resolve(null);
       });
     });
 
@@ -143,7 +143,7 @@ describe("Probot", () => {
         expect(probot.version).toBe("0.0.0-development");
         probot.stop();
 
-        resolve();
+        resolve(null);
       });
     });
   });
@@ -560,7 +560,7 @@ describe("Probot", () => {
             expect(repoData.id).toEqual(4);
             expect(mock.activeMocks()).toStrictEqual([]);
 
-            resolve();
+            resolve(null);
           } catch (error) {
             reject(error);
           }
@@ -830,7 +830,7 @@ describe("Probot", () => {
         return new Promise((resolve) => {
           setTimeout(() => {
             spy();
-            resolve();
+            resolve(null);
           }, 1);
         });
       });

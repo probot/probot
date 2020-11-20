@@ -4,7 +4,6 @@ import { Deprecation } from "deprecation";
 import express from "express";
 import LRUCache from "lru-cache";
 import { Logger } from "pino";
-import pinoHttp from "pino-http";
 import { WebhookEvent, Webhooks } from "@octokit/webhooks";
 import { LogLevel, Options as PinoOptions } from "@probot/pino";
 
@@ -65,36 +64,6 @@ export class Probot {
 
   private httpServer?: Server;
   private state: State;
-
-  /**
-   * @deprecated this.internalRouter can be removed once we remove the Application class
-   */
-  private internalRouter: express.Router;
-
-  /**
-   * @deprecated use probot.log instead
-   */
-  public get logger() {
-    this.log.warn(
-      new Deprecation(
-        `[probot] "probot.logger" is deprecated. Use "probot.log" instead`
-      )
-    );
-    return this.log;
-  }
-
-  /**
-   * @deprecated "app.router" is deprecated, use "getRouter()" from the app function instead: "({ app, getRouter }) => { ... }"
-   */
-  public get router() {
-    this.log.warn(
-      new Deprecation(
-        `[probot] "app.router" is deprecated, use "getRouter()" from the app function instead: "({ app, getRouter }) => { ... }"`
-      )
-    );
-
-    return this.internalRouter;
-  }
 
   constructor(options: Options) {
     //
@@ -166,7 +135,6 @@ export class Probot {
       id: options.id,
       privateKey: options.privateKey,
       host: options.host,
-      webhookPath: options.webhookPath,
       port: options.port,
       webhookProxy: options.webhookProxy,
     };
@@ -241,13 +209,6 @@ export class Probot {
 
     // Load the given appFns along with the default ones
     appFns.concat(defaultAppFns).forEach((appFn) => this.load(appFn));
-
-    // Register error handler as the last middleware
-    this.server.use(
-      pinoHttp({
-        logger: this.log,
-      })
-    );
   }
 
   public start() {
@@ -255,7 +216,8 @@ export class Probot {
       `Running Probot v${this.version} (Node.js: ${process.version})`
     );
     const port = this.state.port || 3000;
-    const { host, webhookPath, webhookProxy } = this.state;
+    const { host, webhookProxy } = this.state;
+    const webhookPath = this.state.webhooks.path;
     const printableHost = host ?? "localhost";
 
     this.httpServer = this.server
@@ -321,5 +283,35 @@ export class Probot {
     );
 
     return getRouter(this.internalRouter, path);
+  }
+
+  /**
+   * @deprecated this.internalRouter can be removed once we remove the Application class
+   */
+  private internalRouter: express.Router;
+
+  /**
+   * @deprecated use probot.log instead
+   */
+  public get logger() {
+    this.log.warn(
+      new Deprecation(
+        `[probot] "probot.logger" is deprecated. Use "probot.log" instead`
+      )
+    );
+    return this.log;
+  }
+
+  /**
+   * @deprecated "app.router" is deprecated, use "getRouter()" from the app function instead: "({ app, getRouter }) => { ... }"
+   */
+  public get router() {
+    this.log.warn(
+      new Deprecation(
+        `[probot] "app.router" is deprecated, use "getRouter()" from the app function instead: "({ app, getRouter }) => { ... }"`
+      )
+    );
+
+    return this.internalRouter;
   }
 }

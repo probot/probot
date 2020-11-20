@@ -24,6 +24,7 @@ export interface Options {
   port?: number;
   host?: string;
   webhookProxy?: string;
+  baseUrl?: string;
 
   // Probot class-specific options
   /**
@@ -52,6 +53,7 @@ export type State = {
   host?: string;
   webhookProxy?: string;
   webhookPath?: string;
+  baseUrl?: string;
 };
 
 export type ProbotWebhooks = Webhooks<

@@ -149,6 +149,7 @@ export class Probot {
       log: this.log,
       redisConfig: options.redisConfig,
       throttleOptions: options.throttleOptions,
+      baseUrl: options.baseUrl,
     });
     const octokit = new Octokit();
 

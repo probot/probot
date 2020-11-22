@@ -74,10 +74,17 @@ describe("Probot", () => {
 
       new Probot({ Octokit: MyOctokit });
     });
+
+    it("sets version", async () => {
+      const probot = new Probot({});
+      expect(probot.version).toBe("0.0.0-development");
+    });
   });
 
-  describe("webhook delivery", () => {
+  describe("webhooks", () => {
     it("responds with the correct error if webhook secret does not match", async () => {
+      expect.assertions(1);
+
       probot.log.error = jest.fn();
       probot.webhooks.on("push", () => {
         throw new Error("X-Hub-Signature does not match blob signature");
@@ -93,6 +100,8 @@ describe("Probot", () => {
     });
 
     it("responds with the correct error if webhook secret is not found", async () => {
+      expect.assertions(1);
+
       probot.log.error = jest.fn();
       probot.webhooks.on("push", () => {
         throw new Error("No X-Hub-Signature found on request");
@@ -108,6 +117,8 @@ describe("Probot", () => {
     });
 
     it("responds with the correct error if webhook secret is wrong", async () => {
+      expect.assertions(1);
+
       probot.log.error = jest.fn();
       probot.webhooks.on("push", () => {
         throw new Error(
@@ -125,6 +136,8 @@ describe("Probot", () => {
     });
 
     it("responds with the correct error if the PEM file is missing", async () => {
+      expect.assertions(1);
+
       probot.log.error = jest.fn();
       probot.webhooks.onAny(() => {
         throw new Error(
@@ -142,6 +155,8 @@ describe("Probot", () => {
     });
 
     it("responds with the correct error if the jwt could not be decoded", async () => {
+      expect.assertions(1);
+
       probot.log.error = jest.fn();
       probot.webhooks.onAny(() => {
         throw new Error(
@@ -156,111 +171,6 @@ describe("Probot", () => {
           (probot.log.error as jest.Mock).mock.calls[0][1]
         ).toMatchSnapshot();
       }
-    });
-  });
-
-  describe("server", () => {
-    it("prefixes paths with route name", () => {
-      probot.load(({ app, getRouter }) => {
-        const router = getRouter("/my-app");
-        router.get("/foo", (req, res) => res.end("foo"));
-      });
-
-      return request(probot.server).get("/my-app/foo").expect(200, "foo");
-    });
-
-    it("allows routes with no path", () => {
-      probot.load(({ app, getRouter }) => {
-        const router = getRouter();
-        router.get("/foo", (req, res) => res.end("foo"));
-      });
-
-      return request(probot.server).get("/foo").expect(200, "foo");
-    });
-
-    it("allows you to overwrite the root path", () => {
-      probot.load(({ app, getRouter }) => {
-        const router = getRouter();
-        router.get("/", (req, res) => res.end("foo"));
-      });
-
-      return request(probot.server).get("/").expect(200, "foo");
-    });
-
-    it("isolates apps from affecting each other", async () => {
-      ["foo", "bar"].forEach((name) => {
-        probot.load(({ app, getRouter }) => {
-          const router = getRouter("/" + name);
-
-          router.use((req, res, next) => {
-            res.append("X-Test", name);
-            next();
-          });
-
-          router.get("/hello", (req, res) => res.end(name));
-        });
-      });
-
-      await request(probot.server)
-        .get("/foo/hello")
-        .expect(200, "foo")
-        .expect("X-Test", "foo");
-
-      await request(probot.server)
-        .get("/bar/hello")
-        .expect(200, "bar")
-        .expect("X-Test", "bar");
-    });
-
-    it("allows users to configure webhook paths", async () => {
-      probot = new Probot({
-        webhookPath: "/webhook",
-        githubToken: "faketoken",
-      });
-      // Error handler to avoid printing logs
-      // tslint:disable-next-line handle-callback-error
-      probot.server.use(
-        (error: any, req: Request, res: Response, next: NextFunction) => {}
-      );
-
-      probot.load(({ getRouter }) => {
-        const router = getRouter();
-        router.get("/webhook", (req, res) => res.end("get-webhook"));
-        router.post("/webhook", (req, res) => res.end("post-webhook"));
-      });
-
-      // GET requests should succeed
-      await request(probot.server).get("/webhook").expect(200, "get-webhook");
-
-      // POST requests should fail b/c webhook path has precedence
-      await request(probot.server).post("/webhook").expect(400);
-    });
-
-    it("defaults webhook path to `/`", async () => {
-      // Error handler to avoid printing logs
-      // tslint:disable-next-line handle-callback-error
-      probot.server.use(
-        (error: any, req: Request, res: Response, next: NextFunction) => {}
-      );
-
-      // POST requests to `/` should 400 b/c webhook signature will fail
-      await request(probot.server).post("/").expect(400);
-    });
-
-    it("responds with 500 on error", async () => {
-      probot.server.get("/boom", () => {
-        throw new Error("boom");
-      });
-
-      await request(probot.server).get("/boom").expect(500);
-    });
-
-    it("responds with 500 on async error", async () => {
-      probot.server.get("/boom", () => {
-        return Promise.reject(new Error("boom"));
-      });
-
-      await request(probot.server).get("/boom").expect(500);
     });
   });
 
@@ -397,54 +307,6 @@ describe("Probot", () => {
       const app = probot.load(() => {});
       const octokit: InstanceType<typeof ProbotOctokit> = await app.auth();
       expect(octokit.foo).toBe("bar");
-    });
-  });
-
-  describe("start", () => {
-    beforeEach(() => {
-      process.exit = jest.fn() as any; // we dont want to terminate the test
-    });
-
-    it("should expect the correct error if port already in use", (next) => {
-      expect.assertions(2);
-
-      // block port 3001
-      const http = require("http");
-      const blockade = http.createServer().listen(3001, () => {
-        const testApp = new Probot({ port: 3001 });
-        testApp.log.error = jest.fn();
-
-        const server = testApp.start().addListener("error", () => {
-          expect(testApp.log.error).toHaveBeenCalledWith(
-            "Port 3001 is already in use. You can define the PORT environment variable to use a different port."
-          );
-          expect(process.exit).toHaveBeenCalledWith(1);
-          server.close(() => blockade.close(() => next()));
-        });
-      });
-    });
-
-    it("should listen to port when not in use", (next) => {
-      expect.assertions(1);
-      const testApp = new Probot({ port: 3001, webhookProxy: undefined });
-      testApp.log.info = jest.fn();
-      const server = testApp.start().on("listening", () => {
-        expect(testApp.log.info).toHaveBeenCalledWith(
-          "Listening on http://localhost:3001"
-        );
-        server.close(() => next());
-      });
-    });
-
-    it("respects host/ip config when starting up HTTP server", (next) => {
-      const testApp = new Probot({ port: 3002, host: "127.0.0.1" });
-      const spy = jest.spyOn(testApp.server, "listen");
-      const server = testApp.start().on("listening", () => {
-        expect(spy.mock.calls[0][0]).toBe(3002);
-        expect(spy.mock.calls[0][1]).toBe("127.0.0.1");
-        spy.mockRestore();
-        server.close(() => next());
-      });
     });
   });
 

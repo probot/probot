@@ -17,7 +17,7 @@
 import pino, { LoggerOptions } from "pino";
 import { getTransformStream, Options, LogLevel } from "@probot/pino";
 
-type GetLogOptions = { level?: LogLevel } & Options;
+export type GetLogOptions = { level?: LogLevel } & Options;
 
 export function getLog(options: GetLogOptions = {}) {
   const deprecated = [];

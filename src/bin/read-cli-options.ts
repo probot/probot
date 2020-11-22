@@ -4,7 +4,9 @@ import { Options as PinoOptions } from "@probot/pino";
 
 import { Options } from "../types";
 
-export function readCliOptions(argv: string[]): Options & PinoOptions {
+export function readCliOptions(
+  argv: string[]
+): Options & PinoOptions & { args: string[] } {
   program
     .usage("[options] <apps...>")
     .option(

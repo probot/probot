@@ -13,11 +13,18 @@ import { Server, ServerOptions } from "./server/server";
 import { load } from "./load";
 import { defaultApp } from "./apps/default";
 
+type AdditionalOptions = {
+  env: Record<string, string | undefined>;
+};
+
 /**
  *
  * @param appFnOrArgv set to either a probot application function: `({ app }) => { ... }` or to process.argv
  */
-export async function run(appFnOrArgv: ApplicationFunction | string[]) {
+export async function run(
+  appFnOrArgv: ApplicationFunction | string[],
+  additionalOptions?: AdditionalOptions
+) {
   const {
     // log options
     logLevel: level,
@@ -42,7 +49,7 @@ export async function run(appFnOrArgv: ApplicationFunction | string[]) {
     args,
   } = Array.isArray(appFnOrArgv)
     ? readCliOptions(appFnOrArgv)
-    : readEnvOptions();
+    : readEnvOptions(additionalOptions?.env);
 
   const logOptions: GetLogOptions = {
     level,
@@ -103,10 +110,12 @@ export async function run(appFnOrArgv: ApplicationFunction | string[]) {
     const [appFn] = args;
 
     load(probot, router, appFn);
-    server.app.use(probot.webhooks.middleware);
+
+    server.app.use(webhookPath ? webhookPath : "/", probot.webhooks.middleware);
   } else {
     load(probot, router, appFnOrArgv);
-    server.app.use(probot.webhooks.middleware);
+
+    server.app.use(webhookPath ? webhookPath : "/", probot.webhooks.middleware);
   }
   await server.start();
 

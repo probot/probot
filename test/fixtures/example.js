@@ -1,6 +1,7 @@
-import { Application } from "../../src/application";
-
-export = (app: Application) => {
+/**
+ * @param {{app: import("../..".Probot)}}
+ */
+module.exports = ({ app }) => {
   app.log.info("loaded app");
 
   app.on("issue_comment.created", async (context) => {

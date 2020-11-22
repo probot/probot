@@ -7,9 +7,8 @@ import request = require("supertest");
 import nock from "nock";
 import pino from "pino";
 
-import { Probot, ProbotOctokit, Context, run } from "../src";
+import { Probot, ProbotOctokit, Context } from "../src";
 
-import path = require("path");
 import { WebhookEvents } from "@octokit/webhooks";
 
 const id = 1;
@@ -74,77 +73,6 @@ describe("Probot", () => {
       });
 
       new Probot({ Octokit: MyOctokit });
-    });
-  });
-
-  describe("run", () => {
-    let env: NodeJS.ProcessEnv;
-
-    beforeAll(() => {
-      env = { ...process.env };
-      process.env.APP_ID = "1";
-      process.env.PRIVATE_KEY_PATH = path.join(
-        __dirname,
-        "test-private-key.pem"
-      );
-      process.env.WEBHOOK_PROXY_URL = "https://smee.io/EfHXC9BFfGAxbM6J";
-      process.env.WEBHOOK_SECRET = "secret";
-    });
-
-    afterAll(() => {
-      process.env = env;
-    });
-
-    it("runs with a function as argument", async () => {
-      let initialized = false;
-
-      probot = await run(() => {
-        initialized = true;
-      });
-      expect(initialized).toBeTruthy();
-      probot.stop();
-    });
-
-    it("runs with an array of strings", async () => {
-      probot = await run(["run", "file.js"]);
-      probot.stop();
-    });
-
-    it("works with REDIS_URL configuration", async () => {
-      process.env.REDIS_URL = "redis://test:test@localhost:6379";
-
-      await new Promise(async (resolve, reject) => {
-        const probot = await run(({ app }: { app: Probot }) => {
-          app.auth(1).then(resolve, reject);
-        });
-        probot.stop();
-      });
-    });
-
-    it("runs without config and loads the setup app", async () => {
-      let initialized = false;
-      delete process.env.PRIVATE_KEY_PATH;
-      process.env.PORT = "3003";
-
-      return new Promise(async (resolve) => {
-        probot = await run(({ app }: { app: Probot }) => {
-          initialized = true;
-        });
-        expect(initialized).toBeFalsy();
-        probot.stop();
-
-        resolve(null);
-      });
-    });
-
-    it("has version", async () => {
-      return new Promise(async (resolve) => {
-        probot = await run(({ app }: { app: Probot }) => {});
-        expect(probot.version).toBe("0.0.0-development");
-        probot.stop();
-
-        resolve(null);
-      });
     });
   });
 
@@ -476,6 +404,7 @@ describe("Probot", () => {
     beforeEach(() => {
       process.exit = jest.fn() as any; // we dont want to terminate the test
     });
+
     it("should expect the correct error if port already in use", (next) => {
       expect.assertions(2);
 

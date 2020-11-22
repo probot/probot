@@ -81,18 +81,18 @@ export class Server {
           resolve(server);
         }
       );
-    })) as HttpServer;
 
-    this.state.httpServer.on("error", (error: NodeJS.ErrnoException) => {
-      if (error.code === "EADDRINUSE") {
-        this.log.error(
-          `Port ${port} is already in use. You can define the PORT environment variable to use a different port.`
-        );
-      } else {
+      server.on("error", (error: NodeJS.ErrnoException) => {
+        if (error.code === "EADDRINUSE") {
+          error = Object.assign(error, {
+            message: `Port ${port} is already in use. You can define the PORT environment variable to use a different port.`,
+          });
+        }
+
         this.log.error(error);
-      }
-      process.exit(1);
-    });
+        reject(error);
+      });
+    })) as HttpServer;
 
     return this.state.httpServer;
   }

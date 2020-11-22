@@ -7,6 +7,7 @@ import { Context, WebhookPayloadWithRepository } from "./context";
 import { getLog } from "./helpers/get-log";
 import { Options } from "./types";
 import { Probot } from "./probot";
+import { Server } from "./server/server";
 import { ProbotOctokit } from "./octokit/probot-octokit";
 import { run } from "./run";
 
@@ -27,7 +28,7 @@ export const createProbot = (options: Options) => {
   return new Probot(options);
 };
 
-export { Logger, Context, Application, ProbotOctokit, run, Probot };
+export { Logger, Context, Application, ProbotOctokit, run, Probot, Server };
 
 /** NOTE: exported types might change at any point in time */
 export { Options, WebhookPayloadWithRepository };

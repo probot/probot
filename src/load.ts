@@ -5,6 +5,7 @@ import { Probot } from "./index";
 import { Application } from "./application";
 import { ApplicationFunction, ApplicationFunctionOptions } from "./types";
 import { getRouter } from "./get-router";
+import { resolveAppFunction } from "./helpers/resolve-app-function";
 
 type DeprecatedKey =
   | "auth"
@@ -37,7 +38,7 @@ function bindMethod(app: Probot | Application, key: keyof Application) {
 export function load(
   app: Application | Probot,
   router: Router | null,
-  appFn: ApplicationFunction | ApplicationFunction[]
+  appFn: string | ApplicationFunction | ApplicationFunction[]
 ) {
   const deprecatedApp = DEPRECATED_APP_KEYS.reduce(
     (api: Record<string, unknown>, key: DeprecatedKey) => {
@@ -64,7 +65,9 @@ export function load(
   if (Array.isArray(appFn)) {
     appFn.forEach((fn) => load(app, router, fn));
   } else {
-    appFn(
+    const fn = typeof appFn === "string" ? resolveAppFunction(appFn) : appFn;
+
+    fn(
       (Object.assign(deprecatedApp, {
         app,
         getRouter: getRouter.bind(null, router || app.router),

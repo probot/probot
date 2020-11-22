@@ -1,14 +1,16 @@
 import Stream from "stream";
+import path = require("path");
+
+import request from "supertest";
+import { sign } from "@octokit/webhooks";
 
 import { Probot, run, Server } from "../src";
 
-import path = require("path");
-
 // tslint:disable:no-empty
 describe("run", () => {
-  let probot: Probot;
   let server: Server;
   let output: any;
+  let env: NodeJS.ProcessEnv;
 
   const streamLogsToOutput = new Stream.Writable({ objectMode: true });
   streamLogsToOutput._write = (object, encoding, done) => {
@@ -19,34 +21,26 @@ describe("run", () => {
   beforeEach(() => {
     // Clear log output
     output = [];
-    process.env.DISABLE_WEBHOOK_EVENT_CHECK = "true";
-    probot = new Probot({ githubToken: "faketoken" });
+    env = {
+      DISABLE_WEBHOOK_EVENT_CHECK: "true",
+      APP_ID: "1",
+      PRIVATE_KEY_PATH: path.join(__dirname, "test-private-key.pem"),
+      WEBHOOK_PROXY_URL: "https://smee.io/EfHXC9BFfGAxbM6J",
+      WEBHOOK_SECRET: "secret",
+      LOG_LEVEL: "fatal",
+    };
   });
 
-  describe("run", () => {
-    let env: NodeJS.ProcessEnv;
-
-    beforeAll(() => {
-      env = { ...process.env };
-      process.env.APP_ID = "1";
-      process.env.PRIVATE_KEY_PATH = path.join(
-        __dirname,
-        "test-private-key.pem"
-      );
-      process.env.WEBHOOK_PROXY_URL = "https://smee.io/EfHXC9BFfGAxbM6J";
-      process.env.WEBHOOK_SECRET = "secret";
-    });
-
-    afterAll(() => {
-      process.env = env;
-    });
-
+  describe("params", () => {
     it("runs with a function as argument", async () => {
       let initialized = false;
 
-      server = await run(() => {
-        initialized = true;
-      });
+      server = await run(
+        () => {
+          initialized = true;
+        },
+        { env }
+      );
       expect(initialized).toBeTruthy();
       await server.stop();
     });
@@ -58,28 +52,61 @@ describe("run", () => {
 
     it("runs without config and loads the setup app", async () => {
       let initialized = false;
-      delete process.env.PRIVATE_KEY_PATH;
-      process.env.PORT = "3003";
+      delete env.PRIVATE_KEY_PATH;
+      env.PORT = "3003";
 
       return new Promise(async (resolve) => {
-        server = await run(({ app }: { app: Probot }) => {
-          initialized = true;
-        });
+        server = await run(
+          ({ app }: { app: Probot }) => {
+            initialized = true;
+          },
+          { env }
+        );
         expect(initialized).toBeFalsy();
         await server.stop();
 
         resolve(null);
       });
     });
+  });
 
-    it("has version", async () => {
-      return new Promise(async (resolve) => {
-        server = await run(({ app }: { app: Probot }) => {});
-        expect(probot.version).toBe("0.0.0-development");
-        await server.stop();
+  describe("webhooks", () => {
+    it("POST /", async () => {
+      server = await run(() => {}, { env });
 
-        resolve(null);
+      const dataString = require("./fixtures/webhook/push.json");
+
+      await request(server.app)
+        .post("/")
+        .send(dataString)
+        .set("x-github-event", "push")
+        .set("x-hub-signature", sign("secret", dataString))
+        .set("x-github-delivery", "123")
+        .expect(200);
+
+      await server.stop();
+    });
+
+    it("custom webhook path", async () => {
+      server = await run(() => {}, {
+        env: {
+          ...env,
+          WEBHOOK_SECRET: "secret",
+          WEBHOOK_PATH: "/custom-webhook",
+        },
       });
+
+      const dataString = require("./fixtures/webhook/push.json");
+
+      await request(server.app)
+        .post("/custom-webhook")
+        .send(dataString)
+        .set("x-github-event", "push")
+        .set("x-hub-signature", sign("secret", dataString))
+        .set("x-github-delivery", "123")
+        .expect(200);
+
+      await server.stop();
     });
   });
 });

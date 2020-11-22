@@ -18,7 +18,6 @@ import { getRouter } from "./get-router";
 import { getWebhooks } from "./octokit/get-webhooks";
 import { load } from "./load";
 import { ProbotOctokit } from "./octokit/probot-octokit";
-import { resolveAppFunction } from "./helpers/resolve-app-function";
 import { run } from "./run";
 import { VERSION } from "./version";
 import { webhookEventCheck } from "./helpers/webhook-event-check";
@@ -188,10 +187,6 @@ export class Probot {
   }
 
   public load(appFn: string | ApplicationFunction | ApplicationFunction[]) {
-    if (typeof appFn === "string") {
-      appFn = resolveAppFunction(appFn) as ApplicationFunction;
-    }
-
     const router = express.Router();
 
     // Connect the router from the app to the server
@@ -240,6 +235,7 @@ export class Probot {
         } else {
           this.log.error(error);
         }
+
         process.exit(1);
       });
 

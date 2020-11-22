@@ -5,6 +5,7 @@ export function readEnvOptions() {
   const privateKey = getPrivateKey();
 
   return {
+    args: [],
     privateKey: (privateKey && privateKey.toString()) || undefined,
     id: Number(process.env.APP_ID),
     port: Number(process.env.PORT) || 3000,

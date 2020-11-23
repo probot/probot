@@ -31,6 +31,7 @@ import {
 import { defaultApp } from "./apps/default";
 
 const defaultAppFns: ApplicationFunction[] = [defaultApp];
+export type Constructor<T> = new (...args: any[]) => T;
 
 export class Probot {
   public static async run(appFn: ApplicationFunction | string[]) {
@@ -46,6 +47,18 @@ export class Probot {
       )
     );
     return run(appFn);
+  }
+
+  static version = VERSION;
+  static defaults<S extends Constructor<any>>(this: S, defaults: Options) {
+    const ProbotWithDefaults = class extends this {
+      constructor(...args: any[]) {
+        const options = args[0] || {};
+        super(Object.assign({}, defaults, options));
+      }
+    };
+
+    return ProbotWithDefaults;
   }
 
   public server: express.Application;
@@ -64,10 +77,7 @@ export class Probot {
   private httpServer?: Server;
   private state: State;
 
-  constructor(options: Options) {
-    //
-    // Probot class-specific options (Express server & Webhooks)
-    //
+  constructor(options: Options = {}) {
     options.webhookPath = options.webhookPath || "/";
     options.secret = options.secret || "development";
 

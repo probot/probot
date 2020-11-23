@@ -2,8 +2,6 @@ import Stream from "stream";
 
 import { WebhookEvent } from "@octokit/webhooks";
 import Bottleneck from "bottleneck";
-import { NextFunction, Request, Response } from "express";
-import request = require("supertest");
 import nock from "nock";
 import pino from "pino";
 
@@ -51,11 +49,34 @@ describe("Probot", () => {
     };
   });
 
+  test(".version", () => {
+    expect(Probot.version).toEqual("0.0.0-development");
+  });
+
+  describe(".defaults()", () => {
+    test.only("sets default options for constructor", async () => {
+      const mock = nock("https://api.github.com").get("/app").reply(200, {
+        id: 1,
+      });
+
+      const MyProbot = Probot.defaults({ id, privateKey });
+      const probot = new MyProbot();
+      const octokit = await probot.auth();
+      await octokit.apps.getAuthenticated();
+      expect(mock.activeMocks()).toStrictEqual([]);
+    });
+  });
+
   describe("constructor", () => {
+    it("no options", () => {
+      new Probot();
+    });
+
     it('{ githubToken: "faketoken" }', () => {
       // probot with token. Should not throw
       new Probot({ githubToken: "faketoken" });
     });
+
     it('{ id, privateKey" }', () => {
       // probot with id/privateKey
       new Probot({ id, privateKey });

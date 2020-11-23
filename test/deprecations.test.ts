@@ -57,7 +57,7 @@ describe("Deprecations", () => {
 
   it("new Probot({ cert })", () => {
     new Probot({
-      id: 1,
+      appId: 1,
       cert: "private key",
       log: pino(streamLogsToOutput),
     });
@@ -65,6 +65,19 @@ describe("Deprecations", () => {
     expect(output.length).toEqual(1);
     expect(output[0].msg).toContain(
       '[probot] "cert" option is deprecated. Use "privateKey" instead'
+    );
+  });
+
+  it("new Probot({ appId })", () => {
+    new Probot({
+      id: 1,
+      privateKey: "private key",
+      log: pino(streamLogsToOutput),
+    });
+
+    expect(output.length).toEqual(1);
+    expect(output[0].msg).toContain(
+      '[probot] "id" option is deprecated. Use "appId" instead'
     );
   });
 
@@ -150,7 +163,7 @@ describe("Deprecations", () => {
 
   it("probot.webhooks.on('*', handler)", () => {
     const probot = new Probot({
-      id: 1,
+      appId: 1,
       privateKey: "private key",
       log: pino(streamLogsToOutput),
     });
@@ -277,7 +290,11 @@ describe("Deprecations", () => {
     let initialized = false;
 
     process.env.APP_ID = "1";
-    process.env.PRIVATE_KEY_PATH = join(__dirname, "test-private-key.pem");
+    process.env.PRIVATE_KEY_PATH = join(
+      __dirname,
+      "fixtures",
+      "test-private-key.pem"
+    );
     process.env.WEBHOOK_PROXY_URL = "https://smee.io/EfHXC9BFfGAxbM6J";
     process.env.WEBHOOK_SECRET = "secret";
 

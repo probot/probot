@@ -101,7 +101,16 @@ export class Probot {
           `[probot] "cert" option is deprecated. Use "privateKey" instead`
         )
       );
-      options.privateKey = options.cert;
+      options.privateKey = options.privateKey || options.cert;
+    }
+
+    if (options.id) {
+      this.log.warn(
+        new Deprecation(
+          `[probot] "id" option is deprecated. Use "appId" instead`
+        )
+      );
+      options.appId = options.appId || options.id;
     }
 
     if (process.env.INSTALLATION_TOKEN_TTL) {
@@ -121,7 +130,7 @@ export class Probot {
     const Octokit = getProbotOctokitWithDefaults({
       githubToken: options.githubToken,
       Octokit: options.Octokit || ProbotOctokit,
-      appId: options.id,
+      appId: Number(options.appId),
       privateKey: options.privateKey,
       cache,
       log: this.log,

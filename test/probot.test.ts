@@ -9,7 +9,7 @@ import { Probot, ProbotOctokit, Context } from "../src";
 
 import { WebhookEvents } from "@octokit/webhooks";
 
-const id = 1;
+const appId = 1;
 const privateKey = `-----BEGIN RSA PRIVATE KEY-----
 MIIBOQIBAAJBAIILhiN9IFpaE0pUXsesuuoaj6eeDiAqCiE49WB1tMB8ZMhC37kY
 Fl52NUYbUxb7JEf6pH5H9vqw1Wp69u78XeUCAwEAAQJAb88urnaXiXdmnIK71tuo
@@ -54,12 +54,12 @@ describe("Probot", () => {
   });
 
   describe(".defaults()", () => {
-    test.only("sets default options for constructor", async () => {
+    test("sets default options for constructor", async () => {
       const mock = nock("https://api.github.com").get("/app").reply(200, {
         id: 1,
       });
 
-      const MyProbot = Probot.defaults({ id, privateKey });
+      const MyProbot = Probot.defaults({ appId, privateKey });
       const probot = new MyProbot();
       const octokit = await probot.auth();
       await octokit.apps.getAuthenticated();
@@ -77,9 +77,9 @@ describe("Probot", () => {
       new Probot({ githubToken: "faketoken" });
     });
 
-    it('{ id, privateKey" }', () => {
-      // probot with id/privateKey
-      new Probot({ id, privateKey });
+    it('{ appId, privateKey" }', () => {
+      // probot with appId/privateKey
+      new Probot({ appId, privateKey });
     });
 
     it("shouldn't overwrite `options.throttle` passed to `{Octokit: ProbotOctokit.defaults(optiosn)}`", () => {
@@ -350,7 +350,7 @@ describe("Probot", () => {
         .reply(200, { id: 4 });
 
       const probot = new Probot({
-        id,
+        appId,
         privateKey,
       });
 
@@ -384,7 +384,7 @@ describe("Probot", () => {
       expect.assertions(2);
 
       const probot = new Probot({
-        id,
+        appId,
         privateKey,
       });
 
@@ -410,7 +410,7 @@ describe("Probot", () => {
 
     it("calls callback when no action is specified", async () => {
       const probot = new Probot({
-        id,
+        appId,
         privateKey,
       });
 
@@ -426,7 +426,7 @@ describe("Probot", () => {
 
     it("calls callback with same action", async () => {
       const probot = new Probot({
-        id,
+        appId,
         privateKey,
       });
 
@@ -439,7 +439,7 @@ describe("Probot", () => {
 
     it("does not call callback with different action", async () => {
       const probot = new Probot({
-        id,
+        appId,
         privateKey,
       });
 
@@ -452,7 +452,7 @@ describe("Probot", () => {
 
     it("calls callback with *", async () => {
       const probot = new Probot({
-        id,
+        appId,
         privateKey,
       });
 
@@ -465,7 +465,7 @@ describe("Probot", () => {
 
     it("calls callback x amount of times when an array of x actions is passed", async () => {
       const probot = new Probot({
-        id,
+        appId,
         privateKey,
       });
 
@@ -488,7 +488,7 @@ describe("Probot", () => {
 
     it("adds a logger on the context", async () => {
       const probot = new Probot({
-        id,
+        appId,
         privateKey,
         log: pino(streamLogsToOutput),
       });
@@ -512,7 +512,7 @@ describe("Probot", () => {
 
     it("returns an authenticated client for installation.created", async () => {
       const probot = new Probot({
-        id,
+        appId,
         privateKey,
       });
 
@@ -549,7 +549,7 @@ describe("Probot", () => {
 
     it("returns an unauthenticated client for installation.deleted", async () => {
       const probot = new Probot({
-        id,
+        appId,
         privateKey,
       });
 
@@ -578,7 +578,7 @@ describe("Probot", () => {
 
     it("returns an authenticated client for events without an installation", async () => {
       const probot = new Probot({
-        id,
+        appId,
         privateKey,
       });
 
@@ -619,7 +619,7 @@ describe("Probot", () => {
 
     it("delivers the event", async () => {
       const probot = new Probot({
-        id,
+        appId,
         privateKey,
       });
 
@@ -633,7 +633,7 @@ describe("Probot", () => {
 
     it("waits for async events to resolve", async () => {
       const probot = new Probot({
-        id,
+        appId,
         privateKey,
       });
 
@@ -654,7 +654,7 @@ describe("Probot", () => {
 
     it("returns a reject errors thrown in apps", async () => {
       const probot = new Probot({
-        id,
+        appId,
         privateKey,
       });
 

@@ -16,7 +16,7 @@ import { State } from "./types";
  * ```js
  *  module.exports = ({ app }) => {
  *    app.on('issues.opened', async context => {
- *      const github = await app.auth();
+ *      const octokit = await app.auth();
  *    });
  *  };
  * ```

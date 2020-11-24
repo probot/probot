@@ -83,3 +83,12 @@ export type ApplicationFunctionOptions = {
   [K in deprecatedKeys]: Application[K];
 } & { app: Probot; getRouter: (path?: string) => express.Router };
 export type ApplicationFunction = (options: ApplicationFunctionOptions) => void;
+
+export type ServerOptions = {
+  log?: Logger;
+  port?: number;
+  host?: string;
+  webhookPath?: string;
+  webhookProxy?: string;
+  Probot: typeof Probot;
+};

@@ -65,7 +65,7 @@ export class ManifestCreation {
   }
 
   public async createAppFromCode(code: any) {
-    const github = new ProbotOctokit();
+    const octokit = new ProbotOctokit();
     const options: any = {
       code,
       mediaType: {
@@ -77,7 +77,7 @@ export class ManifestCreation {
         }/api/v3`,
       }),
     };
-    const response = await github.request(
+    const response = await octokit.request(
       "POST /app-manifests/:code/conversions",
       options
     );

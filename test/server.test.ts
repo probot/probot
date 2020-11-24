@@ -18,7 +18,6 @@ A1yBjz3q2nX+zthk+GLXrJQkYOnIk1ECIHfeFV8TWm5gej1LxZquBTA5pINoqDVq
 NKZSuZEHqGEFAiB6EDrxkovq8SYGhIQsJeqkTMO8n94xhMRZlFmIQDokEQIgAq5U
 r1UQNnUExRh7ZT0kFbMfO9jKYZVlQdCL9Dn93vo=
 -----END RSA PRIVATE KEY-----`;
-const appFn = () => {};
 const pushEvent = require("./fixtures/webhook/push.json");
 
 describe("Server", () => {
@@ -31,9 +30,9 @@ describe("Server", () => {
     done();
   };
 
-  beforeEach(() => {
+  beforeEach(async () => {
     output = [];
-    server = new Server(appFn, {
+    server = new Server({
       Probot: Probot.defaults({ appId, privateKey, secret: "secret" }),
       log: pino(streamLogsToOutput),
     });
@@ -44,6 +43,10 @@ describe("Server", () => {
         res.status(500).send(error.message);
       }
     );
+  });
+
+  test("Server.version", () => {
+    expect(Server.version).toEqual("0.0.0-development");
   });
 
   describe("GET /ping", () => {
@@ -58,24 +61,21 @@ describe("Server", () => {
     it("should return 200 and run event handlers in app function", async () => {
       expect.assertions(3);
 
-      server = new Server(
-        ({ app }) => {
-          app.on("push", (event) => {
-            expect(event.name).toEqual("push");
-          });
-        },
-        {
-          Probot: Probot.defaults({
-            appId,
-            privateKey,
-            secret: "secret",
-          }),
-          log: pino(streamLogsToOutput),
-          port: await getPort(),
-        }
-      );
+      server = new Server({
+        Probot: Probot.defaults({
+          appId,
+          privateKey,
+          secret: "secret",
+        }),
+        log: pino(streamLogsToOutput),
+        port: await getPort(),
+      });
 
-      await server.start();
+      await server.load(({ app }) => {
+        app.on("push", (event) => {
+          expect(event.name).toEqual("push");
+        });
+      });
 
       const dataString = JSON.stringify(pushEvent);
 
@@ -86,10 +86,8 @@ describe("Server", () => {
         .set("x-hub-signature", sign("secret", dataString))
         .set("x-github-delivery", "3sw4d5f6g7h8");
 
-      expect(output.length).toEqual(3);
-      expect(output[2].msg).toContain("POST / 200 -");
-
-      await server.stop();
+      expect(output.length).toEqual(1);
+      expect(output[0].msg).toContain("POST / 200 -");
     });
   });
 
@@ -108,7 +106,7 @@ describe("Server", () => {
       // block port 3001
       const http = require("http");
       const blockade = http.createServer().listen(3001, async () => {
-        const server = new Server(appFn, {
+        const server = new Server({
           Probot: Probot.defaults({ appId, privateKey }),
           log: pino(streamLogsToOutput),
           port: 3001,
@@ -128,7 +126,7 @@ describe("Server", () => {
     });
 
     it("should listen to port when not in use", async () => {
-      const testApp = new Server(appFn, {
+      const testApp = new Server({
         Probot: Probot.defaults({ appId, privateKey }),
         port: 3001,
         log: pino(streamLogsToOutput),
@@ -142,7 +140,7 @@ describe("Server", () => {
     });
 
     it("respects host/ip config when starting up HTTP server", async () => {
-      const testApp = new Server(appFn, {
+      const testApp = new Server({
         Probot: Probot.defaults({ appId, privateKey }),
         port: 3002,
         host: "127.0.0.1",

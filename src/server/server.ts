@@ -8,18 +8,9 @@ import { getLog } from "../helpers/get-log";
 import { getLoggingMiddleware } from "./logging-middleware";
 import { createWebhookProxy } from "../helpers/webhook-proxy";
 import { VERSION } from "../version";
-import { ApplicationFunction } from "../types";
+import { ApplicationFunction, ServerOptions } from "../types";
 import { Probot } from "../";
 import { load } from "../load";
-
-export type ServerOptions = {
-  log?: Logger;
-  port?: number;
-  host?: string;
-  webhookPath?: string;
-  webhookProxy?: string;
-  Probot: typeof Probot;
-};
 
 type State = {
   httpServer?: HttpServer;
@@ -27,11 +18,12 @@ type State = {
   host?: string;
   webhookPath: string;
   webhookProxy?: string;
-  appFn: ApplicationFunction;
   eventSource?: EventSource;
 };
 
 export class Server {
+  static version = VERSION;
+
   public expressApp: Application;
   public log: Logger;
   public version = VERSION;
@@ -39,10 +31,7 @@ export class Server {
 
   private state: State;
 
-  constructor(
-    appFn: ApplicationFunction,
-    options: ServerOptions = {} as ServerOptions
-  ) {
+  constructor(options: ServerOptions = {} as ServerOptions) {
     this.expressApp = express();
     this.log = options.log || getLog().child({ name: "server" });
     this.probotApp = new options.Probot();
@@ -52,7 +41,6 @@ export class Server {
       host: options.host,
       webhookPath: options.webhookPath || "/",
       webhookProxy: options.webhookProxy,
-      appFn,
     };
 
     this.expressApp.use(getLoggingMiddleware(this.log));
@@ -70,6 +58,10 @@ export class Server {
     this.expressApp.get("/ping", (req, res) => res.end("PONG"));
   }
 
+  public async load(appFn: ApplicationFunction) {
+    await load(this.probotApp, this.router(), appFn);
+  }
+
   public async start() {
     this.log.info(
       `Running Probot v${this.version} (Node.js: ${process.version})`
@@ -77,8 +69,6 @@ export class Server {
     const port = this.state.port || 3000;
     const { host, webhookPath, webhookProxy } = this.state;
     const printableHost = host ?? "localhost";
-
-    await load(this.probotApp, this.router(), this.state.appFn);
 
     this.state.httpServer = (await new Promise((resolve, reject) => {
       const server = this.expressApp.listen(

@@ -110,11 +110,11 @@ Sometimes you may need to create your own instance of Probot's internally used O
 const { ProbotOctokit } = require("probot");
 
 function myProbotApp(app) {
-  const github = new ProbotOctokit({
+  const octokit = new ProbotOctokit({
     // any options you'd pass to Octokit
     auth: "token <myToken>",
     // and a logger
-    log: app.log.child({ name: "my-github" }),
+    log: app.log.child({ name: "my-octokit" }),
   });
 }
 ```

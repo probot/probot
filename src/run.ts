@@ -1,13 +1,13 @@
 import pkgConf from "pkg-conf";
 
-import { ApplicationFunction, Options } from "./types";
+import { ApplicationFunction, Options, ServerOptions } from "./types";
 import { Probot } from "./index";
 import { setupAppFactory } from "./apps/setup";
 import { logWarningsForObsoleteEnvironmentVariables } from "./helpers/log-warnings-for-obsolete-environment-variables";
 import { getLog, GetLogOptions } from "./helpers/get-log";
 import { readCliOptions } from "./bin/read-cli-options";
 import { readEnvOptions } from "./bin/read-env-options";
-import { Server, ServerOptions } from "./server/server";
+import { Server } from "./server/server";
 import { defaultApp } from "./apps/default";
 import { resolveAppFunction } from "./helpers/resolve-app-function";
 import { load } from "./load";
@@ -25,6 +25,11 @@ export async function run(
   additionalOptions?: AdditionalOptions
 ) {
   require("dotenv").config();
+
+  const envOptions = readEnvOptions(additionalOptions?.env);
+  const cliOptions = Array.isArray(appFnOrArgv)
+    ? readCliOptions(appFnOrArgv)
+    : {};
 
   const {
     // log options
@@ -48,9 +53,7 @@ export async function run(
 
     // others
     args,
-  } = Array.isArray(appFnOrArgv)
-    ? readCliOptions(appFnOrArgv)
-    : readEnvOptions(additionalOptions?.env);
+  } = { ...envOptions, ...cliOptions };
 
   const logOptions: GetLogOptions = {
     level,
@@ -95,7 +98,8 @@ export async function run(
         );
       }
     }
-    server = new Server(setupAppFactory(host, port), serverOptions);
+    server = new Server(serverOptions);
+    await server.load(setupAppFactory(host, port));
     await server.start();
     return server;
   }
@@ -118,12 +122,14 @@ export async function run(
       load(app, server.router(), appFn);
     };
 
-    server = new Server(combinedApps, serverOptions);
+    server = new Server(serverOptions);
+    await server.load(combinedApps);
     await server.start();
     return server;
   }
 
-  server = new Server(appFnOrArgv, serverOptions);
+  server = new Server(serverOptions);
+  await server.load(appFnOrArgv);
   await server.start();
 
   return server;

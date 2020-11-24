@@ -4,7 +4,7 @@ next: docs/configuration.md
 
 # Extensions
 
-While Probot doesn't have an official extension API (yet), there are a handful of reusable utilities that have been extracted from existing apps.
+While Probot doesn't have an official extension API, there are a handful of reusable utilities that have been extracted from existing apps.
 
 ## Commands
 
@@ -49,24 +49,6 @@ module.exports = ({ app }) => {
   });
 };
 ```
-
-## Scheduler
-
-[probot-scheduler](https://github.com/probot/scheduler) is an extension to trigger events on a periodic schedule. It triggers a `schedule.repository` event every hour for each repository it has access to.
-
-```js
-const createScheduler = require("probot-scheduler");
-
-module.exports = ({ app }) => {
-  createScheduler(app);
-
-  app.on("schedule.repository", (context) => {
-    // this event is triggered on an interval, which is 1 hr by default
-  });
-};
-```
-
-Check out [stale](https://github.com/probot/stale) to see it in action.
 
 ## Attachments
 

@@ -6,18 +6,14 @@ describe("default app", () => {
   let server: Server;
 
   beforeEach(async () => {
-    server = new Server(defaultApp, {
+    server = new Server({
       Probot: Probot.defaults({
         id: 1,
         privateKey: "private key",
       }),
     });
 
-    await server.start();
-  });
-
-  afterEach(async () => {
-    await server.stop();
+    await server.load(defaultApp);
   });
 
   describe("GET /probot", () => {

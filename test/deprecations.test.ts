@@ -11,7 +11,6 @@ import {
   ProbotOctokit,
   Context,
 } from "../src";
-import { ApplicationFunction } from "../src/types";
 
 const pushEvent = require("./fixtures/webhook/push.json");
 
@@ -188,8 +187,8 @@ describe("Deprecations", () => {
       app.on("push", () => {});
     });
 
-    expect(output.length).toEqual(2);
-    expect(output[1].msg).toContain(
+    expect(output.length).toEqual(1);
+    expect(output[0].msg).toContain(
       '[probot] "(app) => {}" is deprecated. Use "({ app }) => {}" instead'
     );
   });
@@ -200,8 +199,8 @@ describe("Deprecations", () => {
       expect(app.router).toBeInstanceOf(Function);
     });
 
-    expect(output.length).toEqual(2);
-    expect(output[1].msg).toContain(
+    expect(output.length).toEqual(1);
+    expect(output[0].msg).toContain(
       '[probot] "app.router" is deprecated, use "getRouter()" from the app function instead: "({ app, getRouter }) => { ... }"'
     );
   });
@@ -212,8 +211,8 @@ describe("Deprecations", () => {
       expect(app.route()).toBeInstanceOf(Function);
     });
 
-    expect(output.length).toEqual(2);
-    expect(output[1].msg).toContain(
+    expect(output.length).toEqual(1);
+    expect(output[0].msg).toContain(
       '[probot] "app.route()" is deprecated, use the "getRouter()" argument from the app function instead: "({ app, getRouter }) => { ... }"'
     );
   });
@@ -327,7 +326,7 @@ describe("Deprecations", () => {
       .toContain(`[probot] "probot.start()" is deprecated. Use the new "Server" class instead:
     
     const { Server, Probot } = require("probot")
-    const server = new Server(async ({ app }) => {}, { 
+    const server = new Server({ 
       // optional:
       host,
       port,
@@ -335,6 +334,9 @@ describe("Deprecations", () => {
       webhookProxy,
       Probot: Probot.defaults({ id, privateKey, ... })
     })
+
+    // load probot app function
+    await server.load(({ app }) => {})
 
     // start listening to requests
     await server.start()
@@ -351,7 +353,7 @@ describe("Deprecations", () => {
       .toContain(`[probot] "probot.setup()" is deprecated. Use the new "Server" class instead:
     
     const { Server, Probot } = require("probot")
-    const server = new Server(async ({ app }) => {}, {
+    const server = new Server({
       // optional:
       host,
       port,
@@ -359,6 +361,9 @@ describe("Deprecations", () => {
       webhookProxy,
       Probot: Probot.defaults({ id, privateKey, ... })
     })
+
+    // load probot app function
+    await server.load(({ app }) => {})
 
     // start listening to requests
     await server.start()
@@ -376,30 +381,12 @@ If you have more than one app function, combine them in a function instead
 `);
   });
 
-  it("probot.load(appFn)", () => {
+  it("probot.load(appFunctionPath)", () => {
     const probot = new Probot({ log: pino(streamLogsToOutput) });
-    probot.load(() => {});
+    probot.load("./test/fixtures/example.js");
 
-    expect(output[0].msg)
-      .toContain(`[probot] "probot.load()" is deprecated. Pass the "probot" instance directly to an app function instead:
-    
-    const myOtherApp = require("./my-other-app.js")
-
-    export async function app ({ probot, getRouter }) {
-      await myOtherApp({ probot, getRouter })
-    }
-    `);
-  });
-
-  it("probot.load([app1, app2])", () => {
-    expect.assertions(2);
-
-    const probot = new Probot({ log: pino(streamLogsToOutput) });
-
-    const app: ApplicationFunction = ({ app }) => {
-      expect(app).toBeInstanceOf(Probot);
-    };
-
-    probot.load([app, app]);
+    expect(output[0].msg).toContain(
+      `[probot] passing a string to "probot.load()" is deprecated. Pass the function from "./test/fixtures/example.js" instead.`
+    );
   });
 });

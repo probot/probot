@@ -135,6 +135,8 @@ To deploy multiple apps in one instance, create a new app that has the existing 
 
 Probot logs messages using [pino](https://getpino.io/). There is a growing number of tools that consume these logs and send them to error tracking services: https://getpino.io/#/docs/transports.
 
+By default, probot can send errors to [Sentry](https://sentry.io/). Set the `SENTRY_DSN` environment variable to enable it.
+
 ## Serverless
 
 Serverless abstracts away the most menial parts of building an application, leaving developers to write code and not actively manage scaling for their applications. The [Serverless Deployment](./serverless-deployment.md) section will show you how to deploy you application using functions instead of servers.

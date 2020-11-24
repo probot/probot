@@ -23,7 +23,6 @@ describe("My Probot app", () => {
   beforeEach(() => {
     nock.disableNetConnect();
     probot = new Probot({
-      id: 1,
       githubToken: "test",
       // Disable throttling & retrying requests for easier testing
       Octokit: ProbotOctokit.defaults({

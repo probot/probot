@@ -3,12 +3,26 @@ import Stream from "stream";
 import { NextFunction, Request, Response } from "express";
 import request from "supertest";
 import pino from "pino";
+import { sign } from "@octokit/webhooks";
+import getPort from "get-port";
 
-import { Server } from "../src";
+import { Server, Probot } from "../src";
+
+const appId = 1;
+const privateKey = `-----BEGIN RSA PRIVATE KEY-----
+MIIBOQIBAAJBAIILhiN9IFpaE0pUXsesuuoaj6eeDiAqCiE49WB1tMB8ZMhC37kY
+Fl52NUYbUxb7JEf6pH5H9vqw1Wp69u78XeUCAwEAAQJAb88urnaXiXdmnIK71tuo
+/TyHBKt9I6Rhfzz0o9Gv7coL7a537FVDvV5UCARXHJMF41tKwj+zlt9EEUw7a1HY
+wQIhAL4F/VHWSPHeTgXYf4EaX2OlpSOk/n7lsFtL/6bWRzRVAiEArzJs2vopJitv
+A1yBjz3q2nX+zthk+GLXrJQkYOnIk1ECIHfeFV8TWm5gej1LxZquBTA5pINoqDVq
+NKZSuZEHqGEFAiB6EDrxkovq8SYGhIQsJeqkTMO8n94xhMRZlFmIQDokEQIgAq5U
+r1UQNnUExRh7ZT0kFbMfO9jKYZVlQdCL9Dn93vo=
+-----END RSA PRIVATE KEY-----`;
+const appFn = () => {};
+const pushEvent = require("./fixtures/webhook/push.json");
 
 describe("Server", () => {
   let server: Server;
-  let webhook: any;
 
   let output: any[];
   const streamLogsToOutput = new Stream.Writable({ objectMode: true });
@@ -19,14 +33,13 @@ describe("Server", () => {
 
   beforeEach(() => {
     output = [];
-    webhook = jest.fn((req, res, next) => next());
-    server = new Server({
+    server = new Server(appFn, {
+      Probot: Probot.defaults({ appId, privateKey, secret: "secret" }),
       log: pino(streamLogsToOutput),
     });
-    server.app.use(webhook);
 
     // Error handler to avoid printing logs
-    server.app.use(
+    server.expressApp.use(
       (error: Error, req: Request, res: Response, next: NextFunction) => {
         res.status(500).send(error.message);
       }
@@ -35,27 +48,54 @@ describe("Server", () => {
 
   describe("GET /ping", () => {
     it("returns a 200 response", async () => {
-      await request(server.app).get("/ping").expect(200, "PONG");
+      await request(server.expressApp).get("/ping").expect(200, "PONG");
       expect(output.length).toEqual(1);
       expect(output[0].msg).toContain("GET /ping 200 -");
     });
   });
 
   describe("webhook handler (POST /)", () => {
-    it("should 500 on a webhook error", async () => {
-      webhook.mockImplementation(
-        (req: Request, res: Response, callback: NextFunction) =>
-          callback(new Error("webhook error"))
+    it("should return 200 and run event handlers in app function", async () => {
+      expect.assertions(3);
+
+      server = new Server(
+        ({ app }) => {
+          app.on("push", (event) => {
+            expect(event.name).toEqual("push");
+          });
+        },
+        {
+          Probot: Probot.defaults({
+            appId,
+            privateKey,
+            secret: "secret",
+          }),
+          log: pino(streamLogsToOutput),
+          port: await getPort(),
+        }
       );
-      await request(server.app).post("/").expect(500);
-      expect(output.length).toEqual(1);
-      expect(output[0].msg).toContain("POST / 500 -");
+
+      await server.start();
+
+      const dataString = JSON.stringify(pushEvent);
+
+      await request(server.expressApp)
+        .post("/")
+        .send(dataString)
+        .set("x-github-event", "push")
+        .set("x-hub-signature", sign("secret", dataString))
+        .set("x-github-delivery", "3sw4d5f6g7h8");
+
+      expect(output.length).toEqual(3);
+      expect(output[2].msg).toContain("POST / 200 -");
+
+      await server.stop();
     });
   });
 
   describe("GET unknown URL", () => {
     it("responds with 404", async () => {
-      await request(server.app).get("/notfound").expect(404);
+      await request(server.expressApp).get("/notfound").expect(404);
       expect(output.length).toEqual(1);
       expect(output[0].msg).toContain("GET /notfound 404 -");
     });
@@ -68,7 +108,8 @@ describe("Server", () => {
       // block port 3001
       const http = require("http");
       const blockade = http.createServer().listen(3001, async () => {
-        const server = new Server({
+        const server = new Server(appFn, {
+          Probot: Probot.defaults({ appId, privateKey }),
           log: pino(streamLogsToOutput),
           port: 3001,
         });
@@ -87,7 +128,11 @@ describe("Server", () => {
     });
 
     it("should listen to port when not in use", async () => {
-      const testApp = new Server({ port: 3001, log: pino(streamLogsToOutput) });
+      const testApp = new Server(appFn, {
+        Probot: Probot.defaults({ appId, privateKey }),
+        port: 3001,
+        log: pino(streamLogsToOutput),
+      });
       await testApp.start();
 
       expect(output.length).toEqual(2);
@@ -97,7 +142,8 @@ describe("Server", () => {
     });
 
     it("respects host/ip config when starting up HTTP server", async () => {
-      const testApp = new Server({
+      const testApp = new Server(appFn, {
+        Probot: Probot.defaults({ appId, privateKey }),
         port: 3002,
         host: "127.0.0.1",
         log: pino(streamLogsToOutput),
@@ -116,21 +162,21 @@ describe("Server", () => {
       const router = server.router("/my-app");
       router.get("/foo", (req, res) => res.end("foo"));
 
-      return request(server.app).get("/my-app/foo").expect(200, "foo");
+      return request(server.expressApp).get("/my-app/foo").expect(200, "foo");
     });
 
     it("allows routes with no path", () => {
       const router = server.router();
       router.get("/foo", (req, res) => res.end("foo"));
 
-      return request(server.app).get("/foo").expect(200, "foo");
+      return request(server.expressApp).get("/foo").expect(200, "foo");
     });
 
     it("allows you to overwrite the root path", () => {
       const router = server.router();
       router.get("/", (req, res) => res.end("foo"));
 
-      return request(server.app).get("/").expect(200, "foo");
+      return request(server.expressApp).get("/").expect(200, "foo");
     });
 
     it("isolates apps from affecting each other", async () => {
@@ -145,31 +191,31 @@ describe("Server", () => {
         router.get("/hello", (req, res) => res.end(name));
       });
 
-      await request(server.app)
+      await request(server.expressApp)
         .get("/foo/hello")
         .expect(200, "foo")
         .expect("X-Test", "foo");
 
-      await request(server.app)
+      await request(server.expressApp)
         .get("/bar/hello")
         .expect(200, "bar")
         .expect("X-Test", "bar");
     });
 
     it("responds with 500 on error", async () => {
-      server.app.get("/boom", () => {
+      server.expressApp.get("/boom", () => {
         throw new Error("boom");
       });
 
-      await request(server.app).get("/boom").expect(500);
+      await request(server.expressApp).get("/boom").expect(500);
     });
 
     it("responds with 500 on async error", async () => {
-      server.app.get("/boom", () => {
+      server.expressApp.get("/boom", () => {
         return Promise.reject(new Error("boom"));
       });
 
-      await request(server.app).get("/boom").expect(500);
+      await request(server.expressApp).get("/boom").expect(500);
     });
   });
 });

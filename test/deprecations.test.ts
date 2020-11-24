@@ -315,4 +315,63 @@ describe("Deprecations", () => {
       `[probot] "REDIS_URL" is deprecated when using with the Probot constructor. Use "new Probot({ redisConfig: 'redis://...' })" instead`
     );
   });
+
+  it("probot.start()", async () => {
+    const probot = new Probot({ log: pino(streamLogsToOutput) });
+
+    probot.start();
+    probot.stop();
+
+    expect(output[0].msg)
+      .toContain(`[probot] "probot.start()" is deprecated. Use the new "Server" class instead:
+    
+    const { Server, Probot } = require("probot")
+    const server = new Server(async ({ probot }) => {}, { 
+      // optional:
+      host,
+      port,
+      webhookPath,
+      webhookProxy,
+      Probot: Probot.defaults({ id, privateKey, ... })
+    })
+
+    // start listening to requests
+    await server.start()
+    // stop server with: await server.stop()
+`);
+  });
+
+  it("probot.setup()", () => {
+    const probot = new Probot({ log: pino(streamLogsToOutput) });
+
+    probot.setup([() => {}]);
+
+    expect(output[0].msg)
+      .toContain(`[probot] "probot.setup()" is deprecated. Use the new "Server" class instead. Pass the function as "new Server({ app })" parameter:
+    
+    const { Server, Probot } = require("probot")
+    const server = new Server(async ({ probot }) => {}, {
+      // optional:
+      host,
+      port,
+      webhookPath,
+      webhookProxy,
+      Probot: Probot.defaults({ id, privateKey })
+    })
+
+    // start listening to requests
+    await server.start()
+    // stop server with: await server.stop()
+
+If you have more than one app function, combine them in a function instead
+
+    const app1 = require("./app1")
+    const app2 = require("./app2")
+
+    async function app ({ probot, getRouter  }) {
+      await app1({ probot, getRouter })
+      await app2({ probot, getRouter })
+    }
+`);
+  });
 });

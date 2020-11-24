@@ -14,7 +14,8 @@ export interface Options {
   // same options as Application class
   privateKey?: string;
   githubToken?: string;
-  id?: number;
+  appId?: number | string;
+
   Octokit?: typeof ProbotOctokit;
   log?: Logger;
   redisConfig?: Redis.RedisOptions | string;
@@ -28,6 +29,10 @@ export interface Options {
 
   // Probot class-specific options
   /**
+   * @deprecated `id` options is deprecated. Use `appId` instead
+   */
+  id?: number | string;
+  /**
    * @deprecated `cert` options is deprecated. Use `privateKey` instead
    */
   cert?: string;
@@ -38,7 +43,7 @@ export interface Options {
 }
 
 export type State = {
-  id?: number;
+  appId?: number;
   privateKey?: string;
   githubToken?: string;
   log: Logger;

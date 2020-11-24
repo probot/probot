@@ -8,6 +8,9 @@ import { getLog } from "../helpers/get-log";
 import { getLoggingMiddleware } from "./logging-middleware";
 import { createWebhookProxy } from "../helpers/webhook-proxy";
 import { VERSION } from "../version";
+import { ApplicationFunction } from "../types";
+import { Probot } from "../";
+import { load } from "../load";
 
 export type ServerOptions = {
   log?: Logger;
@@ -15,45 +18,56 @@ export type ServerOptions = {
   host?: string;
   webhookPath?: string;
   webhookProxy?: string;
+  Probot: typeof Probot;
 };
 
 type State = {
   httpServer?: HttpServer;
   port?: number;
   host?: string;
-  webhookPath?: string;
+  webhookPath: string;
   webhookProxy?: string;
-  router: Router;
+  appFn: ApplicationFunction;
+  eventSource?: EventSource;
 };
 
 export class Server {
-  public app: Application;
+  public expressApp: Application;
   public log: Logger;
   public version = VERSION;
+  public probotApp: Probot;
 
   private state: State;
 
-  constructor(options: ServerOptions = {}) {
-    this.app = express();
+  constructor(
+    appFn: ApplicationFunction,
+    options: ServerOptions = {} as ServerOptions
+  ) {
+    this.expressApp = express();
     this.log = options.log || getLog().child({ name: "server" });
+    this.probotApp = new options.Probot();
 
     this.state = {
       port: options.port,
       host: options.host,
       webhookPath: options.webhookPath || "/",
       webhookProxy: options.webhookProxy,
-      router: Router(),
+      appFn,
     };
 
-    this.app.use(getLoggingMiddleware(this.log));
-    this.app.use(
+    this.expressApp.use(getLoggingMiddleware(this.log));
+    this.expressApp.use(
       "/probot/static/",
       express.static(join(__dirname, "..", "..", "static"))
     );
-    this.app.set("view engine", "hbs");
-    this.app.set("views", join(__dirname, "..", "..", "views"));
-    this.app.get("/ping", (req, res) => res.end("PONG"));
-    this.app.use(this.state.router);
+    this.expressApp.use(
+      this.state.webhookPath,
+      this.probotApp.webhooks.middleware
+    );
+
+    this.expressApp.set("view engine", "hbs");
+    this.expressApp.set("views", join(__dirname, "..", "..", "views"));
+    this.expressApp.get("/ping", (req, res) => res.end("PONG"));
   }
 
   public async start() {
@@ -64,18 +78,20 @@ export class Server {
     const { host, webhookPath, webhookProxy } = this.state;
     const printableHost = host ?? "localhost";
 
+    await load(this.probotApp, this.router(), this.state.appFn);
+
     this.state.httpServer = (await new Promise((resolve, reject) => {
-      const server = this.app.listen(
+      const server = this.expressApp.listen(
         port,
         ...((host ? [host] : []) as any),
         () => {
           if (webhookProxy) {
-            createWebhookProxy({
+            this.state.eventSource = createWebhookProxy({
               logger: this.log,
               path: webhookPath,
               port: port,
               url: webhookProxy,
-            });
+            }) as EventSource;
           }
           this.log.info(`Listening on http://${printableHost}:${port}`);
           resolve(server);
@@ -98,18 +114,15 @@ export class Server {
   }
 
   public async stop() {
+    if (this.state.eventSource) this.state.eventSource.close();
     if (!this.state.httpServer) return;
     const server = this.state.httpServer;
     return new Promise((resolve) => server.close(resolve));
   }
 
-  public router(path?: string) {
-    if (path) {
-      const newRouter = Router();
-      this.state.router.use(path, newRouter);
-      return newRouter;
-    }
-
-    return this.state.router;
+  public router(path: string = "/") {
+    const newRouter = Router();
+    this.expressApp.use(path, newRouter);
+    return newRouter;
   }
 }

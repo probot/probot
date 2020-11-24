@@ -72,11 +72,16 @@ export function readCliOptions(
     )
     .parse(argv);
 
-  const { app: id, privateKey: privateKeyPath, redisUrl, ...options } = program;
+  const {
+    app: appId,
+    privateKey: privateKeyPath,
+    redisUrl,
+    ...options
+  } = program;
 
   return {
     privateKey: getPrivateKey({ filepath: privateKeyPath }) || undefined,
-    id,
+    appId,
     redisConfig: redisUrl,
     ...options,
   };

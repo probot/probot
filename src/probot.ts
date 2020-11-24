@@ -206,6 +206,19 @@ export class Probot {
   }
 
   public load(appFn: string | ApplicationFunction | ApplicationFunction[]) {
+    this.log.warn(
+      new Deprecation(
+        `[probot] "probot.load()" is deprecated. Pass the "probot" instance directly to an app function instead:
+    
+    const myOtherApp = require("./my-other-app.js")
+
+    export async function app ({ probot, getRouter }) {
+      await myOtherApp({ probot, getRouter })
+    }
+    `
+      )
+    );
+
     const router = express.Router();
 
     // Connect the router from the app to the server
@@ -220,16 +233,16 @@ export class Probot {
   public setup(appFns: Array<string | ApplicationFunction>) {
     this.log.warn(
       new Deprecation(
-        `[probot] "probot.setup()" is deprecated. Use the new "Server" class instead. Pass the function as "new Server({ app })" parameter:
+        `[probot] "probot.setup()" is deprecated. Use the new "Server" class instead:
     
     const { Server, Probot } = require("probot")
-    const server = new Server(async ({ probot }) => {}, {
+    const server = new Server(async ({ app }) => {}, {
       // optional:
       host,
       port,
       webhookPath,
       webhookProxy,
-      Probot: Probot.defaults({ id, privateKey })
+      Probot: Probot.defaults({ id, privateKey, ... })
     })
 
     // start listening to requests
@@ -241,7 +254,7 @@ If you have more than one app function, combine them in a function instead
     const app1 = require("./app1")
     const app2 = require("./app2")
 
-    async function app ({ probot, getRouter  }) {
+    module.exports = function app ({ probot, getRouter }) {
       await app1({ probot, getRouter })
       await app2({ probot, getRouter })
     }
@@ -262,7 +275,7 @@ If you have more than one app function, combine them in a function instead
         `[probot] "probot.start()" is deprecated. Use the new "Server" class instead:
     
     const { Server, Probot } = require("probot")
-    const server = new Server(async ({ probot }) => {}, { 
+    const server = new Server(async ({ app }) => {}, { 
       // optional:
       host,
       port,

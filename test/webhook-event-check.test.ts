@@ -60,16 +60,13 @@ describe("webhook-event-check", () => {
       .get("/app")
       .reply(200, mockAppMetaRequest(["label", "star"]));
 
-    const probot = new Probot({ appId, privateKey });
+    const app = new Probot({ appId, privateKey });
 
-    let spyOnLogError;
-    probot.load(async ({ app }) => {
-      spyOnLogError = jest.spyOn(app.log, "error");
+    const spyOnLogError = jest.spyOn(app.log, "error");
 
-      app.on("label.edited", noop);
-      app.on("label.deleted", noop);
-      app.on("team.created", noop);
-    });
+    app.on("label.edited", noop);
+    app.on("label.deleted", noop);
+    app.on("team.created", noop);
 
     // let's give the event check a moment to send its request
     await new Promise((resolve) => setTimeout(resolve, 2500));
@@ -83,14 +80,10 @@ describe("webhook-event-check", () => {
       .get("/app")
       .reply(200, mockAppMetaRequest([]));
 
-    const probot = new Probot({ appId, privateKey });
-    let spyOnLogError;
+    const app = new Probot({ appId, privateKey });
+    const spyOnLogError = jest.spyOn(app.log, "error");
 
-    probot.load(async ({ app }) => {
-      spyOnLogError = jest.spyOn(app.log, "error");
-
-      app.on("*", noop);
-    });
+    app.on("*", noop);
 
     // let's give the event check a moment to send its request
     await new Promise((resolve) => setTimeout(resolve, 500));
@@ -105,14 +98,10 @@ describe("webhook-event-check", () => {
         .get("/app")
         .reply(200, mockAppMetaRequest());
 
-      const probot = new Probot({ appId, privateKey });
-      let spyOnLogError;
+      const app = new Probot({ appId, privateKey });
+      const spyOnLogError = jest.spyOn(app.log, "error");
 
-      probot.load(async ({ app }) => {
-        spyOnLogError = jest.spyOn(app.log, "error");
-
-        app.on("pull_request.opened", noop);
-      });
+      app.on("pull_request.opened", noop);
 
       // let's give the event check a moment to send its request
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -127,14 +116,12 @@ describe("webhook-event-check", () => {
         .get("/app")
         .reply(404);
 
-      const probot = new Probot({ appId, privateKey });
+      const app = new Probot({ appId, privateKey });
       let spyOnLogError;
 
-      probot.load(async ({ app }) => {
-        spyOnLogError = jest.spyOn(app.log, "error");
+      spyOnLogError = jest.spyOn(app.log, "error");
 
-        app.on("pull_request.opened", noop);
-      });
+      app.on("pull_request.opened", noop);
 
       // let's give the event check a moment to send its request
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -154,15 +141,12 @@ describe("webhook-event-check", () => {
     test("when JEST_WORKER_ID is set", async () => {
       process.env.JEST_WORKER_ID = "mocked_id";
 
-      const probot = new Probot({ appId, privateKey });
-      let spyOnLogError;
+      const app = new Probot({ appId, privateKey });
 
-      probot.load(async ({ app }) => {
-        spyOnLogError = jest.spyOn(app.log, "error");
-        app.on("pull_request.opened", noop);
-      });
+      const spyOnLogError = jest.spyOn(app.log, "error");
+      app.on("pull_request.opened", noop);
 
-      // let's give probot setup a moment
+      // let's give app setup a moment
       await new Promise((resolve) => setTimeout(resolve, 500));
 
       expect(spyOnLogError).not.toHaveBeenCalled();
@@ -171,15 +155,11 @@ describe("webhook-event-check", () => {
     test("when DISABLE_WEBHOOK_EVENT_CHECK is true", async () => {
       process.env.DISABLE_WEBHOOK_EVENT_CHECK = "true";
 
-      const probot = new Probot({ appId, privateKey });
-      let spyOnLogError;
+      const app = new Probot({ appId, privateKey });
+      const spyOnLogError = jest.spyOn(app.log, "error");
+      app.on("pull_request.opened", noop);
 
-      probot.load(async ({ app }) => {
-        spyOnLogError = jest.spyOn(app.log, "error");
-        app.on("pull_request.opened", noop);
-      });
-
-      // let's give probot setup a moment
+      // let's give app setup a moment
       await new Promise((resolve) => setTimeout(resolve, 500));
 
       expect(spyOnLogError).not.toHaveBeenCalled();
@@ -188,15 +168,11 @@ describe("webhook-event-check", () => {
     test("when NODE_ENV is production", async () => {
       process.env.NODE_ENV = "production";
 
-      const probot = new Probot({ appId, privateKey });
-      let spyOnLogError;
+      const app = new Probot({ appId, privateKey });
+      const spyOnLogError = jest.spyOn(app.log, "error");
+      app.on("pull_request.opened", noop);
 
-      probot.load(async ({ app }) => {
-        spyOnLogError = jest.spyOn(app.log, "error");
-        app.on("pull_request.opened", noop);
-      });
-
-      // let's give probot setup a moment
+      // let's give app setup a moment
       await new Promise((resolve) => setTimeout(resolve, 500));
 
       expect(spyOnLogError).not.toHaveBeenCalled();
@@ -205,15 +181,11 @@ describe("webhook-event-check", () => {
     test('when NODE_ENV starts with "test"', async () => {
       process.env.NODE_ENV = "testing";
 
-      const probot = new Probot({ appId, privateKey });
-      let spyOnLogError;
+      const app = new Probot({ appId, privateKey });
+      const spyOnLogError = jest.spyOn(app.log, "error");
+      app.on("pull_request.opened", noop);
 
-      probot.load(async ({ app }) => {
-        spyOnLogError = jest.spyOn(app.log, "error");
-        app.on("pull_request.opened", noop);
-      });
-
-      // let's give probot setup a moment
+      // let's give app setup a moment
       await new Promise((resolve) => setTimeout(resolve, 500));
 
       expect(spyOnLogError).not.toHaveBeenCalled();

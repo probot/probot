@@ -3,7 +3,8 @@ import bodyParser from "body-parser";
 import { exec } from "child_process";
 import { Request, Response } from "express";
 import updateDotenv from "update-dotenv";
-import { Probot } from "../index";
+
+import { Probot } from "../probot";
 import { ManifestCreation } from "../manifest-creation";
 
 import { getLoggingMiddleware } from "../server/logging-middleware";

@@ -30,7 +30,7 @@ describe("My Probot app", () => {
         throttle: { enabled: false },
       }),
     });
-    probot.load(myProbotApp);
+    myProbotApp({ app: probot });
   });
 
   test("creates a passing check", async () => {

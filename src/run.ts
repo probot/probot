@@ -1,5 +1,3 @@
-require("dotenv").config();
-
 import pkgConf from "pkg-conf";
 
 import { ApplicationFunction, Options } from "./types";
@@ -26,6 +24,8 @@ export async function run(
   appFnOrArgv: ApplicationFunction | string[],
   additionalOptions?: AdditionalOptions
 ) {
+  require("dotenv").config();
+
   const {
     // log options
     logLevel: level,

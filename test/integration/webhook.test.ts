@@ -56,8 +56,6 @@ describe("webhooks", () => {
   });
 
   test("logs webhook error exactly once", async () => {
-    probot.load(() => {});
-
     await request(probot.server)
       .post("/")
       .send(data)

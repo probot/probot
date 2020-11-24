@@ -24,7 +24,11 @@ describe("run", () => {
     env = {
       DISABLE_WEBHOOK_EVENT_CHECK: "true",
       APP_ID: "1",
-      PRIVATE_KEY_PATH: path.join(__dirname, "test-private-key.pem"),
+      PRIVATE_KEY_PATH: path.join(
+        __dirname,
+        "fixtures",
+        "test-private-key.pem"
+      ),
       WEBHOOK_PROXY_URL: "https://smee.io/EfHXC9BFfGAxbM6J",
       WEBHOOK_SECRET: "secret",
       LOG_LEVEL: "fatal",
@@ -76,7 +80,7 @@ describe("run", () => {
 
       const dataString = require("./fixtures/webhook/push.json");
 
-      await request(server.app)
+      await request(server.expressApp)
         .post("/")
         .send(dataString)
         .set("x-github-event", "push")
@@ -98,7 +102,7 @@ describe("run", () => {
 
       const dataString = require("./fixtures/webhook/push.json");
 
-      await request(server.app)
+      await request(server.expressApp)
         .post("/custom-webhook")
         .send(dataString)
         .set("x-github-event", "push")

@@ -9,7 +9,7 @@ export function readEnvOptions(
   return {
     args: [],
     privateKey: (privateKey && privateKey.toString()) || undefined,
-    id: Number(env.APP_ID),
+    appId: Number(env.APP_ID),
     port: Number(env.PORT) || 3000,
     host: env.HOST,
     secret: env.WEBHOOK_SECRET,

@@ -10,8 +10,9 @@ import { getLog, GetLogOptions } from "./helpers/get-log";
 import { readCliOptions } from "./bin/read-cli-options";
 import { readEnvOptions } from "./bin/read-env-options";
 import { Server, ServerOptions } from "./server/server";
-import { load } from "./load";
 import { defaultApp } from "./apps/default";
+import { resolveAppFunction } from "./helpers/resolve-app-function";
+import { load } from "./load";
 
 type AdditionalOptions = {
   env: Record<string, string | undefined>;
@@ -39,7 +40,7 @@ export async function run(
     webhookProxy,
 
     // probot options
-    id,
+    appId,
     privateKey,
     redisConfig,
     secret,
@@ -61,30 +62,28 @@ export async function run(
   const log = getLog(logOptions);
   logWarningsForObsoleteEnvironmentVariables(log);
 
-  const serverOptions: ServerOptions = {
-    host,
-    port,
-    webhookPath,
-    webhookProxy,
-    log: log.child({ name: "server" }),
-  };
-
-  const server = new Server(serverOptions);
-  const router = server.router();
-
   const probotOptions: Options = {
-    id,
+    appId,
     privateKey,
     redisConfig,
     secret,
     baseUrl,
     log: log.child({ name: "probot" }),
   };
-  const probot = new Probot(probotOptions);
+  const serverOptions: ServerOptions = {
+    host,
+    port,
+    webhookPath,
+    webhookProxy,
+    log: log.child({ name: "server" }),
+    Probot: Probot.defaults(probotOptions),
+  };
 
-  if (!id || !privateKey) {
+  let server: Server;
+
+  if (!appId || !privateKey) {
     if (process.env.NODE_ENV === "production") {
-      if (!id) {
+      if (!appId) {
         throw new Error(
           "Application ID is missing, and is required to run in production mode. " +
             "To resolve, ensure the APP_ID environment variable is set."
@@ -96,27 +95,35 @@ export async function run(
         );
       }
     }
-    load(probot, router, setupAppFactory(host, port));
-  } else if (Array.isArray(appFnOrArgv)) {
-    const pkg = await pkgConf("probot");
-    load(probot, router, defaultApp);
-
-    if (Array.isArray(pkg.apps)) {
-      for (const app of pkg.apps) {
-        load(probot, router, app);
-      }
-    }
-
-    const [appFn] = args;
-
-    load(probot, router, appFn);
-
-    server.app.use(webhookPath ? webhookPath : "/", probot.webhooks.middleware);
-  } else {
-    load(probot, router, appFnOrArgv);
-
-    server.app.use(webhookPath ? webhookPath : "/", probot.webhooks.middleware);
+    server = new Server(setupAppFactory(host, port), serverOptions);
+    await server.start();
+    return server;
   }
+
+  if (Array.isArray(appFnOrArgv)) {
+    const pkg = await pkgConf("probot");
+
+    const combinedApps: ApplicationFunction = ({ app }) => {
+      load(app, server.router(), defaultApp);
+
+      if (Array.isArray(pkg.apps)) {
+        for (const appPath of pkg.apps) {
+          const appFn = resolveAppFunction(appPath);
+          load(app, server.router(), appFn);
+        }
+      }
+
+      const [appPath] = args;
+      const appFn = resolveAppFunction(appPath);
+      load(app, server.router(), appFn);
+    };
+
+    server = new Server(combinedApps, serverOptions);
+    await server.start();
+    return server;
+  }
+
+  server = new Server(appFnOrArgv, serverOptions);
   await server.start();
 
   return server;

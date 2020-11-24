@@ -20,7 +20,7 @@ describe("webhooks", () => {
     output = [];
 
     probot = new Probot({
-      id: 1,
+      appId: 1,
       privateKey: "bexo🥪",
       secret: "secret",
       log: pino(streamLogsToOutput),
@@ -47,7 +47,6 @@ describe("webhooks", () => {
       // Note: 'x-hub-signature' is missing
       .set("x-github-delivery", "3sw4d5f6g7h8")
       .expect(400);
-
     expect(output[0]).toEqual(
       expect.objectContaining({
         msg:

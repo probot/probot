@@ -195,18 +195,6 @@ describe("Probot", () => {
     });
   });
 
-  describe("receive", () => {
-    it("forwards events to each app", async () => {
-      const spy = jest.fn();
-
-      probot.load(({ app }: { app: Probot }) => app.on("push", spy));
-
-      await probot.receive(event);
-
-      expect(spy).toHaveBeenCalledTimes(1);
-    });
-  });
-
   describe("ghe support", () => {
     beforeEach(() => {
       process.env.GHE_HOST = "notreallygithub.com";
@@ -307,92 +295,6 @@ describe("Probot", () => {
           );
         }),
       });
-    });
-  });
-
-  describe("custom Octokit constructor", () => {
-    beforeEach(() => {
-      const MyOctokit = ProbotOctokit.plugin(function fooBar() {
-        return {
-          foo: "bar",
-        };
-      });
-
-      probot = new Probot({
-        Octokit: MyOctokit,
-        githubToken: "faketoken",
-      });
-    });
-
-    it("is propagated to Octokit", async () => {
-      const app = probot.load(() => {});
-      const octokit: InstanceType<typeof ProbotOctokit> = await app.auth();
-      expect(octokit.foo).toBe("bar");
-    });
-  });
-
-  describe("load", () => {
-    it("app sends request with JWT authentication", async () => {
-      expect.assertions(3);
-
-      const mock = nock("https://api.github.com")
-        .get("/app")
-        .reply(200, {
-          id: 1,
-        })
-        .post("/app/installations/1/access_tokens")
-        .reply(201, {
-          token: "v1.123",
-          permissions: {},
-        })
-        .get("/repos/octocat/hello-world")
-        .matchHeader("authorization", "token v1.123")
-        .reply(200, { id: 4 });
-
-      const probot = new Probot({
-        appId,
-        privateKey,
-      });
-
-      await new Promise((resolve, reject) => {
-        probot.load(async ({ app }: { app: Probot }) => {
-          const octokit = await app.auth();
-          try {
-            const { data: appData } = await octokit.apps.getAuthenticated();
-
-            expect(appData.id).toEqual(1);
-
-            const installationOctokit = await app.auth(1);
-
-            const { data: repoData } = await installationOctokit.repos.get({
-              owner: "octocat",
-              repo: "hello-world",
-            });
-
-            expect(repoData.id).toEqual(4);
-            expect(mock.activeMocks()).toStrictEqual([]);
-
-            resolve(null);
-          } catch (error) {
-            reject(error);
-          }
-        });
-      });
-    });
-
-    it("accepts an array of app functions", () => {
-      expect.assertions(2);
-
-      const probot = new Probot({
-        appId,
-        privateKey,
-      });
-
-      const app = ({ app }: { app: Probot }) => {
-        expect(app).toBeInstanceOf(Probot);
-      };
-
-      probot.load([app, app]);
     });
   });
 

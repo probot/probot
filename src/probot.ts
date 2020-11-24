@@ -95,15 +95,6 @@ export class Probot {
       this.log.warn(new Deprecation(logEnvVariableDeprecation));
     }
 
-    if (options.cert) {
-      this.log.warn(
-        new Deprecation(
-          `[probot] "cert" option is deprecated. Use "privateKey" instead`
-        )
-      );
-      options.privateKey = options.privateKey || options.cert;
-    }
-
     if (options.id) {
       this.log.warn(
         new Deprecation(
@@ -111,6 +102,15 @@ export class Probot {
         )
       );
       options.appId = options.appId || options.id;
+    }
+
+    if (options.cert) {
+      this.log.warn(
+        new Deprecation(
+          `[probot] "cert" option is deprecated. Use "privateKey" instead`
+        )
+      );
+      options.privateKey = options.privateKey || options.cert;
     }
 
     if (process.env.INSTALLATION_TOKEN_TTL) {
@@ -150,7 +150,7 @@ export class Probot {
         path: options.webhookPath,
         secret: options.secret,
       },
-      id: options.id,
+      appId: Number(options.appId),
       privateKey: options.privateKey,
       host: options.host,
       port: options.port,
@@ -218,6 +218,37 @@ export class Probot {
   }
 
   public setup(appFns: Array<string | ApplicationFunction>) {
+    this.log.warn(
+      new Deprecation(
+        `[probot] "probot.setup()" is deprecated. Use the new "Server" class instead. Pass the function as "new Server({ app })" parameter:
+    
+    const { Server, Probot } = require("probot")
+    const server = new Server(async ({ probot }) => {}, {
+      // optional:
+      host,
+      port,
+      webhookPath,
+      webhookProxy,
+      Probot: Probot.defaults({ id, privateKey })
+    })
+
+    // start listening to requests
+    await server.start()
+    // stop server with: await server.stop()
+
+If you have more than one app function, combine them in a function instead
+
+    const app1 = require("./app1")
+    const app2 = require("./app2")
+
+    async function app ({ probot, getRouter  }) {
+      await app1({ probot, getRouter })
+      await app2({ probot, getRouter })
+    }
+`
+      )
+    );
+
     // Log all unhandled rejections
     process.on("unhandledRejection", getErrorHandler(this.log));
 
@@ -226,6 +257,26 @@ export class Probot {
   }
 
   public start() {
+    this.log.warn(
+      new Deprecation(
+        `[probot] "probot.start()" is deprecated. Use the new "Server" class instead:
+    
+    const { Server, Probot } = require("probot")
+    const server = new Server(async ({ probot }) => {}, { 
+      // optional:
+      host,
+      port,
+      webhookPath,
+      webhookProxy,
+      Probot: Probot.defaults({ id, privateKey, ... })
+    })
+
+    // start listening to requests
+    await server.start()
+    // stop server with: await server.stop()
+`
+      )
+    );
     this.log.info(
       `Running Probot v${this.version} (Node.js: ${process.version})`
     );

@@ -79,7 +79,7 @@ const log = getLog({
 logWarningsForObsoleteEnvironmentVariables(log);
 
 const probot = new Probot({
-  id: program.app,
+  appId: program.app,
   privateKey: String(privateKey),
   githubToken: githubToken,
   log,

@@ -23,7 +23,7 @@ let didDeprecate = false;
  * Loads an ApplicationFunction into the current Application
  * @param appFn - Probot application function to load
  */
-export function load(
+export async function load(
   app: Application | Probot,
   router: Router | null,
   appFn: string | ApplicationFunction | ApplicationFunction[]
@@ -51,17 +51,20 @@ export function load(
   );
 
   if (Array.isArray(appFn)) {
-    appFn.forEach((fn) => load(app, router, fn));
-  } else {
-    const fn = typeof appFn === "string" ? resolveAppFunction(appFn) : appFn;
-
-    fn(
-      (Object.assign(deprecatedApp, {
-        app,
-        getRouter: getRouter.bind(null, router || app.router),
-      }) as unknown) as ApplicationFunctionOptions
-    );
+    for (const fn of appFn) {
+      await load(app, router, fn);
+    }
+    return app;
   }
+
+  const fn = typeof appFn === "string" ? resolveAppFunction(appFn) : appFn;
+
+  await fn(
+    (Object.assign(deprecatedApp, {
+      app,
+      getRouter: getRouter.bind(null, router || app.router),
+    }) as unknown) as ApplicationFunctionOptions
+  );
 
   return app;
 }

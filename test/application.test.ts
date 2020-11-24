@@ -262,7 +262,7 @@ describe("Application", () => {
       const myApp = ({ app }: { app: Probot }) => app.on("pull_request", spy);
       const myApp2 = ({ app }: { app: Probot }) => app.on("pull_request", spy2);
 
-      app.load([myApp, myApp2]);
+      await app.load([myApp, myApp2]);
       await app.receive(event);
       expect(spy).toHaveBeenCalled();
       expect(spy2).toHaveBeenCalled();

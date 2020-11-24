@@ -10,6 +10,7 @@ import { Probot } from "./probot";
 import { Server } from "./server/server";
 import { ProbotOctokit } from "./octokit/probot-octokit";
 import { run } from "./run";
+import { getOptions } from "./get-options";
 
 export const createProbot = (options: Options) => {
   options.log =
@@ -28,7 +29,16 @@ export const createProbot = (options: Options) => {
   return new Probot(options);
 };
 
-export { Logger, Context, Application, ProbotOctokit, run, Probot, Server };
+export {
+  Logger,
+  Context,
+  Application,
+  ProbotOctokit,
+  run,
+  Probot,
+  Server,
+  getOptions,
+};
 
 /** NOTE: exported types might change at any point in time */
 export { Options, WebhookPayloadWithRepository };

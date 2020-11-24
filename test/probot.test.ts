@@ -206,8 +206,8 @@ describe("Probot", () => {
 
     it("requests from the correct API URL", async () => {
       const appFn = async ({ app }: { app: Probot }) => {
-        const github = await app.auth();
-        expect(github.request.endpoint.DEFAULTS.baseUrl).toEqual(
+        const octokit = await app.auth();
+        expect(octokit.request.endpoint.DEFAULTS.baseUrl).toEqual(
           "https://notreallygithub.com/api/v3"
         );
       };
@@ -239,8 +239,8 @@ describe("Probot", () => {
 
     it("requests from the correct API URL", async () => {
       const appFn = async ({ app }: { app: Probot }) => {
-        const github = await app.auth();
-        expect(github.request.endpoint.DEFAULTS.baseUrl).toEqual(
+        const octokit = await app.auth();
+        expect(octokit.request.endpoint.DEFAULTS.baseUrl).toEqual(
           "http://notreallygithub.com/api/v3"
         );
       };

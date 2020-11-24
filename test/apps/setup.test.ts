@@ -7,7 +7,6 @@ import nock from "nock";
 import { Stream } from "stream";
 import request from "supertest";
 import pino from "pino";
-import getPort from "get-port";
 
 import { Probot, Server } from "../../src";
 import { setupAppFactory } from "../../src/apps/setup";
@@ -24,19 +23,17 @@ describe("Setup app", () => {
 
   beforeEach(async () => {
     logOutput = [];
-    server = new Server(setupAppFactory(undefined, undefined), {
+    server = new Server({
       Probot: Probot.defaults({
         log: pino(streamLogsToOutput),
       }),
       log: pino(streamLogsToOutput),
-      port: await getPort(),
     });
 
-    await server.start();
+    await server.load(setupAppFactory(undefined, undefined));
   });
 
   afterEach(async () => {
-    await server.stop();
     jest.clearAllMocks();
   });
 
@@ -61,15 +58,14 @@ describe("Setup app", () => {
     });
 
     it("should log welcome message with custom host and port", async () => {
-      const server2 = new Server(setupAppFactory("127.0.0.1", 8080), {
+      const server2 = new Server({
         log: pino(streamLogsToOutput),
         Probot: Probot.defaults({
           log: pino(streamLogsToOutput),
         }),
-        port: await getPort(),
       });
 
-      await server2.start();
+      await server2.load(setupAppFactory("127.0.0.1", 8080));
 
       const expMsg =
         "Please follow the instructions at http://127.0.0.1:8080 to configure .env.";
@@ -78,8 +74,6 @@ describe("Setup app", () => {
         .filter((output: any) => output.level === pino.levels.values.info)
         .map((o) => o.msg);
       expect(infoLogs).toContain(expMsg);
-
-      server2.stop();
     });
   });
 

@@ -4,7 +4,7 @@ import { ProbotOctokit } from "../src/octokit/probot-octokit";
 type Options = ConstructorParameters<typeof ProbotOctokit>[0];
 
 describe("ProbotOctokit", () => {
-  let github: InstanceType<typeof ProbotOctokit>;
+  let octokit: InstanceType<typeof ProbotOctokit>;
 
   const defaultOptions: Options = {
     retry: {
@@ -18,22 +18,22 @@ describe("ProbotOctokit", () => {
   };
 
   beforeEach(() => {
-    github = new ProbotOctokit(defaultOptions);
+    octokit = new ProbotOctokit(defaultOptions);
   });
 
   test("works without options", async () => {
-    github = new ProbotOctokit();
+    octokit = new ProbotOctokit();
     const user = { login: "ohai" };
 
     nock("https://api.github.com").get("/user").reply(200, user);
-    expect((await github.users.getAuthenticated({})).data).toEqual(user);
+    expect((await octokit.users.getAuthenticated({})).data).toEqual(user);
   });
 
   test("logs request errors", async () => {
     nock("https://api.github.com").get("/").reply(500, {});
 
     try {
-      await github.request("/");
+      await octokit.request("/");
       throw new Error("should throw");
     } catch (error) {
       expect(error.status).toBe(500);
@@ -49,7 +49,7 @@ describe("ProbotOctokit", () => {
         },
       };
 
-      github = new ProbotOctokit(options);
+      octokit = new ProbotOctokit(options);
     });
 
     test("retries failed requests", async () => {
@@ -57,7 +57,7 @@ describe("ProbotOctokit", () => {
 
       nock("https://api.github.com").get("/").once().reply(200, {});
 
-      const response = await github.request("/");
+      const response = await octokit.request("/");
       expect(response.status).toBe(200);
     });
   });
@@ -78,7 +78,7 @@ describe("ProbotOctokit", () => {
         },
       };
 
-      github = new ProbotOctokit(options);
+      octokit = new ProbotOctokit(options);
     });
 
     test("retries requests when being rate limited", async () => {
@@ -97,7 +97,7 @@ describe("ProbotOctokit", () => {
         .get("/")
         .reply(200, {});
 
-      const { status } = await github.request("/");
+      const { status } = await octokit.request("/");
       expect(status).toBe(200);
     });
 
@@ -109,7 +109,7 @@ describe("ProbotOctokit", () => {
 
       nock("https://api.github.com").get("/").once().reply(200, {});
 
-      const response = await github.request("/");
+      const response = await octokit.request("/");
       expect(response.status).toBe(200);
     });
   });
@@ -154,8 +154,8 @@ describe("ProbotOctokit", () => {
 
     it("returns an array of pages", async () => {
       const spy = jest.fn();
-      const res = await github.paginate(
-        github.issues.listForRepo.endpoint.merge({
+      const res = await octokit.paginate(
+        octokit.issues.listForRepo.endpoint.merge({
           owner: "JasonEtco",
           repo: "pizza",
           per_page: 1,
@@ -171,8 +171,8 @@ describe("ProbotOctokit", () => {
       const spy = jest.fn((response, done) => {
         if (response.data[0].id === 2) done();
       }) as any;
-      const res = await github.paginate(
-        github.issues.listForRepo.endpoint.merge({
+      const res = await octokit.paginate(
+        octokit.issues.listForRepo.endpoint.merge({
           owner: "JasonEtco",
           repo: "pizza",
           per_page: 1,
@@ -184,8 +184,8 @@ describe("ProbotOctokit", () => {
     });
 
     it("maps the responses to data by default", async () => {
-      const res = await github.paginate(
-        github.issues.listForRepo.endpoint.merge({
+      const res = await octokit.paginate(
+        octokit.issues.listForRepo.endpoint.merge({
           owner: "JasonEtco",
           repo: "pizza",
           per_page: 1,

@@ -4,7 +4,7 @@ next: docs/extensions.md
 
 # Pagination
 
-Many GitHub API endpoints are paginated. The `github.paginate` method can be used to get each page of the results.
+Many GitHub API endpoints are paginated. The [`octokit.paginate` method](https://github.com/octokit/plugin-paginate-rest.js) can be used to get each page of the results.
 
 ```js
 module.exports = ({ app }) => {
@@ -24,7 +24,7 @@ module.exports = ({ app }) => {
 
 ## Accumulating pages
 
-The return value of the `github.paginate` callback will be used to accumulate results.
+The return value of the `octokit.paginate` callback will be used to accumulate results.
 
 ```js
 module.exports = ({ app }) => {

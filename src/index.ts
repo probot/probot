@@ -11,6 +11,7 @@ import { Server } from "./server/server";
 import { ProbotOctokit } from "./octokit/probot-octokit";
 import { run } from "./run";
 import { getOptions } from "./get-options";
+import { createNodeMiddleware } from "./create-node-middleware";
 
 export const createProbot = (options: Options) => {
   options.log =
@@ -38,6 +39,7 @@ export {
   Probot,
   Server,
   getOptions,
+  createNodeMiddleware,
 };
 
 /** NOTE: exported types might change at any point in time */

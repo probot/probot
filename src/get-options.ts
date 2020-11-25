@@ -43,7 +43,7 @@ export function getOptions(
     env = process.env,
   }: Parameters = {} as Parameters
 ): ServerOptions {
-  const privateKey = getPrivateKey();
+  const privateKey = getPrivateKey({ env });
   const envWithDefaults = { ...DEFAULTS, ...env };
 
   const logOptions: GetLogOptions = {

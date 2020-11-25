@@ -23,44 +23,66 @@ Every deployment will need an [App](https://developer.github.com/apps/). If you 
 
 ## Deploy the app
 
-To deploy an app to any cloud provider, you will need 3 environment variables:
+To deploy an app to any cloud provider, you will have to pass a custom `Probot` constructor:
 
-- `APP_ID`: the ID of the app, which you can get from the [app settings page](https://github.com/settings/apps).
-- `WEBHOOK_SECRET`: the **Webhook Secret** that you generated when you created the app.
-- `PRIVATE_KEY_PATH`: the path to a private key file
+```js
+const { Probot } = require("probot");
+const { createMyMiddleware } = require("my-probot-middleware");
+const myApp = require("./my-app.js");
 
-> These environment variables will need to be passed through to your FaaS solution. Each solution is different; please consult their documentation on how to use variables in the deployed environment.
+module.exports = createMyMiddleware(myApp, {
+  Probot: Probot.defaults({
+    appId: 1,
+    privateKey: process.env.PRIVATE_KEY,
+    secret: process.env.WEBHOOK_SECRET,
+  }),
+});
+```
+
+Or use the `getOptions` method and define the according [environment variables](https://probot.github.io/docs/configuration/)
+
+```js
+const { getOptions } = require("probot");
+const { createMyMiddleware } = require("my-probot-middleware");
+const myApp = require("./my-app.js");
+
+module.exports = createMyMiddleware(myApp, getOptions());
+```
 
 Choosing a FaaS provider is mostly dependent on developer preference. Each Probot plugin interacts similarly, but the plugins implementation is dealing with different requests and responses specific to the provider. If you do not have a preference for a provider, choose the solution you have the most familiarity.
 
+### Node.js/express middleware
+
+Probot exports a standard Node.js middleware by default, you can use it like this:
+
+```js
+const { createNodeMiddleware, getOptions } = require("probot");
+const myApp = require("./my-app.js");
+
+module.exports = createNodeMiddleware(myApp, getOptions());
+```
+
+The returned middleware includes an optional 3rd `next` argument for compatibility with [express middleware](https://expressjs.com/en/guide/using-middleware.html).
+
 ### AWS Lambda
 
-AWS Lambda is an event-driven, serverless computing platform provided by Amazon as a part of the Amazon Web Services. AWS Lamba additionally manages the computing resources required for the code and adjusts those resources in conjunction with incoming events.
-
-1. [Install the @probot/serverless-lambda](https://github.com/probot/serverless-lambda#usage) plugin.
-2. Create a `handler.js` file in the root of you probot application
-   ```
-   // handler.js
-   const { serverless } = require('@probot/serverless-lambda')
-   const appFn = require('./')
-   module.exports.probot = serverless(appFn)
-   ```
-3. Follow the lambda [configuration steps](https://github.com/probot/serverless-lambda#configuration) using the [AWS CLI](https://aws.amazon.com/cli/) or [Serverless framework](https://github.com/serverless/serverless).
-4. Once the app is is configured and you can proceed with deploying using the either [AWS CLI](https://aws.amazon.com/cli/) or [Serverless framework](https://github.com/serverless/serverless)
-
-> note: The Serverless framework provides a more straightforward approach to setting up your AWS environment. It requires the creation of a serverless.yml in the root of your application.
+See [@probot/serverless-lambda](https://github.com/probot/serverless-lambda#usage)
 
 ### Google Cloud Function
 
-Google Cloud Platform, is a suite of cloud computing services that run on the same infrastructure that Google uses internally for its end-user products. Cloud Functions are the Platform's FaaS offering.
+See [@probot/serverless-gcf](https://github.com/probot/serverless-gcf#usage)
 
-1. [Install the @probot/serverless-gcf](https://github.com/probot/serverless-gcf#usage) plugin.
-2. Create a `handler.js` file in the route of you probot application
-   ```
-   // handler.js
-   const { serverless } = require('@probot/serverless-gcf')
-   const appFn = require('./')
-   module.exports.probot = serverless(appFn)
-   ```
-3. Follow the GCF [configuration steps](https://github.com/probot/serverless-gcf#configuration) using the [gcloud CLI](https://cloud.google.com/pubsub/docs/quickstart-cli) or [Serverless framework](https://github.com/serverless/serverless).
-4. Once the app is is configured and you can proceed with deploying using the either [gcloud CLI](https://cloud.google.com/pubsub/docs/quickstart-cli) or [Serverless framework](https://github.com/serverless/serverless)
+### Azure Function
+
+See [probot-serverless-azurefunctions](https://github.com/ethomson/probot-serverless-azurefunctions/#usage)
+
+### Add yours:
+
+A probot middleware function should follow the following conventions:
+
+1. The package exports a synchronous function. The function name should follow the pattern `create[Platform]Middleware`
+2. The exported function should return a function matching the respective platform of the requirements
+3. The first argument should be a probot application function: `async ({ app }) => { ... }`
+4. The 2nd argument should accept an object with at least a `Probot` key, which has to be set to a Probot constructor with the options preset using `Probot.defaults({ appId, privateKey, secret, ... })`. If environment variables can be set on the platform, the package should export a `getOptions()` function, wich the same signature as the one exported by `probot`. It can be the exact same one, or you can add custom logic useful to the respective platform.
+
+Please share your own middleware by adding it to this list: [edit this page on GitHub](https://github.com/probot/probot/edit/master/docs/serverless-deployment.md).

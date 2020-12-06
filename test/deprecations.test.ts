@@ -192,9 +192,21 @@ describe("Deprecations", () => {
     );
   });
 
-  it("app.route", () => {
+  it("app.route with ({ app }) => {}", () => {
     const probot = new Probot({ log: pino(streamLogsToOutput) });
     probot.load(({ app }) => {
+      expect(app.route()).toBeInstanceOf(Function);
+    });
+
+    expect(output.length).toEqual(1);
+    expect(output[0].msg).toContain(
+      '[probot] "app.route()" is deprecated, use the "getRouter()" argument from the app function instead: "({ app, getRouter }) => { ... }"'
+    );
+  });
+
+  it("app.route with (app) => {} #1428", () => {
+    const probot = new Probot({ log: pino(streamLogsToOutput) });
+    probot.load((app) => {
       expect(app.route()).toBeInstanceOf(Function);
     });
 

@@ -7,7 +7,14 @@ import { ApplicationFunction, ApplicationFunctionOptions } from "./types";
 import { getRouter } from "./get-router";
 import { resolveAppFunction } from "./helpers/resolve-app-function";
 
-type DeprecatedKey = "auth" | "load" | "log" | "on" | "receive" | "router";
+type DeprecatedKey =
+  | "auth"
+  | "load"
+  | "log"
+  | "on"
+  | "receive"
+  | "route"
+  | "router";
 
 const DEPRECATED_APP_KEYS: DeprecatedKey[] = [
   "auth",
@@ -15,9 +22,14 @@ const DEPRECATED_APP_KEYS: DeprecatedKey[] = [
   "log",
   "on",
   "receive",
+  "route",
   "router",
 ];
 let didDeprecate = false;
+
+function bindMethod(app: Probot | Application, key: keyof Application) {
+  return typeof app[key] === "function" ? app[key].bind(app) : app[key];
+}
 
 /**
  * Loads an ApplicationFunction into the current Application
@@ -32,7 +44,7 @@ export async function load(
     (api: Record<string, unknown>, key: DeprecatedKey) => {
       Object.defineProperty(api, key, {
         get() {
-          if (didDeprecate) return app[key];
+          if (didDeprecate) return bindMethod(app, key);
 
           app.log.warn(
             new Deprecation(
@@ -41,7 +53,7 @@ export async function load(
           );
           didDeprecate = true;
 
-          return app[key];
+          return bindMethod(app, key);
         },
       });
 

@@ -92,3 +92,8 @@ export type ServerOptions = {
   webhookProxy?: string;
   Probot: typeof Probot;
 };
+
+export type MiddlewareOptions = {
+  probot: Probot;
+  [key: string]: unknown;
+};

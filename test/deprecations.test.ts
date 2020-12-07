@@ -10,6 +10,7 @@ import {
   Probot,
   ProbotOctokit,
   Context,
+  getOptions,
 } from "../src";
 
 const pushEvent = require("./fixtures/webhook/push.json");
@@ -33,13 +34,15 @@ describe("Deprecations", () => {
     process.env = env;
   });
 
-  it("createProbot", () => {
+  it("createProbot({ log })", () => {
     const probot = createProbot({ log: pino(streamLogsToOutput) });
     expect(probot).toBeInstanceOf(Probot);
 
     expect(output.length).toEqual(1);
     expect(output[0].msg).toContain(
-      '[probot] "createProbot(options)" is deprecated, use "new Probot(options)" instead'
+      `[probot] "createProbot({ log })" is deprecated, use "new Probot(options)" instead.
+      
+"createProbot(options)" will be repurposed with probot v11 and only accept {defaults, overrides, env} option keys`
     );
   });
 
@@ -399,6 +402,19 @@ If you have more than one app function, combine them in a function instead
 
     expect(output[0].msg).toContain(
       `[probot] passing a string to "probot.load()" is deprecated. Pass the function from "./test/fixtures/example.js" instead.`
+    );
+  });
+
+  it("getOptions", () => {
+    getOptions({ overrides: { log: pino(streamLogsToOutput) } });
+
+    expect(output[0].msg).toContain(
+      `[probot] "getOptions()" is deprecated, use "{ probot: createProbot() }" instead:
+
+    const { createNodeMiddleware, createProbot } = require("probot");
+    const myApp = require("./my-app.js");
+
+    module.exports = createNodeMiddleware(myApp, { probot: createProbot() });`
     );
   });
 });

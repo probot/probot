@@ -48,6 +48,11 @@ describe("Deprecations", () => {
     );
   });
 
+  it("createProbot() without options", () => {
+    const probot = createProbot();
+    expect(probot).toBeInstanceOf(Probot);
+  });
+
   it("probot.webhook", () => {
     const probot = new Probot({ log: pino(streamLogsToOutput) });
     expect(probot).toBeInstanceOf(Probot);

@@ -11,7 +11,9 @@ import {
   ProbotOctokit,
   Context,
   getOptions,
+  createNodeMiddleware,
 } from "../src";
+import { IncomingMessage, ServerResponse } from "http";
 
 const pushEvent = require("./fixtures/webhook/push.json");
 
@@ -415,6 +417,21 @@ If you have more than one app function, combine them in a function instead
     const myApp = require("./my-app.js");
 
     module.exports = createNodeMiddleware(myApp, { probot: createProbot() });`
+    );
+  });
+
+  it("createNodeMiddleware(app, { Probot })", () => {
+    // @ts-ignore
+    const middleware = createNodeMiddleware(() => {}, {
+      Probot: Probot.defaults({
+        log: pino(streamLogsToOutput),
+      }),
+    });
+
+    middleware({} as IncomingMessage, { end() {} } as ServerResponse);
+
+    expect(output[0].msg).toContain(
+      `"createNodeMiddleware(app, { Probot })" is deprecated. Use "createNodeMiddleware(app, { probot })" instead`
     );
   });
 });

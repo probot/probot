@@ -33,7 +33,7 @@ const DEFAULTS = {
  * @param overrides overwrites defaults and according environment variables
  * @param env defaults to process.env
  */
-export function createProbot(options: Options | CreateProbotOptions) {
+export function createProbot(options: Options | CreateProbotOptions = {}) {
   if (isDeprecated(options)) {
     return deprecatedCreateProbot(options);
   }

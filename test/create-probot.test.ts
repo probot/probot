@@ -1,4 +1,4 @@
-import { getOptions } from "../src";
+import { createProbot, Probot } from "../src";
 
 const env = {
   APP_ID: "1",
@@ -14,60 +14,51 @@ r1UQNnUExRh7ZT0kFbMfO9jKYZVlQdCL9Dn93vo=
   WEBHOOK_SECRET: "secret",
 };
 // tslint:disable:no-empty
-describe("getOptions", () => {
-  test("getOptions()", () => {
-    const options = getOptions({ env });
-    expect(Object.keys(options).sort()).toStrictEqual([
-      "Probot",
-      "host",
-      "log",
-      "port",
-      "webhookPath",
-      "webhookProxy",
-    ]);
-
-    expect(options.port).toEqual(3000);
+describe("createProbot", () => {
+  test("createProbot()", () => {
+    const probot = createProbot({ env });
+    expect(probot).toBeInstanceOf(Probot);
   });
 
   test("defaults, env", () => {
-    const options = getOptions({
+    const probot = createProbot({
       env: {
         ...env,
-        PORT: "2222",
+        LOG_LEVEL: "debug",
       },
-      defaults: { port: 1111 },
+      defaults: { logLevel: "trace" },
     });
-    expect(options.port).toEqual(2222);
+    expect(probot.log.level).toEqual("debug");
   });
 
   test("defaults, overrides", () => {
-    const options = getOptions({
-      defaults: { port: 1111 },
-      overrides: { port: 3333 },
+    const probot = createProbot({
+      defaults: { logLevel: "debug" },
+      overrides: { logLevel: "trace" },
     });
-    expect(options.port).toEqual(3333);
+    expect(probot.log.level).toEqual("trace");
   });
 
   test("env, overrides", () => {
-    const options = getOptions({
+    const probot = createProbot({
       env: {
         ...env,
-        PORT: "2222",
+        LOG_LEVEL: "fatal",
       },
-      overrides: { port: 3333 },
+      overrides: { logLevel: "trace" },
     });
-    expect(options.port).toEqual(3333);
+    expect(probot.log.level).toEqual("trace");
   });
 
   test("defaults, env, overrides", () => {
-    const options = getOptions({
+    const probot = createProbot({
       env: {
         ...env,
-        PORT: "2222",
+        LOG_LEVEL: "fatal",
       },
-      defaults: { port: 1111 },
-      overrides: { port: 3333 },
+      defaults: { logLevel: "debug" },
+      overrides: { logLevel: "trace" },
     });
-    expect(options.port).toEqual(3333);
+    expect(probot.log.level).toEqual("trace");
   });
 });

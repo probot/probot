@@ -92,3 +92,13 @@ export type ServerOptions = {
   webhookProxy?: string;
   Probot: typeof Probot;
 };
+
+export type MiddlewareOptions = {
+  probot: Probot;
+  [key: string]: unknown;
+
+  /**
+   * @deprecated "Probot" option is deprecated. Pass a "probot" instance instead, see https://github.com/probot/probot/pull/1431
+   */
+  Probot?: typeof Probot;
+};

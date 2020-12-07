@@ -1,3 +1,4 @@
+import { Deprecation } from "deprecation";
 import { getPrivateKey } from "@probot/get-private-key";
 import { Options as PinoOptions, LogLevel } from "@probot/pino";
 
@@ -72,7 +73,7 @@ export function getOptions(
     log: log.child({ name: "probot" }),
   });
 
-  return {
+  const options = {
     ...defaults,
     host: envWithDefaults.HOST,
     port: Number(envWithDefaults.PORT),
@@ -82,4 +83,17 @@ export function getOptions(
     Probot: ProbotWithDefaults,
     ...overrides,
   };
+
+  options.log.warn(
+    new Deprecation(
+      `[probot] "getOptions()" is deprecated, use "{ probot: createProbot() }" instead:
+
+    const { createNodeMiddleware, createProbot } = require("probot");
+    const myApp = require("./my-app.js");
+
+    module.exports = createNodeMiddleware(myApp, { probot: createProbot() });`
+    )
+  );
+
+  return options;
 }

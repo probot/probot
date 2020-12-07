@@ -6,7 +6,7 @@ import getPort from "get-port";
 import got from "got";
 import { sign } from "@octokit/webhooks";
 
-import { createNodeMiddleware, getOptions } from "../src";
+import { createNodeMiddleware, createProbot } from "../src";
 import { ApplicationFunction } from "../src/types";
 
 const APP_ID = "1";
@@ -34,7 +34,7 @@ describe("createNodeMiddleware", () => {
     output = [];
   });
 
-  test("with getOptions", async () => {
+  test("with createProbot", async () => {
     expect.assertions(1);
 
     const app: ApplicationFunction = ({ app }) => {
@@ -42,9 +42,8 @@ describe("createNodeMiddleware", () => {
         expect(event.name).toEqual("push");
       });
     };
-    const middleware = createNodeMiddleware(
-      app,
-      getOptions({
+    const middleware = createNodeMiddleware(app, {
+      probot: createProbot({
         overrides: {
           log: pino(streamLogsToOutput),
         },
@@ -53,8 +52,8 @@ describe("createNodeMiddleware", () => {
           PRIVATE_KEY,
           WEBHOOK_SECRET,
         },
-      })
-    );
+      }),
+    });
 
     const server = createServer(middleware);
     const port = await getPort();

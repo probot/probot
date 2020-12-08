@@ -58,4 +58,43 @@ describe("My Probot app", () => {
 });
 ```
 
-A good testing example from [dco](https://github.com/probot/dco) can be found [here](https://github.com/probot/dco/blob/master/test/index.test.js), and another one from [markdownify](https://github.com/hiimbex/markdownify) can be found [here](https://github.com/hiimbex/markdownify/blob/master/test/index.test.js).
+## Testing log output
+
+Probot is using [pino](https://getpino.io/) for logging. A custom `pino` instance can be passed to the `Probot` constructor. You can write all log output into an array by passing a custom transport function:
+
+```js
+const pino = require("pino");
+const Stream = require("stream");
+
+const streamLogsToOutput = new Stream.Writable({ objectMode: true });
+streamLogsToOutput._write = (object, encoding, done) => {
+  output.push(JSON.parse(object));
+  done();
+};
+
+const probot = new Probot({
+  id: 1,
+  githubToken: "test",
+  // Disable throttling & retrying requests for easier testing
+  Octokit: ProbotOctokit.defaults({
+    retry: { enabled: false },
+    throttle: { enabled: false },
+  }),
+  log: pino(streamLogsToOutput),
+});
+
+probot.log.info("test");
+// output is now:
+// [ { level: 30, time: 1600619283012, pid: 44071, hostname: 'Gregors-MacBook-Pro.local', msg: 'test' } ]
+```
+
+## Examples:
+
+Using Jest
+
+- [DOC](https://github.com/probot/dco): [probot/dco/test/index.test.js](https://github.com/probot/dco/blob/master/test/index.test.js)
+- [Markdownify](https://github.com/probot/markdownify): [hiimbex/markdownify/test/index.test.js](https://github.com/hiimbex/markdownify/blob/master/test/index.test.js)
+
+Using Tap
+
+- [WIP](https://github.com/apps/wip/): [wip/app/test/integration](https://github.com/wip/app/tree/master/test/integration)

@@ -1,4 +1,4 @@
-import { createServer } from "http";
+import { createServer, IncomingMessage, ServerResponse } from "http";
 import Stream from "stream";
 
 import pino from "pino";
@@ -6,7 +6,7 @@ import getPort from "get-port";
 import got from "got";
 import { sign } from "@octokit/webhooks";
 
-import { createNodeMiddleware, createProbot } from "../src";
+import { createNodeMiddleware, createProbot, Probot } from "../src";
 import { ApplicationFunction } from "../src/types";
 
 const APP_ID = "1";
@@ -74,5 +74,20 @@ describe("createNodeMiddleware", () => {
     await new Promise((resolve) => setTimeout(resolve, 100));
 
     server.close();
+  });
+
+  test("loads app only once", async () => {
+    let counter = 0;
+    const appFn = () => {
+      counter++;
+    };
+    const middleware = createNodeMiddleware(appFn, {
+      probot: new Probot(),
+    });
+
+    middleware({} as IncomingMessage, { end() {} } as ServerResponse);
+    middleware({} as IncomingMessage, { end() {} } as ServerResponse);
+
+    expect(counter).toEqual(1);
   });
 });

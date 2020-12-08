@@ -81,14 +81,6 @@ describe("Application", () => {
       expect(spy).toHaveBeenCalledTimes(0);
     });
 
-    it("calls callback with *", async () => {
-      const spy = jest.fn();
-      app.on("*", spy);
-
-      await app.receive(event);
-      expect(spy).toHaveBeenCalled();
-    });
-
     it("calls callback x amount of times when an array of x actions is passed", async () => {
       const event2: WebhookEvent = {
         id: "123",

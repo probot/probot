@@ -31,7 +31,7 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npx tsd
-      - run: npx jest --forceExit
+      - run: npx jest
 
   # separate job to set as required in branch protection,
   # as the above change each time the Node versions change
@@ -45,7 +45,7 @@ jobs:
       - run: npm run lint
       - run: npm run build
       - run: npx tsd
-      - run: npx jest --coverage --force-exit
+      - run: npx jest
       - name: codecov
         run: npx codecov
         env:

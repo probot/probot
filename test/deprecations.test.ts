@@ -24,18 +24,6 @@ describe("Deprecations", () => {
     process.env = env;
   });
 
-  it("LOG_LEVEL/LOG_FORMAT/LOG_LEVEL_IN_STRING/SENTRY_DSN and Probot constructor", () => {
-    process.env.LOG_LEVEL = "debug";
-    process.env.LOG_FORMAT = "pretty";
-    process.env.LOG_LEVEL_IN_STRING = "true";
-    process.env.SENTRY_DSN = "https://1234abcd@sentry.io/12345";
-    const probot = new Probot({});
-    // passing { log: pino(streamLogsToOutput) } disables the deprecation message,
-    // so this is just a reminder
-
-    expect(probot.log.level).toEqual("debug");
-  });
-
   it("REDIS_URL and Probot construtor", () => {
     process.env.REDIS_URL = "test";
     new Probot({ log: pino(streamLogsToOutput) });

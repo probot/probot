@@ -60,19 +60,9 @@ export class Probot {
     options.webhookPath = options.webhookPath || "/";
     options.secret = options.secret || "development";
 
-    let logEnvVariableDeprecation;
     let level = options.logLevel;
-    if (!options.log && !level && process.env.LOG_LEVEL) {
-      logEnvVariableDeprecation =
-        '[probot] "LOG_LEVEL" environment variable is deprecated. Use "new Probot({ logLevel })" instead';
-      level = process.env.LOG_LEVEL as Options["logLevel"];
-    }
 
     this.log = aliasLog(options.log || getLog({ level }));
-
-    if (logEnvVariableDeprecation) {
-      this.log.warn(new Deprecation(logEnvVariableDeprecation));
-    }
 
     // TODO: support redis backend for access token cache if `options.redisConfig || process.env.REDIS_URL`
     const cache = new LRUCache<number, string>({

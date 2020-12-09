@@ -24,6 +24,7 @@ export function getLog(options: GetLogOptions = {}) {
 
   const pinoOptions: LoggerOptions = { level: level || "info", name: "probot" };
   const transform = getTransformStream(getTransformStreamOptions);
+  // @ts-ignore TODO: check out what's wrong here
   transform.pipe(pino.destination(1));
   const log = pino(pinoOptions, transform);
 

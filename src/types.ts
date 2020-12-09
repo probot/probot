@@ -51,21 +51,10 @@ export type ProbotWebhooks = Webhooks<
 
 export type DeprecatedLogger = LogFn & Logger;
 
-type deprecatedKeys =
-  | "router"
-  | "log"
-  | "on"
-  | "receive"
-  | "load"
-  | "route"
-  | "auth";
-
 export type ApplicationFunctionOptions = {
-  /**
-   * @deprecated "(app) => {}" is deprecated. Use "({ app }) => {}" instead.
-   */
-  [K in deprecatedKeys]: Probot[K];
-} & { app: Probot; getRouter: (path?: string) => express.Router };
+  app: Probot;
+  getRouter: (path?: string) => express.Router;
+};
 export type ApplicationFunction = (options: ApplicationFunctionOptions) => void;
 
 export type ServerOptions = {

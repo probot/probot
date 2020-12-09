@@ -33,35 +33,9 @@ describe("Deprecations", () => {
     process.env = env;
   });
 
-  it("(app) => { app.on(event, handler) }", () => {
-    const probot = new Probot({ log: pino(streamLogsToOutput) });
-    probot.load((app) => {
-      // test that deprecation is only logged once
-      app.auth();
-      app.on("push", () => {});
-    });
-
-    expect(output.length).toEqual(1);
-    expect(output[0].msg).toContain(
-      '[probot] "(app) => {}" is deprecated. Use "({ app }) => {}" instead'
-    );
-  });
-
   it("app.route with ({ app }) => {}", () => {
     const probot = new Probot({ log: pino(streamLogsToOutput) });
     probot.load(({ app }) => {
-      expect(app.route()).toBeInstanceOf(Function);
-    });
-
-    expect(output.length).toEqual(1);
-    expect(output[0].msg).toContain(
-      '[probot] "app.route()" is deprecated, use the "getRouter()" argument from the app function instead: "({ app, getRouter }) => { ... }"'
-    );
-  });
-
-  it("app.route with (app) => {} #1428", () => {
-    const probot = new Probot({ log: pino(streamLogsToOutput) });
-    probot.load((app) => {
       expect(app.route()).toBeInstanceOf(Function);
     });
 

@@ -7,8 +7,12 @@ export function defaultApp({
   getRouter,
 }: {
   app: Probot;
-  getRouter: () => express.Router;
+  getRouter?: () => express.Router;
 }) {
+  if (!getRouter) {
+    throw new Error("getRouter() is required for defaultApp");
+  }
+
   const router = getRouter();
 
   router.get("/probot", (req, res) => {

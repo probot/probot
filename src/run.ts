@@ -10,7 +10,6 @@ import { readEnvOptions } from "./bin/read-env-options";
 import { Server } from "./server/server";
 import { defaultApp } from "./apps/default";
 import { resolveAppFunction } from "./helpers/resolve-app-function";
-import { load } from "./load";
 
 type AdditionalOptions = {
   env: Record<string, string | undefined>;
@@ -107,19 +106,19 @@ export async function run(
   if (Array.isArray(appFnOrArgv)) {
     const pkg = await pkgConf("probot");
 
-    const combinedApps: ApplicationFunction = ({ app }) => {
-      load(app, server.router(), defaultApp);
+    const combinedApps: ApplicationFunction = async ({ app }) => {
+      await server.load(defaultApp);
 
       if (Array.isArray(pkg.apps)) {
         for (const appPath of pkg.apps) {
           const appFn = resolveAppFunction(appPath);
-          load(app, server.router(), appFn);
+          server.load(appFn);
         }
       }
 
       const [appPath] = args;
       const appFn = resolveAppFunction(appPath);
-      load(app, server.router(), appFn);
+      server.load(appFn);
     };
 
     server = new Server(serverOptions);

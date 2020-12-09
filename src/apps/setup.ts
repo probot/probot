@@ -18,7 +18,7 @@ export const setupAppFactory = (
     getRouter,
   }: {
     app: Probot;
-    getRouter: () => express.Router;
+    getRouter?: () => express.Router;
   }) {
     const setup: ManifestCreation = new ManifestCreation();
 
@@ -28,6 +28,10 @@ export const setupAppFactory = (
       !(process.env.PROJECT_DOMAIN || process.env.WEBHOOK_PROXY_URL)
     ) {
       await setup.createWebhookChannel();
+    }
+
+    if (!getRouter) {
+      throw new Error("getRouter is required to use the setup app");
     }
 
     const route = getRouter();

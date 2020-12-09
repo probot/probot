@@ -53,7 +53,7 @@ export type DeprecatedLogger = LogFn & Logger;
 
 export type ApplicationFunctionOptions = {
   app: Probot;
-  getRouter: (path?: string) => express.Router;
+  getRouter?: (path?: string) => express.Router;
 };
 export type ApplicationFunction = (options: ApplicationFunctionOptions) => void;
 

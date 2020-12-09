@@ -1,15 +1,12 @@
-import express from "express";
 import LRUCache from "lru-cache";
 import { Logger } from "pino";
 import { WebhookEvent } from "@octokit/webhooks";
 
 import { aliasLog } from "./helpers/alias-log";
 import { auth } from "./auth";
-import { createServer } from "./server/create-server";
 import { getLog } from "./helpers/get-log";
 import { getProbotOctokitWithDefaults } from "./octokit/get-probot-octokit-with-defaults";
 import { getWebhooks } from "./octokit/get-webhooks";
-import { load } from "./load";
 import { ProbotOctokit } from "./octokit/probot-octokit";
 import { VERSION } from "./version";
 import {
@@ -35,7 +32,6 @@ export class Probot {
     return ProbotWithDefaults;
   }
 
-  public server: express.Application;
   public webhooks: ProbotWebhooks;
   public log: DeprecatedLogger;
   public version: String;
@@ -105,11 +101,6 @@ export class Probot {
       return this.webhooks.on(eventNameOrNames, callback);
     };
 
-    this.server = createServer({
-      webhook: (this.webhooks as any).middleware,
-      logger: this.log,
-    });
-
     this.version = VERSION;
   }
 
@@ -118,15 +109,14 @@ export class Probot {
     return this.webhooks.receive(event);
   }
 
-  public load(appFn: string | ApplicationFunction | ApplicationFunction[]) {
-    const router = express.Router();
+  public async load(appFn: ApplicationFunction | ApplicationFunction[]) {
+    if (Array.isArray(appFn)) {
+      for (const fn of appFn) {
+        await this.load(fn);
+      }
+      return;
+    }
 
-    // Connect the router from the app to the server
-    this.server.use(router);
-
-    // Initialize the ApplicationFunction
-    load(this, router, appFn);
-
-    return this;
+    return appFn({ app: this });
   }
 }

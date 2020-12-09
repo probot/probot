@@ -17,7 +17,6 @@ import { getWebhooks } from "./octokit/get-webhooks";
 import { load } from "./load";
 import { ProbotOctokit } from "./octokit/probot-octokit";
 import { VERSION } from "./version";
-import { webhookEventCheck } from "./helpers/webhook-event-check";
 import {
   ApplicationFunction,
   DeprecatedLogger,
@@ -106,14 +105,8 @@ export class Probot {
     this.webhooks = getWebhooks(this.state);
 
     this.on = (eventNameOrNames, callback) => {
-      // when an app subscribes to an event using `app.on(event, callback)`, Probot sends a request to `GET /app` and
-      // verifies if the app is subscribed to the event and logs a warning if it is not.
-      //
-      // This feature will be moved out of Probot core as it has side effects and does not work in a stateless environment.
-      webhookEventCheck(this.state, eventNameOrNames);
-
       if (eventNameOrNames === "*") {
-        // @ts-ignore this workaround is only to surpress a warning. The `.on()` method will be deprecated soon anyway.
+        // @ts-ignore this.webhooks.on("*") is deprecated
         return this.webhooks.onAny(callback);
       }
 

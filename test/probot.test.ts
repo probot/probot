@@ -39,7 +39,6 @@ describe("Probot", () => {
   beforeEach(() => {
     // Clear log output
     output = [];
-    process.env.DISABLE_WEBHOOK_EVENT_CHECK = "true";
     probot = new Probot({ githubToken: "faketoken" });
 
     event = {

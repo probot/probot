@@ -22,7 +22,6 @@ describe("run", () => {
     // Clear log output
     output = [];
     env = {
-      DISABLE_WEBHOOK_EVENT_CHECK: "true",
       APP_ID: "1",
       PRIVATE_KEY_PATH: path.join(
         __dirname,

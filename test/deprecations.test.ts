@@ -6,7 +6,6 @@ import { Webhooks } from "@octokit/webhooks";
 import pino from "pino";
 
 import {
-  createProbot,
   Probot,
   ProbotOctokit,
   Context,
@@ -33,23 +32,6 @@ describe("Deprecations", () => {
   });
   afterEach(() => {
     process.env = env;
-  });
-
-  it("createProbot({ log })", () => {
-    const probot = createProbot({ log: pino(streamLogsToOutput) });
-    expect(probot).toBeInstanceOf(Probot);
-
-    expect(output.length).toEqual(1);
-    expect(output[0].msg).toContain(
-      `[probot] "createProbot({ log })" is deprecated, use "new Probot(options)" instead.
-      
-"createProbot(options)" will be repurposed with probot v11 and only accept {defaults, overrides, env} option keys`
-    );
-  });
-
-  it("createProbot() without options", () => {
-    const probot = createProbot();
-    expect(probot).toBeInstanceOf(Probot);
   });
 
   it("probot.webhook", () => {

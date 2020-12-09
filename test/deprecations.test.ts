@@ -33,16 +33,6 @@ describe("Deprecations", () => {
     process.env = env;
   });
 
-  it("probot.logger", () => {
-    const probot = new Probot({ log: pino(streamLogsToOutput) });
-    probot.logger.info("test");
-
-    expect(output.length).toEqual(2);
-    expect(output[0].msg).toContain(
-      '[probot] "probot.logger" is deprecated. Use "probot.log" instead'
-    );
-  });
-
   it("octokit.repos.createStatus()", () => {
     const log = pino(streamLogsToOutput);
     const octokit = new ProbotOctokit({

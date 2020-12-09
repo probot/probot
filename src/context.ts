@@ -52,7 +52,7 @@ export interface WebhookPayloadWithRepository {
  *
  * @property {octokit} octokit - An Octokit instance
  * @property {payload} payload - The webhook event payload
- * @property {logger} log - A logger
+ * @property {log} log - A pino instance
  */
 export class Context<E extends WebhookPayloadWithRepository = any>
   implements WebhookEvent<E> {

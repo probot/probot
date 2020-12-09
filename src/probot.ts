@@ -336,18 +336,6 @@ If you have more than one app function, combine them in a function instead
   private internalRouter: express.Router;
 
   /**
-   * @deprecated use probot.log instead
-   */
-  public get logger() {
-    this.log.warn(
-      new Deprecation(
-        `[probot] "probot.logger" is deprecated. Use "probot.log" instead`
-      )
-    );
-    return this.log;
-  }
-
-  /**
    * @deprecated "app.router" is deprecated, use "getRouter()" from the app function instead: "({ app, getRouter }) => { ... }"
    */
   public get router() {

@@ -236,16 +236,6 @@ export class Context<E extends WebhookPayloadWithRepository = any>
   }
 
   /**
-   * @deprecated `context.event` is deprecated, use `context.name` instead.
-   */
-  public get event() {
-    this.log.warn(
-      `[probot] "context.event" is deprecated. Use "context.name" instead.`
-    );
-    return this.name;
-  }
-
-  /**
    * @deprecated `context.github` is deprecated. Use `context.octokit` instead.
    */
   public get github() {

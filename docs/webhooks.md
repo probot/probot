@@ -45,7 +45,7 @@ You can also use `app.onAny()` to listen for any event that your app is subscrib
 ```js
 module.exports = ({ app }) => {
   app.onAny(async (context) => {
-    context.log.info({ event: context.event, action: context.payload.action });
+    context.log.info({ event: context.name, action: context.payload.action });
   });
 };
 ```

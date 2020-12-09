@@ -33,21 +33,6 @@ describe("Deprecations", () => {
     process.env = env;
   });
 
-  it("context.event", () => {
-    const octokit = new ProbotOctokit({});
-    const context = new Context(
-      { name: "push", id: "1", payload: pushEvent },
-      octokit,
-      pino(streamLogsToOutput)
-    );
-
-    expect(context.event).toEqual("push");
-    expect(output.length).toEqual(1);
-    expect(output[0].msg).toContain(
-      `[probot] "context.event" is deprecated. Use "context.name" instead.`
-    );
-  });
-
   it("context.octokit", () => {
     const octokit = new ProbotOctokit({});
     const context = new Context(

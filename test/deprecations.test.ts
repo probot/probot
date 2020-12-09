@@ -24,15 +24,6 @@ describe("Deprecations", () => {
     process.env = env;
   });
 
-  it("probot.load(appFunctionPath)", () => {
-    const probot = new Probot({ log: pino(streamLogsToOutput) });
-    probot.load("./test/fixtures/example.js");
-
-    expect(output[0].msg).toContain(
-      `[probot] passing a string to "probot.load()" is deprecated. Pass the function from "./test/fixtures/example.js" instead.`
-    );
-  });
-
   it("getOptions", () => {
     getOptions({ overrides: { log: pino(streamLogsToOutput) } });
 

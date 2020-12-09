@@ -1,4 +1,3 @@
-import { Deprecation } from "deprecation";
 import express from "express";
 import LRUCache from "lru-cache";
 import { Logger } from "pino";
@@ -120,14 +119,6 @@ export class Probot {
   }
 
   public load(appFn: string | ApplicationFunction | ApplicationFunction[]) {
-    if (typeof appFn === "string") {
-      this.log.warn(
-        new Deprecation(
-          `[probot] passing a string to "probot.load()" is deprecated. Pass the function from "${appFn}" instead.`
-        )
-      );
-    }
-
     const router = express.Router();
 
     // Connect the router from the app to the server

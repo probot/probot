@@ -7,7 +7,6 @@ import { WebhookEvent } from "@octokit/webhooks";
 import { aliasLog } from "./helpers/alias-log";
 import { auth } from "./auth";
 import { createServer } from "./server/create-server";
-import { getErrorHandler } from "./helpers/get-error-handler";
 import { getLog } from "./helpers/get-log";
 import { getProbotOctokitWithDefaults } from "./octokit/get-probot-octokit-with-defaults";
 import { getWebhooks } from "./octokit/get-webhooks";
@@ -21,9 +20,7 @@ import {
   ProbotWebhooks,
   State,
 } from "./types";
-import { defaultApp } from "./apps/default";
 
-const defaultAppFns: ApplicationFunction[] = [defaultApp];
 export type Constructor<T> = new (...args: any[]) => T;
 
 export class Probot {
@@ -140,47 +137,5 @@ export class Probot {
     load(this, router, appFn);
 
     return this;
-  }
-
-  public setup(appFns: Array<string | ApplicationFunction>) {
-    this.log.warn(
-      new Deprecation(
-        `[probot] "probot.setup()" is deprecated. Use the new "Server" class instead:
-    
-    const { Server, Probot } = require("probot")
-    const server = new Server({
-      // optional:
-      host,
-      port,
-      webhookPath,
-      webhookProxy,
-      Probot: Probot.defaults({ id, privateKey, ... })
-    })
-
-    // load probot app function
-    await server.load(({ app }) => {})
-
-    // start listening to requests
-    await server.start()
-    // stop server with: await server.stop()
-
-If you have more than one app function, combine them in a function instead
-
-    const app1 = require("./app1")
-    const app2 = require("./app2")
-
-    module.exports = function app ({ probot, getRouter }) {
-      await app1({ probot, getRouter })
-      await app2({ probot, getRouter })
-    }
-`
-      )
-    );
-
-    // Log all unhandled rejections
-    process.on("unhandledRejection", getErrorHandler(this.log));
-
-    // Load the given appFns along with the default ones
-    appFns.concat(defaultAppFns).forEach((appFn) => this.load(appFn));
   }
 }

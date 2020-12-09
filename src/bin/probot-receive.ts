@@ -85,7 +85,8 @@ const probot = new Probot({
   log,
 });
 
-probot.setup(program.args);
+const appFn = require(path.resolve(process.cwd(), program.args[0]));
+probot.load(appFn);
 
 probot.log.debug("Receiving event", program.event);
 probot.receive({ name: program.event, payload, id: uuidv4() }).catch(() => {

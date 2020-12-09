@@ -24,43 +24,6 @@ describe("Deprecations", () => {
     process.env = env;
   });
 
-  it("probot.setup()", () => {
-    const probot = new Probot({ log: pino(streamLogsToOutput) });
-
-    probot.setup([() => {}]);
-
-    expect(output[0].msg)
-      .toContain(`[probot] "probot.setup()" is deprecated. Use the new "Server" class instead:
-    
-    const { Server, Probot } = require("probot")
-    const server = new Server({
-      // optional:
-      host,
-      port,
-      webhookPath,
-      webhookProxy,
-      Probot: Probot.defaults({ id, privateKey, ... })
-    })
-
-    // load probot app function
-    await server.load(({ app }) => {})
-
-    // start listening to requests
-    await server.start()
-    // stop server with: await server.stop()
-
-If you have more than one app function, combine them in a function instead
-
-    const app1 = require("./app1")
-    const app2 = require("./app2")
-
-    module.exports = function app ({ probot, getRouter }) {
-      await app1({ probot, getRouter })
-      await app2({ probot, getRouter })
-    }
-`);
-  });
-
   it("probot.load(appFunctionPath)", () => {
     const probot = new Probot({ log: pino(streamLogsToOutput) });
     probot.load("./test/fixtures/example.js");

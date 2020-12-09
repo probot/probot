@@ -523,6 +523,7 @@ describe("Probot", () => {
       const probot = new Probot({
         appId,
         privateKey,
+        log: pino(streamLogsToOutput),
       });
 
       probot.on("pull_request", () => {

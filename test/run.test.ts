@@ -49,7 +49,13 @@ describe("run", () => {
     });
 
     it("runs with an array of strings", async () => {
-      server = await run(["node", "probot-run", "./test/fixtures/example.js"]);
+      server = await run([
+        "node",
+        "probot-run",
+        "./test/fixtures/example.js",
+        "--log-level",
+        "fatal",
+      ]);
       await server.stop();
     });
 

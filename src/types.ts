@@ -6,12 +6,10 @@ import Redis from "ioredis";
 import { Probot } from "./index";
 import { Context } from "./context";
 import { ProbotOctokit } from "./octokit/probot-octokit";
-import { Application } from "./application";
 
 import type { Logger, LogFn } from "pino";
 
 export interface Options {
-  // same options as Application class
   privateKey?: string;
   githubToken?: string;
   appId?: number | string;
@@ -80,7 +78,7 @@ export type ApplicationFunctionOptions = {
   /**
    * @deprecated "(app) => {}" is deprecated. Use "({ app }) => {}" instead.
    */
-  [K in deprecatedKeys]: Application[K];
+  [K in deprecatedKeys]: Probot[K];
 } & { app: Probot; getRouter: (path?: string) => express.Router };
 export type ApplicationFunction = (options: ApplicationFunctionOptions) => void;
 

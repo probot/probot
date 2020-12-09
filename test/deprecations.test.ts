@@ -6,7 +6,6 @@ import { Webhooks } from "@octokit/webhooks";
 import pino from "pino";
 
 import {
-  Application,
   createProbot,
   Probot,
   ProbotOctokit,
@@ -126,51 +125,6 @@ describe("Deprecations", () => {
     );
   });
 
-  it("throttleOptions", async () => {
-    expect.assertions(4);
-
-    const testLog = pino(streamLogsToOutput);
-    const log = ({
-      fatal: testLog.fatal.bind(testLog),
-      error: testLog.error.bind(testLog),
-      warn: testLog.warn.bind(testLog),
-      info: testLog.info.bind(testLog),
-      debug: testLog.debug.bind(testLog),
-      trace: testLog.trace.bind(testLog),
-      child: () => log,
-    } as unknown) as pino.Logger;
-    const Octokit = ProbotOctokit.plugin((octokit: any, options: any) => {
-      return {
-        pluginLoaded: true,
-        test() {
-          expect(options.throttle.id).toBe(1);
-          expect(options.throttle.foo).toBe("bar");
-        },
-      };
-    }).defaults({ log });
-
-    const app = new Application({
-      Octokit,
-      id: 1,
-      privateKey: "private key",
-      secret: "secret",
-      throttleOptions: {
-        foo: "bar",
-        onAbuseLimit: () => true,
-        onRateLimit: () => true,
-      },
-      log,
-    });
-
-    const installationOctokit = await app.auth(1);
-    installationOctokit.test();
-
-    expect(output.length).toEqual(2); // 2 because Application itself is now deprecated
-    expect(output[1].msg).toContain(
-      '[probot] "new Application({ throttleOptions })" is deprecated. Use "new Application({Octokit: ProbotOctokit.defaults({ throttle }) })" instead'
-    );
-  });
-
   it("probot.webhooks.on('*', handler)", () => {
     const probot = new Probot({
       appId: 1,
@@ -236,24 +190,6 @@ describe("Deprecations", () => {
     expect(output.length).toEqual(1);
     expect(output[0].msg).toContain(
       '[probot] "app.route()" is deprecated, use the "getRouter()" argument from the app function instead: "({ app, getRouter }) => { ... }"'
-    );
-  });
-
-  it("Application", () => {
-    new Application({
-      secret: "secret",
-      id: 1,
-      privateKey:
-        "-----BEGIN RSA PRIVATE KEY-----\nMIIBOQIBAAJBAIILhiN9IFpaE0pUXsesuuoaj6eeDiAqCiE49WB1tMB8ZMhC37kY\nFl52NUYbUxb7JEf6pH5H9vqw1Wp69u78XeUCAwEAAQJAb88urnaXiXdmnIK71tuo\n/TyHBKt9I6Rhfzz0o9Gv7coL7a537FVDvV5UCARXHJMF41tKwj+zlt9EEUw7a1HY\nwQIhAL4F/VHWSPHeTgXYf4EaX2OlpSOk/n7lsFtL/6bWRzRVAiEArzJs2vopJitv\nA1yBjz3q2nX+zthk+GLXrJQkYOnIk1ECIHfeFV8TWm5gej1LxZquBTA5pINoqDVq\nNKZSuZEHqGEFAiB6EDrxkovq8SYGhIQsJeqkTMO8n94xhMRZlFmIQDokEQIgAq5U\nr1UQNnUExRh7ZT0kFbMfO9jKYZVlQdCL9Dn93vo=\n-----END RSA PRIVATE KEY-----",
-      Octokit: ProbotOctokit.defaults({
-        retry: { enabled: false },
-        throttle: { enabled: false },
-      }),
-      log: pino(streamLogsToOutput),
-    });
-    expect(output.length).toEqual(1);
-    expect(output[0].msg).toContain(
-      `[probot] "import { Application } from 'probot'" is deprecated. Use "import { Probot } from 'probot'" instead, the APIs are the same.`
     );
   });
 

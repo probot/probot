@@ -88,7 +88,7 @@ export async function run(
     if (process.env.NODE_ENV === "production") {
       if (!appId) {
         throw new Error(
-          "Application ID is missing, and is required to run in production mode. " +
+          "App ID is missing, and is required to run in production mode. " +
             "To resolve, ensure the APP_ID environment variable is set."
         );
       } else if (!privateKey) {

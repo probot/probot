@@ -1,6 +1,5 @@
 import { Logger } from "pino";
 
-import { Application } from "./application";
 import { Context, WebhookPayloadWithRepository } from "./context";
 import { Options } from "./types";
 import { Probot } from "./probot";
@@ -14,7 +13,6 @@ import { createProbot } from "./create-probot";
 export {
   Logger,
   Context,
-  Application,
   ProbotOctokit,
   run,
   Probot,

@@ -1,8 +1,8 @@
 import { EventPayloads } from "@octokit/webhooks";
 import { expectType } from "tsd";
-import { Application } from "../../lib";
+import { Probot } from "../../src";
 
-const app = new Application({});
+const app = new Probot({});
 
 app.on("repository.edited", (context) => {
   expectType<EventPayloads.WebhookPayloadRepository>(context.payload);

@@ -2,7 +2,6 @@ import { Deprecation } from "deprecation";
 import { Router } from "express";
 
 import { Probot } from "./index";
-import { Application } from "./application";
 import { ApplicationFunction, ApplicationFunctionOptions } from "./types";
 import { getRouter } from "./get-router";
 import { resolveAppFunction } from "./helpers/resolve-app-function";
@@ -27,16 +26,16 @@ const DEPRECATED_APP_KEYS: DeprecatedKey[] = [
 ];
 let didDeprecate = false;
 
-function bindMethod(app: Probot | Application, key: keyof Application) {
+function bindMethod(app: Probot, key: keyof Probot) {
   return typeof app[key] === "function" ? app[key].bind(app) : app[key];
 }
 
 /**
- * Loads an ApplicationFunction into the current Application
+ * Loads an ApplicationFunction into the current application
  * @param appFn - Probot application function to load
  */
 export async function load(
-  app: Application | Probot,
+  app: Probot,
   router: Router | null,
   appFn: string | ApplicationFunction | ApplicationFunction[]
 ) {

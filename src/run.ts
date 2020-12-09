@@ -3,7 +3,6 @@ import pkgConf from "pkg-conf";
 import { ApplicationFunction, Options, ServerOptions } from "./types";
 import { Probot } from "./index";
 import { setupAppFactory } from "./apps/setup";
-import { logWarningsForObsoleteEnvironmentVariables } from "./helpers/log-warnings-for-obsolete-environment-variables";
 import { getLog, GetLogOptions } from "./helpers/get-log";
 import { readCliOptions } from "./bin/read-cli-options";
 import { readEnvOptions } from "./bin/read-env-options";
@@ -62,7 +61,6 @@ export async function run(
   };
 
   const log = getLog(logOptions);
-  logWarningsForObsoleteEnvironmentVariables(log);
 
   const probotOptions: Options = {
     appId,

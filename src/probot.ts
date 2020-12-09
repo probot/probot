@@ -91,12 +91,6 @@ export class Probot {
       this.log.warn(new Deprecation(logEnvVariableDeprecation));
     }
 
-    if (process.env.INSTALLATION_TOKEN_TTL) {
-      this.log.warn(
-        '[probot] "INSTALLATION_TOKEN_TTL" environment variable is no longer used. Tokens are renewed as needed at the time of the request now.'
-      );
-    }
-
     // TODO: support redis backend for access token cache if `options.redisConfig || process.env.REDIS_URL`
     const cache = new LRUCache<number, string>({
       // cache max. 15000 tokens, that will use less than 10mb memory

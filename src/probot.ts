@@ -92,15 +92,6 @@ export class Probot {
       this.log.warn(new Deprecation(logEnvVariableDeprecation));
     }
 
-    if (options.id) {
-      this.log.warn(
-        new Deprecation(
-          `[probot] "id" option is deprecated. Use "appId" instead`
-        )
-      );
-      options.appId = options.appId || options.id;
-    }
-
     if (process.env.INSTALLATION_TOKEN_TTL) {
       this.log.warn(
         '[probot] "INSTALLATION_TOKEN_TTL" environment variable is no longer used. Tokens are renewed as needed at the time of the request now.'

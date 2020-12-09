@@ -24,12 +24,6 @@ export interface Options {
   host?: string;
   webhookProxy?: string;
   baseUrl?: string;
-
-  // Probot class-specific options
-  /**
-   * @deprecated `id` options is deprecated. Use `appId` instead
-   */
-  id?: number | string;
 }
 
 export type State = {

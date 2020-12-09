@@ -33,19 +33,6 @@ describe("Deprecations", () => {
     process.env = env;
   });
 
-  it("new Probot({ appId })", () => {
-    new Probot({
-      id: 1,
-      privateKey: "private key",
-      log: pino(streamLogsToOutput),
-    });
-
-    expect(output.length).toEqual(1);
-    expect(output[0].msg).toContain(
-      '[probot] "id" option is deprecated. Use "appId" instead'
-    );
-  });
-
   it("probot.logger", () => {
     const probot = new Probot({ log: pino(streamLogsToOutput) });
     probot.logger.info("test");

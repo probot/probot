@@ -14,7 +14,6 @@ import { createWebhookProxy } from "./helpers/webhook-proxy";
 import { getErrorHandler } from "./helpers/get-error-handler";
 import { getLog } from "./helpers/get-log";
 import { getProbotOctokitWithDefaults } from "./octokit/get-probot-octokit-with-defaults";
-import { getRouter } from "./get-router";
 import { getWebhooks } from "./octokit/get-webhooks";
 import { load } from "./load";
 import { ProbotOctokit } from "./octokit/probot-octokit";
@@ -160,9 +159,6 @@ export class Probot {
     });
 
     this.version = VERSION;
-
-    // TODO: remove once Application class was removed
-    this.internalRouter = express.Router();
   }
 
   public receive(event: WebhookEvent) {
@@ -296,42 +292,4 @@ If you have more than one app function, combine them in a function instead
 
     this.httpServer.close();
   }
-
-  /**
-   * Get an {@link http://expressjs.com|express} router that can be used to
-   * expose HTTP endpoints
-   *
-   * ```
-   * module.exports = ({ app, getRouter }) => {
-   *   // Get an express router to expose new HTTP endpoints
-   *   const router = getRouter('/my-app');
-   *
-   *   // Use any middleware
-   *   router.use(require('express').static(__dirname + '/public'));
-   *
-   *   // Add a new route
-   *   router.get('/hello-world', (req, res) => {
-   *     res.end('Hello World');
-   *   });
-   * };
-   * ```
-   *
-   * @param path - the prefix for the routes* @param path
-   *
-   * @deprecated "app.route()" is deprecated, use the "getRouter()" argument from the app function instead: "({ app, getRouter }) => { ... }"
-   */
-  route(path?: string) {
-    this.log.warn(
-      new Deprecation(
-        `[probot] "app.route()" is deprecated, use the "getRouter()" argument from the app function instead: "({ app, getRouter }) => { ... }"`
-      )
-    );
-
-    return getRouter(this.internalRouter, path);
-  }
-
-  /**
-   * @deprecated this.internalRouter can be removed once we remove the Application class
-   */
-  private internalRouter: express.Router;
 }

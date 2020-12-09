@@ -33,18 +33,6 @@ describe("Deprecations", () => {
     process.env = env;
   });
 
-  it("app.route with ({ app }) => {}", () => {
-    const probot = new Probot({ log: pino(streamLogsToOutput) });
-    probot.load(({ app }) => {
-      expect(app.route()).toBeInstanceOf(Function);
-    });
-
-    expect(output.length).toEqual(1);
-    expect(output[0].msg).toContain(
-      '[probot] "app.route()" is deprecated, use the "getRouter()" argument from the app function instead: "({ app, getRouter }) => { ... }"'
-    );
-  });
-
   it("context.event", () => {
     const octokit = new ProbotOctokit({});
     const context = new Context(

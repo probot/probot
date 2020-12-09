@@ -234,14 +234,4 @@ export class Context<E extends WebhookPayloadWithRepository = any>
 
     return config as T;
   }
-
-  /**
-   * @deprecated `context.github` is deprecated. Use `context.octokit` instead.
-   */
-  public get github() {
-    this.log.warn(
-      `[probot] "context.github" is deprecated. Use "context.octokit" instead.`
-    );
-    return this.octokit;
-  }
 }

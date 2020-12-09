@@ -3,7 +3,7 @@ import { IncomingMessage, ServerResponse } from "http";
 
 import pino from "pino";
 
-import { Probot, getOptions, createNodeMiddleware } from "../src";
+import { Probot, createNodeMiddleware } from "../src";
 
 describe("Deprecations", () => {
   let output: any;
@@ -22,19 +22,6 @@ describe("Deprecations", () => {
   });
   afterEach(() => {
     process.env = env;
-  });
-
-  it("getOptions", () => {
-    getOptions({ overrides: { log: pino(streamLogsToOutput) } });
-
-    expect(output[0].msg).toContain(
-      `[probot] "getOptions()" is deprecated, use "{ probot: createProbot() }" instead:
-
-    const { createNodeMiddleware, createProbot } = require("probot");
-    const myApp = require("./my-app.js");
-
-    module.exports = createNodeMiddleware(myApp, { probot: createProbot() });`
-    );
   });
 
   it("createNodeMiddleware(app, { Probot })", () => {

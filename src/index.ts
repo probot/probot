@@ -6,7 +6,6 @@ import { Probot } from "./probot";
 import { Server } from "./server/server";
 import { ProbotOctokit } from "./octokit/probot-octokit";
 import { run } from "./run";
-import { getOptions } from "./get-options";
 import { createNodeMiddleware } from "./create-node-middleware";
 import { createProbot } from "./create-probot";
 
@@ -17,7 +16,6 @@ export {
   run,
   Probot,
   Server,
-  getOptions,
   createNodeMiddleware,
   createProbot,
 };

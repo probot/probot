@@ -33,19 +33,6 @@ describe("Deprecations", () => {
     process.env = env;
   });
 
-  it("new Probot({ cert })", () => {
-    new Probot({
-      appId: 1,
-      cert: "private key",
-      log: pino(streamLogsToOutput),
-    });
-
-    expect(output.length).toEqual(1);
-    expect(output[0].msg).toContain(
-      '[probot] "cert" option is deprecated. Use "privateKey" instead'
-    );
-  });
-
   it("new Probot({ appId })", () => {
     new Probot({
       id: 1,

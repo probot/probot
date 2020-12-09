@@ -101,15 +101,6 @@ export class Probot {
       options.appId = options.appId || options.id;
     }
 
-    if (options.cert) {
-      this.log.warn(
-        new Deprecation(
-          `[probot] "cert" option is deprecated. Use "privateKey" instead`
-        )
-      );
-      options.privateKey = options.privateKey || options.cert;
-    }
-
     if (process.env.INSTALLATION_TOKEN_TTL) {
       this.log.warn(
         '[probot] "INSTALLATION_TOKEN_TTL" environment variable is no longer used. Tokens are renewed as needed at the time of the request now.'

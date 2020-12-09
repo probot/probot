@@ -30,10 +30,6 @@ export interface Options {
    * @deprecated `id` options is deprecated. Use `appId` instead
    */
   id?: number | string;
-  /**
-   * @deprecated `cert` options is deprecated. Use `privateKey` instead
-   */
-  cert?: string;
 }
 
 export type State = {

@@ -63,7 +63,7 @@ export class Probot {
 
     this.log = aliasLog(options.log || getLog({ level }));
 
-    // TODO: support redis backend for access token cache if `options.redisConfig || process.env.REDIS_URL`
+    // TODO: support redis backend for access token cache if `options.redisConfig`
     const cache = new LRUCache<number, string>({
       // cache max. 15000 tokens, that will use less than 10mb memory
       max: 15000,

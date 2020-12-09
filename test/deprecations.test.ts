@@ -24,16 +24,6 @@ describe("Deprecations", () => {
     process.env = env;
   });
 
-  it("REDIS_URL and Probot construtor", () => {
-    process.env.REDIS_URL = "test";
-    new Probot({ log: pino(streamLogsToOutput) });
-
-    expect(output.length).toEqual(1);
-    expect(output[0].msg).toContain(
-      `[probot] "REDIS_URL" is deprecated when using with the Probot constructor. Use "new Probot({ redisConfig: 'redis://...' })" instead`
-    );
-  });
-
   it("probot.start()", async () => {
     const probot = new Probot({ log: pino(streamLogsToOutput) });
 

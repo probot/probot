@@ -37,7 +37,7 @@ function bindMethod(app: Probot, key: keyof Probot) {
  */
 export async function load(
   app: Probot,
-  router: Router | null,
+  router: Router,
   appFn: string | ApplicationFunction | ApplicationFunction[]
 ) {
   const deprecatedApp = DEPRECATED_APP_KEYS.reduce(
@@ -74,7 +74,7 @@ export async function load(
   await fn(
     (Object.assign(deprecatedApp, {
       app,
-      getRouter: getRouter.bind(null, router || app.router),
+      getRouter: getRouter.bind(null, router),
     }) as unknown) as ApplicationFunctionOptions
   );
 

@@ -334,17 +334,4 @@ If you have more than one app function, combine them in a function instead
    * @deprecated this.internalRouter can be removed once we remove the Application class
    */
   private internalRouter: express.Router;
-
-  /**
-   * @deprecated "app.router" is deprecated, use "getRouter()" from the app function instead: "({ app, getRouter }) => { ... }"
-   */
-  public get router() {
-    this.log.warn(
-      new Deprecation(
-        `[probot] "app.router" is deprecated, use "getRouter()" from the app function instead: "({ app, getRouter }) => { ... }"`
-      )
-    );
-
-    return this.internalRouter;
-  }
 }

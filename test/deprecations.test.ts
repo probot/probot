@@ -47,18 +47,6 @@ describe("Deprecations", () => {
     );
   });
 
-  it("app.router", () => {
-    const probot = new Probot({ log: pino(streamLogsToOutput) });
-    probot.load(({ app }) => {
-      expect(app.router).toBeInstanceOf(Function);
-    });
-
-    expect(output.length).toEqual(1);
-    expect(output[0].msg).toContain(
-      '[probot] "app.router" is deprecated, use "getRouter()" from the app function instead: "({ app, getRouter }) => { ... }"'
-    );
-  });
-
   it("app.route with ({ app }) => {}", () => {
     const probot = new Probot({ log: pino(streamLogsToOutput) });
     probot.load(({ app }) => {

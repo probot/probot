@@ -24,34 +24,6 @@ describe("Deprecations", () => {
     process.env = env;
   });
 
-  it("probot.start()", async () => {
-    const probot = new Probot({ log: pino(streamLogsToOutput) });
-
-    probot.start();
-    probot.stop();
-
-    expect(output[0].msg)
-      .toContain(`[probot] "probot.start()" is deprecated. Use the new "Server" class instead:
-    
-    const { Server, Probot } = require("probot")
-    const server = new Server({ 
-      // optional:
-      host,
-      port,
-      webhookPath,
-      webhookProxy,
-      Probot: Probot.defaults({ id, privateKey, ... })
-    })
-
-    // load probot app function
-    await server.load(({ app }) => {})
-
-    // start listening to requests
-    await server.start()
-    // stop server with: await server.stop()
-`);
-  });
-
   it("probot.setup()", () => {
     const probot = new Probot({ log: pino(streamLogsToOutput) });
 

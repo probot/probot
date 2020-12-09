@@ -1,5 +1,3 @@
-import { Server } from "http";
-
 import { Deprecation } from "deprecation";
 import express from "express";
 import LRUCache from "lru-cache";
@@ -9,7 +7,6 @@ import { WebhookEvent } from "@octokit/webhooks";
 import { aliasLog } from "./helpers/alias-log";
 import { auth } from "./auth";
 import { createServer } from "./server/create-server";
-import { createWebhookProxy } from "./helpers/webhook-proxy";
 import { getErrorHandler } from "./helpers/get-error-handler";
 import { getLog } from "./helpers/get-log";
 import { getProbotOctokitWithDefaults } from "./octokit/get-probot-octokit-with-defaults";
@@ -52,7 +49,6 @@ export class Probot {
     log?: Logger
   ) => Promise<InstanceType<typeof ProbotOctokit>>;
 
-  private httpServer?: Server;
   private state: State;
 
   constructor(options: Options = {}) {
@@ -186,70 +182,5 @@ If you have more than one app function, combine them in a function instead
 
     // Load the given appFns along with the default ones
     appFns.concat(defaultAppFns).forEach((appFn) => this.load(appFn));
-  }
-
-  public start() {
-    this.log.warn(
-      new Deprecation(
-        `[probot] "probot.start()" is deprecated. Use the new "Server" class instead:
-    
-    const { Server, Probot } = require("probot")
-    const server = new Server({ 
-      // optional:
-      host,
-      port,
-      webhookPath,
-      webhookProxy,
-      Probot: Probot.defaults({ id, privateKey, ... })
-    })
-
-    // load probot app function
-    await server.load(({ app }) => {})
-
-    // start listening to requests
-    await server.start()
-    // stop server with: await server.stop()
-`
-      )
-    );
-    this.log.info(
-      `Running Probot v${this.version} (Node.js: ${process.version})`
-    );
-    const port = this.state.port || 3000;
-    const { host, webhookProxy } = this.state;
-    const webhookPath = this.state.webhooks.path;
-    const printableHost = host ?? "localhost";
-
-    this.httpServer = this.server
-      .listen(port, ...((host ? [host] : []) as any), () => {
-        if (webhookProxy) {
-          createWebhookProxy({
-            logger: this.log,
-            path: webhookPath,
-            port: port,
-            url: webhookProxy,
-          });
-        }
-        this.log.info(`Listening on http://${printableHost}:${port}`);
-      })
-      .on("error", (error: NodeJS.ErrnoException) => {
-        if (error.code === "EADDRINUSE") {
-          this.log.error(
-            `Port ${port} is already in use. You can define the PORT environment variable to use a different port.`
-          );
-        } else {
-          this.log.error(error);
-        }
-
-        process.exit(1);
-      });
-
-    return this.httpServer;
-  }
-
-  public stop() {
-    if (!this.httpServer) return;
-
-    this.httpServer.close();
   }
 }

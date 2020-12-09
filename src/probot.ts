@@ -5,7 +5,6 @@ import express from "express";
 import LRUCache from "lru-cache";
 import { Logger } from "pino";
 import { WebhookEvent } from "@octokit/webhooks";
-import { LogLevel, Options as PinoOptions } from "@probot/pino";
 
 import { aliasLog } from "./helpers/alias-log";
 import { auth } from "./auth";
@@ -17,7 +16,6 @@ import { getProbotOctokitWithDefaults } from "./octokit/get-probot-octokit-with-
 import { getWebhooks } from "./octokit/get-webhooks";
 import { load } from "./load";
 import { ProbotOctokit } from "./octokit/probot-octokit";
-import { run } from "./run";
 import { VERSION } from "./version";
 import { webhookEventCheck } from "./helpers/webhook-event-check";
 import {
@@ -33,21 +31,6 @@ const defaultAppFns: ApplicationFunction[] = [defaultApp];
 export type Constructor<T> = new (...args: any[]) => T;
 
 export class Probot {
-  public static async run(appFn: ApplicationFunction | string[]) {
-    const log = getLog({
-      level: process.env.LOG_LEVEL as LogLevel,
-      logFormat: process.env.LOG_FORMAT as PinoOptions["logFormat"],
-      logLevelInString: process.env.LOG_LEVEL_IN_STRING === "true",
-      sentryDsn: process.env.SENTRY_DSN,
-    });
-    log.warn(
-      new Deprecation(
-        '[probot] "Probot.run" is deprecate. Import { run } from "probot" instead'
-      )
-    );
-    return run(appFn);
-  }
-
   static version = VERSION;
   static defaults<S extends Constructor<any>>(this: S, defaults: Options) {
     const ProbotWithDefaults = class extends this {

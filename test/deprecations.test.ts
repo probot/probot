@@ -1,18 +1,9 @@
 import Stream from "stream";
-import { join } from "path";
 import { IncomingMessage, ServerResponse } from "http";
 
 import pino from "pino";
 
-import {
-  Probot,
-  ProbotOctokit,
-  Context,
-  getOptions,
-  createNodeMiddleware,
-} from "../src";
-
-const pushEvent = require("./fixtures/webhook/push.json");
+import { Probot, getOptions, createNodeMiddleware } from "../src";
 
 describe("Deprecations", () => {
   let output: any;
@@ -31,41 +22,6 @@ describe("Deprecations", () => {
   });
   afterEach(() => {
     process.env = env;
-  });
-
-  it("context.octokit", () => {
-    const octokit = new ProbotOctokit({});
-    const context = new Context(
-      { name: "push", id: "1", payload: pushEvent },
-      octokit,
-      pino(streamLogsToOutput)
-    );
-
-    expect(context.github).toBeInstanceOf(ProbotOctokit);
-    expect(output.length).toEqual(1);
-    expect(output[0].msg).toContain(
-      `[probot] "context.github" is deprecated. Use "context.octokit" instead.`
-    );
-  });
-
-  it("Probot.run()", async () => {
-    let initialized = false;
-
-    process.env.APP_ID = "1";
-    process.env.PRIVATE_KEY_PATH = join(
-      __dirname,
-      "fixtures",
-      "test-private-key.pem"
-    );
-    process.env.WEBHOOK_PROXY_URL = "https://smee.io/EfHXC9BFfGAxbM6J";
-    process.env.WEBHOOK_SECRET = "secret";
-
-    const probot = await Probot.run(({ app }) => {
-      initialized = true;
-    });
-    expect(initialized).toBeTruthy();
-
-    probot.stop();
   });
 
   it("LOG_LEVEL/LOG_FORMAT/LOG_LEVEL_IN_STRING/SENTRY_DSN and Probot constructor", () => {

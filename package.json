@@ -120,9 +120,6 @@
   },
   "jest": {
     "testEnvironment": "node",
-    "setupFiles": [
-      "<rootDir>/test/setup.ts"
-    ],
     "coveragePathIgnorePatterns": [
       "<rootDir>/lib/"
     ],

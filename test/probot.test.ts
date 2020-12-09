@@ -195,14 +195,6 @@ describe("Probot", () => {
   });
 
   describe("ghe support", () => {
-    beforeEach(() => {
-      process.env.GHE_HOST = "notreallygithub.com";
-    });
-
-    afterEach(() => {
-      delete process.env.GHE_HOST;
-    });
-
     it("requests from the correct API URL", async () => {
       const appFn = async ({ app }: { app: Probot }) => {
         const octokit = await app.auth();
@@ -211,31 +203,13 @@ describe("Probot", () => {
         );
       };
 
-      new Probot({}).load(appFn);
-    });
-
-    it("throws if the GHE host includes a protocol", async () => {
-      process.env.GHE_HOST = "https://notreallygithub.com";
-
-      try {
-        require("../src/bin/probot");
-      } catch (e) {
-        expect(e).toMatchSnapshot();
-      }
+      new Probot({
+        baseUrl: "https://notreallygithub.com/api/v3",
+      }).load(appFn);
     });
   });
 
   describe("ghe support with http", () => {
-    beforeEach(() => {
-      process.env.GHE_HOST = "notreallygithub.com";
-      process.env.GHE_PROTOCOL = "http";
-    });
-
-    afterEach(() => {
-      delete process.env.GHE_HOST;
-      delete process.env.GHE_PROTOCOL;
-    });
-
     it("requests from the correct API URL", async () => {
       const appFn = async ({ app }: { app: Probot }) => {
         const octokit = await app.auth();
@@ -244,21 +218,13 @@ describe("Probot", () => {
         );
       };
 
-      new Probot({}).load(appFn);
-    });
-
-    it("throws if the GHE host includes a protocol", async () => {
-      process.env.GHE_HOST = "http://notreallygithub.com";
-
-      try {
-        require("../src/bin/probot");
-      } catch (e) {
-        expect(e).toMatchSnapshot();
-      }
+      new Probot({
+        baseUrl: "http://notreallygithub.com/api/v3",
+      }).load(appFn);
     });
   });
 
-  describe("options.redisConfig as string", () => {
+  describe.skip("options.redisConfig as string", () => {
     it("sets throttle options", async () => {
       expect.assertions(2);
 
@@ -276,7 +242,7 @@ describe("Probot", () => {
     });
   });
 
-  describe("redis configuration object", () => {
+  describe.skip("redis configuration object", () => {
     it("sets throttle options", async () => {
       expect.assertions(2);
       const redisConfig = {

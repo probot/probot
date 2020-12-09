@@ -4,7 +4,7 @@ import { Deprecation } from "deprecation";
 import express from "express";
 import LRUCache from "lru-cache";
 import { Logger } from "pino";
-import { WebhookEvent, Webhooks } from "@octokit/webhooks";
+import { WebhookEvent } from "@octokit/webhooks";
 import { LogLevel, Options as PinoOptions } from "@probot/pino";
 
 import { aliasLog } from "./helpers/alias-log";
@@ -181,19 +181,6 @@ export class Probot {
 
     // TODO: remove once Application class was removed
     this.internalRouter = express.Router();
-  }
-
-  /**
-   * @deprecated `probot.webhook` is deprecated. Use `probot.webhooks` instead
-   */
-  public get webhook(): Webhooks {
-    this.log.warn(
-      new Deprecation(
-        `[probot] "probot.webhook" is deprecated. Use "probot.webhooks" instead`
-      )
-    );
-
-    return this.webhooks;
   }
 
   public receive(event: WebhookEvent) {

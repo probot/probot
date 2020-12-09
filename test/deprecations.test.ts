@@ -2,7 +2,6 @@ import Stream from "stream";
 import { join } from "path";
 import { IncomingMessage, ServerResponse } from "http";
 
-import { Webhooks } from "@octokit/webhooks";
 import pino from "pino";
 
 import {
@@ -32,18 +31,6 @@ describe("Deprecations", () => {
   });
   afterEach(() => {
     process.env = env;
-  });
-
-  it("probot.webhook", () => {
-    const probot = new Probot({ log: pino(streamLogsToOutput) });
-    expect(probot).toBeInstanceOf(Probot);
-
-    expect(probot.webhook).toBeInstanceOf(Webhooks);
-
-    expect(output.length).toEqual(1);
-    expect(output[0].msg).toContain(
-      '[probot] "probot.webhook" is deprecated. Use "probot.webhooks" instead'
-    );
   });
 
   it("new Probot({ cert })", () => {

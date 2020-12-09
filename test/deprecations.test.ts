@@ -33,49 +33,6 @@ describe("Deprecations", () => {
     process.env = env;
   });
 
-  it("octokit.repos.createStatus()", () => {
-    const log = pino(streamLogsToOutput);
-    const octokit = new ProbotOctokit({
-      log: {
-        error: log.error.bind(log),
-        warn: log.warn.bind(log),
-        info: log.info.bind(log),
-        debug: log.debug.bind(log),
-      },
-    });
-
-    octokit.hook.wrap("request", () => {});
-
-    try {
-      octokit.repos.createStatus();
-    } catch (error) {
-      console.log(error);
-    }
-
-    expect(output.length).toEqual(1);
-    expect(output[0].msg).toContain(
-      "octokit.repos.createStatus() has been renamed to octokit.repos.createCommitStatus()"
-    );
-  });
-
-  it("probot.webhooks.on('*', handler)", () => {
-    const probot = new Probot({
-      appId: 1,
-      privateKey: "private key",
-      log: pino(streamLogsToOutput),
-    });
-
-    console.warn = jest.fn();
-
-    probot.webhooks.on("*", () => {});
-
-    expect(console.warn).toHaveBeenCalledTimes(1);
-    // @ts-ignore
-    expect(console.warn.mock.calls[0][0]).toContain(
-      'Using the "*" event with the regular Webhooks.on() function is deprecated. Please use the Webhooks.onAny() method instead'
-    );
-  });
-
   it("(app) => { app.on(event, handler) }", () => {
     const probot = new Probot({ log: pino(streamLogsToOutput) });
     probot.load((app) => {

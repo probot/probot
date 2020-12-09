@@ -27,6 +27,7 @@ const DEPRECATED_APP_KEYS: DeprecatedKey[] = [
 let didDeprecate = false;
 
 function bindMethod(app: Probot, key: keyof Probot) {
+  // @ts-ignore
   return typeof app[key] === "function" ? app[key].bind(app) : app[key];
 }
 

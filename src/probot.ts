@@ -71,9 +71,6 @@ export class Probot {
     log?: Logger
   ) => Promise<InstanceType<typeof ProbotOctokit>>;
 
-  // These need to be public for the tests to work.
-  public throttleOptions: any;
-
   private httpServer?: Server;
   private state: State;
 
@@ -135,7 +132,6 @@ export class Probot {
       cache,
       log: this.log,
       redisConfig: options.redisConfig,
-      throttleOptions: options.throttleOptions,
       baseUrl: options.baseUrl,
     });
     const octokit = new Octokit();

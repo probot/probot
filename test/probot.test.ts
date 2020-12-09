@@ -260,7 +260,7 @@ describe("Probot", () => {
   });
 
   describe("options.redisConfig as string", () => {
-    it("sets throttleOptions", async () => {
+    it("sets throttle options", async () => {
       expect.assertions(2);
 
       probot = new Probot({
@@ -278,7 +278,7 @@ describe("Probot", () => {
   });
 
   describe("redis configuration object", () => {
-    it("sets throttleOptions", async () => {
+    it("sets throttle options", async () => {
       expect.assertions(2);
       const redisConfig = {
         host: "test",
@@ -570,34 +570,6 @@ describe("Probot", () => {
       } catch (error) {
         expect(error.message).toMatch(/error from app/);
       }
-    });
-  });
-
-  describe("auth", () => {
-    it("throttleOptions", async () => {
-      const probot = new Probot({
-        Octokit: ProbotOctokit.plugin((octokit: any, options: any) => {
-          return {
-            pluginLoaded: true,
-            test() {
-              expect(options.throttle.id).toBe(1);
-              expect(options.throttle.foo).toBe("bar");
-            },
-          };
-        }),
-        id: 1,
-        privateKey: "private key",
-        secret: "secret",
-        throttleOptions: {
-          foo: "bar",
-          onAbuseLimit: () => true,
-          onRateLimit: () => true,
-        },
-      } as any);
-
-      const result = await probot.auth(1);
-      expect(result.pluginLoaded).toEqual(true);
-      result.test();
     });
   });
 });

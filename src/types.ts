@@ -34,10 +34,6 @@ export interface Options {
    * @deprecated `cert` options is deprecated. Use `privateKey` instead
    */
   cert?: string;
-  /**
-   * @deprecated set `Octokit` to `ProbotOctokit.defaults({ throttle })` instead
-   */
-  throttleOptions?: any;
 }
 
 export type State = {

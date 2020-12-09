@@ -15,7 +15,6 @@ type Options = {
   appId?: number;
   privateKey?: string;
   redisConfig?: Redis.RedisOptions | string;
-  throttleOptions?: any;
   baseUrl?: string;
 };
 
@@ -62,12 +61,8 @@ export function getProbotOctokitWithDefaults(options: Options) {
     auth: authOptions,
   };
 
-  if (options.throttleOptions || octokitThrottleOptions) {
-    defaultOptions.throttle = Object.assign(
-      {},
-      options.throttleOptions,
-      octokitThrottleOptions
-    );
+  if (octokitThrottleOptions) {
+    defaultOptions.throttle = octokitThrottleOptions;
   }
 
   return options.Octokit.defaults((instanceOptions: any) => {

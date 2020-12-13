@@ -1,7 +1,7 @@
 import { Logger } from "pino";
 
 import { Context, WebhookPayloadWithRepository } from "./context";
-import { Options } from "./types";
+import { Options, ApplicationFunctionOptions } from "./types";
 import { Probot } from "./probot";
 import { Server } from "./server/server";
 import { ProbotOctokit } from "./octokit/probot-octokit";
@@ -21,4 +21,4 @@ export {
 };
 
 /** NOTE: exported types might change at any point in time */
-export { Options, WebhookPayloadWithRepository };
+export { Options, WebhookPayloadWithRepository, ApplicationFunctionOptions };

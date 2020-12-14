@@ -189,9 +189,9 @@ describe("Deprecations", () => {
     );
   });
 
-  it("(app) => { app.on(event, handler) }", () => {
+  it("({ app }) => { app.on(event, handler) }", () => {
     const probot = new Probot({ log: pino(streamLogsToOutput) });
-    probot.load((app) => {
+    probot.load(({ app }) => {
       // test that deprecation is only logged once
       app.auth();
       app.on("push", () => {});
@@ -199,7 +199,19 @@ describe("Deprecations", () => {
 
     expect(output.length).toEqual(1);
     expect(output[0].msg).toContain(
-      '[probot] "(app) => {}" is deprecated. Use "({ app }) => {}" instead'
+      '[probot] "({ app }) => {}" is deprecated (sorry!). We reverted back to the previous API "(app) => {}", see reasoning at https://github.com/probot/probot/issues/1286#issuecomment-744094299'
+    );
+  });
+
+  it("({ getRouter }) => {}", () => {
+    const probot = new Probot({ log: pino(streamLogsToOutput) });
+    probot.load(({ getRouter }) => {
+      getRouter("test");
+    });
+
+    expect(output.length).toEqual(1);
+    expect(output[0].msg).toContain(
+      '[probot] "({ app, getRouter }) => {}" is deprecated. Use "(app, { getRouter }) => {}" instead'
     );
   });
 

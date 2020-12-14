@@ -6,7 +6,6 @@ import Redis from "ioredis";
 import { Probot } from "./index";
 import { Context } from "./context";
 import { ProbotOctokit } from "./octokit/probot-octokit";
-import { Application } from "./application";
 
 import type { Logger, LogFn } from "pino";
 
@@ -67,21 +66,17 @@ export type ProbotWebhooks = Webhooks<
 
 export type DeprecatedLogger = LogFn & Logger;
 
-type deprecatedKeys =
-  | "router"
-  | "log"
-  | "on"
-  | "receive"
-  | "load"
-  | "route"
-  | "auth";
-
-export type ApplicationFunctionOptions = {
+export type GetRouter = (path?: string) => express.Router;
+export type ApplicationFunctionOptions = Probot & {
   /**
-   * @deprecated "(app) => {}" is deprecated. Use "({ app }) => {}" instead.
+   * @deprecated "({ app }) => {}" is deprecated (sorry!). We reverted back to the previous API "(app) => {}", see reasoning at https://github.com/probot/probot/issues/1286#issuecomment-744094299
    */
-  [K in deprecatedKeys]: Application[K];
-} & { app: Probot; getRouter: (path?: string) => express.Router };
+  app: Probot;
+  /**
+   * @deprecated "({ app, getRouter }) => {}" is deprecated. Use "(app, { getRouter }) => {}" instead
+   */
+  getRouter: GetRouter;
+};
 export type ApplicationFunction = (options: ApplicationFunctionOptions) => void;
 
 export type ServerOptions = {

@@ -241,7 +241,7 @@ export class Probot {
     })
 
     // load probot app function
-    await server.load(({ app }) => {})
+    await server.load(app => {})
 
     // start listening to requests
     await server.start()
@@ -283,7 +283,7 @@ If you have more than one app function, combine them in a function instead
     })
 
     // load probot app function
-    await server.load(({ app }) => {})
+    await server.load(app => {})
 
     // start listening to requests
     await server.start()
@@ -337,7 +337,7 @@ If you have more than one app function, combine them in a function instead
    * expose HTTP endpoints
    *
    * ```
-   * module.exports = ({ app, getRouter }) => {
+   * module.exports = (app, { getRouter }) => {
    *   // Get an express router to expose new HTTP endpoints
    *   const router = getRouter('/my-app');
    *
@@ -353,12 +353,12 @@ If you have more than one app function, combine them in a function instead
    *
    * @param path - the prefix for the routes* @param path
    *
-   * @deprecated "app.route()" is deprecated, use the "getRouter()" argument from the app function instead: "({ app, getRouter }) => { ... }"
+   * @deprecated "app.route()" is deprecated, use the "getRouter()" argument from the app function instead: "(app, { getRouter }) => { ... }"
    */
   route(path?: string) {
     this.log.warn(
       new Deprecation(
-        `[probot] "app.route()" is deprecated, use the "getRouter()" argument from the app function instead: "({ app, getRouter }) => { ... }"`
+        `[probot] "app.route()" is deprecated, use the "getRouter()" argument from the app function instead: "(app, { getRouter }) => { ... }"`
       )
     );
 
@@ -383,12 +383,12 @@ If you have more than one app function, combine them in a function instead
   }
 
   /**
-   * @deprecated "app.router" is deprecated, use "getRouter()" from the app function instead: "({ app, getRouter }) => { ... }"
+   * @deprecated "app.router" is deprecated, use "getRouter()" from the app function instead: "(app, { getRouter }) => { ... }"
    */
   public get router() {
     this.log.warn(
       new Deprecation(
-        `[probot] "app.router" is deprecated, use "getRouter()" from the app function instead: "({ app, getRouter }) => { ... }"`
+        `[probot] "app.router" is deprecated, use "getRouter()" from the app function instead: "(app, { getRouter }) => { ... }"`
       )
     );
 

@@ -37,7 +37,7 @@ describe("createNodeMiddleware", () => {
   test("with createProbot", async () => {
     expect.assertions(1);
 
-    const app: ApplicationFunction = ({ app }) => {
+    const app: ApplicationFunction = (app) => {
       app.on("push", (event) => {
         expect(event.name).toEqual("push");
       });

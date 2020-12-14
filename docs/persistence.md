@@ -63,7 +63,7 @@ mongoose.connect(mongoUri, {
 // Register the mongoose model
 const People = require("./PeopleSchema");
 
-module.exports = ({ app }) => {
+module.exports = (app) => {
   app.on("issues.opened", async (context) => {
     // Find all the people in the database
     const people = await People.find().exec();
@@ -104,7 +104,7 @@ module.exports = connection;
 const { sql } = require("@databases/mysql");
 const connection = require("./connection");
 
-module.exports = ({ app }) => {
+module.exports = (app) => {
   app.on("issues.opened", async (context) => {
     // Find all the people in the database
     const people = await connection.query(sql`SELECT * FROM people`);
@@ -145,7 +145,7 @@ module.exports = connection;
 const { sql } = require("@databases/pg");
 const connection = require("./connection");
 
-module.exports = ({ app }) => {
+module.exports = (app) => {
   app.on("issues.opened", async (context) => {
     // Find all the people in the database
     const people = await connection.query(sql`SELECT * FROM people`);
@@ -186,7 +186,7 @@ firebase.initializeApp(config);
 
 const database = firebase.database();
 
-module.exports = ({ app }) => {
+module.exports = (app) => {
   app.on("issues.opened", async (context) => {
     // Find all the people in the database
     const people = await database

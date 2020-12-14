@@ -1,7 +1,7 @@
 /**
  * @param {{app: import("../..".Probot)}}
  */
-module.exports = ({ app }) => {
+module.exports = (app) => {
   app.log.info("loaded app");
 
   app.on("issue_comment.created", async (context) => {

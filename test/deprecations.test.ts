@@ -223,7 +223,7 @@ describe("Deprecations", () => {
 
     expect(output.length).toEqual(1);
     expect(output[0].msg).toContain(
-      '[probot] "app.router" is deprecated, use "getRouter()" from the app function instead: "({ app, getRouter }) => { ... }"'
+      '[probot] "app.router" is deprecated, use "getRouter()" from the app function instead: "(app, { getRouter }) => { ... }"'
     );
   });
 
@@ -235,7 +235,7 @@ describe("Deprecations", () => {
 
     expect(output.length).toEqual(1);
     expect(output[0].msg).toContain(
-      '[probot] "app.route()" is deprecated, use the "getRouter()" argument from the app function instead: "({ app, getRouter }) => { ... }"'
+      '[probot] "app.route()" is deprecated, use the "getRouter()" argument from the app function instead: "(app, { getRouter }) => { ... }"'
     );
   });
 
@@ -247,7 +247,7 @@ describe("Deprecations", () => {
 
     expect(output.length).toEqual(1);
     expect(output[0].msg).toContain(
-      '[probot] "app.route()" is deprecated, use the "getRouter()" argument from the app function instead: "({ app, getRouter }) => { ... }"'
+      '[probot] "app.route()" is deprecated, use the "getRouter()" argument from the app function instead: "(app, { getRouter }) => { ... }"'
     );
   });
 
@@ -320,7 +320,7 @@ describe("Deprecations", () => {
     process.env.WEBHOOK_PROXY_URL = "https://smee.io/EfHXC9BFfGAxbM6J";
     process.env.WEBHOOK_SECRET = "secret";
 
-    const probot = await Probot.run(({ app }) => {
+    const probot = await Probot.run((app) => {
       initialized = true;
     });
     expect(initialized).toBeTruthy();
@@ -370,7 +370,7 @@ describe("Deprecations", () => {
     })
 
     // load probot app function
-    await server.load(({ app }) => {})
+    await server.load(app => {})
 
     // start listening to requests
     await server.start()
@@ -397,7 +397,7 @@ describe("Deprecations", () => {
     })
 
     // load probot app function
-    await server.load(({ app }) => {})
+    await server.load(app => {})
 
     // start listening to requests
     await server.start()

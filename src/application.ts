@@ -40,7 +40,7 @@ export interface Options {
   webhooks?: Webhooks;
 
   /**
-   * @deprecated "app.router" is deprecated, use "getRouter()" from the app function instead: "({ app, getRouter }) => { ... }"
+   * @deprecated "app.router" is deprecated, use "getRouter()" from the app function instead: "(app, { getRouter }) => { ... }"
    */
   router?: Router;
   /**
@@ -146,12 +146,12 @@ export class Application {
   }
 
   /**
-   * @deprecated "app.router" is deprecated, use "getRouter()" from the app function instead: "({ app, getRouter }) => { ... }"
+   * @deprecated "app.router" is deprecated, use "getRouter()" from the app function instead: "(app, { getRouter }) => { ... }"
    */
   public get router() {
     this.log.warn(
       new Deprecation(
-        `[probot] "app.router" is deprecated, use "getRouter()" from the app function instead: "({ app, getRouter }) => { ... }"`
+        `[probot] "app.router" is deprecated, use "getRouter()" from the app function instead: "(app, { getRouter }) => { ... }"`
       )
     );
 
@@ -163,7 +163,7 @@ export class Application {
    * expose HTTP endpoints
    *
    * ```
-   * module.exports = ({ app, getRouter }) => {
+   * module.exports = (app, { getRouter }) => {
    *   // Get an express router to expose new HTTP endpoints
    *   const router = getRouter('/my-app');
    *
@@ -179,12 +179,12 @@ export class Application {
    *
    * @param path - the prefix for the routes* @param path
    *
-   * @deprecated "app.route()" is deprecated, use the "getRouter()" argument from the app function instead: "({ app, getRouter }) => { ... }"
+   * @deprecated "app.route()" is deprecated, use the "getRouter()" argument from the app function instead: "(app, { getRouter }) => { ... }"
    */
   route(path?: string) {
     this.log.warn(
       new Deprecation(
-        `[probot] "app.route()" is deprecated, use the "getRouter()" argument from the app function instead: "({ app, getRouter }) => { ... }"`
+        `[probot] "app.route()" is deprecated, use the "getRouter()" argument from the app function instead: "(app, { getRouter }) => { ... }"`
       )
     );
 

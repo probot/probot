@@ -10,7 +10,7 @@ Your app has access to an authenticated GitHub client that can be used to make A
 
 ## REST API
 
-`context.octokit` is an instance of the [`@octokit/rest` Node.js module](https://github.com/octokit/rest.js), which wraps the [GitHub REST API](https://developer.github.com/v3/) and allows you to do almost anything programmatically that you can do through a web browser.
+`context.github` is an instance of the [`@octokit/rest` Node.js module](https://github.com/octokit/rest.js), which wraps the [GitHub REST API](https://developer.github.com/v3/) and allows you to do almost anything programmatically that you can do through a web browser.
 
 Here is an example of an autoresponder app that comments on opened issues:
 
@@ -23,7 +23,7 @@ module.exports = ({ app }) => {
     const params = context.issue({ body: "Hello World!" });
 
     // Post a comment on the issue
-    return context.octokit.issues.createComment(params);
+    return context.github.issues.createComment(params);
   });
 };
 ```
@@ -32,7 +32,7 @@ See the [full API docs](https://octokit.github.io/rest.js/) to see all the ways 
 
 ## GraphQL API
 
-Use `context.octokit.graphql` to make requests to the [GitHub GraphQL API](https://developer.github.com/v4/).
+Use `context.github.graphql` to make requests to the [GitHub GraphQL API](https://developer.github.com/v4/).
 
 Here is an example of the same autoresponder app from above that comments on opened issues, but this time with GraphQL:
 
@@ -49,7 +49,7 @@ const addComment = `
 module.exports = ({ app }) => {
   app.on("issues.opened", async (context) => {
     // Post a comment on the issue
-    context.octokit.graphql(addComment, {
+    context.github.graphql(addComment, {
       id: context.payload.issue.node_id,
       body: "Hello World",
     });
@@ -71,7 +71,7 @@ const pinIssue = `
 
 module.exports = ({ app }) => {
   app.on("issues.opened", async (context) => {
-    context.octokit.graphql(pinIssue, {
+    context.github.graphql(pinIssue, {
       id: context.payload.issue.node_id,
       headers: {
         accept: "application/vnd.github.elektra-preview+json",
@@ -85,7 +85,7 @@ Check out the [GitHub GraphQL API docs](https://developer.github.com/v4/) to lea
 
 ## Unauthenticated Events
 
-When [receiving webhook events](./webhooks.md), `context.octokit` is _usually_ an authenticated client, but there are a few events that are exceptions:
+When [receiving webhook events](./webhooks.md), `context.github` is _usually_ an authenticated client, but there are a few events that are exceptions:
 
 - [`installation.deleted`](https://developer.github.com/v3/activity/events/types/#installationevent) - The installation was _just_ deleted, so we can't authenticate as the installation.
 

@@ -3,14 +3,12 @@ import pkgConf from "pkg-conf";
 import { ApplicationFunction, Options, ServerOptions } from "./types";
 import { Probot } from "./index";
 import { setupAppFactory } from "./apps/setup";
-import { logWarningsForObsoleteEnvironmentVariables } from "./helpers/log-warnings-for-obsolete-environment-variables";
 import { getLog, GetLogOptions } from "./helpers/get-log";
 import { readCliOptions } from "./bin/read-cli-options";
 import { readEnvOptions } from "./bin/read-env-options";
 import { Server } from "./server/server";
 import { defaultApp } from "./apps/default";
 import { resolveAppFunction } from "./helpers/resolve-app-function";
-import { load } from "./load";
 
 type AdditionalOptions = {
   env: Record<string, string | undefined>;
@@ -63,7 +61,6 @@ export async function run(
   };
 
   const log = getLog(logOptions);
-  logWarningsForObsoleteEnvironmentVariables(log);
 
   const probotOptions: Options = {
     appId,
@@ -88,7 +85,7 @@ export async function run(
     if (process.env.NODE_ENV === "production") {
       if (!appId) {
         throw new Error(
-          "Application ID is missing, and is required to run in production mode. " +
+          "App ID is missing, and is required to run in production mode. " +
             "To resolve, ensure the APP_ID environment variable is set."
         );
       } else if (!privateKey) {
@@ -107,19 +104,19 @@ export async function run(
   if (Array.isArray(appFnOrArgv)) {
     const pkg = await pkgConf("probot");
 
-    const combinedApps: ApplicationFunction = (app) => {
-      load(app, server.router(), defaultApp);
+    const combinedApps: ApplicationFunction = async (app) => {
+      await server.load(defaultApp);
 
       if (Array.isArray(pkg.apps)) {
         for (const appPath of pkg.apps) {
           const appFn = resolveAppFunction(appPath);
-          load(app, server.router(), appFn);
+          server.load(appFn);
         }
       }
 
       const [appPath] = args;
       const appFn = resolveAppFunction(appPath);
-      load(app, server.router(), appFn);
+      server.load(appFn);
     };
 
     server = new Server(serverOptions);

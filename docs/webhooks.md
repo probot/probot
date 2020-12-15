@@ -45,7 +45,7 @@ You can also use `app.webhooks.onAny()` to listen for any event that your app is
 ```js
 module.exports = (app) => {
   app.webhooks.onAny(async (context) => {
-    context.log.info({ event: context.event, action: context.payload.action });
+    context.log.info({ event: context.name, action: context.payload.action });
   });
 };
 ```

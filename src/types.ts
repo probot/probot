@@ -10,7 +10,6 @@ import { ProbotOctokit } from "./octokit/probot-octokit";
 import type { Logger, LogFn } from "pino";
 
 export interface Options {
-  // same options as Application class
   privateKey?: string;
   githubToken?: string;
   appId?: number | string;
@@ -25,20 +24,6 @@ export interface Options {
   host?: string;
   webhookProxy?: string;
   baseUrl?: string;
-
-  // Probot class-specific options
-  /**
-   * @deprecated `id` options is deprecated. Use `appId` instead
-   */
-  id?: number | string;
-  /**
-   * @deprecated `cert` options is deprecated. Use `privateKey` instead
-   */
-  cert?: string;
-  /**
-   * @deprecated set `Octokit` to `ProbotOctokit.defaults({ throttle })` instead
-   */
-  throttleOptions?: any;
 }
 
 export type State = {
@@ -66,18 +51,14 @@ export type ProbotWebhooks = Webhooks<
 
 export type DeprecatedLogger = LogFn & Logger;
 
-export type GetRouter = (path?: string) => express.Router;
-export type ApplicationFunctionOptions = Probot & {
-  /**
-   * @deprecated "({ app }) => {}" is deprecated (sorry!). We reverted back to the previous API "(app) => {}", see reasoning at https://github.com/probot/probot/issues/1286#issuecomment-744094299
-   */
-  app: Probot;
-  /**
-   * @deprecated "({ app, getRouter }) => {}" is deprecated. Use "(app, { getRouter }) => {}" instead
-   */
-  getRouter: GetRouter;
+export type ApplicationFunctionOptions = {
+  getRouter?: (path?: string) => express.Router;
+  [key: string]: unknown;
 };
-export type ApplicationFunction = (options: ApplicationFunctionOptions) => void;
+export type ApplicationFunction = (
+  app: Probot,
+  options: ApplicationFunctionOptions
+) => void;
 
 export type ServerOptions = {
   log?: Logger;
@@ -91,9 +72,4 @@ export type ServerOptions = {
 export type MiddlewareOptions = {
   probot: Probot;
   [key: string]: unknown;
-
-  /**
-   * @deprecated "Probot" option is deprecated. Pass a "probot" instance instead, see https://github.com/probot/probot/pull/1431
-   */
-  Probot?: typeof Probot;
 };

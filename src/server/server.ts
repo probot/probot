@@ -10,7 +10,6 @@ import { createWebhookProxy } from "../helpers/webhook-proxy";
 import { VERSION } from "../version";
 import { ApplicationFunction, ServerOptions } from "../types";
 import { Probot } from "../";
-import { load } from "../load";
 
 type State = {
   httpServer?: HttpServer;
@@ -59,7 +58,9 @@ export class Server {
   }
 
   public async load(appFn: ApplicationFunction) {
-    await load(this.probotApp, this.router(), appFn);
+    await appFn(this.probotApp, {
+      getRouter: (path) => this.router(path),
+    });
   }
 
   public async start() {

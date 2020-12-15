@@ -1,16 +1,29 @@
+import Stream from "stream";
+
+import pino from "pino";
 import request from "supertest";
+
 import { Probot, Server } from "../../src";
 import { defaultApp } from "../../src/apps/default";
 
 describe("default app", () => {
   let server: Server;
+  let output: any;
+
+  const streamLogsToOutput = new Stream.Writable({ objectMode: true });
+  streamLogsToOutput._write = (object, encoding, done) => {
+    output.push(JSON.parse(object));
+    done();
+  };
 
   beforeEach(async () => {
+    output = [];
     server = new Server({
       Probot: Probot.defaults({
-        id: 1,
+        appId: 1,
         privateKey: "private key",
       }),
+      log: pino(streamLogsToOutput),
     });
 
     await server.load(defaultApp);

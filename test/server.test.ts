@@ -32,9 +32,15 @@ describe("Server", () => {
 
   beforeEach(async () => {
     output = [];
+    const log = pino(streamLogsToOutput);
     server = new Server({
-      Probot: Probot.defaults({ appId, privateKey, secret: "secret" }),
-      log: pino(streamLogsToOutput),
+      Probot: Probot.defaults({
+        appId,
+        privateKey,
+        secret: "secret",
+        log: log.child({ name: "probot" }),
+      }),
+      log: log.child({ name: "server" }),
     });
 
     // Error handler to avoid printing logs
@@ -88,6 +94,25 @@ describe("Server", () => {
 
       expect(output.length).toEqual(1);
       expect(output[0].msg).toContain("POST / 200 -");
+    });
+
+    test("shows a friendly error when x-hub-signature is missing", async () => {
+      await server.load(() => {});
+
+      await request(server.expressApp)
+        .post("/")
+        .send(JSON.stringify(pushEvent))
+        .set("x-github-event", "push")
+        // Note: 'x-hub-signature' is missing
+        .set("x-github-delivery", "3sw4d5f6g7h8")
+        .expect(400);
+
+      expect(output[0]).toEqual(
+        expect.objectContaining({
+          msg:
+            "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
+        })
+      );
     });
   });
 
@@ -203,14 +228,6 @@ describe("Server", () => {
     it("responds with 500 on error", async () => {
       server.expressApp.get("/boom", () => {
         throw new Error("boom");
-      });
-
-      await request(server.expressApp).get("/boom").expect(500);
-    });
-
-    it("responds with 500 on async error", async () => {
-      server.expressApp.get("/boom", () => {
-        return Promise.reject(new Error("boom"));
       });
 
       await request(server.expressApp).get("/boom").expect(500);

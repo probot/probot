@@ -22,7 +22,6 @@ describe("run", () => {
     // Clear log output
     output = [];
     env = {
-      DISABLE_WEBHOOK_EVENT_CHECK: "true",
       APP_ID: "1",
       PRIVATE_KEY_PATH: path.join(
         __dirname,
@@ -50,7 +49,13 @@ describe("run", () => {
     });
 
     it("runs with an array of strings", async () => {
-      server = await run(["node", "probot-run", "./test/fixtures/example.js"]);
+      server = await run([
+        "node",
+        "probot-run",
+        "./test/fixtures/example.js",
+        "--log-level",
+        "fatal",
+      ]);
       await server.stop();
     });
 
@@ -61,7 +66,7 @@ describe("run", () => {
 
       return new Promise(async (resolve) => {
         server = await run(
-          ({ app }: { app: Probot }) => {
+          (app: Probot) => {
             initialized = true;
           },
           { env }

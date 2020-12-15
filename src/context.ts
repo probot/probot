@@ -52,7 +52,7 @@ export interface WebhookPayloadWithRepository {
  *
  * @property {octokit} octokit - An Octokit instance
  * @property {payload} payload - The webhook event payload
- * @property {logger} log - A logger
+ * @property {log} log - A pino instance
  */
 export class Context<E extends WebhookPayloadWithRepository = any>
   implements WebhookEvent<E> {
@@ -233,25 +233,5 @@ export class Context<E extends WebhookPayloadWithRepository = any>
     }
 
     return config as T;
-  }
-
-  /**
-   * @deprecated `context.event` is deprecated, use `context.name` instead.
-   */
-  public get event() {
-    this.log.warn(
-      `[probot] "context.event" is deprecated. Use "context.name" instead.`
-    );
-    return this.name;
-  }
-
-  /**
-   * @deprecated `context.github` is deprecated. Use `context.octokit` instead.
-   */
-  public get github() {
-    this.log.warn(
-      `[probot] "context.github" is deprecated. Use "context.octokit" instead.`
-    );
-    return this.octokit;
   }
 }

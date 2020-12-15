@@ -1,6 +1,5 @@
 /**
- *
- * @param {{app: import('../..').Probot}}
+ * @param {import('../../lib').Probot}
  */
 module.exports = (app) => {
   // Your code here

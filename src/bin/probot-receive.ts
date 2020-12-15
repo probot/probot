@@ -9,7 +9,6 @@ import { getPrivateKey } from "@probot/get-private-key";
 import { getLog } from "../helpers/get-log";
 
 import { Probot } from "../";
-import { logWarningsForObsoleteEnvironmentVariables } from "../helpers/log-warnings-for-obsolete-environment-variables";
 
 program
   .usage("[options] [path/to/app.js...]")
@@ -76,7 +75,6 @@ const log = getLog({
   logLevelInString: program.logLevelInString,
   sentryDsn: program.sentryDsn,
 });
-logWarningsForObsoleteEnvironmentVariables(log);
 
 const probot = new Probot({
   appId: program.app,
@@ -85,7 +83,8 @@ const probot = new Probot({
   log,
 });
 
-probot.setup(program.args);
+const appFn = require(path.resolve(process.cwd(), program.args[0]));
+probot.load(appFn);
 
 probot.log.debug("Receiving event", program.event);
 probot.receive({ name: program.event, payload, id: uuidv4() }).catch(() => {

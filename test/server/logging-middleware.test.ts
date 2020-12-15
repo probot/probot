@@ -44,7 +44,6 @@ describe("logging", () => {
             headers: expect.objectContaining({
               "accept-encoding": "gzip, deflate",
               connection: "close",
-              "user-agent": expect.stringMatching(/^node-superagent/),
             }),
             method: "GET",
             remoteAddress: "::ffff:127.0.0.1",

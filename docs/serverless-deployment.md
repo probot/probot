@@ -86,7 +86,7 @@ A probot middleware function should follow the following conventions:
 
 1. The package exports a synchronous function. The function name should follow the pattern `create[Platform]Middleware`
 2. The exported function should return a function matching the respective platform of the requirements
-3. The first argument should be a probot application function: `async ({ app }) => { ... }`
+3. The first argument should be a probot application function: `async (app) => { ... }`
 4. The 2nd argument should accept an object with at least a `probot` key, which has to be set to a Probot instance.
 
 Please share your own middleware by adding it to this list: [edit this page on GitHub](https://github.com/probot/probot/edit/master/docs/serverless-deployment.md).

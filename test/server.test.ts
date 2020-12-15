@@ -71,7 +71,7 @@ describe("Server", () => {
         port: await getPort(),
       });
 
-      await server.load(({ app }) => {
+      await server.load((app) => {
         app.on("push", (event) => {
           expect(event.name).toEqual("push");
         });

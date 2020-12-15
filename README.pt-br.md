@@ -11,7 +11,7 @@ Se você já pensou, "não seria legal se o GitHub pudesse..."; Eu vou parar voc
 **Probot é um framework para construir [GitHub Apps](http://developer.github.com/apps) em [Node.js](https://nodejs.org/)**, escrito em [TypeScript](https://www.typescriptlang.org/). O GitHub Apps pode ouvir eventos de webhook enviados por um repositório ou organização. O Probot usa seu emissor de evento interno para executar ações com base nesses eventos. Um aplicativo Probot simples pode ter esta aparência:
 
 ```js
-module.exports = ({ app }) => {
+module.exports = (app) => {
   app.on("issues.opened", async (context) => {
     const issueComment = context.issue({
       body: "Obrigado por abrir esta issue!",

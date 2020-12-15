@@ -189,9 +189,9 @@ describe("Deprecations", () => {
     );
   });
 
-  it("(app) => { app.on(event, handler) }", () => {
+  it("({ app }) => { app.on(event, handler) }", () => {
     const probot = new Probot({ log: pino(streamLogsToOutput) });
-    probot.load((app) => {
+    probot.load(({ app }) => {
       // test that deprecation is only logged once
       app.auth();
       app.on("push", () => {});
@@ -199,7 +199,19 @@ describe("Deprecations", () => {
 
     expect(output.length).toEqual(1);
     expect(output[0].msg).toContain(
-      '[probot] "(app) => {}" is deprecated. Use "({ app }) => {}" instead'
+      '[probot] "({ app }) => {}" is deprecated (sorry!). We reverted back to the previous API "(app) => {}", see reasoning at https://github.com/probot/probot/issues/1286#issuecomment-744094299'
+    );
+  });
+
+  it("({ getRouter }) => {}", () => {
+    const probot = new Probot({ log: pino(streamLogsToOutput) });
+    probot.load(({ getRouter }) => {
+      getRouter("test");
+    });
+
+    expect(output.length).toEqual(1);
+    expect(output[0].msg).toContain(
+      '[probot] "({ app, getRouter }) => {}" is deprecated. Use "(app, { getRouter }) => {}" instead'
     );
   });
 
@@ -211,7 +223,7 @@ describe("Deprecations", () => {
 
     expect(output.length).toEqual(1);
     expect(output[0].msg).toContain(
-      '[probot] "app.router" is deprecated, use "getRouter()" from the app function instead: "({ app, getRouter }) => { ... }"'
+      '[probot] "app.router" is deprecated, use "getRouter()" from the app function instead: "(app, { getRouter }) => { ... }"'
     );
   });
 
@@ -223,7 +235,7 @@ describe("Deprecations", () => {
 
     expect(output.length).toEqual(1);
     expect(output[0].msg).toContain(
-      '[probot] "app.route()" is deprecated, use the "getRouter()" argument from the app function instead: "({ app, getRouter }) => { ... }"'
+      '[probot] "app.route()" is deprecated, use the "getRouter()" argument from the app function instead: "(app, { getRouter }) => { ... }"'
     );
   });
 
@@ -235,7 +247,7 @@ describe("Deprecations", () => {
 
     expect(output.length).toEqual(1);
     expect(output[0].msg).toContain(
-      '[probot] "app.route()" is deprecated, use the "getRouter()" argument from the app function instead: "({ app, getRouter }) => { ... }"'
+      '[probot] "app.route()" is deprecated, use the "getRouter()" argument from the app function instead: "(app, { getRouter }) => { ... }"'
     );
   });
 
@@ -308,7 +320,7 @@ describe("Deprecations", () => {
     process.env.WEBHOOK_PROXY_URL = "https://smee.io/EfHXC9BFfGAxbM6J";
     process.env.WEBHOOK_SECRET = "secret";
 
-    const probot = await Probot.run(({ app }) => {
+    const probot = await Probot.run((app) => {
       initialized = true;
     });
     expect(initialized).toBeTruthy();
@@ -358,7 +370,7 @@ describe("Deprecations", () => {
     })
 
     // load probot app function
-    await server.load(({ app }) => {})
+    await server.load(app => {})
 
     // start listening to requests
     await server.start()
@@ -385,7 +397,7 @@ describe("Deprecations", () => {
     })
 
     // load probot app function
-    await server.load(({ app }) => {})
+    await server.load(app => {})
 
     // start listening to requests
     await server.start()

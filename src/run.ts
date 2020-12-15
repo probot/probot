@@ -18,7 +18,7 @@ type AdditionalOptions = {
 
 /**
  *
- * @param appFnOrArgv set to either a probot application function: `({ app }) => { ... }` or to process.argv
+ * @param appFnOrArgv set to either a probot application function: `(app) => { ... }` or to process.argv
  */
 export async function run(
   appFnOrArgv: ApplicationFunction | string[],
@@ -107,7 +107,7 @@ export async function run(
   if (Array.isArray(appFnOrArgv)) {
     const pkg = await pkgConf("probot");
 
-    const combinedApps: ApplicationFunction = ({ app }) => {
+    const combinedApps: ApplicationFunction = (app) => {
       load(app, server.router(), defaultApp);
 
       if (Array.isArray(pkg.apps)) {

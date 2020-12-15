@@ -83,7 +83,7 @@ describe("webhook-event-check", () => {
     const probot = new Probot({ appId, privateKey });
     let spyOnLogError;
 
-    probot.load(async ({ app }) => {
+    probot.load(async (app) => {
       spyOnLogError = jest.spyOn(app.log, "error");
 
       app.webhooks.onAny(noop);

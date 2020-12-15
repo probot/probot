@@ -15,7 +15,7 @@ Your app has access to an authenticated GitHub client that can be used to make A
 Here is an example of an autoresponder app that comments on opened issues:
 
 ```js
-module.exports = ({ app }) => {
+module.exports = (app) => {
   app.on("issues.opened", async (context) => {
     // `context` extracts information from the event, which can be passed to
     // GitHub API calls. This will return:
@@ -46,7 +46,7 @@ const addComment = `
   }
 `;
 
-module.exports = ({ app }) => {
+module.exports = (app) => {
   app.on("issues.opened", async (context) => {
     // Post a comment on the issue
     context.octokit.graphql(addComment, {
@@ -69,7 +69,7 @@ const pinIssue = `
   }
 `;
 
-module.exports = ({ app }) => {
+module.exports = (app) => {
   app.on("issues.opened", async (context) => {
     context.octokit.graphql(pinIssue, {
       id: context.payload.issue.node_id,

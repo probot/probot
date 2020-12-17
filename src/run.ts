@@ -1,54 +1,133 @@
-require("dotenv").config();
-
 import pkgConf from "pkg-conf";
-import program from "commander";
 
-import { ApplicationFunction } from "./types";
+import { ApplicationFunction, Options, ServerOptions } from "./types";
 import { Probot } from "./index";
 import { setupAppFactory } from "./apps/setup";
-import { logWarningsForObsoleteEnvironmentVariables } from "./helpers/log-warnings-for-obsolete-environment-variables";
-import { getLog } from "./helpers/get-log";
+import { getLog, GetLogOptions } from "./helpers/get-log";
 import { readCliOptions } from "./bin/read-cli-options";
 import { readEnvOptions } from "./bin/read-env-options";
+import { Server } from "./server/server";
+import { defaultApp } from "./apps/default";
+import { resolveAppFunction } from "./helpers/resolve-app-function";
 
-export async function run(appFnOrArgv: ApplicationFunction | string[]) {
+type AdditionalOptions = {
+  env: Record<string, string | undefined>;
+};
+
+/**
+ *
+ * @param appFnOrArgv set to either a probot application function: `(app) => { ... }` or to process.argv
+ */
+export async function run(
+  appFnOrArgv: ApplicationFunction | string[],
+  additionalOptions?: AdditionalOptions
+) {
+  require("dotenv").config();
+
+  const envOptions = readEnvOptions(additionalOptions?.env);
+  const cliOptions = Array.isArray(appFnOrArgv)
+    ? readCliOptions(appFnOrArgv)
+    : {};
+
   const {
+    // log options
     logLevel: level,
     logFormat,
     logLevelInString,
     sentryDsn,
-    ...options
-  } = Array.isArray(appFnOrArgv)
-    ? readCliOptions(appFnOrArgv)
-    : readEnvOptions();
 
-  const log = getLog({ level, logFormat, logLevelInString, sentryDsn });
-  logWarningsForObsoleteEnvironmentVariables(log);
+    // server options
+    host,
+    port,
+    webhookPath,
+    webhookProxy,
 
-  const probot = new Probot({ log, ...options });
+    // probot options
+    appId,
+    privateKey,
+    redisConfig,
+    secret,
+    baseUrl,
 
-  if (!options.id || !options.privateKey) {
+    // others
+    args,
+  } = { ...envOptions, ...cliOptions };
+
+  const logOptions: GetLogOptions = {
+    level,
+    logFormat,
+    logLevelInString,
+    sentryDsn,
+  };
+
+  const log = getLog(logOptions);
+
+  const probotOptions: Options = {
+    appId,
+    privateKey,
+    redisConfig,
+    secret,
+    baseUrl,
+    log: log.child({ name: "probot" }),
+  };
+  const serverOptions: ServerOptions = {
+    host,
+    port,
+    webhookPath,
+    webhookProxy,
+    log: log.child({ name: "server" }),
+    Probot: Probot.defaults(probotOptions),
+  };
+
+  let server: Server;
+
+  if (!appId || !privateKey) {
     if (process.env.NODE_ENV === "production") {
-      if (!options.id) {
+      if (!appId) {
         throw new Error(
-          "Application ID is missing, and is required to run in production mode. " +
+          "App ID is missing, and is required to run in production mode. " +
             "To resolve, ensure the APP_ID environment variable is set."
         );
-      } else if (!options.privateKey) {
+      } else if (!privateKey) {
         throw new Error(
           "Certificate is missing, and is required to run in production mode. " +
             "To resolve, ensure either the PRIVATE_KEY or PRIVATE_KEY_PATH environment variable is set and contains a valid certificate"
         );
       }
     }
-    probot.load(setupAppFactory(options.host, options.port));
-  } else if (Array.isArray(appFnOrArgv)) {
-    const pkg = await pkgConf("probot");
-    probot.setup(program.args.concat((pkg.apps as string[]) || []));
-  } else {
-    probot.load(appFnOrArgv);
+    server = new Server(serverOptions);
+    await server.load(setupAppFactory(host, port));
+    await server.start();
+    return server;
   }
-  probot.start();
 
-  return probot;
+  if (Array.isArray(appFnOrArgv)) {
+    const pkg = await pkgConf("probot");
+
+    const combinedApps: ApplicationFunction = async (app) => {
+      await server.load(defaultApp);
+
+      if (Array.isArray(pkg.apps)) {
+        for (const appPath of pkg.apps) {
+          const appFn = resolveAppFunction(appPath);
+          server.load(appFn);
+        }
+      }
+
+      const [appPath] = args;
+      const appFn = resolveAppFunction(appPath);
+      server.load(appFn);
+    };
+
+    server = new Server(serverOptions);
+    await server.load(combinedApps);
+    await server.start();
+    return server;
+  }
+
+  server = new Server(serverOptions);
+  await server.load(appFnOrArgv);
+  await server.start();
+
+  return server;
 }

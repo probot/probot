@@ -7,11 +7,12 @@ import nock from "nock";
 import { Stream } from "stream";
 import request from "supertest";
 import pino from "pino";
-import { Probot } from "../../src";
+
+import { Probot, Server } from "../../src";
 import { setupAppFactory } from "../../src/apps/setup";
 
 describe("Setup app", () => {
-  let probot: Probot;
+  let server: Server;
   let logOutput: any[] = [];
 
   const streamLogsToOutput = new Stream.Writable({ objectMode: true });
@@ -21,17 +22,18 @@ describe("Setup app", () => {
   };
 
   beforeEach(async () => {
-    delete process.env.WEBHOOK_PROXY_URL;
-    probot = new Probot({
+    logOutput = [];
+    server = new Server({
+      Probot: Probot.defaults({
+        log: pino(streamLogsToOutput),
+      }),
       log: pino(streamLogsToOutput),
     });
-    probot.load(setupAppFactory(undefined, undefined));
 
-    // there is currently no way to await probot.load, so we do hacky hack hack
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await server.load(setupAppFactory(undefined, undefined));
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     jest.clearAllMocks();
   });
 
@@ -56,11 +58,14 @@ describe("Setup app", () => {
     });
 
     it("should log welcome message with custom host and port", async () => {
-      logOutput.length = 0; // clear array
-      probot.load(setupAppFactory("127.0.0.1", 8080));
+      const server2 = new Server({
+        log: pino(streamLogsToOutput),
+        Probot: Probot.defaults({
+          log: pino(streamLogsToOutput),
+        }),
+      });
 
-      // there is currently no way to await probot.load, so we do hacky hack hack
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await server2.load(setupAppFactory("127.0.0.1", 8080));
 
       const expMsg =
         "Please follow the instructions at http://127.0.0.1:8080 to configure .env.";
@@ -74,7 +79,7 @@ describe("Setup app", () => {
 
   describe("GET /probot", () => {
     it("returns a 200 response", async () => {
-      await request(probot.server).get("/probot").expect(200);
+      await request(server.expressApp).get("/probot").expect(200);
     });
   });
 
@@ -89,7 +94,7 @@ describe("Setup app", () => {
           webhook_secret: "webhook_secret",
         });
 
-      await request(probot.server)
+      await request(server.expressApp)
         .get("/probot/setup")
         .query({ code: "123" })
         .expect(302)
@@ -102,7 +107,7 @@ describe("Setup app", () => {
 
   describe("GET /probot/import", () => {
     it("renders import.hbs", async () => {
-      await request(probot.server).get("/probot/import").expect(200);
+      await request(server.expressApp).get("/probot/import").expect(200);
     });
   });
 
@@ -114,7 +119,7 @@ describe("Setup app", () => {
         webhook_secret: "baz",
       });
 
-      await request(probot.server)
+      await request(server.expressApp)
         .post("/probot/import")
         .set("content-type", "application/json")
         .send(body)
@@ -131,7 +136,7 @@ describe("Setup app", () => {
         webhook_secret: "baz",
       });
 
-      await request(probot.server)
+      await request(server.expressApp)
         .post("/probot/import")
         .set("content-type", "application/json")
         .send(body)
@@ -141,7 +146,7 @@ describe("Setup app", () => {
 
   describe("GET /probot/success", () => {
     it("returns a 200 response", async () => {
-      await request(probot.server).get("/probot/success").expect(200);
+      await request(server.expressApp).get("/probot/success").expect(200);
 
       expect(createChannel).toHaveBeenCalledTimes(1);
     });

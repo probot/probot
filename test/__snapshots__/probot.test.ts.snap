@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Probot webhooks responds with the correct error if the PEM file is missing 1`] = `"Your private key (usually a .pem file) is not correct. Go to https://github.com/settings/apps/YOUR_APP and generate a new PEM file. If you're deploying to Now, visit https://probot.github.io/docs/deployment/#now."`;
+
+exports[`Probot webhooks responds with the correct error if the jwt could not be decoded 1`] = `"Your private key (usually a .pem file) is not correct. Go to https://github.com/settings/apps/YOUR_APP and generate a new PEM file. If you're deploying to Now, visit https://probot.github.io/docs/deployment/#now."`;
+
+exports[`Probot webhooks responds with the correct error if webhook secret does not match 1`] = `"Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable."`;
+
+exports[`Probot webhooks responds with the correct error if webhook secret is not found 1`] = `"Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable."`;
+
+exports[`Probot webhooks responds with the correct error if webhook secret is wrong 1`] = `"Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable."`;

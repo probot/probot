@@ -6,15 +6,14 @@ import Redis from "ioredis";
 import { Probot } from "./index";
 import { Context } from "./context";
 import { ProbotOctokit } from "./octokit/probot-octokit";
-import { Application } from "./application";
 
 import type { Logger, LogFn } from "pino";
 
 export interface Options {
-  // same options as Application class
   privateKey?: string;
   githubToken?: string;
-  id?: number;
+  appId?: number | string;
+
   Octokit?: typeof ProbotOctokit;
   log?: Logger;
   redisConfig?: Redis.RedisOptions | string;
@@ -25,20 +24,10 @@ export interface Options {
   host?: string;
   webhookProxy?: string;
   baseUrl?: string;
-
-  // Probot class-specific options
-  /**
-   * @deprecated `cert` options is deprecated. Use `privateKey` instead
-   */
-  cert?: string;
-  /**
-   * @deprecated set `Octokit` to `ProbotOctokit.defaults({ throttle })` instead
-   */
-  throttleOptions?: any;
 }
 
 export type State = {
-  id?: number;
+  appId?: number;
   privateKey?: string;
   githubToken?: string;
   log: Logger;
@@ -52,7 +41,6 @@ export type State = {
   port?: number;
   host?: string;
   webhookProxy?: string;
-  webhookPath?: string;
   baseUrl?: string;
 };
 
@@ -63,19 +51,25 @@ export type ProbotWebhooks = Webhooks<
 
 export type DeprecatedLogger = LogFn & Logger;
 
-type deprecatedKeys =
-  | "router"
-  | "log"
-  | "on"
-  | "receive"
-  | "load"
-  | "route"
-  | "auth";
-
 export type ApplicationFunctionOptions = {
-  /**
-   * @deprecated "(app) => {}" is deprecated. Use "({ app }) => {}" instead.
-   */
-  [K in deprecatedKeys]: Application[K];
-} & { app: Probot; getRouter: (path?: string) => express.Router };
-export type ApplicationFunction = (options: ApplicationFunctionOptions) => void;
+  getRouter?: (path?: string) => express.Router;
+  [key: string]: unknown;
+};
+export type ApplicationFunction = (
+  app: Probot,
+  options: ApplicationFunctionOptions
+) => void;
+
+export type ServerOptions = {
+  log?: Logger;
+  port?: number;
+  host?: string;
+  webhookPath?: string;
+  webhookProxy?: string;
+  Probot: typeof Probot;
+};
+
+export type MiddlewareOptions = {
+  probot: Probot;
+  [key: string]: unknown;
+};

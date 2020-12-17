@@ -1,24 +1,37 @@
+import Stream from "stream";
+
+import pino from "pino";
 import request from "supertest";
-import { Probot } from "../../src";
+
+import { Probot, Server } from "../../src";
 import { defaultApp } from "../../src/apps/default";
 
 describe("default app", () => {
-  let probot: Probot;
+  let server: Server;
+  let output: any;
+
+  const streamLogsToOutput = new Stream.Writable({ objectMode: true });
+  streamLogsToOutput._write = (object, encoding, done) => {
+    output.push(JSON.parse(object));
+    done();
+  };
 
   beforeEach(async () => {
-    probot = new Probot({
-      id: 1,
-      privateKey: "private key",
+    output = [];
+    server = new Server({
+      Probot: Probot.defaults({
+        appId: 1,
+        privateKey: "private key",
+      }),
+      log: pino(streamLogsToOutput),
     });
-    probot.load(defaultApp);
 
-    // there is currently no way to await probot.load, so we do hacky hack hack
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await server.load(defaultApp);
   });
 
   describe("GET /probot", () => {
     it("returns a 200 response", () => {
-      return request(probot.server).get("/probot").expect(200);
+      return request(server.expressApp).get("/probot").expect(200);
     });
 
     describe("get info from package.json", () => {
@@ -28,7 +41,9 @@ describe("default app", () => {
       });
 
       it("returns the correct HTML with values", async () => {
-        const actual = await request(probot.server).get("/probot").expect(200);
+        const actual = await request(server.expressApp)
+          .get("/probot")
+          .expect(200);
         expect(actual.text).toMatch("Welcome to probot");
         expect(actual.text).toMatch("A framework for building GitHub Apps");
         expect(actual.text).toMatch(/v\d+\.\d+\.\d+/);
@@ -36,7 +51,9 @@ describe("default app", () => {
 
       it("returns the correct HTML without values", async () => {
         process.chdir(__dirname);
-        const actual = await request(probot.server).get("/probot").expect(200);
+        const actual = await request(server.expressApp)
+          .get("/probot")
+          .expect(200);
         expect(actual.text).toMatch("Welcome to your Probot App");
       });
 
@@ -48,7 +65,7 @@ describe("default app", () => {
 
   describe("GET /", () => {
     it("redirects to /probot", () => {
-      return request(probot.server)
+      return request(server.expressApp)
         .get("/")
         .expect(302)
         .expect("location", "/probot");

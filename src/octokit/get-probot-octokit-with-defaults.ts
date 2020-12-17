@@ -1,4 +1,3 @@
-import { Deprecation } from "deprecation";
 import LRUCache from "lru-cache";
 import { ProbotOctokit } from "./probot-octokit";
 import Redis from "ioredis";
@@ -15,7 +14,6 @@ type Options = {
   appId?: number;
   privateKey?: string;
   redisConfig?: Redis.RedisOptions | string;
-  throttleOptions?: any;
   baseUrl?: string;
 };
 
@@ -45,29 +43,13 @@ export function getProbotOctokitWithDefaults(options: Options) {
     redisConfig: options.redisConfig,
   });
 
-  if (!options.baseUrl && process.env.GHE_HOST) {
-    options.baseUrl = `${process.env.GHE_PROTOCOL || "https"}://${
-      process.env.GHE_HOST
-    }/api/v3`;
-
-    options.log.warn(
-      new Deprecation(
-        `[probot] "GHE_HOST"/"GHE_PROTOCOL" is deprecated when using with the Probot constructor. Use "new Probot({ baseUrl: 'https://github.acme-inc.com/api/v3' })" instead`
-      )
-    );
-  }
-
   const defaultOptions: any = {
     baseUrl: options.baseUrl,
     auth: authOptions,
   };
 
-  if (options.throttleOptions || octokitThrottleOptions) {
-    defaultOptions.throttle = Object.assign(
-      {},
-      options.throttleOptions,
-      octokitThrottleOptions
-    );
+  if (octokitThrottleOptions) {
+    defaultOptions.throttle = octokitThrottleOptions;
   }
 
   return options.Octokit.defaults((instanceOptions: any) => {

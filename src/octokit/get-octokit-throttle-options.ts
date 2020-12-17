@@ -1,7 +1,6 @@
 import Bottleneck from "bottleneck";
 import Redis from "ioredis";
 import { Logger } from "pino";
-import { Deprecation } from "deprecation";
 
 type Options = {
   log: Logger;
@@ -10,15 +9,6 @@ type Options = {
 
 export function getOctokitThrottleOptions(options: Options) {
   let { log, redisConfig } = options;
-
-  if (!redisConfig && process.env.REDIS_URL) {
-    redisConfig = process.env.REDIS_URL;
-    log.warn(
-      new Deprecation(
-        `[probot] "REDIS_URL" is deprecated when using with the Probot constructor. Use "new Probot({ redisConfig: 'redis://...' })" instead`
-      )
-    );
-  }
 
   if (!redisConfig) return;
 

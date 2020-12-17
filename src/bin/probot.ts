@@ -17,12 +17,6 @@ if (pkg.version !== "0.0.0-development") {
   updateNotifier({ pkg }).notify();
 }
 
-if (process.env.GHE_HOST && /^https?:\/\//.test(process.env.GHE_HOST)) {
-  throw new Error(
-    "Your `GHE_HOST` environment variable should not begin with https:// or http://"
-  );
-}
-
 program
   .version(pkg.version)
   .usage("<command> [options]")

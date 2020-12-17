@@ -1,14 +1,14 @@
 import path from "path";
-import express from "express";
-import { Probot } from "../index";
+import { ApplicationFunctionOptions, Probot } from "../index";
 
-export function defaultApp({
-  app,
-  getRouter,
-}: {
-  app: Probot;
-  getRouter: () => express.Router;
-}) {
+export function defaultApp(
+  app: Probot,
+  { getRouter }: ApplicationFunctionOptions
+) {
+  if (!getRouter) {
+    throw new Error("getRouter() is required for defaultApp");
+  }
+
   const router = getRouter();
 
   router.get("/probot", (req, res) => {

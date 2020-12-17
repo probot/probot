@@ -10,9 +10,9 @@ import { State } from "../types";
  */
 export async function webhookTransform(state: State, event: WebhookEvent) {
   const log = state.log.child({ name: "event", id: event.id });
-  const github = (await state.octokit.auth({
+  const octokit = (await state.octokit.auth({
     type: "event-octokit",
     event,
   })) as typeof state.octokit;
-  return new Context(event, github, log);
+  return new Context(event, octokit, log);
 }

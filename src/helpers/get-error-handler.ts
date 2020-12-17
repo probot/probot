@@ -1,11 +1,13 @@
 import type { Logger } from "pino";
-import { WebhookError } from "@octokit/webhooks";
+import { WebhookError, WebhookEvent } from "@octokit/webhooks";
 
 export function getErrorHandler(log: Logger) {
   return (error: Error) => {
     const errors = (error.name === "AggregateError"
       ? error
       : [error]) as WebhookError[];
+
+    const event = (error as any).event as WebhookEvent<any>;
 
     for (const error of errors) {
       const errMessage = (error.message || "").toLowerCase();
@@ -29,7 +31,7 @@ export function getErrorHandler(log: Logger) {
       log
         .child({
           name: "event",
-          id: error.event ? error.event.id : undefined,
+          id: event ? event.id : undefined,
         })
         .error(error);
     }

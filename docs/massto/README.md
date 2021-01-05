@@ -1,7 +1,9 @@
----
+<---
+
 next: docs/hello-world.md
 permalink: /docs/
----
+
+<---
 
 # Introduction
 
@@ -16,3 +18,5 @@ Probot apps are easy to write, deploy, and share. Many of the most popular Probo
 Check out the [featured apps](https://probot.github.io/apps/) or [browse more examples on GitHub](https://github.com/search?q=topic%3Aprobot-app&type=Repositories)
 
 Ready to get started?
+
+--->

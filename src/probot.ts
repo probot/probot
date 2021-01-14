@@ -85,7 +85,6 @@ export class Probot {
       privateKey: options.privateKey,
       host: options.host,
       port: options.port,
-      webhookProxy: options.webhookProxy,
     };
 
     this.auth = auth.bind(null, this.state);

@@ -22,7 +22,6 @@ export interface Options {
   logLevel?: "trace" | "debug" | "info" | "warn" | "error" | "fatal";
   port?: number;
   host?: string;
-  webhookProxy?: string;
   baseUrl?: string;
 }
 
@@ -40,7 +39,6 @@ export type State = {
   };
   port?: number;
   host?: string;
-  webhookProxy?: string;
   baseUrl?: string;
 };
 

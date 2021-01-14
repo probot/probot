@@ -81,6 +81,7 @@ describe("ManifestCreation", () => {
       delete process.env.PRIVATE_KEY;
       delete process.env.WEBHOOK_SECRET;
       delete process.env.GHE_HOST;
+      delete process.env.GITHUB_ORG;
     });
 
     test("creates an app from a code", async () => {
@@ -115,6 +116,14 @@ describe("ManifestCreation", () => {
           '"-----BEGIN RSA PRIVATE KEY-----\nsecrets\n-----END RSA PRIVATE KEY-----\n"',
         WEBHOOK_SECRET: "12345abcde",
       });
+    });
+
+    test("creates an organization app from code with github org env set", async () => {
+      process.env.GITHUB_ORG = "bar";
+
+      expect(setup.createAppUrl).toEqual(
+        "https://github.com/organizations/bar/settings/apps/new"
+      );
     });
   });
 

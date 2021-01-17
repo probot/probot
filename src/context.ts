@@ -129,8 +129,8 @@ export class Context<E extends WebhookPayloadWithRepository = any>
   }
 
   /**
-   * Return the `owner`, `repo`, and `issue_number` params for making API requests
-   * against an issue. The object passed in will be merged with the repo params.
+   * Return the `owner`, `repo`, and `pull_number` params for making API requests
+   * against a pull request. The object passed in will be merged with the repo params.
    *
    *
    * ```js

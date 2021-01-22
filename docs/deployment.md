@@ -1,5 +1,5 @@
 ---
-next: docs/serverless-deployment.md
+next: docs/extensions.md
 ---
 
 # Deployment
@@ -10,7 +10,7 @@ Every app can either be deployed stand-alone, or combined with other apps in one
 
 **Contents:**
 
-1. [Create the GitHub App](#create-the-github-app)
+1. [Register the GitHub App](#register-the-github-app)
 1. [Deploy the app](#deploy-the-app)
    1. [Glitch](#glitch)
    1. [Heroku](#heroku)
@@ -19,15 +19,15 @@ Every app can either be deployed stand-alone, or combined with other apps in one
 1. [Error tracking](#error-tracking)
 1. [Serverless Deployments](#serverless)
 
-## Create the GitHub App
+## Register the GitHub App
 
-Every deployment will need an [App](https://developer.github.com/apps/).
+Every deployment will need a [GitHub App registration](https://docs.github.com/apps).
 
-1. [Create a new GitHub App](https://github.com/settings/apps/new) with:
+1. [Register a new GitHub App](https://github.com/settings/apps/new) with:
 
    - **Homepage URL**: the URL to the GitHub repository for your app
    - **Webhook URL**: Use `https://example.com/` for now, we'll come back in a minute to update this with the URL of your deployed app.
-   - **Webhook Secret**: Generate a unique secret with `openssl rand -base64 32` and save it because you'll need it in a minute to configure your deployed app.
+   - **Webhook Secret**: Generate a unique secret with (e.g. with `openssl rand -base64 32`) and save it because you'll need it in a minute to configure your Probot app.
 
 1. Download the private key from the app.
 
@@ -47,7 +47,11 @@ And one of:
 
 `PRIVATE_KEY` takes precedence over `PRIVATE_KEY_PATH`.
 
-### Glitch
+### As node app
+
+Probot can run your app function using the `probot` binary. If your app function lives in `./app.js`, you can start it as node process using `probot run ./app.js`
+
+#### Glitch
 
 Glitch lets you host node applications for free and edit them directly in your browser. It’s great for experimentation and entirely sufficient for simple apps.
 
@@ -66,11 +70,9 @@ Glitch lets you host node applications for free and edit them directly in your b
 
 Enjoy!
 
-**Bonus:** You can deploy your app using [glitch-deploy](https://github.com/gr2m/glitch-deploy) directly from your terminal or as [continuous deployment](https://github.com/gr2m/glitch-deploy#deploy-from-ci).
+#### Heroku
 
-### Heroku
-
-Probot runs like [any other Node app](https://devcenter.heroku.com/articles/deploying-nodejs) on Heroku. After [creating the GitHub App](#create-the-github-app):
+Probot runs like [any other Node app](https://devcenter.heroku.com/articles/deploying-nodejs) on Heroku. After [creating the GitHub App](#register-the-github-app):
 
 1.  Make sure you have the [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli) client installed.
 
@@ -106,6 +108,22 @@ Probot runs like [any other Node app](https://devcenter.heroku.com/articles/depl
          $ heroku config:set LOG_LEVEL=trace
          $ heroku logs --tail
 
+### As serverless function
+
+When deploying your Probot app to a serverless/function environment, you don't need to worry about handling the http webhook requests coming from GitHub, the platform takes care of that. In many cases you can use [`createNodeMiddleware`](./development.md#use-createNodeMiddleware) directly, e.g. for Vercel or Google Cloud Function.
+
+```js
+const { Probot, createProbot } = require("probot");
+const { createMyMiddleware } = require("my-probot-middleware");
+const myApp = require("./my-app.js");
+
+module.exports = createMyMiddleware(myApp, { probot: createProbot() });
+```
+
+In other circumstances you can use one of the other official Probot middlewares, such as [`@probot/azure-middleware`](#TBD) for Azure Functions or [`@probot/github-action-middleware](#TBD) for GitHub Actions.
+
+<!-- TODO: Add short deployment instructions for Vercel, Begin, Cloudflare Functions, GItHub Actions, Azure, Lambda. Reference the example apps for more details -->
+
 ## Share the app
 
 The Probot website includes a list of [featured apps](https://probot.github.io/apps). Consider [adding your app to the website](https://github.com/probot/probot.github.io/blob/master/CONTRIBUTING.md#adding-your-app) so others can discover and use it.
@@ -131,11 +149,24 @@ To deploy multiple apps in one instance, create a new app that has the existing 
 }
 ```
 
+Note that this feature is only supported when [run as Node app](#as-node-app). For serverless/function deployments, create a new Probot app that combines others programmatically
+
+```js
+// app.js
+const autoresponder = require("probot-autoresponder");
+const settings = require("probot-settings");
+
+module.exports = async (app, options) => {
+  await autoresponder(app, options);
+  await settings(app, options);
+};
+```
+
 ## Error tracking
 
 Probot logs messages using [pino](https://getpino.io/). There is a growing number of tools that consume these logs and send them to error tracking services: https://getpino.io/#/docs/transports.
 
-By default, probot can send errors to [Sentry](https://sentry.io/). Set the `SENTRY_DSN` environment variable to enable it.
+By default, Probot can send errors to [Sentry](https://sentry.io/) using its own transport [`@probot/pino`](https://github.com/probot/pino/#readme). Set the `SENTRY_DSN` environment variable to enable it.
 
 ## Serverless
 

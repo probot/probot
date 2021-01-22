@@ -1,5 +1,5 @@
 ---
-next: docs/configuration.md
+next: docs/persistence.md
 ---
 
 # Extensions

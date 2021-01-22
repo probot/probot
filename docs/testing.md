@@ -92,8 +92,8 @@ probot.log.info("test");
 
 Using Jest
 
-- [DOC](https://github.com/probot/dco): [probot/dco/test/index.test.js](https://github.com/probot/dco/blob/master/test/index.test.js)
-- [Markdownify](https://github.com/probot/markdownify): [hiimbex/markdownify/test/index.test.js](https://github.com/hiimbex/markdownify/blob/master/test/index.test.js)
+- [Settings](https://github.com/probot/settings): [probot/settings/test/integration/plugins/repository.test.js](https://github.com/probot/settings/blob/master/test/integration/plugins/repository.test.js)
+- [DCO](https://github.com/probot/dco): [probot/dco/test/index.test.js](https://github.com/probot/dco/blob/master/test/index.test.js)
 
 Using Tap
 

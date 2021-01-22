@@ -4,7 +4,9 @@ next: docs/simulating-webhooks.md
 
 # HTTP routes
 
-Calling `getRouter('/my-app')` will return an [express](http://expressjs.com/) router that you can use to expose HTTP endpoints from your app.
+When starting your app using `probot run ./app.js` or using the [`Server`](./development.md#use-server) class, your Probot app function will receive the `options.getRouter` function as its 2nd argument.
+
+Calling `getRouter('/my-app')` will return an [express](http://expressjs.com/) router that you can use to expose custom HTTP endpoints from your app.
 
 ```js
 module.exports = (app, { getRouter }) => {

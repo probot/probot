@@ -8,6 +8,7 @@ import { Context } from "./context";
 import { ProbotOctokit } from "./octokit/probot-octokit";
 
 import type { Logger, LogFn } from "pino";
+import { LoggerOptions } from "./server/logging-middleware";
 
 export interface Options {
   privateKey?: string;
@@ -65,6 +66,7 @@ export type ServerOptions = {
   webhookPath?: string;
   webhookProxy?: string;
   Probot: typeof Probot;
+  loggerOptions?: LoggerOptions;
 };
 
 export type MiddlewareOptions = {

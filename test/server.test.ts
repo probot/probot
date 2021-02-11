@@ -63,6 +63,31 @@ describe("Server", () => {
     });
   });
 
+  describe("LoggerOptions", () => {
+    it("passes loggerOptions to logging middleware", async () => {
+      const testApp = new Server({
+        Probot: Probot.defaults({ appId, privateKey }),
+        port: 3003,
+        host: "127.0.0.1",
+        log: pino(streamLogsToOutput),
+        loggerOptions: {
+          autoLogging: {
+            ignorePaths: ["/ping"],
+          },
+        },
+      });
+      await testApp.start();
+
+      output = [];
+
+      await request(testApp.expressApp).get("/ping").expect(200, "PONG");
+
+      expect(output.length).toEqual(0);
+
+      await testApp.stop();
+    });
+  });
+
   describe("webhook handler (POST /)", () => {
     it("should return 200 and run event handlers in app function", async () => {
       expect.assertions(3);

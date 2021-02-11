@@ -2,7 +2,12 @@ import pinoHttp from "pino-http";
 import type { Logger } from "pino";
 import { v4 as uuidv4 } from "uuid";
 
-export function getLoggingMiddleware(logger: Logger) {
+export type LoggerOptions = pinoHttp.Options;
+
+export function getLoggingMiddleware(
+  logger: Logger,
+  options: LoggerOptions = {}
+) {
   return pinoHttp({
     logger: logger.child({ name: "http" }),
     customSuccessMessage(res) {
@@ -19,5 +24,6 @@ export function getLoggingMiddleware(logger: Logger) {
       req.headers["x-request-id"] ||
       req.headers["x-github-delivery"] ||
       uuidv4(),
+    ...options,
   });
 }

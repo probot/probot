@@ -1,10 +1,10 @@
 ---
-next: docs/extensions.md
+next: docs/http.md
 ---
 
 # Pagination
 
-Many GitHub API endpoints are paginated. The [`octokit.paginate` method](https://github.com/octokit/plugin-paginate-rest.js) can be used to get each page of the results.
+Many GitHub API endpoints are paginated. The [`octokit.paginate` method](https://github.com/octokit/plugin-paginate-rest.js/#readme) can be used to get each page of the results.
 
 ```js
 module.exports = (app) => {
@@ -12,8 +12,8 @@ module.exports = (app) => {
     context.octokit.paginate(
       context.octokit.issues.list,
       context.repo(),
-      (res) => {
-        res.data.issues.forEach((issue) => {
+      (response) => {
+        response.data.issues.forEach((issue) => {
           context.log.info("Issue: %s", issue.title);
         });
       }
@@ -32,7 +32,7 @@ module.exports = (app) => {
     const allIssues = await context.octokit.paginate(
       context.octokit.issues.list,
       context.repo(),
-      (res) => res.data
+      (response) => response.data
     );
     console.log(allIssues);
   });
@@ -74,7 +74,7 @@ module.exports = (app) => {
       context.octokit.issues.list,
       context.repo()
     )) {
-      for (const issue of res.data) {
+      for (const issue of response.data) {
         if (issue.body.includes("something")) {
           return console.log("found it:", issue);
         }

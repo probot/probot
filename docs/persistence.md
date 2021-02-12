@@ -6,6 +6,19 @@ next: docs/best-practices.md
 
 Generally speaking, adding database storage or persistence to your Probot App will greatly complicate your life. It's perfectly doable, but for most use-cases you'll be able to manage relevant data within GitHub issues, pull requests and your app's configuration file.
 
+**Contents:**
+
+<!-- toc -->
+
+- [Using GitHub for persistent data](#using-github-for-persistent-data)
+- [Using a Database](#using-a-database)
+  - [MongoDB (with Mongoose)](#mongodb-with-mongoose)
+  - [MySQL](#mysql)
+  - [Postgres](#postgres)
+  - [Firebase](#firebase)
+
+<!-- tocstop -->
+
 ## Using GitHub for persistent data
 
 Probot includes a wrapper for the GitHub API which can enable you to store and manipulate data in the GitHub environment. Since your Probot App will usually be running to supplement work done on GitHub, it makes sense to try to keep everything in one place and avoid extra complications.

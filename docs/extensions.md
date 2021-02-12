@@ -1,10 +1,18 @@
 ---
-next: docs/configuration.md
+next: docs/persistence.md
 ---
 
 # Extensions
 
 While Probot doesn't have an official extension API, there are a handful of reusable utilities that have been extracted from existing apps.
+
+<!-- toc -->
+
+- [Commands](#commands)
+- [Metadata](#metadata)
+- [Attachments](#attachments)
+
+<!-- tocstop -->
 
 ## Commands
 

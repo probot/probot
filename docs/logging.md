@@ -1,15 +1,15 @@
 ---
-next: docs/pagination.md
+next: docs/deployment.md
 ---
 
 # Logging
 
-A good logger is a good developer's secret weapon. Probot comes with [pino](https://getpino.io), which is a minimal logging solution that outputs JSON data and leaves formatting, sending, and error handling to external processes.
+Probot comes with [`pino`](https://getpino.io), a minimal logging library that outputs [newline delimited JSON](http://ndjson.org/). Probot uses [`pino-pretty`](https://github.com/pinojs/pino-pretty) for more readbale formatting during development and [`@probot/pino`](https://github.com/probot/pino/) which supports error reporting to Sentry by configuring the `SENTRY_DSN` environment variable.
 
 `app.log`, `context.log` in an event handler, and `req.log` in an HTTP request are all loggers that you can use to get more information about what your app is doing.
 
 ```js
-module.exports = (app) => {
+module.exports = (app, { getRouter }) => {
   app.log.info("Yay, my app is loaded");
 
   app.on("issues.opened", (context) => {
@@ -20,17 +20,17 @@ module.exports = (app) => {
     }
   });
 
-  route().get("/hello-world", (req, res) => {
+  const router = getRouter("/my-app");
+  router.get("/hello-world", (req, res) => {
     req.log.info("Someone is saying hello");
+    res.send("Hello World");
   });
 };
 ```
 
-When you start up your app with `npm start`, You should see your log message appear in your terminal.
+When you start up your Probot app you should see your log message appear in your terminal.
 
-<!-- TODO: paste in log output -->
-
-`app.log` will log messages at the `info` level, which is what your app should use for most relevant messages. Occasionally you will want to log more detailed information that is useful for debugging, but you might not want to see it all the time.
+Occasionally you will want to log more detailed information that is useful for debugging, but you might not want to see it all the time.
 
 ```js
 module.exports = (app) => {
@@ -53,7 +53,7 @@ By default, messages that are `info` and above will show in your logs, but you c
 $ LOG_LEVEL=debug npm start
 ```
 
-### Log formats
+## Log formats
 
 In development, it's nice to see simple, colorized, pretty log messages. But those pretty messages don't do you any good when you have 2TB of log files and you're trying to track down why that one-in-a-million bug is happening in production.
 
@@ -71,10 +71,8 @@ module.exports = (app) => {
 
 You'll see this output:
 
-<!-- TODO: update output -->
-
 ```
-{"name":"Probot","hostname":"Brandons-MacBook-Pro-3.local","pid":96993,"event":{"id":"afdcb370-c57d-11e7-9b26-0f31120e45b8","event":"issue_comment","action":"created","repository":"robotland/test","installation":13055},"level":20,"msg":"Comment created","time":"2017-11-09T18:42:07.312Z","v":0}
+{"name":"Probot","hostname":"Brandons-MacBook-Pro-3.local","pid":96993,"event":{"id":"afdcb370-c57d-11e7-9b26-0f31120e45b8","event":"issue_comment","action":"created","repository":"robotland/test","installation":13055},"level":30,"msg":"Comment created","time":"2017-11-09T18:42:07.312Z","v":0}
 ```
 
 The output can then be piped to one of [pino's transport tools](https://getpino.io/#/docs/transports), or you can build your own.

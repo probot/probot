@@ -1,6 +1,7 @@
 ---
 next: docs/extensions.md
 ---
+
 # Deployment
 
 Every app can either be deployed stand-alone, or combined with other apps in one deployment.

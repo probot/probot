@@ -1,5 +1,5 @@
 ---
-next: docs/http.md
+next: docs/extensions.md
 ---
 
 # Pagination

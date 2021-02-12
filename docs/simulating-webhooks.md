@@ -1,7 +1,6 @@
 ---
 next: docs/testing.md
 ---
-
 # Simulate receiving webhooks
 
 As you are developing your app, you will likely want to test it by repeatedly triggering the same webhook. You can simulate a webhook being delivered by saving the payload to a file, and then calling `probot receive` from the command line.
@@ -21,3 +20,4 @@ Note that `event-name` here is just the name of the event (like pull_request or 
 For example, to simulate receiving the `pull_request.labeled` event, run:
 
     $ node_modules/.bin/probot receive -e pull_request -p test/fixtures/pull_request.labeled.json ./index.js
+

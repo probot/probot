@@ -53,7 +53,7 @@ describe("Context", () => {
     });
 
     // The `repository` object on the push event has a different format than the other events
-    // https://developer.github.com/v3/activity/events/types/#pushevent
+    // https://docs.github.com/en/developers/webhooks-and-events/webhook-events-and-payloads#push
     it("properly handles the push event", () => {
       event.payload = require("./fixtures/webhook/push");
 

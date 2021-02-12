@@ -1,7 +1,6 @@
 ---
 next: docs/development.md
 ---
-
 # Hello world
 
 A Probot app is just a [Node.js module](https://nodejs.org/api/modules.html) that exports a function:
@@ -48,3 +47,4 @@ To get started, you can use the instructions for [Developing an App](./developme
 [![Remix on Glitch](https://cdn.glitch.com/2703baf2-b643-4da7-ab91-7ee2a2d00b5b%2Fremix-button.svg)](https://glitch.com/edit/#!/remix/probot-hello-world)
 
 Don't know what to build? Browse the [list of ideas](https://github.com/probot/ideas/issues) from the community for inspiration.
+

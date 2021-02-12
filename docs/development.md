@@ -1,10 +1,28 @@
 ---
 next: docs/webhooks.md
 ---
-
 # Developing an app
 
 To develop a Probot app, you will first need a recent version of [Node.js](https://nodejs.org/) installed. Open a terminal and run `node -v` to verify that it is installed and is at least 10.0.0 or later. Otherwise, [install the latest version](https://nodejs.org/).
+
+**Contents:**
+
+<!-- toc -->
+
+- [Generating a new app](#generating-a-new-app)
+- [Running the app locally](#running-the-app-locally)
+- [Configuring a GitHub App](#configuring-a-github-app)
+- [Manually Configuring a GitHub App](#manually-configuring-a-github-app)
+- [Installing the app on a repository](#installing-the-app-on-a-repository)
+- [Debugging](#debugging)
+- [Run Probot programmatically](#run-probot-programmatically)
+  - [Use `run`](#use-run)
+  - [Use `server`](#use-server)
+  - [Use `createNodeMiddleware`](#use-createnodemiddleware)
+  - [Use `probot`](#use-probot)
+  - [Use Probot's Octokit](#use-probots-octokit)
+
+<!-- tocstop -->
 
 ## Generating a new app
 
@@ -247,3 +265,4 @@ function myProbotApp(app) {
   });
 }
 ```
+

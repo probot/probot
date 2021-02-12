@@ -1,12 +1,11 @@
 ---
 next: docs/configuration.md
 ---
-
 # Interacting with GitHub
 
-Probot uses [GitHub Apps](https://developer.github.com/apps/) for authorizing requests to GitHub's APIs. A registered GitHub App is a first-class actor on GitHub, like a user (e.g. [@bkeepers](https://github.com/bkeepers)) or an organization (e.g. [@github](https://github.com/github)). The GitHub App is granted access to all or selected repositories by being "installed" on a user or organization account and can perform actions through the API like [commenting on an issue](https://developer.github.com/v3/issues/comments/#create-a-comment) or [creating a status](https://developer.github.com/v3/repos/statuses/#create-a-status).
+Probot uses [GitHub Apps](https://docs.github.com/developers/apps/) for authorizing requests to GitHub's APIs. A registered GitHub App is a first-class actor on GitHub, like a user (e.g. [@bkeepers](https://github.com/bkeepers)) or an organization (e.g. [@github](https://github.com/github)). The GitHub App is granted access to all or selected repositories by being "installed" on a user or organization account and can perform actions through the API like [commenting on an issue](https://docs.github.com/rest/reference/issues#create-an-issue-comment) or [creating a status](https://docs.github.com/rest/reference/repos#create-a-commit-status).
 
-Your Probot app has access to an authenticated [Octokit client](https://octokit.github.io/rest.js/) that can be used to make API calls. It supports both the [GitHub REST API](https://docs.github.com/en/rest), and the [GitHub GraphQL API](https://docs.github.com/en/graphql).
+Your Probot app has access to an authenticated [Octokit client](https://octokit.github.io/rest.js/) that can be used to make API calls. It supports both the [GitHub REST API](https://docs.github.com/rest), and the [GitHub GraphQL API](https://docs.github.com/graphql).
 
 ## REST API
 
@@ -89,7 +88,7 @@ When [receiving webhook events](./webhooks.md), `context.octokit` is _usually_ a
 
 - [`installation.deleted` & `installation.suspend`](https://docs.github.com/en/developers/webhooks-and-events/webhook-events-and-payloads#installation) - The installation was _just_ deleted or suspended, so we can't authenticate as the installation.
 
-- [`marketplace_purchase`](https://developer.github.com/v3/activity/events/types/#marketplacepurchaseevent) - The purchase happens before the app is installed on an account.
+- [`marketplace_purchase`](https://docs.github.com/en/developers/webhooks-and-events/webhook-events-and-payloads#marketplace_purchase) - The purchase happens before the app is installed on an account.
 
 For these events, `context.octokit` will be unauthenticated. Attemts to send any requests will fail with an error explaining the circumstances.
 
@@ -108,3 +107,4 @@ const MyProbot = Probot.defaults({
   baseUrl: "https://fake.github-enterprise.com/api/v3",
 });
 ```
+

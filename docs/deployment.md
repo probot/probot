@@ -1,7 +1,6 @@
 ---
 next: docs/extensions.md
 ---
-
 # Deployment
 
 Every app can either be deployed stand-alone, or combined with other apps in one deployment.
@@ -10,14 +9,26 @@ Every app can either be deployed stand-alone, or combined with other apps in one
 
 **Contents:**
 
-1. [Register the GitHub App](#register-the-github-app)
-1. [Deploy the app](#deploy-the-app)
-   1. [Glitch](#glitch)
-   1. [Heroku](#heroku)
-1. [Share the app](#share-the-app)
-1. [Combining apps](#combining-apps)
-1. [Error tracking](#error-tracking)
-1. [Serverless Deployments](#serverless)
+<!-- toc -->
+
+- [Register the GitHub App](#register-the-github-app)
+- [Deploy the app](#deploy-the-app)
+  - [As node app](#as-node-app)
+    - [Glitch](#glitch)
+    - [Heroku](#heroku)
+  - [As serverless function](#as-serverless-function)
+    - [AWS Lambda](#aws-lambda)
+    - [Azure Functions](#azure-functions)
+    - [Google Cloud Functions](#google-cloud-functions)
+    - [GitHub Actions](#github-actions)
+    - [Begin](#begin)
+    - [Vercel](#vercel)
+- [Share the app](#share-the-app)
+- [Combining apps](#combining-apps)
+- [Error tracking](#error-tracking)
+- [Serverless](#serverless)
+
+<!-- tocstop -->
 
 ## Register the GitHub App
 
@@ -120,9 +131,171 @@ const myApp = require("./my-app.js");
 module.exports = createMyMiddleware(myApp, { probot: createProbot() });
 ```
 
-In other circumstances you can use one of the other official Probot middlewares, such as [`@probot/azure-middleware`](#TBD) for Azure Functions or [`@probot/github-action-middleware](#TBD) for GitHub Actions.
+For other environments such as AWS Lambda or GitHub Actions, you can use one of [Probot's adapters](https://github.com/probot/?q=adapter).
 
-<!-- TODO: Add short deployment instructions for Vercel, Begin, Cloudflare Functions, GItHub Actions, Azure, Lambda. Reference the example apps for more details -->
+#### AWS Lambda
+
+```js
+// handler.js
+const {
+  createLambdaFunction,
+  createProbot,
+} = require("@probot/adapter-aws-lambda-serverless");
+const appFn = require("./app");
+
+module.exports.webhooks = createLambdaFunction(appFn, {
+  probot: createProbot(),
+});
+```
+
+Learn more
+
+- Probot's official adapter for AWS Lambda using the Serverless framework: [@probot/adapter-aws-lambda-serverless](https://github.com/probot/adapter-aws-lambda-serverless#readme)
+
+Examples
+
+- Probot's "Hello, world!" example deployed to AWS Lamda: [probot/example-aws-lambda-serverless](https://github.com/probot/example-aws-lambda-serverless/#readme)
+
+Please add yours!
+
+#### Azure Functions
+
+```js
+// ProbotFunction/index.js
+const {
+  createProbot,
+  createAzureFunction,
+} = require("@probot/adapter-azure-functions");
+const app = require("../app");
+
+module.exports = createAzureFunction(app, { probot: createProbot() });
+```
+
+Learn more
+
+- Probot's official adapter for Azure functions: [@probot/adapter-azure-functions](https://github.com/probot/adapter-azure-functions#readme)
+
+Examples
+
+- Probot's "Hello, world!" example deployed to Azure functions: [probot/example-azure-function](https://github.com/probot/example-azure-function/#readme)
+
+Please add yours!
+
+#### Google Cloud Functions
+
+```js
+// function.js
+const { createNodeMiddleware, createProbot } = require("probot");
+const app = require("./app");
+
+exports.probotApp = createNodeMiddleware(app, { probot: createProbot() });
+```
+
+Examples
+
+- Probot's "Hello, world!" example deployed to Google Cloud Functions: [probot/example-google-cloud-function](https://github.com/probot/example-google-cloud-function#readme)
+
+Please add yours!
+
+#### GitHub Actions
+
+```js
+const { run } = require("@probot/adapter-github-actions");
+const app = require("./app");
+
+run(app);
+```
+
+Learn more
+
+- Probot's official adapter for GitHub Actions: [@probot/adapter-github-actions](https://github.com/probot/adapter-github-actions#readme)
+
+Examples
+
+- Probot's "Hello, world!" example deployed as a GitHub Action: [probot/example-github-actions](https://github.com/probot/example-github-actions/#readme)
+
+Please add yours!
+
+#### Begin
+
+[Begin](https://begin.com/) is a service to deploy serverless applications build using the [Architect](https://arc.codes/) to AWS.
+
+1. Add the `@http` pragma to your `app.arc` file
+
+   ```
+   @app
+   my-app-name
+
+   @http
+   post /api/github/webhooks
+   ```
+
+2. Make sure to [configure your app](../confinguration) using environment variables
+
+3. Create the `src/http/post-api-github-webhooks` folder with the following files
+
+   ```js
+   {
+     "name": "http-post-api-github-webhooks",
+     "dependencies": {}
+   }
+   ```
+
+   in the new directory, install the `probot` and `@architect/functions`
+
+   ```
+   cd src/http/post-api-github-webhooks
+   npm install probot @architect/functions
+   ```
+
+4. Create `src/http/post-api-github-webhooks/app.js` with your Probot application function, e.g.
+
+   ```
+   /**
+    * @param {import('probot').Probot} app
+    */
+   module.exports = (app) => {
+     app.log("Yay! The app was loaded!");
+
+     app.on("issues.opened", async (context) => {
+       return context.octokit.issues.createComment(
+         context.issue({ body: "Hello, World!" })
+       );
+     });
+   };
+   ```
+
+5. Create `src/http/post-api-github-webhooks/index.js` with the request handler. See [/probot/example-begin/src/http/post-api-github-webhooks/index.js](https://github.com/probot/example-begin/blob/main/src/http/post-api-github-webhooks/index.js) for an example.
+
+Examples
+
+- [probot/example-begin](https://github.com/probot/example-begin#readme)
+
+Please add yours!
+
+#### Vercel
+
+```js
+// api/github/webhooks/index.js
+const { createNodeMiddleware, createProbot } = require("probot");
+
+const app = require("../../../app");
+const probot = createProbot({
+  defaults: {
+    webhookPath: "/api/github/webhooks",
+  },
+});
+
+module.exports = createNodeMiddleware(app, { probot });
+```
+
+Examples
+
+- [probot/example-vercel](https://github.com/probot/example-vercel#readme)
+- [wip/app](https://github.com/wip/app#readme)
+- [all-contributors/app](https://github.com/all-contributors/app#readme)
+
+Please add yours!
 
 ## Share the app
 
@@ -171,3 +344,5 @@ By default, Probot can send errors to [Sentry](https://sentry.io/) using its own
 ## Serverless
 
 Serverless abstracts away the most menial parts of building an application, leaving developers to write code and not actively manage scaling for their applications. The [Serverless Deployment](./serverless-deployment.md) section will show you how to deploy you application using functions instead of servers.
+
+

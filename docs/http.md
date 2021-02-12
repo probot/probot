@@ -1,7 +1,6 @@
 ---
 next: docs/simulating-webhooks.md
 ---
-
 # HTTP routes
 
 When starting your app using `probot run ./app.js` or using the [`Server`](./development.md#use-server) class, your Probot app function will receive the `options.getRouter` function as its 2nd argument.
@@ -28,3 +27,4 @@ Visit https://localhost:3000/my-app/hello-world to access the endpoint.
 It is strongly encouraged to use the name of your package as the prefix so none of your routes or middleware conflict with other apps. For example, if [`probot/owners`](https://github.com/probot/owners) exposed an endpoint, the app would call `getRouter('/owners')` to prefix all endpoints with `/owners`.
 
 See the [express documentation](http://expressjs.com/en/guide/routing.html) for more information.
+

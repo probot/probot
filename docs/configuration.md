@@ -1,7 +1,6 @@
 ---
 next: docs/testing.md
 ---
-
 # Configuration
 
 When developing a Probot App, you will need to have several different fields in a `.env` file which specify environment variables. Here are some common use cases:
@@ -32,3 +31,4 @@ Some less common environment variables are:
 | `REDIS_URL`           | `new Probot({ redisConfig })                                          | Set to a `redis://` url as connection option for [ioredis](https://github.com/luin/ioredis#connect-to-redis) in order to enable [cluster support for request throttling](https://github.com/octokit/plugin-throttling.js#clustering). <p>_(Example: `redis://:secret@redis-123.redislabs.com:12345/0`)_</p> |
 
 For more information on the formatting conventions and rules of `.env` files, check out [the npm `dotenv` module's documentation](https://www.npmjs.com/package/dotenv#rules).
+

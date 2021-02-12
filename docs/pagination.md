@@ -1,7 +1,6 @@
 ---
 next: docs/http.md
 ---
-
 # Pagination
 
 Many GitHub API endpoints are paginated. The [`octokit.paginate` method](https://github.com/octokit/plugin-paginate-rest.js/#readme) can be used to get each page of the results.
@@ -83,3 +82,4 @@ module.exports = (app) => {
   });
 };
 ```
+

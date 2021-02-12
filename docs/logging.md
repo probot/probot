@@ -1,7 +1,6 @@
 ---
 next: docs/deployment.md
 ---
-
 # Logging
 
 Probot comes with [`pino`](https://getpino.io), a minimal logging library that outputs [newline delimited JSON](http://ndjson.org/). Probot uses [`pino-pretty`](https://github.com/pinojs/pino-pretty) for more readbale formatting during development and [`@probot/pino`](https://github.com/probot/pino/) which supports error reporting to Sentry by configuring the `SENTRY_DSN` environment variable.
@@ -53,7 +52,7 @@ By default, messages that are `info` and above will show in your logs, but you c
 $ LOG_LEVEL=debug npm start
 ```
 
-### Log formats
+## Log formats
 
 In development, it's nice to see simple, colorized, pretty log messages. But those pretty messages don't do you any good when you have 2TB of log files and you're trying to track down why that one-in-a-million bug is happening in production.
 
@@ -76,3 +75,4 @@ You'll see this output:
 ```
 
 The output can then be piped to one of [pino's transport tools](https://getpino.io/#/docs/transports), or you can build your own.
+

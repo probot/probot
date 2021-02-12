@@ -1,6 +1,7 @@
 ---
 next: docs/configuration.md
 ---
+
 # Interacting with GitHub
 
 Probot uses [GitHub Apps](https://docs.github.com/developers/apps/) for authorizing requests to GitHub's APIs. A registered GitHub App is a first-class actor on GitHub, like a user (e.g. [@bkeepers](https://github.com/bkeepers)) or an organization (e.g. [@github](https://github.com/github)). The GitHub App is granted access to all or selected repositories by being "installed" on a user or organization account and can perform actions through the API like [commenting on an issue](https://docs.github.com/rest/reference/issues#create-an-issue-comment) or [creating a status](https://docs.github.com/rest/reference/repos#create-a-commit-status).
@@ -107,4 +108,3 @@ const MyProbot = Probot.defaults({
   baseUrl: "https://fake.github-enterprise.com/api/v3",
 });
 ```
-

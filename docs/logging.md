@@ -1,6 +1,7 @@
 ---
 next: docs/deployment.md
 ---
+
 # Logging
 
 Probot comes with [`pino`](https://getpino.io), a minimal logging library that outputs [newline delimited JSON](http://ndjson.org/). Probot uses [`pino-pretty`](https://github.com/pinojs/pino-pretty) for more readbale formatting during development and [`@probot/pino`](https://github.com/probot/pino/) which supports error reporting to Sentry by configuring the `SENTRY_DSN` environment variable.
@@ -75,4 +76,3 @@ You'll see this output:
 ```
 
 The output can then be piped to one of [pino's transport tools](https://getpino.io/#/docs/transports), or you can build your own.
-

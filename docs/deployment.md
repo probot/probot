@@ -1,6 +1,7 @@
 ---
 next: docs/extensions.md
 ---
+
 # Deployment
 
 Every app can either be deployed stand-alone, or combined with other apps in one deployment.
@@ -344,5 +345,3 @@ By default, Probot can send errors to [Sentry](https://sentry.io/) using its own
 ## Serverless
 
 Serverless abstracts away the most menial parts of building an application, leaving developers to write code and not actively manage scaling for their applications. The [Serverless Deployment](./serverless-deployment.md) section will show you how to deploy you application using functions instead of servers.
-
-

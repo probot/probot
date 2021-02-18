@@ -27,7 +27,6 @@ Every app can either be deployed stand-alone, or combined with other apps in one
 - [Share the app](#share-the-app)
 - [Combining apps](#combining-apps)
 - [Error tracking](#error-tracking)
-- [Serverless](#serverless)
 
 <!-- tocstop -->
 
@@ -341,7 +340,3 @@ module.exports = async (app, options) => {
 Probot logs messages using [pino](https://getpino.io/). There is a growing number of tools that consume these logs and send them to error tracking services: https://getpino.io/#/docs/transports.
 
 By default, Probot can send errors to [Sentry](https://sentry.io/) using its own transport [`@probot/pino`](https://github.com/probot/pino/#readme). Set the `SENTRY_DSN` environment variable to enable it.
-
-## Serverless
-
-Serverless abstracts away the most menial parts of building an application, leaving developers to write code and not actively manage scaling for their applications. The [Serverless Deployment](./serverless-deployment.md) section will show you how to deploy you application using functions instead of servers.

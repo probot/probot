@@ -27,7 +27,6 @@ Every app can either be deployed stand-alone, or combined with other apps in one
 - [Share the app](#share-the-app)
 - [Combining apps](#combining-apps)
 - [Error tracking](#error-tracking)
-- [Serverless](#serverless)
 
 <!-- tocstop -->
 

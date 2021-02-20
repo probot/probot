@@ -154,7 +154,8 @@ Learn more
 
 Examples
 
-- Probot's "Hello, world!" example deployed to AWS Lamda: [probot/example-aws-lambda-serverless](https://github.com/probot/example-aws-lambda-serverless/#readme)
+- Probot's "Hello, world!" example deployed to AWS Lambda: [probot/example-aws-lambda-serverless](https://github.com/probot/example-aws-lambda-serverless/#readme)
+- Issue labeler bot deployed to AWS Lambda: [riyadhalnur/issuelabeler](https://github.com/riyadhalnur/issuelabeler#issuelabeler)
 
 Please add yours!
 

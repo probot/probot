@@ -21,6 +21,14 @@ module.exports = (app) => {
     });
     return context.octokit.issues.createComment(issueComment);
   });
+
+  app.onAny(async (context) => {
+    context.log.info({ event: context.name, action: context.payload.action });
+  });
+
+  app.onError(async (error) => {
+    context.log.error(error);
+  })
 };
 ```
 

@@ -36,6 +36,8 @@ export class Probot {
   public log: DeprecatedLogger;
   public version: String;
   public on: ProbotWebhooks["on"];
+  public onAny: ProbotWebhooks["onAny"];
+  public onError: ProbotWebhooks["onError"];
   public auth: (
     installationId?: number,
     log?: Logger
@@ -99,6 +101,9 @@ export class Probot {
 
       return this.webhooks.on(eventNameOrNames, callback);
     };
+
+    this.onAny = this.webhooks.onAny;
+    this.onError = this.webhooks.onError;
 
     this.version = VERSION;
   }

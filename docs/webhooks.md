@@ -40,11 +40,11 @@ module.exports = (app) => {
 };
 ```
 
-You can also use `app.webhooks.onAny()` to listen for any event that your app is subscribed to:
+You can also use `app.onAny()` to listen for any event that your app is subscribed to:
 
 ```js
 module.exports = (app) => {
-  app.webhooks.onAny(async (context) => {
+  app.onAny(async (context) => {
     context.log.info({ event: context.name, action: context.payload.action });
   });
 };

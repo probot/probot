@@ -213,7 +213,7 @@ Learn more
 
 Examples
 
-- Probot's "Hello, world!" example deployed as a GitHub Action: [probot/example-github-actions](https://github.com/probot/example-github-actions/#readme)
+- Probot's "Hello, world!" example deployed as a GitHub Action: [probot/example-github-action](https://github.com/probot/example-github-action/#readme)
 
 Please add yours!
 

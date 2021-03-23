@@ -151,7 +151,7 @@ You'll need to create a test repository and install your app by clicking the "In
 
 ## Run Probot programmatically
 
-### Use `run`
+### Use run
 
 If you take a look to the `npm start` script, this is what it runs: `probot run ./index.js`. This is nice, but you sometimes need more control over how your Node.js application is executed. For example, if you want to use custom V8 flags, `ts-node`, etc. you need more flexibility. In those cases there's a simple way of executing your probot application programmatically:
 
@@ -166,7 +166,7 @@ run(app);
 
 Now you can run `main.js` however you want.
 
-### Use `server`
+### Use server
 
 The [`run`](https://github.com/probot/probot/blob/master/src/run.ts) function that gets executed when running `probot run ./index.js` does two main things
 
@@ -196,7 +196,7 @@ async function startServer() {
 
 The `server` instance gives you access to the express app instance (`server.expressApp`) as well as the [`Probot`](https://probot.github.io/api/latest/classes/probot.html) instance (`server.probotApp`).
 
-### Use `createNodeMiddleware`
+### Use createNodeMiddleware
 
 If you have have your own server or deploy to a serverless environment that supports loading [Express-style middleware](https://expressjs.com/en/guide/using-middleware.html) or Node's http middleware (`(request, response) => { ... }`), you can use `createNodeMiddleware`.
 
@@ -222,7 +222,7 @@ const app = require("./index.js");
 module.exports = createNodeMiddleware(app, { probot: createProbot() });
 ```
 
-### Use `probot`
+### Use probot
 
 If you don't Probot's http handling in order to receive and verify events from GitHub via webhook requests, you can use the [`Probot`](https://probot.github.io/api/latest/classes/probot.html) class directly.
 

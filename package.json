@@ -1,7 +1,7 @@
 {
   "name": "probot",
   "version": "0.0.0-development",
-  "description": "ð¤ A framework for building GitHub Apps to automate and improve your workflow",
+  "description": "A framework for building GitHub Apps to automate and improve your workflow",
   "repository": "github:probot/probot",
   "main": "lib/index.js",
   "types": "./lib/index.d.ts",

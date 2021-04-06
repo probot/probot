@@ -224,7 +224,7 @@ module.exports = createNodeMiddleware(app, { probot: createProbot() });
 
 ### Use `probot`
 
-If you don't Probot's http handling in order to receive and verify events from GitHub via webhook requests, you can use the [`Probot`](https://probot.github.io/api/latest/classes/probot.html) class directly.
+If you don't use Probot's http handling in order to receive and verify events from GitHub via webhook requests, you can use the [`Probot`](https://probot.github.io/api/latest/classes/probot.html) class directly.
 
 ```js
 const { Probot } = require("probot");

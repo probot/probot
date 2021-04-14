@@ -33,7 +33,14 @@ export class Server {
   constructor(options: ServerOptions = {} as ServerOptions) {
     this.expressApp = express();
     this.log = options.log || getLog().child({ name: "server" });
-    this.probotApp = options.probotApp || new options.Probot();
+    if (options.Probot) {
+      this.probotApp = new options.Probot();
+    } else if (options.probotApp) {
+      this.probotApp = options.probotApp;
+    } else {
+      throw "Either probotApp or Probot has to be set in Server options";
+    }
+      
 
     this.state = {
       port: options.port,

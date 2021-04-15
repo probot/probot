@@ -40,7 +40,6 @@ export class Server {
     } else {
       throw "Either probotApp or Probot has to be set in Server options";
     }
-      
 
     this.state = {
       port: options.port,

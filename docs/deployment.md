@@ -24,6 +24,7 @@ Every app can either be deployed stand-alone, or combined with other apps in one
     - [GitHub Actions](#github-actions)
     - [Begin](#begin)
     - [Vercel](#vercel)
+    - [Netlify Functions](#netlify-functions)
 - [Share the app](#share-the-app)
 - [Combining apps](#combining-apps)
 - [Error tracking](#error-tracking)
@@ -121,7 +122,7 @@ Probot runs like [any other Node app](https://devcenter.heroku.com/articles/depl
 
 ### As serverless function
 
-When deploying your Probot app to a serverless/function environment, you don't need to worry about handling the http webhook requests coming from GitHub, the platform takes care of that. In many cases you can use [`createNodeMiddleware`](./development.md#use-createNodeMiddleware) directly, e.g. for Vercel or Google Cloud Function.
+When deploying your Probot app to a serverless/function environment, you don't need to worry about handling the http webhook requests coming from GitHub, the platform takes care of that. In many cases you can use [`createNodeMiddleware`](./development.md#use-createNodeMiddleware) directly, e.g. for Vercel, Netlify Functions or Google Cloud Function.
 
 ```js
 const { Probot, createProbot } = require("probot");
@@ -297,6 +298,21 @@ Examples
 - [all-contributors/app](https://github.com/all-contributors/app#readme)
 
 Please add yours!
+
+#### Netlify Functions
+
+```js
+// functions/index.js
+const {
+  createLambdaFunction,
+  createProbot,
+} = require("@probot/adapter-aws-lambda-serverless");
+const appFn = require("../src/app");
+
+module.exports.webhooks = createLambdaFunction(appFn, {
+  probot: createProbot(),
+});
+```
 
 ## Share the app
 

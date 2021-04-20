@@ -24,6 +24,7 @@ Every app can either be deployed stand-alone, or combined with other apps in one
     - [GitHub Actions](#github-actions)
     - [Begin](#begin)
     - [Vercel](#vercel)
+    - [Netlify Functions](#netlify-functions)
 - [Share the app](#share-the-app)
 - [Combining apps](#combining-apps)
 - [Error tracking](#error-tracking)
@@ -131,7 +132,7 @@ const myApp = require("./my-app.js");
 module.exports = createMyMiddleware(myApp, { probot: createProbot() });
 ```
 
-For other environments such as AWS Lambda or GitHub Actions, you can use one of [Probot's adapters](https://github.com/probot/?q=adapter).
+For other environments such as AWS Lambda, Netlify Functions or GitHub Actions, you can use one of [Probot's adapters](https://github.com/probot/?q=adapter).
 
 #### AWS Lambda
 
@@ -297,6 +298,23 @@ Examples
 - [all-contributors/app](https://github.com/all-contributors/app#readme)
 
 Please add yours!
+
+#### Netlify Functions
+
+[Netlify Functions](https://www.netlify.com/products/functions/) are deployed on AWS by Netlify itself. So we can use `@probot/adapter-aws-lambda-serverless` adapter for Netlify Functions as well.
+
+```js
+// functions/index.js
+const {
+  createLambdaFunction,
+  createProbot,
+} = require("@probot/adapter-aws-lambda-serverless");
+const appFn = require("../src/app");
+
+module.exports.handler = createLambdaFunction(appFn, {
+  probot: createProbot(),
+});
+```
 
 ## Share the app
 

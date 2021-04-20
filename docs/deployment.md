@@ -301,6 +301,8 @@ Please add yours!
 
 #### Netlify Functions
 
+[Netlify Functions](https://www.netlify.com/products/functions/) are deployed on AWS by Netlify itself. So we can use `@probot/adapter-aws-lambda-serverless` adapter for Netlify Functions as well.
+
 ```js
 // functions/index.js
 const {
@@ -309,7 +311,7 @@ const {
 } = require("@probot/adapter-aws-lambda-serverless");
 const appFn = require("../src/app");
 
-module.exports.webhooks = createLambdaFunction(appFn, {
+module.exports.handler = createLambdaFunction(appFn, {
   probot: createProbot(),
 });
 ```

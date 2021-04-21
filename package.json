@@ -38,7 +38,7 @@
     "@octokit/core": "^3.2.4",
     "@octokit/plugin-enterprise-compatibility": "^1.2.8",
     "@octokit/plugin-paginate-rest": "^2.6.2",
-    "@octokit/plugin-rest-endpoint-methods": "^4.4.1",
+    "@octokit/plugin-rest-endpoint-methods": "^5.0.1",
     "@octokit/plugin-retry": "^3.0.6",
     "@octokit/plugin-throttling": "^3.3.4",
     "@octokit/types": "^6.1.1",

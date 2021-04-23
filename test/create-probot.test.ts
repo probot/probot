@@ -33,6 +33,7 @@ describe("createProbot", () => {
 
   test("defaults, overrides", () => {
     const probot = createProbot({
+      env,
       defaults: { logLevel: "debug" },
       overrides: { logLevel: "trace" },
     });

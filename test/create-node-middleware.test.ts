@@ -82,7 +82,10 @@ describe("createNodeMiddleware", () => {
       counter++;
     };
     const middleware = createNodeMiddleware(appFn, {
-      probot: new Probot(),
+      probot: new Probot({
+        appId: APP_ID,
+        privateKey: PRIVATE_KEY,
+      }),
     });
 
     middleware({} as IncomingMessage, { end() {} } as ServerResponse);

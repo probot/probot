@@ -68,7 +68,9 @@ describe("Probot", () => {
 
   describe("constructor", () => {
     it("no options", () => {
-      new Probot();
+      expect(() => new Probot()).toThrow(
+        "[@octokit/auth-app] appId option is required"
+      );
     });
 
     it('{ githubToken: "faketoken" }', () => {
@@ -81,22 +83,27 @@ describe("Probot", () => {
       new Probot({ appId, privateKey });
     });
 
-    it("shouldn't overwrite `options.throttle` passed to `{Octokit: ProbotOctokit.defaults(optiosn)}`", () => {
+    it("shouldn't overwrite `options.throttle` passed to `{Octokit: ProbotOctokit.defaults(options)}`", () => {
       expect.assertions(1);
 
       const MyOctokit = ProbotOctokit.plugin((octokit, options) => {
         expect(options.throttle.enabled).toEqual(false);
       }).defaults({
+        appId,
+        privateKey,
         throttle: {
           enabled: false,
         },
       });
 
-      new Probot({ Octokit: MyOctokit });
+      new Probot({ Octokit: MyOctokit, appId, privateKey });
     });
 
     it("sets version", async () => {
-      const probot = new Probot({});
+      const probot = new Probot({
+        appId,
+        privateKey,
+      });
       expect(probot.version).toBe("0.0.0-development");
     });
   });
@@ -204,6 +211,8 @@ describe("Probot", () => {
       };
 
       new Probot({
+        appId,
+        privateKey,
         baseUrl: "https://notreallygithub.com/api/v3",
       }).load(appFn);
     });
@@ -219,6 +228,8 @@ describe("Probot", () => {
       };
 
       new Probot({
+        appId,
+        privateKey,
         baseUrl: "http://notreallygithub.com/api/v3",
       }).load(appFn);
     });

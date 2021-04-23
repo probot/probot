@@ -48,7 +48,7 @@ describe("run", () => {
       await server.stop();
     });
 
-    it("runs with an array of strings", async () => {
+    it.only("runs with an array of strings", async () => {
       server = await run([
         "node",
         "probot-run",

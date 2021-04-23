@@ -26,6 +26,9 @@ describe("Setup app", () => {
     server = new Server({
       Probot: Probot.defaults({
         log: pino(streamLogsToOutput),
+        // workaround for https://github.com/probot/probot/issues/1512
+        appId: 1,
+        privateKey: "dummy value for setup, see #1512",
       }),
       log: pino(streamLogsToOutput),
     });
@@ -62,6 +65,9 @@ describe("Setup app", () => {
         log: pino(streamLogsToOutput),
         Probot: Probot.defaults({
           log: pino(streamLogsToOutput),
+          // workaround for https://github.com/probot/probot/issues/1512
+          appId: 1,
+          privateKey: "dummy value for setup, see #1512",
         }),
       });
 

@@ -1,5 +1,6 @@
 ---
 next: docs/github-api.md
+title: Receiving webhooks
 ---
 
 # Receiving webhooks

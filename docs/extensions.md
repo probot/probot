@@ -1,5 +1,6 @@
 ---
 next: docs/persistence.md
+title: Extensions
 ---
 
 # Extensions

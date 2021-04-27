@@ -1,27 +1,24 @@
 import fs = require("fs");
 import path = require("path");
 
-import { WebhookEvent } from "@octokit/webhooks";
+import { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
+import { PushEvent } from "@octokit/webhooks-types"
+import WebhookExamples from "@octokit/webhooks-examples";
 import nock from "nock";
 
 import { Context } from "../src";
 import { ProbotOctokit } from "../src/octokit/probot-octokit";
 
+const pushEventPayload: PushEvent = WebhookExamples.filter(e => e.name === 'push')[0].examples[0] as PushEvent;
 describe("Context", () => {
-  let event: WebhookEvent;
-  let context: Context;
+  let event: WebhookEvent<"push">;
+  let context: Context<"push">;
 
   beforeEach(() => {
     event = {
       id: "123",
       name: "push",
-      payload: {
-        issue: { number: 4 },
-        repository: {
-          name: "probot",
-          owner: { login: "bkeepers" },
-        },
-      },
+      payload: pushEventPayload
     };
 
     context = new Context(event, {} as any, {} as any);
@@ -194,14 +191,14 @@ describe("Context", () => {
 
   describe("isBot", () => {
     test("returns true if sender is a bot", () => {
-      event.payload.sender = { type: "Bot" };
+      event.payload.sender.type = "Bot";
       context = new Context(event, {} as any, {} as any);
 
       expect(context.isBot).toBe(true);
     });
 
     test("returns false if sender is not a bot", () => {
-      event.payload.sender = { type: "User" };
+      event.payload.sender.type = "User";
       context = new Context(event, {} as any, {} as any);
 
       expect(context.isBot).toBe(false);

@@ -1,6 +1,6 @@
 import LRUCache from "lru-cache";
 import { Logger } from "pino";
-import { WebhookEvent } from "@octokit/webhooks";
+import { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
 
 import { aliasLog } from "./helpers/alias-log";
 import { auth } from "./auth";

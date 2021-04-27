@@ -4,7 +4,7 @@ import Stream from "stream";
 import pino from "pino";
 import getPort from "get-port";
 import got from "got";
-import { sign } from "@octokit/webhooks";
+import { sign } from "@octokit/webhooks-methods";
 
 import { createNodeMiddleware, createProbot, Probot } from "../src";
 import { ApplicationFunction } from "../src/types";
@@ -66,7 +66,7 @@ describe("createNodeMiddleware", () => {
         "content-type": "application/json",
         "x-github-event": "push",
         "x-github-delivery": "1",
-        "x-hub-signature": sign("secret", body),
+        "x-hub-signature": await sign("secret", body),
       },
       body,
     });

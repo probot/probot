@@ -1,13 +1,13 @@
 import Stream from "stream";
 
-import { WebhookEvent } from "@octokit/webhooks";
+import { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
 import Bottleneck from "bottleneck";
 import nock from "nock";
 import pino from "pino";
 
 import { Probot, ProbotOctokit, Context } from "../src";
 
-import { WebhookEvents } from "@octokit/webhooks";
+import { EmitterWebhookEventName as WebhookEvents } from "@octokit/webhooks/dist-types/types";
 
 const appId = 1;
 const privateKey = `-----BEGIN RSA PRIVATE KEY-----

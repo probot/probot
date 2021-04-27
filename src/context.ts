@@ -1,6 +1,7 @@
 import path from "path";
 
-import { EventPayloads, WebhookEvent } from "@octokit/webhooks";
+import { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
+import { Repository } from "@octokit/webhooks-types";
 import merge from "deepmerge";
 
 import type { Logger } from "pino";
@@ -8,13 +9,13 @@ import type { Logger } from "pino";
 import { ProbotOctokit } from "./octokit/probot-octokit";
 import { aliasLog } from "./helpers/alias-log";
 import { DeprecatedLogger } from "./types";
-import { WebhookEvents } from "@octokit/webhooks";
+import { EmitterWebhookEvent, EmitterWebhookEventName, EmitterWebhookEventName as WebhookEvents } from "@octokit/webhooks/dist-types/types";
 
 export type MergeOptions = merge.Options;
 
 export interface WebhookPayloadWithRepository {
   [key: string]: any;
-  repository?: EventPayloads.PayloadRepository;
+  repository?: Repository;
   issue?: {
     [key: string]: any;
     number: number;
@@ -54,11 +55,11 @@ export interface WebhookPayloadWithRepository {
  * @property {payload} payload - The webhook event payload
  * @property {log} log - A pino instance
  */
-export class Context<E extends WebhookPayloadWithRepository = any>
+export class Context<E extends EmitterWebhookEventName = EmitterWebhookEventName>
   implements WebhookEvent<E> {
   public name: WebhookEvents;
   public id: string;
-  public payload: E;
+  public payload: WebhookPayloadWithRepository;
 
   public octokit: InstanceType<typeof ProbotOctokit>;
   public log: DeprecatedLogger;

@@ -3,7 +3,7 @@ import Stream from "stream";
 import { NextFunction, Request, Response } from "express";
 import request from "supertest";
 import pino from "pino";
-import { sign } from "@octokit/webhooks";
+import { sign } from "@octokit/webhooks-methods";
 import getPort from "get-port";
 
 import { Server, Probot } from "../src";
@@ -89,7 +89,7 @@ describe("Server", () => {
         .post("/")
         .send(dataString)
         .set("x-github-event", "push")
-        .set("x-hub-signature", sign("secret", dataString))
+        .set("x-hub-signature", await sign("secret", dataString))
         .set("x-github-delivery", "3sw4d5f6g7h8");
 
       expect(output.length).toEqual(1);

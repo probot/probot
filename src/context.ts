@@ -9,7 +9,7 @@ import type { Logger } from "pino";
 import { ProbotOctokit } from "./octokit/probot-octokit";
 import { aliasLog } from "./helpers/alias-log";
 import { DeprecatedLogger } from "./types";
-import { EmitterWebhookEvent, EmitterWebhookEventName, EmitterWebhookEventName as WebhookEvents } from "@octokit/webhooks/dist-types/types";
+import { EmitterWebhookEventName as WebhookEvents } from "@octokit/webhooks/dist-types/types";
 
 export type MergeOptions = merge.Options;
 

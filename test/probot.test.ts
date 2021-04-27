@@ -342,19 +342,6 @@ describe("Probot", () => {
       expect(spy).toHaveBeenCalledTimes(0);
     });
 
-    it("calls callback with *", async () => {
-      const probot = new Probot({
-        appId,
-        privateKey,
-      });
-
-      const spy = jest.fn();
-      probot.on("*", spy);
-
-      await probot.receive(event);
-      expect(spy).toHaveBeenCalled();
-    });
-
     it("calls callback with onAny", async () => {
       const probot = new Probot({
         appId,

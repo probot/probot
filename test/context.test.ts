@@ -2,14 +2,16 @@ import fs = require("fs");
 import path = require("path");
 
 import { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
-import { PushEvent } from "@octokit/webhooks-types"
+import { PushEvent } from "@octokit/webhooks-types";
 import WebhookExamples from "@octokit/webhooks-examples";
 import nock from "nock";
 
 import { Context } from "../src";
 import { ProbotOctokit } from "../src/octokit/probot-octokit";
 
-const pushEventPayload: PushEvent = WebhookExamples.filter(e => e.name === 'push')[0].examples[0] as PushEvent;
+const pushEventPayload: PushEvent = WebhookExamples.filter(
+  (e) => e.name === "push"
+)[0].examples[0] as PushEvent;
 describe("Context", () => {
   let event: WebhookEvent<"push">;
   let context: Context<"push">;
@@ -18,7 +20,7 @@ describe("Context", () => {
     event = {
       id: "123",
       name: "push",
-      payload: pushEventPayload
+      payload: pushEventPayload,
     };
 
     context = new Context(event, {} as any, {} as any);

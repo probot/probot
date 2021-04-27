@@ -55,8 +55,9 @@ export interface WebhookPayloadWithRepository {
  * @property {payload} payload - The webhook event payload
  * @property {log} log - A pino instance
  */
-export class Context<E extends EmitterWebhookEventName = EmitterWebhookEventName>
-  implements WebhookEvent<E> {
+export class Context<
+  E extends EmitterWebhookEventName = EmitterWebhookEventName
+> implements WebhookEvent<E> {
   public name: WebhookEvents;
   public id: string;
   public payload: WebhookPayloadWithRepository;

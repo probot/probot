@@ -1,5 +1,8 @@
 import type { Logger } from "pino";
-import { WebhookError, EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
+import {
+  WebhookError,
+  EmitterWebhookEvent as WebhookEvent,
+} from "@octokit/webhooks";
 
 export function getErrorHandler(log: Logger) {
   return (error: Error) => {

@@ -1,5 +1,8 @@
 import express from "express";
-import { EmitterWebhookEvent as WebhookEvent, Webhooks } from "@octokit/webhooks";
+import {
+  EmitterWebhookEvent as WebhookEvent,
+  Webhooks,
+} from "@octokit/webhooks";
 import LRUCache from "lru-cache";
 import Redis from "ioredis";
 
@@ -43,9 +46,7 @@ export type State = {
   baseUrl?: string;
 };
 
-export type ProbotWebhooks = Webhooks<
-  Omit<Context, keyof WebhookEvent>
->;
+export type ProbotWebhooks = Webhooks<Omit<Context, keyof WebhookEvent>>;
 
 export type DeprecatedLogger = LogFn & Logger;
 

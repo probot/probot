@@ -23,7 +23,9 @@ r1UQNnUExRh7ZT0kFbMfO9jKYZVlQdCL9Dn93vo=
 // tslint:disable:no-empty
 describe("Probot", () => {
   let probot: Probot;
-  let event: WebhookEvent<"push" | "pull_request" | "installation" | "check_run">;
+  let event: WebhookEvent<
+    "push" | "pull_request" | "installation" | "check_run"
+  >;
   let output: any;
 
   const streamLogsToOutput = new Stream.Writable({ objectMode: true });
@@ -105,7 +107,7 @@ describe("Probot", () => {
         name: "push",
         payload: require("./fixtures/webhook/push") as PushEvent,
       } as WebhookEvent<"push">;
-    })
+    });
     it("responds with the correct error if webhook secret does not match", async () => {
       expect.assertions(1);
 

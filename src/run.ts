@@ -125,13 +125,13 @@ export async function run(
       if (Array.isArray(pkg.apps)) {
         for (const appPath of pkg.apps) {
           const appFn = await resolveAppFunction(appPath);
-          server.load(appFn);
+          await server.load(appFn);
         }
       }
 
       const [appPath] = args;
       const appFn = await resolveAppFunction(appPath);
-      server.load(appFn);
+      await server.load(appFn);
     };
 
     server = new Server(serverOptions);

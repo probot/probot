@@ -23,11 +23,7 @@ r1UQNnUExRh7ZT0kFbMfO9jKYZVlQdCL9Dn93vo=
 // tslint:disable:no-empty
 describe("Probot", () => {
   let probot: Probot;
-  let event: {
-    id: string;
-    name: WebhookEvents;
-    payload: any;
-  };
+  let event: WebhookEvent<"push" | "pull_request" | "installation" | "check_run">;
   let output: any;
 
   const streamLogsToOutput = new Stream.Writable({ objectMode: true });

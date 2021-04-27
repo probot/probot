@@ -3,6 +3,7 @@ import { Server as HttpServer } from "http";
 import express, { Application, Router } from "express";
 import { join } from "path";
 import { Logger } from "pino";
+import { createNodeMiddleware as createWebhooksMiddleware } from "@octokit/webhooks";
 
 import { getLog } from "../helpers/get-log";
 import { getLoggingMiddleware } from "./logging-middleware";
@@ -49,7 +50,7 @@ export class Server {
     );
     this.expressApp.use(
       this.state.webhookPath,
-      this.probotApp.webhooks.middleware
+      createWebhooksMiddleware(this.probotApp.webhooks)
     );
 
     this.expressApp.set("view engine", "hbs");

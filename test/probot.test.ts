@@ -36,12 +36,6 @@ describe("Probot", () => {
     // Clear log output
     output = [];
     probot = new Probot({ githubToken: "faketoken" });
-
-    event = {
-      id: "0",
-      name: "push",
-      payload: require("./fixtures/webhook/push"),
-    };
   });
 
   test(".version", () => {
@@ -105,6 +99,13 @@ describe("Probot", () => {
   });
 
   describe("webhooks", () => {
+    beforeEach(() => {
+      event = {
+        id: "0",
+        name: "push",
+        payload: require("./fixtures/webhook/push") as PushEvent,
+      } as WebhookEvent<"push">;
+    })
     it("responds with the correct error if webhook secret does not match", async () => {
       expect.assertions(1);
 

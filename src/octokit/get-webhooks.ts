@@ -8,7 +8,6 @@ import { Context } from "../context";
 
 export function getWebhooks(state: State) {
   const webhooks = new Webhooks<Context>({
-    path: state.webhooks.path,
     secret: state.webhooks.secret!,
     transform: webhookTransform.bind(null, state),
   });

@@ -96,7 +96,7 @@ describe("Server", () => {
       expect(output[0].msg).toContain("POST / 200 -");
     });
 
-    test("shows a friendly error when x-hub-signature is missing", async () => {
+    test("shows a friendly error when x-hub-signature-256 is missing", async () => {
       await server.load(() => {});
 
       await request(server.expressApp)

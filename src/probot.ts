@@ -95,6 +95,7 @@ export class Probot {
 
     this.on = (eventNameOrNames, callback) => {
       if (eventNameOrNames === "*") {
+        this.log.warn(`Using the "*" event with the regular Probot.on() function is deprecated. Please use the Probot.onAny() method instead`)
         // @ts-ignore this.webhooks.on("*") is deprecated
         return this.webhooks.onAny(callback);
       }

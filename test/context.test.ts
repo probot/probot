@@ -81,11 +81,19 @@ describe("Context", () => {
     });
 
     it("return error for context.repo() when repository doesn't exist", () => {
-      delete context.payload.repository;
+      event = {
+        id: "123",
+        name: "push",
+        payload: { ...pushEventPayload, repository: undefined as any },
+      };
+
+      context = new Context<"push">(event, {} as any, {} as any);
       try {
         context.repo();
       } catch (e) {
-        expect(e.message).toMatch("context.repo() is not supported");
+        expect(e.message).toMatch(
+          "context.repo() is not supported for this webhook event."
+        );
       }
     });
   });
@@ -188,7 +196,7 @@ describe("Context", () => {
 
     it("gets a valid configuration", async () => {
       const mock = nock("https://api.github.com")
-        .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
+        .get("/repos/Codertocat/Hello-World/contents/.github%2Ftest-file.yml")
         .reply(200, nockConfigResponseDataFile("basic.yml"));
 
       const config = await context.config("test-file.yml");
@@ -202,9 +210,9 @@ describe("Context", () => {
 
     it("returns null when the file and base repository are missing", async () => {
       const mock = nock("https://api.github.com")
-        .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
+        .get("/repos/Codertocat/Hello-World/contents/.github%2Ftest-file.yml")
         .reply(404)
-        .get("/repos/bkeepers/.github/contents/.github%2Ftest-file.yml")
+        .get("/repos/Codertocat/.github/contents/.github%2Ftest-file.yml")
         .reply(404);
 
       expect(await context.config("test-file.yml")).toBe(null);
@@ -213,12 +221,12 @@ describe("Context", () => {
 
     it("accepts deepmerge options", async () => {
       const mock = nock("https://api.github.com")
-        .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
+        .get("/repos/Codertocat/Hello-World/contents/.github%2Ftest-file.yml")
         .reply(
           200,
           "foo:\n  - name: master\n    shouldChange: changed\n_extends: .github"
         )
-        .get("/repos/bkeepers/.github/contents/.github%2Ftest-file.yml")
+        .get("/repos/Codertocat/.github/contents/.github%2Ftest-file.yml")
         .reply(
           200,
           "foo:\n  - name: develop\n  - name: master\n    shouldChange: should"

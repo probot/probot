@@ -96,7 +96,7 @@ describe("Server", () => {
       expect(output[0].msg).toContain("POST / 200 -");
     });
 
-    test("shows a friendly error when x-hub-signature-256 is missing", async () => {
+    test("respond with a friendly error when x-hub-signature-256 is missing", async () => {
       await server.load(() => {});
 
       await request(server.expressApp)
@@ -105,14 +105,10 @@ describe("Server", () => {
         .set("x-github-event", "push")
         // Note: 'x-hub-signature-256' is missing
         .set("x-github-delivery", "3sw4d5f6g7h8")
-        .expect(400);
-
-      expect(output[0]).toEqual(
-        expect.objectContaining({
-          msg:
-            "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
-        })
-      );
+        .expect(
+          400,
+          '{"error":"Required headers missing: x-hub-signature-256"}'
+        );
     });
   });
 

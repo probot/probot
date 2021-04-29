@@ -21,7 +21,6 @@ export interface Options {
   log?: Logger;
   redisConfig?: Redis.RedisOptions | string;
   secret?: string;
-  webhookPath?: string;
   logLevel?: "trace" | "debug" | "info" | "warn" | "error" | "fatal";
   logMessageKey?: string;
   port?: number;
@@ -38,7 +37,6 @@ export type State = {
   octokit: InstanceType<typeof ProbotOctokit>;
   cache?: LRUCache<number, string>;
   webhooks: {
-    path?: string;
     secret?: string;
   };
   port?: number;

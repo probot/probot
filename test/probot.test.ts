@@ -278,7 +278,6 @@ describe("Probot", () => {
       expect.assertions(2);
 
       probot = new Probot({
-        webhookPath: "/webhook",
         githubToken: "faketoken",
         redisConfig: "test",
         Octokit: ProbotOctokit.plugin((octokit, options) => {
@@ -299,7 +298,6 @@ describe("Probot", () => {
       };
 
       probot = new Probot({
-        webhookPath: "/webhook",
         githubToken: "faketoken",
         redisConfig,
         Octokit: ProbotOctokit.plugin((octokit, options) => {

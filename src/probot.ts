@@ -46,7 +46,6 @@ export class Probot {
   private state: State;
 
   constructor(options: Options = {}) {
-    options.webhookPath = options.webhookPath || "/";
     options.secret = options.secret || "development";
 
     let level = options.logLevel;
@@ -81,7 +80,6 @@ export class Probot {
       Octokit,
       octokit,
       webhooks: {
-        path: options.webhookPath,
         secret: options.secret,
       },
       appId: Number(options.appId),

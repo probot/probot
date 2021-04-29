@@ -15,7 +15,7 @@ export function getErrorHandler(log: Logger) {
     for (const error of errors) {
       const errMessage = (error.message || "").toLowerCase();
 
-      if (errMessage.includes("x-hub-signature")) {
+      if (errMessage.includes("x-hub-signature-256")) {
         log.error(
           error,
           "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable."

@@ -89,7 +89,7 @@ describe("Server", () => {
         .post("/")
         .send(dataString)
         .set("x-github-event", "push")
-        .set("x-hub-signature", await sign("secret", dataString))
+        .set("x-hub-signature-256", await sign("secret", dataString))
         .set("x-github-delivery", "3sw4d5f6g7h8");
 
       expect(output.length).toEqual(1);
@@ -103,7 +103,7 @@ describe("Server", () => {
         .post("/")
         .send(JSON.stringify(pushEvent))
         .set("x-github-event", "push")
-        // Note: 'x-hub-signature' is missing
+        // Note: 'x-hub-signature-256' is missing
         .set("x-github-delivery", "3sw4d5f6g7h8")
         .expect(400);
 

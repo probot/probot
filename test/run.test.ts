@@ -89,7 +89,7 @@ describe("run", () => {
         .post("/")
         .send(dataString)
         .set("x-github-event", "push")
-        .set("x-hub-signature", await sign("secret", dataString))
+        .set("x-hub-signature-256", await sign("secret", dataString))
         .set("x-github-delivery", "123")
         .expect(200);
 
@@ -111,7 +111,7 @@ describe("run", () => {
         .post("/custom-webhook")
         .send(dataString)
         .set("x-github-event", "push")
-        .set("x-hub-signature", await sign("secret", dataString))
+        .set("x-hub-signature-256", await sign("secret", dataString))
         .set("x-github-delivery", "123")
         .expect(200);
 

@@ -107,7 +107,7 @@ describe("end-to-end-tests", () => {
           "content-type": "application/json",
           "x-github-event": "issues",
           "x-github-delivery": "1",
-          "x-hub-signature": await sign("test", body),
+          "x-hub-signature-256": await sign("test", body),
         },
         body,
       });

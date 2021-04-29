@@ -66,7 +66,7 @@ describe("createNodeMiddleware", () => {
         "content-type": "application/json",
         "x-github-event": "push",
         "x-github-delivery": "1",
-        "x-hub-signature": await sign("secret", body),
+        "x-hub-signature-256": await sign("secret", body),
       },
       body,
     });

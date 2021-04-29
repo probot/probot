@@ -135,7 +135,7 @@ describe("Probot", () => {
 
       probot.log.error = jest.fn();
       probot.webhooks.on("push", () => {
-        throw new Error("X-Hub-Signature does not match blob signature");
+        throw new Error("X-Hub-Signature-256 does not match blob signature");
       });
 
       try {
@@ -152,7 +152,7 @@ describe("Probot", () => {
 
       probot.log.error = jest.fn();
       probot.webhooks.on("push", () => {
-        throw new Error("No X-Hub-Signature found on request");
+        throw new Error("No X-Hub-Signature-256 found on request");
       });
 
       try {
@@ -169,8 +169,8 @@ describe("Probot", () => {
 
       probot.log.error = jest.fn();
       probot.webhooks.on("push", () => {
-        throw new Error(
-          "webhooks:receiver ignored: POST / due to missing headers: x-hub-signature"
+        throw Error(
+          "webhooks:receiver ignored: POST / due to missing headers: x-hub-signature-256"
         );
       });
 

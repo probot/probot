@@ -88,8 +88,14 @@ describe("createNodeMiddleware", () => {
       }),
     });
 
-    middleware({} as IncomingMessage, { end() {} } as ServerResponse);
-    middleware({} as IncomingMessage, { end() {} } as ServerResponse);
+    middleware(
+      {} as IncomingMessage,
+      ({ end() {}, writeHead() {} } as unknown) as ServerResponse
+    );
+    middleware(
+      {} as IncomingMessage,
+      ({ end() {}, writeHead() {} } as unknown) as ServerResponse
+    );
 
     expect(counter).toEqual(1);
   });

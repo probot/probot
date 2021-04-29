@@ -6,9 +6,11 @@ import { MiddlewareOptions } from "./types";
 
 export function createNodeMiddleware(
   appFn: ApplicationFunction,
-  { probot }: MiddlewareOptions
+  { probot, webhooksPath }: MiddlewareOptions
 ): RequestListener {
   probot.load(appFn);
 
-  return createWebbhooksMiddleware(probot.webhooks, { path: "/" });
+  return createWebbhooksMiddleware(probot.webhooks, {
+    path: webhooksPath || "/",
+  });
 }

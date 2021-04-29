@@ -49,7 +49,10 @@ describe("Context", () => {
     });
 
     it("returns attributes from repository payload", () => {
-      expect(context.repo()).toEqual({ owner: "Codertocat", repo: "Hello-World" });
+      expect(context.repo()).toEqual({
+        owner: "Codertocat",
+        repo: "Hello-World",
+      });
     });
 
     it("merges attributes", () => {

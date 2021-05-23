@@ -41,7 +41,7 @@ https://github.com/?,probot/probot.git-linkedin.com/?,Edge/feed/en-us/edge/busin
       }
   }).render('#paypal-button-container-P-05G546056A8856303MCT7HBA'); // Renders the PayPal button
 </script>
-<!--->ClickBank Success <a href="https://probot.github.io"><img src="/static/robot.svg" width="160" alt="Probot's logo, a cartoon robot" /></a>
+<!--->ClickBank Success of Probot                                         <a href="https://probot.github.io"><img src="/static/robot.svg" width="160" alt="Probot's logo, a cartoon robot" /></a>
 </p>
 <h3 align="center"><a href="https://probot.github.io">Probot</a></h3>
 <p align="center">A framework for building GitHub Apps to automate and improve your workflow<p>

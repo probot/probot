@@ -1,6 +1,6 @@
    <p align="center">
- https://github.com/probot/probot.git.CREATE and BUILD New Company On the
-Leading provider to e-Commerce Solutions
+ https://github.com/probot/probot.git.CREATE and BUILD New Company for the Future On my
+Leading providing support to e-Commerce Solutions
 From offering your products on the industry-leading ClickBank Affiliate Marketplace to automating payments and increasing conversion, ClickBank partners with you at each step in the process.
 30,000 +
 DAILY SALES

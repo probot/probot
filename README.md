@@ -13,7 +13,26 @@ COUNTRIES
 ![Logo_businesswire_big](https://user-images.githubusercontent.com/83507592/119059454-552e4880-b99e-11eb-8a68-749b79487fce.jpg)
 ![channels4_profile](https://user-images.githubusercontent.com/83507592/119059489-68d9af00-b99e-11eb-8ec2-86cd799e4852.jpg)
 ![16215519583231185882978382824687](https://user-images.githubusercontent.com/83507592/119059535-80189c80-b99e-11eb-9588-c305f13bb4bd.jpg)
-.
+.---
+# A human-friendly name of your listing
+title: Title of Your app
+# A short description of what your app does
+description: What your app does
+# The slug of your hosted app on GitHub (https://github.com/apps/YOUR-SLUG)
+slug: Shortened version of app name
+# Include a few screenshots that show your app in action
+screenshots:
+- https://somewebsite.com/your-screenshot.png
+# The GitHub usernames of anyone who authored the app
+authors: [ your-username, other-usernames ]
+# The repository where the code is located
+repository: your-username/your-app
+# The address where this app is deployed
+host: https://my-probot-app.awesomecloudhost.com
+---
+
+Any documentation can go here. Many apps just use their README.md here.
+
 MISSED PAYMENTS
 Leader in Compliance
 ClickBank is known as an industry leader in compliance and fraud prevention. Having compliant products mitigates potential legal issues and builds your brand.

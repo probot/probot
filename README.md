@@ -110,3 +110,22 @@ Want to chat with Probot users and contributors? [Join us in Slack](https://prob
 ## Ideas
 
 Have an idea for a cool new GitHub App (built with Probot)? That's great! If you want feedback, help, or just to share it with the world you can do so by [creating an issue in the `probot/ideas` repository](https://github.com/probot/ideas/issues/new)!
+---
+# A human-friendly name of your listing
+title: Title of Your app
+# A short description of what your app does
+description: What your app does
+# The slug of your hosted app on GitHub (https://github.com/apps/YOUR-SLUG)
+slug: Shortened version of app name
+# Include a few screenshots that show your app in action
+screenshots:
+- https://somewebsite.com/your-screenshot.png
+# The GitHub usernames of anyone who authored the app
+authors: [ your-username, other-usernames ]
+# The repository where the code is located
+repository: your-username/your-app
+# The address where this app is deployed
+host: https://my-probot-app.awesomecloudhost.com
+---
+
+Any documentation can go here. Many apps just use their README.md here.

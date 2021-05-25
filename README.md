@@ -129,3 +129,85 @@ host: https://my-probot-app.awesomecloudhost.com
 ---
 
 Any documentation can go here. Many apps just use their README.md here.
+My Sites
+Reader
+Write
+My Profile
+Skip navigation
+Switch Site
+
+my-Smart-Ai-Companies-myAirwatch-present-by-me-Evens-pierre-louis-Haiti-Business-HP-Dell-Ai-INC+Clouds+Maxmedia-Cinema-Corporations
+evenspierrelouishpcloud.wordpress.com
+Free domain with an annual plan
+Upgrade
+My Home
+Stats
+UpgradesFree
+Posts
+Media
+Pages
+Testimonials
+Comments
+Feedback
+Jetpack
+Appearance
+Plugins
+Users
+Tools
+Settings
+Collapse menu
+My Home
+Your hub for posting, editing, and growing your site.
+
+Visit site
+Boost your site speed and security with Cloudflare CDN
+Create a faster experience for your visitors regardless of their device or location.
+
+Learn more
+Hide this
+
+No traffic this week, but don't give up!
+
+Stats can help you optimize for the right keywords, and feature content your readers are interested in.Read more.
+The WordPress.com free photo library
+Our free photo library integrates your site with over 40,000 beautiful copyright-free photos to create stunning designs.
+
+Learn more
+
+Make money from your website
+Accept credit and debit card payments on your website for just about anything.
+
+Start making money
+
+The official WordPress.com blogging guide
+Learn everything you need to know to build a popular blog in this course taught by world-class WordPress experts.
+
+Learn more(opens in a new tab)
+
+Quick links
+More
+Write blog post
+Manage comments
+Add a page
+Edit menus
+Customize theme
+Change theme
+Add a domain
+
+Create a logo
+
+Create a podcast with Anchor
+Get help
+Search support articles
+Do I Need a Website, a Blog, or a Website with a Blog?
+Uploading custom plugins and themes
+All About Domains
+Quick-Start Guide
+Privacy Settings
+Contact support
+WordPress app
+Make updates on the go.
+Apple App Store download badge
+Google Play Store download badge
+Get a download link via email — click it on your phone to get the app.Send my download link
+No file chosen

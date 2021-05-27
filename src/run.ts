@@ -1,14 +1,14 @@
-import pkgConf from "pkg-conf";
-
 import { ApplicationFunction, Options, ServerOptions } from "./types";
+import { GetLogOptions, getLog } from "./helpers/get-log";
+
 import { Probot } from "./index";
-import { setupAppFactory } from "./apps/setup";
-import { getLog, GetLogOptions } from "./helpers/get-log";
-import { readCliOptions } from "./bin/read-cli-options";
-import { readEnvOptions } from "./bin/read-env-options";
 import { Server } from "./server/server";
 import { defaultApp } from "./apps/default";
+import pkgConf from "pkg-conf";
+import { readCliOptions } from "./bin/read-cli-options";
+import { readEnvOptions } from "./bin/read-env-options";
 import { resolveAppFunction } from "./helpers/resolve-app-function";
+import { setupAppFactory } from "./apps/setup";
 
 type AdditionalOptions = {
   env: Record<string, string | undefined>;
@@ -34,6 +34,7 @@ export async function run(
     logLevel: level,
     logFormat,
     logLevelInString,
+    logMessageKey,
     sentryDsn,
 
     // server options
@@ -57,6 +58,7 @@ export async function run(
     level,
     logFormat,
     logLevelInString,
+    logMessageKey,
     sentryDsn,
   };
 

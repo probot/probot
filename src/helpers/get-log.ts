@@ -1,3 +1,4 @@
+import { LogLevel, Options, getTransformStream } from "@probot/pino";
 /**
  * A logger backed by [pino](https://getpino.io/)
  *
@@ -15,14 +16,17 @@
  * ```
  */
 import pino, { LoggerOptions } from "pino";
-import { getTransformStream, Options, LogLevel } from "@probot/pino";
 
-export type GetLogOptions = { level?: LogLevel } & Options;
+export type GetLogOptions = { level?: LogLevel, logMessageKey?: string } & Options;
 
 export function getLog(options: GetLogOptions = {}) {
-  const { level, ...getTransformStreamOptions } = options;
+  const { level, logMessageKey, ...getTransformStreamOptions } = options;
 
-  const pinoOptions: LoggerOptions = { level: level || "info", name: "probot" };
+  const pinoOptions: LoggerOptions = {
+    level: level || "info",
+    name: "probot",
+    messageKey: logMessageKey || "msg"
+  };
   const transform = getTransformStream(getTransformStreamOptions);
   // @ts-ignore TODO: check out what's wrong here
   transform.pipe(pino.destination(1));

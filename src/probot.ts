@@ -1,14 +1,3 @@
-import LRUCache from "lru-cache";
-import { Logger } from "pino";
-import { WebhookEvent } from "@octokit/webhooks";
-
-import { aliasLog } from "./helpers/alias-log";
-import { auth } from "./auth";
-import { getLog } from "./helpers/get-log";
-import { getProbotOctokitWithDefaults } from "./octokit/get-probot-octokit-with-defaults";
-import { getWebhooks } from "./octokit/get-webhooks";
-import { ProbotOctokit } from "./octokit/probot-octokit";
-import { VERSION } from "./version";
 import {
   ApplicationFunction,
   DeprecatedLogger,
@@ -16,6 +5,17 @@ import {
   ProbotWebhooks,
   State,
 } from "./types";
+
+import LRUCache from "lru-cache";
+import { Logger } from "pino";
+import { ProbotOctokit } from "./octokit/probot-octokit";
+import { VERSION } from "./version";
+import { WebhookEvent } from "@octokit/webhooks";
+import { aliasLog } from "./helpers/alias-log";
+import { auth } from "./auth";
+import { getLog } from "./helpers/get-log";
+import { getProbotOctokitWithDefaults } from "./octokit/get-probot-octokit-with-defaults";
+import { getWebhooks } from "./octokit/get-webhooks";
 
 export type Constructor<T> = new (...args: any[]) => T;
 
@@ -50,8 +50,9 @@ export class Probot {
     options.secret = options.secret || "development";
 
     let level = options.logLevel;
+    const logMessageKey = options.logMessageKey;
 
-    this.log = aliasLog(options.log || getLog({ level }));
+    this.log = aliasLog(options.log || getLog({ level, logMessageKey }));
 
     // TODO: support redis backend for access token cache if `options.redisConfig`
     const cache = new LRUCache<number, string>({

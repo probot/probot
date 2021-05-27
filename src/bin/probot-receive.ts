@@ -2,14 +2,13 @@
 
 require("dotenv").config();
 
-import path from "path";
-import { v4 as uuidv4 } from "uuid";
-import program from "commander";
-import { getPrivateKey } from "@probot/get-private-key";
-import { getLog } from "../helpers/get-log";
-
 import { Probot } from "../";
+import { getLog } from "../helpers/get-log";
+import { getPrivateKey } from "@probot/get-private-key";
+import path from "path";
+import program from "commander";
 import { resolveAppFunction } from "../helpers/resolve-app-function";
+import { v4 as uuidv4 } from "uuid";
 
 async function main() {
   program
@@ -51,6 +50,11 @@ async function main() {
       process.env.LOG_LEVEL_IN_STRING === "true"
     )
     .option(
+      "--log-message-key",
+      "Set to the string key for the 'message' in the log JSON object",
+      process.env.LOG_MESSAGE_KEY || "msg"
+    )
+    .option(
       "--sentry-dsn <dsn>",
       'Set to your Sentry DSN, e.g. "https://1234abcd@sentry.io/12345"',
       process.env.SENTRY_DSN
@@ -75,6 +79,7 @@ async function main() {
     level: program.logLevel,
     logFormat: program.logFormat,
     logLevelInString: program.logLevelInString,
+    logMessageKey: program.logMessageKey,
     sentryDsn: program.sentryDsn,
   });
 

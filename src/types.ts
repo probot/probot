@@ -1,13 +1,12 @@
-import express from "express";
+import type { LogFn, Logger } from "pino";
 import { WebhookEvent, Webhooks } from "@octokit/webhooks";
-import LRUCache from "lru-cache";
-import Redis from "ioredis";
 
-import { Probot } from "./index";
 import { Context } from "./context";
+import LRUCache from "lru-cache";
+import { Probot } from "./index";
 import { ProbotOctokit } from "./octokit/probot-octokit";
-
-import type { Logger, LogFn } from "pino";
+import Redis from "ioredis";
+import express from "express";
 
 export interface Options {
   privateKey?: string;
@@ -20,6 +19,7 @@ export interface Options {
   secret?: string;
   webhookPath?: string;
   logLevel?: "trace" | "debug" | "info" | "warn" | "error" | "fatal";
+  logMessageKey?: string;
   port?: number;
   host?: string;
   baseUrl?: string;

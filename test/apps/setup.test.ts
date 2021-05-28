@@ -98,6 +98,8 @@ describe("Setup app", () => {
           id: "id",
           pem: "pem",
           webhook_secret: "webhook_secret",
+          client_id: "Iv1.8a61f9b3a7aba766",
+          client_secret: "1726be1638095a19edd134c77bde3aa2ece1e5d8",
         });
 
       await request(server.expressApp)

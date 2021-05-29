@@ -21,7 +21,7 @@ export const setupAppFactory = (
     // If not on Glitch or Production, create a smee URL
     if (
       process.env.NODE_ENV !== "production" &&
-      !(process.env.PROJECT_DOMAIN || process.env.WEBHOOK_PROXY_URL || host)
+      !(process.env.PROJECT_DOMAIN || process.env.WEBHOOK_PROXY_URL || process.env.NO_SMEE_SETUP === 'true')
     ) {
       await setup.createWebhookChannel();
     }

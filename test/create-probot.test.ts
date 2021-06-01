@@ -65,11 +65,11 @@ describe("createProbot", () => {
   });
 
   test("env, logger message key", () => {
-    let outputData;
+    let outputData = "";
 
     const sbWrite = SonicBoom.prototype.write;
     SonicBoom.prototype.write = function (data) {
-      outputData = data;
+      outputData += data;
     };
 
     const probot = createProbot({
@@ -84,8 +84,10 @@ describe("createProbot", () => {
 
     probot.log.info("Ciao");
 
-    expect(outputData && JSON.parse(outputData).myMessage).toEqual("Ciao");
-
-    SonicBoom.prototype.write = sbWrite;
+    try {
+      expect(JSON.parse(outputData).myMessage).toEqual("CiaoC");
+    } finally {
+      SonicBoom.prototype.write = sbWrite;
+    }
   });
 });

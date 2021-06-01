@@ -1,3 +1,4 @@
+import SonicBoom from "sonic-boom";
 import { createProbot, Probot } from "../src";
 
 const env = {
@@ -61,5 +62,30 @@ describe("createProbot", () => {
       overrides: { logLevel: "trace" },
     });
     expect(probot.log.level).toEqual("trace");
+  });
+
+  test("env, logger message key", () => {
+    let outputData;
+
+    const sbWrite = SonicBoom.prototype.write;
+    SonicBoom.prototype.write = function (data) {
+      outputData = data;
+    };
+
+    const probot = createProbot({
+      env: {
+        ...env,
+        LOG_LEVEL: "info",
+        LOG_FORMAT: "json",
+        LOG_MESSAGE_KEY: "myMessage",
+      },
+      defaults: { logLevel: "trace" },
+    });
+
+    probot.log.info("Ciao");
+
+    expect(outputData && JSON.parse(outputData).myMessage).toEqual("Ciao");
+
+    SonicBoom.prototype.write = sbWrite;
   });
 });

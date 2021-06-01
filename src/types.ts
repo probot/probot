@@ -20,6 +20,7 @@ export interface Options {
   secret?: string;
   webhookPath?: string;
   logLevel?: "trace" | "debug" | "info" | "warn" | "error" | "fatal";
+  logMessageKey?: string;
   port?: number;
   host?: string;
   baseUrl?: string;

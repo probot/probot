@@ -19,6 +19,7 @@ const DEFAULTS = {
   LOG_FORMAT: "",
   LOG_LEVEL: "warn",
   LOG_LEVEL_IN_STRING: "",
+  LOG_MESSAGE_KEY: "msg",
   REDIS_URL: "",
   SENTRY_DSN: "",
 };
@@ -63,6 +64,7 @@ export function createProbot({
     level: probotOptions.logLevel,
     logFormat: envWithDefaults.LOG_FORMAT as PinoOptions["logFormat"],
     logLevelInString: envWithDefaults.LOG_LEVEL_IN_STRING === "true",
+    logMessageKey: envWithDefaults.LOG_MESSAGE_KEY,
     sentryDsn: envWithDefaults.SENTRY_DSN,
   };
 

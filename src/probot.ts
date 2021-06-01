@@ -50,8 +50,9 @@ export class Probot {
     options.secret = options.secret || "development";
 
     let level = options.logLevel;
+    const logMessageKey = options.logMessageKey;
 
-    this.log = aliasLog(options.log || getLog({ level }));
+    this.log = aliasLog(options.log || getLog({ level, logMessageKey }));
 
     // TODO: support redis backend for access token cache if `options.redisConfig`
     const cache = new LRUCache<number, string>({

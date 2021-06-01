@@ -18,6 +18,7 @@ export function readEnvOptions(
     logLevel: env.LOG_LEVEL as LogLevel,
     logFormat: env.LOG_FORMAT as PinoOptions["logFormat"],
     logLevelInString: env.LOG_LEVEL_IN_STRING === "true",
+    logMessageKey: env.LOG_MESSAGE_KEY,
     sentryDsn: env.SENTRY_DSN,
     redisConfig: env.REDIS_URL,
     baseUrl: env.GHE_HOST

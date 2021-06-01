@@ -85,7 +85,7 @@ describe("createProbot", () => {
     probot.log.info("Ciao");
 
     try {
-      expect(JSON.parse(outputData).myMessage).toEqual("CiaoC");
+      expect(JSON.parse(outputData).myMessage).toEqual("Ciao");
     } finally {
       SonicBoom.prototype.write = sbWrite;
     }

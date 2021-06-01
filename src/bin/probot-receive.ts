@@ -51,6 +51,11 @@ async function main() {
       process.env.LOG_LEVEL_IN_STRING === "true"
     )
     .option(
+      "--log-message-key",
+      "Set to the string key for the 'message' in the log JSON object",
+      process.env.LOG_MESSAGE_KEY || "msg"
+    )
+    .option(
       "--sentry-dsn <dsn>",
       'Set to your Sentry DSN, e.g. "https://1234abcd@sentry.io/12345"',
       process.env.SENTRY_DSN
@@ -75,6 +80,7 @@ async function main() {
     level: program.logLevel,
     logFormat: program.logFormat,
     logLevelInString: program.logLevelInString,
+    logMessageKey: program.logMessageKey,
     sentryDsn: program.sentryDsn,
   });
 

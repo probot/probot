@@ -34,6 +34,7 @@ export async function run(
     logLevel: level,
     logFormat,
     logLevelInString,
+    logMessageKey,
     sentryDsn,
 
     // server options
@@ -57,6 +58,7 @@ export async function run(
     level,
     logFormat,
     logLevelInString,
+    logMessageKey,
     sentryDsn,
   };
 

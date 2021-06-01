@@ -17,7 +17,10 @@
 import pino, { LoggerOptions } from "pino";
 import { getTransformStream, Options, LogLevel } from "@probot/pino";
 
-export type GetLogOptions = { level?: LogLevel, logMessageKey?: string } & Options;
+export type GetLogOptions = {
+  level?: LogLevel;
+  logMessageKey?: string;
+} & Options;
 
 export function getLog(options: GetLogOptions = {}) {
   const { level, logMessageKey, ...getTransformStreamOptions } = options;
@@ -25,7 +28,7 @@ export function getLog(options: GetLogOptions = {}) {
   const pinoOptions: LoggerOptions = {
     level: level || "info",
     name: "probot",
-    messageKey: logMessageKey || "msg"
+    messageKey: logMessageKey || "msg",
   };
   const transform = getTransformStream(getTransformStreamOptions);
   // @ts-ignore TODO: check out what's wrong here

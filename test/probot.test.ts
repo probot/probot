@@ -216,6 +216,23 @@ describe("Probot", () => {
         baseUrl: "https://notreallygithub.com/api/v3",
       }).load(appFn);
     });
+
+    it("requests from the correct API URL when setting `baseUrl` on Octokit constructor", async () => {
+      const appFn = async (app: Probot) => {
+        const octokit = await app.auth();
+        expect(octokit.request.endpoint.DEFAULTS.baseUrl).toEqual(
+          "https://notreallygithub.com/api/v3"
+        );
+      };
+
+      new Probot({
+        appId,
+        privateKey,
+        Octokit: ProbotOctokit.defaults({
+          baseUrl: "https://notreallygithub.com/api/v3",
+        }),
+      }).load(appFn);
+    });
   });
 
   describe("ghe support with http", () => {

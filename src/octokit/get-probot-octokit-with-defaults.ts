@@ -43,10 +43,13 @@ export function getProbotOctokitWithDefaults(options: Options) {
     redisConfig: options.redisConfig,
   });
 
-  const defaultOptions: any = {
-    baseUrl: options.baseUrl,
+  let defaultOptions: any = {
     auth: authOptions,
   };
+
+  if (options.baseUrl) {
+    defaultOptions.baseUrl = options.baseUrl;
+  }
 
   if (octokitThrottleOptions) {
     defaultOptions.throttle = octokitThrottleOptions;

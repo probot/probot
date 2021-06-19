@@ -9,15 +9,21 @@ import { Context } from "../src";
 import { ProbotOctokit } from "../src/octokit/probot-octokit";
 import { PushEvent } from "@octokit/webhooks-types";
 
-const pushEventPayload = (WebhookExamples.filter(
-  (event) => event.name === "push"
-)[0] as WebhookDefinition<"push">).examples[0];
-const issuesEventPayload = (WebhookExamples.filter(
-  (event) => event.name === "issues"
-)[0] as WebhookDefinition<"issues">).examples[0];
-const pullRequestEventPayload = (WebhookExamples.filter(
-  (event) => event.name === "pull_request"
-)[0] as WebhookDefinition<"pull_request">).examples[0];
+const pushEventPayload = (
+  WebhookExamples.filter(
+    (event) => event.name === "push"
+  )[0] as WebhookDefinition<"push">
+).examples[0];
+const issuesEventPayload = (
+  WebhookExamples.filter(
+    (event) => event.name === "issues"
+  )[0] as WebhookDefinition<"issues">
+).examples[0];
+const pullRequestEventPayload = (
+  WebhookExamples.filter(
+    (event) => event.name === "pull_request"
+  )[0] as WebhookDefinition<"pull_request">
+).examples[0];
 
 describe("Context", () => {
   let event: WebhookEvent<"push"> = {
@@ -191,6 +197,7 @@ describe("Context", () => {
         retry: { enabled: false },
         throttle: { enabled: false },
       });
+      // @ts-ignore - Expression produces a union type that is too complex to represent
       context = new Context(event, octokit, {} as any);
     });
 

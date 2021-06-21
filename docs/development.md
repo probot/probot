@@ -116,8 +116,9 @@ To automatically configure your GitHub App, follow these steps:
 1. Go ahead and click the **Register a GitHub App** button.
 1. Next, you'll get to decide on an app name that isn't already taken. Note: if you see a message "Name is already in use" although no such app exists, it means that a GitHub organization with that name exists and cannot be used as an app name.
 1. After registering your GitHub App, you'll be redirected to install the app on any repositories. At the same time, you can check your local `.env` and notice it will be populated with values GitHub sends us in the course of that redirect.
-1. Install the app on a test repository and try triggering a webhook to activate the bot!
 1. Restart the server in your terminal (press <kbd>ctrl</kbd> + <kbd>c</kbd> to stop the server)
+1. Install the app on a test repository.
+1. Try triggering a webhook to activate the bot!
 1. You're all set! Head down to [Debugging](#debugging) to learn more about developing your Probot App.
 
 GitHub App Manifests--otherwise known as easy app creation--make it simple to generate all the settings necessary for a GitHub App. This process abstracts the [Configuring a GitHub App](#configuring-a-github-app) section. You can learn more about how GitHub App Manifests work and how to change your settings for one via the [GitHub Developer Docs](https://docs.github.com/en/developers/apps/creating-a-github-app-from-a-manifest/).

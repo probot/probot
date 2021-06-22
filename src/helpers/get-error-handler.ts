@@ -6,9 +6,9 @@ import {
 
 export function getErrorHandler(log: Logger) {
   return (error: Error) => {
-    const errors = (error.name === "AggregateError"
-      ? error
-      : [error]) as WebhookError[];
+    const errors = (
+      error.name === "AggregateError" ? error : [error]
+    ) as WebhookError[];
 
     const event = (error as any).event as WebhookEvent;
 

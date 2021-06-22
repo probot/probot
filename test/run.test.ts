@@ -48,7 +48,7 @@ describe("run", () => {
       await server.stop();
     });
 
-    it.only("runs with an array of strings", async () => {
+    it("runs with an array of strings", async () => {
       server = await run([
         "node",
         "probot-run",
@@ -80,10 +80,12 @@ describe("run", () => {
   });
 
   describe("webhooks", () => {
+    const pushEvent = require("./fixtures/webhook/push.json");
+
     it("POST /", async () => {
       server = await run(() => {}, { env });
 
-      const dataString = require("./fixtures/webhook/push.json");
+      const dataString = JSON.stringify(pushEvent);
 
       await request(server.expressApp)
         .post("/")
@@ -105,7 +107,7 @@ describe("run", () => {
         },
       });
 
-      const dataString = require("./fixtures/webhook/push.json");
+      const dataString = JSON.stringify(pushEvent);
 
       await request(server.expressApp)
         .post("/custom-webhook")

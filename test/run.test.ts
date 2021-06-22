@@ -98,7 +98,7 @@ describe("run", () => {
       await server.stop();
     });
 
-    it.skip("custom webhook path", async () => {
+    it("custom webhook path", async () => {
       server = await run(() => {}, {
         env: {
           ...env,

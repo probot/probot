@@ -51,7 +51,7 @@ export class Server {
     this.expressApp.use(
       this.state.webhookPath,
       createWebhooksMiddleware(this.probotApp.webhooks, {
-        path: this.state.webhookPath,
+        path: "/",
       })
     );
 

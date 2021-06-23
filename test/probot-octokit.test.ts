@@ -128,23 +128,19 @@ describe("ProbotOctokit", () => {
       nock("https://api.github.com")
         .get("/repos/JasonEtco/pizza/issues?per_page=1")
         .reply(200, [issues[0]], {
-          link:
-            '<https://api.github.com/repositories/123/issues?per_page=1&page=2>; rel="next"',
+          link: '<https://api.github.com/repositories/123/issues?per_page=1&page=2>; rel="next"',
         })
         .get("/repositories/123/issues?per_page=1&page=2")
         .reply(200, [issues[1]], {
-          link:
-            '<https://api.github.com/repositories/123/issues?per_page=1&page=3>; rel="next"',
+          link: '<https://api.github.com/repositories/123/issues?per_page=1&page=3>; rel="next"',
         })
         .get("/repositories/123/issues?per_page=1&page=3")
         .reply(200, [issues[2]], {
-          link:
-            '<https://api.github.com/repositories/123/issues?per_page=1&page=4>; rel="next"',
+          link: '<https://api.github.com/repositories/123/issues?per_page=1&page=4>; rel="next"',
         })
         .get("/repositories/123/issues?per_page=1&page=4")
         .reply(200, [issues[3]], {
-          link:
-            '<https://api.github.com/repositories/123/issues?per_page=1&page=5>; rel="next"',
+          link: '<https://api.github.com/repositories/123/issues?per_page=1&page=5>; rel="next"',
         })
         .get("/repositories/123/issues?per_page=1&page=5")
         .reply(200, [issues[4]], {

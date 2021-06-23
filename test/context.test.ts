@@ -1,82 +1,126 @@
 import fs = require("fs");
 import path = require("path");
 
-import { WebhookEvent } from "@octokit/webhooks";
+import { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
+import WebhookExamples, { WebhookDefinition } from "@octokit/webhooks-examples";
 import nock from "nock";
 
 import { Context } from "../src";
 import { ProbotOctokit } from "../src/octokit/probot-octokit";
+import { PushEvent } from "@octokit/webhooks-types";
+
+const pushEventPayload = (
+  WebhookExamples.filter(
+    (event) => event.name === "push"
+  )[0] as WebhookDefinition<"push">
+).examples[0];
+const issuesEventPayload = (
+  WebhookExamples.filter(
+    (event) => event.name === "issues"
+  )[0] as WebhookDefinition<"issues">
+).examples[0];
+const pullRequestEventPayload = (
+  WebhookExamples.filter(
+    (event) => event.name === "pull_request"
+  )[0] as WebhookDefinition<"pull_request">
+).examples[0];
 
 describe("Context", () => {
-  let event: WebhookEvent;
-  let context: Context;
-
-  beforeEach(() => {
-    event = {
-      id: "123",
-      name: "push",
-      payload: {
-        issue: { number: 4 },
-        repository: {
-          name: "probot",
-          owner: { login: "bkeepers" },
-        },
-      },
-    };
-
-    context = new Context(event, {} as any, {} as any);
-  });
+  let event: WebhookEvent<"push"> = {
+    id: "0",
+    name: "push",
+    payload: pushEventPayload,
+  };
+  let context: Context<"push"> = new Context<"push">(
+    event,
+    {} as any,
+    {} as any
+  );
 
   it("inherits the payload", () => {
     expect(context.payload).toBe(event.payload);
   });
 
   describe("repo", () => {
+    let event: WebhookEvent<"push">;
+    let context: Context<"push">;
+    beforeEach(() => {
+      event = {
+        id: "123",
+        name: "push",
+        payload: pushEventPayload,
+      };
+
+      context = new Context<"push">(event, {} as any, {} as any);
+    });
+
     it("returns attributes from repository payload", () => {
-      expect(context.repo()).toEqual({ owner: "bkeepers", repo: "probot" });
+      expect(context.repo()).toEqual({
+        owner: "Codertocat",
+        repo: "Hello-World",
+      });
     });
 
     it("merges attributes", () => {
       expect(context.repo({ foo: 1, bar: 2 })).toEqual({
         bar: 2,
         foo: 1,
-        owner: "bkeepers",
-        repo: "probot",
+        owner: "Codertocat",
+        repo: "Hello-World",
       });
     });
 
     it("overrides repo attributes", () => {
       expect(context.repo({ owner: "muahaha" })).toEqual({
         owner: "muahaha",
-        repo: "probot",
+        repo: "Hello-World",
       });
     });
 
     // The `repository` object on the push event has a different format than the other events
     // https://docs.github.com/en/developers/webhooks-and-events/webhook-events-and-payloads#push
     it("properly handles the push event", () => {
-      event.payload = require("./fixtures/webhook/push");
+      event.payload = require("./fixtures/webhook/push") as PushEvent;
 
-      context = new Context(event, {} as any, {} as any);
+      context = new Context<"push">(event, {} as any, {} as any);
       expect(context.repo()).toEqual({ owner: "bkeepers-inc", repo: "test" });
     });
 
     it("return error for context.repo() when repository doesn't exist", () => {
-      delete context.payload.repository;
+      event = {
+        id: "123",
+        name: "push",
+        payload: { ...pushEventPayload, repository: undefined as any },
+      };
+
+      context = new Context<"push">(event, {} as any, {} as any);
       try {
         context.repo();
       } catch (e) {
-        expect(e.message).toMatch("context.repo() is not supported");
+        expect(e.message).toMatch(
+          "context.repo() is not supported for this webhook event."
+        );
       }
     });
   });
 
   describe("issue", () => {
+    let event: WebhookEvent<"issues">;
+    let context: Context<"issues">;
+    beforeEach(() => {
+      event = {
+        id: "123",
+        name: "issues",
+        payload: issuesEventPayload,
+      };
+
+      context = new Context<"issues">(event, {} as any, {} as any);
+    });
     it("returns attributes from repository payload", () => {
       expect(context.issue()).toEqual({
-        owner: "bkeepers",
-        repo: "probot",
-        issue_number: 4,
+        owner: "Codertocat",
+        repo: "Hello-World",
+        issue_number: 1,
       });
     });
 
@@ -84,9 +128,9 @@ describe("Context", () => {
       expect(context.issue({ foo: 1, bar: 2 })).toEqual({
         bar: 2,
         foo: 1,
-        issue_number: 4,
-        owner: "bkeepers",
-        repo: "probot",
+        issue_number: 1,
+        owner: "Codertocat",
+        repo: "Hello-World",
       });
     });
 
@@ -94,17 +138,28 @@ describe("Context", () => {
       expect(context.issue({ owner: "muahaha", issue_number: 5 })).toEqual({
         issue_number: 5,
         owner: "muahaha",
-        repo: "probot",
+        repo: "Hello-World",
       });
     });
   });
 
   describe("pullRequest", () => {
+    let event: WebhookEvent<"pull_request">;
+    let context: Context<"pull_request">;
+    beforeEach(() => {
+      event = {
+        id: "123",
+        name: "pull_request",
+        payload: pullRequestEventPayload,
+      };
+
+      context = new Context<"pull_request">(event, {} as any, {} as any);
+    });
     it("returns attributes from repository payload", () => {
       expect(context.pullRequest()).toEqual({
-        owner: "bkeepers",
-        repo: "probot",
-        pull_number: 4,
+        owner: "Codertocat",
+        repo: "Hello-World",
+        pull_number: 2,
       });
     });
 
@@ -112,9 +167,9 @@ describe("Context", () => {
       expect(context.pullRequest({ foo: 1, bar: 2 })).toEqual({
         bar: 2,
         foo: 1,
-        owner: "bkeepers",
-        pull_number: 4,
-        repo: "probot",
+        owner: "Codertocat",
+        pull_number: 2,
+        repo: "Hello-World",
       });
     });
 
@@ -123,7 +178,7 @@ describe("Context", () => {
         {
           owner: "muahaha",
           pull_number: 5,
-          repo: "probot",
+          repo: "Hello-World",
         }
       );
     });
@@ -142,12 +197,13 @@ describe("Context", () => {
         retry: { enabled: false },
         throttle: { enabled: false },
       });
+      // @ts-ignore - Expression produces a union type that is too complex to represent
       context = new Context(event, octokit, {} as any);
     });
 
     it("gets a valid configuration", async () => {
       const mock = nock("https://api.github.com")
-        .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
+        .get("/repos/Codertocat/Hello-World/contents/.github%2Ftest-file.yml")
         .reply(200, nockConfigResponseDataFile("basic.yml"));
 
       const config = await context.config("test-file.yml");
@@ -161,9 +217,9 @@ describe("Context", () => {
 
     it("returns null when the file and base repository are missing", async () => {
       const mock = nock("https://api.github.com")
-        .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
+        .get("/repos/Codertocat/Hello-World/contents/.github%2Ftest-file.yml")
         .reply(404)
-        .get("/repos/bkeepers/.github/contents/.github%2Ftest-file.yml")
+        .get("/repos/Codertocat/.github/contents/.github%2Ftest-file.yml")
         .reply(404);
 
       expect(await context.config("test-file.yml")).toBe(null);
@@ -172,12 +228,12 @@ describe("Context", () => {
 
     it("accepts deepmerge options", async () => {
       const mock = nock("https://api.github.com")
-        .get("/repos/bkeepers/probot/contents/.github%2Ftest-file.yml")
+        .get("/repos/Codertocat/Hello-World/contents/.github%2Ftest-file.yml")
         .reply(
           200,
           "foo:\n  - name: master\n    shouldChange: changed\n_extends: .github"
         )
-        .get("/repos/bkeepers/.github/contents/.github%2Ftest-file.yml")
+        .get("/repos/Codertocat/.github/contents/.github%2Ftest-file.yml")
         .reply(
           200,
           "foo:\n  - name: develop\n  - name: master\n    shouldChange: should"
@@ -194,14 +250,14 @@ describe("Context", () => {
 
   describe("isBot", () => {
     test("returns true if sender is a bot", () => {
-      event.payload.sender = { type: "Bot" };
+      event.payload.sender.type = "Bot";
       context = new Context(event, {} as any, {} as any);
 
       expect(context.isBot).toBe(true);
     });
 
     test("returns false if sender is not a bot", () => {
-      event.payload.sender = { type: "User" };
+      event.payload.sender.type = "User";
       context = new Context(event, {} as any, {} as any);
 
       expect(context.isBot).toBe(false);

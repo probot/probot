@@ -1,5 +1,8 @@
 import express from "express";
-import { WebhookEvent, Webhooks } from "@octokit/webhooks";
+import {
+  EmitterWebhookEvent as WebhookEvent,
+  Webhooks,
+} from "@octokit/webhooks";
 import LRUCache from "lru-cache";
 import Redis from "ioredis";
 
@@ -18,7 +21,6 @@ export interface Options {
   log?: Logger;
   redisConfig?: Redis.RedisOptions | string;
   secret?: string;
-  webhookPath?: string;
   logLevel?: "trace" | "debug" | "info" | "warn" | "error" | "fatal";
   logMessageKey?: string;
   port?: number;
@@ -35,7 +37,6 @@ export type State = {
   octokit: InstanceType<typeof ProbotOctokit>;
   cache?: LRUCache<number, string>;
   webhooks: {
-    path?: string;
     secret?: string;
   };
   port?: number;
@@ -43,10 +44,7 @@ export type State = {
   baseUrl?: string;
 };
 
-export type ProbotWebhooks = Webhooks<
-  WebhookEvent,
-  Omit<Context, keyof WebhookEvent>
->;
+export type ProbotWebhooks = Webhooks<Omit<Context, keyof WebhookEvent>>;
 
 export type DeprecatedLogger = LogFn & Logger;
 
@@ -70,5 +68,6 @@ export type ServerOptions = {
 
 export type MiddlewareOptions = {
   probot: Probot;
+  webhooksPath?: string;
   [key: string]: unknown;
 };

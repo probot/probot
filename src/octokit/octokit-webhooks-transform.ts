@@ -1,4 +1,4 @@
-import { WebhookEvent } from "@octokit/webhooks";
+import { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
 
 import { Context } from "../context";
 import { State } from "../types";

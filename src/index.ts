@@ -1,6 +1,6 @@
 import { Logger } from "pino";
 
-import { Context, WebhookPayloadWithRepository } from "./context";
+import { Context } from "./context";
 import { Options, ApplicationFunctionOptions } from "./types";
 import { Probot } from "./probot";
 import { Server } from "./server/server";
@@ -21,4 +21,4 @@ export {
 };
 
 /** NOTE: exported types might change at any point in time */
-export { Options, WebhookPayloadWithRepository, ApplicationFunctionOptions };
+export { Options, ApplicationFunctionOptions };

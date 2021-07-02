@@ -1,13 +1,17 @@
 import Stream from "stream";
 
-import { WebhookEvent } from "@octokit/webhooks";
+import {
+  EmitterWebhookEvent,
+  EmitterWebhookEvent as WebhookEvent,
+} from "@octokit/webhooks";
 import Bottleneck from "bottleneck";
 import nock from "nock";
 import pino from "pino";
 
 import { Probot, ProbotOctokit, Context } from "../src";
 
-import { WebhookEvents } from "@octokit/webhooks";
+import webhookExamples from "@octokit/webhooks-examples";
+import { EmitterWebhookEventName } from "@octokit/webhooks/dist-types/types";
 
 const appId = 1;
 const privateKey = `-----BEGIN RSA PRIVATE KEY-----
@@ -20,14 +24,31 @@ NKZSuZEHqGEFAiB6EDrxkovq8SYGhIQsJeqkTMO8n94xhMRZlFmIQDokEQIgAq5U
 r1UQNnUExRh7ZT0kFbMfO9jKYZVlQdCL9Dn93vo=
 -----END RSA PRIVATE KEY-----`;
 
+const getPayloadExamples = <TName extends EmitterWebhookEventName>(
+  name: TName
+) => {
+  return webhookExamples.filter((event) => event.name === name.split(".")[0])[0]
+    .examples as EmitterWebhookEvent<TName>["payload"][];
+};
+const getPayloadExample = <TName extends EmitterWebhookEventName>(
+  name: TName
+) => {
+  const examples = getPayloadExamples<TName>(name);
+  if (name.includes(".")) {
+    const [, action] = name.split(".");
+    return examples.filter((payload) => {
+      // @ts-expect-error
+      return payload.action === action;
+    })[0];
+  }
+  return examples[0];
+};
 // tslint:disable:no-empty
 describe("Probot", () => {
   let probot: Probot;
-  let event: {
-    id: string;
-    name: WebhookEvents;
-    payload: any;
-  };
+  let event: WebhookEvent<
+    "push" | "pull_request" | "installation" | "check_run"
+  >;
   let output: any;
 
   const streamLogsToOutput = new Stream.Writable({ objectMode: true });
@@ -40,12 +61,6 @@ describe("Probot", () => {
     // Clear log output
     output = [];
     probot = new Probot({ githubToken: "faketoken" });
-
-    event = {
-      id: "0",
-      name: "push",
-      payload: require("./fixtures/webhook/push"),
-    };
   });
 
   test(".version", () => {
@@ -109,12 +124,18 @@ describe("Probot", () => {
   });
 
   describe("webhooks", () => {
+    let event: WebhookEvent<"push"> = {
+      id: "0",
+      name: "push",
+      payload: getPayloadExample("push"),
+    };
+
     it("responds with the correct error if webhook secret does not match", async () => {
       expect.assertions(1);
 
       probot.log.error = jest.fn();
       probot.webhooks.on("push", () => {
-        throw new Error("X-Hub-Signature does not match blob signature");
+        throw new Error("X-Hub-Signature-256 does not match blob signature");
       });
 
       try {
@@ -131,7 +152,7 @@ describe("Probot", () => {
 
       probot.log.error = jest.fn();
       probot.webhooks.on("push", () => {
-        throw new Error("No X-Hub-Signature found on request");
+        throw new Error("No X-Hub-Signature-256 found on request");
       });
 
       try {
@@ -148,8 +169,8 @@ describe("Probot", () => {
 
       probot.log.error = jest.fn();
       probot.webhooks.on("push", () => {
-        throw new Error(
-          "webhooks:receiver ignored: POST / due to missing headers: x-hub-signature"
+        throw Error(
+          "webhooks:receiver ignored: POST / due to missing headers: x-hub-signature-256"
         );
       });
 
@@ -257,7 +278,6 @@ describe("Probot", () => {
       expect.assertions(2);
 
       probot = new Probot({
-        webhookPath: "/webhook",
         githubToken: "faketoken",
         redisConfig: "test",
         Octokit: ProbotOctokit.plugin((octokit, options) => {
@@ -278,7 +298,6 @@ describe("Probot", () => {
       };
 
       probot = new Probot({
-        webhookPath: "/webhook",
         githubToken: "faketoken",
         redisConfig,
         Octokit: ProbotOctokit.plugin((octokit, options) => {
@@ -296,10 +315,7 @@ describe("Probot", () => {
       event = {
         id: "123-456",
         name: "pull_request",
-        payload: {
-          action: "opened",
-          installation: { id: 1 },
-        },
+        payload: getPayloadExample("pull_request"),
       };
     });
 
@@ -345,19 +361,6 @@ describe("Probot", () => {
       expect(spy).toHaveBeenCalledTimes(0);
     });
 
-    it("calls callback with *", async () => {
-      const probot = new Probot({
-        appId,
-        privateKey,
-      });
-
-      const spy = jest.fn();
-      probot.on("*", spy);
-
-      await probot.receive(event);
-      expect(spy).toHaveBeenCalled();
-    });
-
     it("calls callback with onAny", async () => {
       const probot = new Probot({
         appId,
@@ -377,13 +380,10 @@ describe("Probot", () => {
         privateKey,
       });
 
-      const event2: WebhookEvent = {
+      const event2: WebhookEvent<"issues.opened"> = {
         id: "123",
         name: "issues",
-        payload: {
-          action: "opened",
-          installation: { id: 2 },
-        },
+        payload: getPayloadExample("issues.opened"),
       };
 
       const spy = jest.fn();
@@ -427,11 +427,9 @@ describe("Probot", () => {
       event = {
         id: "123-456",
         name: "installation",
-        payload: {
-          action: "created",
-          installation: { id: 1 },
-        },
+        payload: getPayloadExample("installation.created"),
       };
+      event.payload.installation.id = 1;
 
       const mock = nock("https://api.github.com")
         .post("/app/installations/1/access_tokens")
@@ -464,11 +462,9 @@ describe("Probot", () => {
       event = {
         id: "123-456",
         name: "installation",
-        payload: {
-          action: "deleted",
-          installation: { id: 1 },
-        },
+        payload: getPayloadExample("installation.deleted"),
       };
+      event.payload.installation.id = 1;
 
       const mock = nock("https://api.github.com")
         .get("/")
@@ -493,9 +489,9 @@ describe("Probot", () => {
       event = {
         id: "123-456",
         name: "check_run",
-        payload: {
-          /* no installation */
-        },
+        payload: getPayloadExamples("check_run").filter(
+          (event) => typeof event.installation === "undefined"
+        )[0],
       };
 
       const mock = nock("https://api.github.com")
@@ -518,10 +514,7 @@ describe("Probot", () => {
       event = {
         id: "123-456",
         name: "pull_request",
-        payload: {
-          action: "opened",
-          installation: { id: 1 },
-        },
+        payload: getPayloadExample("pull_request.opened"),
       };
     });
 

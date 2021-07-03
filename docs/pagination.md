@@ -1,5 +1,6 @@
 ---
 next: docs/extensions.md
+title: Pagination
 ---
 
 # Pagination

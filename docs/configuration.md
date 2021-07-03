@@ -1,5 +1,6 @@
 ---
 next: docs/testing.md
+title: Configuration
 ---
 
 # Configuration

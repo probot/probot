@@ -1,5 +1,6 @@
 ---
 next: docs/logging.md
+title: Simulate receiving webhooks
 ---
 
 # Simulate receiving webhooks

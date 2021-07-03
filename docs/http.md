@@ -1,5 +1,6 @@
 ---
 next: docs/pagination.md
+title: HTTP routes
 ---
 
 # HTTP routes

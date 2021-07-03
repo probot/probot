@@ -1,5 +1,6 @@
 ---
 next: docs/best-practices.md
+title: Persistence
 ---
 
 # Persistence

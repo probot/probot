@@ -1,5 +1,6 @@
 ---
 next: docs/deployment.md
+title: Logging
 ---
 
 # Logging

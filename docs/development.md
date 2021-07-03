@@ -1,5 +1,6 @@
 ---
 next: docs/webhooks.md
+title: Developing an app
 ---
 
 # Developing an app

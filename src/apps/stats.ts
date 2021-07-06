@@ -54,6 +54,12 @@ export = async (app: Application): Promise<void> => {
     let popular = await Promise.all(installations.map(async (installation) => {
       const { account } = installation
 
+      // @ts-expect-error The `suspended_by` property does not exist in this version of the types.
+      if (installation.suspended_by?.login) {
+        app.log.warn({ installation }, 'Installation is suspended')
+        return account
+      }
+
       if (ignoredAccounts.includes(account.login.toLowerCase())) {
         account.stars = 0
         app.log.debug({ installation }, 'Installation is ignored')

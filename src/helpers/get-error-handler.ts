@@ -24,10 +24,18 @@ export function getErrorHandler(log: Logger) {
       }
 
       if (errMessage.includes("pem") || errMessage.includes("json web token")) {
-        log.error(
-          error,
-          "Your private key (a .pem file or PRIVATE_KEY environment variable) or APP_ID is incorrect. Go to https://github.com/settings/apps/YOUR_APP, verify that APP_ID is set correctly, and generate a new PEM file if necessary."
-        );
+        if (process.env.PRIVATE_KEY && process.env.PRIVATE_KEY.indexOf('\\n') !== -1) {
+          log.error(
+            error,
+            "The environment variable PRIVATE_KEY contains escaped newlines. Please see this issue for more information: https://github.com/octokit/app.js/issues/40"
+          );
+        } else {
+          log.error(
+            error,
+            "Your private key (a .pem file or PRIVATE_KEY environment variable) or APP_ID is incorrect. Go to https://github.com/settings/apps/YOUR_APP, verify that APP_ID is set correctly, and generate a new PEM file if necessary."
+          );
+        }
+
         continue;
       }
 

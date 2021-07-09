@@ -3,9 +3,6 @@ on:
   push:
     branches:
       - master
-    tags:
-      # TODO: only update docs for tags that match npm's @latest version
-      - v10.*
 
 jobs:
   docs:

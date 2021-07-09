@@ -24,7 +24,7 @@ export function getErrorHandler(log: Logger) {
       }
 
       if (errMessage.includes("pem") || errMessage.includes("json web token")) {
-        if (process.env.PRIVATE_KEY && process.env.PRIVATE_KEY.indexOf('\\n') !== -1) {
+        if (process.env.PRIVATE_KEY && process.env.PRIVATE_KEY.indexOf("\\n") !== -1) {
           log.error(
             error,
             "The environment variable PRIVATE_KEY contains escaped newlines. Please see this issue for more information: https://github.com/octokit/app.js/issues/40"

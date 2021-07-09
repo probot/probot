@@ -9,4 +9,5 @@ tmp
 coverage
 lib/
 .idea
+*.iml
 yarn.lock

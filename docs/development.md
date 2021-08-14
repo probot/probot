@@ -11,19 +11,18 @@ To develop a Probot app, you will first need a recent version of [Node.js](https
 
 <!-- toc -->
 
-- [Developing an app](#developing-an-app)
-  - [Generating a new app](#generating-a-new-app)
-  - [Running the app locally](#running-the-app-locally)
-  - [Configuring a GitHub App](#configuring-a-github-app)
-  - [Manually Configuring a GitHub App](#manually-configuring-a-github-app)
-  - [Installing the app on a repository](#installing-the-app-on-a-repository)
-  - [Debugging](#debugging)
-  - [Run Probot programmatically](#run-probot-programmatically)
-    - [Use run](#use-run)
-    - [Use server](#use-server)
-    - [Use createNodeMiddleware](#use-createnodemiddleware)
-    - [Use probot](#use-probot)
-    - [Use Probot's Octokit](#use-probots-octokit)
+- [Generating a new app](#generating-a-new-app)
+- [Running the app locally](#running-the-app-locally)
+- [Configuring a GitHub App](#configuring-a-github-app)
+- [Manually Configuring a GitHub App](#manually-configuring-a-github-app)
+- [Installing the app on a repository](#installing-the-app-on-a-repository)
+- [Debugging](#debugging)
+- [Run Probot programmatically](#run-probot-programmatically)
+  - [Use `run`](#use-run)
+  - [Use `server`](#use-server)
+  - [Use `createNodeMiddleware`](#use-createnodemiddleware)
+  - [Use `probot`](#use-probot)
+  - [Use Probot's Octokit](#use-probots-octokit)
 
 <!-- tocstop -->
 

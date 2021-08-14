@@ -11,18 +11,19 @@ To develop a Probot app, you will first need a recent version of [Node.js](https
 
 <!-- toc -->
 
-- [Generating a new app](#generating-a-new-app)
-- [Running the app locally](#running-the-app-locally)
-- [Configuring a GitHub App](#configuring-a-github-app)
-- [Manually Configuring a GitHub App](#manually-configuring-a-github-app)
-- [Installing the app on a repository](#installing-the-app-on-a-repository)
-- [Debugging](#debugging)
-- [Run Probot programmatically](#run-probot-programmatically)
-  - [Use `run`](#use-run)
-  - [Use `server`](#use-server)
-  - [Use `createNodeMiddleware`](#use-createnodemiddleware)
-  - [Use `probot`](#use-probot)
-  - [Use Probot's Octokit](#use-probots-octokit)
+- [Developing an app](#developing-an-app)
+  - [Generating a new app](#generating-a-new-app)
+  - [Running the app locally](#running-the-app-locally)
+  - [Configuring a GitHub App](#configuring-a-github-app)
+  - [Manually Configuring a GitHub App](#manually-configuring-a-github-app)
+  - [Installing the app on a repository](#installing-the-app-on-a-repository)
+  - [Debugging](#debugging)
+  - [Run Probot programmatically](#run-probot-programmatically)
+    - [Use run](#use-run)
+    - [Use server](#use-server)
+    - [Use createNodeMiddleware](#use-createnodemiddleware)
+    - [Use probot](#use-probot)
+    - [Use Probot's Octokit](#use-probots-octokit)
 
 <!-- tocstop -->
 
@@ -200,7 +201,7 @@ The `server` instance gives you access to the express app instance (`server.expr
 
 ### Use createNodeMiddleware
 
-If you have have your own server or deploy to a serverless environment that supports loading [Express-style middleware](https://expressjs.com/en/guide/using-middleware.html) or Node's http middleware (`(request, response) => { ... }`), you can use `createNodeMiddleware`.
+If you have your own server or deploy to a serverless environment that supports loading [Express-style middleware](https://expressjs.com/en/guide/using-middleware.html) or Node's http middleware (`(request, response) => { ... }`), you can use `createNodeMiddleware`.
 
 ```js
 const { createNodeMiddleware, Probot } = require("probot");

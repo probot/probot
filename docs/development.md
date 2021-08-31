@@ -200,7 +200,7 @@ The `server` instance gives you access to the express app instance (`server.expr
 
 ### Use createNodeMiddleware
 
-If you have your own server or deploy to a serverless environment like that supports loading [Express-style middleware](https://expressjs.com/en/guide/using-middleware.html) or Node's http middleware (`(request, response) => { ... }`), you can use `createNodeMiddleware`.
+If you have your own server or deploy to a serverless environment that supports loading [Express-style middleware](https://expressjs.com/en/guide/using-middleware.html) or Node's http middleware (`(request, response) => { ... }`), you can use `createNodeMiddleware`.
 
 ```js
 const { createNodeMiddleware, Probot } = require("probot");

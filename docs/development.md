@@ -227,7 +227,10 @@ module.exports = createNodeMiddleware(app, { probot: createProbot() });
 By default, `createNodeMiddleware()` uses `/` as the webhook endpoint. To customize this behaviour, you can use the `webhooksPath` option.
 
 ```js
-module.exports = createNodeMiddleware(app, { probot: createProbot(), webhooksPath: '/path/to/webhook/endpoint' });
+module.exports = createNodeMiddleware(app, {
+  probot: createProbot(),
+  webhooksPath: "/path/to/webhook/endpoint",
+});
 ```
 
 ### Use probot

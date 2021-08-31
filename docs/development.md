@@ -212,7 +212,7 @@ const probot = new Probot({
   secret: "webhooksecret123",
 });
 
-module.exports = createNodeMiddleware(app, { probot, webhooksPath: '/path/to/webhook/endpoint' });
+module.exports = createNodeMiddleware(app, { probot });
 ```
 
 If you want to read probot's configuration from the same environment variables as [`run`](#run), use the [`createProbot`](https://probot.github.io/api/latest/index.html#createprobot) export
@@ -221,6 +221,12 @@ If you want to read probot's configuration from the same environment variables a
 const { createNodeMiddleware, createProbot } = require("probot");
 const app = require("./index.js");
 
+module.exports = createNodeMiddleware(app, { probot: createProbot() });
+```
+
+By default, `createNodeMiddleware()` uses `/` as the webhook endpoint. To customize this behaviour, you can use the `webhooksPath` option.
+
+```js
 module.exports = createNodeMiddleware(app, { probot: createProbot(), webhooksPath: '/path/to/webhook/endpoint' });
 ```
 

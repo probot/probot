@@ -200,7 +200,7 @@ The `server` instance gives you access to the express app instance (`server.expr
 
 ### Use createNodeMiddleware
 
-If you have your own server or deploy to a serverless environment that supports loading [Express-style middleware](https://expressjs.com/en/guide/using-middleware.html) or Node's http middleware (`(request, response) => { ... }`), you can use `createNodeMiddleware`.
+If you have your own server or deploy to a serverless environment like that supports loading [Express-style middleware](https://expressjs.com/en/guide/using-middleware.html) or Node's http middleware (`(request, response) => { ... }`), you can use `createNodeMiddleware`.
 
 ```js
 const { createNodeMiddleware, Probot } = require("probot");
@@ -212,7 +212,7 @@ const probot = new Probot({
   secret: "webhooksecret123",
 });
 
-module.exports = createNodeMiddleware(app, { probot });
+module.exports = createNodeMiddleware(app, { probot, webhooksPath: '/path/to/webhook/endpoint' });
 ```
 
 If you want to read probot's configuration from the same environment variables as [`run`](#run), use the [`createProbot`](https://probot.github.io/api/latest/index.html#createprobot) export
@@ -221,7 +221,7 @@ If you want to read probot's configuration from the same environment variables a
 const { createNodeMiddleware, createProbot } = require("probot");
 const app = require("./index.js");
 
-module.exports = createNodeMiddleware(app, { probot: createProbot() });
+module.exports = createNodeMiddleware(app, { probot: createProbot(), webhooksPath: '/path/to/webhook/endpoint' });
 ```
 
 ### Use probot

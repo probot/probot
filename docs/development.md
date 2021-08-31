@@ -224,6 +224,15 @@ const app = require("./index.js");
 module.exports = createNodeMiddleware(app, { probot: createProbot() });
 ```
 
+By default, `createNodeMiddleware()` uses `/` as the webhook endpoint. To customize this behaviour, you can use the `webhooksPath` option.
+
+```js
+module.exports = createNodeMiddleware(app, {
+  probot: createProbot(),
+  webhooksPath: "/path/to/webhook/endpoint",
+});
+```
+
 ### Use probot
 
 If you don't use Probot's http handling in order to receive and verify events from GitHub via webhook requests, you can use the [`Probot`](https://probot.github.io/api/latest/classes/probot.html) class directly.

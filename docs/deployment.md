@@ -283,13 +283,11 @@ Please add yours!
 const { createNodeMiddleware, createProbot } = require("probot");
 
 const app = require("../../../app");
-const probot = createProbot({
-  defaults: {
-    webhookPath: "/api/github/webhooks",
-  },
-});
 
-module.exports = createNodeMiddleware(app, { probot });
+module.exports = createNodeMiddleware(app, {
+  probot: createProbot(),
+  webhooksPath: "/api/github/webhooks",
+});
 ```
 
 Examples
@@ -297,6 +295,7 @@ Examples
 - [probot/example-vercel](https://github.com/probot/example-vercel#readme)
 - [wip/app](https://github.com/wip/app#readme)
 - [all-contributors/app](https://github.com/all-contributors/app#readme)
+- [probot-nextjs-starter](https://github.com/maximousblk/probot-nextjs-starter#readme)
 
 Please add yours!
 

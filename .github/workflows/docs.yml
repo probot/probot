@@ -1,9 +1,8 @@
 name: Docs
-on:
+"on":
   push:
     branches:
       - master
-
 jobs:
   docs:
     name: docs
@@ -13,7 +12,7 @@ jobs:
       - run: git fetch --depth=20 origin +refs/tags/*:refs/tags/*
       - uses: actions/setup-node@v2
         with:
-          node-version: 12
+          node-version: 16
           cache: npm
       - run: npm ci
       - run: npm run build

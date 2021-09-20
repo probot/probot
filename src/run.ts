@@ -34,6 +34,7 @@ export async function run(
     logLevel: level,
     logFormat,
     logLevelInString,
+    logMessageKey,
     sentryDsn,
 
     // server options
@@ -57,6 +58,7 @@ export async function run(
     level,
     logFormat,
     logLevelInString,
+    logMessageKey,
     sentryDsn,
   };
 
@@ -70,6 +72,7 @@ export async function run(
     baseUrl,
     log: log.child({ name: "probot" }),
   };
+
   const serverOptions: ServerOptions = {
     host,
     port,
@@ -95,7 +98,21 @@ export async function run(
         );
       }
     }
-    server = new Server(serverOptions);
+
+    // Workaround for setup (#1512)
+    // When probot is started for the first time, it gets into a setup mode
+    // where `appId` and `privateKey` are not present. The setup mode gets
+    // these credentials. In order to not throw an error, we set the values
+    // to anything, as the Probot instance is not used in setup it makes no
+    // difference anyway.
+    server = new Server({
+      ...serverOptions,
+      Probot: Probot.defaults({
+        ...probotOptions,
+        appId: 1,
+        privateKey: "dummy value for setup, see #1512",
+      }),
+    });
     await server.load(setupAppFactory(host, port));
     await server.start();
     return server;
@@ -109,14 +126,14 @@ export async function run(
 
       if (Array.isArray(pkg.apps)) {
         for (const appPath of pkg.apps) {
-          const appFn = resolveAppFunction(appPath);
-          server.load(appFn);
+          const appFn = await resolveAppFunction(appPath);
+          await server.load(appFn);
         }
       }
 
       const [appPath] = args;
-      const appFn = resolveAppFunction(appPath);
-      server.load(appFn);
+      const appFn = await resolveAppFunction(appPath);
+      await server.load(appFn);
     };
 
     server = new Server(serverOptions);

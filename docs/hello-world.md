@@ -1,5 +1,6 @@
 ---
 next: docs/development.md
+title: Hello World
 ---
 
 # Hello world
@@ -25,7 +26,7 @@ module.exports = (app) => {
 };
 ```
 
-The `context` passed to the event handler includes everything about the event that was triggered, as well as some helpful properties for doing something useful in response to the event. `context.octokit` is an authenticated GitHub client that can be used to [make API calls](./github-api.md), and allows you to do almost anything programmatically that you can do through a web browser on GitHub.
+The [`context`](https://probot.github.io/api/latest/classes/context.html) passed to the event handler includes everything about the event that was triggered, as well as some helpful properties for doing something useful in response to the event. `context.octokit` is an authenticated GitHub client that can be used to [make REST API and GraphQL calls](./github-api.md), and allows you to do almost anything programmatically that you can do through a web browser on GitHub.
 
 Here is an example of an autoresponder app that comments on opened issues:
 
@@ -43,7 +44,7 @@ module.exports = (app) => {
 };
 ```
 
-To get started, you can use the instructions for [Developing an App](./development.md) or remix this 'Hello World' project on Glitch:
+To get started, you can use the instructions for [Developing an App](/docs/development/) or remix this 'Hello World' project on Glitch:
 
 [![Remix on Glitch](https://cdn.glitch.com/2703baf2-b643-4da7-ab91-7ee2a2d00b5b%2Fremix-button.svg)](https://glitch.com/edit/#!/remix/probot-hello-world)
 

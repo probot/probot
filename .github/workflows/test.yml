@@ -1,15 +1,12 @@
 name: Test
-
-on:
+"on":
   push:
     branches:
       - master
-
   pull_request:
     types:
       - opened
       - synchronize
-
 jobs:
   test_matrix:
     strategy:
@@ -18,33 +15,33 @@ jobs:
           - 10
           - 12
           - 14
-        os: [ubuntu-latest, macos-latest, windows-latest]
-
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
     runs-on: ${{ matrix.os }}
-
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
+          cache: npm
       - run: npm ci
       - run: npm run build
       - run: npx jest
-
-  # separate job to set as required in branch protection,
-  # as the above change each time the Node versions change
   test:
     runs-on: ubuntu-latest
     needs: test_matrix
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
+        with:
+          cache: npm
+          node-version: 16
       - run: npm ci
       - run: npm run lint
       - run: npm run build
-      # See https://github.com/probot/probot/issues/1439
-      # - run: npx tsd
       - run: npx jest
       - name: codecov
         run: npx codecov

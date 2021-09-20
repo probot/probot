@@ -1,6 +1,6 @@
 import LRUCache from "lru-cache";
 import { Logger } from "pino";
-import { WebhookEvent } from "@octokit/webhooks";
+import { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
 
 import { aliasLog } from "./helpers/alias-log";
 import { auth } from "./auth";
@@ -36,6 +36,8 @@ export class Probot {
   public log: DeprecatedLogger;
   public version: String;
   public on: ProbotWebhooks["on"];
+  public onAny: ProbotWebhooks["onAny"];
+  public onError: ProbotWebhooks["onError"];
   public auth: (
     installationId?: number,
     log?: Logger
@@ -44,12 +46,12 @@ export class Probot {
   private state: State;
 
   constructor(options: Options = {}) {
-    options.webhookPath = options.webhookPath || "/";
     options.secret = options.secret || "development";
 
     let level = options.logLevel;
+    const logMessageKey = options.logMessageKey;
 
-    this.log = aliasLog(options.log || getLog({ level }));
+    this.log = aliasLog(options.log || getLog({ level, logMessageKey }));
 
     // TODO: support redis backend for access token cache if `options.redisConfig`
     const cache = new LRUCache<number, string>({
@@ -78,28 +80,21 @@ export class Probot {
       Octokit,
       octokit,
       webhooks: {
-        path: options.webhookPath,
         secret: options.secret,
       },
       appId: Number(options.appId),
       privateKey: options.privateKey,
       host: options.host,
       port: options.port,
-      webhookProxy: options.webhookProxy,
     };
 
     this.auth = auth.bind(null, this.state);
 
     this.webhooks = getWebhooks(this.state);
 
-    this.on = (eventNameOrNames, callback) => {
-      if (eventNameOrNames === "*") {
-        // @ts-ignore this.webhooks.on("*") is deprecated
-        return this.webhooks.onAny(callback);
-      }
-
-      return this.webhooks.on(eventNameOrNames, callback);
-    };
+    this.on = this.webhooks.on;
+    this.onAny = this.webhooks.onAny;
+    this.onError = this.webhooks.onError;
 
     this.version = VERSION;
   }

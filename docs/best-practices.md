@@ -1,3 +1,7 @@
+---
+title: Best practices
+---
+
 # Best practices
 
 First and foremost, your app must obey the [The Three Laws of Robotics](https://en.wikipedia.org/wiki/Three_Laws_of_Robotics):
@@ -11,9 +15,19 @@ Now that we agree that nobody will get hurt, here are some tips to make your app
 
 **Contents:**
 
+<!-- toc -->
+
 - [Empathy](#empathy)
+  - [Avoid the uncanny valley](#avoid-the-uncanny-valley)
 - [Autonomy](#autonomy)
+  - [Never take bulk actions without explicit permission](#never-take-bulk-actions-without-explicit-permission)
+  - [Include "dry run" functionality](#include-dry-run-functionality)
 - [Configuration](#configuration)
+  - [Require minimal configuration](#require-minimal-configuration)
+  - [Provide full configuration](#provide-full-configuration)
+  - [Store configuration in the repository](#store-configuration-in-the-repository)
+
+<!-- tocstop -->
 
 ## Empathy
 

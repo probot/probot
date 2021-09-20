@@ -1,21 +1,21 @@
 name: Release
-on:
+"on":
   push:
     branches:
       - master
       - next
       - beta
-      - "*.x" # maintenance releases such as 15.x
-
+      - "*.x"
 jobs:
   release:
     name: release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
-          node-version: 12
+          node-version: 16
+          cache: npm
       - run: npm ci
       - run: npm run build
       - run: npx semantic-release

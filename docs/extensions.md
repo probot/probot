@@ -1,10 +1,19 @@
 ---
-next: docs/configuration.md
+next: docs/persistence.md
+title: Extensions
 ---
 
 # Extensions
 
 While Probot doesn't have an official extension API, there are a handful of reusable utilities that have been extracted from existing apps.
+
+<!-- toc -->
+
+- [Commands](#commands)
+- [Metadata](#metadata)
+- [Attachments](#attachments)
+
+<!-- tocstop -->
 
 ## Commands
 
@@ -68,7 +77,3 @@ module.exports = (app) => {
 ```
 
 Check out [probot/unfurl](https://github.com/probot/unfurl) to see it in action.
-
-## Community Created Extensions
-
-[probot-messages](https://github.com/dessant/probot-messages) was created by [@dessant](https://github.com/dessant) to deliver messages that require user action to ensure the correct operation of the app.

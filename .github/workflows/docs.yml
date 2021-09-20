@@ -1,12 +1,8 @@
 name: Docs
-on:
+"on":
   push:
     branches:
       - master
-    tags:
-      # TODO: only update docs for tags that match npm's @latest version
-      - v10.*
-
 jobs:
   docs:
     name: docs
@@ -14,9 +10,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: git fetch --depth=20 origin +refs/tags/*:refs/tags/*
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
-          node-version: 12
+          node-version: 16
+          cache: npm
       - run: npm ci
       - run: npm run build
       - run: ./script/publish-docs

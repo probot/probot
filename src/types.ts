@@ -63,7 +63,8 @@ export type ServerOptions = {
   host?: string;
   webhookPath?: string;
   webhookProxy?: string;
-  Probot: typeof Probot;
+  Probot?: typeof Probot;
+  probotApp?: Probot;
 };
 
 export type MiddlewareOptions = {

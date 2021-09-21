@@ -60,9 +60,15 @@ async function main() {
       'Set to your Sentry DSN, e.g. "https://1234abcd@sentry.io/12345"',
       process.env.SENTRY_DSN
     )
+    .option(
+      "--host <host>",
+      'Set to your gihtub host (to support github enterprise), e.g. "https://your.github.com/api/v3"',
+      process.env.GHE_HOST || "https://api.github.com"
+    )
     .parse(process.argv);
 
   const githubToken = program.token;
+  const githubHost = program.host;
 
   if (!program.event || !program.payloadPath) {
     program.help();
@@ -88,6 +94,7 @@ async function main() {
     appId: program.app,
     privateKey: String(privateKey),
     githubToken: githubToken,
+    baseUrl: githubHost,
     log,
   });
 

@@ -22,3 +22,8 @@ Note that `event-name` here is just the name of the event (like pull_request or 
 For example, to simulate receiving the `pull_request.labeled` event, run:
 
     $ node_modules/.bin/probot receive -e pull_request -p test/fixtures/pull_request.labeled.json ./index.js
+
+## GitHub Enterprise
+
+To use this feature for testing with GitHub Enterprise you can call
+the CLI with `--host <your-ghe-host>` (e.g. `https://your.company.com/github/api/v3`).

@@ -14,16 +14,21 @@
  * app.log.fatal("Goodbye, cruel world!");
  * ```
  */
-import pino, { LoggerOptions } from "pino";
+import pino, { Logger, LoggerOptions } from "pino";
 import { getTransformStream, Options, LogLevel } from "@probot/pino";
+import { isProd } from "./is-prod";
 
 export type GetLogOptions = {
   level?: LogLevel;
   logMessageKey?: string;
 } & Options;
 
-export function getLog(options: GetLogOptions = {}) {
+export function getLog(options: GetLogOptions = {}): Logger {
   const { level, logMessageKey, ...getTransformStreamOptions } = options;
+
+  if (isProd() && !getTransformStreamOptions.logFormat) {
+    getTransformStreamOptions.logFormat = "json";
+  }
 
   const pinoOptions: LoggerOptions = {
     level: level || "info",

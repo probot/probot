@@ -9,6 +9,7 @@ import { readEnvOptions } from "./bin/read-env-options";
 import { Server } from "./server/server";
 import { defaultApp } from "./apps/default";
 import { resolveAppFunction } from "./helpers/resolve-app-function";
+import { isProd } from "./helpers/is-prod";
 
 type AdditionalOptions = {
   env: Record<string, string | undefined>;
@@ -85,7 +86,7 @@ export async function run(
   let server: Server;
 
   if (!appId || !privateKey) {
-    if (process.env.NODE_ENV === "production") {
+    if (isProd()) {
       if (!appId) {
         throw new Error(
           "App ID is missing, and is required to run in production mode. " +

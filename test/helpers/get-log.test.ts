@@ -21,7 +21,6 @@ describe("get log", () => {
     });
 
     expect(output).toContain("Ciao");
-    expect(output).toContain("\u001b");
     expect(output).not.toContain("{");
   });
   it("should log in specified format when passed", () => {

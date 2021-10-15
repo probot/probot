@@ -5,7 +5,7 @@ title: Logging
 
 # Logging
 
-Probot comes with [`pino`](https://getpino.io), a minimal logging library that outputs [newline delimited JSON](http://ndjson.org/). Probot uses [`pino-pretty`](https://github.com/pinojs/pino-pretty) for more readbale formatting during development and [`@probot/pino`](https://github.com/probot/pino/) which supports error reporting to Sentry by configuring the `SENTRY_DSN` environment variable.
+Probot comes with [`pino`](https://getpino.io), a minimal logging library that outputs [newline delimited JSON](http://ndjson.org/). Probot uses [`pino-pretty`](https://github.com/pinojs/pino-pretty) for more readable formatting during development and [`@probot/pino`](https://github.com/probot/pino/) which supports error reporting to Sentry by configuring the `SENTRY_DSN` environment variable.
 
 `app.log`, `context.log` in an event handler, and `req.log` in an HTTP request are all loggers that you can use to get more information about what your app is doing.
 

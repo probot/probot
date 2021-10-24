@@ -11,4 +11,3 @@ sh('cd src && git rev-parse HEAD > GIT_COMMIT')
 git_commit=readFile('src/GIT_COMMIT')
 // short SHA, possibly better for chat notifications, etc.
 short_commit=git_commit.take(6)
-// 

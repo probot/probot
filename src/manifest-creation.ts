@@ -103,6 +103,6 @@ export class ManifestCreation {
     const githubHost = process.env.GHE_HOST || `github.com`;
     return `${
       process.env.GHE_PROTOCOL || "https"
-    }://${githubHost}/settings/apps/new`;
+    }://${githubHost}${process.env.GHE_ORG?"/organizations/".concat(process.env.GHE_ORG):""}/settings/apps/new`;
   }
 }

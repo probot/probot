@@ -61,7 +61,7 @@ export class Context<E extends WebhookEvents = WebhookEvents> {
    * @param object - Params to be merged with the repo params.
    *
    */
-  public repo<T>(object?: T) {
+  public repo<T>(object?: T): { owner: string; repo: string; } & T {
     // @ts-ignore `repository` is not always present in this.payload
     const repo = this.payload.repository;
 
@@ -92,7 +92,7 @@ export class Context<E extends WebhookEvents = WebhookEvents> {
    *
    * @param object - Params to be merged with the issue params.
    */
-  public issue<T>(object?: T) {
+  public issue<T>(object?: T): { owner: string; repo: string; issue_number: number; } & T {
     return Object.assign(
       {
         issue_number:
@@ -116,7 +116,7 @@ export class Context<E extends WebhookEvents = WebhookEvents> {
    *
    * @param object - Params to be merged with the pull request params.
    */
-  public pullRequest<T>(object?: T) {
+  public pullRequest<T>(object?: T): { owner: string; repo: string; pull_number: number; } & T {
     const payload = this.payload;
     return Object.assign(
       {

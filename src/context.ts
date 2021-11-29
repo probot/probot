@@ -14,21 +14,39 @@ export type MergeOptions = merge.Options;
 
 /** Repo owner type, either string or never depending on the context */
 type RepoOwnerType<T extends WebhookEvents> =
-  WebhookEvent<T>["payload"] extends { repository: { owner: { login: string } } } ? string : never |
-  WebhookEvent<T>["payload"] extends { repository: { owner: { name: string } } } ? string : never;
+  WebhookEvent<T>["payload"] extends {
+    repository: { owner: { login: string } };
+  }
+    ? string
+    : never | WebhookEvent<T>["payload"] extends {
+        repository: { owner: { name: string } };
+      }
+    ? string
+    : never;
 
 /** Repo name type, either string or never depending on the context */
 type RepoNameType<T extends WebhookEvents> =
-  WebhookEvent<T>["payload"] extends { repository: { name: string } } ? string : never;
+  WebhookEvent<T>["payload"] extends { repository: { name: string } }
+    ? string
+    : never;
 
 /** Issue type (also pull request number), either number or never depending on the context */
 type RepoIssueNumberType<T extends WebhookEvents> =
-  WebhookEvent<T>["payload"] extends { issue: { number: number } } ? number : never |
-  WebhookEvent<T>["payload"] extends { pull_request: { number: number } } ? number : never |
-  WebhookEvent<T>["payload"] extends { number: number } ? number : never;
+  WebhookEvent<T>["payload"] extends { issue: { number: number } }
+    ? number
+    : never | WebhookEvent<T>["payload"] extends {
+        pull_request: { number: number };
+      }
+    ? number
+    : never | WebhookEvent<T>["payload"] extends { number: number }
+    ? number
+    : never;
 
 /** Context.repo return type */
-type RepoResultType<E extends WebhookEvents> = { owner: RepoOwnerType<E>; repo: RepoNameType<E>; };
+type RepoResultType<E extends WebhookEvents> = {
+  owner: RepoOwnerType<E>;
+  repo: RepoNameType<E>;
+};
 
 /**
  * The context of the event that was triggered, including the payload and
@@ -110,7 +128,9 @@ export class Context<E extends WebhookEvents = WebhookEvents> {
    *
    * @param object - Params to be merged with the issue params.
    */
-  public issue<T>(object?: T): RepoResultType<E> & { issue_number: RepoIssueNumberType<E>; } & T {
+  public issue<T>(
+    object?: T
+  ): RepoResultType<E> & { issue_number: RepoIssueNumberType<E> } & T {
     return Object.assign(
       {
         issue_number:
@@ -134,7 +154,9 @@ export class Context<E extends WebhookEvents = WebhookEvents> {
    *
    * @param object - Params to be merged with the pull request params.
    */
-  public pullRequest<T>(object?: T): RepoResultType<E> & { pull_number: RepoIssueNumberType<E>; } & T {
+  public pullRequest<T>(
+    object?: T
+  ): RepoResultType<E> & { pull_number: RepoIssueNumberType<E> } & T {
     const payload = this.payload;
     return Object.assign(
       {

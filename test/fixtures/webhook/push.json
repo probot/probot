@@ -57,7 +57,8 @@
     "full_name": "bkeepers-inc/test",
     "owner": {
       "name": "bkeepers-inc",
-      "email": null
+      "email": null,
+      "login": "bkeepers-inc"
     },
     "private": true,
     "html_url": "https://github.com/bkeepers-inc/test",

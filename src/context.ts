@@ -18,10 +18,6 @@ type RepoOwnerType<T extends WebhookEvents> =
     repository: { owner: { login: string } };
   }
     ? string
-    : never | WebhookEvent<T>["payload"] extends {
-        repository: { owner: { name: string } };
-      }
-    ? string
     : never;
 
 /** Repo name type, either string or never depending on the context */
@@ -109,7 +105,7 @@ export class Context<E extends WebhookEvents = WebhookEvents> {
 
     return Object.assign(
       {
-        owner: repo.owner.login || repo.owner.name,
+        owner: repo.owner.login,
         repo: repo.name,
       },
       object

@@ -1,7 +1,7 @@
 import program from "commander";
 import { getPrivateKey } from "@probot/get-private-key";
 import { Options as PinoOptions } from "@probot/pino";
-import {isProduction} from '../helpers/is-production';
+import { isProduction } from "../helpers/is-production";
 
 import { Options } from "../types";
 

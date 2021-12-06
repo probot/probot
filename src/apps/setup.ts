@@ -7,7 +7,7 @@ import { Probot } from "../probot";
 import { ManifestCreation } from "../manifest-creation";
 import { getLoggingMiddleware } from "../server/logging-middleware";
 import { ApplicationFunctionOptions } from "../types";
-import { isProd } from "../helpers/is-prod";
+import { isProduction } from "../helpers/is-production";
 
 export const setupAppFactory = (
   host: string | undefined,
@@ -21,7 +21,7 @@ export const setupAppFactory = (
 
     // If not on Glitch or Production, create a smee URL
     if (
-      !isProd() &&
+      !isProduction() &&
       !(
         process.env.PROJECT_DOMAIN ||
         process.env.WEBHOOK_PROXY_URL ||

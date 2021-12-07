@@ -64,8 +64,8 @@ describe("createProbot", () => {
     expect(probot.log.level).toEqual("trace");
   });
 
-  test("env, logger message key", () => {
-    const outputData = captureLogOutput(() => {
+  test("env, logger message key", async () => {
+    const outputData = await captureLogOutput(() => {
       const probot = createProbot({
         env: {
           ...env,

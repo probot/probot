@@ -1,6 +1,6 @@
 import SonicBoom from "sonic-boom";
 
-export function captureLogOutput(action: () => any): string {
+export async function captureLogOutput(action: () => any): Promise<string> {
   let outputData = "";
 
   const sbWrite = SonicBoom.prototype.write;
@@ -9,7 +9,7 @@ export function captureLogOutput(action: () => any): string {
   };
 
   try {
-    action();
+    await action();
 
     return outputData;
   } finally {

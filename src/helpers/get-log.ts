@@ -16,7 +16,6 @@
  */
 import pino, { Logger, LoggerOptions } from "pino";
 import { getTransformStream, Options, LogLevel } from "@probot/pino";
-import { isProduction } from "./is-production";
 
 export type GetLogOptions = {
   level?: LogLevel;
@@ -25,10 +24,6 @@ export type GetLogOptions = {
 
 export function getLog(options: GetLogOptions = {}): Logger {
   const { level, logMessageKey, ...getTransformStreamOptions } = options;
-
-  if (isProduction() && !getTransformStreamOptions.logFormat) {
-    getTransformStreamOptions.logFormat = "json";
-  }
 
   const pinoOptions: LoggerOptions = {
     level: level || "info",

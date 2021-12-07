@@ -7,8 +7,7 @@ export function readEnvOptions(
   const privateKey = getPrivateKey({ env });
 
   const logFormat =
-    env.LOG_FORMAT ||
-    (process.env.NODE_ENV === "production" ? "json" : "pretty");
+    env.LOG_FORMAT || (env.NODE_ENV === "production" ? "json" : "pretty");
 
   return {
     args: [],

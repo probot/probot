@@ -1,5 +1,5 @@
-import SonicBoom from "sonic-boom";
 import { createProbot, Probot } from "../src";
+import { captureLogOutput } from "./helpers/capture-log-output";
 
 const env = {
   APP_ID: "1",
@@ -64,30 +64,20 @@ describe("createProbot", () => {
     expect(probot.log.level).toEqual("trace");
   });
 
-  test("env, logger message key", () => {
-    let outputData = "";
+  test("env, logger message key", async () => {
+    const outputData = await captureLogOutput(() => {
+      const probot = createProbot({
+        env: {
+          ...env,
+          LOG_LEVEL: "info",
+          LOG_FORMAT: "json",
+          LOG_MESSAGE_KEY: "myMessage",
+        },
+        defaults: { logLevel: "trace" },
+      });
 
-    const sbWrite = SonicBoom.prototype.write;
-    SonicBoom.prototype.write = function (data) {
-      outputData += data;
-    };
-
-    const probot = createProbot({
-      env: {
-        ...env,
-        LOG_LEVEL: "info",
-        LOG_FORMAT: "json",
-        LOG_MESSAGE_KEY: "myMessage",
-      },
-      defaults: { logLevel: "trace" },
+      probot.log.info("Ciao");
     });
-
-    probot.log.info("Ciao");
-
-    try {
-      expect(JSON.parse(outputData).myMessage).toEqual("Ciao");
-    } finally {
-      SonicBoom.prototype.write = sbWrite;
-    }
+    expect(JSON.parse(outputData).myMessage).toEqual("Ciao");
   });
 });

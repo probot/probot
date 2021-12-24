@@ -1,3 +1,4 @@
+import Stream from "stream";
 import path = require("path");
 
 import request from "supertest";
@@ -5,14 +6,21 @@ import { sign } from "@octokit/webhooks-methods";
 
 import { Probot, run, Server } from "../src";
 
-import { captureLogOutput } from "./helpers/capture-log-output";
-
 // tslint:disable:no-empty
 describe("run", () => {
   let server: Server;
+  let output: any;
   let env: NodeJS.ProcessEnv;
 
+  const streamLogsToOutput = new Stream.Writable({ objectMode: true });
+  streamLogsToOutput._write = (object, encoding, done) => {
+    output.push(JSON.parse(object));
+    done();
+  };
+
   beforeEach(() => {
+    // Clear log output
+    output = [];
     env = {
       APP_ID: "1",
       PRIVATE_KEY_PATH: path.join(
@@ -68,22 +76,6 @@ describe("run", () => {
 
         resolve(null);
       });
-    });
-
-    it("defaults to JSON logs if NODE_ENV is set to 'production'", async () => {
-      const outputData = await captureLogOutput(async () => {
-        env.NODE_ENV = "production";
-
-        server = await run(
-          (app) => {
-            app.log.fatal("test");
-          },
-          { env }
-        );
-        await server.stop();
-      });
-
-      expect(outputData).toMatch(/"msg":"test"/);
     });
   });
 

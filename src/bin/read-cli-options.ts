@@ -44,7 +44,7 @@ export function readCliOptions(
     .option(
       "--log-format <format>",
       'One of: "pretty", "json"',
-      process.env.LOG_FORMAT
+      process.env.LOG_FORMAT || "pretty"
     )
     .option(
       "--log-level-in-string",

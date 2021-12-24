@@ -6,9 +6,6 @@ export function readEnvOptions(
 ) {
   const privateKey = getPrivateKey({ env });
 
-  const logFormat =
-    env.LOG_FORMAT || (env.NODE_ENV === "production" ? "json" : "pretty");
-
   return {
     args: [],
     privateKey: (privateKey && privateKey.toString()) || undefined,
@@ -19,7 +16,7 @@ export function readEnvOptions(
     webhookPath: env.WEBHOOK_PATH,
     webhookProxy: env.WEBHOOK_PROXY_URL,
     logLevel: env.LOG_LEVEL as LogLevel,
-    logFormat: logFormat as PinoOptions["logFormat"],
+    logFormat: env.LOG_FORMAT as PinoOptions["logFormat"],
     logLevelInString: env.LOG_LEVEL_IN_STRING === "true",
     logMessageKey: env.LOG_MESSAGE_KEY,
     sentryDsn: env.SENTRY_DSN,

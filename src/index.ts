@@ -1,7 +1,11 @@
 import { Logger } from "pino";
 
 import { Context } from "./context";
-import { Options, ApplicationFunction, ApplicationFunctionOptions } from "./types";
+import {
+  Options,
+  ApplicationFunction,
+  ApplicationFunctionOptions,
+} from "./types";
 import { Probot } from "./probot";
 import { Server } from "./server/server";
 import { ProbotOctokit } from "./octokit/probot-octokit";

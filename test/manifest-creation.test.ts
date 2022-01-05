@@ -46,7 +46,7 @@ describe("ManifestCreation", () => {
   describe("createAppUrl", () => {
     afterEach(() => {
       delete process.env.GHE_HOST;
-      delete process.env.GHE_ORG;
+      delete process.env.GH_ORG;
       delete process.env.GHE_PROTOCOL;
     });
 
@@ -57,7 +57,7 @@ describe("ManifestCreation", () => {
     });
 
     test("creates an app url when github org is set", () => {
-      process.env.GHE_ORG = "testorg";
+      process.env.GH_ORG = "testorg";
       expect(setup.createAppUrl).toEqual(
         "https://github.com/organizations/testorg/settings/apps/new"
       );
@@ -72,7 +72,7 @@ describe("ManifestCreation", () => {
 
     test("creates an app url when github host env and github org is set", () => {
       process.env.GHE_HOST = "hiimbex.github.com";
-      process.env.GHE_ORG = "testorg";
+      process.env.GH_ORG = "testorg";
       expect(setup.createAppUrl).toEqual(
         "https://hiimbex.github.com/organizations/testorg/settings/apps/new"
       );

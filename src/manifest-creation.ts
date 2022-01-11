@@ -101,8 +101,8 @@ export class ManifestCreation {
 
   get createAppUrl() {
     const githubHost = process.env.GHE_HOST || `github.com`;
-    return `${
-      process.env.GHE_PROTOCOL || "https"
-    }://${githubHost}/settings/apps/new`;
+    return `${process.env.GHE_PROTOCOL || "https"}://${githubHost}${
+      process.env.GH_ORG ? "/organizations/".concat(process.env.GH_ORG) : ""
+    }/settings/apps/new`;
   }
 }

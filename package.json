@@ -57,7 +57,7 @@
     "dotenv": "^8.2.0",
     "eventsource": "^1.0.7",
     "express": "^4.17.1",
-    "hbs": "^4.1.1",
+    "hbs": "^4.2.0",
     "ioredis": "^4.27.8",
     "js-yaml": "^3.14.1",
     "lru-cache": "^6.0.0",
@@ -102,7 +102,7 @@
     "supertest": "^6.0.1",
     "ts-jest": "^26.4.4",
     "tsd": "^0.14.0",
-    "typedoc": "^0.19.2",
+    "typedoc": "^0.22.10",
     "typescript": "^4.1.2"
   },
   "engines": {

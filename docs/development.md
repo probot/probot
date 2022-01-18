@@ -272,7 +272,7 @@ function myProbotApp(app) {
   const octokit = new ProbotOctokit({
     // any options you'd pass to Octokit
     auth: {
-      token: "yourToken"
+      token: "yourToken",
     },
     // and a logger
     log: app.log.child({ name: "my-octokit" }),

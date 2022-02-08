@@ -45,7 +45,7 @@ export class Server {
       webhookProxy: options.webhookProxy,
     };
 
-    this.expressApp.use(getLoggingMiddleware(this.log));
+    this.expressApp.use(getLoggingMiddleware(this.log, options.loggingOptions));
     this.expressApp.use(
       "/probot/static/",
       express.static(join(__dirname, "..", "..", "static"))

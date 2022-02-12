@@ -86,7 +86,7 @@ Check out the [GitHub GraphQL API docs](https://docs.github.com/en/graphql) to l
 
 ## Unauthenticated Events
 
-When [receiving webhook events](./webhooks.md), `context.octokit` is _usually_ an authenticated client, but there are a few events that are exceptions:
+When [receiving webhook events](/docs/webhooks.md), `context.octokit` is _usually_ an authenticated client, but there are a few events that are exceptions:
 
 - [`installation.deleted` & `installation.suspend`](https://docs.github.com/en/developers/webhooks-and-events/webhook-events-and-payloads#installation) - The installation was _just_ deleted or suspended, so we can't authenticate as the installation.
 
@@ -102,7 +102,7 @@ If you want to run a Probot App against a GitHub Enterprise instance, you'll nee
 GHE_HOST=fake.github-enterprise.com
 ```
 
-When [using Probot programmatically](./development.md#run-probot-programmatically), set the `baseUrl` option for the [`Probot`](https://probot.github.io/api/latest/modules/probot.html) constructor to the full base Url of the REST API
+When [using Probot programmatically](/docs/development.md#run-probot-programmatically), set the `baseUrl` option for the [`Probot`](https://probot.github.io/api/latest/modules/probot.html) constructor to the full base Url of the REST API
 
 ```js
 const MyProbot = Probot.defaults({

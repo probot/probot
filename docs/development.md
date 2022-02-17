@@ -173,7 +173,7 @@ Now you can run `main.js` however you want.
 The [`run`](https://github.com/probot/probot/blob/master/src/run.ts) function that gets executed when running `probot run ./index.js` does two main things
 
 1. Read configuration from environment variables and local files
-2. Start a [`Server`](https://probot.github.io/api/latest/classes/server.html) instance
+2. Start a [`Server`](https://probot.github.io/api/latest/classes/server_server.Server.html) instance
 
 Among other things, using the Server instance permits you to set your own [`Octokit` constructor](https://github.com/octokit/core.js) with custom plugins and a custom logger.
 
@@ -196,7 +196,7 @@ async function startServer() {
 }
 ```
 
-The `server` instance gives you access to the express app instance (`server.expressApp`) as well as the [`Probot`](https://probot.github.io/api/latest/classes/probot.html) instance (`server.probotApp`).
+The `server` instance gives you access to the express app instance (`server.expressApp`) as well as the [`Probot`](https://probot.github.io/api/latest/classes/probot.Probot.html) instance (`server.probotApp`).
 
 ### Use createNodeMiddleware
 
@@ -215,7 +215,7 @@ const probot = new Probot({
 module.exports = createNodeMiddleware(app, { probot });
 ```
 
-If you want to read probot's configuration from the same environment variables as [`run`](#run), use the [`createProbot`](https://probot.github.io/api/latest/index.html#createprobot) export
+If you want to read probot's configuration from the same environment variables as [`run`](#run), use the [`createProbot`](https://probot.github.io/api/latest/modules/create_probot.html) export
 
 ```js
 const { createNodeMiddleware, createProbot } = require("probot");
@@ -235,7 +235,7 @@ module.exports = createNodeMiddleware(app, {
 
 ### Use probot
 
-If you don't use Probot's http handling in order to receive and verify events from GitHub via webhook requests, you can use the [`Probot`](https://probot.github.io/api/latest/classes/probot.html) class directly.
+If you don't use Probot's http handling in order to receive and verify events from GitHub via webhook requests, you can use the [`Probot`](https://probot.github.io/api/latest/classes/probot.Probot.html) class directly.
 
 ```js
 const { Probot } = require("probot");

@@ -57,7 +57,7 @@
     "dotenv": "^8.2.0",
     "eventsource": "^1.0.7",
     "express": "^4.17.1",
-    "express-handlebars": "^6.0.2",
+    "express-handlebars": "^6.0.3",
     "ioredis": "^4.27.8",
     "js-yaml": "^3.14.1",
     "lru-cache": "^6.0.0",

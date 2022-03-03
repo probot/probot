@@ -59,7 +59,6 @@ export class Server {
     this.expressApp.engine(
       "handlebars",
       engine({
-        // @ts-ignore: Fix is requested https://github.com/express-handlebars/express-handlebars/pull/303
         defaultLayout: false,
       })
     );

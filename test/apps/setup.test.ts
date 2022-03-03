@@ -114,7 +114,7 @@ describe("Setup app", () => {
   });
 
   describe("GET /probot/import", () => {
-    it("renders import.hbs", async () => {
+    it("renders import.handlebars", async () => {
       await request(server.expressApp).get("/probot/import").expect(200);
     });
   });

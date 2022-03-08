@@ -47,7 +47,7 @@ export const setupAppFactory = (
       const manifest = setup.getManifest(pkg, baseUrl);
       const createAppUrl = setup.createAppUrl;
       // Pass the manifest to be POST'd
-      res.render("setup.hbs", { pkg, createAppUrl, manifest });
+      res.render("setup.handlebars", { pkg, createAppUrl, manifest });
     });
 
     route.get("/probot/setup", async (req: Request, res: Response) => {
@@ -71,7 +71,7 @@ export const setupAppFactory = (
     route.get("/probot/import", async (_req, res) => {
       const { WEBHOOK_PROXY_URL, GHE_HOST } = process.env;
       const GH_HOST = `https://${GHE_HOST ?? "github.com"}`;
-      res.render("import.hbs", { WEBHOOK_PROXY_URL, GH_HOST });
+      res.render("import.handlebars", { WEBHOOK_PROXY_URL, GH_HOST });
     });
 
     route.post("/probot/import", bodyParser.json(), async (req, res) => {
@@ -90,7 +90,7 @@ export const setupAppFactory = (
     });
 
     route.get("/probot/success", async (req, res) => {
-      res.render("success.hbs");
+      res.render("success.handlebars");
     });
 
     route.get("/", (req, res, next) => res.redirect("/probot"));

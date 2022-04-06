@@ -55,7 +55,7 @@ export type ApplicationFunctionOptions = {
 export type ApplicationFunction = (
   app: Probot,
   options: ApplicationFunctionOptions
-) => void;
+) => void | Promise<void>;
 
 export type ServerOptions = {
   log?: Logger;

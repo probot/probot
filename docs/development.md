@@ -259,7 +259,7 @@ async function example() {
 }
 ```
 
-Using the `Probot` class directly is great for [writing tests](/docs/testing.md) for your Probot app function. It permits you to pass a custom logger to test for log output, disable throttling, request retries, and much more.
+Using the `Probot` class directly is great for [writing tests](/docs/testing) for your Probot app function. It permits you to pass a custom logger to test for log output, disable throttling, request retries, and much more.
 
 ### Use Probot's Octokit
 

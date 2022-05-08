@@ -41,7 +41,7 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run build
-      - run: npx jest
+      - run: NODE_OPTIONS='--experimental-vm-modules' npx jest
       - name: codecov
         run: npx codecov
         env:

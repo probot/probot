@@ -29,7 +29,9 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - run: NODE_OPTIONS='--experimental-vm-modules' npx jest
+      - run: npx jest
+        env:
+          NODE_OPTIONS: --experimental-vm-modules
   test:
     runs-on: ubuntu-latest
     needs: test_matrix

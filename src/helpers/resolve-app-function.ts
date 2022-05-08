@@ -2,7 +2,7 @@ import { sync } from "resolve";
 
 const defaultOptions: ResolveOptions = {};
 
-const _importDynamic = new Function('modulePath', 'return import(modulePath)')
+const _importDynamic = new Function("modulePath", "return import(modulePath)");
 
 export const resolveAppFunction = async (
   appFnId: string,

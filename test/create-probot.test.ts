@@ -80,4 +80,24 @@ describe("createProbot", () => {
     });
     expect(JSON.parse(outputData).myMessage).toEqual("Ciao");
   });
+
+  test("env, octokit logger set", async () => {
+    const outputData = await captureLogOutput(async () => {
+      const probot = createProbot({
+        env: {
+          ...env,
+          LOG_LEVEL: "info",
+          LOG_FORMAT: "json",
+          LOG_MESSAGE_KEY: "myMessage",
+        },
+      });
+
+      const octokit = await probot.auth();
+      octokit.log.info("Ciao");
+    });
+    expect(JSON.parse(outputData)).toMatchObject({
+      myMessage: "Ciao",
+      name: "octokit",
+    });
+  });
 });

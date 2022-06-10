@@ -96,7 +96,7 @@
     "nock": "^13.0.5",
     "prettier": "^2.2.1",
     "rimraf": "^3.0.2",
-    "semantic-release": "^17.3.0",
+    "semantic-release": "^19.0.3",
     "semantic-release-plugin-update-version-in-files": "^1.1.0",
     "smee-client": "^1.2.2",
     "supertest": "^6.0.1",

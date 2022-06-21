@@ -108,7 +108,7 @@ Probot runs like [any other Node app](https://devcenter.heroku.com/articles/depl
 
 1.  Deploy the app to heroku with `git push`:
 
-        $ git push heroku master
+        $ git push heroku main
         ...
         -----> Node.js app detected
         ...

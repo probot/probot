@@ -102,7 +102,7 @@ If you want to run a Probot App against a GitHub Enterprise instance, you'll nee
 GHE_HOST=fake.github-enterprise.com
 ```
 
-When [using Probot programmatically](/docs/development.md#run-probot-programmatically), set the `baseUrl` option for the [`Probot`](https://probot.github.io/api/latest/classes/probot.Probot.html) constructor to the full base Url of the REST API
+When [using Probot programmatically](/docs/development/#run-probot-programmatically), set the `baseUrl` option for the [`Probot`](https://probot.github.io/api/latest/classes/probot.Probot.html) constructor to the full base Url of the REST API
 
 ```js
 const MyProbot = Probot.defaults({

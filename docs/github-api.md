@@ -86,7 +86,7 @@ Check out the [GitHub GraphQL API docs](https://docs.github.com/en/graphql) to l
 
 ## Unauthenticated Events
 
-When [receiving webhook events](/docs/webhooks.md), `context.octokit` is _usually_ an authenticated client, but there are a few events that are exceptions:
+When [receiving webhook events](/docs/webhooks), `context.octokit` is _usually_ an authenticated client, but there are a few events that are exceptions:
 
 - [`installation.deleted` & `installation.suspend`](https://docs.github.com/en/developers/webhooks-and-events/webhook-events-and-payloads#installation) - The installation was _just_ deleted or suspended, so we can't authenticate as the installation.
 

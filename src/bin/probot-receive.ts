@@ -1,6 +1,6 @@
 // Usage: probot receive -e push -p path/to/payload app.js
 
-import express, {Router} from "express";
+import express, { Router } from "express";
 
 require("dotenv").config();
 
@@ -10,7 +10,7 @@ import program from "commander";
 import { getPrivateKey } from "@probot/get-private-key";
 import { getLog } from "../helpers/get-log";
 
-import {ApplicationFunctionOptions, Probot} from "../";
+import { ApplicationFunctionOptions, Probot } from "../";
 import { resolveAppFunction } from "../helpers/resolve-app-function";
 
 async function main() {
@@ -97,10 +97,10 @@ async function main() {
   const options: ApplicationFunctionOptions = {
     getRouter: (path: string = "/") => {
       const newRouter = Router();
-      expressApp.use(path, newRouter)
-      return newRouter
-    }
-  }
+      expressApp.use(path, newRouter);
+      return newRouter;
+    },
+  };
 
   const appFn = await resolveAppFunction(
     path.resolve(process.cwd(), program.args[0])

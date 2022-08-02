@@ -10,7 +10,7 @@ import { getWebhooks } from "./octokit/get-webhooks";
 import { ProbotOctokit } from "./octokit/probot-octokit";
 import { VERSION } from "./version";
 import {
-  ApplicationFunction,
+  ApplicationFunction, ApplicationFunctionOptions,
   DeprecatedLogger,
   Options,
   ProbotWebhooks,
@@ -104,7 +104,7 @@ export class Probot {
     return this.webhooks.receive(event);
   }
 
-  public async load(appFn: ApplicationFunction | ApplicationFunction[]) {
+  public async load(appFn: ApplicationFunction | ApplicationFunction[], options: ApplicationFunctionOptions = {}) {
     if (Array.isArray(appFn)) {
       for (const fn of appFn) {
         await this.load(fn);
@@ -112,6 +112,6 @@ export class Probot {
       return;
     }
 
-    return appFn(this, {});
+    return appFn(this, options);
   }
 }

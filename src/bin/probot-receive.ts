@@ -59,11 +59,16 @@ async function main() {
       "--sentry-dsn <dsn>",
       'Set to your Sentry DSN, e.g. "https://1234abcd@sentry.io/12345"',
       process.env.SENTRY_DSN
-    ).option(
+    )
+    .option(
       "--base-url <url>",
       'GitHub API base URL. If you use GitHub Enterprise Server, and your hostname is "https://github.acme-inc.com", then the root URL is "https://github.acme-inc.com/api/v3"',
-      process.env.GHE_HOST ? `${process.env.GHE_PROTOCOL || "https"}://${process.env.GHE_HOST}/api/v3`
-      : "https://api.github.com")
+      process.env.GHE_HOST
+        ? `${process.env.GHE_PROTOCOL || "https"}://${
+          process.env.GHE_HOST
+        }/api/v3`
+        : "https://api.github.com"
+    )
     .parse(process.argv);
 
   const githubToken = program.token;

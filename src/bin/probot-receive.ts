@@ -65,8 +65,8 @@ async function main() {
       'GitHub API base URL. If you use GitHub Enterprise Server, and your hostname is "https://github.acme-inc.com", then the root URL is "https://github.acme-inc.com/api/v3"',
       process.env.GHE_HOST
         ? `${process.env.GHE_PROTOCOL || "https"}://${
-          process.env.GHE_HOST
-        }/api/v3`
+            process.env.GHE_HOST
+          }/api/v3`
         : "https://api.github.com"
     )
     .parse(process.argv);
@@ -98,7 +98,7 @@ async function main() {
     privateKey: String(privateKey),
     githubToken: githubToken,
     log,
-    baseUrl: program.baseUrl
+    baseUrl: program.baseUrl,
   });
 
   const appFn = await resolveAppFunction(

@@ -1,146 +1,146 @@
 {
-	"name": "probot",
-	"version": "0.0.0-development",
-	"description": "A framework for building GitHub Apps to automate and improve your workflow",
-	"repository": "github:probot/probot",
-	"main": "lib/index.js",
-	"types": "./lib/index.d.ts",
-	"bin": {
-		"probot": "./bin/probot.js"
-	},
-	"scripts": {
-		"build": "rimraf lib && tsc -p tsconfig.json",
-		"lint": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\" \"docs/*.md\" *.md package.json tsconfig.json --end-of-line auto",
-		"lint:fix": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"docs/*.md\" *.md package.json tsconfig.json --end-of-line auto",
-		"pretest": "tsc --noEmit -p test",
-		"test": "jest",
-		"posttest": "npm run lint",
-		"doc": "typedoc --options .typedoc.json"
-	},
-	"files": [
-		"lib",
-		"bin",
-		"static",
-		"views"
-	],
-	"keywords": [
-		"probot",
-		"github-apps",
-		"github",
-		"automation",
-		"robots",
-		"workflow"
-	],
-	"homepage": "https://probot.github.io",
-	"author": "Brandon Keepers",
-	"license": "ISC",
-	"dependencies": {
-		"@octokit/core": "^3.2.4",
-		"@octokit/plugin-enterprise-compatibility": "^1.2.8",
-		"@octokit/plugin-paginate-rest": "^2.6.2",
-		"@octokit/plugin-rest-endpoint-methods": "^5.0.1",
-		"@octokit/plugin-retry": "^3.0.6",
-		"@octokit/plugin-throttling": "^3.3.4",
-		"@octokit/types": "^7.1.1",
-		"@octokit/webhooks": "^9.8.4",
-		"@probot/get-private-key": "^1.1.0",
-		"@probot/octokit-plugin-config": "^1.0.0",
-		"@probot/pino": "^2.2.0",
-		"@types/express": "^4.17.9",
-		"@types/ioredis": "^4.27.1",
-		"@types/pino": "^6.3.4",
-		"@types/pino-http": "^5.0.6",
-		"commander": "^6.2.0",
-		"deepmerge": "^4.2.2",
-		"deprecation": "^2.3.1",
-		"dotenv": "^8.2.0",
-		"eventsource": "^2.0.2",
-		"express": "^4.17.1",
-		"express-handlebars": "^6.0.3",
-		"ioredis": "^4.27.8",
-		"js-yaml": "^3.14.1",
-		"lru-cache": "^6.0.0",
-		"octokit-auth-probot": "^1.2.2",
-		"pino": "^6.7.0",
-		"pino-http": "^5.3.0",
-		"pkg-conf": "^3.1.0",
-		"resolve": "^1.19.0",
-		"semver": "^7.3.4",
-		"update-dotenv": "^1.1.1",
-		"uuid": "^8.3.2"
-	},
-	"devDependencies": {
-		"@octokit/webhooks-examples": "^4.0.0",
-		"@octokit/webhooks-methods": "^2.0.0",
-		"@octokit/webhooks-types": "^4.0.0",
-		"@tsconfig/node10": "^1.0.7",
-		"@types/eventsource": "^1.1.5",
-		"@types/jest": "^26.0.18",
-		"@types/js-yaml": "^3.12.5",
-		"@types/jsonwebtoken": "^8.5.0",
-		"@types/node": "^14.14.11",
-		"@types/readable-stream": "^2.3.9",
-		"@types/resolve": "^1.17.1",
-		"@types/semver": "^7.3.4",
-		"@types/supertest": "^2.0.10",
-		"@types/uuid": "^8.3.0",
-		"body-parser": "^1.19.0",
-		"bottleneck": "^2.19.5",
-		"connect-sse": "^1.2.0",
-		"execa": "^5.0.0",
-		"get-port": "^5.1.1",
-		"got": "^11.8.0",
-		"jest": "^26.6.3",
-		"nock": "^13.0.5",
-		"prettier": "^2.2.1",
-		"rimraf": "^3.0.2",
-		"semantic-release": "^19.0.3",
-		"semantic-release-plugin-update-version-in-files": "^1.1.0",
-		"smee-client": "^1.2.2",
-		"supertest": "^6.0.1",
-		"ts-jest": "^26.4.4",
-		"tsd": "^0.14.0",
-		"typedoc": "^0.22.10",
-		"typescript": "^4.1.2"
-	},
-	"engines": {
-		"node": ">=10.21"
-	},
-	"jest": {
-		"testEnvironment": "node",
-		"coveragePathIgnorePatterns": [
-			"<rootDir>/lib/"
-		],
-		"moduleFileExtensions": [
-			"ts",
-			"js",
-			"json",
-			"node"
-		],
-		"preset": "ts-jest"
-	},
-	"tsd": {
-		"directory": "test/types"
-	},
-	"release": {
-		"plugins": [
-			"@semantic-release/commit-analyzer",
-			"@semantic-release/release-notes-generator",
-			"@semantic-release/github",
-			"@semantic-release/npm",
-			[
-				"semantic-release-plugin-update-version-in-files",
-				{
-					"files": [
-						"lib/version.*"
-					]
-				}
-			]
-		]
-	},
-	"renovate": {
-		"extends": [
-			"github>octokit/.github"
-		]
-	}
+  "name": "probot",
+  "version": "0.0.0-development",
+  "description": "A framework for building GitHub Apps to automate and improve your workflow",
+  "repository": "github:probot/probot",
+  "main": "lib/index.js",
+  "types": "./lib/index.d.ts",
+  "bin": {
+    "probot": "./bin/probot.js"
+  },
+  "scripts": {
+    "build": "rimraf lib && tsc -p tsconfig.json",
+    "lint": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\" \"docs/*.md\" *.md package.json tsconfig.json --end-of-line auto",
+    "lint:fix": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"docs/*.md\" *.md package.json tsconfig.json --end-of-line auto",
+    "pretest": "tsc --noEmit -p test",
+    "test": "jest",
+    "posttest": "npm run lint",
+    "doc": "typedoc --options .typedoc.json"
+  },
+  "files": [
+    "lib",
+    "bin",
+    "static",
+    "views"
+  ],
+  "keywords": [
+    "probot",
+    "github-apps",
+    "github",
+    "automation",
+    "robots",
+    "workflow"
+  ],
+  "homepage": "https://probot.github.io",
+  "author": "Brandon Keepers",
+  "license": "ISC",
+  "dependencies": {
+    "@octokit/core": "^3.2.4",
+    "@octokit/plugin-enterprise-compatibility": "^1.2.8",
+    "@octokit/plugin-paginate-rest": "^2.6.2",
+    "@octokit/plugin-rest-endpoint-methods": "^5.0.1",
+    "@octokit/plugin-retry": "^3.0.6",
+    "@octokit/plugin-throttling": "^3.3.4",
+    "@octokit/types": "^7.1.1",
+    "@octokit/webhooks": "^9.8.4",
+    "@probot/get-private-key": "^1.1.0",
+    "@probot/octokit-plugin-config": "^1.0.0",
+    "@probot/pino": "^2.2.0",
+    "@types/express": "^4.17.9",
+    "@types/ioredis": "^4.27.1",
+    "@types/pino": "^6.3.4",
+    "@types/pino-http": "^5.0.6",
+    "commander": "^6.2.0",
+    "deepmerge": "^4.2.2",
+    "deprecation": "^2.3.1",
+    "dotenv": "^8.2.0",
+    "eventsource": "^2.0.2",
+    "express": "^4.17.1",
+    "express-handlebars": "^6.0.3",
+    "ioredis": "^4.27.8",
+    "js-yaml": "^3.14.1",
+    "lru-cache": "^6.0.0",
+    "octokit-auth-probot": "^1.2.2",
+    "pino": "^6.7.0",
+    "pino-http": "^5.3.0",
+    "pkg-conf": "^3.1.0",
+    "resolve": "^1.19.0",
+    "semver": "^7.3.4",
+    "update-dotenv": "^1.1.1",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@octokit/webhooks-examples": "^4.0.0",
+    "@octokit/webhooks-methods": "^2.0.0",
+    "@octokit/webhooks-types": "^4.0.0",
+    "@tsconfig/node10": "^1.0.7",
+    "@types/eventsource": "^1.1.5",
+    "@types/jest": "^26.0.18",
+    "@types/js-yaml": "^3.12.5",
+    "@types/jsonwebtoken": "^8.5.0",
+    "@types/node": "^14.14.11",
+    "@types/readable-stream": "^2.3.9",
+    "@types/resolve": "^1.17.1",
+    "@types/semver": "^7.3.4",
+    "@types/supertest": "^2.0.10",
+    "@types/uuid": "^8.3.0",
+    "body-parser": "^1.19.0",
+    "bottleneck": "^2.19.5",
+    "connect-sse": "^1.2.0",
+    "execa": "^5.0.0",
+    "get-port": "^5.1.1",
+    "got": "^11.8.0",
+    "jest": "^26.6.3",
+    "nock": "^13.0.5",
+    "prettier": "^2.2.1",
+    "rimraf": "^3.0.2",
+    "semantic-release": "^19.0.3",
+    "semantic-release-plugin-update-version-in-files": "^1.1.0",
+    "smee-client": "^1.2.2",
+    "supertest": "^6.0.1",
+    "ts-jest": "^26.4.4",
+    "tsd": "^0.14.0",
+    "typedoc": "^0.22.10",
+    "typescript": "^4.1.2"
+  },
+  "engines": {
+    "node": ">=10.21"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "<rootDir>/lib/"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "js",
+      "json",
+      "node"
+    ],
+    "preset": "ts-jest"
+  },
+  "tsd": {
+    "directory": "test/types"
+  },
+  "release": {
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/github",
+      "@semantic-release/npm",
+      [
+        "semantic-release-plugin-update-version-in-files",
+        {
+          "files": [
+            "lib/version.*"
+          ]
+        }
+      ]
+    ]
+  },
+  "renovate": {
+    "extends": [
+      "github>octokit/.github"
+    ]
+  }
 }

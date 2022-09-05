@@ -137,5 +137,10 @@
         }
       ]
     ]
+  },
+  "renovate": {
+    "extends": [
+      "github>octokit/.github"
+    ]
   }
 }

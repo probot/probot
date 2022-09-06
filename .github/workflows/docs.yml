@@ -8,7 +8,7 @@ jobs:
     name: docs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: git fetch --depth=20 origin +refs/tags/*:refs/tags/*
       - uses: actions/setup-node@v2
         with:

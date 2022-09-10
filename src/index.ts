@@ -1,7 +1,11 @@
 import { Logger } from "pino";
 
 import { Context } from "./context";
-import { Options, ApplicationFunctionOptions } from "./types";
+import {
+  Options,
+  ApplicationFunction,
+  ApplicationFunctionOptions,
+} from "./types";
 import { Probot } from "./probot";
 import { Server } from "./server/server";
 import { ProbotOctokit } from "./octokit/probot-octokit";
@@ -21,4 +25,4 @@ export {
 };
 
 /** NOTE: exported types might change at any point in time */
-export { Options, ApplicationFunctionOptions };
+export { Options, ApplicationFunction, ApplicationFunctionOptions };

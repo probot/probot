@@ -1,17 +1,13 @@
 {
-  "mode": "file",
+  "entryPoints": ["src"],
   "out": "out",
   "exclude": "test",
-  "theme": "minimal",
+  "theme": "default",
   "excludePrivate": true,
-  "excludeNotExported": true,
   "excludeExternals": true,
   "listInvalidSymbolLinks": true,
-  "target": "ES5",
-  "moduleResolution": "node",
-  "preserveConstEnums": "true",
-  "stripInternal": "true",
-  "module": "commonjs",
+  "excludeInternal": true,
+  "entryPointStrategy": "expand",
   "readme": "none",
   "gaID": "UA-102577034-2"
 }

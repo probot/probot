@@ -14,7 +14,7 @@
  * app.log.fatal("Goodbye, cruel world!");
  * ```
  */
-import pino, { LoggerOptions } from "pino";
+import pino, { Logger, LoggerOptions } from "pino";
 import { getTransformStream, Options, LogLevel } from "@probot/pino";
 
 export type GetLogOptions = {
@@ -22,7 +22,7 @@ export type GetLogOptions = {
   logMessageKey?: string;
 } & Options;
 
-export function getLog(options: GetLogOptions = {}) {
+export function getLog(options: GetLogOptions = {}): Logger {
   const { level, logMessageKey, ...getTransformStreamOptions } = options;
 
   const pinoOptions: LoggerOptions = {

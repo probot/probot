@@ -11,6 +11,7 @@ import { createWebhookProxy } from "../helpers/webhook-proxy";
 import { VERSION } from "../version";
 import { ApplicationFunction, ServerOptions } from "../types";
 import { Probot } from "../";
+import { engine } from "express-handlebars";
 
 type State = {
   httpServer?: HttpServer;
@@ -55,7 +56,13 @@ export class Server {
       })
     );
 
-    this.expressApp.set("view engine", "hbs");
+    this.expressApp.engine(
+      "handlebars",
+      engine({
+        defaultLayout: false,
+      })
+    );
+    this.expressApp.set("view engine", "handlebars");
     this.expressApp.set("views", join(__dirname, "..", "..", "views"));
     this.expressApp.get("/ping", (req, res) => res.end("PONG"));
   }

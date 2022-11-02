@@ -13,6 +13,7 @@ import { isProduction } from "./helpers/is-production";
 
 type AdditionalOptions = {
   env: Record<string, string | undefined>;
+  [key: string]: unknown;
 };
 
 /**
@@ -114,7 +115,7 @@ export async function run(
         privateKey: "dummy value for setup, see #1512",
       }),
     });
-    await server.load(setupAppFactory(host, port));
+    await server.load(setupAppFactory(host, port), additionalOptions);
     await server.start();
     return server;
   }
@@ -123,28 +124,28 @@ export async function run(
     const pkg = await pkgConf("probot");
 
     const combinedApps: ApplicationFunction = async (app) => {
-      await server.load(defaultApp);
+      await server.load(defaultApp, additionalOptions);
 
       if (Array.isArray(pkg.apps)) {
         for (const appPath of pkg.apps) {
           const appFn = await resolveAppFunction(appPath);
-          await server.load(appFn);
+          await server.load(appFn, additionalOptions);
         }
       }
 
       const [appPath] = args;
       const appFn = await resolveAppFunction(appPath);
-      await server.load(appFn);
+      await server.load(appFn, additionalOptions);
     };
 
     server = new Server(serverOptions);
-    await server.load(combinedApps);
+    await server.load(combinedApps, additionalOptions);
     await server.start();
     return server;
   }
 
   server = new Server(serverOptions);
-  await server.load(appFnOrArgv);
+  await server.load(appFnOrArgv, additionalOptions);
   await server.start();
 
   return server;

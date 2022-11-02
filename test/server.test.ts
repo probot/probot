@@ -55,6 +55,29 @@ describe("Server", () => {
     expect(Server.version).toEqual("0.0.0-development");
   });
 
+  describe("Server.load", () => {
+    it("should pass additionalOptions to the appFn", async () => {
+      server = new Server({
+        Probot: Probot.defaults({
+          appId,
+          privateKey,
+          secret: "secret",
+        }),
+        log: pino(streamLogsToOutput),
+        port: await getPort(),
+      });
+
+      await server.load(
+        (app, options) => {
+          expect(options?.extraOption).toBe(42);
+        },
+        {
+          extraOption: 42,
+        }
+      );
+    });
+  });
+
   describe("GET /ping", () => {
     it("returns a 200 response", async () => {
       await request(server.expressApp).get("/ping").expect(200, "PONG");

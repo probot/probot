@@ -67,9 +67,13 @@ export class Server {
     this.expressApp.get("/ping", (req, res) => res.end("PONG"));
   }
 
-  public async load(appFn: ApplicationFunction) {
+  public async load(
+    appFn: ApplicationFunction,
+    additionalOptions?: Record<string, unknown>
+  ) {
     await appFn(this.probotApp, {
       getRouter: (path) => this.router(path),
+      ...additionalOptions,
     });
   }
 

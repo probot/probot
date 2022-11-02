@@ -3,7 +3,7 @@ import path = require("path");
 import request from "supertest";
 import { sign } from "@octokit/webhooks-methods";
 
-import { Probot, run, Server } from "../src";
+import { Probot, run, Server, ApplicationFunctionOptions } from "../src";
 
 import { captureLogOutput } from "./helpers/capture-log-output";
 
@@ -84,6 +84,23 @@ describe("run", () => {
       });
 
       expect(outputData).toMatch(/"msg":"test"/);
+    });
+
+    it("passes additional options to the loaded apps", async () => {
+      let receivedOptions: ApplicationFunctionOptions | undefined;
+
+      return new Promise(async (resolve) => {
+        server = await run(
+          (_app: Probot, options) => {
+            receivedOptions = options;
+          },
+          { env, foo: "bar" }
+        );
+        await server.stop();
+        expect(receivedOptions?.foo).toEqual("bar");
+
+        resolve(null);
+      });
     });
   });
 

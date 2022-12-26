@@ -6,6 +6,8 @@ layout: docs.liquid
 
 # Introduction
 
+
+
 If you've ever thought, "wouldn't it be cool if GitHub could…"; imma stop you right there. Most features can actually be added via [GitHub Apps](https://docs.github.com/apps/), which extend GitHub and can be installed directly on organizations and user accounts and granted access to specific repositories. They come with granular permissions and built-in webhooks. Apps are first class actors within GitHub.
 
 **Probot is a framework for building [GitHub Apps](http://docs.github.com/apps) in [Node.js](https://nodejs.org/)**. It aims to eliminate all the drudgery–like receiving and validating webhooks, and doing authentication handstands–so you can focus on the features you want to build.

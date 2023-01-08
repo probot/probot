@@ -12,6 +12,7 @@ import { VERSION } from "../version";
 import { ApplicationFunction, ServerOptions } from "../types";
 import { Probot } from "../";
 import { engine } from "express-handlebars";
+import EventSource from "eventsource";
 
 type State = {
   httpServer?: HttpServer;

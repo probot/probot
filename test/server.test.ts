@@ -136,7 +136,7 @@ describe("Server", () => {
         try {
           await server.start();
         } catch (error) {
-          expect(error.message).toEqual(
+          expect((error as Error).message).toEqual(
             "Port 3001 is already in use. You can define the PORT environment variable to use a different port."
           );
         }

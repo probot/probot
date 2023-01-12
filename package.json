@@ -70,9 +70,9 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@octokit/webhooks-examples": "^4.0.0",
+    "@octokit/webhooks-examples": "^5.8.0",
     "@octokit/webhooks-methods": "^3.0.0",
-    "@octokit/webhooks-types": "^4.0.0",
+    "@octokit/webhooks-types": "^5.8.0",
     "@tsconfig/node10": "^1.0.7",
     "@types/eventsource": "^1.1.5",
     "@types/jest": "^26.0.18",

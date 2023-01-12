@@ -1,5 +1,6 @@
 import nock from "nock";
 import { ProbotOctokit } from "../src/octokit/probot-octokit";
+import type {RequestError} from "@octokit/request-error";
 
 type Options = ConstructorParameters<typeof ProbotOctokit>[0];
 
@@ -36,7 +37,7 @@ describe("ProbotOctokit", () => {
       await octokit.request("/");
       throw new Error("should throw");
     } catch (error) {
-      expect(error.status).toBe(500);
+      expect((error as RequestError).status).toBe(500);
     }
   });
 

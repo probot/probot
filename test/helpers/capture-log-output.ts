@@ -4,8 +4,9 @@ export async function captureLogOutput(action: () => any): Promise<string> {
   let outputData = "";
 
   const sbWrite = SonicBoom.prototype.write;
-  SonicBoom.prototype.write = function (data) {
+  SonicBoom.prototype.write = function (data: string) {
     outputData += data;
+    return true;
   };
 
   try {

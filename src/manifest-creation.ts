@@ -35,9 +35,8 @@ export class ManifestCreation {
     try {
       const file = fs.readFileSync(path.join(process.cwd(), "app.yml"), "utf8");
       manifest = yaml.safeLoad(file);
-    } catch (error) {
+    } catch (error: any) {
       // App config does not exist, which is ok.
-      // @ts-ignore - in theory error can be anything
       if (error.code !== "ENOENT") {
         throw error;
       }

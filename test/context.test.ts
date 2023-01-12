@@ -96,7 +96,7 @@ describe("Context", () => {
       context = new Context<"push">(event, {} as any, {} as any);
       try {
         context.repo();
-      } catch (e) {
+      } catch (e: any) {
         expect(e.message).toMatch(
           "context.repo() is not supported for this webhook event."
         );

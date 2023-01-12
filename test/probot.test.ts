@@ -567,7 +567,7 @@ describe("Probot", () => {
       try {
         await probot.receive(event);
         throw new Error("expected error to be raised from app");
-      } catch (error) {
+      } catch (error: any) {
         expect(error.message).toMatch(/error from app/);
       }
     });

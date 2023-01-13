@@ -107,36 +107,37 @@ describe("createProbot", () => {
   });
 
   test("env, logger message key", async () => {
-    const outputData = await captureLogOutput(() => {
-      const probot = createProbot({
-        env: {
-          ...env,
-          LOG_LEVEL: "info",
-          LOG_FORMAT: "json",
-          LOG_MESSAGE_KEY: "myMessage",
-        },
-        defaults: { logLevel: "trace" },
-      });
-
-      probot.log.info("Ciao");
+    const probot = createProbot({
+      env: {
+        ...env,
+        LOG_LEVEL: "info",
+        LOG_FORMAT: "json",
+        LOG_MESSAGE_KEY: "myMessage",
+      },
+      defaults: { logLevel: "trace" },
     });
+    const outputData = await captureLogOutput(() => {
+      probot.log.info("Ciao");
+      // @ts-expect-error We need to access this private prop for debugging
+    }, probot._logger);
     expect(JSON.parse(outputData).myMessage).toEqual("Ciao");
   });
 
   test("env, octokit logger set", async () => {
+    const probot = createProbot({
+      env: {
+        ...env,
+        LOG_LEVEL: "info",
+        LOG_FORMAT: "json",
+        LOG_MESSAGE_KEY: "myMessage",
+      },
+    });
     const outputData = await captureLogOutput(async () => {
-      const probot = createProbot({
-        env: {
-          ...env,
-          LOG_LEVEL: "info",
-          LOG_FORMAT: "json",
-          LOG_MESSAGE_KEY: "myMessage",
-        },
-      });
 
       const octokit = await probot.auth();
       octokit.log.info("Ciao");
-    });
+      // @ts-expect-error We need to access this private prop for debugging
+    }, probot._logger);
     expect(JSON.parse(outputData)).toMatchObject({
       myMessage: "Ciao",
       name: "octokit",

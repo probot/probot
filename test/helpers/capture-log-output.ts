@@ -5,8 +5,7 @@ export async function captureLogOutput(action: () => any, log: Logger): Promise<
   let outputData = "";
 
   // @ts-expect-error
-  let stdoutSpy = jest.spyOn(log[streamSym], 'write');
-  // @ts-expect-error
+  let stdoutSpy = jest.spyOn(log[streamSym], 'write') as jest.SpyInstance;
   stdoutSpy.mockImplementation((data) => {
     outputData += data;
   });

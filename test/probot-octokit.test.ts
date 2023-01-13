@@ -1,6 +1,6 @@
 import nock from "nock";
 import { ProbotOctokit } from "../src/octokit/probot-octokit";
-import type {RequestError} from "@octokit/request-error";
+import type { RequestError } from "@octokit/request-error";
 
 type Options = ConstructorParameters<typeof ProbotOctokit>[0];
 

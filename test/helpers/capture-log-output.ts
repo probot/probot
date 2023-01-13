@@ -1,18 +1,21 @@
-import SonicBoom from "sonic-boom";
+const { streamSym } = require('pino/lib/symbols');
+import type { Logger } from "pino";
 
-export async function captureLogOutput(action: () => any): Promise<string> {
+export async function captureLogOutput(action: () => any, log: Logger): Promise<string> {
   let outputData = "";
 
-  const sbWrite = SonicBoom.prototype.write;
-  SonicBoom.prototype.write = function (data) {
+  // @ts-expect-error
+  let stdoutSpy = jest.spyOn(log[streamSym], 'write');
+  // @ts-expect-error
+  stdoutSpy.mockImplementation((data) => {
     outputData += data;
-  };
+  });
 
   try {
     await action();
 
     return outputData;
   } finally {
-    SonicBoom.prototype.write = sbWrite;
+    stdoutSpy.mockRestore();
   }
 }

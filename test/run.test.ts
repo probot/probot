@@ -2,6 +2,7 @@ import path = require("path");
 
 import request from "supertest";
 import { sign } from "@octokit/webhooks-methods";
+import Stream from "stream";
 
 import { Probot, run, Server } from "../src";
 
@@ -11,6 +12,16 @@ import { captureLogOutput } from "./helpers/capture-log-output";
 describe("run", () => {
   let server: Server;
   let env: NodeJS.ProcessEnv;
+  let output: any[];
+  const streamLogsToOutput = new Stream.Writable({ objectMode: true });
+  streamLogsToOutput._write = (object, encoding, done) => {
+    output.push(JSON.parse(object));
+    done();
+  };
+
+  beforeEach(() => {
+    output = [];
+  });
 
   beforeEach(() => {
     env = {
@@ -71,17 +82,19 @@ describe("run", () => {
     });
 
     it("defaults to JSON logs if NODE_ENV is set to 'production'", async () => {
-      const outputData = await captureLogOutput(async () => {
-        env.NODE_ENV = "production";
+      let outputData = "";
+      env.NODE_ENV = "production";
 
-        server = await run(
-          (app) => {
+      server = await run(
+        async (app) => {
+          outputData = await captureLogOutput(async () => {
             app.log.fatal("test");
-          },
-          { env }
-        );
-        await server.stop();
-      });
+            // @ts-expect-error We need to access this private prop for debugging
+          }, app._logger);
+        },
+        { env }
+      );
+      await server.stop();
 
       expect(outputData).toMatch(/"msg":"test"/);
     });

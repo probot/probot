@@ -45,6 +45,7 @@ export class Probot {
   ) => Promise<InstanceType<typeof ProbotOctokit>>;
 
   private state: State;
+  private _logger: Logger;
 
   constructor(options: Options = {}) {
     options.secret = options.secret || "development";
@@ -52,7 +53,8 @@ export class Probot {
     let level = options.logLevel;
     const logMessageKey = options.logMessageKey;
 
-    this.log = aliasLog(options.log || getLog({ level, logMessageKey }));
+    this._logger = options.log || getLog({ level, logMessageKey });
+    this.log = aliasLog(this._logger);
 
     // TODO: support redis backend for access token cache if `options.redisConfig`
     const cache = new LRUCache<number, string>({

@@ -3,12 +3,14 @@ import Stream from "stream";
 import express from "express";
 import request from "supertest";
 import pino from "pino";
+import { Options } from "pino-http";
 
 import { getLoggingMiddleware } from "../../src/server/logging-middleware";
 
 describe("logging", () => {
   let server: express.Express;
   let output: any[];
+  let options: Options;
 
   const streamLogsToOutput = new Stream.Writable({ objectMode: true });
   streamLogsToOutput._write = (object, encoding, done) => {
@@ -17,20 +19,24 @@ describe("logging", () => {
   };
   const logger = pino(streamLogsToOutput);
 
-  beforeEach(() => {
-    server = express();
-    output = [];
-
+  function applyMiddlewares() {
     server.use(express.json());
-    server.use(getLoggingMiddleware(logger));
+    server.use(getLoggingMiddleware(logger, options));
     server.get("/", (req, res) => {
       res.set("X-Test-Header", "testing");
       res.send("OK");
     });
     server.post("/", (req, res) => res.send("OK"));
+  }
+
+  beforeEach(() => {
+    server = express();
+    output = [];
+    options = {};
   });
 
   test("logs requests and responses", () => {
+    applyMiddlewares();
     return request(server)
       .get("/")
       .expect(200)
@@ -62,6 +68,7 @@ describe("logging", () => {
   });
 
   test("uses supplied X-Request-ID", () => {
+    applyMiddlewares();
     return request(server)
       .get("/")
       .set("X-Request-ID", "42")
@@ -72,12 +79,28 @@ describe("logging", () => {
   });
 
   test("uses X-GitHub-Delivery", () => {
+    applyMiddlewares();
     return request(server)
       .get("/")
       .set("X-GitHub-Delivery", "a-b-c")
       .expect(200)
       .expect((res) => {
         expect(output[0].req.id).toEqual("a-b-c");
+      });
+  });
+
+  test("sets ignorePaths option to ignore logging", () => {
+    options = {
+      autoLogging: {
+        ignorePaths: ["/"],
+      },
+    };
+    applyMiddlewares();
+    return request(server)
+      .get("/")
+      .expect(200)
+      .expect((res) => {
+        expect(output.length).toEqual(0);
       });
   });
 });

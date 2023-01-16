@@ -5,6 +5,7 @@ import {
 } from "@octokit/webhooks";
 import LRUCache from "lru-cache";
 import Redis from "ioredis";
+import { Options as LoggingOptions } from "pino-http";
 
 import { Probot } from "./index";
 import { Context } from "./context";
@@ -64,6 +65,7 @@ export type ServerOptions = {
   webhookPath?: string;
   webhookProxy?: string;
   Probot: typeof Probot;
+  loggingOptions?: LoggingOptions;
 };
 
 export type MiddlewareOptions = {

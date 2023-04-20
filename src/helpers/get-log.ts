@@ -31,7 +31,7 @@ export function getLog(options: GetLogOptions = {}): Logger {
     messageKey: logMessageKey || "msg",
   };
   const transform = getTransformStream(getTransformStreamOptions);
-  // @ts-expect-error TODO: check out what's wrong here
+  // @ts-expect-error Sonic Boom is missing a writable property, but this still works
   transform.pipe(pino.destination(1));
   const log = pino(pinoOptions, transform);
 

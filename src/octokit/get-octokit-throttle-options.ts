@@ -1,10 +1,10 @@
 import Bottleneck from "bottleneck";
-import Redis from "ioredis";
+import * as redis from "ioredis";
 import { Logger } from "pino";
 
 type Options = {
   log: Logger;
-  redisConfig?: Redis.RedisOptions | string;
+  redisConfig?: redis.RedisOptions | string;
 };
 
 export function getOctokitThrottleOptions(options: Options) {
@@ -25,6 +25,6 @@ export function getOctokitThrottleOptions(options: Options) {
   };
 }
 
-function getRedisClient({ log, redisConfig }: Options): Redis.Redis | void {
-  if (redisConfig) return new Redis(redisConfig as Redis.RedisOptions);
+function getRedisClient({ log, redisConfig }: Options): redis.Redis | void {
+  if (redisConfig) return new redis.Redis(redisConfig as redis.RedisOptions);
 }

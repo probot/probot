@@ -89,8 +89,7 @@ describe("run", () => {
         async (app) => {
           outputData = await captureLogOutput(async () => {
             app.log.fatal("test");
-            // @ts-expect-error We need to access this private prop for debugging
-          }, app._logger);
+          }, app.log);
         },
         { env }
       );

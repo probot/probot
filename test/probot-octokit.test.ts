@@ -69,11 +69,11 @@ describe("ProbotOctokit", () => {
         ...defaultOptions,
         throttle: {
           enabled: true,
-          minimumAbuseRetryAfter: 1,
+          minimumSecondaryRateRetryAfter: 1,
           onRateLimit() {
             return true;
           },
-          onAbuseLimit() {
+          onSecondaryRateLimit() {
             return true;
           },
         },
@@ -105,7 +105,7 @@ describe("ProbotOctokit", () => {
     test("retries requests when hitting the abuse limiter", async () => {
       nock("https://api.github.com").get("/").once().reply(403, {
         message:
-          "The throttle plugin just looks for the word abuse in the error message",
+          "The throttle plugin just looks for the term 'secondary rate' in the error message",
       });
 
       nock("https://api.github.com").get("/").once().reply(200, {});

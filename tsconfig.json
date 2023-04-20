@@ -1,5 +1,5 @@
 {
-  "extends": "@tsconfig/node10/tsconfig.json",
+  "extends": "@tsconfig/node16/tsconfig.json",
   "compilerOptions": {
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,

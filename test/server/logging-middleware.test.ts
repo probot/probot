@@ -92,7 +92,7 @@ describe("logging", () => {
   test("sets ignorePaths option to ignore logging", () => {
     options = {
       autoLogging: {
-        ignorePaths: ["/"],
+        ignore: (req) => ["/"].includes(req.url!),
       },
     };
     applyMiddlewares();

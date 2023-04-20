@@ -1,8 +1,7 @@
-import LRUCache from "lru-cache";
+import {LRUCache} from "lru-cache";
 import { Logger } from "pino";
 import { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
 
-import { aliasLog } from "./helpers/alias-log";
 import { auth } from "./auth";
 import { getLog } from "./helpers/get-log";
 import { getProbotOctokitWithDefaults } from "./octokit/get-probot-octokit-with-defaults";
@@ -12,7 +11,6 @@ import { VERSION } from "./version";
 import {
   ApplicationFunction,
   ApplicationFunctionOptions,
-  DeprecatedLogger,
   Options,
   ProbotWebhooks,
   State,
@@ -34,7 +32,7 @@ export class Probot {
   }
 
   public webhooks: ProbotWebhooks;
-  public log: DeprecatedLogger;
+  public log: Logger;
   public version: String;
   public on: ProbotWebhooks["on"];
   public onAny: ProbotWebhooks["onAny"];
@@ -45,7 +43,6 @@ export class Probot {
   ) => Promise<InstanceType<typeof ProbotOctokit>>;
 
   private state: State;
-  private _logger: Logger;
 
   constructor(options: Options = {}) {
     options.secret = options.secret || "development";
@@ -53,15 +50,14 @@ export class Probot {
     let level = options.logLevel;
     const logMessageKey = options.logMessageKey;
 
-    this._logger = options.log || getLog({ level, logMessageKey });
-    this.log = aliasLog(this._logger);
+    this.log = options.log || getLog({ level, logMessageKey });
 
     // TODO: support redis backend for access token cache if `options.redisConfig`
     const cache = new LRUCache<number, string>({
       // cache max. 15000 tokens, that will use less than 10mb memory
       max: 15000,
       // Cache for 1 minute less than GitHub expiry
-      maxAge: 1000 * 60 * 59,
+      ttl: 1000 * 60 * 59,
     });
 
     const Octokit = getProbotOctokitWithDefaults({

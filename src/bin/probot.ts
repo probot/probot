@@ -1,5 +1,5 @@
 import semver from "semver";
-import program from "commander";
+import {program} from "commander";
 
 require("dotenv").config();
 
@@ -18,7 +18,7 @@ program
   .command("run", "run the bot")
   .command("receive", "Receive a single event and payload")
   .on("command:*", (cmd) => {
-    if (!program.commands.find((c) => c._name == cmd[0])) {
+    if (!program.commands.find((c) => c.name() == cmd[0])) {
       console.error(`Invalid command: ${program.args.join(" ")}\n`);
       program.outputHelp();
       process.exit(1);

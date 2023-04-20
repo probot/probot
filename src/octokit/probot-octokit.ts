@@ -14,13 +14,13 @@ import { VERSION } from "../version";
 const defaultOptions = {
   authStrategy: createProbotAuth,
   throttle: {
-    onAbuseLimit: (
+    onSecondaryRateLimit: (
       retryAfter: number,
       options: RequestOptions,
       octokit: Octokit
     ) => {
       octokit.log.warn(
-        `Abuse limit hit with "${options.method} ${options.url}", retrying in ${retryAfter} seconds.`
+        `Secondary rate limit hit with "${options.method} ${options.url}", retrying in ${retryAfter} seconds.`
       );
       return true;
     },

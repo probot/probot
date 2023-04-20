@@ -118,8 +118,7 @@ describe("createProbot", () => {
     });
     const outputData = await captureLogOutput(() => {
       probot.log.info("Ciao");
-      // @ts-expect-error We need to access this private prop for debugging
-    }, probot._logger);
+    }, probot.log);
     expect(JSON.parse(outputData).myMessage).toEqual("Ciao");
   });
 
@@ -136,8 +135,7 @@ describe("createProbot", () => {
 
       const octokit = await probot.auth();
       octokit.log.info("Ciao");
-      // @ts-expect-error We need to access this private prop for debugging
-    }, probot._logger);
+    }, probot.log);
     expect(JSON.parse(outputData)).toMatchObject({
       myMessage: "Ciao",
       name: "octokit",

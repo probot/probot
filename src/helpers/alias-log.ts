@@ -15,6 +15,7 @@ export function aliasLog(log: Logger): DeprecatedLogger {
   for (const key in log) {
     // @ts-ignore
     logInfo[key] =
+    // @ts-ignore
       typeof log[key] === "function" ? log[key].bind(log) : log[key];
   }
 

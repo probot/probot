@@ -6,8 +6,6 @@ import merge from "deepmerge";
 import type { Logger } from "pino";
 
 import { ProbotOctokit } from "./octokit/probot-octokit";
-import { aliasLog } from "./helpers/alias-log";
-import { DeprecatedLogger } from "./types";
 import { EmitterWebhookEventName as WebhookEvents } from "@octokit/webhooks/dist-types/types";
 
 export type MergeOptions = merge.Options;
@@ -66,7 +64,7 @@ export class Context<E extends WebhookEvents = WebhookEvents> {
   public payload: WebhookEvent<E>["payload"];
 
   public octokit: InstanceType<typeof ProbotOctokit>;
-  public log: DeprecatedLogger;
+  public log: Logger;
 
   constructor(
     event: WebhookEvent<E>,
@@ -78,7 +76,7 @@ export class Context<E extends WebhookEvents = WebhookEvents> {
     this.payload = event.payload;
 
     this.octokit = octokit;
-    this.log = aliasLog(log);
+    this.log = log;
   }
 
   /**

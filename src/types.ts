@@ -11,7 +11,7 @@ import { Probot } from "./index";
 import { Context } from "./context";
 import { ProbotOctokit } from "./octokit/probot-octokit";
 
-import type { Logger, LogFn } from "pino";
+import type { Logger } from "pino";
 
 export interface Options {
   privateKey?: string;
@@ -47,8 +47,6 @@ export type State = {
 
 type SimplifiedObject = Omit<Context, keyof WebhookEvent>;
 export type ProbotWebhooks = Webhooks<SimplifiedObject>;
-
-export type DeprecatedLogger = LogFn & Logger;
 
 export type ApplicationFunctionOptions = {
   getRouter?: (path?: string) => express.Router;

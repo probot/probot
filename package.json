@@ -42,7 +42,7 @@
     "@octokit/plugin-retry": "^4.1.3",
     "@octokit/plugin-throttling": "^5.0.1",
     "@octokit/types": "^9.0.0",
-    "@octokit/webhooks": "^10.9.1",
+    "@octokit/webhooks": "^11.0.0",
     "@probot/get-private-key": "^1.1.1",
     "@probot/octokit-plugin-config": "^1.1.6",
     "@probot/pino": "^2.3.5",

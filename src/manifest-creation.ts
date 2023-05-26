@@ -1,8 +1,8 @@
 import fs from "fs";
 import yaml from "js-yaml";
 import path from "path";
-import updateDotenv from "update-dotenv";
-import { ProbotOctokit } from "./octokit/probot-octokit";
+import updateDotenv from "./helpers/update-dotenv.js";
+import { ProbotOctokit } from "./octokit/probot-octokit.js";
 
 export class ManifestCreation {
   get pkg() {

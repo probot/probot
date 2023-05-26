@@ -5,14 +5,21 @@ import { join } from "path";
 import { Logger } from "pino";
 import { createNodeMiddleware as createWebhooksMiddleware } from "@octokit/webhooks";
 
-import { getLog } from "../helpers/get-log";
-import { getLoggingMiddleware } from "./logging-middleware";
-import { createWebhookProxy } from "../helpers/webhook-proxy";
-import { VERSION } from "../version";
-import { ApplicationFunction, ServerOptions } from "../types";
-import { Probot } from "../";
+import { getLog } from "../helpers/get-log.js";
+import { getLoggingMiddleware } from "./logging-middleware.js";
+import { createWebhookProxy } from "../helpers/webhook-proxy.js";
+import { VERSION } from "../version.js";
+import { ApplicationFunction, ServerOptions } from "../types.js";
+import { Probot } from "../index.js";
 import { engine } from "express-handlebars";
 import EventSource from "eventsource";
+import { fileURLToPath } from 'url'
+import path from 'path'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+
 
 type State = {
   httpServer?: HttpServer;

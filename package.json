@@ -8,6 +8,7 @@
   "bin": {
     "probot": "./bin/probot.js"
   },
+  "type": "module",
   "scripts": {
     "build": "rimraf lib && tsc -p tsconfig.json",
     "lint": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\" \"docs/*.md\" *.md package.json tsconfig.json --end-of-line auto",
@@ -64,7 +65,7 @@
     "pino": "^6.7.0",
     "pino-http": "^5.3.0",
     "pkg-conf": "^3.1.0",
-    "resolve": "^1.19.0",
+    "resolve": "^2.0.0-next.4",
     "semver": "^7.3.4",
     "update-dotenv": "^1.1.1",
     "uuid": "^8.3.2"
@@ -74,6 +75,7 @@
     "@octokit/webhooks-methods": "^3.0.0",
     "@octokit/webhooks-types": "^4.0.0",
     "@tsconfig/node10": "^1.0.7",
+    "@tsconfig/node16": "^1.0.4",
     "@types/eventsource": "^1.1.5",
     "@types/jest": "^26.0.18",
     "@types/js-yaml": "^3.12.5",
@@ -96,7 +98,7 @@
     "rimraf": "^3.0.2",
     "semantic-release": "^19.0.3",
     "semantic-release-plugin-update-version-in-files": "^1.1.0",
-    "smee-client": "^1.2.2",
+    "smee-client": "^1.2.3",
     "supertest": "^6.0.1",
     "ts-jest": "^26.4.4",
     "tsd": "^0.23.0",

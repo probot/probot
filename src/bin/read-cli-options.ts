@@ -2,7 +2,7 @@ import program from "commander";
 import { getPrivateKey } from "@probot/get-private-key";
 import { Options as PinoOptions } from "@probot/pino";
 
-import { Options } from "../types";
+import { Options } from "../types.js";
 
 export function readCliOptions(
   argv: string[]

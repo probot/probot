@@ -1,5 +1,5 @@
 import path from "path";
-import { ApplicationFunctionOptions, Probot } from "../index";
+import { ApplicationFunctionOptions, Probot } from "../index.js";
 
 export function defaultApp(
   app: Probot,

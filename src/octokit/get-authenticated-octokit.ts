@@ -1,5 +1,5 @@
-import { State } from "../types";
-import { ProbotOctokit } from "./probot-octokit";
+import { State } from "../types.js";
+import { ProbotOctokit } from "./probot-octokit.js";
 
 type FactoryOptions = {
   octokit: InstanceType<typeof ProbotOctokit>;

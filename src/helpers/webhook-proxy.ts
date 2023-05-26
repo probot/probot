@@ -1,4 +1,5 @@
 import EventSource from "eventsource";
+import SmeeClient from "smee-client";
 
 import type { Logger } from "pino";
 
@@ -6,10 +7,9 @@ export const createWebhookProxy = (
   opts: WebhookProxyOptions
 ): EventSource | undefined => {
   try {
-    const SmeeClient = require("smee-client");
     const smee = new SmeeClient({
       logger: opts.logger,
-      source: opts.url,
+      source: opts.url as string,
       target: `http://localhost:${opts.port}${opts.path}`,
     });
     return smee.start();

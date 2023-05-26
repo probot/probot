@@ -2,16 +2,19 @@
 
 import express, { Router } from "express";
 
-require("dotenv").config();
+import dotenv from "dotenv"
+
+dotenv.config();
+
 
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import program from "commander";
 import { getPrivateKey } from "@probot/get-private-key";
-import { getLog } from "../helpers/get-log";
+import { getLog } from "../helpers/get-log.js";
 
-import { ApplicationFunctionOptions, Probot } from "../";
-import { resolveAppFunction } from "../helpers/resolve-app-function";
+import { ApplicationFunctionOptions, Probot } from "../index.js";
+import { resolveAppFunction } from "../helpers/resolve-app-function.js";
 
 async function main() {
   program

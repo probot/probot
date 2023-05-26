@@ -1,3 +1,3 @@
 #!/usr/bin/env node
 
-require("../lib/bin/probot-receive");
+import "../lib/bin/probot-recieve.js";

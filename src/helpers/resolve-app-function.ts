@@ -1,4 +1,4 @@
-import { sync } from "resolve";
+import * as resolve from "resolve";
 
 const defaultOptions: ResolveOptions = {};
 
@@ -9,7 +9,7 @@ export const resolveAppFunction = async (
   opts = opts || defaultOptions;
   // These are mostly to ease testing
   const basedir = opts.basedir || process.cwd();
-  const resolver: Resolver = opts.resolver || sync;
+  const resolver: Resolver = opts.resolver || resolve.sync;
   const appFnPath = resolver(appFnId, { basedir });
   const mod = await import(appFnPath);
   // Note: This needs "esModuleInterop" to be set to "true" in "tsconfig.json"

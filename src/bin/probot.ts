@@ -1,19 +1,11 @@
-import semver from "semver";
 import program from "commander";
 
-require("dotenv").config();
+import dotenv from "dotenv"
 
-const pkg = require("../../package");
+dotenv.config();
 
-if (!semver.satisfies(process.version, pkg.engines.node)) {
-  console.log(
-    `Node.js version ${pkg.engines.node} is required. You have ${process.version}.`
-  );
-  process.exit(1);
-}
 
 program
-  .version(pkg.version)
   .usage("<command> [options]")
   .command("run", "run the bot")
   .command("receive", "Receive a single event and payload")

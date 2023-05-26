@@ -1,17 +1,17 @@
 import { Logger } from "pino";
 
-import { Context } from "./context";
+import { Context } from "./context.js";
 import {
   Options,
   ApplicationFunction,
   ApplicationFunctionOptions,
-} from "./types";
-import { Probot } from "./probot";
-import { Server } from "./server/server";
-import { ProbotOctokit } from "./octokit/probot-octokit";
-import { run } from "./run";
-import { createNodeMiddleware } from "./create-node-middleware";
-import { createProbot } from "./create-probot";
+} from "./types.js";
+import { Probot } from "./probot.js";
+import { Server } from "./server/server.js";
+import { ProbotOctokit } from "./octokit/probot-octokit.js";
+import { run } from "./run.js";
+import { createNodeMiddleware } from "./create-node-middleware.js";
+import { createProbot } from "./create-probot.js";
 
 export {
   Logger,

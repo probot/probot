@@ -1,6 +1,6 @@
 import type { Logger } from "pino";
 
-import type { DeprecatedLogger } from "../types";
+import type { DeprecatedLogger } from "../types.js";
 
 /**
  * `probot.log()`, `app.log()` and `context.log()` are aliasing `.log.info()`.

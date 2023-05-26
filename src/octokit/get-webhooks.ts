@@ -1,7 +1,7 @@
 import { Webhooks } from "@octokit/webhooks";
+import { getErrorHandler } from "../helpers/get-error-handler.js";
 
 import { State } from "../types.js";
-import { getErrorHandler } from "../helpers/get-error-handler.js";
 import { webhookTransform } from "./octokit-webhooks-transform.js";
 
 // import { Context } from "../context";

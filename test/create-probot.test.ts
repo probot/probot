@@ -78,6 +78,8 @@ describe("createProbot", () => {
 
       probot.log.info("Ciao");
     });
+
+    // Todo captureLogOutput has a bug (see Todo)
     expect(JSON.parse(outputData).myMessage).toEqual("Ciao");
   });
 
@@ -95,6 +97,7 @@ describe("createProbot", () => {
       const octokit = await probot.auth();
       octokit.log.info("Ciao");
     });
+    // Todo captureLogOutput has a bug (see Todo)
     expect(JSON.parse(outputData)).toMatchObject({
       myMessage: "Ciao",
       name: "octokit",

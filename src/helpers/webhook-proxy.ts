@@ -1,7 +1,7 @@
 import EventSource from "eventsource";
-import SmeeClient from "smee-client";
 
 import type { Logger } from "pino";
+import SmeeClient from "smee-client";
 
 export const createWebhookProxy = (
   opts: WebhookProxyOptions

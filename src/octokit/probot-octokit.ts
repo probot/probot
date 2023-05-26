@@ -1,15 +1,15 @@
 import { Octokit } from "@octokit/core";
 import { enterpriseCompatibility } from "@octokit/plugin-enterprise-compatibility";
-import { RequestOptions } from "@octokit/types";
 import { paginateRest } from "@octokit/plugin-paginate-rest";
 import { legacyRestEndpointMethods } from "@octokit/plugin-rest-endpoint-methods";
 import { retry } from "@octokit/plugin-retry";
 import { throttling } from "@octokit/plugin-throttling";
+import { RequestOptions } from "@octokit/types";
 import { config } from "@probot/octokit-plugin-config";
 import { createProbotAuth } from "octokit-auth-probot";
+import { VERSION } from "../version.js";
 
 import { probotRequestLogging } from "./octokit-plugin-probot-request-logging.js";
-import { VERSION } from "../version.js";
 
 const defaultOptions = {
   authStrategy: createProbotAuth,

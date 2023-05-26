@@ -1,8 +1,7 @@
-import { RequestListener } from "http";
 import { createNodeMiddleware as createWebbhooksMiddleware } from "@octokit/webhooks";
+import { RequestListener } from "http";
 
-import { ApplicationFunction } from "./types.js";
-import { MiddlewareOptions } from "./types.js";
+import { ApplicationFunction, MiddlewareOptions } from "./types.js";
 
 export function createNodeMiddleware(
   appFn: ApplicationFunction,

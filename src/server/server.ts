@@ -1,25 +1,23 @@
-import { Server as HttpServer } from "http";
+import { createNodeMiddleware as createWebhooksMiddleware } from "@octokit/webhooks";
+import EventSource from "eventsource";
 
 import express, { Application, Router } from "express";
+import { engine } from "express-handlebars";
+import { Server as HttpServer } from "http";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { join } from "path";
 import { Logger } from "pino";
-import { createNodeMiddleware as createWebhooksMiddleware } from "@octokit/webhooks";
 
 import { getLog } from "../helpers/get-log.js";
-import { getLoggingMiddleware } from "./logging-middleware.js";
 import { createWebhookProxy } from "../helpers/webhook-proxy.js";
-import { VERSION } from "../version.js";
-import { ApplicationFunction, ServerOptions } from "../types.js";
 import { Probot } from "../index.js";
-import { engine } from "express-handlebars";
-import EventSource from "eventsource";
-import { fileURLToPath } from 'url'
-import path from 'path'
+import { ApplicationFunction, ServerOptions } from "../types.js";
+import { VERSION } from "../version.js";
+import { getLoggingMiddleware } from "./logging-middleware.js";
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-
-
+export const __filename = fileURLToPath(import.meta.url);
+export const __dirname = path.dirname(__filename);
 
 type State = {
   httpServer?: HttpServer;

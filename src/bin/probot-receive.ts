@@ -1,20 +1,18 @@
 // Usage: probot receive -e push -p path/to/payload app.js
 
+import { getPrivateKey } from "@probot/get-private-key";
+import program from "commander";
+
+import dotenv from "dotenv";
 import express, { Router } from "express";
-
-import dotenv from "dotenv"
-
-dotenv.config();
-
-
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
-import program from "commander";
-import { getPrivateKey } from "@probot/get-private-key";
 import { getLog } from "../helpers/get-log.js";
+import { resolveAppFunction } from "../helpers/resolve-app-function.js";
 
 import { ApplicationFunctionOptions, Probot } from "../index.js";
-import { resolveAppFunction } from "../helpers/resolve-app-function.js";
+
+dotenv.config();
 
 async function main() {
   program
@@ -89,7 +87,7 @@ async function main() {
     );
   }
 
-  const payload = require(path.resolve(program.payloadPath));
+  const { default: payload } = await import(path.resolve(program.payloadPath));
   const log = getLog({
     level: program.logLevel,
     logFormat: program.logFormat,

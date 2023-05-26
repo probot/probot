@@ -14,8 +14,8 @@
  * app.log.fatal("Goodbye, cruel world!");
  * ```
  */
+import { getTransformStream, LogLevel, Options } from "@probot/pino";
 import pino, { Logger, LoggerOptions } from "pino";
-import { getTransformStream, Options, LogLevel } from "@probot/pino";
 
 export type GetLogOptions = {
   level?: LogLevel;

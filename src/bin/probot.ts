@@ -1,9 +1,8 @@
 import program from "commander";
 
-import dotenv from "dotenv"
+import dotenv from "dotenv";
 
 dotenv.config();
-
 
 program
   .usage("<command> [options]")

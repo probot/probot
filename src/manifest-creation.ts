@@ -1,14 +1,18 @@
 import fs from "fs";
 import yaml from "js-yaml";
 import path from "path";
-import updateDotenv from "./helpers/update-dotenv.js";
+import updateDotenv from "update-dotenv";
 import { ProbotOctokit } from "./octokit/probot-octokit.js";
 
 export class ManifestCreation {
   get pkg() {
     let pkg: any;
     try {
-      pkg = require(path.join(process.cwd(), "package.json"));
+      pkg = JSON.parse(
+        fs.readFileSync(path.join(process.cwd(), "package.json"), {
+          encoding: "utf-8",
+        })
+      );
     } catch (e) {
       pkg = {};
     }
@@ -18,7 +22,7 @@ export class ManifestCreation {
   public async createWebhookChannel() {
     try {
       // tslint:disable:no-var-requires
-      const SmeeClient = require("smee-client");
+      const { default: SmeeClient } = await import("smee-client");
 
       await this.updateEnv({
         WEBHOOK_PROXY_URL: await SmeeClient.createChannel(),

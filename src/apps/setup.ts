@@ -1,13 +1,13 @@
 import bodyParser from "body-parser";
 import { exec } from "child_process";
 import { Request, Response } from "express";
-import { Probot } from "../probot";
+import { isProduction } from "../helpers/is-production.js";
+import updateDotenv from "update-dotenv";
 
 import { ManifestCreation } from "../manifest-creation.js";
+import { Probot } from "../probot";
 import { getLoggingMiddleware } from "../server/logging-middleware.js";
 import { ApplicationFunctionOptions } from "../types.js";
-import { isProduction } from "../helpers/is-production.js";
-import updateDotenv from "../helpers/update-dotenv.js";
 
 export const setupAppFactory = (
   host: string | undefined,

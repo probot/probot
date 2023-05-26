@@ -11,10 +11,14 @@ export function defaultApp(
 
   const router = getRouter();
 
-  router.get("/probot", (req, res) => {
+  router.get("/probot", async (req, res) => {
     let pkg;
     try {
-      pkg = require(path.join(process.cwd(), "package.json"));
+      pkg = (
+        await import(path.join(process.cwd(), "package.json"), {
+          assert: { type: "json" },
+        })
+      ).default;
     } catch (e) {
       pkg = {};
     }

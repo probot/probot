@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import fs from "fs";
 import nock from "nock";
 import pkg from "../package.json";
@@ -12,17 +13,23 @@ describe("ManifestCreation", () => {
   });
 
   describe("createWebhookChannel", () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       delete process.env.NODE_ENV;
       delete process.env.PROJECT_DOMAIN;
       delete process.env.WEBHOOK_PROXY_URL;
 
-      setup.updateEnv = jest.fn();
+      setup.updateEnv = jest.fn(async () => {
+        return {};
+      });
 
-      const SmeeClient: typeof import("smee-client") = require("smee-client");
+      const SmeeClient: typeof import("smee-client") = (
+        await import("smee-client")
+      ).default;
       SmeeClient.createChannel = jest
-        .fn()
-        .mockReturnValue("https://smee.io/1234abc");
+        .fn(async () => {
+          return "https://smee.io/1234abc";
+        })
+        .mockReturnValue(Promise.resolve("https://smee.io/1234abc"));
     });
 
     afterEach(() => {
@@ -89,7 +96,7 @@ describe("ManifestCreation", () => {
 
   describe("createAppFromCode", () => {
     beforeEach(() => {
-      setup.updateEnv = jest.fn();
+      setup.updateEnv = jest.fn(async () => ({}));
     });
 
     afterEach(() => {

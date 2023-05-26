@@ -1,10 +1,15 @@
-import Stream from "stream";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 import pino from "pino";
+import Stream from "stream";
 import request from "supertest";
 
 import { Probot, Server } from "../../src";
 import { defaultApp } from "../../src/apps/default";
+
+export const __filename = fileURLToPath(import.meta.url);
+export const __dirname = path.dirname(__filename);
 
 describe("default app", () => {
   let server: Server;

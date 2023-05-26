@@ -1,16 +1,19 @@
-import express, { Response } from "express";
-// tslint:disable-next-line:no-var-requires
-const sse: (
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction
-) => void = require("connect-sse")();
+import { jest } from "@jest/globals";
+// @ts-ignore
+import connectSSE from "connect-sse";
 import EventSource from "eventsource";
+import express, { Response } from "express";
 import http from "http";
 import net from "net";
 import nock from "nock";
 import { getLog } from "../src/helpers/get-log";
 import { createWebhookProxy } from "../src/helpers/webhook-proxy";
+
+const sse: (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) => void = connectSSE();
 
 const targetPort = 999999;
 

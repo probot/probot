@@ -1,10 +1,10 @@
-import { createServer, IncomingMessage, ServerResponse } from "http";
-import Stream from "stream";
-
-import pino from "pino";
+import { sign } from "@octokit/webhooks-methods";
 import getPort from "get-port";
 import got from "got";
-import { sign } from "@octokit/webhooks-methods";
+import { createServer, IncomingMessage, ServerResponse } from "http";
+
+import pino from "pino";
+import Stream from "stream";
 
 import { createNodeMiddleware, createProbot, Probot } from "../src";
 import { ApplicationFunction } from "../src/types";
@@ -20,7 +20,7 @@ NKZSuZEHqGEFAiB6EDrxkovq8SYGhIQsJeqkTMO8n94xhMRZlFmIQDokEQIgAq5U
 r1UQNnUExRh7ZT0kFbMfO9jKYZVlQdCL9Dn93vo=
 -----END RSA PRIVATE KEY-----`;
 const WEBHOOK_SECRET = "secret";
-const pushEvent = require("./fixtures/webhook/push.json");
+import pushEvent from "./fixtures/webhook/push.json" assert { type: "json" };
 
 describe("createNodeMiddleware", () => {
   let output: any[];

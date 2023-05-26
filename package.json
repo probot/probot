@@ -6,15 +6,15 @@
   "main": "lib/index.js",
   "types": "./lib/index.d.ts",
   "bin": {
-    "probot": "./bin/probot.js"
+    "probot": "bin/probot.js"
   },
   "type": "module",
   "scripts": {
     "build": "rimraf lib && tsc -p tsconfig.json",
     "lint": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\" \"docs/*.md\" *.md package.json tsconfig.json --end-of-line auto",
     "lint:fix": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"docs/*.md\" *.md package.json tsconfig.json --end-of-line auto",
-    "pretest": "tsc --noEmit -p test",
-    "test": "jest",
+    "pretest": "tsc --noEmit -p tsconfig.test.json",
+    "test": "npx cross-env NODE_OPTIONS=--experimental-vm-modules npx jest",
     "posttest": "npm run lint",
     "doc": "typedoc --options .typedoc.json"
   },
@@ -65,7 +65,7 @@
     "pino": "^6.7.0",
     "pino-http": "^5.3.0",
     "pkg-conf": "^3.1.0",
-    "resolve": "^2.0.0-next.4",
+    "resolve": "^1.19.0",
     "semver": "^7.3.4",
     "update-dotenv": "^1.1.1",
     "uuid": "^8.3.2"
@@ -75,15 +75,15 @@
     "@octokit/webhooks-methods": "^3.0.0",
     "@octokit/webhooks-types": "^4.0.0",
     "@tsconfig/node10": "^1.0.7",
-    "@tsconfig/node16": "^1.0.4",
     "@types/eventsource": "^1.1.5",
-    "@types/jest": "^26.0.18",
+    "@types/jest": "^29.5.1",
     "@types/js-yaml": "^3.12.5",
     "@types/jsonwebtoken": "^8.5.0",
     "@types/node": "^16.0.0",
     "@types/readable-stream": "^2.3.9",
     "@types/resolve": "^1.17.1",
     "@types/semver": "^7.3.4",
+    "@types/sonic-boom": "^2.1.1",
     "@types/supertest": "^2.0.10",
     "@types/uuid": "^8.3.0",
     "body-parser": "^1.19.0",
@@ -92,34 +92,22 @@
     "execa": "^5.0.0",
     "get-port": "^5.1.1",
     "got": "^11.8.0",
-    "jest": "^26.6.3",
+    "jest": "^29.5.0",
     "nock": "^13.0.5",
     "prettier": "^2.2.1",
     "rimraf": "^3.0.2",
     "semantic-release": "^19.0.3",
     "semantic-release-plugin-update-version-in-files": "^1.1.0",
-    "smee-client": "^1.2.3",
+    "smee-client": "^1.2.2",
+    "sonic-boom": "2.8.0",
     "supertest": "^6.0.1",
-    "ts-jest": "^26.4.4",
+    "ts-jest": "^29.1.0",
     "tsd": "^0.23.0",
     "typedoc": "^0.22.10",
     "typescript": "^4.1.2"
   },
   "engines": {
-    "node": ">=10.21"
-  },
-  "jest": {
-    "testEnvironment": "node",
-    "coveragePathIgnorePatterns": [
-      "<rootDir>/lib/"
-    ],
-    "moduleFileExtensions": [
-      "ts",
-      "js",
-      "json",
-      "node"
-    ],
-    "preset": "ts-jest"
+    "node": ">=16"
   },
   "tsd": {
     "directory": "test/types"

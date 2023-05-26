@@ -1,13 +1,17 @@
-import fs = require("fs");
-import path = require("path");
+import { jest } from "@jest/globals";
 
 import { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
 import WebhookExamples, { WebhookDefinition } from "@octokit/webhooks-examples";
+import fs from "fs";
 import nock from "nock";
+import { fileURLToPath } from "node:url";
+import path from "path";
 
 import { Context } from "../src";
 import { ProbotOctokit } from "../src/octokit/probot-octokit";
-import { PushEvent } from "@octokit/webhooks-types";
+
+export const __filename = fileURLToPath(import.meta.url);
+export const __dirname = path.dirname(__filename);
 
 const pushEventPayload = (
   WebhookExamples.filter(
@@ -79,8 +83,8 @@ describe("Context", () => {
 
     // The `repository` object on the push event has a different format than the other events
     // https://docs.github.com/en/developers/webhooks-and-events/webhook-events-and-payloads#push
-    it("properly handles the push event", () => {
-      event.payload = require("./fixtures/webhook/push") as PushEvent;
+    it("properly handles the push event", async () => {
+      event.payload = (await import("./fixtures/webhook/push.json")) as any;
 
       context = new Context<"push">(event, {} as any, {} as any);
       expect(context.repo()).toEqual({ owner: "bkeepers-inc", repo: "test" });
@@ -96,7 +100,7 @@ describe("Context", () => {
       context = new Context<"push">(event, {} as any, {} as any);
       try {
         context.repo();
-      } catch (e) {
+      } catch (e: any) {
         expect(e.message).toMatch(
           "context.repo() is not supported for this webhook event."
         );
@@ -150,7 +154,7 @@ describe("Context", () => {
       event = {
         id: "123",
         name: "pull_request",
-        payload: pullRequestEventPayload,
+        payload: pullRequestEventPayload as any,
       };
 
       context = new Context<"pull_request">(event, {} as any, {} as any);

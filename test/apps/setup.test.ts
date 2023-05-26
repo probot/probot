@@ -1,15 +1,20 @@
-const createChannel = jest.fn().mockResolvedValue("mocked proxy URL");
-const updateDotenv = jest.fn().mockResolvedValue({});
-jest.mock("smee-client", () => ({ createChannel }));
-jest.mock("update-dotenv", () => updateDotenv);
-
+import { jest } from "@jest/globals";
 import nock from "nock";
+import pino from "pino";
 import { Stream } from "stream";
 import request from "supertest";
-import pino from "pino";
 
 import { Probot, Server } from "../../src";
 import { setupAppFactory } from "../../src/apps/setup";
+
+const createChannel = jest
+  .fn<() => Promise<string>>()
+  .mockResolvedValue("mocked proxy URL");
+const updateDotenv = jest
+  .fn<() => Promise<Record<string, string>>>()
+  .mockResolvedValue({});
+jest.mock("smee-client", () => ({ createChannel }));
+jest.mock("update-dotenv", () => updateDotenv);
 
 describe("Setup app", () => {
   let server: Server;
@@ -108,7 +113,9 @@ describe("Setup app", () => {
         .expect(302)
         .expect("Location", "/apps/my-app/installations/new");
 
+      // Todo Does not get called
       expect(createChannel).toHaveBeenCalledTimes(1);
+      // Todo Does not match
       expect(updateDotenv.mock.calls).toMatchSnapshot();
     });
   });

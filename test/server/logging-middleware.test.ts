@@ -1,9 +1,8 @@
-import Stream from "stream";
-
 import express from "express";
-import request from "supertest";
 import pino from "pino";
 import { Options } from "pino-http";
+import Stream from "stream";
+import request from "supertest";
 
 import { getLoggingMiddleware } from "../../src/server/logging-middleware";
 

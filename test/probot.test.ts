@@ -1,17 +1,17 @@
-import Stream from "stream";
-
 import {
   EmitterWebhookEvent,
   EmitterWebhookEvent as WebhookEvent,
 } from "@octokit/webhooks";
-import Bottleneck from "bottleneck";
-import nock from "nock";
-import pino from "pino";
-
-import { Probot, ProbotOctokit, Context } from "../src";
 
 import webhookExamples from "@octokit/webhooks-examples";
 import { EmitterWebhookEventName } from "@octokit/webhooks/dist-types/types";
+import Bottleneck from "bottleneck";
+import nock from "nock";
+import pino from "pino";
+import Stream from "stream";
+import { jest } from "@jest/globals";
+
+import { Context, Probot, ProbotOctokit } from "../src";
 
 const appId = 1;
 const privateKey = `-----BEGIN RSA PRIVATE KEY-----
@@ -332,7 +332,7 @@ describe("Probot", () => {
       await probot.receive(event);
       expect(spy).toHaveBeenCalled();
       expect(spy.mock.calls[0][0]).toBeInstanceOf(Context);
-      expect(spy.mock.calls[0][0].payload).toBe(event.payload);
+      expect((spy.mock.calls[0][0] as any).payload).toBe(event.payload);
     });
 
     it("calls callback with same action", async () => {
@@ -401,17 +401,19 @@ describe("Probot", () => {
         log: pino(streamLogsToOutput),
       });
 
-      const handler = jest.fn().mockImplementation((context) => {
-        expect(context.log.info).toBeDefined();
-        context.log.info("testing");
+      const handler = jest
+        .fn((context: Context) => {})
+        .mockImplementation((context: Context) => {
+          expect(context.log.info).toBeDefined();
+          context.log.info("testing");
 
-        expect(output[0]).toEqual(
-          expect.objectContaining({
-            id: context.id,
-            msg: "testing",
-          })
-        );
-      });
+          expect(output[0]).toEqual(
+            expect.objectContaining({
+              id: context.id,
+              msg: "testing",
+            })
+          );
+        });
 
       probot.on("pull_request", handler);
       await probot.receive(event).catch(console.error);
@@ -447,6 +449,8 @@ describe("Probot", () => {
       probot.on("installation.created", async (context) => {
         await context.octokit.request("/");
       });
+
+      // Todo ERROR (event): secretOrPrivateKey has a minimum key size of 2048 bits for RS256
 
       await probot.receive(event);
 
@@ -567,7 +571,7 @@ describe("Probot", () => {
       try {
         await probot.receive(event);
         throw new Error("expected error to be raised from app");
-      } catch (error) {
+      } catch (error: any) {
         expect(error.message).toMatch(/error from app/);
       }
     });

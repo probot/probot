@@ -1,12 +1,13 @@
-import Stream from "stream";
+import { sign } from "@octokit/webhooks-methods";
 
 import { NextFunction, Request, Response } from "express";
-import request from "supertest";
-import pino from "pino";
-import { sign } from "@octokit/webhooks-methods";
 import getPort from "get-port";
+import http from "http";
+import pino from "pino";
+import Stream from "stream";
+import request from "supertest";
 
-import { Server, Probot } from "../src";
+import { Probot, Server } from "../src";
 
 const appId = 1;
 const privateKey = `-----BEGIN RSA PRIVATE KEY-----
@@ -18,7 +19,7 @@ A1yBjz3q2nX+zthk+GLXrJQkYOnIk1ECIHfeFV8TWm5gej1LxZquBTA5pINoqDVq
 NKZSuZEHqGEFAiB6EDrxkovq8SYGhIQsJeqkTMO8n94xhMRZlFmIQDokEQIgAq5U
 r1UQNnUExRh7ZT0kFbMfO9jKYZVlQdCL9Dn93vo=
 -----END RSA PRIVATE KEY-----`;
-const pushEvent = require("./fixtures/webhook/push.json");
+import pushEvent from "./fixtures/webhook/push.json" assert { type: "json" };
 
 describe("Server", () => {
   let server: Server;
@@ -125,7 +126,6 @@ describe("Server", () => {
       expect.assertions(1);
 
       // block port 3001
-      const http = require("http");
       const blockade = http.createServer().listen(3001, async () => {
         const server = new Server({
           Probot: Probot.defaults({ appId, privateKey }),
@@ -135,7 +135,7 @@ describe("Server", () => {
 
         try {
           await server.start();
-        } catch (error) {
+        } catch (error: any) {
           expect(error.message).toEqual(
             "Port 3001 is already in use. You can define the PORT environment variable to use a different port."
           );

@@ -1,11 +1,15 @@
-import path = require("path");
+import { sign } from "@octokit/webhooks-methods";
+import fs from "fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 import request from "supertest";
-import { sign } from "@octokit/webhooks-methods";
 
 import { Probot, run, Server } from "../src";
-
 import { captureLogOutput } from "./helpers/capture-log-output";
+
+export const __filename = fileURLToPath(import.meta.url);
+export const __dirname = path.dirname(__filename);
 
 // tslint:disable:no-empty
 describe("run", () => {
@@ -83,12 +87,17 @@ describe("run", () => {
         await server.stop();
       });
 
+      // Todo captureLogOutput has a bug (see Todo)
       expect(outputData).toMatch(/"msg":"test"/);
     });
   });
 
   describe("webhooks", () => {
-    const pushEvent = require("./fixtures/webhook/push.json");
+    const pushEvent = JSON.parse(
+      fs.readFileSync(path.join(__dirname, "./fixtures/webhook/push.json"), {
+        encoding: "utf-8",
+      })
+    );
 
     it("POST /", async () => {
       server = await run(() => {}, { env });

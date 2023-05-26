@@ -1,7 +1,7 @@
 /**
  * @param {import('../../lib').Probot} app
  */
-module.exports = (app) => {
+export default function (app) {
   // Your code here
   app.log.info("Yay! The app was loaded!");
 
@@ -18,4 +18,4 @@ module.exports = (app) => {
       (error) => console.log("not ok", error)
     );
   });
-};
+}

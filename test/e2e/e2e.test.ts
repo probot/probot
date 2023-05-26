@@ -1,9 +1,10 @@
-import execa from "execa";
-import getPort from "get-port";
+import { jest } from "@jest/globals";
 
 import { sign } from "@octokit/webhooks-methods";
 import bodyParser from "body-parser";
+import execa from "execa";
 import express from "express";
+import getPort from "get-port";
 import got from "got";
 
 jest.setTimeout(10000);
@@ -35,7 +36,7 @@ describe("end-to-end-tests", () => {
   it("hello-world app", async () => {
     const app = express();
     const httpMock = jest
-      .fn()
+      .fn<(req: express.Request, res: express.Response) => void>()
       .mockImplementationOnce((req, res) => {
         expect(req.method).toEqual("POST");
         expect(req.path).toEqual("/app/installations/1/access_tokens");
@@ -49,7 +50,7 @@ describe("end-to-end-tests", () => {
           repository_selection: "all",
         });
       })
-      .mockImplementationOnce((req, res) => {
+      .mockImplementationOnce((req: any, res: any) => {
         expect(req.method).toEqual("POST");
         expect(req.path).toEqual(
           "/repos/octocat/hello-world/issues/1/comments"
@@ -113,9 +114,10 @@ describe("end-to-end-tests", () => {
       });
     } catch (error) {
       probotProcess.cancel();
+      // Todo Command failed with exit code 1: bin/probot.js run ./test/e2e/hello-world.js
       console.log((await probotProcess).stdout);
     }
-
+    // Todo Does not get called
     expect(httpMock).toHaveBeenCalledTimes(2);
   });
 });

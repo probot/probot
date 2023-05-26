@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import nock from "nock";
 import { ProbotOctokit } from "../src/octokit/probot-octokit";
 
@@ -35,7 +36,7 @@ describe("ProbotOctokit", () => {
     try {
       await octokit.request("/");
       throw new Error("should throw");
-    } catch (error) {
+    } catch (error: any) {
       expect(error.status).toBe(500);
     }
   });
@@ -155,7 +156,7 @@ describe("ProbotOctokit", () => {
           owner: "JasonEtco",
           repo: "pizza",
           per_page: 1,
-        }),
+        } as any),
         spy
       );
       expect(Array.isArray(res)).toBeTruthy();

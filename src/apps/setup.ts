@@ -1,8 +1,8 @@
 import bodyParser from "body-parser";
 import { exec } from "child_process";
 import { Request, Response } from "express";
-import { isProduction } from "../helpers/is-production.js";
 import updateDotenv from "update-dotenv";
+import { isProduction } from "../helpers/is-production.js";
 
 import { ManifestCreation } from "../manifest-creation.js";
 import { Probot } from "../probot";

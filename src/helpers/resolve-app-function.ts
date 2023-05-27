@@ -1,4 +1,4 @@
-import * as resolve from "resolve";
+import resolve from "resolve";
 
 const defaultOptions: ResolveOptions = {};
 

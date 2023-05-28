@@ -2,6 +2,9 @@ import { sync } from "resolve";
 
 const defaultOptions: ResolveOptions = {};
 
+// This is a workaround to prevent TypeScript from converting a dynamic import to require()
+const _importDynamic = new Function("modulePath", "return import(modulePath)");
+
 export const resolveAppFunction = async (
   appFnId: string,
   opts?: ResolveOptions
@@ -11,9 +14,9 @@ export const resolveAppFunction = async (
   const basedir = opts.basedir || process.cwd();
   const resolver: Resolver = opts.resolver || sync;
   const appFnPath = resolver(appFnId, { basedir });
-  const mod = await import(appFnPath);
-  // Note: This needs "esModuleInterop" to be set to "true" in "tsconfig.json"
-  return mod.default;
+  const mod = await _importDynamic(appFnPath);
+  // mod.default.default gets exported by transpiled TypeScript code
+  return mod.default?.default ? mod.default.default : mod.default;
 };
 
 export type Resolver = (appFnId: string, opts: { basedir: string }) => string;

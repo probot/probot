@@ -101,7 +101,7 @@
     "typescript": "^5.0.4"
   },
   "engines": {
-    "node": ">=10.21"
+    "node": ">=18"
   },
   "jest": {
     "testEnvironment": "node",

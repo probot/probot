@@ -48,7 +48,6 @@
     "@probot/pino": "^2.3.5",
     "@types/express": "^4.17.17",
     "@types/ioredis": "^4.28.10",
-    "@types/pino-http": "^5.8.1",
     "commander": "^10.0.0",
     "deepmerge": "^4.3.1",
     "deprecation": "^2.3.1",

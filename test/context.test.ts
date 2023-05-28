@@ -1,5 +1,5 @@
-import fs = require("fs");
-import path = require("path");
+import fs from "fs";
+import path from "path";
 
 import { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
 import WebhookExamples, { WebhookDefinition } from "@octokit/webhooks-examples";

@@ -59,7 +59,7 @@
     "js-yaml": "^4.1.0",
     "lru-cache": "^9.1.1",
     "octokit-auth-probot": "^1.2.9",
-    "pino": "^8.14.1",
+    "pino": "8.11.0",
     "pino-http": "^8.3.3",
     "pkg-conf": "^3.1.0",
     "resolve": "^1.22.2",
@@ -67,9 +67,9 @@
     "update-dotenv": "^1.1.1"
   },
   "devDependencies": {
-    "@octokit/webhooks-examples": "^7.0.2",
+    "@octokit/webhooks-examples": "^6.11.0",
     "@octokit/webhooks-methods": "^3.0.2",
-    "@octokit/webhooks-types": "^7.0.2",
+    "@octokit/webhooks-types": "^6.11.0",
     "@tsconfig/node16": "^1.0.4",
     "@types/eventsource": "^1.1.11",
     "@types/jest": "^29.5.1",

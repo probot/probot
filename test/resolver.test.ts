@@ -10,14 +10,15 @@ describe("resolver", () => {
   it("loads the module at the resolved path", async () => {
     const stubResolver = jest.fn().mockReturnValue(stubAppFnPath);
     const module = await resolveAppFunction("foo", { resolver: stubResolver });
-    expect(module).toBe(require(stubAppFnPath));
+    expect(module).toBe((await import(stubAppFnPath)).default);
     expect(stubResolver).toHaveBeenCalledWith("foo", { basedir });
   });
 
   it("loads module transpiled from TypeScript (https://github.com/probot/probot/issues/1447)", async () => {
     const stubResolver = jest.fn().mockReturnValue(stubTranspiledAppFnPath);
     const module = await resolveAppFunction("foo", { resolver: stubResolver });
-    expect(module).toBe(require(stubTranspiledAppFnPath).default);
+    expect(module).toBe((await import(stubTranspiledAppFnPath)).default);
+    expect(module).toBeInstanceOf(Function);
     expect(stubResolver).toHaveBeenCalledWith("foo", { basedir });
   });
 });

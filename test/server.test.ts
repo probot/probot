@@ -105,7 +105,7 @@ describe("Server", () => {
     });
   });
 
-  describe("webhook handler (POST /)", () => {
+  describe("webhook handler (POST /api/github/webhooks)", () => {
     it("should return 200 and run event handlers in app function", async () => {
       expect.assertions(3);
 
@@ -128,7 +128,7 @@ describe("Server", () => {
       const dataString = JSON.stringify(pushEvent);
 
       await request(server.expressApp)
-        .post("/")
+        .post("/api/github/webhooks")
         .send(dataString)
         .set("content-type", "application/json")
         .set("x-github-event", "push")
@@ -136,14 +136,14 @@ describe("Server", () => {
         .set("x-github-delivery", "3sw4d5f6g7h8");
 
       expect(output.length).toEqual(1);
-      expect(output[0].msg).toContain("POST / 200 -");
+      expect(output[0].msg).toContain("POST /api/github/webhooks 200 -");
     });
 
     test("respond with a friendly error when x-hub-signature-256 is missing", async () => {
       await server.load(() => {});
 
       await request(server.expressApp)
-        .post("/")
+        .post("/api/github/webhooks")
         .send(JSON.stringify(pushEvent))
         .set("content-type", "application/json")
         .set("x-github-event", "push")

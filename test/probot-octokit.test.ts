@@ -68,8 +68,8 @@ describe("ProbotOctokit", () => {
       const options: Options = {
         ...defaultOptions,
         throttle: {
-          enabled: true,
-          minimumSecondaryRateRetryAfter: 1,
+          //enabled: true,
+          fallbackSecondaryRateRetryAfter: 1,
           onRateLimit() {
             return true;
           },

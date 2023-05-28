@@ -3,8 +3,7 @@ import { ProbotOctokit } from "./probot-octokit";
 
 type FactoryOptions = {
   octokit: InstanceType<typeof ProbotOctokit>;
-  octokitOptions: ConstructorParameters<typeof ProbotOctokit> & {
-    throttle?: Record<string, unknown>;
+  octokitOptions: ConstructorParameters<typeof ProbotOctokit>[0] & {
     auth?: Record<string, unknown>;
   };
   [key: string]: unknown;
@@ -24,7 +23,7 @@ export async function getAuthenticatedOctokit(
     factory: ({ octokit, octokitOptions, ...otherOptions }: FactoryOptions) => {
       const pinoLog = log.child({ name: "github" });
 
-      const options = {
+      const options: ConstructorParameters<typeof ProbotOctokit>[0] & { log: { fatal: any; trace: any; }} = {
         ...octokitOptions,
         log: {
           fatal: pinoLog.fatal.bind(pinoLog),
@@ -34,9 +33,10 @@ export async function getAuthenticatedOctokit(
           debug: pinoLog.debug.bind(pinoLog),
           trace: pinoLog.trace.bind(pinoLog),
         },
+        // @ts-expect-error The correct properties are always passed into here
         throttle: {
           ...octokitOptions.throttle,
-          id: installationId,
+          id: installationId.toString(),
         },
         auth: {
           ...octokitOptions.auth,

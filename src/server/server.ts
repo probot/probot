@@ -41,7 +41,7 @@ export class Server {
     this.state = {
       port: options.port,
       host: options.host,
-      webhookPath: options.webhookPath || "/",
+      webhookPath: options.webhookPath || "/api/github/webhooks",
       webhookProxy: options.webhookProxy,
     };
 
@@ -51,9 +51,8 @@ export class Server {
       express.static(join(__dirname, "..", "..", "static"))
     );
     this.expressApp.use(
-      this.state.webhookPath,
       createWebhooksMiddleware(this.probotApp.webhooks, {
-        path: "/",
+        path: this.state.webhookPath,
       })
     );
 

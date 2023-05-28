@@ -144,7 +144,7 @@ describe("Probot", () => {
       expect.assertions(1);
 
       const MyOctokit = ProbotOctokit.plugin((octokit, options) => {
-        expect(options.throttle.enabled).toEqual(false);
+        expect(options.throttle?.enabled).toEqual(false);
       }).defaults({
         appId,
         privateKey,
@@ -323,8 +323,8 @@ describe("Probot", () => {
         githubToken: "faketoken",
         redisConfig: "test",
         Octokit: ProbotOctokit.plugin((octokit, options) => {
-          expect(options.throttle.Bottleneck).toBe(Bottleneck);
-          expect(options.throttle.connection).toBeInstanceOf(
+          expect(options.throttle?.Bottleneck).toBe(Bottleneck);
+          expect(options.throttle?.connection).toBeInstanceOf(
             Bottleneck.IORedisConnection
           );
         }),
@@ -343,8 +343,8 @@ describe("Probot", () => {
         githubToken: "faketoken",
         redisConfig,
         Octokit: ProbotOctokit.plugin((octokit, options) => {
-          expect(options.throttle.Bottleneck).toBe(Bottleneck);
-          expect(options.throttle.connection).toBeInstanceOf(
+          expect(options.throttle?.Bottleneck).toBe(Bottleneck);
+          expect(options.throttle?.connection).toBeInstanceOf(
             Bottleneck.IORedisConnection
           );
         }),

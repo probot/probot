@@ -116,7 +116,7 @@ describe("createNodeMiddleware", () => {
     await new Promise((resolve) => setTimeout(resolve, 100));
 
     server.close();
-  });
+  }, 1000);
 
   test("loads app only once", async () => {
     let counter = 0;

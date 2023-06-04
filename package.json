@@ -78,7 +78,7 @@
     "@types/jest": "^26.0.18",
     "@types/js-yaml": "^3.12.5",
     "@types/jsonwebtoken": "^8.5.0",
-    "@types/node": "^16.0.0",
+    "@types/node": "^18.0.0",
     "@types/readable-stream": "^2.3.9",
     "@types/resolve": "^1.17.1",
     "@types/semver": "^7.3.4",

@@ -45,7 +45,8 @@ export type State = {
   baseUrl?: string;
 };
 
-export type ProbotWebhooks = Webhooks<Omit<Context, keyof WebhookEvent>>;
+type SimplifiedObject = Omit<Context, keyof WebhookEvent>;
+export type ProbotWebhooks = Webhooks<SimplifiedObject>;
 
 export type DeprecatedLogger = LogFn & Logger;
 

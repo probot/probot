@@ -42,7 +42,7 @@
     "@octokit/plugin-retry": "^3.0.6",
     "@octokit/plugin-throttling": "^3.3.4",
     "@octokit/types": "^8.0.0",
-    "@octokit/webhooks": "^9.8.4",
+    "@octokit/webhooks": "^10.9.1",
     "@probot/get-private-key": "^1.1.0",
     "@probot/octokit-plugin-config": "^1.0.0",
     "@probot/pino": "^2.2.0",
@@ -70,9 +70,9 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@octokit/webhooks-examples": "^4.0.0",
+    "@octokit/webhooks-examples": "^6.0.0",
     "@octokit/webhooks-methods": "^3.0.0",
-    "@octokit/webhooks-types": "^4.0.0",
+    "@octokit/webhooks-types": "^6.11.0",
     "@tsconfig/node10": "^1.0.7",
     "@types/eventsource": "^1.1.5",
     "@types/jest": "^26.0.18",

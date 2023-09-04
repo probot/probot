@@ -79,7 +79,7 @@
     "@types/js-yaml": "^3.12.5",
     "@types/jsonwebtoken": "^8.5.0",
     "@types/node": "^16.0.0",
-    "@types/readable-stream": "^2.3.9",
+    "@types/readable-stream": "^4.0.0",
     "@types/resolve": "^1.17.1",
     "@types/semver": "^7.3.4",
     "@types/supertest": "^2.0.10",

@@ -36,6 +36,7 @@ describe("ProbotOctokit", () => {
       await octokit.request("/");
       throw new Error("should throw");
     } catch (error) {
+      // @ts-expect-error - error is unknown
       expect(error.status).toBe(500);
     }
   });

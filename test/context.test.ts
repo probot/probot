@@ -96,8 +96,9 @@ describe("Context", () => {
       context = new Context<"push">(event, {} as any, {} as any);
       try {
         context.repo();
-      } catch (e) {
-        expect(e.message).toMatch(
+      } catch (error) {
+        // @ts-expect-error - error is unknown
+        expect(error.message).toMatch(
           "context.repo() is not supported for this webhook event."
         );
       }
@@ -150,6 +151,7 @@ describe("Context", () => {
       event = {
         id: "123",
         name: "pull_request",
+        // @ts-expect-error - payload types incompatible? TODO: investigate
         payload: pullRequestEventPayload,
       };
 

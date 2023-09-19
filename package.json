@@ -53,7 +53,7 @@
     "commander": "^6.2.0",
     "deepmerge": "^4.2.2",
     "deprecation": "^2.3.1",
-    "dotenv": "^8.2.0",
+    "dotenv": "^16.0.0",
     "eventsource": "^2.0.2",
     "express": "^4.17.1",
     "express-handlebars": "^6.0.3",

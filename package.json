@@ -50,7 +50,7 @@
     "@types/ioredis": "^4.27.1",
     "@types/pino": "^6.3.4",
     "@types/pino-http": "^5.0.6",
-    "commander": "^6.2.0",
+    "commander": "^11.0.0",
     "deepmerge": "^4.2.2",
     "deprecation": "^2.3.1",
     "dotenv": "^8.2.0",

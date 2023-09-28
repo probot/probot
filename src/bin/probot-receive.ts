@@ -5,7 +5,7 @@ import express, { Router } from "express";
 require("dotenv").config();
 
 import path from "path";
-import { v4 as uuidv4 } from "uuid";
+import { randomUUID as uuidv4 } from "crypto";
 import program from "commander";
 import { getPrivateKey } from "@probot/get-private-key";
 import { getLog } from "../helpers/get-log";

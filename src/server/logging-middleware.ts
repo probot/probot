@@ -1,6 +1,6 @@
 import pinoHttp from "pino-http";
 import type { Logger } from "pino";
-import { v4 as uuidv4 } from "uuid";
+import { randomUUID as uuidv4 } from "crypto";
 
 export function getLoggingMiddleware(logger: Logger, options?: pinoHttp.Options) {
   return pinoHttp({

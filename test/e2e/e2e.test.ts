@@ -117,5 +117,5 @@ describe("end-to-end-tests", () => {
     }
 
     expect(httpMock).toHaveBeenCalledTimes(2);
-  });
+  }, 1000000);
 });

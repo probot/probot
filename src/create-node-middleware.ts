@@ -1,5 +1,5 @@
 import { RequestListener } from "http";
-import { createNodeMiddleware as createWebbhooksMiddleware } from "@octokit/webhooks";
+import { createNodeMiddleware as createWebhooksMiddleware } from "@octokit/webhooks";
 
 import { ApplicationFunction } from "./types";
 import { MiddlewareOptions } from "./types";
@@ -10,7 +10,7 @@ export function createNodeMiddleware(
 ): RequestListener {
   probot.load(appFn);
 
-  return createWebbhooksMiddleware(probot.webhooks, {
+  return createWebhooksMiddleware(probot.webhooks, {
     path: webhooksPath || "/",
   });
 }

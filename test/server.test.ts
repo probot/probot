@@ -111,6 +111,7 @@ describe("Server", () => {
       await request(server.expressApp)
         .post("/")
         .send(dataString)
+        .set("content-type", "application/json")
         .set("x-github-event", "push")
         .set("x-hub-signature-256", await sign("secret", dataString))
         .set("x-github-delivery", "3sw4d5f6g7h8");
@@ -126,6 +127,7 @@ describe("Server", () => {
         .post("/")
         .send(JSON.stringify(pushEvent))
         .set("x-github-event", "push")
+        .set("content-type", "application/json")
         // Note: 'x-hub-signature-256' is missing
         .set("x-github-delivery", "3sw4d5f6g7h8")
         .expect(

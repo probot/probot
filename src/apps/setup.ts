@@ -93,7 +93,7 @@ export const setupAppFactory = (
       res.render("success.handlebars");
     });
 
-    route.get("/", (req, res, next) => res.redirect("/probot"));
+    route.get("/", (req, res) => res.redirect("/probot"));
   };
 
 function printWelcomeMessage(

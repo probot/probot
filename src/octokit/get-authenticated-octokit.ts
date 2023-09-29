@@ -37,12 +37,15 @@ export async function getAuthenticatedOctokit(
         throttle: {
           ...octokitOptions.throttle,
           id: "" + installationId,
+          request: state.request,
         },
         auth: {
           ...octokitOptions.auth,
           otherOptions,
           installationId,
+          request: state.request,
         },
+        request: state.request,
       };
 
       const Octokit = octokit.constructor as typeof ProbotOctokit;

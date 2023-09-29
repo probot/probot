@@ -36,7 +36,9 @@ export class Server {
   constructor(options: ServerOptions = {} as ServerOptions) {
     this.expressApp = express();
     this.log = options.log || getLog().child({ name: "server" });
-    this.probotApp = new options.Probot();
+    this.probotApp = new options.Probot({
+      request: options.request,
+    });
 
     this.state = {
       port: options.port,

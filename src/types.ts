@@ -70,6 +70,7 @@ export type ServerOptions = {
   webhookProxy?: string;
   Probot: typeof Probot;
   loggingOptions?: LoggingOptions;
+  request?: RequestRequestOptions;
 };
 
 export type MiddlewareOptions = {

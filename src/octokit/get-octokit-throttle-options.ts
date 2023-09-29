@@ -25,7 +25,7 @@ export function getOctokitThrottleOptions(options: Options) {
 
         // Retry twice after hitting a rate limit error, then give up
         if (options.request.retryCount <= 2) {
-          console.log(`Retrying after ${retryAfter} seconds!`);
+          log.info(`Retrying after ${retryAfter} seconds!`);
           return true;
         }
         return false;
@@ -55,7 +55,7 @@ export function getOctokitThrottleOptions(options: Options) {
 
       // Retry twice after hitting a rate limit error, then give up
       if (options.request.retryCount <= 2) {
-        console.log(`Retrying after ${retryAfter} seconds!`);
+        log.info(`Retrying after ${retryAfter} seconds!`);
         return true;
       }
       return false;

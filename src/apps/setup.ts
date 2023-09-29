@@ -52,7 +52,10 @@ export const setupAppFactory = (
 
     route.get("/probot/setup", async (req: Request, res: Response) => {
       const { code } = req.query;
-      const response = await setup.createAppFromCode(code);
+      const response = await setup.createAppFromCode(code, {
+        // @ts-ignore
+        request: app.state.request,
+      });
 
       // If using glitch, restart the app
       if (process.env.PROJECT_DOMAIN) {

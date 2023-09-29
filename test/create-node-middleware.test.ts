@@ -3,7 +3,6 @@ import Stream from "stream";
 
 import pino from "pino";
 import getPort from "get-port";
-import got from "got";
 import { sign } from "@octokit/webhooks-methods";
 
 import { createNodeMiddleware, createProbot, Probot } from "../src";
@@ -84,7 +83,9 @@ describe("createNodeMiddleware", () => {
 
     const body = JSON.stringify(pushEvent);
 
-    await got.post(`http://127.0.0.1:${port}`, {
+    // @ts-ignore
+    await fetch(`http://127.0.0.1:${port}`, {
+      method: "POST",
       headers: {
         "content-type": "application/json",
         "x-github-event": "push",

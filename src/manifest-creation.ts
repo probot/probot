@@ -3,6 +3,7 @@ import yaml from "js-yaml";
 import path from "path";
 import updateDotenv from "update-dotenv";
 import { ProbotOctokit } from "./octokit/probot-octokit";
+import { OctokitOptions } from "@octokit/core/dist-types/types.d";
 
 export class ManifestCreation {
   get pkg() {
@@ -65,9 +66,10 @@ export class ManifestCreation {
     return generatedManifest;
   }
 
-  public async createAppFromCode(code: any) {
-    const octokit = new ProbotOctokit();
+  public async createAppFromCode(code: any, probotOptions?: OctokitOptions) {
+    const octokit = new ProbotOctokit(probotOptions);
     const options: any = {
+      ...probotOptions,
       code,
       mediaType: {
         previews: ["fury"], // needed for GHES 2.20 and older

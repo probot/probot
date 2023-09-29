@@ -20,16 +20,16 @@ Array [
 `;
 
 exports[`Setup app POST /probot/import updates .env 1`] = `
-Array [
-  Array [
-    Object {
+[
+  [
+    {
       "WEBHOOK_PROXY_URL": "mocked proxy URL",
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "APP_ID": "foo",
-      "PRIVATE_KEY": "\\"bar\\"",
+      "PRIVATE_KEY": ""bar"",
       "WEBHOOK_SECRET": "baz",
     },
   ],

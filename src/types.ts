@@ -12,6 +12,7 @@ import { Context } from "./context";
 import { ProbotOctokit } from "./octokit/probot-octokit";
 
 import type { Logger, LogFn } from "pino";
+import { RequestRequestOptions } from "@octokit/types";
 
 export interface Options {
   privateKey?: string;
@@ -27,6 +28,7 @@ export interface Options {
   port?: number;
   host?: string;
   baseUrl?: string;
+  request?: RequestRequestOptions;
 }
 
 export type State = {
@@ -43,6 +45,7 @@ export type State = {
   port?: number;
   host?: string;
   baseUrl?: string;
+  request?: RequestRequestOptions;
 };
 
 type SimplifiedObject = Omit<Context, keyof WebhookEvent>;

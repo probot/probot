@@ -36,7 +36,7 @@ export async function getAuthenticatedOctokit(
         },
         throttle: {
           ...octokitOptions.throttle,
-          id: installationId,
+          id: "" + installationId,
         },
         auth: {
           ...octokitOptions.auth,
@@ -47,7 +47,7 @@ export async function getAuthenticatedOctokit(
 
       const Octokit = octokit.constructor as typeof ProbotOctokit;
 
-      return new Octokit(options);
+      return new Octokit(options as any);
     },
   }) as Promise<InstanceType<typeof ProbotOctokit>>;
 }

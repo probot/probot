@@ -2,7 +2,6 @@ import LRUCache from "lru-cache";
 import { Logger } from "pino";
 import { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
 
-import { aliasLog } from "./helpers/alias-log";
 import { auth } from "./auth";
 import { getLog } from "./helpers/get-log";
 import { getProbotOctokitWithDefaults } from "./octokit/get-probot-octokit-with-defaults";
@@ -12,7 +11,6 @@ import { VERSION } from "./version";
 import {
   ApplicationFunction,
   ApplicationFunctionOptions,
-  DeprecatedLogger,
   Options,
   ProbotWebhooks,
   State,
@@ -34,7 +32,7 @@ export class Probot {
   }
 
   public webhooks: ProbotWebhooks;
-  public log: DeprecatedLogger;
+  public log: Logger;
   public version: String;
   public on: ProbotWebhooks["on"];
   public onAny: ProbotWebhooks["onAny"];
@@ -52,7 +50,7 @@ export class Probot {
     let level = options.logLevel;
     const logMessageKey = options.logMessageKey;
 
-    this.log = aliasLog(options.log || getLog({ level, logMessageKey }));
+    this.log = options.log || getLog({ level, logMessageKey });
 
     // TODO: support redis backend for access token cache if `options.redisConfig`
     const cache = new LRUCache<number, string>({
@@ -72,7 +70,10 @@ export class Probot {
       redisConfig: options.redisConfig,
       baseUrl: options.baseUrl,
     });
-    const octokit = new Octokit();
+
+    const octokit = new Octokit({
+      request: options.request,
+    });
 
     this.state = {
       cache,
@@ -87,6 +88,7 @@ export class Probot {
       privateKey: options.privateKey,
       host: options.host,
       port: options.port,
+      request: options.request,
     };
 
     this.auth = auth.bind(null, this.state);

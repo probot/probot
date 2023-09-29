@@ -1,8 +1,8 @@
 import fs from "fs";
-import nock from "nock";
 import pkg from "../package.json";
 import { ManifestCreation } from "../src/manifest-creation";
 import response from "./fixtures/setup/response.json";
+import fetchMock from "fetch-mock";
 
 describe("ManifestCreation", () => {
   let setup: ManifestCreation;
@@ -100,11 +100,18 @@ describe("ManifestCreation", () => {
     });
 
     test("creates an app from a code", async () => {
-      nock("https://api.github.com")
-        .post("/app-manifests/123abc/conversions")
-        .reply(200, response);
+      const fetch = fetchMock
+        .sandbox()
+        .postOnce("https://api.github.com/app-manifests/123abc/conversions", {
+          status: 200,
+          body: response,
+        });
 
-      const createdApp = await setup.createAppFromCode("123abc");
+      const createdApp = await setup.createAppFromCode("123abc", {
+        request: {
+          fetch,
+        },
+      });
       expect(createdApp).toEqual("https://github.com/apps/testerino0000000");
       // expect dotenv to be called with id, webhook_secret, pem
       expect(setup.updateEnv).toHaveBeenCalledWith({
@@ -118,11 +125,21 @@ describe("ManifestCreation", () => {
     test("creates an app from a code when github host env is set", async () => {
       process.env.GHE_HOST = "swinton.github.com";
 
-      nock("https://swinton.github.com")
-        .post("/api/v3/app-manifests/123abc/conversions")
-        .reply(200, response);
+      const fetch = fetchMock
+        .sandbox()
+        .postOnce(
+          "https://swinton.github.com/api/v3/app-manifests/123abc/conversions",
+          {
+            status: 200,
+            body: response,
+          }
+        );
 
-      const createdApp = await setup.createAppFromCode("123abc");
+      const createdApp = await setup.createAppFromCode("123abc", {
+        request: {
+          fetch,
+        },
+      });
       expect(createdApp).toEqual("https://github.com/apps/testerino0000000");
       // expect dotenv to be called with id, webhook_secret, pem
       expect(setup.updateEnv).toHaveBeenCalledWith({

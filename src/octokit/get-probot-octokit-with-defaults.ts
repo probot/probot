@@ -6,6 +6,7 @@ import { getOctokitThrottleOptions } from "./get-octokit-throttle-options";
 import { aliasLog } from "../helpers/alias-log";
 
 import type { Logger } from "pino";
+import { RequestRequestOptions } from "@octokit/types";
 
 type Options = {
   cache: LRUCache<number, string>;
@@ -16,6 +17,7 @@ type Options = {
   privateKey?: string;
   redisConfig?: Redis.RedisOptions | string;
   baseUrl?: string;
+  request?: RequestRequestOptions;
 };
 
 /**

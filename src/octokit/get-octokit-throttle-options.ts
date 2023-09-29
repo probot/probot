@@ -1,6 +1,12 @@
 import Bottleneck from "bottleneck";
 import Redis from "ioredis";
 import { Logger } from "pino";
+import { throttling } from "@octokit/plugin-throttling";
+
+type ThrottlingOptions = Exclude<
+  Parameters<typeof throttling>[1]["throttle"],
+  undefined
+>;
 
 type Options = {
   log: Logger;
@@ -10,7 +16,27 @@ type Options = {
 export function getOctokitThrottleOptions(options: Options) {
   let { log, redisConfig } = options;
 
-  if (!redisConfig) return;
+  if (!redisConfig)
+    return {
+      onRateLimit: (retryAfter, options: { [key: string]: any }) => {
+        log.warn(
+          `Request quota exhausted for request ${options.method} ${options.url}`
+        );
+
+        // Retry twice after hitting a rate limit error, then give up
+        if (options.request.retryCount <= 2) {
+          console.log(`Retrying after ${retryAfter} seconds!`);
+          return true;
+        }
+        return false;
+      },
+      onSecondaryRateLimit: (retryAfter, options: { [key: string]: any }) => {
+        // does not retry, only logs a warning
+        log.warn(
+          `Secondary quota detected for request ${options.method} ${options.url}`
+        );
+      },
+    } as ThrottlingOptions;
 
   const connection = new Bottleneck.IORedisConnection({
     client: getRedisClient(options),
@@ -19,10 +45,30 @@ export function getOctokitThrottleOptions(options: Options) {
     log.error(Object.assign(error, { source: "bottleneck" }));
   });
 
-  return {
+  const throttlingOptions: ThrottlingOptions = {
     Bottleneck,
     connection,
+    onRateLimit: (retryAfter, options: { [key: string]: any }) => {
+      log.warn(
+        `Request quota exhausted for request ${options.method} ${options.url}`
+      );
+
+      // Retry twice after hitting a rate limit error, then give up
+      if (options.request.retryCount <= 2) {
+        console.log(`Retrying after ${retryAfter} seconds!`);
+        return true;
+      }
+      return false;
+    },
+    onSecondaryRateLimit: (retryAfter, options: { [key: string]: any }) => {
+      // does not retry, only logs a warning
+      log.warn(
+        `Secondary quota detected for request ${options.method} ${options.url}`
+      );
+    },
   };
+
+  return throttlingOptions;
 }
 
 function getRedisClient({ log, redisConfig }: Options): Redis.Redis | void {

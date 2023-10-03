@@ -78,3 +78,7 @@ export type MiddlewareOptions = {
   webhooksPath?: string;
   [key: string]: unknown;
 };
+
+export type OctokitOptions = NonNullable<
+  ConstructorParameters<typeof ProbotOctokit>[0]
+>;

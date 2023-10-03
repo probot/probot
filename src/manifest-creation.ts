@@ -3,10 +3,7 @@ import yaml from "js-yaml";
 import path from "path";
 import updateDotenv from "update-dotenv";
 import { ProbotOctokit } from "./octokit/probot-octokit";
-
-type OctokitOptions = NonNullable<
-  ConstructorParameters<typeof ProbotOctokit>[0]
->;
+import type { OctokitOptions } from "./types";
 
 export class ManifestCreation {
   get pkg() {

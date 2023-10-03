@@ -1,9 +1,10 @@
 import { State } from "../types";
 import { ProbotOctokit } from "./probot-octokit";
+import type { OctokitOptions } from "../types";
 
 type FactoryOptions = {
   octokit: InstanceType<typeof ProbotOctokit>;
-  octokitOptions: ConstructorParameters<typeof ProbotOctokit> & {
+  octokitOptions: OctokitOptions & {
     throttle?: Record<string, unknown>;
     auth?: Record<string, unknown>;
   };

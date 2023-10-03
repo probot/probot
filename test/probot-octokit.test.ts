@@ -1,12 +1,11 @@
 import fetchMock from "fetch-mock";
 import { ProbotOctokit } from "../src/octokit/probot-octokit";
 import { Headers } from "undici";
-import { RequestError } from "@octokit/types";
-
-type Options = ConstructorParameters<typeof ProbotOctokit>[0];
+import type { RequestError } from "@octokit/types";
+import type { OctokitOptions } from "../src/types";
 
 describe("ProbotOctokit", () => {
-  const defaultOptions: Options = {
+  const defaultOptions: OctokitOptions = {
     retry: {
       // disable retries to test error states
       enabled: false,

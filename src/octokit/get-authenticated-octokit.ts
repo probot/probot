@@ -36,7 +36,7 @@ export async function getAuthenticatedOctokit(
         },
         throttle: {
           ...octokitOptions.throttle,
-          id: "" + installationId,
+          id: String(installationId),
           request: state.request,
         },
         auth: {

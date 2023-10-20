@@ -14,7 +14,8 @@
     "noImplicitAny": true,
     "esModuleInterop": true,
     "declaration": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "lib": ["es2023", "dom"]
   },
   "include": ["src/**/*"],
   "compileOnSave": false

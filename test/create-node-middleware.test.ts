@@ -84,7 +84,6 @@ describe("createNodeMiddleware", () => {
 
     const body = JSON.stringify(pushEvent);
 
-    // @ts-ignore
     await fetch(`http://127.0.0.1:${port}`, {
       method: "POST",
       headers: {

@@ -100,7 +100,6 @@ describe("end-to-end-tests", () => {
     });
 
     try {
-      // @ts-ignore
       await fetch(`http://127.0.0.1:${probotPort}/`, {
         method: "POST",
         headers: {

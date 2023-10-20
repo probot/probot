@@ -115,7 +115,6 @@ describe("Setup app", () => {
         log: pino(streamLogsToOutput),
         request: {
           fetch: async (url: string, options: { [key: string]: any }) => {
-            // @ts-ignore
             return fetch(url, options);
           },
         },

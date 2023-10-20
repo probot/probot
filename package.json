@@ -83,7 +83,7 @@
     "bottleneck": "^2.19.5",
     "connect-sse": "^1.2.0",
     "execa": "^5.0.0",
-    "fetch-mock": "^9.11.0",
+    "fetch-mock": "npm:@gr2m/fetch-mock@9.11.0-pull-request-644.1",
     "get-port": "^5.1.1",
     "jest": "^29.6.4",
     "nock": "^13.0.5",

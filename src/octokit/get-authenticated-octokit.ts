@@ -1,4 +1,4 @@
-import { State } from "../types";
+import type { State } from "../types";
 import { ProbotOctokit } from "./probot-octokit";
 import type { OctokitOptions } from "../types";
 

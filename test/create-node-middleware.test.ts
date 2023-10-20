@@ -6,8 +6,9 @@ import getPort from "get-port";
 import { sign } from "@octokit/webhooks-methods";
 
 import { createNodeMiddleware, createProbot, Probot } from "../src";
-import { ApplicationFunction } from "../src/types";
-import WebhookExamples, { WebhookDefinition } from "@octokit/webhooks-examples";
+import type { ApplicationFunction } from "../src/types";
+import WebhookExamples from "@octokit/webhooks-examples";
+import type { WebhookDefinition } from "@octokit/webhooks-examples";
 
 const APP_ID = "1";
 const PRIVATE_KEY = `-----BEGIN RSA PRIVATE KEY-----
@@ -47,7 +48,7 @@ const pushEvent = (
 describe("createNodeMiddleware", () => {
   let output: any[];
   const streamLogsToOutput = new Stream.Writable({ objectMode: true });
-  streamLogsToOutput._write = (object, encoding, done) => {
+  streamLogsToOutput._write = (object, _encoding, done) => {
     output.push(JSON.parse(object));
     done();
   };

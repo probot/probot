@@ -6,7 +6,7 @@ import { getOctokitThrottleOptions } from "./get-octokit-throttle-options";
 import { aliasLog } from "../helpers/alias-log";
 
 import type { Logger } from "pino";
-import { RequestRequestOptions } from "@octokit/types";
+import type { RequestRequestOptions } from "@octokit/types";
 
 type Options = {
   cache: LRUCache<number, string>;

@@ -1,4 +1,5 @@
-import express, { Response } from "express";
+import express from "express";
+import type { Response } from "express";
 // tslint:disable-next-line:no-var-requires
 const sse: (
   req: express.Request,
@@ -33,7 +34,7 @@ describe("webhook-proxy", () => {
     beforeEach((done) => {
       const app = express();
 
-      app.get("/events", sse, (req, res: SSEResponse) => {
+      app.get("/events", sse, (_req, res: SSEResponse) => {
         res.json({}, "ready");
         emit = res.json;
       });

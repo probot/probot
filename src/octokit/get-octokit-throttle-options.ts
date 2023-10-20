@@ -1,6 +1,6 @@
 import Bottleneck from "bottleneck";
 import Redis from "ioredis";
-import { Logger } from "pino";
+import type { Logger } from "pino";
 import { throttling } from "@octokit/plugin-throttling";
 
 type ThrottlingOptions = Exclude<
@@ -29,7 +29,7 @@ export function getOctokitThrottleOptions(options: Options) {
       }
       return false;
     },
-    onSecondaryRateLimit: (retryAfter, options: { [key: string]: any }) => {
+    onSecondaryRateLimit: (_retryAfter, options: { [key: string]: any }) => {
       // does not retry, only logs a warning
       log.warn(
         `Secondary quota detected for request ${options.method} ${options.url}`
@@ -52,6 +52,6 @@ export function getOctokitThrottleOptions(options: Options) {
   return throttlingOptions;
 }
 
-function getRedisClient({ log, redisConfig }: Options): Redis.Redis | void {
+function getRedisClient({ redisConfig }: Options): Redis.Redis | void {
   if (redisConfig) return new Redis(redisConfig as Redis.RedisOptions);
 }

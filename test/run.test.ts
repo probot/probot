@@ -1,4 +1,4 @@
-import path = require("path");
+import path from "path";
 
 import request from "supertest";
 import { sign } from "@octokit/webhooks-methods";
@@ -6,7 +6,8 @@ import { sign } from "@octokit/webhooks-methods";
 import { Probot, run, Server } from "../src";
 
 import { captureLogOutput } from "./helpers/capture-log-output";
-import WebhookExamples, { WebhookDefinition } from "@octokit/webhooks-examples";
+import WebhookExamples from "@octokit/webhooks-examples";
+import type { WebhookDefinition } from "@octokit/webhooks-examples";
 
 // tslint:disable:no-empty
 describe("run", () => {
@@ -59,7 +60,7 @@ describe("run", () => {
 
       return new Promise(async (resolve) => {
         server = await run(
-          (app: Probot) => {
+          (_app: Probot) => {
             initialized = true;
           },
           { env }

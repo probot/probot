@@ -1,6 +1,8 @@
 {
-  "extends": "@tsconfig/node10/tsconfig.json",
+  "extends": "@octokit/tsconfig",
   "compilerOptions": {
+    "module": "CommonJS",
+    "verbatimModuleSyntax": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,

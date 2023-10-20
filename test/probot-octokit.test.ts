@@ -196,7 +196,7 @@ describe("ProbotOctokit", () => {
   });
 
   // Prepare an array of issue objects
-  const issues = new Array(5).fill(0).map((_, i, arr) => {
+  const issues = new Array(5).fill(0).map((_, i) => {
     return {
       id: i,
       number: i,

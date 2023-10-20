@@ -10,7 +10,7 @@ describe("resolver", () => {
   it("loads the module at the resolved path", async () => {
     const stubResolver = jest.fn().mockReturnValue(stubAppFnPath);
     const module = await resolveAppFunction("foo", { resolver: stubResolver });
-    expect(module).toBe(require(stubAppFnPath));
+    expect(module).toBe(require(stubAppFnPath).default);
     expect(stubResolver).toHaveBeenCalledWith("foo", { basedir });
   });
 

@@ -1,7 +1,7 @@
-import { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
+import type { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
 
 import { Context } from "../context";
-import { State } from "../types";
+import type { State } from "../types";
 
 /**
  * Probot's transform option, which extends the `event` object that is passed

@@ -1,5 +1,5 @@
 import type { Logger } from "pino";
-import {
+import type {
   WebhookError,
   EmitterWebhookEvent as WebhookEvent,
 } from "@octokit/webhooks";

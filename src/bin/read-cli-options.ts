@@ -1,8 +1,8 @@
 import program from "commander";
 import { getPrivateKey } from "@probot/get-private-key";
-import { Options as PinoOptions } from "@probot/pino";
+import type { Options as PinoOptions } from "@probot/pino";
 
-import { Options } from "../types";
+import type { Options } from "../types";
 
 export function readCliOptions(
   argv: string[]

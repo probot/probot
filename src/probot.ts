@@ -1,6 +1,6 @@
 import LRUCache from "lru-cache";
-import { Logger } from "pino";
-import { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
+import type { Logger } from "pino";
+import type { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
 
 import { auth } from "./auth";
 import { getLog } from "./helpers/get-log";
@@ -8,7 +8,7 @@ import { getProbotOctokitWithDefaults } from "./octokit/get-probot-octokit-with-
 import { getWebhooks } from "./octokit/get-webhooks";
 import { ProbotOctokit } from "./octokit/probot-octokit";
 import { VERSION } from "./version";
-import {
+import type {
   ApplicationFunction,
   ApplicationFunctionOptions,
   Options,

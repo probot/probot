@@ -1,6 +1,6 @@
 import { Octokit } from "@octokit/core";
 import { enterpriseCompatibility } from "@octokit/plugin-enterprise-compatibility";
-import { RequestOptions } from "@octokit/types";
+import type { RequestOptions } from "@octokit/types";
 import { paginateRest } from "@octokit/plugin-paginate-rest";
 import { legacyRestEndpointMethods } from "@octokit/plugin-rest-endpoint-methods";
 import { retry } from "@octokit/plugin-retry";

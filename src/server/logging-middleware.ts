@@ -14,7 +14,7 @@ export function getLoggingMiddleware(
       // @ts-ignore
       return `${res.req.method} ${res.req.url} ${res.statusCode} - ${responseTime}ms`;
     },
-    customErrorMessage(err, res) {
+    customErrorMessage(_err, res) {
       const responseTime = Date.now() - res[pinoHttp.startTime];
       // @ts-ignore
       return `${res.req.method} ${res.req.url} ${res.statusCode} - ${responseTime}ms`;

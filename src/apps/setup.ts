@@ -1,12 +1,12 @@
 import bodyParser from "body-parser";
 import { exec } from "child_process";
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import updateDotenv from "update-dotenv";
 
 import { Probot } from "../probot";
 import { ManifestCreation } from "../manifest-creation";
 import { getLoggingMiddleware } from "../server/logging-middleware";
-import { ApplicationFunctionOptions } from "../types";
+import type { ApplicationFunctionOptions } from "../types";
 import { isProduction } from "../helpers/is-production";
 
 export const setupAppFactory = (
@@ -92,11 +92,11 @@ export const setupAppFactory = (
       printRestartMessage(app);
     });
 
-    route.get("/probot/success", async (req, res) => {
+    route.get("/probot/success", async (_req, res) => {
       res.render("success.handlebars");
     });
 
-    route.get("/", (req, res) => res.redirect("/probot"));
+    route.get("/", (_req, res) => res.redirect("/probot"));
   };
 
 function printWelcomeMessage(

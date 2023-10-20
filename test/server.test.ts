@@ -1,11 +1,12 @@
 import Stream from "stream";
 
-import { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import request from "supertest";
 import pino from "pino";
 import { sign } from "@octokit/webhooks-methods";
 import getPort from "get-port";
-import WebhookExamples, { WebhookDefinition } from "@octokit/webhooks-examples";
+import WebhookExamples from "@octokit/webhooks-examples";
+import type { WebhookDefinition } from "@octokit/webhooks-examples";
 
 import { Server, Probot } from "../src";
 
@@ -48,7 +49,7 @@ describe("Server", () => {
 
   let output: any[];
   const streamLogsToOutput = new Stream.Writable({ objectMode: true });
-  streamLogsToOutput._write = (object, encoding, done) => {
+  streamLogsToOutput._write = (object, _encoding, done) => {
     output.push(JSON.parse(object));
     done();
   };
@@ -68,7 +69,7 @@ describe("Server", () => {
 
     // Error handler to avoid printing logs
     server.expressApp.use(
-      (error: Error, req: Request, res: Response, next: NextFunction) => {
+      (error: Error, _req: Request, res: Response, _next: NextFunction) => {
         res.status(500).send(error.message);
       }
     );
@@ -204,14 +205,14 @@ describe("Server", () => {
   describe("router", () => {
     it("prefixes paths with route name", () => {
       const router = server.router("/my-app");
-      router.get("/foo", (req, res) => res.end("foo"));
+      router.get("/foo", (_req, res) => res.end("foo"));
 
       return request(server.expressApp).get("/my-app/foo").expect(200, "foo");
     });
 
     it("allows routes with no path", () => {
       const router = server.router();
-      router.get("/foo", (req, res) => res.end("foo"));
+      router.get("/foo", (_req, res) => res.end("foo"));
 
       return request(server.expressApp).get("/foo").expect(200, "foo");
     });
@@ -219,7 +220,7 @@ describe("Server", () => {
     // webhooks overwrite the root path
     xit("allows you to overwrite the root path", () => {
       const router = server.router();
-      router.get("/", (req, res) => res.end("foo"));
+      router.get("/", (_req, res) => res.end("foo"));
 
       return request(server.expressApp).get("/").expect(200, "foo");
     });
@@ -228,12 +229,12 @@ describe("Server", () => {
       ["foo", "bar"].forEach((name) => {
         const router = server.router("/" + name);
 
-        router.use((req, res, next) => {
+        router.use((_req, res, next) => {
           res.append("X-Test", name);
           next();
         });
 
-        router.get("/hello", (req, res) => res.end(name));
+        router.get("/hello", (_req, res) => res.end(name));
       });
 
       await request(server.expressApp)

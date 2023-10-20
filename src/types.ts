@@ -1,18 +1,18 @@
 import express from "express";
-import {
+import type {
   EmitterWebhookEvent as WebhookEvent,
   Webhooks,
 } from "@octokit/webhooks";
 import LRUCache from "lru-cache";
 import Redis from "ioredis";
-import { Options as LoggingOptions } from "pino-http";
+import type { Options as LoggingOptions } from "pino-http";
 
 import { Probot } from "./index";
 import { Context } from "./context";
 import { ProbotOctokit } from "./octokit/probot-octokit";
 
 import type { Logger, LogFn } from "pino";
-import { RequestRequestOptions } from "@octokit/types";
+import type { RequestRequestOptions } from "@octokit/types";
 
 export interface Options {
   privateKey?: string;

@@ -1,13 +1,14 @@
-import fs = require("fs");
-import path = require("path");
+import fs from "fs";
+import path from "path";
 
-import { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
-import WebhookExamples, { WebhookDefinition } from "@octokit/webhooks-examples";
+import type { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
+import WebhookExamples from "@octokit/webhooks-examples";
+import type { WebhookDefinition } from "@octokit/webhooks-examples";
 import fetchMock from "fetch-mock";
 
 import { Context } from "../src";
 import { ProbotOctokit } from "../src/octokit/probot-octokit";
-import { PushEvent } from "@octokit/webhooks-types";
+import type { PushEvent } from "@octokit/webhooks-types";
 
 const pushEventPayload = (
   WebhookExamples.filter(

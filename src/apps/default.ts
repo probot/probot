@@ -1,8 +1,8 @@
 import path from "path";
-import { ApplicationFunctionOptions, Probot } from "../index";
+import type { ApplicationFunctionOptions, Probot } from "../index";
 
 export function defaultApp(
-  app: Probot,
+  _app: Probot,
   { getRouter }: ApplicationFunctionOptions
 ) {
   if (!getRouter) {
@@ -11,7 +11,7 @@ export function defaultApp(
 
   const router = getRouter();
 
-  router.get("/probot", (req, res) => {
+  router.get("/probot", (_req, res) => {
     let pkg;
     try {
       pkg = require(path.join(process.cwd(), "package.json"));
@@ -22,5 +22,5 @@ export function defaultApp(
     res.render("probot.handlebars", pkg);
   });
 
-  router.get("/", (req, res) => res.redirect("/probot"));
+  router.get("/", (_req, res) => res.redirect("/probot"));
 }

@@ -1,6 +1,6 @@
 import Stream from "stream";
 
-import {
+import type {
   EmitterWebhookEvent,
   EmitterWebhookEvent as WebhookEvent,
 } from "@octokit/webhooks";
@@ -11,7 +11,7 @@ import pino from "pino";
 import { Probot, ProbotOctokit, Context } from "../src";
 
 import webhookExamples from "@octokit/webhooks-examples";
-import { EmitterWebhookEventName } from "@octokit/webhooks/dist-types/types";
+import type { EmitterWebhookEventName } from "@octokit/webhooks/dist-types/types";
 
 const appId = 1;
 const privateKey = `-----BEGIN RSA PRIVATE KEY-----
@@ -70,7 +70,7 @@ describe("Probot", () => {
   let output: any;
 
   const streamLogsToOutput = new Stream.Writable({ objectMode: true });
-  streamLogsToOutput._write = (object, encoding, done) => {
+  streamLogsToOutput._write = (object, _encoding, done) => {
     output.push(JSON.parse(object));
     done();
   };
@@ -123,7 +123,7 @@ describe("Probot", () => {
     it("shouldn't overwrite `options.throttle` passed to `{Octokit: ProbotOctokit.defaults(options)}`", () => {
       expect.assertions(1);
 
-      const MyOctokit = ProbotOctokit.plugin((octokit, options) => {
+      const MyOctokit = ProbotOctokit.plugin((_octokit, options) => {
         expect(options.throttle?.enabled).toEqual(false);
       }).defaults({
         appId,
@@ -302,7 +302,7 @@ describe("Probot", () => {
       probot = new Probot({
         githubToken: "faketoken",
         redisConfig: "test",
-        Octokit: ProbotOctokit.plugin((octokit, options) => {
+        Octokit: ProbotOctokit.plugin((_octokit, options) => {
           expect(options.throttle?.Bottleneck).toBe(Bottleneck);
           expect(options.throttle?.connection).toBeInstanceOf(
             Bottleneck.IORedisConnection
@@ -322,7 +322,7 @@ describe("Probot", () => {
       probot = new Probot({
         githubToken: "faketoken",
         redisConfig,
-        Octokit: ProbotOctokit.plugin((octokit, options) => {
+        Octokit: ProbotOctokit.plugin((_octokit, options) => {
           expect(options.throttle?.Bottleneck).toBe(Bottleneck);
           expect(options.throttle?.connection).toBeInstanceOf(
             Bottleneck.IORedisConnection
@@ -456,9 +456,9 @@ describe("Probot", () => {
         .getOnce(
           function (url, opts) {
             if (url === "https://api.github.com/") {
-              expect(opts.headers.authorization).toEqual(
-                "token v1.1f699f1069f60xxx"
-              );
+              expect(
+                (opts.headers as Record<string, string>).authorization
+              ).toEqual("token v1.1f699f1069f60xxx");
               return true;
             }
             throw new Error("Should have matched");
@@ -495,7 +495,9 @@ describe("Probot", () => {
       const fetch = fetchMock.sandbox().getOnce(
         function (url, opts) {
           if (url === "https://api.github.com/") {
-            expect(opts.headers.authorization).toEqual(undefined);
+            expect(
+              (opts.headers as Record<string, string>).authorization
+            ).toEqual(undefined);
             return true;
           }
           throw new Error("Should have matched");
@@ -531,7 +533,9 @@ describe("Probot", () => {
       const fetch = fetchMock.sandbox().mock(
         function (url, opts) {
           if (url === "https://api.github.com/") {
-            expect(opts.headers.authorization).toEqual(undefined);
+            expect(
+              (opts.headers as Record<string, string>).authorization
+            ).toEqual(undefined);
             return true;
           }
           throw new Error("Should have matched");

@@ -19,7 +19,7 @@ type ThrottlingOptions = Exclude<
 const defaultOptions = {
   authStrategy: createProbotAuth,
   throttle: {
-    enabled: false,
+    enabled: true,
     onSecondaryRateLimit: (
       retryAfter: number,
       options: RequestOptions,

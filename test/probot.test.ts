@@ -124,7 +124,7 @@ describe("Probot", () => {
       expect.assertions(1);
 
       const MyOctokit = ProbotOctokit.plugin((_octokit, options) => {
-        expect(options.throttle?.enabled).toEqual(false);
+        expect(options.throttle?.enabled).toEqual(true);
       }).defaults({
         appId,
         privateKey,

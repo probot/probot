@@ -1,12 +1,7 @@
 import Bottleneck from "bottleneck";
 import Redis from "ioredis";
 import type { Logger } from "pino";
-import { throttling } from "@octokit/plugin-throttling";
-
-type ThrottlingOptions = Exclude<
-  Parameters<typeof throttling>[1]["throttle"],
-  undefined
->;
+import type { ThrottlingOptions } from "@octokit/plugin-throttling";
 
 type Options = {
   log: Logger;

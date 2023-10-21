@@ -5,16 +5,12 @@ import { paginateRest } from "@octokit/plugin-paginate-rest";
 import { legacyRestEndpointMethods } from "@octokit/plugin-rest-endpoint-methods";
 import { retry } from "@octokit/plugin-retry";
 import { throttling } from "@octokit/plugin-throttling";
+import type { ThrottlingOptions } from "@octokit/plugin-throttling";
 import { config } from "@probot/octokit-plugin-config";
 import { createProbotAuth } from "octokit-auth-probot";
 
 import { probotRequestLogging } from "./octokit-plugin-probot-request-logging";
 import { VERSION } from "../version";
-
-type ThrottlingOptions = Exclude<
-  Parameters<typeof throttling>[1]["throttle"],
-  undefined
->;
 
 const defaultOptions = {
   authStrategy: createProbotAuth,

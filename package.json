@@ -40,7 +40,7 @@
     "@octokit/plugin-paginate-rest": "^9.0.0",
     "@octokit/plugin-rest-endpoint-methods": "^10.0.0",
     "@octokit/plugin-retry": "^6.0.0",
-    "@octokit/plugin-throttling": "^8.0.0",
+    "@octokit/plugin-throttling": "^8.0.1",
     "@octokit/types": "^12.0.0",
     "@octokit/webhooks": "^12.0.0",
     "@probot/get-private-key": "^1.1.0",
@@ -96,7 +96,7 @@
     "supertest": "^6.0.1",
     "ts-jest": "^29.1.1",
     "tsd": "^0.23.0",
-    "typedoc": "^0.22.10",
+    "typedoc": "^0.25.2",
     "typescript": "^5.2.2",
     "undici": "^5.25.2"
   },

@@ -15,6 +15,9 @@ import { Probot } from "../";
 import { engine } from "express-handlebars";
 import EventSource from "eventsource";
 
+// the default path as defined in @octokit/webhooks
+export const defaultWebhooksPath = "/api/github/webhooks";
+
 type State = {
   httpServer?: HttpServer;
   port?: number;
@@ -44,7 +47,7 @@ export class Server {
     this.state = {
       port: options.port,
       host: options.host,
-      webhookPath: options.webhookPath || "/",
+      webhookPath: options.webhookPath || defaultWebhooksPath,
       webhookProxy: options.webhookProxy,
     };
 
@@ -54,9 +57,8 @@ export class Server {
       express.static(join(__dirname, "..", "..", "static"))
     );
     this.expressApp.use(
-      this.state.webhookPath,
       createWebhooksMiddleware(this.probotApp.webhooks, {
-        path: "/",
+        path: this.state.webhookPath,
       })
     );
 

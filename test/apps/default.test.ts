@@ -64,7 +64,7 @@ describe("default app", () => {
   });
 
   // Redirect does not work because webhooks middleware is using root path
-  xdescribe("GET /", () => {
+  describe("GET /", () => {
     it("redirects to /probot", () => {
       return request(server.expressApp)
         .get("/")

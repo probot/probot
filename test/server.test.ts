@@ -58,6 +58,7 @@ describe("Server", () => {
     output = [];
     const log = pino(streamLogsToOutput);
     server = new Server({
+      webhookPath: "/",
       Probot: Probot.defaults({
         appId,
         privateKey,
@@ -92,6 +93,7 @@ describe("Server", () => {
       expect.assertions(3);
 
       server = new Server({
+        webhookPath: "/",
         Probot: Probot.defaults({
           appId,
           privateKey,
@@ -217,8 +219,24 @@ describe("Server", () => {
       return request(server.expressApp).get("/foo").expect(200, "foo");
     });
 
-    // webhooks overwrite the root path
-    xit("allows you to overwrite the root path", () => {
+    it("allows you to overwrite the root path when webhookPath is not defined", () => {
+      const log = pino(streamLogsToOutput);
+      server = new Server({
+        Probot: Probot.defaults({
+          appId,
+          privateKey,
+          secret: "secret",
+          log: log.child({ name: "probot" }),
+        }),
+        log: log.child({ name: "server" }),
+      });
+
+      // Error handler to avoid printing logs
+      server.expressApp.use(
+        (error: Error, _req: Request, res: Response, _next: NextFunction) => {
+          res.status(500).send(error.message);
+        }
+      );
       const router = server.router();
       router.get("/", (_req, res) => res.end("foo"));
 

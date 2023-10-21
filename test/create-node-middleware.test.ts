@@ -84,6 +84,50 @@ describe("createNodeMiddleware", () => {
 
     const body = JSON.stringify(pushEvent);
 
+    await fetch(`http://127.0.0.1:${port}/api/github/webhooks`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-github-event": "push",
+        "x-github-delivery": "1",
+        "x-hub-signature-256": await sign("secret", body),
+      },
+      body,
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    server.close();
+  });
+
+  test("with createProbot and setting the webhooksPath to the root", async () => {
+    expect.assertions(1);
+
+    const app: ApplicationFunction = (app) => {
+      app.on("push", (event) => {
+        expect(event.name).toEqual("push");
+      });
+    };
+    const middleware = createNodeMiddleware(app, {
+      webhooksPath: "/",
+      probot: createProbot({
+        overrides: {
+          log: pino(streamLogsToOutput),
+        },
+        env: {
+          APP_ID,
+          PRIVATE_KEY,
+          WEBHOOK_SECRET,
+        },
+      }),
+    });
+
+    const server = createServer(middleware);
+    const port = await getPort();
+    server.listen(port);
+
+    const body = JSON.stringify(pushEvent);
+
     await fetch(`http://127.0.0.1:${port}`, {
       method: "POST",
       headers: {

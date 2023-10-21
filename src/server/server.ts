@@ -1,7 +1,6 @@
 import { Server as HttpServer } from "http";
 
-import express, { Router } from "express";
-import type { Application } from "express";
+import express, { Router, type Application } from "express";
 import { join } from "path";
 import type { Logger } from "pino";
 import { createNodeMiddleware as createWebhooksMiddleware } from "@octokit/webhooks";

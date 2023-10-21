@@ -10,8 +10,7 @@ import program from "commander";
 import { getPrivateKey } from "@probot/get-private-key";
 import { getLog } from "../helpers/get-log";
 
-import type { ApplicationFunctionOptions } from "../";
-import { Probot } from "../";
+import { Probot, type ApplicationFunctionOptions } from "../";
 import { resolveAppFunction } from "../helpers/resolve-app-function";
 
 async function main() {

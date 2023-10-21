@@ -5,8 +5,9 @@ import request from "supertest";
 import pino from "pino";
 import { sign } from "@octokit/webhooks-methods";
 import getPort from "get-port";
-import WebhookExamples from "@octokit/webhooks-examples";
-import type { WebhookDefinition } from "@octokit/webhooks-examples";
+import WebhookExamples, {
+  type WebhookDefinition,
+} from "@octokit/webhooks-examples";
 
 import { Server, Probot } from "../src";
 

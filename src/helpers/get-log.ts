@@ -16,8 +16,7 @@
  */
 import pino from "pino";
 import type { Logger, LoggerOptions } from "pino";
-import { getTransformStream } from "@probot/pino";
-import type { Options, LogLevel } from "@probot/pino";
+import { getTransformStream, type Options, type LogLevel } from "@probot/pino";
 
 export type GetLogOptions = {
   level?: LogLevel;

@@ -7,8 +7,9 @@ import { sign } from "@octokit/webhooks-methods";
 
 import { createNodeMiddleware, createProbot, Probot } from "../src";
 import type { ApplicationFunction } from "../src/types";
-import WebhookExamples from "@octokit/webhooks-examples";
-import type { WebhookDefinition } from "@octokit/webhooks-examples";
+import WebhookExamples, {
+  type WebhookDefinition,
+} from "@octokit/webhooks-examples";
 
 const APP_ID = "1";
 const PRIVATE_KEY = `-----BEGIN RSA PRIVATE KEY-----

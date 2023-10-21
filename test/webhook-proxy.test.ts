@@ -1,5 +1,4 @@
-import express from "express";
-import type { Response } from "express";
+import express, { type Response } from "express";
 // tslint:disable-next-line:no-var-requires
 const sse: (
   req: express.Request,

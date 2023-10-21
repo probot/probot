@@ -58,7 +58,7 @@
     "express-handlebars": "^6.0.3",
     "ioredis": "^4.27.8",
     "js-yaml": "^3.14.1",
-    "lru-cache": "^6.0.0",
+    "lru-cache": "^10.0.1",
     "octokit-auth-probot": "^1.2.2",
     "pino": "^6.7.0",
     "pino-http": "^5.3.0",

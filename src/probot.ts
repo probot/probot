@@ -1,4 +1,4 @@
-import LRUCache from "lru-cache";
+import { LRUCache } from "lru-cache";
 import type { Logger } from "pino";
 import type { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
 
@@ -57,7 +57,7 @@ export class Probot {
       // cache max. 15000 tokens, that will use less than 10mb memory
       max: 15000,
       // Cache for 1 minute less than GitHub expiry
-      maxAge: 1000 * 60 * 59,
+      ttl: 1000 * 60 * 59,
     });
 
     const Octokit = getProbotOctokitWithDefaults({

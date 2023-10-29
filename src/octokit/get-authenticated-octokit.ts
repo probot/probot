@@ -13,7 +13,7 @@ type FactoryOptions = {
 
 export async function getAuthenticatedOctokit(
   state: State,
-  installationId?: number
+  installationId?: number,
 ) {
   const { log, octokit } = state;
 

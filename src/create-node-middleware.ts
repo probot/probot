@@ -6,7 +6,7 @@ import { defaultWebhooksPath } from "./server/server";
 
 export function createNodeMiddleware(
   appFn: ApplicationFunction,
-  { probot, webhooksPath }: MiddlewareOptions
+  { probot, webhooksPath }: MiddlewareOptions,
 ): RequestListener {
   probot.load(appFn);
 

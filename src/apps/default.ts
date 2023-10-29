@@ -3,7 +3,7 @@ import type { ApplicationFunctionOptions, Probot } from "../index";
 
 export function defaultApp(
   _app: Probot,
-  { getRouter }: ApplicationFunctionOptions
+  { getRouter }: ApplicationFunctionOptions,
 ) {
   if (!getRouter) {
     throw new Error("getRouter() is required for defaultApp");

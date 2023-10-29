@@ -54,7 +54,7 @@ describe("logging", () => {
             method: "GET",
             remoteAddress: "::ffff:127.0.0.1",
             url: "/",
-          })
+          }),
         );
 
         expect(output[0].res).toEqual(
@@ -62,7 +62,7 @@ describe("logging", () => {
             headers: expect.objectContaining({
               "x-test-header": "testing",
             }),
-          })
+          }),
         );
       });
   });

@@ -59,7 +59,7 @@ export type ApplicationFunctionOptions = {
 };
 export type ApplicationFunction = (
   app: Probot,
-  options: ApplicationFunctionOptions
+  options: ApplicationFunctionOptions,
 ) => void;
 
 export type ServerOptions = {

@@ -17,7 +17,7 @@ module.exports = (app) => {
         response.data.issues.forEach((issue) => {
           context.log.info("Issue: %s", issue.title);
         });
-      }
+      },
     );
   });
 };
@@ -33,7 +33,7 @@ module.exports = (app) => {
     const allIssues = await context.octokit.paginate(
       context.octokit.issues.list,
       context.repo(),
-      (response) => response.data
+      (response) => response.data,
     );
     console.log(allIssues);
   });
@@ -58,7 +58,7 @@ module.exports = (app) => {
             break;
           }
         }
-      }
+      },
     );
   });
 };
@@ -73,7 +73,7 @@ module.exports = (app) => {
   app.on("issues.opened", async (context) => {
     for await (const response of octokit.paginate.iterator(
       context.octokit.issues.list,
-      context.repo()
+      context.repo(),
     )) {
       for (const issue of response.data) {
         if (issue.body.includes("something")) {

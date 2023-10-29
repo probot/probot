@@ -4,7 +4,7 @@ const defaultOptions: ResolveOptions = {};
 
 export const resolveAppFunction = async (
   appFnId: string,
-  opts?: ResolveOptions
+  opts?: ResolveOptions,
 ) => {
   opts = opts || defaultOptions;
   // These are mostly to ease testing

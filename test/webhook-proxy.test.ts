@@ -3,7 +3,7 @@ import express, { type Response } from "express";
 const sse: (
   req: express.Request,
   res: express.Response,
-  next: express.NextFunction
+  next: express.NextFunction,
 ) => void = require("connect-sse")();
 import EventSource from "eventsource";
 import http from "http";

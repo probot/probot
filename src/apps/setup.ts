@@ -11,11 +11,11 @@ import { isProduction } from "../helpers/is-production";
 
 export const setupAppFactory = (
   host: string | undefined,
-  port: number | undefined
+  port: number | undefined,
 ) =>
   async function setupApp(
     app: Probot,
-    { getRouter }: ApplicationFunctionOptions
+    { getRouter }: ApplicationFunctionOptions,
   ) {
     const setup: ManifestCreation = new ManifestCreation();
 
@@ -102,7 +102,7 @@ export const setupAppFactory = (
 function printWelcomeMessage(
   app: Probot,
   host: string | undefined,
-  port: number | undefined
+  port: number | undefined,
 ) {
   // use glitch env to get correct domain welcome message
   // https://glitch.com/help/project/

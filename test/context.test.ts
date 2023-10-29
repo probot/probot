@@ -12,17 +12,17 @@ import type { PushEvent } from "@octokit/webhooks-types";
 
 const pushEventPayload = (
   WebhookExamples.filter(
-    (event) => event.name === "push"
+    (event) => event.name === "push",
   )[0] as WebhookDefinition<"push">
 ).examples[0];
 const issuesEventPayload = (
   WebhookExamples.filter(
-    (event) => event.name === "issues"
+    (event) => event.name === "issues",
   )[0] as WebhookDefinition<"issues">
 ).examples[0];
 const pullRequestEventPayload = (
   WebhookExamples.filter(
-    (event) => event.name === "pull_request"
+    (event) => event.name === "pull_request",
   )[0] as WebhookDefinition<"pull_request">
 ).examples[0] as WebhookEvent<"pull_request">["payload"];
 
@@ -35,7 +35,7 @@ describe("Context", () => {
   let context: Context<"push"> = new Context<"push">(
     event,
     {} as any,
-    {} as any
+    {} as any,
   );
 
   it("inherits the payload", () => {
@@ -99,7 +99,7 @@ describe("Context", () => {
         context.repo();
       } catch (e) {
         expect((e as Error).message).toMatch(
-          "context.repo() is not supported for this webhook event."
+          "context.repo() is not supported for this webhook event.",
         );
       }
     });
@@ -180,7 +180,7 @@ describe("Context", () => {
           owner: "muahaha",
           pull_number: 5,
           repo: "Hello-World",
-        }
+        },
       );
     });
   });
@@ -207,7 +207,7 @@ describe("Context", () => {
         .sandbox()
         .getOnce(
           "https://api.github.com/repos/Codertocat/Hello-World/contents/.github%2Ftest-file.yml",
-          getConfigFile("basic.yml")
+          getConfigFile("basic.yml"),
         );
 
       const octokit = new ProbotOctokit({
@@ -241,11 +241,11 @@ describe("Context", () => {
         .sandbox()
         .getOnce(
           "https://api.github.com/repos/Codertocat/Hello-World/contents/.github%2Ftest-file.yml",
-          NOT_FOUND_RESPONSE
+          NOT_FOUND_RESPONSE,
         )
         .getOnce(
           "https://api.github.com/repos/Codertocat/.github/contents/.github%2Ftest-file.yml",
-          NOT_FOUND_RESPONSE
+          NOT_FOUND_RESPONSE,
         );
 
       const octokit = new ProbotOctokit({
@@ -265,11 +265,11 @@ describe("Context", () => {
         .sandbox()
         .getOnce(
           "https://api.github.com/repos/Codertocat/Hello-World/contents/.github%2Ftest-file.yml",
-          "foo:\n  - name: master\n    shouldChange: changed\n_extends: .github"
+          "foo:\n  - name: master\n    shouldChange: changed\n_extends: .github",
         )
         .getOnce(
           "https://api.github.com/repos/Codertocat/.github/contents/.github%2Ftest-file.yml",
-          "foo:\n  - name: develop\n  - name: master\n    shouldChange: should"
+          "foo:\n  - name: develop\n  - name: master\n    shouldChange: should",
         );
 
       const octokit = new ProbotOctokit({
@@ -282,7 +282,7 @@ describe("Context", () => {
       const context = new Context(event, octokit, {} as any);
 
       const customMerge = jest.fn(
-        (_target: any[], _source: any[], _options: any): any[] => []
+        (_target: any[], _source: any[], _options: any): any[] => [],
       );
       await context.config("test-file.yml", {}, { arrayMerge: customMerge });
       expect(customMerge).toHaveBeenCalled();

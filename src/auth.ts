@@ -32,10 +32,10 @@ import type { State } from "./types";
 export async function auth(
   state: State,
   installationId?: number,
-  log?: Logger
+  log?: Logger,
 ): Promise<InstanceType<typeof ProbotOctokit>> {
   return getAuthenticatedOctokit(
     Object.assign({}, state, log ? { log } : null),
-    installationId
+    installationId,
   );
 }

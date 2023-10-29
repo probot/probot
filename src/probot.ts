@@ -39,7 +39,7 @@ export class Probot {
   public onError: ProbotWebhooks["onError"];
   public auth: (
     installationId?: number,
-    log?: Logger
+    log?: Logger,
   ) => Promise<InstanceType<typeof ProbotOctokit>>;
 
   private state: State;
@@ -109,7 +109,7 @@ export class Probot {
 
   public async load(
     appFn: ApplicationFunction | ApplicationFunction[],
-    options: ApplicationFunctionOptions = {}
+    options: ApplicationFunctionOptions = {},
   ) {
     if (Array.isArray(appFn)) {
       for (const fn of appFn) {

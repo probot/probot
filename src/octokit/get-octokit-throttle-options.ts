@@ -14,7 +14,7 @@ export function getOctokitThrottleOptions(options: Options) {
   const throttlingOptions: ThrottlingOptions = {
     onRateLimit: (retryAfter, options: { [key: string]: any }) => {
       log.warn(
-        `Request quota exhausted for request ${options.method} ${options.url}`
+        `Request quota exhausted for request ${options.method} ${options.url}`,
       );
 
       // Retry twice after hitting a rate limit error, then give up
@@ -27,7 +27,7 @@ export function getOctokitThrottleOptions(options: Options) {
     onSecondaryRateLimit: (_retryAfter, options: { [key: string]: any }) => {
       // does not retry, only logs a warning
       log.warn(
-        `Secondary quota detected for request ${options.method} ${options.url}`
+        `Secondary quota detected for request ${options.method} ${options.url}`,
       );
     },
   };

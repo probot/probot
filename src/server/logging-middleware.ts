@@ -4,7 +4,7 @@ import { randomUUID as uuidv4 } from "crypto";
 
 export function getLoggingMiddleware(
   logger: Logger,
-  options?: pinoHttp.Options
+  options?: pinoHttp.Options,
 ) {
   return pinoHttp({
     ...options,

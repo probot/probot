@@ -25,7 +25,9 @@ export async function getAuthenticatedOctokit(
     factory: ({ octokit, octokitOptions, ...otherOptions }: FactoryOptions) => {
       const pinoLog = log.child({ name: "github" });
 
-      const options: ConstructorParameters<typeof ProbotOctokit>[0] & { log: { fatal: any; trace: any;}; request: typeof state.request } = {
+      const options: ConstructorParameters<typeof ProbotOctokit>[0] & {
+        log: { fatal: any; trace: any };
+      } = {
         ...octokitOptions,
         log: {
           fatal: pinoLog.fatal.bind(pinoLog),

@@ -3,7 +3,7 @@ import type {
   EmitterWebhookEvent as WebhookEvent,
   Webhooks,
 } from "@octokit/webhooks";
-import type {LRUCache} from "lru-cache";
+import type { LRUCache } from "lru-cache";
 import type * as Redis from "ioredis";
 import type { Options as LoggingOptions } from "pino-http";
 

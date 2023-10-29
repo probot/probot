@@ -17,7 +17,7 @@ describe("run", () => {
   let env: NodeJS.ProcessEnv;
   let output: any[];
   const streamLogsToOutput = new Stream.Writable({ objectMode: true });
-  streamLogsToOutput._write = (object, encoding, done) => {
+  streamLogsToOutput._write = (object, _encoding, done) => {
     output.push(JSON.parse(object));
     done();
   };

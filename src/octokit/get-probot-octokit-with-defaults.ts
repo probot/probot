@@ -1,4 +1,4 @@
-import type {LRUCache} from "lru-cache";
+import type { LRUCache } from "lru-cache";
 import { ProbotOctokit } from "./probot-octokit";
 import * as redis from "ioredis";
 

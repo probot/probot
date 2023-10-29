@@ -1,4 +1,4 @@
-import {program} from "commander";
+import { program } from "commander";
 import { getPrivateKey } from "@probot/get-private-key";
 import type { Options as PinoOptions } from "@probot/pino";
 

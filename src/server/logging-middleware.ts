@@ -6,7 +6,7 @@ export function getLoggingMiddleware(logger: Logger, options?: Options) {
   return pinoHttp({
     ...options,
     logger: logger.child({ name: "http" }),
-    customSuccessMessage(_req ,res) {
+    customSuccessMessage(_req, res) {
       const responseTime = Date.now() - res[startTime];
       return `${res.req.method} ${res.req.url} ${res.statusCode} - ${responseTime}ms`;
     },

@@ -113,7 +113,7 @@ describe("end-to-end-tests", () => {
       });
     } catch (error) {
       probotProcess.cancel();
-      const awaitedProcess = (await probotProcess);
+      const awaitedProcess = await probotProcess;
       console.log(awaitedProcess.stdout);
       console.log(awaitedProcess.stderr);
     }

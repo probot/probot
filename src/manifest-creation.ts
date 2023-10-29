@@ -59,8 +59,8 @@ export class ManifestCreation {
           url: manifest.url || pkg.homepage || pkg.repository,
           version: "v1",
         },
-        manifest
-      )
+        manifest,
+      ),
     );
 
     return generatedManifest;
@@ -82,7 +82,7 @@ export class ManifestCreation {
     };
     const response = await octokit.request(
       "POST /app-manifests/:code/conversions",
-      options
+      options,
     );
 
     const { id, client_id, client_secret, webhook_secret, pem } = response.data;

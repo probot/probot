@@ -88,7 +88,7 @@
     "get-port": "^5.1.1",
     "jest": "^29.6.4",
     "nock": "^13.0.5",
-    "prettier": "^2.2.1",
+    "prettier": "^3.0.0",
     "rimraf": "^3.0.2",
     "semantic-release": "^22.0.0",
     "semantic-release-plugin-update-version-in-files": "^1.1.0",

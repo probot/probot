@@ -42,7 +42,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
 const WEBHOOK_SECRET = "secret";
 const pushEvent = (
   WebhookExamples.filter(
-    (event) => event.name === "push"
+    (event) => event.name === "push",
   )[0] as WebhookDefinition<"push">
 ).examples[0];
 
@@ -159,11 +159,11 @@ describe("createNodeMiddleware", () => {
 
     middleware(
       {} as IncomingMessage,
-      { end() {}, writeHead() {} } as unknown as ServerResponse
+      { end() {}, writeHead() {} } as unknown as ServerResponse,
     );
     middleware(
       {} as IncomingMessage,
-      { end() {}, writeHead() {} } as unknown as ServerResponse
+      { end() {}, writeHead() {} } as unknown as ServerResponse,
     );
 
     expect(counter).toEqual(1);

@@ -21,7 +21,7 @@ type AdditionalOptions = {
  */
 export async function run(
   appFnOrArgv: ApplicationFunction | string[],
-  additionalOptions?: AdditionalOptions
+  additionalOptions?: AdditionalOptions,
 ) {
   require("dotenv").config();
 
@@ -88,12 +88,12 @@ export async function run(
       if (!appId) {
         throw new Error(
           "App ID is missing, and is required to run in production mode. " +
-            "To resolve, ensure the APP_ID environment variable is set."
+            "To resolve, ensure the APP_ID environment variable is set.",
         );
       } else if (!privateKey) {
         throw new Error(
           "Certificate is missing, and is required to run in production mode. " +
-            "To resolve, ensure either the PRIVATE_KEY or PRIVATE_KEY_PATH environment variable is set and contains a valid certificate"
+            "To resolve, ensure either the PRIVATE_KEY or PRIVATE_KEY_PATH environment variable is set and contains a valid certificate",
         );
       }
     }

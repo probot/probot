@@ -3,7 +3,7 @@ import type { Logger } from "pino";
 
 export async function captureLogOutput(
   action: () => any,
-  log: Logger
+  log: Logger,
 ): Promise<string> {
   let outputData = "";
 

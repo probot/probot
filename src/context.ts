@@ -71,7 +71,7 @@ export class Context<E extends WebhookEvents = WebhookEvents> {
   constructor(
     event: WebhookEvent<E>,
     octokit: InstanceType<typeof ProbotOctokit>,
-    log: Logger
+    log: Logger,
   ) {
     this.name = event.name;
     this.id = event.id;
@@ -99,7 +99,7 @@ export class Context<E extends WebhookEvents = WebhookEvents> {
 
     if (!repo) {
       throw new Error(
-        "context.repo() is not supported for this webhook event."
+        "context.repo() is not supported for this webhook event.",
       );
     }
 
@@ -108,7 +108,7 @@ export class Context<E extends WebhookEvents = WebhookEvents> {
         owner: repo.owner.login,
         repo: repo.name,
       },
-      object
+      object,
     );
   }
 
@@ -125,7 +125,7 @@ export class Context<E extends WebhookEvents = WebhookEvents> {
    * @param object - Params to be merged with the issue params.
    */
   public issue<T>(
-    object?: T
+    object?: T,
   ): RepoResultType<E> & { issue_number: RepoIssueNumberType<E> } & T {
     return Object.assign(
       {
@@ -134,7 +134,7 @@ export class Context<E extends WebhookEvents = WebhookEvents> {
           (this.payload.issue || this.payload.pull_request || this.payload)
             .number,
       },
-      this.repo(object)
+      this.repo(object),
     );
   }
 
@@ -151,7 +151,7 @@ export class Context<E extends WebhookEvents = WebhookEvents> {
    * @param object - Params to be merged with the pull request params.
    */
   public pullRequest<T>(
-    object?: T
+    object?: T,
   ): RepoResultType<E> & { pull_number: RepoIssueNumberType<E> } & T {
     const payload = this.payload;
     return Object.assign(
@@ -159,7 +159,7 @@ export class Context<E extends WebhookEvents = WebhookEvents> {
         // @ts-ignore - this.payload may not have `issue` or `pull_request` keys
         pull_number: (payload.issue || payload.pull_request || payload).number,
       },
-      this.repo(object)
+      this.repo(object),
     );
   }
 
@@ -225,14 +225,14 @@ export class Context<E extends WebhookEvents = WebhookEvents> {
   public async config<T>(
     fileName: string,
     defaultConfig?: T,
-    deepMergeOptions?: MergeOptions
+    deepMergeOptions?: MergeOptions,
   ): Promise<T | null> {
     const params = this.repo({
       path: path.posix.join(".github", fileName),
       defaults(configs: object[]) {
         const result = merge.all(
           [defaultConfig || {}, ...configs],
-          deepMergeOptions
+          deepMergeOptions,
         );
 
         return result;

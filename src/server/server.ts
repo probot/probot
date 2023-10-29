@@ -53,19 +53,19 @@ export class Server {
     this.expressApp.use(getLoggingMiddleware(this.log, options.loggingOptions));
     this.expressApp.use(
       "/probot/static/",
-      express.static(join(__dirname, "..", "..", "static"))
+      express.static(join(__dirname, "..", "..", "static")),
     );
     this.expressApp.use(
       createWebhooksMiddleware(this.probotApp.webhooks, {
         path: this.state.webhookPath,
-      })
+      }),
     );
 
     this.expressApp.engine(
       "handlebars",
       engine({
         defaultLayout: false,
-      })
+      }),
     );
     this.expressApp.set("view engine", "handlebars");
     this.expressApp.set("views", join(__dirname, "..", "..", "views"));
@@ -80,7 +80,7 @@ export class Server {
 
   public async start() {
     this.log.info(
-      `Running Probot v${this.version} (Node.js: ${process.version})`
+      `Running Probot v${this.version} (Node.js: ${process.version})`,
     );
     const port = this.state.port || 3000;
     const { host, webhookPath, webhookProxy } = this.state;
@@ -101,7 +101,7 @@ export class Server {
           }
           this.log.info(`Listening on http://${printableHost}:${port}`);
           resolve(server);
-        }
+        },
       );
 
       server.on("error", (error: NodeJS.ErrnoException) => {

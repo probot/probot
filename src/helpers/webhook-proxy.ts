@@ -3,7 +3,7 @@ import EventSource from "eventsource";
 import type { Logger } from "pino";
 
 export const createWebhookProxy = (
-  opts: WebhookProxyOptions
+  opts: WebhookProxyOptions,
 ): EventSource | undefined => {
   try {
     const SmeeClient = require("smee-client");
@@ -15,7 +15,7 @@ export const createWebhookProxy = (
     return smee.start();
   } catch (error) {
     opts.logger.warn(
-      "Run `npm install --save-dev smee-client` to proxy webhooks to localhost."
+      "Run `npm install --save-dev smee-client` to proxy webhooks to localhost.",
     );
     return;
   }

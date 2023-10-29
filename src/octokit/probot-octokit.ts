@@ -18,20 +18,20 @@ const defaultOptions = {
     onSecondaryRateLimit: (
       retryAfter: number,
       options: RequestOptions,
-      octokit: Octokit
+      octokit: Octokit,
     ) => {
       octokit.log.warn(
-        `Secondary Rate limit hit with "${options.method} ${options.url}", retrying in ${retryAfter} seconds.`
+        `Secondary Rate limit hit with "${options.method} ${options.url}", retrying in ${retryAfter} seconds.`,
       );
       return true;
     },
     onRateLimit: (
       retryAfter: number,
       options: RequestOptions,
-      octokit: Octokit
+      octokit: Octokit,
     ) => {
       octokit.log.warn(
-        `Rate limit hit with "${options.method} ${options.url}", retrying in ${retryAfter} seconds.`
+        `Rate limit hit with "${options.method} ${options.url}", retrying in ${retryAfter} seconds.`,
       );
       return true;
     },
@@ -46,7 +46,7 @@ export const ProbotOctokit = Octokit.plugin(
   legacyRestEndpointMethods,
   enterpriseCompatibility,
   probotRequestLogging,
-  config
+  config,
 ).defaults((instanceOptions: any) => {
   // merge throttle options deeply
   const options = Object.assign({}, defaultOptions, instanceOptions, {

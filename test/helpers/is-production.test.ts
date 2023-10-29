@@ -11,6 +11,6 @@ describe("isProduction", () => {
     (value) => {
       process.env.NODE_ENV = value;
       expect(isProduction()).toBe(false);
-    }
+    },
   );
 });

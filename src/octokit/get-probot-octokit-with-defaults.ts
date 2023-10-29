@@ -74,7 +74,7 @@ export function getProbotOctokitWithDefaults(options: Options) {
       options.throttle = Object.assign(
         {},
         defaultOptions.throttle,
-        instanceOptions.throttle
+        instanceOptions.throttle,
       );
     }
 

@@ -2,7 +2,7 @@ import { resolveAppFunction } from "../src/helpers/resolve-app-function";
 
 const stubAppFnPath = require.resolve("./fixtures/plugin/stub-plugin");
 const stubTranspiledAppFnPath = require.resolve(
-  "./fixtures/plugin/stub-typescript-transpiled-plugin"
+  "./fixtures/plugin/stub-typescript-transpiled-plugin",
 );
 const basedir = process.cwd();
 

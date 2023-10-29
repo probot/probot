@@ -1,9 +1,10 @@
-import { State } from "../types";
+import type { State } from "../types";
 import { ProbotOctokit } from "./probot-octokit";
+import type { OctokitOptions } from "../types";
 
 type FactoryOptions = {
   octokit: InstanceType<typeof ProbotOctokit>;
-  octokitOptions: ConstructorParameters<typeof ProbotOctokit> & {
+  octokitOptions: OctokitOptions & {
     throttle?: Record<string, unknown>;
     auth?: Record<string, unknown>;
   };
@@ -36,18 +37,21 @@ export async function getAuthenticatedOctokit(
         },
         throttle: {
           ...octokitOptions.throttle,
-          id: installationId,
+          id: String(installationId),
+          request: state.request,
         },
         auth: {
           ...octokitOptions.auth,
           otherOptions,
           installationId,
+          request: state.request,
         },
+        request: state.request,
       };
 
       const Octokit = octokit.constructor as typeof ProbotOctokit;
 
-      return new Octokit(options);
+      return new Octokit(options as any);
     },
   }) as Promise<InstanceType<typeof ProbotOctokit>>;
 }

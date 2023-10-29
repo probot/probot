@@ -1,10 +1,10 @@
 import { Octokit } from "@octokit/core";
 import { enterpriseCompatibility } from "@octokit/plugin-enterprise-compatibility";
-import { RequestOptions } from "@octokit/types";
+import type { RequestOptions } from "@octokit/types";
 import { paginateRest } from "@octokit/plugin-paginate-rest";
 import { legacyRestEndpointMethods } from "@octokit/plugin-rest-endpoint-methods";
 import { retry } from "@octokit/plugin-retry";
-import { throttling } from "@octokit/plugin-throttling";
+import { throttling, type ThrottlingOptions } from "@octokit/plugin-throttling";
 import { config } from "@probot/octokit-plugin-config";
 import { createProbotAuth } from "octokit-auth-probot";
 
@@ -14,13 +14,14 @@ import { VERSION } from "../version";
 const defaultOptions = {
   authStrategy: createProbotAuth,
   throttle: {
-    onAbuseLimit: (
+    enabled: true,
+    onSecondaryRateLimit: (
       retryAfter: number,
       options: RequestOptions,
       octokit: Octokit
     ) => {
       octokit.log.warn(
-        `Abuse limit hit with "${options.method} ${options.url}", retrying in ${retryAfter} seconds.`
+        `Secondary Rate limit hit with "${options.method} ${options.url}", retrying in ${retryAfter} seconds.`
       );
       return true;
     },
@@ -34,7 +35,7 @@ const defaultOptions = {
       );
       return true;
     },
-  },
+  } as ThrottlingOptions,
   userAgent: `probot/${VERSION}`,
 };
 

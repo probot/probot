@@ -1,6 +1,6 @@
 import { Webhooks } from "@octokit/webhooks";
 
-import { State } from "../types";
+import type { State } from "../types";
 import { getErrorHandler } from "../helpers/get-error-handler";
 import { webhookTransform } from "./octokit-webhooks-transform";
 

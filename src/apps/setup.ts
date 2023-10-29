@@ -1,12 +1,12 @@
 import bodyParser from "body-parser";
 import { exec } from "child_process";
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import updateDotenv from "update-dotenv";
 
 import { Probot } from "../probot";
 import { ManifestCreation } from "../manifest-creation";
 import { getLoggingMiddleware } from "../server/logging-middleware";
-import { ApplicationFunctionOptions } from "../types";
+import type { ApplicationFunctionOptions } from "../types";
 import { isProduction } from "../helpers/is-production";
 
 export const setupAppFactory = (
@@ -52,7 +52,10 @@ export const setupAppFactory = (
 
     route.get("/probot/setup", async (req: Request, res: Response) => {
       const { code } = req.query;
-      const response = await setup.createAppFromCode(code);
+      const response = await setup.createAppFromCode(code, {
+        // @ts-ignore
+        request: app.state.request,
+      });
 
       // If using glitch, restart the app
       if (process.env.PROJECT_DOMAIN) {
@@ -89,11 +92,11 @@ export const setupAppFactory = (
       printRestartMessage(app);
     });
 
-    route.get("/probot/success", async (req, res) => {
+    route.get("/probot/success", async (_req, res) => {
       res.render("success.handlebars");
     });
 
-    route.get("/", (req, res, next) => res.redirect("/probot"));
+    route.get("/", (_req, res) => res.redirect("/probot"));
   };
 
 function printWelcomeMessage(

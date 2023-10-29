@@ -1,17 +1,18 @@
 import express from "express";
-import {
+import type {
   EmitterWebhookEvent as WebhookEvent,
   Webhooks,
 } from "@octokit/webhooks";
-import LRUCache from "lru-cache";
+import { type LRUCache } from "lru-cache";
 import Redis from "ioredis";
-import { Options as LoggingOptions } from "pino-http";
+import type { Options as LoggingOptions } from "pino-http";
 
 import { Probot } from "./index";
 import { Context } from "./context";
 import { ProbotOctokit } from "./octokit/probot-octokit";
 
 import type { Logger, LogFn } from "pino";
+import type { RequestRequestOptions } from "@octokit/types";
 
 export interface Options {
   privateKey?: string;
@@ -27,6 +28,7 @@ export interface Options {
   port?: number;
   host?: string;
   baseUrl?: string;
+  request?: RequestRequestOptions;
 }
 
 export type State = {
@@ -43,6 +45,7 @@ export type State = {
   port?: number;
   host?: string;
   baseUrl?: string;
+  request?: RequestRequestOptions;
 };
 
 type SimplifiedObject = Omit<Context, keyof WebhookEvent>;
@@ -67,6 +70,7 @@ export type ServerOptions = {
   webhookProxy?: string;
   Probot: typeof Probot;
   loggingOptions?: LoggingOptions;
+  request?: RequestRequestOptions;
 };
 
 export type MiddlewareOptions = {
@@ -74,3 +78,7 @@ export type MiddlewareOptions = {
   webhooksPath?: string;
   [key: string]: unknown;
 };
+
+export type OctokitOptions = NonNullable<
+  ConstructorParameters<typeof ProbotOctokit>[0]
+>;

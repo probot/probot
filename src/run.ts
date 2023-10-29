@@ -1,9 +1,9 @@
 import pkgConf from "pkg-conf";
 
-import { ApplicationFunction, Options, ServerOptions } from "./types";
+import type { ApplicationFunction, Options, ServerOptions } from "./types";
 import { Probot } from "./index";
 import { setupAppFactory } from "./apps/setup";
-import { getLog, GetLogOptions } from "./helpers/get-log";
+import { getLog } from "./helpers/get-log";
 import { readCliOptions } from "./bin/read-cli-options";
 import { readEnvOptions } from "./bin/read-env-options";
 import { Server } from "./server/server";
@@ -55,15 +55,13 @@ export async function run(
     args,
   } = { ...envOptions, ...cliOptions };
 
-  const logOptions: GetLogOptions = {
+  const log = getLog({
     level,
     logFormat,
     logLevelInString,
     logMessageKey,
     sentryDsn,
-  };
-
-  const log = getLog(logOptions);
+  });
 
   const probotOptions: Options = {
     appId,
@@ -122,7 +120,7 @@ export async function run(
   if (Array.isArray(appFnOrArgv)) {
     const pkg = await pkgConf("probot");
 
-    const combinedApps: ApplicationFunction = async (app) => {
+    const combinedApps: ApplicationFunction = async (_app) => {
       await server.load(defaultApp);
 
       if (Array.isArray(pkg.apps)) {

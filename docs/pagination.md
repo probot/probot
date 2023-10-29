@@ -66,7 +66,7 @@ module.exports = (app) => {
 
 ## Async iterators
 
-If your runtime environment supports async iterators (such as Node 12+), you can iterate through each response
+Using async iterators you can iterate through each response
 
 ```js
 module.exports = (app) => {

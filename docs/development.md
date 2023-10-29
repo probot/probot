@@ -5,7 +5,7 @@ title: Developing an app
 
 # Developing an app
 
-To develop a Probot app, you will first need a recent version of [Node.js](https://nodejs.org/) installed. Open a terminal and run `node -v` to verify that it is installed and is at least 10.0.0 or later. Otherwise, [install the latest version](https://nodejs.org/).
+To develop a Probot app, you will first need a recent version of [Node.js](https://nodejs.org/) installed. Open a terminal and run `node -v` to verify that it is installed and is at least 18.0.0 or later. Otherwise, [install the latest version](https://nodejs.org/).
 
 **Contents:**
 

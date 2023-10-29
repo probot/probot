@@ -7,7 +7,7 @@ const pkg = require("../../package");
 
 if (!semver.satisfies(process.version, pkg.engines.node)) {
   console.log(
-    `Node.js version ${pkg.engines.node} is required. You have ${process.version}.`
+    `Node.js version ${pkg.engines.node} is required. You have ${process.version}.`,
   );
   process.exit(1);
 }

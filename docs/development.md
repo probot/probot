@@ -5,7 +5,7 @@ title: Developing an app
 
 # Developing an app
 
-To develop a Probot app, you will first need a recent version of [Node.js](https://nodejs.org/) installed. Open a terminal and run `node -v` to verify that it is installed and is at least 10.0.0 or later. Otherwise, [install the latest version](https://nodejs.org/).
+To develop a Probot app, you will first need a recent version of [Node.js](https://nodejs.org/) installed. Open a terminal and run `node -v` to verify that it is installed and is at least 18.0.0 or later. Otherwise, [install the latest version](https://nodejs.org/).
 
 **Contents:**
 
@@ -18,10 +18,10 @@ To develop a Probot app, you will first need a recent version of [Node.js](https
 - [Installing the app on a repository](#installing-the-app-on-a-repository)
 - [Debugging](#debugging)
 - [Run Probot programmatically](#run-probot-programmatically)
-  - [Use `run`](#use-run)
-  - [Use `server`](#use-server)
-  - [Use `createNodeMiddleware`](#use-createnodemiddleware)
-  - [Use `probot`](#use-probot)
+  - [Use run](#use-run)
+  - [Use server](#use-server)
+  - [Use createNodeMiddleware](#use-createnodemiddleware)
+  - [Use probot](#use-probot)
   - [Use Probot's Octokit](#use-probots-octokit)
 
 <!-- tocstop -->

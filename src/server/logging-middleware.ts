@@ -6,13 +6,12 @@ export function getLoggingMiddleware(logger: Logger, options?: Options) {
   return pinoHttp({
     ...options,
     logger: logger.child({ name: "http" }),
-    customSuccessMessage(req ,res) {
+    customSuccessMessage(_req ,res) {
       const responseTime = Date.now() - res[startTime];
       return `${res.req.method} ${res.req.url} ${res.statusCode} - ${responseTime}ms`;
     },
-    customErrorMessage(req, res, err) {
-      // @ts-expect-error
-      const responseTime = Date.now() - res[pinoHttp.startTime];
+    customErrorMessage(_err, res) {
+      const responseTime = Date.now() - res[startTime];
       return `${res.req.method} ${res.req.url} ${res.statusCode} - ${responseTime}ms`;
     },
     genReqId: (req) =>

@@ -1,8 +1,8 @@
-import { LogLevel, Options as PinoOptions } from "@probot/pino";
+import type { LogLevel, Options as PinoOptions } from "@probot/pino";
 import { getPrivateKey } from "@probot/get-private-key";
 
-import { getLog, GetLogOptions } from "./helpers/get-log";
-import { Options } from "./types";
+import { getLog } from "./helpers/get-log";
+import type { Options } from "./types";
 import { Probot } from "./probot";
 
 type CreateProbotOptions = {
@@ -60,15 +60,13 @@ export function createProbot({
     ...overrides,
   };
 
-  const logOptions: GetLogOptions = {
+  const log = getLog({
     level: probotOptions.logLevel,
     logFormat: envWithDefaults.LOG_FORMAT as PinoOptions["logFormat"],
     logLevelInString: envWithDefaults.LOG_LEVEL_IN_STRING === "true",
     logMessageKey: envWithDefaults.LOG_MESSAGE_KEY,
     sentryDsn: envWithDefaults.SENTRY_DSN,
-  };
-
-  const log = getLog(logOptions).child({ name: "server" });
+  }).child({ name: "server" });
 
   return new Probot({
     log: log.child({ name: "probot" }),

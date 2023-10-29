@@ -1,18 +1,21 @@
 import { Server as HttpServer } from "http";
 
-import express, { Application, Router } from "express";
+import express, { Router, type Application } from "express";
 import { join } from "path";
-import { Logger } from "pino";
+import type { Logger } from "pino";
 import { createNodeMiddleware as createWebhooksMiddleware } from "@octokit/webhooks";
 
 import { getLog } from "../helpers/get-log";
 import { getLoggingMiddleware } from "./logging-middleware";
 import { createWebhookProxy } from "../helpers/webhook-proxy";
 import { VERSION } from "../version";
-import { ApplicationFunction, ServerOptions } from "../types";
+import type { ApplicationFunction, ServerOptions } from "../types";
 import { Probot } from "../";
 import { engine } from "express-handlebars";
 import EventSource from "eventsource";
+
+// the default path as defined in @octokit/webhooks
+export const defaultWebhooksPath = "/api/github/webhooks";
 
 type State = {
   httpServer?: HttpServer;
@@ -36,35 +39,37 @@ export class Server {
   constructor(options: ServerOptions = {} as ServerOptions) {
     this.expressApp = express();
     this.log = options.log || getLog().child({ name: "server" });
-    this.probotApp = new options.Probot();
+    this.probotApp = new options.Probot({
+      request: options.request,
+    });
 
     this.state = {
       port: options.port,
       host: options.host,
-      webhookPath: options.webhookPath || "/api/github/webhooks",
+      webhookPath: options.webhookPath || defaultWebhooksPath,
       webhookProxy: options.webhookProxy,
     };
 
     this.expressApp.use(getLoggingMiddleware(this.log, options.loggingOptions));
     this.expressApp.use(
       "/probot/static/",
-      express.static(join(__dirname, "..", "..", "static"))
+      express.static(join(__dirname, "..", "..", "static")),
     );
     this.expressApp.use(
       createWebhooksMiddleware(this.probotApp.webhooks, {
         path: this.state.webhookPath,
-      })
+      }),
     );
 
     this.expressApp.engine(
       "handlebars",
       engine({
         defaultLayout: false,
-      })
+      }),
     );
     this.expressApp.set("view engine", "handlebars");
     this.expressApp.set("views", join(__dirname, "..", "..", "views"));
-    this.expressApp.get("/ping", (req, res) => res.end("PONG"));
+    this.expressApp.get("/ping", (_req, res) => res.end("PONG"));
   }
 
   public async load(appFn: ApplicationFunction) {
@@ -75,7 +80,7 @@ export class Server {
 
   public async start() {
     this.log.info(
-      `Running Probot v${this.version} (Node.js: ${process.version})`
+      `Running Probot v${this.version} (Node.js: ${process.version})`,
     );
     const port = this.state.port || 3000;
     const { host, webhookPath, webhookProxy } = this.state;
@@ -96,7 +101,7 @@ export class Server {
           }
           this.log.info(`Listening on http://${printableHost}:${port}`);
           resolve(server);
-        }
+        },
       );
 
       server.on("error", (error: NodeJS.ErrnoException) => {

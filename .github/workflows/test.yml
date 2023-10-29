@@ -12,15 +12,15 @@ jobs:
     strategy:
       matrix:
         node-version:
-          - 16
           - 18
+          - 20
         os:
           - ubuntu-latest
           - macos-latest
           - windows-latest
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
@@ -33,11 +33,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: test_matrix
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
           cache: npm
-          node-version: 18
+          node-version: lts/*
       - run: npm ci
       - run: npm run lint
       - run: npm run build

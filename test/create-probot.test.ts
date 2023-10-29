@@ -132,7 +132,6 @@ describe("createProbot", () => {
       },
     });
     const outputData = await captureLogOutput(async () => {
-
       const octokit = await probot.auth();
       octokit.log.info("Ciao");
     }, probot.log);

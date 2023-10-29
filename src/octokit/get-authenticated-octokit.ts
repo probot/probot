@@ -1,9 +1,11 @@
-import { State } from "../types";
+import type { State } from "../types";
 import { ProbotOctokit } from "./probot-octokit";
+import type { OctokitOptions } from "../types";
 
 type FactoryOptions = {
   octokit: InstanceType<typeof ProbotOctokit>;
-  octokitOptions: ConstructorParameters<typeof ProbotOctokit>[0] & {
+  octokitOptions: OctokitOptions & {
+    throttle?: Record<string, unknown>;
     auth?: Record<string, unknown>;
   };
   [key: string]: unknown;
@@ -11,7 +13,7 @@ type FactoryOptions = {
 
 export async function getAuthenticatedOctokit(
   state: State,
-  installationId?: number
+  installationId?: number,
 ) {
   const { log, octokit } = state;
 
@@ -23,7 +25,7 @@ export async function getAuthenticatedOctokit(
     factory: ({ octokit, octokitOptions, ...otherOptions }: FactoryOptions) => {
       const pinoLog = log.child({ name: "github" });
 
-      const options: ConstructorParameters<typeof ProbotOctokit>[0] & { log: { fatal: any; trace: any; }} = {
+      const options: ConstructorParameters<typeof ProbotOctokit>[0] & { log: { fatal: any; trace: any;}; request: typeof state.request } = {
         ...octokitOptions,
         log: {
           fatal: pinoLog.fatal.bind(pinoLog),
@@ -36,18 +38,20 @@ export async function getAuthenticatedOctokit(
         // @ts-expect-error The correct properties are always passed into here
         throttle: {
           ...octokitOptions.throttle,
-          id: installationId.toString(),
+          id: String(installationId),
         },
         auth: {
           ...octokitOptions.auth,
           otherOptions,
           installationId,
+          request: state.request,
         },
+        request: state.request,
       };
 
       const Octokit = octokit.constructor as typeof ProbotOctokit;
 
-      return new Octokit(options);
+      return new Octokit(options as any);
     },
   }) as Promise<InstanceType<typeof ProbotOctokit>>;
 }

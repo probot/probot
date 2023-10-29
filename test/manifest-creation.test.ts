@@ -1,8 +1,8 @@
 import fs from "fs";
-import nock from "nock";
 import pkg from "../package.json";
 import { ManifestCreation } from "../src/manifest-creation";
 import response from "./fixtures/setup/response.json";
+import fetchMock from "fetch-mock";
 
 describe("ManifestCreation", () => {
   let setup: ManifestCreation;
@@ -52,21 +52,21 @@ describe("ManifestCreation", () => {
 
     test("creates an app url", () => {
       expect(setup.createAppUrl).toEqual(
-        "https://github.com/settings/apps/new"
+        "https://github.com/settings/apps/new",
       );
     });
 
     test("creates an app url when github org is set", () => {
       process.env.GH_ORG = "testorg";
       expect(setup.createAppUrl).toEqual(
-        "https://github.com/organizations/testorg/settings/apps/new"
+        "https://github.com/organizations/testorg/settings/apps/new",
       );
     });
 
     test("creates an app url when github host env is set", () => {
       process.env.GHE_HOST = "hiimbex.github.com";
       expect(setup.createAppUrl).toEqual(
-        "https://hiimbex.github.com/settings/apps/new"
+        "https://hiimbex.github.com/settings/apps/new",
       );
     });
 
@@ -74,7 +74,7 @@ describe("ManifestCreation", () => {
       process.env.GHE_HOST = "hiimbex.github.com";
       process.env.GH_ORG = "testorg";
       expect(setup.createAppUrl).toEqual(
-        "https://hiimbex.github.com/organizations/testorg/settings/apps/new"
+        "https://hiimbex.github.com/organizations/testorg/settings/apps/new",
       );
     });
 
@@ -82,7 +82,7 @@ describe("ManifestCreation", () => {
       process.env.GHE_HOST = "hiimbex.github.com";
       process.env.GHE_PROTOCOL = "http";
       expect(setup.createAppUrl).toEqual(
-        "http://hiimbex.github.com/settings/apps/new"
+        "http://hiimbex.github.com/settings/apps/new",
       );
     });
   });
@@ -100,11 +100,18 @@ describe("ManifestCreation", () => {
     });
 
     test("creates an app from a code", async () => {
-      nock("https://api.github.com")
-        .post("/app-manifests/123abc/conversions")
-        .reply(200, response);
+      const fetch = fetchMock
+        .sandbox()
+        .postOnce("https://api.github.com/app-manifests/123abc/conversions", {
+          status: 200,
+          body: response,
+        });
 
-      const createdApp = await setup.createAppFromCode("123abc");
+      const createdApp = await setup.createAppFromCode("123abc", {
+        request: {
+          fetch,
+        },
+      });
       expect(createdApp).toEqual("https://github.com/apps/testerino0000000");
       // expect dotenv to be called with id, webhook_secret, pem
       expect(setup.updateEnv).toHaveBeenCalledWith({
@@ -118,11 +125,21 @@ describe("ManifestCreation", () => {
     test("creates an app from a code when github host env is set", async () => {
       process.env.GHE_HOST = "swinton.github.com";
 
-      nock("https://swinton.github.com")
-        .post("/api/v3/app-manifests/123abc/conversions")
-        .reply(200, response);
+      const fetch = fetchMock
+        .sandbox()
+        .postOnce(
+          "https://swinton.github.com/api/v3/app-manifests/123abc/conversions",
+          {
+            status: 200,
+            body: response,
+          },
+        );
 
-      const createdApp = await setup.createAppFromCode("123abc");
+      const createdApp = await setup.createAppFromCode("123abc", {
+        request: {
+          fetch,
+        },
+      });
       expect(createdApp).toEqual("https://github.com/apps/testerino0000000");
       // expect dotenv to be called with id, webhook_secret, pem
       expect(setup.updateEnv).toHaveBeenCalledWith({
@@ -142,7 +159,7 @@ describe("ManifestCreation", () => {
     test("creates an app from a code", () => {
       // checks that getManifest returns a JSON.stringified manifest
       expect(setup.getManifest(pkg, "localhost://3000")).toEqual(
-        '{"description":"A framework for building GitHub Apps to automate and improve your workflow","hook_attributes":{"url":"localhost://3000/"},"name":"probot","public":true,"redirect_url":"localhost://3000/probot/setup","url":"https://probot.github.io","version":"v1"}'
+        '{"description":"A framework for building GitHub Apps to automate and improve your workflow","hook_attributes":{"url":"localhost://3000/"},"name":"probot","public":true,"redirect_url":"localhost://3000/probot/setup","url":"https://probot.github.io","version":"v1"}',
       );
     });
 
@@ -153,7 +170,7 @@ describe("ManifestCreation", () => {
 
       // checks that getManifest returns the correct JSON.stringified manifest
       expect(setup.getManifest(pkg, "localhost://3000")).toEqual(
-        '{"description":"A description for a cool app","hook_attributes":{"url":"localhost://3000/"},"name":"cool-app","public":true,"redirect_url":"localhost://3000/probot/setup","url":"https://probot.github.io","version":"v1"}'
+        '{"description":"A description for a cool app","hook_attributes":{"url":"localhost://3000/"},"name":"cool-app","public":true,"redirect_url":"localhost://3000/probot/setup","url":"https://probot.github.io","version":"v1"}',
       );
     });
   });

@@ -7,7 +7,7 @@ const _importDynamic = new Function("modulePath", "return import(modulePath)");
 
 export const resolveAppFunction = async (
   appFnId: string,
-  opts?: ResolveOptions
+  opts?: ResolveOptions,
 ) => {
   opts = opts || defaultOptions;
   // These are mostly to ease testing

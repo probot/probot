@@ -2,7 +2,7 @@ import type { Logger } from "pino";
 
 import { getAuthenticatedOctokit } from "./octokit/get-authenticated-octokit";
 import { ProbotOctokit } from "./octokit/probot-octokit";
-import { State } from "./types";
+import type { State } from "./types";
 
 /**
  * Authenticate and get a GitHub client that can be used to make API calls.
@@ -32,10 +32,10 @@ import { State } from "./types";
 export async function auth(
   state: State,
   installationId?: number,
-  log?: Logger
+  log?: Logger,
 ): Promise<InstanceType<typeof ProbotOctokit>> {
   return getAuthenticatedOctokit(
     Object.assign({}, state, log ? { log } : null),
-    installationId
+    installationId,
   );
 }

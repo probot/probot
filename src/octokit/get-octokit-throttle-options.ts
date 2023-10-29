@@ -1,6 +1,7 @@
 import Bottleneck from "bottleneck";
 import * as redis from "ioredis";
-import { Logger } from "pino";
+import type { Logger } from "pino";
+import type { ThrottlingOptions } from "@octokit/plugin-throttling";
 
 type Options = {
   log: Logger;
@@ -10,7 +11,28 @@ type Options = {
 export function getOctokitThrottleOptions(options: Options) {
   let { log, redisConfig } = options;
 
-  if (!redisConfig) return;
+  const throttlingOptions: ThrottlingOptions = {
+    onRateLimit: (retryAfter, options: { [key: string]: any }) => {
+      log.warn(
+        `Request quota exhausted for request ${options.method} ${options.url}`,
+      );
+
+      // Retry twice after hitting a rate limit error, then give up
+      if (options.request.retryCount <= 2) {
+        log.info(`Retrying after ${retryAfter} seconds!`);
+        return true;
+      }
+      return false;
+    },
+    onSecondaryRateLimit: (_retryAfter, options: { [key: string]: any }) => {
+      // does not retry, only logs a warning
+      log.warn(
+        `Secondary quota detected for request ${options.method} ${options.url}`,
+      );
+    },
+  };
+
+  if (!redisConfig) return throttlingOptions;
 
   const connection = new Bottleneck.IORedisConnection({
     client: getRedisClient(options),
@@ -19,12 +41,12 @@ export function getOctokitThrottleOptions(options: Options) {
     log.error(Object.assign(error, { source: "bottleneck" }));
   });
 
-  return {
-    Bottleneck,
-    connection,
-  };
+  throttlingOptions.Bottleneck = Bottleneck;
+  throttlingOptions.connection = connection;
+
+  return throttlingOptions;
 }
 
-function getRedisClient({ log, redisConfig }: Options): redis.Redis | void {
+function getRedisClient({ redisConfig }: Options): redis.Redis | void {
   if (redisConfig) return new redis.Redis(redisConfig as redis.RedisOptions);
 }

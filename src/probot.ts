@@ -1,6 +1,6 @@
-import {LRUCache} from "lru-cache";
-import { Logger } from "pino";
-import { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
+import { LRUCache } from "lru-cache";
+import type { Logger } from "pino";
+import type { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
 
 import { auth } from "./auth";
 import { getLog } from "./helpers/get-log";
@@ -8,7 +8,7 @@ import { getProbotOctokitWithDefaults } from "./octokit/get-probot-octokit-with-
 import { getWebhooks } from "./octokit/get-webhooks";
 import { ProbotOctokit } from "./octokit/probot-octokit";
 import { VERSION } from "./version";
-import {
+import type {
   ApplicationFunction,
   ApplicationFunctionOptions,
   Options,
@@ -39,7 +39,7 @@ export class Probot {
   public onError: ProbotWebhooks["onError"];
   public auth: (
     installationId?: number,
-    log?: Logger
+    log?: Logger,
   ) => Promise<InstanceType<typeof ProbotOctokit>>;
 
   private state: State;
@@ -70,7 +70,10 @@ export class Probot {
       redisConfig: options.redisConfig,
       baseUrl: options.baseUrl,
     });
-    const octokit = new Octokit();
+
+    const octokit = new Octokit({
+      request: options.request,
+    });
 
     this.state = {
       cache,
@@ -85,6 +88,7 @@ export class Probot {
       privateKey: options.privateKey,
       host: options.host,
       port: options.port,
+      request: options.request,
     };
 
     this.auth = auth.bind(null, this.state);
@@ -105,7 +109,7 @@ export class Probot {
 
   public async load(
     appFn: ApplicationFunction | ApplicationFunction[],
-    options: ApplicationFunctionOptions = {}
+    options: ApplicationFunctionOptions = {},
   ) {
     if (Array.isArray(appFn)) {
       for (const fn of appFn) {

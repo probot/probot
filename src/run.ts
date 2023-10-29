@@ -1,9 +1,9 @@
 import pkgConf from "pkg-conf";
 
-import { ApplicationFunction, Options, ServerOptions } from "./types";
+import type { ApplicationFunction, Options, ServerOptions } from "./types";
 import { Probot } from "./index";
 import { setupAppFactory } from "./apps/setup";
-import { getLog, GetLogOptions } from "./helpers/get-log";
+import { getLog } from "./helpers/get-log";
 import { readCliOptions } from "./bin/read-cli-options";
 import { readEnvOptions } from "./bin/read-env-options";
 import { Server } from "./server/server";
@@ -21,7 +21,7 @@ type AdditionalOptions = {
  */
 export async function run(
   appFnOrArgv: ApplicationFunction | string[],
-  additionalOptions?: AdditionalOptions
+  additionalOptions?: AdditionalOptions,
 ) {
   require("dotenv").config();
 
@@ -55,15 +55,13 @@ export async function run(
     args,
   } = { ...envOptions, ...cliOptions };
 
-  const logOptions: GetLogOptions = {
+  const log = getLog({
     level,
     logFormat,
     logLevelInString,
     logMessageKey,
     sentryDsn,
-  };
-
-  const log = getLog(logOptions);
+  });
 
   const probotOptions: Options = {
     appId,
@@ -90,12 +88,12 @@ export async function run(
       if (!appId) {
         throw new Error(
           "App ID is missing, and is required to run in production mode. " +
-            "To resolve, ensure the APP_ID environment variable is set."
+            "To resolve, ensure the APP_ID environment variable is set.",
         );
       } else if (!privateKey) {
         throw new Error(
           "Certificate is missing, and is required to run in production mode. " +
-            "To resolve, ensure either the PRIVATE_KEY or PRIVATE_KEY_PATH environment variable is set and contains a valid certificate"
+            "To resolve, ensure either the PRIVATE_KEY or PRIVATE_KEY_PATH environment variable is set and contains a valid certificate",
         );
       }
     }
@@ -122,7 +120,7 @@ export async function run(
   if (Array.isArray(appFnOrArgv)) {
     const pkg = await pkgConf("probot");
 
-    const combinedApps: ApplicationFunction = async (app) => {
+    const combinedApps: ApplicationFunction = async (_app) => {
       await server.load(defaultApp);
 
       if (Array.isArray(pkg.apps)) {

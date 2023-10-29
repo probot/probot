@@ -7,6 +7,9 @@ import Stream from "stream";
 import { Probot, run, Server } from "../src";
 
 import { captureLogOutput } from "./helpers/capture-log-output";
+import WebhookExamples, {
+  type WebhookDefinition,
+} from "@octokit/webhooks-examples";
 
 // tslint:disable:no-empty
 describe("run", () => {
@@ -29,7 +32,7 @@ describe("run", () => {
       PRIVATE_KEY_PATH: path.join(
         __dirname,
         "fixtures",
-        "test-private-key.pem"
+        "test-private-key.pem",
       ),
       WEBHOOK_PROXY_URL: "https://smee.io/EfHXC9BFfGAxbM6J",
       WEBHOOK_SECRET: "secret",
@@ -45,7 +48,7 @@ describe("run", () => {
         () => {
           initialized = true;
         },
-        { env }
+        { env },
       );
       expect(initialized).toBeTruthy();
       await server.stop();
@@ -69,10 +72,10 @@ describe("run", () => {
 
       return new Promise(async (resolve) => {
         server = await run(
-          (app: Probot) => {
+          (_app: Probot) => {
             initialized = true;
           },
-          { env }
+          { env },
         );
         expect(initialized).toBeFalsy();
         await server.stop();
@@ -91,7 +94,7 @@ describe("run", () => {
             app.log.fatal("test");
           }, app.log);
         },
-        { env }
+        { env },
       );
       await server.stop();
 
@@ -100,7 +103,11 @@ describe("run", () => {
   });
 
   describe("webhooks", () => {
-    const pushEvent = require("./fixtures/webhook/push.json");
+    const pushEvent = (
+      WebhookExamples.filter(
+        (event) => event.name === "push",
+      )[0] as WebhookDefinition<"push">
+    ).examples[0];
 
     it("POST /api/github/webhooks", async () => {
       server = await run(() => {}, { env });

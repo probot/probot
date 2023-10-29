@@ -3,6 +3,7 @@ import yaml from "js-yaml";
 import path from "path";
 import updateDotenv from "update-dotenv";
 import { ProbotOctokit } from "./octokit/probot-octokit";
+import type { OctokitOptions } from "./types";
 
 export class ManifestCreation {
   get pkg() {
@@ -58,16 +59,17 @@ export class ManifestCreation {
           url: manifest.url || pkg.homepage || pkg.repository,
           version: "v1",
         },
-        manifest
-      )
+        manifest,
+      ),
     );
 
     return generatedManifest;
   }
 
-  public async createAppFromCode(code: any) {
-    const octokit = new ProbotOctokit();
+  public async createAppFromCode(code: any, probotOptions?: OctokitOptions) {
+    const octokit = new ProbotOctokit(probotOptions);
     const options: any = {
+      ...probotOptions,
       code,
       mediaType: {
         previews: ["fury"], // needed for GHES 2.20 and older
@@ -80,7 +82,7 @@ export class ManifestCreation {
     };
     const response = await octokit.request(
       "POST /app-manifests/:code/conversions",
-      options
+      options,
     );
 
     const { id, client_id, client_secret, webhook_secret, pem } = response.data;

@@ -9,6 +9,11 @@ exports[`Setup app GET /probot/setup returns a redirect 1`] = `
   ],
   [
     {
+      "WEBHOOK_PROXY_URL": "mocked proxy URL",
+    },
+  ],
+  [
+    {
       "APP_ID": "id",
       "GITHUB_CLIENT_ID": "Iv1.8a61f9b3a7aba766",
       "GITHUB_CLIENT_SECRET": "1726be1638095a19edd134c77bde3aa2ece1e5d8",

@@ -1,9 +1,9 @@
-import express, { Response } from "express";
+import express, { type Response } from "express";
 // tslint:disable-next-line:no-var-requires
 const sse: (
   req: express.Request,
   res: express.Response,
-  next: express.NextFunction
+  next: express.NextFunction,
 ) => void = require("connect-sse")();
 import EventSource from "eventsource";
 import http from "http";
@@ -12,7 +12,7 @@ import nock from "nock";
 import { getLog } from "../src/helpers/get-log";
 import { createWebhookProxy } from "../src/helpers/webhook-proxy";
 
-const targetPort = 55555;
+let targetPort = 999999;
 
 interface SSEResponse extends Response {
   json(body: any, status?: string): this;
@@ -21,8 +21,9 @@ interface SSEResponse extends Response {
 jest.setTimeout(10000);
 
 describe("webhook-proxy", () => {
-  // tslint:disable-next-line:one-variable-per-declaration
-  let emit: SSEResponse["json"], proxy: EventSource, server: http.Server;
+  let emit: SSEResponse["json"];
+  let proxy: EventSource;
+  let server: http.Server;
 
   afterEach(() => {
     server && server.close();
@@ -33,15 +34,14 @@ describe("webhook-proxy", () => {
     beforeEach((done) => {
       const app = express();
 
-      app.get("/events", sse, (req, res: SSEResponse) => {
+      app.get("/events", sse, (_req, res: SSEResponse) => {
         res.json({}, "ready");
         emit = res.json;
       });
 
       server = app.listen(0, () => {
-        const url = `http://127.0.0.1:${
-          (server.address() as net.AddressInfo).port
-        }/events`;
+        targetPort = (server.address() as net.AddressInfo).port;
+        const url = `http://127.0.0.1:${targetPort}/events`;
         proxy = createWebhookProxy({
           url,
           port: targetPort,

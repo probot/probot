@@ -59,7 +59,7 @@
     "ioredis": "^4.27.8",
     "js-yaml": "^3.14.1",
     "lru-cache": "^10.0.1",
-    "octokit-auth-probot": "^1.2.2",
+    "octokit-auth-probot": "^2.0.0",
     "pino": "^6.7.0",
     "pino-http": "^5.3.0",
     "pkg-conf": "^3.1.0",

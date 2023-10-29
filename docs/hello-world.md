@@ -15,7 +15,7 @@ module.exports = (app) => {
 
 The `app` parameter is an instance of [`Probot`](https://probot.github.io/api/latest/classes/probot.Probot.html) and gives you access to all of the GitHub goodness.
 
-`app.on` will listen for any [webhook events triggered by GitHub](/docs/webhooks.md), which will notify you when anything interesting happens on GitHub that your app wants to know about.
+`app.on` will listen for any [webhook events triggered by GitHub](/docs/webhooks/), which will notify you when anything interesting happens on GitHub that your app wants to know about.
 
 ```js
 module.exports = (app) => {

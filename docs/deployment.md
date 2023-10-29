@@ -108,7 +108,7 @@ Probot runs like [any other Node app](https://devcenter.heroku.com/articles/depl
 
 1.  Deploy the app to heroku with `git push`:
 
-        $ git push heroku master
+        $ git push heroku main
         ...
         -----> Node.js app detected
         ...
@@ -158,6 +158,7 @@ Examples
 
 - Probot's "Hello, world!" example deployed to AWS Lambda: [probot/example-aws-lambda-serverless](https://github.com/probot/example-aws-lambda-serverless/#readme)
 - Issue labeler bot deployed to AWS Lambda: [riyadhalnur/issuelabeler](https://github.com/riyadhalnur/issuelabeler#issuelabeler)
+- Auto-Me-Bot is deployed to AWS Lambda without using the _serverless_ framework and adapter: [TomerFi/auto-me-bot](https://github.com/TomerFi/auto-me-bot)
 
 Please add yours!
 

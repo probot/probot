@@ -2,7 +2,7 @@ import type { Logger } from "pino";
 
 import { getAuthenticatedOctokit } from "./octokit/get-authenticated-octokit";
 import { ProbotOctokit } from "./octokit/probot-octokit";
-import { State } from "./types";
+import type { State } from "./types";
 
 /**
  * Authenticate and get a GitHub client that can be used to make API calls.

@@ -3,7 +3,7 @@ const updateDotenv = jest.fn().mockResolvedValue({});
 jest.mock("smee-client", () => ({ createChannel }));
 jest.mock("update-dotenv", () => updateDotenv);
 
-import nock from "nock";
+import fetchMock from "fetch-mock";
 import { Stream } from "stream";
 import request from "supertest";
 import pino from "pino";
@@ -91,16 +91,36 @@ describe("Setup app", () => {
 
   describe("GET /probot/setup", () => {
     it("returns a redirect", async () => {
-      nock("https://api.github.com")
-        .post("/app-manifests/123/conversions")
-        .reply(201, {
-          html_url: "/apps/my-app",
-          id: "id",
-          pem: "pem",
-          webhook_secret: "webhook_secret",
-          client_id: "Iv1.8a61f9b3a7aba766",
-          client_secret: "1726be1638095a19edd134c77bde3aa2ece1e5d8",
+      const fetch = fetchMock
+        .sandbox()
+        .postOnce("https://api.github.com/app-manifests/123/conversions", {
+          status: 201,
+          body: {
+            html_url: "/apps/my-app",
+            id: "id",
+            pem: "pem",
+            webhook_secret: "webhook_secret",
+            client_id: "Iv1.8a61f9b3a7aba766",
+            client_secret: "1726be1638095a19edd134c77bde3aa2ece1e5d8",
+          },
         });
+
+      const server = new Server({
+        Probot: Probot.defaults({
+          log: pino(streamLogsToOutput),
+          // workaround for https://github.com/probot/probot/issues/1512
+          appId: 1,
+          privateKey: "dummy value for setup, see #1512",
+        }),
+        log: pino(streamLogsToOutput),
+        request: {
+          fetch: async (url: string, options: { [key: string]: any }) => {
+            return fetch(url, options);
+          },
+        },
+      });
+
+      await server.load(setupAppFactory(undefined, undefined));
 
       await request(server.expressApp)
         .get("/probot/setup")
@@ -108,7 +128,7 @@ describe("Setup app", () => {
         .expect(302)
         .expect("Location", "/apps/my-app/installations/new");
 
-      expect(createChannel).toHaveBeenCalledTimes(1);
+      expect(createChannel).toHaveBeenCalledTimes(2);
       expect(updateDotenv.mock.calls).toMatchSnapshot();
     });
   });

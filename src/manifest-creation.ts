@@ -3,6 +3,7 @@ import yaml from "js-yaml";
 import path from "path";
 import updateDotenv from "update-dotenv";
 import { ProbotOctokit } from "./octokit/probot-octokit";
+import type { OctokitOptions } from "./types";
 
 export class ManifestCreation {
   get pkg() {
@@ -37,6 +38,7 @@ export class ManifestCreation {
       manifest = yaml.safeLoad(file);
     } catch (error) {
       // App config does not exist, which is ok.
+      // @ts-ignore - in theory error can be anything
       if (error.code !== "ENOENT") {
         throw error;
       }
@@ -64,9 +66,10 @@ export class ManifestCreation {
     return generatedManifest;
   }
 
-  public async createAppFromCode(code: any) {
-    const octokit = new ProbotOctokit();
+  public async createAppFromCode(code: any, probotOptions?: OctokitOptions) {
+    const octokit = new ProbotOctokit(probotOptions);
     const options: any = {
+      ...probotOptions,
       code,
       mediaType: {
         previews: ["fury"], // needed for GHES 2.20 and older

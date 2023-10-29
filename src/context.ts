@@ -1,14 +1,14 @@
 import path from "path";
 
-import { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
+import type { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
 import merge from "deepmerge";
 
 import type { Logger } from "pino";
 
 import { ProbotOctokit } from "./octokit/probot-octokit";
 import { aliasLog } from "./helpers/alias-log";
-import { DeprecatedLogger } from "./types";
-import { EmitterWebhookEventName as WebhookEvents } from "@octokit/webhooks/dist-types/types";
+import type { DeprecatedLogger } from "./types";
+import type { EmitterWebhookEventName as WebhookEvents } from "@octokit/webhooks/dist-types/types";
 
 export type MergeOptions = merge.Options;
 

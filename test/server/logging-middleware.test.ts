@@ -3,38 +3,44 @@ import Stream from "stream";
 import express from "express";
 import request from "supertest";
 import pino from "pino";
+import type { Options } from "pino-http";
 
 import { getLoggingMiddleware } from "../../src/server/logging-middleware";
 
 describe("logging", () => {
   let server: express.Express;
   let output: any[];
+  let options: Options;
 
   const streamLogsToOutput = new Stream.Writable({ objectMode: true });
-  streamLogsToOutput._write = (object, encoding, done) => {
+  streamLogsToOutput._write = (object, _encoding, done) => {
     output.push(JSON.parse(object));
     done();
   };
   const logger = pino(streamLogsToOutput);
 
-  beforeEach(() => {
-    server = express();
-    output = [];
-
+  function applyMiddlewares() {
     server.use(express.json());
-    server.use(getLoggingMiddleware(logger));
-    server.get("/", (req, res) => {
+    server.use(getLoggingMiddleware(logger, options));
+    server.get("/", (_req, res) => {
       res.set("X-Test-Header", "testing");
       res.send("OK");
     });
-    server.post("/", (req, res) => res.send("OK"));
+    server.post("/", (_req, res) => res.send("OK"));
+  }
+
+  beforeEach(() => {
+    server = express();
+    output = [];
+    options = {};
   });
 
   test("logs requests and responses", () => {
+    applyMiddlewares();
     return request(server)
       .get("/")
       .expect(200)
-      .expect((res) => {
+      .expect((_res) => {
         // logs id with request and response
         expect(output[0].req.id).toBeTruthy();
         expect(typeof output[0].responseTime).toEqual("number");
@@ -62,22 +68,39 @@ describe("logging", () => {
   });
 
   test("uses supplied X-Request-ID", () => {
+    applyMiddlewares();
     return request(server)
       .get("/")
       .set("X-Request-ID", "42")
       .expect(200)
-      .expect((res) => {
+      .expect((_res) => {
         expect(output[0].req.id).toEqual("42");
       });
   });
 
   test("uses X-GitHub-Delivery", () => {
+    applyMiddlewares();
     return request(server)
       .get("/")
       .set("X-GitHub-Delivery", "a-b-c")
       .expect(200)
-      .expect((res) => {
+      .expect((_res) => {
         expect(output[0].req.id).toEqual("a-b-c");
+      });
+  });
+
+  test("sets ignorePaths option to ignore logging", () => {
+    options = {
+      autoLogging: {
+        ignorePaths: ["/"],
+      },
+    };
+    applyMiddlewares();
+    return request(server)
+      .get("/")
+      .expect(200)
+      .expect((_res) => {
+        expect(output.length).toEqual(0);
       });
   });
 });

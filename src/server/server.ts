@@ -1,17 +1,21 @@
 import { Server as HttpServer } from "http";
 
-import express, { Application, Router } from "express";
+import express, { Router, type Application } from "express";
 import { join } from "path";
-import { Logger } from "pino";
+import type { Logger } from "pino";
 import { createNodeMiddleware as createWebhooksMiddleware } from "@octokit/webhooks";
 
 import { getLog } from "../helpers/get-log";
 import { getLoggingMiddleware } from "./logging-middleware";
 import { createWebhookProxy } from "../helpers/webhook-proxy";
 import { VERSION } from "../version";
-import { ApplicationFunction, ServerOptions } from "../types";
+import type { ApplicationFunction, ServerOptions } from "../types";
 import { Probot } from "../";
 import { engine } from "express-handlebars";
+import EventSource from "eventsource";
+
+// the default path as defined in @octokit/webhooks
+export const defaultWebhooksPath = "/api/github/webhooks";
 
 type State = {
   httpServer?: HttpServer;
@@ -35,24 +39,25 @@ export class Server {
   constructor(options: ServerOptions = {} as ServerOptions) {
     this.expressApp = express();
     this.log = options.log || getLog().child({ name: "server" });
-    this.probotApp = new options.Probot();
+    this.probotApp = new options.Probot({
+      request: options.request,
+    });
 
     this.state = {
       port: options.port,
       host: options.host,
-      webhookPath: options.webhookPath || "/",
+      webhookPath: options.webhookPath || defaultWebhooksPath,
       webhookProxy: options.webhookProxy,
     };
 
-    this.expressApp.use(getLoggingMiddleware(this.log));
+    this.expressApp.use(getLoggingMiddleware(this.log, options.loggingOptions));
     this.expressApp.use(
       "/probot/static/",
       express.static(join(__dirname, "..", "..", "static"))
     );
     this.expressApp.use(
-      this.state.webhookPath,
       createWebhooksMiddleware(this.probotApp.webhooks, {
-        path: "/",
+        path: this.state.webhookPath,
       })
     );
 
@@ -64,7 +69,7 @@ export class Server {
     );
     this.expressApp.set("view engine", "handlebars");
     this.expressApp.set("views", join(__dirname, "..", "..", "views"));
-    this.expressApp.get("/ping", (req, res) => res.end("PONG"));
+    this.expressApp.get("/ping", (_req, res) => res.end("PONG"));
   }
 
   public async load(appFn: ApplicationFunction) {

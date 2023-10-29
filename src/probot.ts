@@ -1,17 +1,16 @@
-import LRUCache from "lru-cache";
-import { Logger } from "pino";
-import { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
+import { LRUCache } from "lru-cache";
+import type { Logger } from "pino";
+import type { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
 
-import { aliasLog } from "./helpers/alias-log";
 import { auth } from "./auth";
 import { getLog } from "./helpers/get-log";
 import { getProbotOctokitWithDefaults } from "./octokit/get-probot-octokit-with-defaults";
 import { getWebhooks } from "./octokit/get-webhooks";
 import { ProbotOctokit } from "./octokit/probot-octokit";
 import { VERSION } from "./version";
-import {
+import type {
   ApplicationFunction,
-  DeprecatedLogger,
+  ApplicationFunctionOptions,
   Options,
   ProbotWebhooks,
   State,
@@ -33,7 +32,7 @@ export class Probot {
   }
 
   public webhooks: ProbotWebhooks;
-  public log: DeprecatedLogger;
+  public log: Logger;
   public version: String;
   public on: ProbotWebhooks["on"];
   public onAny: ProbotWebhooks["onAny"];
@@ -51,14 +50,14 @@ export class Probot {
     let level = options.logLevel;
     const logMessageKey = options.logMessageKey;
 
-    this.log = aliasLog(options.log || getLog({ level, logMessageKey }));
+    this.log = options.log || getLog({ level, logMessageKey });
 
     // TODO: support redis backend for access token cache if `options.redisConfig`
     const cache = new LRUCache<number, string>({
       // cache max. 15000 tokens, that will use less than 10mb memory
       max: 15000,
       // Cache for 1 minute less than GitHub expiry
-      maxAge: 1000 * 60 * 59,
+      ttl: 1000 * 60 * 59,
     });
 
     const Octokit = getProbotOctokitWithDefaults({
@@ -71,7 +70,10 @@ export class Probot {
       redisConfig: options.redisConfig,
       baseUrl: options.baseUrl,
     });
-    const octokit = new Octokit();
+
+    const octokit = new Octokit({
+      request: options.request,
+    });
 
     this.state = {
       cache,
@@ -86,6 +88,7 @@ export class Probot {
       privateKey: options.privateKey,
       host: options.host,
       port: options.port,
+      request: options.request,
     };
 
     this.auth = auth.bind(null, this.state);
@@ -104,7 +107,10 @@ export class Probot {
     return this.webhooks.receive(event);
   }
 
-  public async load(appFn: ApplicationFunction | ApplicationFunction[]) {
+  public async load(
+    appFn: ApplicationFunction | ApplicationFunction[],
+    options: ApplicationFunctionOptions = {}
+  ) {
     if (Array.isArray(appFn)) {
       for (const fn of appFn) {
         await this.load(fn);
@@ -112,6 +118,6 @@ export class Probot {
       return;
     }
 
-    return appFn(this, {});
+    return appFn(this, options);
   }
 }

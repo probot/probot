@@ -1,28 +1,17 @@
-import { Logger } from "pino";
+export type { Logger } from "pino";
 
-import { Context } from "./context";
-import {
+export { Context } from "./context";
+
+export { Probot } from "./probot";
+export { Server } from "./server/server";
+export { ProbotOctokit } from "./octokit/probot-octokit";
+export { run } from "./run";
+export { createNodeMiddleware } from "./create-node-middleware";
+export { createProbot } from "./create-probot";
+
+/** NOTE: exported types might change at any point in time */
+export type {
   Options,
   ApplicationFunction,
   ApplicationFunctionOptions,
 } from "./types";
-import { Probot } from "./probot";
-import { Server } from "./server/server";
-import { ProbotOctokit } from "./octokit/probot-octokit";
-import { run } from "./run";
-import { createNodeMiddleware } from "./create-node-middleware";
-import { createProbot } from "./create-probot";
-
-export {
-  Logger,
-  Context,
-  ProbotOctokit,
-  run,
-  Probot,
-  Server,
-  createNodeMiddleware,
-  createProbot,
-};
-
-/** NOTE: exported types might change at any point in time */
-export { Options, ApplicationFunction, ApplicationFunctionOptions };

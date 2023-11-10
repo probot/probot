@@ -11,9 +11,9 @@ export const resolveAppFunction = async (
   const basedir = opts.basedir || process.cwd();
   const resolver: Resolver = opts.resolver || sync;
   const appFnPath = resolver(appFnId, { basedir });
-  const {default: mod} = await import(appFnPath);
+  const { default: mod } = await import(appFnPath);
   // mod.default gets exported by transpiled TypeScript code
-  return (mod.__esModule && mod.default) ? mod.default : mod;
+  return mod.__esModule && mod.default ? mod.default : mod;
 };
 
 export type Resolver = (appFnId: string, opts: { basedir: string }) => string;

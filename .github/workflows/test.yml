@@ -28,7 +28,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - run: node --experimental-vm-modules node_modules/.bin/jest
+      - run: npm run test
   test:
     runs-on: ubuntu-latest
     needs: test_matrix
@@ -41,7 +41,7 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run build
-      - run: node --experimental-vm-modules node_modules/.bin/jest
+      - run: npm run test
       - name: codecov
         run: npx codecov
         env:

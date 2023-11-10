@@ -74,6 +74,7 @@ export class Probot {
     const octokit = new Octokit({
       request: options.request,
     });
+    octokit.log = this.log.child({ name: "octokit" });
 
     this.state = {
       cache,

@@ -1,4 +1,3 @@
-// tslint:disable-next-line
 import type { Octokit } from "@octokit/core";
 
 export function probotRequestLogging(octokit: Octokit) {

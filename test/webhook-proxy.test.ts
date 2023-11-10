@@ -1,5 +1,4 @@
 import express, { type Response } from "express";
-// tslint:disable-next-line:no-var-requires
 const sse: (
   req: express.Request,
   res: express.Response,

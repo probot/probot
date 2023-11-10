@@ -56,7 +56,6 @@ wB98bfAGtcuCZWzgjgL67CS0pcNxadFA/TFo/NnynLBC4qRXSfFslKVE+Og=
 -----END RSA PRIVATE KEY-----`,
   WEBHOOK_SECRET: "secret",
 };
-// tslint:disable:no-empty
 describe("createProbot", () => {
   test("createProbot()", () => {
     const probot = createProbot({ env });

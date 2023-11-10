@@ -58,7 +58,6 @@ describe("end-to-end-tests", () => {
         res.status(201).json({});
       });
 
-    // tslint:disable-next-line
     app.use(bodyParser.json());
     app.use("/api/v3", httpMock);
     server = app.listen(mockServerPort);

@@ -18,7 +18,6 @@ export class ManifestCreation {
 
   public async createWebhookChannel() {
     try {
-      // tslint:disable:no-var-requires
       const SmeeClient = require("smee-client");
 
       await this.updateEnv({
@@ -26,7 +25,6 @@ export class ManifestCreation {
       });
     } catch (error) {
       // Smee is not available, so we'll just move on
-      // tslint:disable:no-console
       console.warn("Unable to connect to smee.io, try restarting your server.");
     }
   }

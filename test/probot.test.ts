@@ -61,7 +61,6 @@ const getPayloadExample = <TName extends EmitterWebhookEventName>(
   }
   return examples[0];
 };
-// tslint:disable:no-empty
 describe("Probot", () => {
   let probot: Probot;
   let event: WebhookEvent<

@@ -1,5 +1,5 @@
 {
-  "extends": ["@tsconfig/node16", "@octokit/tsconfig"],
+  "extends": "@octokit/tsconfig",
   "compilerOptions": {
     "module": "CommonJS",
     "verbatimModuleSyntax": false,

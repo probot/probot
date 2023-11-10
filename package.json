@@ -13,7 +13,7 @@
     "lint": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\" \"docs/*.md\" *.md package.json tsconfig.json --end-of-line auto",
     "lint:fix": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"docs/*.md\" *.md package.json tsconfig.json --end-of-line auto",
     "pretest": "tsc --noEmit -p test",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
     "posttest": "npm run lint",
     "doc": "typedoc --options .typedoc.json"
   },
@@ -80,6 +80,7 @@
     "body-parser": "^1.20.2",
     "bottleneck": "^2.19.5",
     "connect-sse": "^1.2.0",
+    "cross-env": "^7.0.3",
     "execa": "^5.0.0",
     "fetch-mock": "npm:@gr2m/fetch-mock@9.11.0-pull-request-644.1",
     "get-port": "^5.1.1",

@@ -59,7 +59,6 @@ describe("Server", () => {
     output = [];
     const log = pino(streamLogsToOutput);
     server = new Server({
-      webhookPath: "/",
       Probot: Probot.defaults({
         appId,
         privateKey,
@@ -94,7 +93,6 @@ describe("Server", () => {
       expect.assertions(3);
 
       server = new Server({
-        webhookPath: "/",
         Probot: Probot.defaults({
           appId,
           privateKey,

@@ -2,7 +2,6 @@ import path from "path";
 
 import request from "supertest";
 import { sign } from "@octokit/webhooks-methods";
-import Stream from "stream";
 
 import { Probot, run, Server } from "../src";
 
@@ -11,20 +10,9 @@ import WebhookExamples, {
   type WebhookDefinition,
 } from "@octokit/webhooks-examples";
 
-// tslint:disable:no-empty
 describe("run", () => {
   let server: Server;
   let env: NodeJS.ProcessEnv;
-  let output: any[];
-  const streamLogsToOutput = new Stream.Writable({ objectMode: true });
-  streamLogsToOutput._write = (object, _encoding, done) => {
-    output.push(JSON.parse(object));
-    done();
-  };
-
-  beforeEach(() => {
-    output = [];
-  });
 
   beforeEach(() => {
     env = {

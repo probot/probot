@@ -72,7 +72,6 @@
     "@octokit/webhooks-examples": "^7.0.0",
     "@octokit/webhooks-methods": "^4.0.0",
     "@octokit/webhooks-types": "^7.0.0",
-    "@tsconfig/node10": "^1.0.7",
     "@types/eventsource": "^1.1.5",
     "@types/jest": "^29.5.5",
     "@types/js-yaml": "^3.12.5",

@@ -6,14 +6,21 @@ import { ProbotOctokit } from "./octokit/probot-octokit";
 import type { OctokitOptions } from "./types";
 
 export class ManifestCreation {
+  #pkg: { [key: string]: any } | null = null;
+
   get pkg() {
-    let pkg: any;
-    try {
-      pkg = require(path.join(process.cwd(), "package.json"));
-    } catch (e) {
-      pkg = {};
+    if (this.#pkg === null) {
+      let pkgContent = "{}";
+      try {
+        pkgContent = fs.readFileSync(
+          path.join(process.cwd(), "package.json"),
+          "utf8",
+        );
+      } finally {
+        this.#pkg = JSON.parse(pkgContent);
+      }
     }
-    return pkg;
+    return this.#pkg;
   }
 
   public async createWebhookChannel() {

@@ -11,6 +11,6 @@ export function createNodeMiddleware(
   probot.load(appFn);
 
   return createWebhooksMiddleware(probot.webhooks, {
-    path: webhooksPath || defaultWebhooksPath,
+    path: webhooksPath || probot.webhookPath || defaultWebhooksPath,
   });
 }

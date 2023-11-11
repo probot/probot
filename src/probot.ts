@@ -15,6 +15,7 @@ import type {
   ProbotWebhooks,
   State,
 } from "./types";
+import { defaultWebhooksPath } from "./server/server";
 
 export type Constructor<T> = new (...args: any[]) => T;
 
@@ -32,6 +33,7 @@ export class Probot {
   }
 
   public webhooks: ProbotWebhooks;
+  public webhookPath: string;
   public log: Logger;
   public version: String;
   public on: ProbotWebhooks["on"];
@@ -88,12 +90,14 @@ export class Probot {
       privateKey: options.privateKey,
       host: options.host,
       port: options.port,
+      webhookPath: options.webhookPath || defaultWebhooksPath,
       request: options.request,
     };
 
     this.auth = auth.bind(null, this.state);
 
     this.webhooks = getWebhooks(this.state);
+    this.webhookPath = this.state.webhookPath;
 
     this.on = this.webhooks.on;
     this.onAny = this.webhooks.onAny;

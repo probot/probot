@@ -1,8 +1,8 @@
 // Usage: probot receive -e push -p path/to/payload app.js
 
 import express, { Router } from "express";
-
-require("dotenv").config();
+import { config as dotenvConfig } from "dotenv";
+dotenvConfig();
 
 import path from "path";
 import { randomUUID as uuidv4 } from "crypto";

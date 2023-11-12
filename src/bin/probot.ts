@@ -1,7 +1,8 @@
 import program from "commander";
 import { isSupportedNodeVersion } from "../helpers/is-supported-node-version";
+import { config as dotenvConfig } from "dotenv";
 
-require("dotenv").config();
+dotenvConfig();
 
 const pkg = require("../../package");
 

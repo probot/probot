@@ -38,15 +38,15 @@ describe("webhook-proxy", () => {
         emit = res.json;
       });
 
-      server = app.listen(0, () => {
+      server = app.listen(0, async () => {
         targetPort = (server.address() as net.AddressInfo).port;
         const url = `http://127.0.0.1:${targetPort}/events`;
-        proxy = createWebhookProxy({
+        proxy = (await createWebhookProxy({
           url,
           port: targetPort,
           path: "/test",
           logger: getLog({ level: "fatal" }),
-        })!;
+        })) as EventSource;
 
         // Wait for proxy to be ready
         proxy.addEventListener("ready", () => done());
@@ -76,12 +76,12 @@ describe("webhook-proxy", () => {
     const log = getLog({ level: "fatal" }).child({});
     log.error = jest.fn();
 
-    proxy = createWebhookProxy({ url, logger: log })!;
-
-    proxy.addEventListener("error", (error: any) => {
-      expect(error.status).toBe(404);
-      expect(log.error).toHaveBeenCalledWith(error);
-      done();
+    createWebhookProxy({ url, logger: log })!.then((proxy) => {
+      (proxy as EventSource).addEventListener("error", (error: any) => {
+        expect(error.status).toBe(404);
+        expect(log.error).toHaveBeenCalledWith(error);
+        done();
+      });
     });
   });
 });

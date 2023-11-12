@@ -1,11 +1,11 @@
-import semver from "semver";
 import { program } from "commander";
+import { isSupportedNodeVersion } from "../helpers/is-supported-node-version";
 
 require("dotenv").config();
 
 const pkg = require("../../package");
 
-if (!semver.satisfies(process.version, pkg.engines.node)) {
+if (!isSupportedNodeVersion()) {
   console.log(
     `Node.js version ${pkg.engines.node} is required. You have ${process.version}.`,
   );

@@ -62,7 +62,6 @@
     "pino-http": "^8.5.1",
     "pkg-conf": "^3.1.0",
     "resolve": "^1.22.8",
-    "semver": "^7.5.4",
     "update-dotenv": "^1.1.1"
   },
   "devDependencies": {
@@ -75,7 +74,6 @@
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^18.18.1",
     "@types/resolve": "^1.20.5",
-    "@types/semver": "^7.5.5",
     "@types/supertest": "^2.0.16",
     "body-parser": "^1.20.2",
     "bottleneck": "^2.19.5",

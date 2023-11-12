@@ -63,8 +63,8 @@ describe("end-to-end-tests", () => {
     server = app.listen(mockServerPort);
 
     probotProcess = execa(
-      "bin/probot.js",
-      ["run", "./test/e2e/hello-world.js"],
+      "node",
+      ["bin/probot.js", "run", "./test/e2e/hello-world.js"],
       {
         env: {
           APP_ID: "1",
@@ -81,6 +81,8 @@ describe("end-to-end-tests", () => {
 
     // give probot a moment to start
     await new Promise((resolve) => setTimeout(resolve, 3000));
+    // the probot process should be successfully started
+    expect(probotProcess.exitCode).toBeNull();
 
     // send webhook event request
     const body = JSON.stringify({

@@ -18,8 +18,7 @@ export class ManifestCreation {
 
   public async createWebhookChannel() {
     try {
-      // tslint:disable:no-var-requires
-      const SmeeClient = require("smee-client");
+      const SmeeClient = (await import("smee-client")).default;
 
       await this.updateEnv({
         WEBHOOK_PROXY_URL: await SmeeClient.createChannel(),

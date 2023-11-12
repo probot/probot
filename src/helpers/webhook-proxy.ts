@@ -2,11 +2,11 @@ import EventSource from "eventsource";
 
 import type { Logger } from "pino";
 
-export const createWebhookProxy = (
+export const createWebhookProxy = async (
   opts: WebhookProxyOptions,
-): EventSource | undefined => {
+): Promise<EventSource | undefined> => {
   try {
-    const SmeeClient = require("smee-client");
+    const SmeeClient = (await import("smee-client")).default;
     const smee = new SmeeClient({
       logger: opts.logger,
       source: opts.url,
@@ -22,7 +22,7 @@ export const createWebhookProxy = (
 };
 
 export interface WebhookProxyOptions {
-  url?: string;
+  url: string;
   port?: number;
   path?: string;
   logger: Logger;

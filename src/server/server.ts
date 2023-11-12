@@ -90,14 +90,14 @@ export class Server {
       const server = this.expressApp.listen(
         port,
         ...((host ? [host] : []) as any),
-        () => {
+        async () => {
           if (webhookProxy) {
-            this.state.eventSource = createWebhookProxy({
+            this.state.eventSource = (await createWebhookProxy({
               logger: this.log,
               path: webhookPath,
               port: port,
               url: webhookProxy,
-            }) as EventSource;
+            })) as EventSource;
           }
           this.log.info(`Listening on http://${printableHost}:${port}`);
           resolve(server);

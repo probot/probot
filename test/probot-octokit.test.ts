@@ -217,7 +217,7 @@ describe("ProbotOctokit", () => {
           } else {
             expect(url).toMatch(
               new RegExp(
-                "^https://api.github.com/repositories/[0-9]+/issues\\?per_page=[0-9]+&page=[0-9]+$",
+                "^https://api\.github\.com/repositories/[0-9]+/issues\\?per_page=[0-9]+&page=[0-9]+$",
               ),
             );
           }
@@ -270,7 +270,7 @@ describe("ProbotOctokit", () => {
           } else {
             expect(url).toMatch(
               new RegExp(
-                "^https://api.github.com/repositories/[0-9]+/issues\\?per_page=[0-9]+&page=[0-9]+$",
+                "^https://api\.github\.com/repositories/[0-9]+/issues\\?per_page=[0-9]+&page=[0-9]+$",
               ),
             );
           }
@@ -319,12 +319,12 @@ describe("ProbotOctokit", () => {
         fetch: (url: string, options: { [key: string]: any }) => {
           if (callCount === 0) {
             expect(url).toEqual(
-              "https://api.github.com/repos/JasonEtco/pizza/issues?per_page=1",
+              "https://api\.github\.com/repos/JasonEtco/pizza/issues?per_page=1",
             );
           } else {
             expect(url).toMatch(
               new RegExp(
-                "^https://api.github.com/repositories/[0-9]+/issues\\?per_page=[0-9]+&page=[0-9]+$",
+                "^https://api\.github\.com/repositories/[0-9]+/issues\\?per_page=[0-9]+&page=[0-9]+$",
               ),
             );
           }

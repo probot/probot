@@ -217,7 +217,7 @@ describe("ProbotOctokit", () => {
           } else {
             expect(url).toMatch(
               new RegExp(
-                "^https://api.github.com/repositories/[0-9]+/issues\\?per_page=[0-9]+&page=[0-9]+$",
+                "^https://api\\.github\\.com/repositories/[0-9]+/issues\\?per_page=[0-9]+&page=[0-9]+$",
               ),
             );
           }
@@ -270,7 +270,7 @@ describe("ProbotOctokit", () => {
           } else {
             expect(url).toMatch(
               new RegExp(
-                "^https://api.github.com/repositories/[0-9]+/issues\\?per_page=[0-9]+&page=[0-9]+$",
+                "^https://api\\.github\\.com/repositories/[0-9]+/issues\\?per_page=[0-9]+&page=[0-9]+$",
               ),
             );
           }
@@ -324,7 +324,7 @@ describe("ProbotOctokit", () => {
           } else {
             expect(url).toMatch(
               new RegExp(
-                "^https://api.github.com/repositories/[0-9]+/issues\\?per_page=[0-9]+&page=[0-9]+$",
+                "^https://api\\.github\\.com/repositories/[0-9]+/issues\\?per_page=[0-9]+&page=[0-9]+$",
               ),
             );
           }

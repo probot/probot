@@ -1,5 +1,5 @@
 import Bottleneck from "bottleneck";
-import { Redis, RedisOptions } from "ioredis";
+import { Redis, type RedisOptions } from "ioredis";
 import type { Logger } from "pino";
 import type { ThrottlingOptions } from "@octokit/plugin-throttling";
 

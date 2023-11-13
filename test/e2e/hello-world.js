@@ -17,7 +17,7 @@ module.exports = (app) => {
       await context.octokit.issues.createComment(params)
       console.log("issue comment created");
     } catch (e) {
-      console.log("not ok", error)
+      console.log("not ok", e)
     }
   });
 };

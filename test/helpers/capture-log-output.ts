@@ -8,8 +8,11 @@ export async function captureLogOutput(
 ): Promise<string> {
   let outputData = "";
 
-  // @ts-expect-error
-  let stdoutSpy = vi.spyOn(log[pinoSymbols.streamSym], "write") as SpyInstance;
+  const stdoutSpy: SpyInstance = vi.spyOn(
+    // @ts-expect-error
+    log[pinoSymbols.streamSym],
+    "write",
+  );
   stdoutSpy.mockImplementation((data) => {
     outputData += data;
   });

@@ -89,6 +89,59 @@ describe("Server", () => {
     });
   });
 
+  describe("webhook handler by providing webhookPath (POST /)", () => {
+    it("should return 200 and run event handlers in app function", async () => {
+      expect.assertions(3);
+
+      server = new Server({
+        webhookPath: "/",
+        Probot: Probot.defaults({
+          appId,
+          privateKey,
+          secret: "secret",
+        }),
+        log: pino(streamLogsToOutput),
+        port: await getPort(),
+      });
+
+      await server.load((app) => {
+        app.on("push", (event) => {
+          expect(event.name).toEqual("push");
+        });
+      });
+
+      const dataString = JSON.stringify(pushEvent);
+
+      await request(server.expressApp)
+        .post("/")
+        .send(dataString)
+        .set("content-type", "application/json")
+        .set("x-github-event", "push")
+        .set("x-hub-signature-256", await sign("secret", dataString))
+        .set("x-github-delivery", "3sw4d5f6g7h8");
+
+      expect(output.length).toEqual(1);
+      expect(output[0].msg).toContain("POST / 200 -");
+    });
+
+    test("respond with a friendly error when x-hub-signature-256 is missing", async () => {
+      await server.load(() => {});
+
+      await request(server.expressApp)
+        .post("/api/github/webhooks")
+        .send(JSON.stringify(pushEvent))
+        .set("content-type", "application/json")
+        .set("x-github-event", "push")
+        .set("content-type", "application/json")
+        // Note: 'x-hub-signature-256' is missing
+        .set("x-github-delivery", "3sw4d5f6g7h8")
+        .expect(
+          400,
+          '{"error":"Required headers missing: x-hub-signature-256"}',
+        );
+    });
+  });
+
   describe("webhook handler (POST /api/github/webhooks)", () => {
     it("should return 200 and run event handlers in app function", async () => {
       expect.assertions(3);

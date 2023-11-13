@@ -74,37 +74,47 @@ async function main() {
     )
     .parse(process.argv);
 
-  const opts = program.opts();
-  const githubToken = opts.token;
+  const {
+    app: appId,
+    baseUrl,
+    token: githubToken,
+    event,
+    payloadPath,
+    logLevel,
+    logFormat,
+    logLevelInString,
+    logMessageKey,
+    sentryDsn,
+  } = program.opts();
 
-  if (!opts.event || !opts.payloadPath) {
+  if (!event || !payloadPath) {
     program.help();
   }
 
   const privateKey = getPrivateKey();
-  if (!githubToken && (!opts.app || !privateKey)) {
+  if (!githubToken && (!appId || !privateKey)) {
     console.warn(
       "No token specified and no certificate found, which means you will not be able to do authenticated requests to GitHub",
     );
   }
 
   const payload = JSON.parse(
-    fs.readFileSync(path.resolve(opts.payloadPath), "utf8"),
+    fs.readFileSync(path.resolve(payloadPath), "utf8"),
   );
   const log = getLog({
-    level: opts.logLevel,
-    logFormat: opts.logFormat,
-    logLevelInString: opts.logLevelInString,
-    logMessageKey: opts.logMessageKey,
-    sentryDsn: opts.sentryDsn,
+    level: logLevel,
+    logFormat,
+    logLevelInString,
+    logMessageKey,
+    sentryDsn,
   });
 
   const probot = new Probot({
-    appId: opts.app,
+    appId,
     privateKey: String(privateKey),
     githubToken: githubToken,
     log,
-    baseUrl: opts.baseUrl,
+    baseUrl: baseUrl,
   });
 
   const expressApp = express();
@@ -121,8 +131,8 @@ async function main() {
   );
   await probot.load(appFn, options);
 
-  probot.log.debug("Receiving event", opts.event);
-  probot.receive({ name: opts.event, payload, id: uuidv4() }).catch(() => {
+  probot.log.debug("Receiving event", event);
+  probot.receive({ name: event, payload, id: uuidv4() }).catch(() => {
     // Process must exist non-zero to indicate that the action failed to run
     process.exit(1);
   });

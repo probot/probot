@@ -18,6 +18,7 @@ import EventSource from "eventsource";
 export const defaultWebhooksPath = "/api/github/webhooks";
 
 type State = {
+  cwd?: string;
   httpServer?: HttpServer;
   port?: number;
   host?: string;
@@ -44,6 +45,7 @@ export class Server {
     });
 
     this.state = {
+      cwd: options.cwd || process.cwd(),
       port: options.port,
       host: options.host,
       webhookPath: options.webhookPath || defaultWebhooksPath,
@@ -74,6 +76,7 @@ export class Server {
 
   public async load(appFn: ApplicationFunction) {
     await appFn(this.probotApp, {
+      cwd: this.state.cwd,
       getRouter: (path) => this.router(path),
     });
   }

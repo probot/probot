@@ -53,6 +53,7 @@ export type ProbotWebhooks = Webhooks<SimplifiedObject>;
 
 export type ApplicationFunctionOptions = {
   getRouter?: (path?: string) => express.Router;
+  cwd?: string;
   [key: string]: unknown;
 };
 export type ApplicationFunction = (
@@ -61,6 +62,7 @@ export type ApplicationFunction = (
 ) => void;
 
 export type ServerOptions = {
+  cwd?: string;
   log?: Logger;
   port?: number;
   host?: string;

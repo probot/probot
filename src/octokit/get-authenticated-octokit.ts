@@ -37,11 +37,12 @@ export async function getAuthenticatedOctokit(
           debug: pinoLog.debug.bind(pinoLog),
           trace: pinoLog.trace.bind(pinoLog),
         },
-        // @ts-expect-error The correct properties are always passed into here
-        throttle: {
-          ...octokitOptions.throttle,
-          id: String(installationId),
-        },
+        throttle: octokitOptions.throttle?.enabled
+        ? {
+            ...octokitOptions.throttle,
+            id: String(installationId),
+          }
+        : { enabled: false },
         auth: {
           ...octokitOptions.auth,
           otherOptions,

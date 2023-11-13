@@ -1,4 +1,4 @@
-const { streamSym } = require("pino/lib/symbols");
+import { symbols as pinoSymbols } from "pino";
 import type { Logger } from "pino";
 import { type SpyInstance, vi } from "vitest";
 
@@ -9,7 +9,7 @@ export async function captureLogOutput(
   let outputData = "";
 
   // @ts-expect-error
-  let stdoutSpy = vi.spyOn(log[streamSym], "write") as SpyInstance;
+  let stdoutSpy = vi.spyOn(log[pinoSymbols.streamSym], "write") as SpyInstance;
   stdoutSpy.mockImplementation((data) => {
     outputData += data;
   });

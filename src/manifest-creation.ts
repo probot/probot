@@ -4,16 +4,11 @@ import path from "path";
 import updateDotenv from "update-dotenv";
 import { ProbotOctokit } from "./octokit/probot-octokit";
 import type { OctokitOptions } from "./types";
+import { loadPackageJson } from "./helpers/load-package-json";
 
 export class ManifestCreation {
   get pkg() {
-    let pkg: any;
-    try {
-      pkg = require(path.join(process.cwd(), "package.json"));
-    } catch (e) {
-      pkg = {};
-    }
-    return pkg;
+    return loadPackageJson();
   }
 
   public async createWebhookChannel() {

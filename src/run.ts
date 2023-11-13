@@ -10,6 +10,7 @@ import { Server } from "./server/server";
 import { defaultApp } from "./apps/default";
 import { resolveAppFunction } from "./helpers/resolve-app-function";
 import { isProduction } from "./helpers/is-production";
+import { config as dotenvConfig } from "dotenv";
 
 type AdditionalOptions = {
   env: Record<string, string | undefined>;
@@ -23,7 +24,7 @@ export async function run(
   appFnOrArgv: ApplicationFunction | string[],
   additionalOptions?: AdditionalOptions,
 ) {
-  require("dotenv").config();
+  dotenvConfig();
 
   const envOptions = readEnvOptions(additionalOptions?.env);
   const cliOptions = Array.isArray(appFnOrArgv)

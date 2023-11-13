@@ -1,9 +1,10 @@
 // Usage: probot receive -e push -p path/to/payload app.js
 
 import express, { Router } from "express";
+import { config as dotenvConfig } from "dotenv";
+dotenvConfig();
 
-require("dotenv").config();
-
+import fs from "fs";
 import path from "path";
 import { randomUUID as uuidv4 } from "crypto";
 import { program } from "commander";
@@ -87,7 +88,9 @@ async function main() {
     );
   }
 
-  const payload = require(path.resolve(opts.payloadPath));
+  const payload = JSON.parse(
+    fs.readFileSync(path.resolve(opts.payloadPath), "utf8"),
+  );
   const log = getLog({
     level: opts.logLevel,
     logFormat: opts.logFormat,

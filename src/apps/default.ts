@@ -1,5 +1,5 @@
-import path from "path";
 import type { ApplicationFunctionOptions, Probot } from "../index";
+import { loadPackageJson } from "../helpers/load-package-json";
 
 export function defaultApp(
   _app: Probot,
@@ -12,12 +12,7 @@ export function defaultApp(
   const router = getRouter();
 
   router.get("/probot", (_req, res) => {
-    let pkg;
-    try {
-      pkg = require(path.join(process.cwd(), "package.json"));
-    } catch (e) {
-      pkg = {};
-    }
+    const pkg = loadPackageJson();
 
     res.render("probot.handlebars", pkg);
   });

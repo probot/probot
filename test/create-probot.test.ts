@@ -83,6 +83,21 @@ describe("createProbot", () => {
     expect(probot.log.level).toEqual("trace");
   });
 
+
+  test("defaults, custom host", () => {
+    const probot = createProbot({
+      env: {
+        ...env,
+        GHE_HOST: "github.acme-inc.com",
+        GHE_PROTOCOL: "https",
+      },
+    });
+    // @ts-expect-error This is private
+    expect(probot.state.octokit.request.endpoint.DEFAULTS.baseUrl).toEqual(
+      "https://github.acme-inc.com/api/v3",
+    );
+  });
+
   test("env, overrides", () => {
     const probot = createProbot({
       env: {

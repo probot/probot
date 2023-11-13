@@ -14,7 +14,7 @@ type Options = {
   githubToken?: string;
   appId?: number;
   privateKey?: string;
-  redisConfig?: redis.RedisOptions | string;
+  redisConfig?: RedisOptions | string;
   baseUrl?: string;
   request?: RequestRequestOptions;
 };

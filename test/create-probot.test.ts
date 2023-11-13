@@ -83,7 +83,6 @@ describe("createProbot", () => {
     expect(probot.log.level).toEqual("trace");
   });
 
-
   test("defaults, custom host", () => {
     const probot = createProbot({
       env: {

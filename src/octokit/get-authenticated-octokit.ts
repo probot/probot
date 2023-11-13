@@ -38,11 +38,11 @@ export async function getAuthenticatedOctokit(
           trace: pinoLog.trace.bind(pinoLog),
         },
         throttle: octokitOptions.throttle?.enabled
-        ? {
-            ...octokitOptions.throttle,
-            id: String(installationId),
-          }
-        : { enabled: false },
+          ? {
+              ...octokitOptions.throttle,
+              id: String(installationId),
+            }
+          : { enabled: false },
         auth: {
           ...octokitOptions.auth,
           otherOptions,

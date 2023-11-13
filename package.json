@@ -15,7 +15,7 @@
     "pretest": "npm run build && tsc --noEmit -p test",
     "test": "vitest run",
     "test:dev": "vitest --ui --coverage",
-    "test:coverage": "vitest run --no-threads --coverage",
+    "test:coverage": "vitest run --coverage",
     "posttest": "npm run lint",
     "doc": "typedoc --options .typedoc.json"
   },

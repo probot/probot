@@ -1,4 +1,4 @@
-import bodyParser from "body-parser";
+import express from "express";
 import { exec } from "child_process";
 import type { Request, Response } from "express";
 import updateDotenv from "update-dotenv";
@@ -77,7 +77,7 @@ export const setupAppFactory = (
       res.render("import.handlebars", { WEBHOOK_PROXY_URL, GH_HOST });
     });
 
-    route.post("/probot/import", bodyParser.json(), async (req, res) => {
+    route.post("/probot/import", express.json(), async (req, res) => {
       const { appId, pem, webhook_secret } = req.body;
       if (!appId || !pem || !webhook_secret) {
         res.status(400).send("appId and/or pem and/or webhook_secret missing");

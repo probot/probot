@@ -2,7 +2,6 @@ import execa from "execa";
 import getPort from "get-port";
 
 import { sign } from "@octokit/webhooks-methods";
-import bodyParser from "body-parser";
 import express from "express";
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
@@ -58,7 +57,7 @@ describe("end-to-end-tests", () => {
         res.status(201).json({});
       });
 
-    app.use(bodyParser.json());
+    app.use(express.json());
     app.use("/api/v3", httpMock);
     server = app.listen(mockServerPort);
 

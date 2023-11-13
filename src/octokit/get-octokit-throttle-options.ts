@@ -1,11 +1,11 @@
 import Bottleneck from "bottleneck";
-import * as redis from "ioredis";
+import { Redis, RedisOptions } from "ioredis";
 import type { Logger } from "pino";
 import type { ThrottlingOptions } from "@octokit/plugin-throttling";
 
 type Options = {
   log: Logger;
-  redisConfig?: redis.RedisOptions | string;
+  redisConfig?: RedisOptions | string;
 };
 
 export function getOctokitThrottleOptions(options: Options) {
@@ -47,6 +47,6 @@ export function getOctokitThrottleOptions(options: Options) {
   return throttlingOptions;
 }
 
-function getRedisClient({ redisConfig }: Options): redis.Redis | void {
-  if (redisConfig) return new redis.Redis(redisConfig as redis.RedisOptions);
+function getRedisClient({ redisConfig }: Options): Redis | void {
+  if (redisConfig) return new Redis(redisConfig as RedisOptions);
 }

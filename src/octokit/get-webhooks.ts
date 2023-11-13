@@ -12,7 +12,7 @@ export function getWebhooks(state: State) {
   //         helpers for extracting information can be passed to GitHub API calls
   const webhooks = new Webhooks({
     secret: state.webhooks.secret!,
-    transform: webhookTransform.bind(null, state),
+    transform: (hook) => webhookTransform(state, hook),
   });
   webhooks.onError(getErrorHandler(state.log));
   return webhooks;

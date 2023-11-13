@@ -70,11 +70,16 @@ export class Probot {
       redisConfig: options.redisConfig,
       baseUrl: options.baseUrl,
     });
-
+    const octokitLogger = this.log.child({ name: "octokit" });
     const octokit = new Octokit({
       request: options.request,
+      log: {
+        debug: octokitLogger.debug.bind(octokitLogger),
+        info: octokitLogger.info.bind(octokitLogger),
+        warn: octokitLogger.warn.bind(octokitLogger),
+        error: octokitLogger.error.bind(octokitLogger),
+      },
     });
-    octokit.log = this.log.child({ name: "octokit" });
 
     this.state = {
       cache,

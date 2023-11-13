@@ -1,6 +1,6 @@
 import type { LRUCache } from "lru-cache";
 import { ProbotOctokit } from "./probot-octokit";
-import * as redis from "ioredis";
+import type { RedisOptions } from "ioredis";
 
 import { getOctokitThrottleOptions } from "./get-octokit-throttle-options";
 
@@ -14,7 +14,7 @@ type Options = {
   githubToken?: string;
   appId?: number;
   privateKey?: string;
-  redisConfig?: redis.RedisOptions | string;
+  redisConfig?: RedisOptions | string;
   baseUrl?: string;
   request?: RequestRequestOptions;
 };

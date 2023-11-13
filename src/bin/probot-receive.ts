@@ -4,6 +4,7 @@ import express, { Router } from "express";
 import { config as dotenvConfig } from "dotenv";
 dotenvConfig();
 
+import fs from "fs";
 import path from "path";
 import { randomUUID as uuidv4 } from "crypto";
 import program from "commander";
@@ -86,7 +87,9 @@ async function main() {
     );
   }
 
-  const payload = require(path.resolve(program.payloadPath));
+  const payload = JSON.parse(
+    fs.readFileSync(path.resolve(program.payloadPath), "utf8"),
+  );
   const log = getLog({
     level: program.logLevel,
     logFormat: program.logFormat,

@@ -4,7 +4,7 @@ import type {
   Webhooks,
 } from "@octokit/webhooks";
 import type { LRUCache } from "lru-cache";
-import type * as Redis from "ioredis";
+import type { RedisOptions } from "ioredis";
 import type { Options as LoggingOptions } from "pino-http";
 
 import { Probot } from "./index";
@@ -21,7 +21,7 @@ export interface Options {
 
   Octokit?: typeof ProbotOctokit;
   log?: Logger;
-  redisConfig?: Redis.RedisOptions | string;
+  redisConfig?: RedisOptions | string;
   secret?: string;
   logLevel?: "trace" | "debug" | "info" | "warn" | "error" | "fatal";
   logMessageKey?: string;

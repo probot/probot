@@ -4,6 +4,7 @@ import Stream from "stream";
 import pino from "pino";
 import getPort from "get-port";
 import { sign } from "@octokit/webhooks-methods";
+import { describe, expect, test, beforeEach } from "vitest";
 
 import { createNodeMiddleware, createProbot, Probot } from "../src";
 import type { ApplicationFunction } from "../src/types";

@@ -12,8 +12,9 @@
     "build": "rimraf lib && tsc -p tsconfig.json",
     "lint": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\" \"docs/*.md\" *.md package.json tsconfig.json --end-of-line auto",
     "lint:fix": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"docs/*.md\" *.md package.json tsconfig.json --end-of-line auto",
-    "pretest": "tsc --noEmit -p test",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "pretest": "npm run build && tsc --noEmit -p test",
+    "test": "vitest --no-threads --no-watch",
+    "test:watch": "vitest --no-threads",
     "posttest": "npm run lint",
     "doc": "typedoc --options .typedoc.json"
   },
@@ -69,7 +70,6 @@
     "@octokit/webhooks-methods": "^4.0.0",
     "@octokit/webhooks-types": "^7.3.1",
     "@types/eventsource": "^1.1.15",
-    "@types/jest": "^29.5.8",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^18.18.1",
     "@types/resolve": "^1.20.5",
@@ -80,7 +80,6 @@
     "execa": "^5.0.0",
     "fetch-mock": "npm:@gr2m/fetch-mock@9.11.0-pull-request-644.1",
     "get-port": "^5.1.1",
-    "jest": "^29.7.0",
     "nock": "^13.3.8",
     "prettier": "^3.0.3",
     "rimraf": "^5.0.5",
@@ -89,30 +88,14 @@
     "smee-client": "^1.2.3",
     "sonic-boom": "^3.7.0",
     "supertest": "^6.3.3",
-    "ts-jest": "^29.1.1",
     "tsd": "^0.29.0",
     "typedoc": "^0.25.3",
     "typescript": "^5.2.2",
-    "undici": "^5.27.2"
+    "undici": "^5.27.2",
+    "vitest": "^0.34.6"
   },
   "engines": {
     "node": ">=18"
-  },
-  "jest": {
-    "testEnvironment": "node",
-    "coveragePathIgnorePatterns": [
-      "<rootDir>/lib/"
-    ],
-    "moduleFileExtensions": [
-      "ts",
-      "js",
-      "json",
-      "node"
-    ],
-    "preset": "ts-jest"
-  },
-  "tsd": {
-    "directory": "test/types"
   },
   "release": {
     "plugins": [

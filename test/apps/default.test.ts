@@ -2,6 +2,7 @@ import Stream from "stream";
 
 import pino from "pino";
 import request from "supertest";
+import { beforeEach, describe, expect, it, afterEach } from "vitest";
 
 import { Probot, Server } from "../../src";
 import { defaultApp } from "../../src/apps/default";

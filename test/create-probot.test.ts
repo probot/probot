@@ -1,5 +1,6 @@
 import { createProbot, Probot } from "../src";
 import { captureLogOutput } from "./helpers/capture-log-output";
+import { describe, expect, test } from "vitest";
 
 const env = {
   APP_ID: "1",

@@ -1,7 +1,18 @@
-const createChannel = jest.fn().mockResolvedValue("mocked proxy URL");
-const updateDotenv = jest.fn().mockResolvedValue({});
-jest.mock("smee-client", () => ({ createChannel }));
-jest.mock("update-dotenv", () => updateDotenv);
+import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
+
+const mocks = vi.hoisted(() => {
+  return {
+    createChannel: vi.fn().mockResolvedValue("mocked proxy URL"),
+    updateDotenv: vi.fn().mockResolvedValue({}),
+  };
+});
+vi.mock("smee-client", () => ({
+  default: { createChannel: mocks.createChannel },
+  createChannel: mocks.createChannel,
+}));
+vi.mock("update-dotenv", () => ({
+  default: mocks.updateDotenv,
+}));
 
 import fetchMock from "fetch-mock";
 import { Stream } from "stream";
@@ -37,7 +48,7 @@ describe("Setup app", () => {
   });
 
   afterEach(async () => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("logs", () => {
@@ -128,8 +139,8 @@ describe("Setup app", () => {
         .expect(302)
         .expect("Location", "/apps/my-app/installations/new");
 
-      expect(createChannel).toHaveBeenCalledTimes(2);
-      expect(updateDotenv.mock.calls).toMatchSnapshot();
+      expect(mocks.createChannel).toHaveBeenCalledTimes(2);
+      expect(mocks.updateDotenv.mock.calls).toMatchSnapshot();
     });
   });
 
@@ -154,7 +165,7 @@ describe("Setup app", () => {
         .expect(200)
         .expect("");
 
-      expect(updateDotenv.mock.calls).toMatchSnapshot();
+      expect(mocks.updateDotenv.mock.calls).toMatchSnapshot();
     });
 
     it("400 when keys are missing", async () => {
@@ -176,7 +187,7 @@ describe("Setup app", () => {
     it("returns a 200 response", async () => {
       await request(server.expressApp).get("/probot/success").expect(200);
 
-      expect(createChannel).toHaveBeenCalledTimes(1);
+      expect(mocks.createChannel).toHaveBeenCalledTimes(1);
     });
   });
 });

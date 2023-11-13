@@ -8,6 +8,7 @@ import getPort from "get-port";
 import WebhookExamples, {
   type WebhookDefinition,
 } from "@octokit/webhooks-examples";
+import { describe, expect, it, beforeEach, test } from "vitest";
 
 import { Server, Probot } from "../src";
 
@@ -149,30 +150,31 @@ describe("Server", () => {
   });
 
   describe(".start() / .stop()", () => {
-    it("should expect the correct error if port already in use", (next) => {
-      expect.assertions(1);
+    it("should expect the correct error if port already in use", () =>
+      new Promise<void>((next) => {
+        expect.assertions(1);
 
-      // block port 3001
-      const http = require("http");
-      const blockade = http.createServer().listen(3001, async () => {
-        const server = new Server({
-          Probot: Probot.defaults({ appId, privateKey }),
-          log: pino(streamLogsToOutput),
-          port: 3001,
+        // block port 3001
+        const http = require("http");
+        const blockade = http.createServer().listen(3001, async () => {
+          const server = new Server({
+            Probot: Probot.defaults({ appId, privateKey }),
+            log: pino(streamLogsToOutput),
+            port: 3001,
+          });
+
+          try {
+            await server.start();
+          } catch (error) {
+            expect((error as Error).message).toEqual(
+              "Port 3001 is already in use. You can define the PORT environment variable to use a different port.",
+            );
+          }
+
+          await server.stop();
+          blockade.close(() => next());
         });
-
-        try {
-          await server.start();
-        } catch (error) {
-          expect((error as Error).message).toEqual(
-            "Port 3001 is already in use. You can define the PORT environment variable to use a different port.",
-          );
-        }
-
-        await server.stop();
-        blockade.close(() => next());
-      });
-    });
+      }));
 
     it("should listen to port when not in use", async () => {
       const testApp = new Server({

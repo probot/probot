@@ -3,6 +3,7 @@ import pkg from "../package.json";
 import { ManifestCreation } from "../src/manifest-creation";
 import response from "./fixtures/setup/response.json";
 import fetchMock from "fetch-mock";
+import { describe, expect, test, beforeEach, afterEach, vi } from "vitest";
 
 describe("ManifestCreation", () => {
   let setup: ManifestCreation;
@@ -17,10 +18,10 @@ describe("ManifestCreation", () => {
       delete process.env.PROJECT_DOMAIN;
       delete process.env.WEBHOOK_PROXY_URL;
 
-      setup.updateEnv = jest.fn();
+      setup.updateEnv = vi.fn();
 
       const SmeeClient: typeof import("smee-client") = require("smee-client");
-      SmeeClient.createChannel = jest
+      SmeeClient.createChannel = vi
         .fn()
         .mockReturnValue("https://smee.io/1234abc");
     });
@@ -89,7 +90,7 @@ describe("ManifestCreation", () => {
 
   describe("createAppFromCode", () => {
     beforeEach(() => {
-      setup.updateEnv = jest.fn();
+      setup.updateEnv = vi.fn();
     });
 
     afterEach(() => {
@@ -153,7 +154,7 @@ describe("ManifestCreation", () => {
 
   describe("getManifest", () => {
     afterEach(() => {
-      jest.clearAllMocks();
+      vi.clearAllMocks();
     });
 
     test("creates an app from a code", () => {
@@ -166,7 +167,7 @@ describe("ManifestCreation", () => {
     test("creates an app from a code with overrided values from app.yml", () => {
       const appYaml =
         "name: cool-app\ndescription: A description for a cool app";
-      jest.spyOn(fs, "readFileSync").mockReturnValue(appYaml);
+      vi.spyOn(fs, "readFileSync").mockReturnValue(appYaml);
 
       // checks that getManifest returns the correct JSON.stringified manifest
       expect(setup.getManifest(pkg, "localhost://3000")).toEqual(

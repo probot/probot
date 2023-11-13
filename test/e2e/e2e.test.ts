@@ -5,13 +5,13 @@ import { sign } from "@octokit/webhooks-methods";
 import bodyParser from "body-parser";
 import express from "express";
 
-jest.setTimeout(10000);
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
 /**
  * In these tests we are starting probot apps by running "npm run [path to app.js]" using ghub.io/execa.
  * This allows us to pass dynamic environment variables for configuration.
  *
- * We also spawn a mock server which receives the Octokit requests from the app and uses jest assertions
+ * We also spawn a mock server which receives the Octokit requests from the app and uses vitest assertions
  * to verify they are what we expect
  */
 describe("end-to-end-tests", () => {
@@ -33,7 +33,7 @@ describe("end-to-end-tests", () => {
 
   it("hello-world app", async () => {
     const app = express();
-    const httpMock = jest
+    const httpMock = vi
       .fn()
       .mockImplementationOnce((req, res) => {
         expect(req.method).toEqual("POST");

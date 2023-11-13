@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Setup app GET /probot/setup returns a redirect 1`] = `
+exports[`Setup app > GET /probot/setup > returns a redirect 1`] = `
 [
   [
     {
@@ -17,14 +17,14 @@ exports[`Setup app GET /probot/setup returns a redirect 1`] = `
       "APP_ID": "id",
       "GITHUB_CLIENT_ID": "Iv1.8a61f9b3a7aba766",
       "GITHUB_CLIENT_SECRET": "1726be1638095a19edd134c77bde3aa2ece1e5d8",
-      "PRIVATE_KEY": ""pem"",
+      "PRIVATE_KEY": "\\"pem\\"",
       "WEBHOOK_SECRET": "webhook_secret",
     },
   ],
 ]
 `;
 
-exports[`Setup app POST /probot/import updates .env 1`] = `
+exports[`Setup app > POST /probot/import > updates .env 1`] = `
 [
   [
     {
@@ -34,7 +34,7 @@ exports[`Setup app POST /probot/import updates .env 1`] = `
   [
     {
       "APP_ID": "foo",
-      "PRIVATE_KEY": ""bar"",
+      "PRIVATE_KEY": "\\"bar\\"",
       "WEBHOOK_SECRET": "baz",
     },
   ],

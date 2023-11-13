@@ -3,6 +3,7 @@ import { ProbotOctokit } from "../src/octokit/probot-octokit";
 import { Headers } from "undici";
 import type { RequestError } from "@octokit/types";
 import type { OctokitOptions } from "../src/types";
+import { describe, expect, test, vi, it } from "vitest";
 
 describe("ProbotOctokit", () => {
   const defaultOptions: OctokitOptions = {
@@ -243,7 +244,7 @@ describe("ProbotOctokit", () => {
       },
     });
 
-    const spy = jest.fn();
+    const spy = vi.fn();
     const res = await octokit.paginate(
       octokit.issues.listForRepo.endpoint.merge({
         owner: "JasonEtco",
@@ -296,7 +297,7 @@ describe("ProbotOctokit", () => {
       },
     });
 
-    const spy = jest.fn((response, done) => {
+    const spy = vi.fn((response, done) => {
       if (response.data[0].id === 2) done();
     }) as any;
     const res = await octokit.paginate(

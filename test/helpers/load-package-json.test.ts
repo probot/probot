@@ -1,5 +1,6 @@
 import { loadPackageJson } from "../../src/helpers/load-package-json";
 import { resolve } from "path";
+import { describe, expect, it } from "vitest";
 
 describe("loadPackageJson", () => {
   it("returns empty object if filepath is invalid", () => {

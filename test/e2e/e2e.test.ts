@@ -76,6 +76,7 @@ describe("end-to-end-tests", () => {
           LOG_LEVEL: "trace",
           WEBHOOK_PATH: "/",
         },
+        stdio: "inherit"
       },
     );
 

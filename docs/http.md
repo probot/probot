@@ -1,5 +1,5 @@
 ---
-next: docs/pagination.md
+next: pagination
 title: HTTP routes
 ---
 

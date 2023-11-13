@@ -1,5 +1,5 @@
 ---
-next: docs/simulating-webhooks.md
+next: simulating-webhooks
 title: Testing
 ---
 

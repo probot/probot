@@ -13,10 +13,9 @@
     "lint": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\" \"docs/*.md\" *.md package.json tsconfig.json --end-of-line auto",
     "lint:fix": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"docs/*.md\" *.md package.json tsconfig.json --end-of-line auto",
     "pretest": "npm run build && tsc --noEmit -p test",
-    "test": "vitest run && npm run lint",
+    "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:dev": "vitest --ui --coverage",
-    "test:unit": "vitest run",
     "doc": "typedoc --options .typedoc.json"
   },
   "files": [

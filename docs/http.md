@@ -1,11 +1,11 @@
 ---
-next: docs/pagination.md
+next: pagination
 title: HTTP routes
 ---
 
 # HTTP routes
 
-When starting your app using `probot run ./app.js` or using the [`Server`](/docs/development.md#use-server) class, your Probot app function will receive the `options.getRouter` function as its 2nd argument.
+When starting your app using `probot run ./app.js` or using the [`Server`](/docs/development/#use-server) class, your Probot app function will receive the `options.getRouter` function as its 2nd argument.
 
 Calling `getRouter('/my-app')` will return an [express](http://expressjs.com/) router that you can use to expose custom HTTP endpoints from your app.
 

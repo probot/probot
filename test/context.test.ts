@@ -187,7 +187,7 @@ describe("Context", () => {
   });
 
   describe("config", () => {
-    let octokit: InstanceType<typeof ProbotOctokit>;
+    let octokit: ProbotOctokit;
 
     function getConfigFile(fileName: string) {
       const configPath = path.join(__dirname, "fixtures", "config", fileName);

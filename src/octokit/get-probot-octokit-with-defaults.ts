@@ -6,6 +6,7 @@ import { getOctokitThrottleOptions } from "./get-octokit-throttle-options";
 
 import type { Logger } from "pino";
 import type { RequestRequestOptions } from "@octokit/types";
+import { OctokitOptions } from "../types";
 
 type Options = {
   cache: LRUCache<number, string>;
@@ -48,7 +49,7 @@ export function getProbotOctokitWithDefaults(options: Options) {
     redisConfig: options.redisConfig,
   });
 
-  let defaultOptions: any = {
+  let defaultOptions: Partial<OctokitOptions> = {
     auth: authOptions,
     log: options.log.child
       ? options.log.child({ name: "octokit" })
@@ -63,7 +64,7 @@ export function getProbotOctokitWithDefaults(options: Options) {
     defaultOptions.throttle = octokitThrottleOptions;
   }
 
-  return options.Octokit.defaults((instanceOptions: any) => {
+  return options.Octokit.defaults((instanceOptions: OctokitOptions) => {
     const options = Object.assign({}, defaultOptions, instanceOptions, {
       auth: instanceOptions.auth
         ? Object.assign({}, defaultOptions.auth, instanceOptions.auth)

@@ -3,7 +3,7 @@ export function importView({
   GH_HOST,
   WEBHOOK_PROXY_URL = "",
 }: {
-  name: string;
+  name?: string;
   GH_HOST: string;
   WEBHOOK_PROXY_URL?: string;
 }): string {

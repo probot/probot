@@ -1,9 +1,10 @@
 import fs from "fs";
 import path from "path";
+import type { PackageJson } from "../types";
 
 export function loadPackageJson(
   filepath = path.join(process.cwd(), "package.json"),
-): { [key: string]: any } {
+): PackageJson {
   let pkgContent;
   try {
     pkgContent = fs.readFileSync(filepath, "utf8");

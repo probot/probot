@@ -285,42 +285,48 @@ describe("Probot", () => {
     });
   });
 
-  describe.skip("options.redisConfig as string", () => {
-    it("sets throttle options", async () => {
-      expect.assertions(2);
+  describe.skipIf(process.env.REDIS_URL === undefined)(
+    "options.redisConfig as string",
+    () => {
+      it("sets throttle options", async () => {
+        expect.assertions(2);
 
-      probot = new Probot({
-        githubToken: "faketoken",
-        redisConfig: "test",
-        Octokit: ProbotOctokit.plugin((_octokit, options) => {
-          expect(options.throttle?.Bottleneck).toBe(Bottleneck);
-          expect(options.throttle?.connection).toBeInstanceOf(
-            Bottleneck.IORedisConnection,
-          );
-        }),
+        probot = new Probot({
+          githubToken: "faketoken",
+          redisConfig: process.env.REDIS_URL,
+          Octokit: ProbotOctokit.plugin((_octokit, options) => {
+            expect(options.throttle?.Bottleneck).toBe(Bottleneck);
+            expect(options.throttle?.connection).toBeInstanceOf(
+              Bottleneck.IORedisConnection,
+            );
+          }),
+        });
       });
-    });
-  });
+    },
+  );
 
-  describe.skip("redis configuration object", () => {
-    it("sets throttle options", async () => {
-      expect.assertions(2);
-      const redisConfig = {
-        host: "test",
-      };
+  describe.skipIf(process.env.REDIS_URL === undefined)(
+    "redis configuration object",
+    () => {
+      it("sets throttle options", async () => {
+        expect.assertions(2);
+        const redisConfig = {
+          host: process.env.REDIS_URL,
+        };
 
-      probot = new Probot({
-        githubToken: "faketoken",
-        redisConfig,
-        Octokit: ProbotOctokit.plugin((_octokit, options) => {
-          expect(options.throttle?.Bottleneck).toBe(Bottleneck);
-          expect(options.throttle?.connection).toBeInstanceOf(
-            Bottleneck.IORedisConnection,
-          );
-        }),
+        probot = new Probot({
+          githubToken: "faketoken",
+          redisConfig,
+          Octokit: ProbotOctokit.plugin((_octokit, options) => {
+            expect(options.throttle?.Bottleneck).toBe(Bottleneck);
+            expect(options.throttle?.connection).toBeInstanceOf(
+              Bottleneck.IORedisConnection,
+            );
+          }),
+        });
       });
-    });
-  });
+    },
+  );
 
   describe("on", () => {
     beforeEach(() => {

@@ -13,9 +13,13 @@
     "lint": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\" \"docs/*.md\" *.md package.json tsconfig.json --end-of-line auto",
     "lint:fix": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"docs/*.md\" *.md package.json tsconfig.json --end-of-line auto",
     "pretest": "npm run build && tsc --noEmit -p test",
+    "redis:start": "docker run -d -p 6379:6379 --name probot-redis --rm redis",
+    "redis:stop": "docker stop probot-redis",
     "test": "vitest run",
+    "test:redis": "REDIS_URL=127.0.0.1 vitest run",
     "test:dev": "vitest --ui --coverage",
     "test:coverage": "vitest run --coverage",
+    "test:redis:coverage": "REDIS_URL=127.0.0.1 vitest run --coverage",
     "posttest": "npm run lint",
     "doc": "typedoc --options .typedoc.json"
   },

@@ -45,7 +45,7 @@ jobs:
       - name: Check Licenses
         run: npx license-checker --production --summary --onlyAllow="0BSD;Apache-2.0;Apache 2.0;Python-2.0;BSD-2-Clause;BSD-3-Clause;ISC;MIT"
 
-  test_matrix:
+  test-unit:
     name: Test on Node ${{ matrix.node-version }} and ${{ matrix.os }}
     strategy:
       matrix:
@@ -69,9 +69,53 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm run test
+
+  test-redis:
+    name: Test on Node ${{ matrix.node-version }} and Redis ${{ matrix.redis-version }}
+    strategy:
+      matrix:
+        node-version:
+          - 18
+          - 20
+          - 21
+        redis-version: 
+          - 5
+          - 6
+          - 7
+      fail-fast: false
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:${{ matrix.redis-version }}
+        ports:
+          - '6379:6379'
+        options: '--entrypoint redis-server'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm run test:redis
+                
   test:
     runs-on: ubuntu-latest
-    needs: test_matrix
+    needs:
+      - test-unit
+      - test-redis
+
+    services:
+      redis:
+        image: redis:7
+        ports:
+          - '6379:6379'
+        options: '--entrypoint redis-server'
+
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
@@ -79,9 +123,8 @@ jobs:
           cache: npm
           node-version: lts/*
       - run: npm ci
-      - run: npm run lint
       - run: npm run build
-      - run: npm run test:coverage
+      - run: npm run test:redis:coverage
       - name: codecov
         run: npx codecov
         env:

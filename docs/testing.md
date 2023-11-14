@@ -1,5 +1,5 @@
 ---
-next: docs/simulating-webhooks.md
+next: simulating-webhooks
 title: Testing
 ---
 
@@ -99,3 +99,7 @@ Using Jest
 Using Tap
 
 - [WIP](https://github.com/apps/wip/): [wip/app/test/integration](https://github.com/wip/app/tree/master/test/integration)
+
+Using Mocha and Sinon
+
+- [Auto-Me-Bot](https://github.com/TomerFi/auto-me-bot): [tests](https://github.com/TomerFi/auto-me-bot/tree/main/tests)

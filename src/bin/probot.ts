@@ -1,6 +1,5 @@
 import semver from "semver";
 import program from "commander";
-import updateNotifier from "update-notifier";
 
 require("dotenv").config();
 
@@ -11,10 +10,6 @@ if (!semver.satisfies(process.version, pkg.engines.node)) {
     `Node.js version ${pkg.engines.node} is required. You have ${process.version}.`
   );
   process.exit(1);
-}
-
-if (pkg.version !== "0.0.0-development") {
-  updateNotifier({ pkg }).notify();
 }
 
 program

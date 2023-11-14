@@ -1,5 +1,5 @@
 ---
-next: docs/deployment.md
+next: deployment
 title: Logging
 ---
 

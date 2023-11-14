@@ -1,5 +1,5 @@
 ---
-next: docs/testing.md
+next: testing
 title: Configuration
 ---
 

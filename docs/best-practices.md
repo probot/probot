@@ -43,8 +43,8 @@ The [uncanny valley](https://en.wikipedia.org/wiki/Uncanny_valley) is the hypoth
 
 Your app should be empathetic, but it shouldn't pretend to be human. It is an app and everyone that interacts with it knows that.
 
-> - :smile: "Latest build failures: _{listing of build failures}_…"
-> - :cry: "Hey there! You asked for the build failures, so I went and dug them up for you: _{listing of build failures}_ … Have a fantastic day!"
+> - 😄 "Latest build failures: _{listing of build failures}_…"
+> - 😢 "Hey there! You asked for the build failures, so I went and dug them up for you: _{listing of build failures}_ … Have a fantastic day!"
 
 ## Autonomy
 

@@ -5,6 +5,7 @@ import {
 } from "@octokit/webhooks";
 import LRUCache from "lru-cache";
 import Redis from "ioredis";
+import { Options as LoggingOptions } from "pino-http";
 
 import { Probot } from "./index";
 import { Context } from "./context";
@@ -44,7 +45,8 @@ export type State = {
   baseUrl?: string;
 };
 
-export type ProbotWebhooks = Webhooks<Omit<Context, keyof WebhookEvent>>;
+type SimplifiedObject = Omit<Context, keyof WebhookEvent>;
+export type ProbotWebhooks = Webhooks<SimplifiedObject>;
 
 export type DeprecatedLogger = LogFn & Logger;
 
@@ -64,6 +66,7 @@ export type ServerOptions = {
   webhookPath?: string;
   webhookProxy?: string;
   Probot: typeof Probot;
+  loggingOptions?: LoggingOptions;
 };
 
 export type MiddlewareOptions = {

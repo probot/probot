@@ -26,7 +26,7 @@ module.exports = (app) => {
 };
 ```
 
-The [`context`](https://probot.github.io/api/latest/classes/context.Context.html) passed to the event handler includes everything about the event that was triggered, as well as some helpful properties for doing something useful in response to the event. `context.octokit` is an authenticated GitHub client that can be used to [make REST API and GraphQL calls](/docs/github-api.md), and allows you to do almost anything programmatically that you can do through a web browser on GitHub.
+The [`context`](https://probot.github.io/api/latest/classes/context.Context.html) passed to the event handler includes everything about the event that was triggered, as well as some helpful properties for doing something useful in response to the event. `context.octokit` is an authenticated GitHub client that can be used to [make REST API and GraphQL calls](/docs/github-api), and allows you to do almost anything programmatically that you can do through a web browser on GitHub.
 
 Here is an example of an autoresponder app that comments on opened issues:
 

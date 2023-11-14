@@ -123,7 +123,7 @@ Probot runs like [any other Node app](https://devcenter.heroku.com/articles/depl
 
 ### As serverless function
 
-When deploying your Probot app to a serverless/function environment, you don't need to worry about handling the http webhook requests coming from GitHub, the platform takes care of that. In many cases you can use [`createNodeMiddleware`](/docs/development.md#use-createNodeMiddleware) directly, e.g. for Vercel or Google Cloud Function.
+When deploying your Probot app to a serverless/function environment, you don't need to worry about handling the http webhook requests coming from GitHub, the platform takes care of that. In many cases you can use [`createNodeMiddleware`](/docs/development/#use-createNodeMiddleware) directly, e.g. for Vercel or Google Cloud Function.
 
 ```js
 const { Probot, createProbot } = require("probot");

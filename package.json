@@ -13,10 +13,10 @@
     "lint": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\" \"docs/*.md\" *.md package.json tsconfig.json --end-of-line auto",
     "lint:fix": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"docs/*.md\" *.md package.json tsconfig.json --end-of-line auto",
     "pretest": "npm run build && tsc --noEmit -p test",
-    "test": "vitest run",
-    "test:dev": "vitest --ui --coverage",
+    "test": "vitest run && npm run lint",
     "test:coverage": "vitest run --coverage",
-    "posttest": "npm run lint",
+    "test:dev": "vitest --ui --coverage",
+    "test:unit": "vitest run",
     "doc": "typedoc --options .typedoc.json"
   },
   "files": [

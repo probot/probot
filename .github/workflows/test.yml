@@ -70,7 +70,6 @@ jobs:
       - run: npx jest
 
   test:
-    name: Report coverage to Codecov
     runs-on: ubuntu-latest
     needs: test_matrix
     steps:

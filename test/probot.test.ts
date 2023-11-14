@@ -6,7 +6,8 @@ import type {
 } from "@octokit/webhooks";
 import Bottleneck from "bottleneck";
 import fetchMock from "fetch-mock";
-import pino from "pino";
+import pino, { type LogFn } from "pino";
+import { describe, expect, test, beforeEach, it, vi, type Mock } from "vitest";
 
 import { Probot, ProbotOctokit, Context } from "../src";
 
@@ -61,7 +62,6 @@ const getPayloadExample = <TName extends EmitterWebhookEventName>(
   }
   return examples[0];
 };
-// tslint:disable:no-empty
 describe("Probot", () => {
   let probot: Probot;
   let event: WebhookEvent<
@@ -155,7 +155,7 @@ describe("Probot", () => {
     it("responds with the correct error if webhook secret does not match", async () => {
       expect.assertions(1);
 
-      probot.log.error = jest.fn();
+      probot.log.error = vi.fn() as LogFn;
       probot.webhooks.on("push", () => {
         throw new Error("X-Hub-Signature-256 does not match blob signature");
       });
@@ -163,16 +163,14 @@ describe("Probot", () => {
       try {
         await probot.webhooks.receive(event);
       } catch (e) {
-        expect(
-          (probot.log.error as jest.Mock).mock.calls[0][1],
-        ).toMatchSnapshot();
+        expect((probot.log.error as Mock).mock.calls[0][1]).toMatchSnapshot();
       }
     });
 
     it("responds with the correct error if webhook secret is not found", async () => {
       expect.assertions(1);
 
-      probot.log.error = jest.fn();
+      probot.log.error = vi.fn() as LogFn;
       probot.webhooks.on("push", () => {
         throw new Error("No X-Hub-Signature-256 found on request");
       });
@@ -180,16 +178,14 @@ describe("Probot", () => {
       try {
         await probot.webhooks.receive(event);
       } catch (e) {
-        expect(
-          (probot.log.error as jest.Mock).mock.calls[0][1],
-        ).toMatchSnapshot();
+        expect((probot.log.error as Mock).mock.calls[0][1]).toMatchSnapshot();
       }
     });
 
     it("responds with the correct error if webhook secret is wrong", async () => {
       expect.assertions(1);
 
-      probot.log.error = jest.fn();
+      probot.log.error = vi.fn() as LogFn;
       probot.webhooks.on("push", () => {
         throw Error(
           "webhooks:receiver ignored: POST / due to missing headers: x-hub-signature-256",
@@ -199,16 +195,14 @@ describe("Probot", () => {
       try {
         await probot.webhooks.receive(event);
       } catch (e) {
-        expect(
-          (probot.log.error as jest.Mock).mock.calls[0][1],
-        ).toMatchSnapshot();
+        expect((probot.log.error as Mock).mock.calls[0][1]).toMatchSnapshot();
       }
     });
 
     it("responds with the correct error if the PEM file is missing", async () => {
       expect.assertions(1);
 
-      probot.log.error = jest.fn();
+      probot.log.error = vi.fn() as LogFn;
       probot.webhooks.onAny(() => {
         throw new Error(
           "error:0906D06C:PEM routines:PEM_read_bio:no start line",
@@ -218,16 +212,14 @@ describe("Probot", () => {
       try {
         await probot.webhooks.receive(event);
       } catch (e) {
-        expect(
-          (probot.log.error as jest.Mock).mock.calls[0][1],
-        ).toMatchSnapshot();
+        expect((probot.log.error as Mock).mock.calls[0][1]).toMatchSnapshot();
       }
     });
 
     it("responds with the correct error if the jwt could not be decoded", async () => {
       expect.assertions(1);
 
-      probot.log.error = jest.fn();
+      probot.log.error = vi.fn() as LogFn;
       probot.webhooks.onAny(() => {
         throw new Error(
           '{"message":"A JSON web token could not be decoded","documentation_url":"https://developer.github.com/v3"}',
@@ -237,9 +229,7 @@ describe("Probot", () => {
       try {
         await probot.webhooks.receive(event);
       } catch (e) {
-        expect(
-          (probot.log.error as jest.Mock).mock.calls[0][1],
-        ).toMatchSnapshot();
+        expect((probot.log.error as Mock).mock.calls[0][1]).toMatchSnapshot();
       }
     });
   });
@@ -347,7 +337,7 @@ describe("Probot", () => {
         privateKey,
       });
 
-      const spy = jest.fn();
+      const spy = vi.fn();
       probot.on("pull_request", spy);
 
       expect(spy).toHaveBeenCalledTimes(0);
@@ -363,8 +353,14 @@ describe("Probot", () => {
         privateKey,
       });
 
-      const spy = jest.fn();
+      const spy = vi.fn();
       probot.on("pull_request.opened", spy);
+
+      const event: WebhookEvent<"pull_request.opened"> = {
+        id: "123-456",
+        name: "pull_request",
+        payload: getPayloadExample("pull_request.opened"),
+      };
 
       await probot.receive(event);
       expect(spy).toHaveBeenCalled();
@@ -376,7 +372,7 @@ describe("Probot", () => {
         privateKey,
       });
 
-      const spy = jest.fn();
+      const spy = vi.fn();
       probot.on("pull_request.closed", spy);
 
       await probot.receive(event);
@@ -389,7 +385,7 @@ describe("Probot", () => {
         privateKey,
       });
 
-      const spy = jest.fn();
+      const spy = vi.fn();
       probot.onAny(spy);
 
       await probot.receive(event);
@@ -402,13 +398,19 @@ describe("Probot", () => {
         privateKey,
       });
 
+      const event: WebhookEvent<"pull_request.opened"> = {
+        id: "123-456",
+        name: "pull_request",
+        payload: getPayloadExample("pull_request.opened"),
+      };
+
       const event2: WebhookEvent<"issues.opened"> = {
         id: "123",
         name: "issues",
         payload: getPayloadExample("issues.opened"),
       };
 
-      const spy = jest.fn();
+      const spy = vi.fn();
       probot.on(["pull_request.opened", "issues.opened"], spy);
 
       await probot.receive(event);
@@ -423,7 +425,7 @@ describe("Probot", () => {
         log: pino(streamLogsToOutput),
       });
 
-      const handler = jest.fn().mockImplementation((context) => {
+      const handler = vi.fn().mockImplementation((context) => {
         expect(context.log.info).toBeDefined();
         context.log.info("testing");
 
@@ -584,7 +586,7 @@ describe("Probot", () => {
         privateKey,
       });
 
-      const spy = jest.fn();
+      const spy = vi.fn();
       probot.on("pull_request", spy);
 
       await probot.receive(event);
@@ -598,7 +600,7 @@ describe("Probot", () => {
         privateKey,
       });
 
-      const spy = jest.fn();
+      const spy = vi.fn();
       probot.on("pull_request", () => {
         return new Promise((resolve) => {
           setTimeout(() => {

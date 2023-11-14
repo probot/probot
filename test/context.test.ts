@@ -5,6 +5,7 @@ import type { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
 import WebhookExamples from "@octokit/webhooks-examples";
 import type { WebhookDefinition } from "@octokit/webhooks-examples";
 import fetchMock from "fetch-mock";
+import { describe, expect, test, beforeEach, it, vi } from "vitest";
 
 import { Context } from "../src";
 import { ProbotOctokit } from "../src/octokit/probot-octokit";
@@ -281,7 +282,7 @@ describe("Context", () => {
       });
       const context = new Context(event, octokit, {} as any);
 
-      const customMerge = jest.fn(
+      const customMerge = vi.fn(
         (_target: any[], _source: any[], _options: any): any[] => [],
       );
       await context.config("test-file.yml", {}, { arrayMerge: customMerge });

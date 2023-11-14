@@ -3,15 +3,15 @@ import type {
   EmitterWebhookEvent as WebhookEvent,
   Webhooks,
 } from "@octokit/webhooks";
-import { type LRUCache } from "lru-cache";
-import Redis from "ioredis";
+import type { LRUCache } from "lru-cache";
+import type { RedisOptions } from "ioredis";
 import type { Options as LoggingOptions } from "pino-http";
 
 import { Probot } from "./index";
 import { Context } from "./context";
 import { ProbotOctokit } from "./octokit/probot-octokit";
 
-import type { Logger, LogFn } from "pino";
+import type { Logger } from "pino";
 import type { RequestRequestOptions } from "@octokit/types";
 
 export interface Options {
@@ -21,7 +21,7 @@ export interface Options {
 
   Octokit?: typeof ProbotOctokit;
   log?: Logger;
-  redisConfig?: Redis.RedisOptions | string;
+  redisConfig?: RedisOptions | string;
   secret?: string;
   logLevel?: "trace" | "debug" | "info" | "warn" | "error" | "fatal";
   logMessageKey?: string;
@@ -53,10 +53,9 @@ export type State = {
 type SimplifiedObject = Omit<Context, keyof WebhookEvent>;
 export type ProbotWebhooks = Webhooks<SimplifiedObject>;
 
-export type DeprecatedLogger = LogFn & Logger;
-
 export type ApplicationFunctionOptions = {
   getRouter?: (path?: string) => express.Router;
+  cwd?: string;
   [key: string]: unknown;
 };
 export type ApplicationFunction = (
@@ -65,6 +64,7 @@ export type ApplicationFunction = (
 ) => void;
 
 export type ServerOptions = {
+  cwd?: string;
   log?: Logger;
   port?: number;
   host?: string;

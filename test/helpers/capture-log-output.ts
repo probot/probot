@@ -1,5 +1,6 @@
-const { streamSym } = require("pino/lib/symbols");
+import { symbols as pinoSymbols } from "pino";
 import type { Logger } from "pino";
+import { type SpyInstance, vi } from "vitest";
 
 export async function captureLogOutput(
   action: () => any,
@@ -7,8 +8,11 @@ export async function captureLogOutput(
 ): Promise<string> {
   let outputData = "";
 
-  // @ts-expect-error
-  let stdoutSpy = jest.spyOn(log[streamSym], "write") as jest.SpyInstance;
+  const stdoutSpy: SpyInstance = vi.spyOn(
+    // @ts-expect-error
+    log[pinoSymbols.streamSym],
+    "write",
+  );
   stdoutSpy.mockImplementation((data) => {
     outputData += data;
   });

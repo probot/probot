@@ -11,13 +11,13 @@ import { createWebhookProxy } from "../helpers/webhook-proxy";
 import { VERSION } from "../version";
 import type { ApplicationFunction, ServerOptions } from "../types";
 import { Probot } from "../";
-import { engine } from "express-handlebars";
 import EventSource from "eventsource";
 
 // the default path as defined in @octokit/webhooks
 export const defaultWebhooksPath = "/api/github/webhooks";
 
 type State = {
+  cwd?: string;
   httpServer?: HttpServer;
   port?: number;
   host?: string;
@@ -44,6 +44,7 @@ export class Server {
     });
 
     this.state = {
+      cwd: options.cwd || process.cwd(),
       port: options.port,
       host: options.host,
       webhookPath: options.webhookPath || defaultWebhooksPath,
@@ -61,19 +62,12 @@ export class Server {
       }),
     );
 
-    this.expressApp.engine(
-      "handlebars",
-      engine({
-        defaultLayout: false,
-      }),
-    );
-    this.expressApp.set("view engine", "handlebars");
-    this.expressApp.set("views", join(__dirname, "..", "..", "views"));
     this.expressApp.get("/ping", (_req, res) => res.end("PONG"));
   }
 
   public async load(appFn: ApplicationFunction) {
     await appFn(this.probotApp, {
+      cwd: this.state.cwd,
       getRouter: (path) => this.router(path),
     });
   }

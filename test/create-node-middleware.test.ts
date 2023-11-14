@@ -4,6 +4,7 @@ import Stream from "stream";
 import pino from "pino";
 import getPort from "get-port";
 import { sign } from "@octokit/webhooks-methods";
+import { describe, expect, test, beforeEach } from "vitest";
 
 import { createNodeMiddleware, createProbot, Probot } from "../src";
 import type { ApplicationFunction } from "../src/types";
@@ -187,7 +188,7 @@ describe("createNodeMiddleware", () => {
     await new Promise((resolve) => setTimeout(resolve, 100));
 
     server.close();
-  });
+  }, 1000);
 
   test("loads app only once", async () => {
     let counter = 0;

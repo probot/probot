@@ -25,7 +25,9 @@ export async function getAuthenticatedOctokit(
     factory: ({ octokit, octokitOptions, ...otherOptions }: FactoryOptions) => {
       const pinoLog = log.child({ name: "github" });
 
-      const options = {
+      const options: ConstructorParameters<typeof ProbotOctokit>[0] & {
+        log: { fatal: any; trace: any };
+      } = {
         ...octokitOptions,
         log: {
           fatal: pinoLog.fatal.bind(pinoLog),
@@ -35,11 +37,12 @@ export async function getAuthenticatedOctokit(
           debug: pinoLog.debug.bind(pinoLog),
           trace: pinoLog.trace.bind(pinoLog),
         },
-        throttle: {
-          ...octokitOptions.throttle,
-          id: String(installationId),
-          request: state.request,
-        },
+        throttle: octokitOptions.throttle?.enabled
+          ? {
+              ...octokitOptions.throttle,
+              id: String(installationId),
+            }
+          : { enabled: false },
         auth: {
           ...octokitOptions.auth,
           otherOptions,

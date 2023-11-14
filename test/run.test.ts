@@ -2,6 +2,7 @@ import path from "path";
 
 import request from "supertest";
 import { sign } from "@octokit/webhooks-methods";
+import { describe, expect, it, beforeEach } from "vitest";
 
 import { Probot, run, Server } from "../src";
 
@@ -10,7 +11,6 @@ import WebhookExamples, {
   type WebhookDefinition,
 } from "@octokit/webhooks-examples";
 
-// tslint:disable:no-empty
 describe("run", () => {
   let server: Server;
   let env: NodeJS.ProcessEnv;

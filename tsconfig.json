@@ -1,7 +1,7 @@
 {
   "extends": "@octokit/tsconfig",
   "compilerOptions": {
-    "module": "CommonJS",
+    "module": "Node16",
     "verbatimModuleSyntax": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
@@ -15,7 +15,9 @@
     "esModuleInterop": true,
     "declaration": true,
     "resolveJsonModule": true,
-    "lib": ["es2023", "dom"]
+    "allowJs": true,
+    "lib": ["es2023", "dom"],
+    "moduleResolution": "node16"
   },
   "include": ["src/**/*"],
   "compileOnSave": false

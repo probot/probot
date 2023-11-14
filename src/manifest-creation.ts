@@ -20,7 +20,6 @@ export class ManifestCreation {
       });
     } catch (error) {
       // Smee is not available, so we'll just move on
-      // tslint:disable:no-console
       console.warn("Unable to connect to smee.io, try restarting your server.");
     }
   }
@@ -29,7 +28,7 @@ export class ManifestCreation {
     let manifest: any = {};
     try {
       const file = fs.readFileSync(path.join(process.cwd(), "app.yml"), "utf8");
-      manifest = yaml.safeLoad(file);
+      manifest = yaml.load(file);
     } catch (error) {
       // App config does not exist, which is ok.
       // @ts-ignore - in theory error can be anything

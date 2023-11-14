@@ -1,9 +1,8 @@
-import { type LRUCache } from "lru-cache";
+import type { LRUCache } from "lru-cache";
 import { ProbotOctokit } from "./probot-octokit";
-import Redis from "ioredis";
+import type { RedisOptions } from "ioredis";
 
 import { getOctokitThrottleOptions } from "./get-octokit-throttle-options";
-import { aliasLog } from "../helpers/alias-log";
 
 import type { Logger } from "pino";
 import type { RequestRequestOptions } from "@octokit/types";
@@ -15,7 +14,7 @@ type Options = {
   githubToken?: string;
   appId?: number;
   privateKey?: string;
-  redisConfig?: Redis.RedisOptions | string;
+  redisConfig?: RedisOptions | string;
   webhookPath?: string;
   baseUrl?: string;
   request?: RequestRequestOptions;
@@ -52,7 +51,7 @@ export function getProbotOctokitWithDefaults(options: Options) {
   let defaultOptions: any = {
     auth: authOptions,
     log: options.log.child
-      ? aliasLog(options.log.child({ name: "octokit" }))
+      ? options.log.child({ name: "octokit" })
       : options.log,
   };
 

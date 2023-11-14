@@ -1,22 +1,20 @@
-import pinoHttp from "pino-http";
+import pinoHttp, { startTime, type Options, type HttpLogger } from "pino-http";
 import type { Logger } from "pino";
 import { randomUUID as uuidv4 } from "crypto";
 
 export function getLoggingMiddleware(
   logger: Logger,
-  options?: pinoHttp.Options,
-) {
+  options?: Options,
+): HttpLogger {
   return pinoHttp({
     ...options,
     logger: logger.child({ name: "http" }),
-    customSuccessMessage(res) {
-      const responseTime = Date.now() - res[pinoHttp.startTime];
-      // @ts-ignore
+    customSuccessMessage(_req, res) {
+      const responseTime = Date.now() - res[startTime];
       return `${res.req.method} ${res.req.url} ${res.statusCode} - ${responseTime}ms`;
     },
     customErrorMessage(_err, res) {
-      const responseTime = Date.now() - res[pinoHttp.startTime];
-      // @ts-ignore
+      const responseTime = Date.now() - res[startTime];
       return `${res.req.method} ${res.req.url} ${res.statusCode} - ${responseTime}ms`;
     },
     genReqId: (req) =>

@@ -2,21 +2,20 @@ import execa from "execa";
 import getPort from "get-port";
 
 import { sign } from "@octokit/webhooks-methods";
-import bodyParser from "body-parser";
 import express from "express";
 
-jest.setTimeout(10000);
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
 /**
  * In these tests we are starting probot apps by running "npm run [path to app.js]" using ghub.io/execa.
  * This allows us to pass dynamic environment variables for configuration.
  *
- * We also spawn a mock server which receives the Octokit requests from the app and uses jest assertions
+ * We also spawn a mock server which receives the Octokit requests from the app and uses vitest assertions
  * to verify they are what we expect
  */
 describe("end-to-end-tests", () => {
   let server: any;
-  let probotProcess: any;
+  let probotProcess: execa.ExecaChildProcess<string> | null;
   let probotPort: number;
   let mockServerPort: number;
 
@@ -33,7 +32,7 @@ describe("end-to-end-tests", () => {
 
   it("hello-world app", async () => {
     const app = express();
-    const httpMock = jest
+    const httpMock = vi
       .fn()
       .mockImplementationOnce((req, res) => {
         expect(req.method).toEqual("POST");
@@ -58,14 +57,13 @@ describe("end-to-end-tests", () => {
         res.status(201).json({});
       });
 
-    // tslint:disable-next-line
-    app.use(bodyParser.json());
+    app.use(express.json());
     app.use("/api/v3", httpMock);
     server = app.listen(mockServerPort);
 
     probotProcess = execa(
-      "bin/probot.js",
-      ["run", "./test/e2e/hello-world.js"],
+      "node",
+      ["bin/probot.js", "run", "./test/e2e/hello-world.js"],
       {
         env: {
           APP_ID: "1",
@@ -77,11 +75,14 @@ describe("end-to-end-tests", () => {
           LOG_LEVEL: "trace",
           WEBHOOK_PATH: "/",
         },
+        stdio: "inherit",
       },
     );
 
     // give probot a moment to start
     await new Promise((resolve) => setTimeout(resolve, 3000));
+    // the probot process should be successfully started
+    expect(probotProcess.exitCode).toBeNull();
 
     // send webhook event request
     const body = JSON.stringify({
@@ -113,7 +114,9 @@ describe("end-to-end-tests", () => {
       });
     } catch (error) {
       probotProcess.cancel();
-      console.log((await probotProcess).stdout);
+      const awaitedProcess = await probotProcess;
+      console.log(awaitedProcess.stdout);
+      console.log(awaitedProcess.stderr);
     }
 
     expect(httpMock).toHaveBeenCalledTimes(2);

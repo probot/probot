@@ -8,6 +8,7 @@ import getPort from "get-port";
 import WebhookExamples, {
   type WebhookDefinition,
 } from "@octokit/webhooks-examples";
+import { describe, expect, it, beforeEach, test } from "vitest";
 
 import { Server, Probot } from "../src";
 
@@ -59,7 +60,6 @@ describe("Server", () => {
     output = [];
     const log = pino(streamLogsToOutput);
     server = new Server({
-      webhookPath: "/",
       Probot: Probot.defaults({
         appId,
         privateKey,
@@ -89,7 +89,7 @@ describe("Server", () => {
     });
   });
 
-  describe("webhook handler (POST /)", () => {
+  describe("webhook handler by providing webhookPath (POST /)", () => {
     it("should return 200 and run event handlers in app function", async () => {
       expect.assertions(3);
 
@@ -128,8 +128,61 @@ describe("Server", () => {
       await server.load(() => {});
 
       await request(server.expressApp)
-        .post("/")
+        .post("/api/github/webhooks")
         .send(JSON.stringify(pushEvent))
+        .set("content-type", "application/json")
+        .set("x-github-event", "push")
+        .set("content-type", "application/json")
+        // Note: 'x-hub-signature-256' is missing
+        .set("x-github-delivery", "3sw4d5f6g7h8")
+        .expect(
+          400,
+          '{"error":"Required headers missing: x-hub-signature-256"}',
+        );
+    });
+  });
+
+  describe("webhook handler (POST /api/github/webhooks)", () => {
+    it("should return 200 and run event handlers in app function", async () => {
+      expect.assertions(3);
+
+      server = new Server({
+        Probot: Probot.defaults({
+          appId,
+          privateKey,
+          secret: "secret",
+        }),
+        log: pino(streamLogsToOutput),
+        port: await getPort(),
+      });
+
+      await server.load((app) => {
+        app.on("push", (event) => {
+          expect(event.name).toEqual("push");
+        });
+      });
+
+      const dataString = JSON.stringify(pushEvent);
+
+      await request(server.expressApp)
+        .post("/api/github/webhooks")
+        .send(dataString)
+        .set("content-type", "application/json")
+        .set("x-github-event", "push")
+        .set("x-hub-signature-256", await sign("secret", dataString))
+        .set("x-github-delivery", "3sw4d5f6g7h8");
+
+      expect(output.length).toEqual(1);
+      expect(output[0].msg).toContain("POST /api/github/webhooks 200 -");
+    });
+
+    test("respond with a friendly error when x-hub-signature-256 is missing", async () => {
+      await server.load(() => {});
+
+      await request(server.expressApp)
+        .post("/api/github/webhooks")
+        .send(JSON.stringify(pushEvent))
+        .set("content-type", "application/json")
         .set("x-github-event", "push")
         .set("content-type", "application/json")
         // Note: 'x-hub-signature-256' is missing
@@ -150,30 +203,31 @@ describe("Server", () => {
   });
 
   describe(".start() / .stop()", () => {
-    it("should expect the correct error if port already in use", (next) => {
-      expect.assertions(1);
+    it("should expect the correct error if port already in use", () =>
+      new Promise<void>((next) => {
+        expect.assertions(1);
 
-      // block port 3001
-      const http = require("http");
-      const blockade = http.createServer().listen(3001, async () => {
-        const server = new Server({
-          Probot: Probot.defaults({ appId, privateKey }),
-          log: pino(streamLogsToOutput),
-          port: 3001,
+        // block port 3001
+        const http = require("http");
+        const blockade = http.createServer().listen(3001, async () => {
+          const server = new Server({
+            Probot: Probot.defaults({ appId, privateKey }),
+            log: pino(streamLogsToOutput),
+            port: 3001,
+          });
+
+          try {
+            await server.start();
+          } catch (error) {
+            expect((error as Error).message).toEqual(
+              "Port 3001 is already in use. You can define the PORT environment variable to use a different port.",
+            );
+          }
+
+          await server.stop();
+          blockade.close(() => next());
         });
-
-        try {
-          await server.start();
-        } catch (error) {
-          expect((error as Error).message).toEqual(
-            "Port 3001 is already in use. You can define the PORT environment variable to use a different port.",
-          );
-        }
-
-        await server.stop();
-        blockade.close(() => next());
-      });
-    });
+      }));
 
     it("should listen to port when not in use", async () => {
       const testApp = new Server({

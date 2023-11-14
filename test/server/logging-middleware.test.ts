@@ -4,6 +4,7 @@ import express from "express";
 import request from "supertest";
 import pino from "pino";
 import type { Options } from "pino-http";
+import { describe, expect, test, beforeEach } from "vitest";
 
 import { getLoggingMiddleware } from "../../src/server/logging-middleware";
 
@@ -92,7 +93,7 @@ describe("logging", () => {
   test("sets ignorePaths option to ignore logging", () => {
     options = {
       autoLogging: {
-        ignorePaths: ["/"],
+        ignore: (req) => ["/"].includes(req.url!),
       },
     };
     applyMiddlewares();

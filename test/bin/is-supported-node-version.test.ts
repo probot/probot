@@ -1,3 +1,5 @@
+import { describe, it, expect } from "vitest";
+
 import { isSupportedNodeVersion } from "../../src/helpers/is-supported-node-version";
 import { engines } from "../../package.json";
 

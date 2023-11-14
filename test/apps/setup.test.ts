@@ -1,7 +1,18 @@
-const createChannel = jest.fn().mockResolvedValue("mocked proxy URL");
-const updateDotenv = jest.fn().mockResolvedValue({});
-jest.mock("smee-client", () => ({ createChannel }));
-jest.mock("update-dotenv", () => updateDotenv);
+import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
+
+const mocks = vi.hoisted(() => {
+  return {
+    createChannel: vi.fn().mockResolvedValue("mocked proxy URL"),
+    updateDotenv: vi.fn().mockResolvedValue({}),
+  };
+});
+vi.mock("smee-client", () => ({
+  default: { createChannel: mocks.createChannel },
+  createChannel: mocks.createChannel,
+}));
+vi.mock("update-dotenv", () => ({
+  default: mocks.updateDotenv,
+}));
 
 import fetchMock from "fetch-mock";
 import { Stream } from "stream";
@@ -37,7 +48,7 @@ describe("Setup app", () => {
   });
 
   afterEach(async () => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("logs", () => {
@@ -122,20 +133,26 @@ describe("Setup app", () => {
 
       await server.load(setupAppFactory(undefined, undefined));
 
-      await request(server.expressApp)
+      const setupResponse = await request(server.expressApp)
         .get("/probot/setup")
         .query({ code: "123" })
         .expect(302)
         .expect("Location", "/apps/my-app/installations/new");
 
-      expect(createChannel).toHaveBeenCalledTimes(2);
-      expect(updateDotenv.mock.calls).toMatchSnapshot();
+      expect(setupResponse.text).toMatchSnapshot();
+
+      expect(mocks.createChannel).toHaveBeenCalledTimes(2);
+      expect(mocks.updateDotenv.mock.calls).toMatchSnapshot();
     });
   });
 
   describe("GET /probot/import", () => {
-    it("renders import.handlebars", async () => {
-      await request(server.expressApp).get("/probot/import").expect(200);
+    it("renders importView", async () => {
+      const importView = await request(server.expressApp)
+        .get("/probot/import")
+        .expect(200);
+
+      expect(importView.text).toMatchSnapshot();
     });
   });
 
@@ -154,7 +171,7 @@ describe("Setup app", () => {
         .expect(200)
         .expect("");
 
-      expect(updateDotenv.mock.calls).toMatchSnapshot();
+      expect(mocks.updateDotenv.mock.calls).toMatchSnapshot();
     });
 
     it("400 when keys are missing", async () => {
@@ -164,19 +181,25 @@ describe("Setup app", () => {
         webhook_secret: "baz",
       });
 
-      await request(server.expressApp)
+      const importResponse = await request(server.expressApp)
         .post("/probot/import")
         .set("content-type", "application/json")
         .send(body)
         .expect(400);
+
+      expect(importResponse.text).toMatchSnapshot();
     });
   });
 
   describe("GET /probot/success", () => {
     it("returns a 200 response", async () => {
-      await request(server.expressApp).get("/probot/success").expect(200);
+      const successResponse = await request(server.expressApp)
+        .get("/probot/success")
+        .expect(200);
 
-      expect(createChannel).toHaveBeenCalledTimes(1);
+      expect(successResponse.text).toMatchSnapshot();
+
+      expect(mocks.createChannel).toHaveBeenCalledTimes(1);
     });
   });
 });

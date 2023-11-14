@@ -1,5 +1,5 @@
 name: Test
-"on":
+on:
   push:
     branches:
       - master
@@ -46,6 +46,7 @@ jobs:
         run: npx license-checker --production --summary --onlyAllow="0BSD;Apache-2.0;Apache 2.0;Python-2.0;BSD-2-Clause;BSD-3-Clause;ISC;MIT"
 
   test_matrix:
+    name: Test on Node ${{ matrix.node-version }} and ${{ matrix.os }}
     strategy:
       matrix:
         node-version:
@@ -68,7 +69,8 @@ jobs:
       - run: npm run build
       - run: npx jest
 
-  test-codecov:
+  test:
+    name: Report coverage to Codecov
     runs-on: ubuntu-latest
     needs: test_matrix
     steps:

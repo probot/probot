@@ -1,6 +1,5 @@
 import fetchMock from "fetch-mock";
 import { ProbotOctokit } from "../src/octokit/probot-octokit";
-import { Headers } from "undici";
 import type { RequestError } from "@octokit/types";
 import type { OctokitOptions } from "../src/types";
 import { describe, expect, test, vi, it } from "vitest";

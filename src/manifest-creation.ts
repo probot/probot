@@ -37,6 +37,7 @@ export class ManifestCreation {
       manifest = yaml.safeLoad(file);
     } catch (error) {
       // App config does not exist, which is ok.
+      // @ts-ignore - in theory error can be anything
       if (error.code !== "ENOENT") {
         throw error;
       }

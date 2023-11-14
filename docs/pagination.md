@@ -1,5 +1,5 @@
 ---
-next: docs/extensions.md
+next: extensions
 title: Pagination
 ---
 

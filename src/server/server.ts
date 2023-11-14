@@ -12,6 +12,7 @@ import { VERSION } from "../version";
 import { ApplicationFunction, ServerOptions } from "../types";
 import { Probot } from "../";
 import { engine } from "express-handlebars";
+import EventSource from "eventsource";
 
 type State = {
   httpServer?: HttpServer;
@@ -44,7 +45,7 @@ export class Server {
       webhookProxy: options.webhookProxy,
     };
 
-    this.expressApp.use(getLoggingMiddleware(this.log));
+    this.expressApp.use(getLoggingMiddleware(this.log, options.loggingOptions));
     this.expressApp.use(
       "/probot/static/",
       express.static(join(__dirname, "..", "..", "static"))

@@ -27,7 +27,7 @@ module.exports = (app) => {
   });
 
   app.onError(async (error) => {
-    context.log.error(error);
+    app.log.error(error);
   });
 };
 ```

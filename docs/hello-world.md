@@ -1,5 +1,5 @@
 ---
-next: docs/development.md
+next: development
 title: Hello World
 ---
 
@@ -15,7 +15,7 @@ module.exports = (app) => {
 
 The `app` parameter is an instance of [`Probot`](https://probot.github.io/api/latest/classes/probot.Probot.html) and gives you access to all of the GitHub goodness.
 
-`app.on` will listen for any [webhook events triggered by GitHub](/docs/webhooks.md), which will notify you when anything interesting happens on GitHub that your app wants to know about.
+`app.on` will listen for any [webhook events triggered by GitHub](/docs/webhooks/), which will notify you when anything interesting happens on GitHub that your app wants to know about.
 
 ```js
 module.exports = (app) => {
@@ -26,7 +26,7 @@ module.exports = (app) => {
 };
 ```
 
-The [`context`](https://probot.github.io/api/latest/classes/context.Context.html) passed to the event handler includes everything about the event that was triggered, as well as some helpful properties for doing something useful in response to the event. `context.octokit` is an authenticated GitHub client that can be used to [make REST API and GraphQL calls](/docs/github-api.md), and allows you to do almost anything programmatically that you can do through a web browser on GitHub.
+The [`context`](https://probot.github.io/api/latest/classes/context.Context.html) passed to the event handler includes everything about the event that was triggered, as well as some helpful properties for doing something useful in response to the event. `context.octokit` is an authenticated GitHub client that can be used to [make REST API and GraphQL calls](/docs/github-api), and allows you to do almost anything programmatically that you can do through a web browser on GitHub.
 
 Here is an example of an autoresponder app that comments on opened issues:
 

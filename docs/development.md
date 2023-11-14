@@ -1,5 +1,5 @@
 ---
-next: docs/webhooks.md
+next: webhooks
 title: Developing an app
 ---
 
@@ -18,10 +18,10 @@ To develop a Probot app, you will first need a recent version of [Node.js](https
 - [Installing the app on a repository](#installing-the-app-on-a-repository)
 - [Debugging](#debugging)
 - [Run Probot programmatically](#run-probot-programmatically)
-  - [Use `run`](#use-run)
-  - [Use `server`](#use-server)
-  - [Use `createNodeMiddleware`](#use-createnodemiddleware)
-  - [Use `probot`](#use-probot)
+  - [Use run](#use-run)
+  - [Use server](#use-server)
+  - [Use createNodeMiddleware](#use-createnodemiddleware)
+  - [Use probot](#use-probot)
   - [Use Probot's Octokit](#use-probots-octokit)
 
 <!-- tocstop -->
@@ -259,7 +259,7 @@ async function example() {
 }
 ```
 
-Using the `Probot` class directly is great for [writing tests](/docs/testing.md) for your Probot app function. It permits you to pass a custom logger to test for log output, disable throttling, request retries, and much more.
+Using the `Probot` class directly is great for [writing tests](/docs/testing) for your Probot app function. It permits you to pass a custom logger to test for log output, disable throttling, request retries, and much more.
 
 ### Use Probot's Octokit
 

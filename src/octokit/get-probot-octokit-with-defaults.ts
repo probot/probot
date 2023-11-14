@@ -16,6 +16,7 @@ type Options = {
   appId?: number;
   privateKey?: string;
   redisConfig?: Redis.RedisOptions | string;
+  webhookPath?: string;
   baseUrl?: string;
   request?: RequestRequestOptions;
 };

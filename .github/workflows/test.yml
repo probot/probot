@@ -43,7 +43,7 @@ jobs:
         run: npm ci
 
       - name: Check Licenses
-        run: npx license-checker --production --summary --onlyAllow="0BSD;Apache-2.0;Python-2.0;BSD-2-Clause;BSD-3-Clause;ISC;MIT"
+        run: npx license-checker --production --summary --onlyAllow="0BSD;Apache-2.0;Apache 2.0;Python-2.0;BSD-2-Clause;BSD-3-Clause;ISC;MIT"
 
   test_matrix:
     needs:

@@ -11,7 +11,6 @@ import { createWebhookProxy } from "../helpers/webhook-proxy";
 import { VERSION } from "../version";
 import type { ApplicationFunction, ServerOptions } from "../types";
 import { Probot } from "../";
-import { engine } from "express-handlebars";
 import EventSource from "eventsource";
 
 // the default path as defined in @octokit/webhooks
@@ -63,14 +62,6 @@ export class Server {
       }),
     );
 
-    this.expressApp.engine(
-      "handlebars",
-      engine({
-        defaultLayout: false,
-      }),
-    );
-    this.expressApp.set("view engine", "handlebars");
-    this.expressApp.set("views", join(__dirname, "..", "..", "views"));
     this.expressApp.get("/ping", (_req, res) => res.end("PONG"));
   }
 

@@ -46,6 +46,7 @@ describe("default app", () => {
         expect(actual.text).toMatch("Welcome to probot");
         expect(actual.text).toMatch("A framework for building GitHub Apps");
         expect(actual.text).toMatch(/v\d+\.\d+\.\d+/);
+        expect(actual.text).toMatchSnapshot();
       });
 
       it("returns the correct HTML without values", async () => {
@@ -54,6 +55,7 @@ describe("default app", () => {
           .get("/probot")
           .expect(200);
         expect(actual.text).toMatch("Welcome to your Probot App");
+        expect(actual.text).toMatchSnapshot();
       });
     });
   });

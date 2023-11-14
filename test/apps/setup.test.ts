@@ -133,11 +133,13 @@ describe("Setup app", () => {
 
       await server.load(setupAppFactory(undefined, undefined));
 
-      await request(server.expressApp)
+      const setupResponse = await request(server.expressApp)
         .get("/probot/setup")
         .query({ code: "123" })
         .expect(302)
         .expect("Location", "/apps/my-app/installations/new");
+
+      expect(setupResponse.text).toMatchSnapshot();
 
       expect(mocks.createChannel).toHaveBeenCalledTimes(2);
       expect(mocks.updateDotenv.mock.calls).toMatchSnapshot();
@@ -145,8 +147,12 @@ describe("Setup app", () => {
   });
 
   describe("GET /probot/import", () => {
-    it("renders import.handlebars", async () => {
-      await request(server.expressApp).get("/probot/import").expect(200);
+    it("renders importView", async () => {
+      const importView = await request(server.expressApp)
+        .get("/probot/import")
+        .expect(200);
+
+      expect(importView.text).toMatchSnapshot();
     });
   });
 
@@ -175,17 +181,23 @@ describe("Setup app", () => {
         webhook_secret: "baz",
       });
 
-      await request(server.expressApp)
+      const importResponse = await request(server.expressApp)
         .post("/probot/import")
         .set("content-type", "application/json")
         .send(body)
         .expect(400);
+
+      expect(importResponse.text).toMatchSnapshot();
     });
   });
 
   describe("GET /probot/success", () => {
     it("returns a 200 response", async () => {
-      await request(server.expressApp).get("/probot/success").expect(200);
+      const successResponse = await request(server.expressApp)
+        .get("/probot/success")
+        .expect(200);
+
+      expect(successResponse.text).toMatchSnapshot();
 
       expect(mocks.createChannel).toHaveBeenCalledTimes(1);
     });

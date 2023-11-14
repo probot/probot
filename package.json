@@ -18,6 +18,7 @@
     "test": "vitest run",
     "test:redis": "REDIS_URL=127.0.0.1 vitest run",
     "test:dev": "vitest --ui --coverage",
+    "test:redis:dev": "REDIS_URL=127.0.0.1 vitest --ui --coverage",
     "test:coverage": "vitest run --coverage",
     "test:redis:coverage": "REDIS_URL=127.0.0.1 vitest run --coverage",
     "posttest": "npm run lint",

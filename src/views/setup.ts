@@ -5,9 +5,9 @@ export function setupView({
   createAppUrl,
   manifest,
 }: {
-  name: string;
-  description: string;
-  version: string;
+  name?: string;
+  description?: string;
+  version?: string;
   createAppUrl: string;
   manifest: string;
 }): string {

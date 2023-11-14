@@ -13,7 +13,7 @@ import { isProduction } from "./helpers/is-production";
 import { config as dotenvConfig } from "dotenv";
 
 type AdditionalOptions = {
-  env: Record<string, string | undefined>;
+  env: NodeJS.ProcessEnv;
 };
 
 /**

@@ -17,11 +17,11 @@ import type {
 } from "./types";
 import { defaultWebhooksPath } from "./server/server";
 
-export type Constructor<T> = new (...args: any[]) => T;
+export type Constructor<T = any> = new (...args: any[]) => T;
 
 export class Probot {
   static version = VERSION;
-  static defaults<S extends Constructor<any>>(this: S, defaults: Options) {
+  static defaults<S extends Constructor>(this: S, defaults: Options) {
     const ProbotWithDefaults = class extends this {
       constructor(...args: any[]) {
         const options = args[0] || {};
@@ -42,7 +42,7 @@ export class Probot {
   public auth: (
     installationId?: number,
     log?: Logger,
-  ) => Promise<InstanceType<typeof ProbotOctokit>>;
+  ) => Promise<ProbotOctokit>;
 
   private state: State;
 

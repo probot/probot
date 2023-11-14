@@ -10,8 +10,8 @@ import { getLoggingMiddleware } from "./logging-middleware";
 import { createWebhookProxy } from "../helpers/webhook-proxy";
 import { VERSION } from "../version";
 import type { ApplicationFunction, ServerOptions } from "../types";
-import { Probot } from "../";
-import EventSource from "eventsource";
+import type { Probot } from "../";
+import type EventSource from "eventsource";
 
 // the default path as defined in @octokit/webhooks
 export const defaultWebhooksPath = "/api/github/webhooks";
@@ -80,18 +80,18 @@ export class Server {
     const { host, webhookPath, webhookProxy } = this.state;
     const printableHost = host ?? "localhost";
 
-    this.state.httpServer = (await new Promise((resolve, reject) => {
+    this.state.httpServer = await new Promise((resolve, reject) => {
       const server = this.expressApp.listen(
         port,
         ...((host ? [host] : []) as any),
         async () => {
           if (webhookProxy) {
-            this.state.eventSource = (await createWebhookProxy({
+            this.state.eventSource = await createWebhookProxy({
               logger: this.log,
               path: webhookPath,
               port: port,
               url: webhookProxy,
-            })) as EventSource;
+            });
           }
           this.log.info(`Listening on http://${printableHost}:${port}`);
           resolve(server);
@@ -108,7 +108,7 @@ export class Server {
         this.log.error(error);
         reject(error);
       });
-    })) as HttpServer;
+    });
 
     return this.state.httpServer;
   }

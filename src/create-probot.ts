@@ -9,18 +9,18 @@ import { defaultWebhooksPath } from "./server/server";
 type CreateProbotOptions = {
   overrides?: Options;
   defaults?: Options;
-  env?: NodeJS.ProcessEnv;
+  env?: Partial<NodeJS.ProcessEnv>;
 };
 
-const DEFAULTS = {
+const DEFAULTS: Partial<NodeJS.ProcessEnv> = {
   APP_ID: "",
   WEBHOOK_SECRET: "",
   WEBHOOK_PATH: defaultWebhooksPath,
   GHE_HOST: "",
-  GHE_PROTOCOL: "",
-  LOG_FORMAT: "",
+  GHE_PROTOCOL: "https",
+  LOG_FORMAT: undefined,
   LOG_LEVEL: "warn",
-  LOG_LEVEL_IN_STRING: "",
+  LOG_LEVEL_IN_STRING: "false",
   LOG_MESSAGE_KEY: "msg",
   REDIS_URL: "",
   SENTRY_DSN: "",

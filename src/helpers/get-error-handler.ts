@@ -5,12 +5,12 @@ import type {
 } from "@octokit/webhooks";
 
 export function getErrorHandler(log: Logger) {
-  return (error: Error) => {
+  return (error: Error & { event?: WebhookEvent }) => {
     const errors = (
       error.name === "AggregateError" ? error : [error]
     ) as WebhookError[];
 
-    const event = (error as any).event as WebhookEvent;
+    const event = error.event;
 
     for (const error of errors) {
       const errMessage = (error.message || "").toLowerCase();
@@ -34,7 +34,7 @@ export function getErrorHandler(log: Logger) {
       log
         .child({
           name: "event",
-          id: event ? event.id : undefined,
+          id: event?.id,
         })
         .error(error);
     }

@@ -4,7 +4,7 @@ import type { RequestOptions } from "@octokit/types";
 import { paginateRest } from "@octokit/plugin-paginate-rest";
 import { legacyRestEndpointMethods } from "@octokit/plugin-rest-endpoint-methods";
 import { retry } from "@octokit/plugin-retry";
-import { throttling, type ThrottlingOptions } from "@octokit/plugin-throttling";
+import { throttling } from "@octokit/plugin-throttling";
 import { config } from "@probot/octokit-plugin-config";
 import { createProbotAuth } from "octokit-auth-probot";
 
@@ -35,7 +35,7 @@ const defaultOptions = {
       );
       return true;
     },
-  } as ThrottlingOptions,
+  },
   userAgent: `probot/${VERSION}`,
 };
 
@@ -57,3 +57,5 @@ export const ProbotOctokit = Octokit.plugin(
 
   return options;
 });
+
+export type ProbotOctokit = InstanceType<typeof ProbotOctokit>;

@@ -144,6 +144,47 @@ describe("Setup app", () => {
       expect(mocks.createChannel).toHaveBeenCalledTimes(2);
       expect(mocks.updateDotenv.mock.calls).toMatchSnapshot();
     });
+
+    it("throws a 400 Error if code is not provided", async () => {
+      const server = new Server({
+        Probot: Probot.defaults({
+          log: pino(streamLogsToOutput),
+          // workaround for https://github.com/probot/probot/issues/1512
+          appId: 1,
+          privateKey: "dummy value for setup, see #1512",
+        }),
+        log: pino(streamLogsToOutput),
+      });
+
+      await server.load(setupAppFactory(undefined, undefined));
+
+      const setupResponse = await request(server.expressApp)
+        .get("/probot/setup")
+        .expect(400);
+
+      expect(setupResponse.text).toMatchSnapshot();
+    });
+
+    it("throws a 400 Error if code is an empty string", async () => {
+      const server = new Server({
+        Probot: Probot.defaults({
+          log: pino(streamLogsToOutput),
+          // workaround for https://github.com/probot/probot/issues/1512
+          appId: 1,
+          privateKey: "dummy value for setup, see #1512",
+        }),
+        log: pino(streamLogsToOutput),
+      });
+
+      await server.load(setupAppFactory(undefined, undefined));
+
+      const setupResponse = await request(server.expressApp)
+        .get("/probot/setup")
+        .query({ code: "" })
+        .expect(400);
+
+      expect(setupResponse.text).toMatchSnapshot();
+    });
   });
 
   describe("GET /probot/import", () => {

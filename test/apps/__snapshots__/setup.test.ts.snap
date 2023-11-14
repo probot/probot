@@ -113,6 +113,10 @@ exports[`Setup app > GET /probot/setup > returns a redirect 2`] = `
 ]
 `;
 
+exports[`Setup app > GET /probot/setup > throws a 400 Error if code is an empty string 1`] = `"code missing or invalid"`;
+
+exports[`Setup app > GET /probot/setup > throws a 400 Error if code is not provided 1`] = `"code missing or invalid"`;
+
 exports[`Setup app > GET /probot/success > returns a 200 response 1`] = `
 "<!DOCTYPE html>
 <html lang=\\"en\\" class=\\"height-full\\" data-color-mode=\\"auto\\" data-light-theme=\\"light\\" data-dark-theme=\\"dark\\">

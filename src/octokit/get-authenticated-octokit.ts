@@ -1,9 +1,10 @@
 import type { State } from "../types";
-import { ProbotOctokit } from "./probot-octokit";
+import type { ProbotOctokit } from "./probot-octokit";
 import type { OctokitOptions } from "../types";
+import type { LogFn, Level } from "pino";
 
 type FactoryOptions = {
-  octokit: InstanceType<typeof ProbotOctokit>;
+  octokit: ProbotOctokit;
   octokitOptions: OctokitOptions & {
     throttle?: Record<string, unknown>;
     auth?: Record<string, unknown>;
@@ -26,7 +27,7 @@ export async function getAuthenticatedOctokit(
       const pinoLog = log.child({ name: "github" });
 
       const options: ConstructorParameters<typeof ProbotOctokit>[0] & {
-        log: { fatal: any; trace: any };
+        log: Record<Level, LogFn>;
       } = {
         ...octokitOptions,
         log: {
@@ -54,7 +55,7 @@ export async function getAuthenticatedOctokit(
 
       const Octokit = octokit.constructor as typeof ProbotOctokit;
 
-      return new Octokit(options as any);
+      return new Octokit(options);
     },
-  }) as Promise<InstanceType<typeof ProbotOctokit>>;
+  }) as Promise<ProbotOctokit>;
 }

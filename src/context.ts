@@ -1,11 +1,9 @@
 import path from "path";
-
-import type { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
 import merge from "deepmerge";
 
+import type { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
 import type { Logger } from "pino";
-
-import { ProbotOctokit } from "./octokit/probot-octokit";
+import type { ProbotOctokit } from "./octokit/probot-octokit";
 import type { EmitterWebhookEventName as WebhookEvents } from "@octokit/webhooks/dist-types/types";
 
 export type MergeOptions = merge.Options;
@@ -63,14 +61,10 @@ export class Context<E extends WebhookEvents = WebhookEvents> {
   public id: string;
   public payload: WebhookEvent<E>["payload"];
 
-  public octokit: InstanceType<typeof ProbotOctokit>;
+  public octokit: ProbotOctokit;
   public log: Logger;
 
-  constructor(
-    event: WebhookEvent<E>,
-    octokit: InstanceType<typeof ProbotOctokit>,
-    log: Logger,
-  ) {
+  constructor(event: WebhookEvent<E>, octokit: ProbotOctokit, log: Logger) {
     this.name = event.name;
     this.id = event.id;
     this.payload = event.payload;
@@ -92,7 +86,7 @@ export class Context<E extends WebhookEvents = WebhookEvents> {
    *
    */
   public repo<T>(object?: T): RepoResultType<E> & T {
-    // @ts-ignore `repository` is not always present in this.payload
+    // @ts-expect-error `repository` is not always present in this.payload
     const repo = this.payload.repository;
 
     if (!repo) {
@@ -128,7 +122,7 @@ export class Context<E extends WebhookEvents = WebhookEvents> {
     return Object.assign(
       {
         issue_number:
-          // @ts-ignore - this.payload may not have `issue` or `pull_request` keys
+          // @ts-expect-error - this.payload may not have `issue` or `pull_request` keys
           (this.payload.issue || this.payload.pull_request || this.payload)
             .number,
       },
@@ -154,7 +148,7 @@ export class Context<E extends WebhookEvents = WebhookEvents> {
     const payload = this.payload;
     return Object.assign(
       {
-        // @ts-ignore - this.payload may not have `issue` or `pull_request` keys
+        // @ts-expect-error - this.payload may not have `issue` or `pull_request` keys
         pull_number: (payload.issue || payload.pull_request || payload).number,
       },
       this.repo(object),
@@ -237,11 +231,11 @@ export class Context<E extends WebhookEvents = WebhookEvents> {
       },
     });
 
-    // @ts-ignore
+    // @ts-expect-error
     const { config, files } = await this.octokit.config.get(params);
 
     // if no default config is set, and no config files are found, return null
-    if (!defaultConfig && !files.find((file: any) => file.config !== null)) {
+    if (!defaultConfig && !files.find((file) => file.config !== null)) {
       return null;
     }
 

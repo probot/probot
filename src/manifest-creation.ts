@@ -3,8 +3,9 @@ import yaml from "js-yaml";
 import path from "path";
 import updateDotenv from "update-dotenv";
 import { ProbotOctokit } from "./octokit/probot-octokit";
-import type { OctokitOptions } from "./types";
 import { loadPackageJson } from "./helpers/load-package-json";
+import type { Env, Manifest, OctokitOptions, PackageJson } from "./types";
+import type { RequestParameters } from "@octokit/types";
 
 export class ManifestCreation {
   get pkg() {
@@ -24,44 +25,39 @@ export class ManifestCreation {
     }
   }
 
-  public getManifest(pkg: any, baseUrl: any) {
-    let manifest: any = {};
+  public getManifest(pkg: PackageJson, baseUrl: string) {
+    let manifest: Partial<Manifest> = {};
     try {
       const file = fs.readFileSync(path.join(process.cwd(), "app.yml"), "utf8");
-      manifest = yaml.load(file);
+      manifest = yaml.load(file) as Manifest;
     } catch (error) {
       // App config does not exist, which is ok.
-      // @ts-ignore - in theory error can be anything
-      if (error.code !== "ENOENT") {
+      if ((error as Error & { code?: string }).code !== "ENOENT") {
         throw error;
       }
     }
 
-    const generatedManifest = JSON.stringify(
-      Object.assign(
-        {
-          description: manifest.description || pkg.description,
-          hook_attributes: {
-            url: process.env.WEBHOOK_PROXY_URL || `${baseUrl}/`,
-          },
-          name: process.env.PROJECT_DOMAIN || manifest.name || pkg.name,
-          public: manifest.public || true,
-          redirect_url: `${baseUrl}/probot/setup`,
-          // TODO: add setup url
-          // setup_url:`${baseUrl}/probot/success`,
-          url: manifest.url || pkg.homepage || pkg.repository,
-          version: "v1",
-        },
-        manifest,
-      ),
-    );
+    const generatedManifest = JSON.stringify({
+      description: manifest.description || pkg.description,
+      hook_attributes: {
+        url: process.env.WEBHOOK_PROXY_URL || `${baseUrl}/`,
+      },
+      name: process.env.PROJECT_DOMAIN || manifest.name || pkg.name,
+      public: manifest.public || true,
+      redirect_url: `${baseUrl}/probot/setup`,
+      // TODO: add setup url
+      // setup_url:`${baseUrl}/probot/success`,
+      url: manifest.url || pkg.homepage || pkg.repository,
+      version: "v1",
+      ...manifest,
+    });
 
     return generatedManifest;
   }
 
-  public async createAppFromCode(code: any, probotOptions?: OctokitOptions) {
+  public async createAppFromCode(code: string, probotOptions?: OctokitOptions) {
     const octokit = new ProbotOctokit(probotOptions);
-    const options: any = {
+    const options: RequestParameters = {
       ...probotOptions,
       code,
       mediaType: {
@@ -90,7 +86,7 @@ export class ManifestCreation {
     return response.data.html_url;
   }
 
-  public async updateEnv(env: any) {
+  public async updateEnv(env: Env) {
     // Needs to be public due to tests
     return updateDotenv(env);
   }
@@ -98,7 +94,7 @@ export class ManifestCreation {
   get createAppUrl() {
     const githubHost = process.env.GHE_HOST || `github.com`;
     return `${process.env.GHE_PROTOCOL || "https"}://${githubHost}${
-      process.env.GH_ORG ? "/organizations/".concat(process.env.GH_ORG) : ""
+      process.env.GH_ORG ? `/organizations/${process.env.GH_ORG}` : ""
     }/settings/apps/new`;
   }
 }

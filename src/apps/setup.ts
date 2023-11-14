@@ -21,6 +21,10 @@ export const setupAppFactory = (
     app: Probot,
     { getRouter }: ApplicationFunctionOptions,
   ) {
+    if (!getRouter) {
+      throw new Error("getRouter is required to use the setup app");
+    }
+
     const setup: ManifestCreation = new ManifestCreation();
     const pkg = setup.pkg;
 
@@ -34,10 +38,6 @@ export const setupAppFactory = (
       )
     ) {
       await setup.createWebhookChannel();
-    }
-
-    if (!getRouter) {
-      throw new Error("getRouter is required to use the setup app");
     }
 
     const route = getRouter();
@@ -64,8 +64,14 @@ export const setupAppFactory = (
 
     route.get("/probot/setup", async (req: Request, res: Response) => {
       const { code } = req.query;
+
+      if (!code || typeof code !== "string" || code.length === 0) {
+        res.status(400).send("code missing or invalid");
+        return;
+      }
+
       const response = await setup.createAppFromCode(code, {
-        // @ts-ignore
+        // @ts-expect-error
         request: app.state.request,
       });
 

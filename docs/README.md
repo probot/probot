@@ -1,5 +1,5 @@
 ---
-next: docs/hello-world.md
+next: hello-world
 title: Introduction
 layout: docs.liquid
 ---

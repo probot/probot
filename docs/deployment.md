@@ -1,5 +1,5 @@
 ---
-next: docs/http.md
+next: http
 title: Deployment
 ---
 

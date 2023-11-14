@@ -1,5 +1,5 @@
 ---
-next: docs/development.md
+next: development
 title: Hello World
 ---
 

@@ -1,5 +1,5 @@
 ---
-next: docs/configuration.md
+next: configuration
 title: Interacting with GitHub
 ---
 

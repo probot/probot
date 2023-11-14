@@ -1,5 +1,5 @@
 ---
-next: docs/persistence.md
+next: persistence
 title: Extensions
 ---
 

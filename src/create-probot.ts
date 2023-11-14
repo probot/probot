@@ -4,6 +4,7 @@ import { getPrivateKey } from "@probot/get-private-key";
 import { getLog } from "./helpers/get-log";
 import type { Options } from "./types";
 import { Probot } from "./probot";
+import { defaultWebhooksPath } from "./server/server";
 
 type CreateProbotOptions = {
   overrides?: Options;
@@ -14,6 +15,7 @@ type CreateProbotOptions = {
 const DEFAULTS = {
   APP_ID: "",
   WEBHOOK_SECRET: "",
+  WEBHOOK_PATH: defaultWebhooksPath,
   GHE_HOST: "",
   GHE_PROTOCOL: "",
   LOG_FORMAT: "",
@@ -47,6 +49,7 @@ export function createProbot({
     privateKey: (privateKey && privateKey.toString()) || undefined,
     secret: envWithDefaults.WEBHOOK_SECRET,
     redisConfig: envWithDefaults.REDIS_URL,
+    webhookPath: envWithDefaults.WEBHOOK_PATH,
     baseUrl: envWithDefaults.GHE_HOST
       ? `${envWithDefaults.GHE_PROTOCOL || "https"}://${
           envWithDefaults.GHE_HOST

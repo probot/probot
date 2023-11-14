@@ -102,7 +102,51 @@ describe("createNodeMiddleware", () => {
     server.close();
   });
 
-  test("with createProbot and setting the webhooksPath to the root", async () => {
+  test("with createProbot and setting the webhookPath via WEBHOOK_PATH to the root", async () => {
+    expect.assertions(1);
+
+    const app: ApplicationFunction = (app) => {
+      app.on("push", (event) => {
+        expect(event.name).toEqual("push");
+      });
+    };
+    const middleware = createNodeMiddleware(app, {
+      probot: createProbot({
+        overrides: {
+          log: pino(streamLogsToOutput),
+        },
+        env: {
+          APP_ID,
+          PRIVATE_KEY,
+          WEBHOOK_SECRET,
+          WEBHOOK_PATH: "/",
+        },
+      }),
+    });
+
+    const server = createServer(middleware);
+    const port = await getPort();
+    server.listen(port);
+
+    const body = JSON.stringify(pushEvent);
+
+    await fetch(`http://127.0.0.1:${port}`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-github-event": "push",
+        "x-github-delivery": "1",
+        "x-hub-signature-256": await sign("secret", body),
+      },
+      body,
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    server.close();
+  });
+
+  test("with createProbot and setting the webhookPath to the root via the deprecated webhooksPath", async () => {
     expect.assertions(1);
 
     const app: ApplicationFunction = (app) => {

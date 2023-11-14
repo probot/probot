@@ -29,6 +29,7 @@ export interface Options {
   host?: string;
   baseUrl?: string;
   request?: RequestRequestOptions;
+  webhookPath?: string;
 }
 
 export type State = {
@@ -45,6 +46,7 @@ export type State = {
   port?: number;
   host?: string;
   baseUrl?: string;
+  webhookPath: string;
   request?: RequestRequestOptions;
 };
 

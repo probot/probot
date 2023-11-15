@@ -16,9 +16,11 @@ export class ManifestCreation {
     try {
       const SmeeClient = (await import("smee-client")).default;
 
+      const WEBHOOK_PROXY_URL = await SmeeClient.createChannel();
       await this.updateEnv({
-        WEBHOOK_PROXY_URL: await SmeeClient.createChannel(),
+        WEBHOOK_PROXY_URL,
       });
+      return WEBHOOK_PROXY_URL;
     } catch (error) {
       // Smee is not available, so we'll just move on
       console.warn("Unable to connect to smee.io, try restarting your server.");

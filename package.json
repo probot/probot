@@ -14,9 +14,8 @@
     "lint:fix": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"docs/*.md\" *.md package.json tsconfig.json --end-of-line auto",
     "pretest": "npm run build && tsc --noEmit -p test",
     "test": "vitest run",
-    "test:dev": "vitest --ui --coverage",
     "test:coverage": "vitest run --coverage",
-    "posttest": "npm run lint",
+    "test:dev": "vitest --ui --coverage",
     "doc": "typedoc --options .typedoc.json"
   },
   "files": [

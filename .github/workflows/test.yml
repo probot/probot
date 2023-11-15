@@ -58,7 +58,7 @@ jobs:
       - run: npm ci
       - run: npm run lint
 
-  test_matrix:
+  test-unit:
     name: Test on Node ${{ matrix.node-version }} and ${{ matrix.os }}
     strategy:
       matrix:
@@ -82,9 +82,37 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm run test
+
+  test-redis:
+    name: Test on Node LTS and Redis 7
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: 'redis:7'
+        ports:
+          - '6379:6379'
+        options: '--entrypoint redis-server'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Use Node.js LTS
+        uses: actions/setup-node@v3
+        with:
+          node-version: lts/*
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm run test
+        env:
+          REDIS_HOST: 127.0.0.1
+                
   test:
     runs-on: ubuntu-latest
-    needs: test_matrix
+    needs:
+      - test-unit
+      - test-redis
+
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
@@ -92,7 +120,6 @@ jobs:
           cache: npm
           node-version: lts/*
       - run: npm ci
-      - run: npm run lint
       - run: npm run build
       - run: npm run test:coverage
       - name: codecov

@@ -45,6 +45,19 @@ jobs:
       - name: Check Licenses
         run: npx license-checker --production --summary --onlyAllow="0BSD;Apache-2.0;Apache 2.0;Python-2.0;BSD-2-Clause;BSD-3-Clause;ISC;MIT"
 
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js lts
+        uses: actions/setup-node@v3
+        with:
+          node-version: lts/*
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+
   test-unit:
     name: Test on Node ${{ matrix.node-version }} and ${{ matrix.os }}
     strategy:
@@ -71,22 +84,11 @@ jobs:
       - run: npm run test
 
   test-redis:
-    name: Test on Node ${{ matrix.node-version }} and Redis ${{ matrix.redis-version }}
-    strategy:
-      matrix:
-        node-version:
-          - 18
-          - 20
-          - 21
-        redis-version: 
-          - 5
-          - 6
-          - 7
-      fail-fast: false
+    name: Test on Node LTS and Redis 7
     runs-on: ubuntu-latest
     services:
       redis:
-        image: redis:${{ matrix.redis-version }}
+        image: 'redis:7'
         ports:
           - '6379:6379'
         options: '--entrypoint redis-server'
@@ -94,10 +96,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js LTS
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: lts/*
           cache: npm
       - run: npm ci
       - run: npm run build
@@ -109,13 +111,6 @@ jobs:
       - test-unit
       - test-redis
 
-    services:
-      redis:
-        image: redis:7
-        ports:
-          - '6379:6379'
-        options: '--entrypoint redis-server'
-
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
@@ -124,7 +119,7 @@ jobs:
           node-version: lts/*
       - run: npm ci
       - run: npm run build
-      - run: npm run test:redis:coverage
+      - run: npm run test:coverage
       - name: codecov
         run: npx codecov
         env:

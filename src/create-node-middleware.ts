@@ -3,10 +3,11 @@ import { createNodeMiddleware as createWebhooksMiddleware } from "@octokit/webho
 
 import type { ApplicationFunction, MiddlewareOptions } from "./types";
 import { defaultWebhooksPath } from "./server/server";
+import { createProbot } from ".";
 
 export function createNodeMiddleware(
   appFn: ApplicationFunction,
-  { probot, webhooksPath }: MiddlewareOptions,
+  { probot = createProbot(), webhooksPath }: MiddlewareOptions,
 ): RequestListener {
   probot.load(appFn);
 

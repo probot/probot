@@ -58,7 +58,7 @@ export function importView({
             <h4 class="alt-h4 text-gray-light">Need help?</h4>
             <div class="d-flex flex-justify-center mt-2">
                 <a href="https://probot.github.io/docs/" class="btn btn-outline mr-2">Documentation</a>
-                <a href="https://probot-slackin.herokuapp.com/" class="btn btn-outline">Chat on Slack</a>
+                <a href="https://github.com/probot/probot/discussions" class="btn btn-outline">Discuss on GitHub</a>
             </div>
         </div>
     </div>

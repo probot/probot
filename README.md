@@ -44,7 +44,7 @@ Probot is built by people just like you! Most of the interesting things are buil
 
 If you're interested in contributing to Probot itself, check out our [contributing docs](CONTRIBUTING.md) to get started.
 
-Want to chat with Probot users and contributors? [Join us in Slack](https://probot-slackin.herokuapp.com/)!
+Want to discuss with Probot users and contributors? [Discuss on GitHub](https://github.com/probot/probot/discussions)!
 
 ## Ideas
 

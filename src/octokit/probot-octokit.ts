@@ -49,11 +49,13 @@ export const ProbotOctokit = Octokit.plugin(
   config,
 ).defaults((instanceOptions: any) => {
   // merge throttle options deeply
-  const options = Object.assign({}, defaultOptions, instanceOptions, {
-    throttle: instanceOptions.throttle
-      ? Object.assign({}, defaultOptions.throttle, instanceOptions.throttle)
-      : defaultOptions.throttle,
-  });
+  const options = {
+    ...defaultOptions,
+    ...instanceOptions,
+    ...{
+      throttle: { ...defaultOptions.throttle, ...instanceOptions?.throttle },
+    },
+  };
 
   return options;
 });

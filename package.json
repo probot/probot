@@ -18,7 +18,6 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:dev": "vitest --ui --coverage",
-    "posttest": "npm run lint",
     "doc": "typedoc --options .typedoc.json"
   },
   "files": [

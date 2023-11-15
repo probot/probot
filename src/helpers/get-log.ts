@@ -14,8 +14,9 @@
  * app.log.fatal("Goodbye, cruel world!");
  * ```
  */
-import pino, { Logger, LoggerOptions } from "pino";
-import { getTransformStream, Options, LogLevel } from "@probot/pino";
+import pino from "pino";
+import type { Logger, LoggerOptions } from "pino";
+import { getTransformStream, type Options, type LogLevel } from "@probot/pino";
 
 export type GetLogOptions = {
   level?: LogLevel;
@@ -31,7 +32,6 @@ export function getLog(options: GetLogOptions = {}): Logger {
     messageKey: logMessageKey || "msg",
   };
   const transform = getTransformStream(getTransformStreamOptions);
-  // @ts-ignore TODO: check out what's wrong here
   transform.pipe(pino.destination(1));
   const log = pino(pinoOptions, transform);
 

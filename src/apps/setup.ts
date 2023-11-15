@@ -1,23 +1,32 @@
-import bodyParser from "body-parser";
+import express from "express";
 import { exec } from "child_process";
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import updateDotenv from "update-dotenv";
 
 import { Probot } from "../probot";
 import { ManifestCreation } from "../manifest-creation";
 import { getLoggingMiddleware } from "../server/logging-middleware";
-import { ApplicationFunctionOptions } from "../types";
+import type { ApplicationFunctionOptions } from "../types";
 import { isProduction } from "../helpers/is-production";
+
+import { importView } from "../views/import";
+import { setupView } from "../views/setup";
+import { successView } from "../views/success";
 
 export const setupAppFactory = (
   host: string | undefined,
-  port: number | undefined
+  port: number | undefined,
 ) =>
   async function setupApp(
     app: Probot,
-    { getRouter }: ApplicationFunctionOptions
+    { getRouter }: ApplicationFunctionOptions,
   ) {
+    if (!getRouter) {
+      throw new Error("getRouter is required to use the setup app");
+    }
+
     const setup: ManifestCreation = new ManifestCreation();
+    const pkg = setup.pkg;
 
     // If not on Glitch or Production, create a smee URL
     if (
@@ -31,10 +40,6 @@ export const setupAppFactory = (
       await setup.createWebhookChannel();
     }
 
-    if (!getRouter) {
-      throw new Error("getRouter is required to use the setup app");
-    }
-
     const route = getRouter();
 
     route.use(getLoggingMiddleware(app.log));
@@ -43,16 +48,32 @@ export const setupAppFactory = (
 
     route.get("/probot", async (req, res) => {
       const baseUrl = getBaseUrl(req);
-      const pkg = setup.pkg;
       const manifest = setup.getManifest(pkg, baseUrl);
       const createAppUrl = setup.createAppUrl;
       // Pass the manifest to be POST'd
-      res.render("setup.handlebars", { pkg, createAppUrl, manifest });
+      res.send(
+        setupView({
+          name: pkg.name,
+          version: pkg.version,
+          description: pkg.description,
+          createAppUrl,
+          manifest,
+        }),
+      );
     });
 
     route.get("/probot/setup", async (req: Request, res: Response) => {
       const { code } = req.query;
-      const response = await setup.createAppFromCode(code);
+
+      if (!code || typeof code !== "string" || code.length === 0) {
+        res.status(400).send("code missing or invalid");
+        return;
+      }
+
+      const response = await setup.createAppFromCode(code, {
+        // @ts-expect-error
+        request: app.state.request,
+      });
 
       // If using glitch, restart the app
       if (process.env.PROJECT_DOMAIN) {
@@ -68,13 +89,20 @@ export const setupAppFactory = (
       res.redirect(`${response}/installations/new`);
     });
 
-    route.get("/probot/import", async (_req, res) => {
-      const { WEBHOOK_PROXY_URL, GHE_HOST } = process.env;
-      const GH_HOST = `https://${GHE_HOST ?? "github.com"}`;
-      res.render("import.handlebars", { WEBHOOK_PROXY_URL, GH_HOST });
+    const { WEBHOOK_PROXY_URL, GHE_HOST } = process.env;
+    const GH_HOST = `https://${GHE_HOST ?? "github.com"}`;
+
+    const importViewRendered = importView({
+      name: pkg.name,
+      WEBHOOK_PROXY_URL,
+      GH_HOST,
     });
 
-    route.post("/probot/import", bodyParser.json(), async (req, res) => {
+    route.get("/probot/import", (_req, res) => {
+      res.send(importViewRendered);
+    });
+
+    route.post("/probot/import", express.json(), (req, res) => {
       const { appId, pem, webhook_secret } = req.body;
       if (!appId || !pem || !webhook_secret) {
         res.status(400).send("appId and/or pem and/or webhook_secret missing");
@@ -89,17 +117,19 @@ export const setupAppFactory = (
       printRestartMessage(app);
     });
 
-    route.get("/probot/success", async (req, res) => {
-      res.render("success.handlebars");
+    const successViewRendered = successView({ name: pkg.name });
+
+    route.get("/probot/success", (_req, res) => {
+      res.send(successViewRendered);
     });
 
-    route.get("/", (req, res, next) => res.redirect("/probot"));
+    route.get("/", (_req, res) => res.redirect("/probot"));
   };
 
 function printWelcomeMessage(
   app: Probot,
   host: string | undefined,
-  port: number | undefined
+  port: number | undefined,
 ) {
   // use glitch env to get correct domain welcome message
   // https://glitch.com/help/project/

@@ -1,6 +1,8 @@
 {
-  "extends": "@tsconfig/node10/tsconfig.json",
+  "extends": "@octokit/tsconfig",
   "compilerOptions": {
+    "module": "Node16",
+    "verbatimModuleSyntax": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
@@ -12,7 +14,10 @@
     "noImplicitAny": true,
     "esModuleInterop": true,
     "declaration": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "lib": ["es2023", "dom"],
+    "moduleResolution": "node16"
   },
   "include": ["src/**/*"],
   "compileOnSave": false

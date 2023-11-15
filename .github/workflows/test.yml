@@ -1,5 +1,5 @@
 name: Test
-"on":
+on:
   push:
     branches:
       - master
@@ -7,42 +7,121 @@ name: Test
     types:
       - opened
       - synchronize
+
 jobs:
-  test_matrix:
+  dependency-review:
+    name: Dependency Review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Dependency review
+        uses: actions/dependency-review-action@v3
+
+  license-check:
+    name: Check Licenses
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check Licenses
+        run: npx license-checker --production --summary --onlyAllow="0BSD;Apache-2.0;Apache 2.0;Python-2.0;BSD-2-Clause;BSD-3-Clause;ISC;MIT"
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js lts
+        uses: actions/setup-node@v3
+        with:
+          node-version: lts/*
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+
+  test-unit:
+    name: Test on Node ${{ matrix.node-version }} and ${{ matrix.os }}
     strategy:
       matrix:
         node-version:
-          - 10
-          - 12
-          - 14
+          - 18
+          - 20
+          - 21
         os:
           - ubuntu-latest
           - macos-latest
           - windows-latest
+      fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
       - run: npm ci
       - run: npm run build
-      - run: npx jest
+      - run: npm run test
+
+  test-redis:
+    name: Test on Node LTS and Redis 7
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: 'redis:7'
+        ports:
+          - '6379:6379'
+        options: '--entrypoint redis-server'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Use Node.js LTS
+        uses: actions/setup-node@v3
+        with:
+          node-version: lts/*
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm run test
+        env:
+          REDIS_HOST: 127.0.0.1
+                
   test:
     runs-on: ubuntu-latest
-    needs: test_matrix
+    needs:
+      - test-unit
+      - test-redis
+
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
         with:
           cache: npm
-          node-version: 16
+          node-version: lts/*
       - run: npm ci
-      - run: npm run lint
       - run: npm run build
-      - run: npx jest
+      - run: npm run test:coverage
       - name: codecov
         run: npx codecov
         env:

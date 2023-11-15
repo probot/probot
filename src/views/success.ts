@@ -1,10 +1,11 @@
-<!DOCTYPE html>
+export function successView({ name }: { name?: string }): string {
+  return `<!DOCTYPE html>
 <html lang="en" class="height-full" data-color-mode="auto" data-light-theme="light" data-dark-theme="dark">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Setup {{#if pkg.name }}{{ pkg.name }}{{else}}Your App{{/if}} | built with Probot</title>
+    <title>Setup ${name || "Your App"} | built with Probot</title>
     <link rel="icon" href="/probot/static/probot-head.png">
     <link rel="stylesheet" href="/probot/static/primer.css">
   </head>
@@ -23,9 +24,10 @@
         <h4 class="alt-h4 text-gray-light">Need help?</h4>
         <div class="d-flex flex-justify-center mt-2">
           <a href="https://probot.github.io/docs/" class="btn btn-outline mr-2">Documentation</a>
-          <a href="https://probot-slackin.herokuapp.com/" class="btn btn-outline">Chat on Slack</a>
+          <a href="https://github.com/probot/probot/discussions" class="btn btn-outline">Discuss on GitHub</a>
         </div>
       </div>
     </div>
   </body>
-</html>
+</html>`;
+}

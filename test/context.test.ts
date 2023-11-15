@@ -1,29 +1,31 @@
-import fs = require("fs");
-import path = require("path");
+import fs from "fs";
+import path from "path";
 
-import { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
-import WebhookExamples, { WebhookDefinition } from "@octokit/webhooks-examples";
-import nock from "nock";
+import type { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
+import WebhookExamples from "@octokit/webhooks-examples";
+import type { WebhookDefinition } from "@octokit/webhooks-examples";
+import fetchMock from "fetch-mock";
+import { describe, expect, test, beforeEach, it, vi } from "vitest";
 
 import { Context } from "../src";
 import { ProbotOctokit } from "../src/octokit/probot-octokit";
-import { PushEvent } from "@octokit/webhooks-types";
+import type { PushEvent } from "@octokit/webhooks-types";
 
 const pushEventPayload = (
   WebhookExamples.filter(
-    (event) => event.name === "push"
+    (event) => event.name === "push",
   )[0] as WebhookDefinition<"push">
 ).examples[0];
 const issuesEventPayload = (
   WebhookExamples.filter(
-    (event) => event.name === "issues"
+    (event) => event.name === "issues",
   )[0] as WebhookDefinition<"issues">
 ).examples[0];
 const pullRequestEventPayload = (
   WebhookExamples.filter(
-    (event) => event.name === "pull_request"
+    (event) => event.name === "pull_request",
   )[0] as WebhookDefinition<"pull_request">
-).examples[0];
+).examples[0] as WebhookEvent<"pull_request">["payload"];
 
 describe("Context", () => {
   let event: WebhookEvent<"push"> = {
@@ -34,7 +36,7 @@ describe("Context", () => {
   let context: Context<"push"> = new Context<"push">(
     event,
     {} as any,
-    {} as any
+    {} as any,
   );
 
   it("inherits the payload", () => {
@@ -97,8 +99,8 @@ describe("Context", () => {
       try {
         context.repo();
       } catch (e) {
-        expect(e.message).toMatch(
-          "context.repo() is not supported for this webhook event."
+        expect((e as Error).message).toMatch(
+          "context.repo() is not supported for this webhook event.",
         );
       }
     });
@@ -179,15 +181,15 @@ describe("Context", () => {
           owner: "muahaha",
           pull_number: 5,
           repo: "Hello-World",
-        }
+        },
       );
     });
   });
 
   describe("config", () => {
-    let octokit: InstanceType<typeof ProbotOctokit>;
+    let octokit: ProbotOctokit;
 
-    function nockConfigResponseDataFile(fileName: string) {
+    function getConfigFile(fileName: string) {
       const configPath = path.join(__dirname, "fixtures", "config", fileName);
       return fs.readFileSync(configPath, { encoding: "utf8" });
     }
@@ -202,9 +204,21 @@ describe("Context", () => {
     });
 
     it("gets a valid configuration", async () => {
-      const mock = nock("https://api.github.com")
-        .get("/repos/Codertocat/Hello-World/contents/.github%2Ftest-file.yml")
-        .reply(200, nockConfigResponseDataFile("basic.yml"));
+      const fetch = fetchMock
+        .sandbox()
+        .getOnce(
+          "https://api.github.com/repos/Codertocat/Hello-World/contents/.github%2Ftest-file.yml",
+          getConfigFile("basic.yml"),
+        );
+
+      const octokit = new ProbotOctokit({
+        retry: { enabled: false },
+        throttle: { enabled: false },
+        request: {
+          fetch,
+        },
+      });
+      const context = new Context(event, octokit, {} as any);
 
       const config = await context.config("test-file.yml");
       expect(config).toEqual({
@@ -212,39 +226,67 @@ describe("Context", () => {
         baz: 11,
         foo: 5,
       });
-      expect(mock.activeMocks()).toStrictEqual([]);
     });
 
     it("returns null when the file and base repository are missing", async () => {
-      const mock = nock("https://api.github.com")
-        .get("/repos/Codertocat/Hello-World/contents/.github%2Ftest-file.yml")
-        .reply(404)
-        .get("/repos/Codertocat/.github/contents/.github%2Ftest-file.yml")
-        .reply(404);
+      const NOT_FOUND_RESPONSE = {
+        status: 404,
+        body: {
+          message: "Not Found",
+          documentation_url:
+            "https://docs.github.com/rest/reference/repos#get-repository-content",
+        },
+      };
+
+      const fetch = fetchMock
+        .sandbox()
+        .getOnce(
+          "https://api.github.com/repos/Codertocat/Hello-World/contents/.github%2Ftest-file.yml",
+          NOT_FOUND_RESPONSE,
+        )
+        .getOnce(
+          "https://api.github.com/repos/Codertocat/.github/contents/.github%2Ftest-file.yml",
+          NOT_FOUND_RESPONSE,
+        );
+
+      const octokit = new ProbotOctokit({
+        retry: { enabled: false },
+        throttle: { enabled: false },
+        request: {
+          fetch,
+        },
+      });
+      const context = new Context(event, octokit, {} as any);
 
       expect(await context.config("test-file.yml")).toBe(null);
-      expect(mock.activeMocks()).toStrictEqual([]);
     });
 
     it("accepts deepmerge options", async () => {
-      const mock = nock("https://api.github.com")
-        .get("/repos/Codertocat/Hello-World/contents/.github%2Ftest-file.yml")
-        .reply(
-          200,
-          "foo:\n  - name: master\n    shouldChange: changed\n_extends: .github"
+      const fetch = fetchMock
+        .sandbox()
+        .getOnce(
+          "https://api.github.com/repos/Codertocat/Hello-World/contents/.github%2Ftest-file.yml",
+          "foo:\n  - name: master\n    shouldChange: changed\n_extends: .github",
         )
-        .get("/repos/Codertocat/.github/contents/.github%2Ftest-file.yml")
-        .reply(
-          200,
-          "foo:\n  - name: develop\n  - name: master\n    shouldChange: should"
+        .getOnce(
+          "https://api.github.com/repos/Codertocat/.github/contents/.github%2Ftest-file.yml",
+          "foo:\n  - name: develop\n  - name: master\n    shouldChange: should",
         );
 
-      const customMerge = jest.fn(
-        (_target: any[], _source: any[], _options: any): any[] => []
+      const octokit = new ProbotOctokit({
+        retry: { enabled: false },
+        throttle: { enabled: false },
+        request: {
+          fetch,
+        },
+      });
+      const context = new Context(event, octokit, {} as any);
+
+      const customMerge = vi.fn(
+        (_target: any[], _source: any[], _options: any): any[] => [],
       );
       await context.config("test-file.yml", {}, { arrayMerge: customMerge });
       expect(customMerge).toHaveBeenCalled();
-      expect(mock.activeMocks()).toStrictEqual([]);
     });
   });
 

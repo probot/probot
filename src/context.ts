@@ -1,14 +1,10 @@
 import path from "path";
-
-import { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
 import merge from "deepmerge";
 
+import type { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
 import type { Logger } from "pino";
-
-import { ProbotOctokit } from "./octokit/probot-octokit";
-import { aliasLog } from "./helpers/alias-log";
-import { DeprecatedLogger } from "./types";
-import { EmitterWebhookEventName as WebhookEvents } from "@octokit/webhooks/dist-types/types";
+import type { ProbotOctokit } from "./octokit/probot-octokit";
+import type { EmitterWebhookEventName as WebhookEvents } from "@octokit/webhooks/dist-types/types";
 
 export type MergeOptions = merge.Options;
 
@@ -65,20 +61,16 @@ export class Context<E extends WebhookEvents = WebhookEvents> {
   public id: string;
   public payload: WebhookEvent<E>["payload"];
 
-  public octokit: InstanceType<typeof ProbotOctokit>;
-  public log: DeprecatedLogger;
+  public octokit: ProbotOctokit;
+  public log: Logger;
 
-  constructor(
-    event: WebhookEvent<E>,
-    octokit: InstanceType<typeof ProbotOctokit>,
-    log: Logger
-  ) {
+  constructor(event: WebhookEvent<E>, octokit: ProbotOctokit, log: Logger) {
     this.name = event.name;
     this.id = event.id;
     this.payload = event.payload;
 
     this.octokit = octokit;
-    this.log = aliasLog(log);
+    this.log = log;
   }
 
   /**
@@ -94,12 +86,12 @@ export class Context<E extends WebhookEvents = WebhookEvents> {
    *
    */
   public repo<T>(object?: T): RepoResultType<E> & T {
-    // @ts-ignore `repository` is not always present in this.payload
+    // @ts-expect-error `repository` is not always present in this.payload
     const repo = this.payload.repository;
 
     if (!repo) {
       throw new Error(
-        "context.repo() is not supported for this webhook event."
+        "context.repo() is not supported for this webhook event.",
       );
     }
 
@@ -108,7 +100,7 @@ export class Context<E extends WebhookEvents = WebhookEvents> {
         owner: repo.owner.login,
         repo: repo.name,
       },
-      object
+      object,
     );
   }
 
@@ -125,16 +117,16 @@ export class Context<E extends WebhookEvents = WebhookEvents> {
    * @param object - Params to be merged with the issue params.
    */
   public issue<T>(
-    object?: T
+    object?: T,
   ): RepoResultType<E> & { issue_number: RepoIssueNumberType<E> } & T {
     return Object.assign(
       {
         issue_number:
-          // @ts-ignore - this.payload may not have `issue` or `pull_request` keys
+          // @ts-expect-error - this.payload may not have `issue` or `pull_request` keys
           (this.payload.issue || this.payload.pull_request || this.payload)
             .number,
       },
-      this.repo(object)
+      this.repo(object),
     );
   }
 
@@ -151,15 +143,15 @@ export class Context<E extends WebhookEvents = WebhookEvents> {
    * @param object - Params to be merged with the pull request params.
    */
   public pullRequest<T>(
-    object?: T
+    object?: T,
   ): RepoResultType<E> & { pull_number: RepoIssueNumberType<E> } & T {
     const payload = this.payload;
     return Object.assign(
       {
-        // @ts-ignore - this.payload may not have `issue` or `pull_request` keys
+        // @ts-expect-error - this.payload may not have `issue` or `pull_request` keys
         pull_number: (payload.issue || payload.pull_request || payload).number,
       },
-      this.repo(object)
+      this.repo(object),
     );
   }
 
@@ -225,25 +217,25 @@ export class Context<E extends WebhookEvents = WebhookEvents> {
   public async config<T>(
     fileName: string,
     defaultConfig?: T,
-    deepMergeOptions?: MergeOptions
+    deepMergeOptions?: MergeOptions,
   ): Promise<T | null> {
     const params = this.repo({
       path: path.posix.join(".github", fileName),
       defaults(configs: object[]) {
         const result = merge.all(
           [defaultConfig || {}, ...configs],
-          deepMergeOptions
+          deepMergeOptions,
         );
 
         return result;
       },
     });
 
-    // @ts-ignore
+    // @ts-expect-error
     const { config, files } = await this.octokit.config.get(params);
 
     // if no default config is set, and no config files are found, return null
-    if (!defaultConfig && !files.find((file: any) => file.config !== null)) {
+    if (!defaultConfig && !files.find((file) => file.config !== null)) {
       return null;
     }
 

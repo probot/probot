@@ -1,4 +1,3 @@
-// tslint:disable-next-line
 import type { Octokit } from "@octokit/core";
 
 export function probotRequestLogging(octokit: Octokit) {
@@ -20,7 +19,7 @@ export function probotRequestLogging(octokit: Octokit) {
       octokit.request.endpoint.parse(options);
     const msg = `GitHub request: ${method} ${url} - ${result.status}`;
 
-    // @ts-ignore log.debug is a pino log method and accepts a fields object
+    // @ts-expect-error log.debug is a pino log method and accepts a fields object
     octokit.log.debug(params.body || {}, msg);
   });
 }

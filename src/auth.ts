@@ -1,8 +1,6 @@
-import type { Logger } from "pino";
-
 import { getAuthenticatedOctokit } from "./octokit/get-authenticated-octokit";
 import { ProbotOctokit } from "./octokit/probot-octokit";
-import { State } from "./types";
+import type { State } from "./types";
 
 /**
  * Authenticate and get a GitHub client that can be used to make API calls.
@@ -20,6 +18,7 @@ import { State } from "./types";
  *    });
  *  };
  * ```
+ * @param state - Probot application instance state, which is used to persist
  *
  * @param id - ID of the installation, which can be extracted from
  * `context.payload.installation.id`. If called without this parameter, the
@@ -32,10 +31,6 @@ import { State } from "./types";
 export async function auth(
   state: State,
   installationId?: number,
-  log?: Logger
 ): Promise<InstanceType<typeof ProbotOctokit>> {
-  return getAuthenticatedOctokit(
-    Object.assign({}, state, log ? { log } : null),
-    installationId
-  );
+  return getAuthenticatedOctokit(Object.assign({}, state), installationId);
 }

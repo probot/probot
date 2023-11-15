@@ -35,7 +35,7 @@ describe("ProbotOctokit", () => {
     try {
       await octokit.request("/");
       throw new Error("should throw");
-    } catch (error) {
+    } catch (error: any) {
       expect(error.status).toBe(500);
     }
   });

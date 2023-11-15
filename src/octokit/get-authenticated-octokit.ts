@@ -5,10 +5,7 @@ import type { LogFn, Level } from "pino";
 
 type FactoryOptions = {
   octokit: ProbotOctokit;
-  octokitOptions: OctokitOptions & {
-    throttle?: Record<string, unknown>;
-    auth?: Record<string, unknown>;
-  };
+  octokitOptions: OctokitOptions;
   [key: string]: unknown;
 };
 
@@ -49,6 +46,7 @@ export async function getAuthenticatedOctokit(
           otherOptions,
           installationId,
         },
+        request: state.request,
       };
 
       const Octokit = octokit.constructor as typeof ProbotOctokit;

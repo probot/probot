@@ -46,7 +46,6 @@ export async function getAuthenticatedOctokit(
           otherOptions,
           installationId,
         },
-        request: state.request,
       };
 
       const Octokit = octokit.constructor as typeof ProbotOctokit;

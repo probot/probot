@@ -103,7 +103,9 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - run: npm run test:redis
+      - run: npm run test
+        env:
+          REDIS_HOST: 127.0.0.1
                 
   test:
     runs-on: ubuntu-latest

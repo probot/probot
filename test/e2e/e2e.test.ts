@@ -63,7 +63,7 @@ describe("end-to-end-tests", () => {
 
     probotProcess = execa(
       "node",
-      ["bin/probot.js", "run", "./test/e2e/hello-world.js"],
+      ["bin/probot.js", "run", "./test/e2e/hello-world.cjs"],
       {
         env: {
           APP_ID: "1",

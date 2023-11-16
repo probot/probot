@@ -1,4 +1,5 @@
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 import request from "supertest";
 import { sign } from "@octokit/webhooks-methods";
@@ -10,6 +11,8 @@ import { captureLogOutput } from "./helpers/capture-log-output.js";
 import WebhookExamples, {
   type WebhookDefinition,
 } from "@octokit/webhooks-examples";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 describe("run", () => {
   let server: Server;

@@ -1,4 +1,4 @@
-import execa from "execa";
+import {execa, ExecaChildProcess} from "execa";
 import getPort from "get-port";
 
 import { sign } from "@octokit/webhooks-methods";
@@ -15,7 +15,7 @@ import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
  */
 describe("end-to-end-tests", () => {
   let server: any;
-  let probotProcess: execa.ExecaChildProcess<string> | null;
+  let probotProcess: ExecaChildProcess<string> | null;
   let probotPort: number;
   let mockServerPort: number;
 

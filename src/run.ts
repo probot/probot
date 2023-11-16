@@ -1,4 +1,4 @@
-import pkgConf from "pkg-conf";
+import { packageConfig } from "pkg-conf";
 
 import type { ApplicationFunction, Options, ServerOptions } from "./types.js";
 import { Probot } from "./index.js";
@@ -119,7 +119,7 @@ export async function run(
   }
 
   if (Array.isArray(appFnOrArgv)) {
-    const pkg = await pkgConf("probot");
+    const pkg = await packageConfig("probot");
 
     const combinedApps: ApplicationFunction = async (_app) => {
       await server.load(defaultApp);

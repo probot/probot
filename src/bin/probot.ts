@@ -12,9 +12,7 @@ dotenvConfig();
 const pkg = loadPackageJson(resolve(__dirname, "package.json"));
 
 if (!isSupportedNodeVersion()) {
-  console.log(
-    `Node.js version 18 is required. You have ${process.version}.`,
-  );
+  console.log(`Node.js version 18 is required. You have ${process.version}.`);
   process.exit(1);
 }
 

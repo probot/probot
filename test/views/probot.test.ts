@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { probotView } from "../../src/views/probot";
+import { probotView } from "../../src/views/probot.js";
 
 describe("probotView", () => {
   test("not providing parameters", () => {

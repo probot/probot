@@ -1,4 +1,4 @@
-import { resolveAppFunction } from "../src/helpers/resolve-app-function";
+import { resolveAppFunction } from "../src/helpers/resolve-app-function.js";
 import { describe, expect, vi, it } from "vitest";
 
 const stubAppFnPath = require.resolve("./fixtures/plugin/stub-plugin.ts");

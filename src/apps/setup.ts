@@ -3,15 +3,15 @@ import { exec } from "child_process";
 import type { Request, Response } from "express";
 import updateDotenv from "update-dotenv";
 
-import { Probot } from "../probot";
-import { ManifestCreation } from "../manifest-creation";
-import { getLoggingMiddleware } from "../server/logging-middleware";
-import type { ApplicationFunctionOptions } from "../types";
-import { isProduction } from "../helpers/is-production";
+import { Probot } from "../probot.js";
+import { ManifestCreation } from "../manifest-creation.js";
+import { getLoggingMiddleware } from "../server/logging-middleware.js";
+import type { ApplicationFunctionOptions } from "../types.js";
+import { isProduction } from "../helpers/is-production.js";
 
-import { importView } from "../views/import";
-import { setupView } from "../views/setup";
-import { successView } from "../views/success";
+import { importView } from "../views/import.js";
+import { setupView } from "../views/setup.js";
+import { successView } from "../views/success.js";
 
 export const setupAppFactory = (
   host: string | undefined,

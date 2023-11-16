@@ -1,13 +1,13 @@
 import { createServer, IncomingMessage, ServerResponse } from "http";
 import Stream from "stream";
 
-import pino from "pino";
+import { pino } from "pino";
 import getPort from "get-port";
 import { sign } from "@octokit/webhooks-methods";
 import { describe, expect, test, beforeEach } from "vitest";
 
-import { createNodeMiddleware, createProbot, Probot } from "../src";
-import type { ApplicationFunction } from "../src/types";
+import { createNodeMiddleware, createProbot, Probot } from "../src/index.js";
+import type { ApplicationFunction } from "../src/types.js";
 import WebhookExamples, {
   type WebhookDefinition,
 } from "@octokit/webhooks-examples";
@@ -42,7 +42,7 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
 -----END RSA PRIVATE KEY-----`;
 const WEBHOOK_SECRET = "secret";
 const pushEvent = (
-  WebhookExamples.filter(
+  (WebhookExamples as unknown as WebhookDefinition[]).filter(
     (event) => event.name === "push",
   )[0] as WebhookDefinition<"push">
 ).examples[0];

@@ -1,4 +1,4 @@
-import { isProduction } from "../../src/helpers/is-production";
+import { isProduction } from "../../src/helpers/is-production.js";
 import { describe, expect, it } from "vitest";
 
 describe("isProduction", () => {

@@ -1,15 +1,15 @@
 import pkgConf from "pkg-conf";
 
-import type { ApplicationFunction, Options, ServerOptions } from "./types";
-import { Probot } from "./index";
-import { setupAppFactory } from "./apps/setup";
-import { getLog } from "./helpers/get-log";
-import { readCliOptions } from "./bin/read-cli-options";
-import { readEnvOptions } from "./bin/read-env-options";
-import { Server } from "./server/server";
-import { defaultApp } from "./apps/default";
-import { resolveAppFunction } from "./helpers/resolve-app-function";
-import { isProduction } from "./helpers/is-production";
+import type { ApplicationFunction, Options, ServerOptions } from "./types.js";
+import { Probot } from "./index.js";
+import { setupAppFactory } from "./apps/setup.js";
+import { getLog } from "./helpers/get-log.js";
+import { readCliOptions } from "./bin/read-cli-options.js";
+import { readEnvOptions } from "./bin/read-env-options.js";
+import { Server } from "./server/server.js";
+import { defaultApp } from "./apps/default.js";
+import { resolveAppFunction } from "./helpers/resolve-app-function.js";
+import { isProduction } from "./helpers/is-production.js";
 import { config as dotenvConfig } from "dotenv";
 
 type AdditionalOptions = {

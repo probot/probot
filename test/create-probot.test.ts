@@ -1,5 +1,5 @@
-import { createProbot, Probot } from "../src";
-import { captureLogOutput } from "./helpers/capture-log-output";
+import { createProbot, Probot } from "../src/index.js";
+import { captureLogOutput } from "./helpers/capture-log-output.js";
 import { describe, expect, test } from "vitest";
 
 const env = {

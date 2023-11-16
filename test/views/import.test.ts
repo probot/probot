@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { importView } from "../../src/views/import";
+import { importView } from "../../src/views/import.js";
 
 describe("importView", () => {
   test("only providing GH_HOST ", () => {

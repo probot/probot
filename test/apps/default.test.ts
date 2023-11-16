@@ -1,11 +1,11 @@
 import Stream from "stream";
 
-import pino from "pino";
+import { pino } from "pino";
 import request from "supertest";
 import { describe, expect, it } from "vitest";
 
-import { Probot, Server } from "../../src";
-import { defaultApp } from "../../src/apps/default";
+import { Probot, Server } from "../../src/index.js";
+import { defaultApp } from "../../src/apps/default.js";
 
 describe("default app", () => {
   let output = [];

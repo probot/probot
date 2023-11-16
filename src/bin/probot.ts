@@ -1,20 +1,25 @@
 import { program } from "commander";
-import { isSupportedNodeVersion } from "../helpers/is-supported-node-version";
+import { isSupportedNodeVersion } from "../helpers/is-supported-node-version.js";
+import { loadPackageJson } from "../helpers/load-package-json.js";
 import { config as dotenvConfig } from "dotenv";
+import { resolve } from "path";
+/*import { dirname } from 'path';
+import { fileURLToPath } from 'url';*/
 
 dotenvConfig();
 
-const pkg = require("../../package");
+//const __dirname = dirname(fileURLToPath(import.meta.url));
+const pkg = loadPackageJson(resolve(__dirname, "package.json"));
 
 if (!isSupportedNodeVersion()) {
   console.log(
-    `Node.js version ${pkg.engines.node} is required. You have ${process.version}.`,
+    `Node.js version 18 is required. You have ${process.version}.`,
   );
   process.exit(1);
 }
 
 program
-  .version(pkg.version)
+  .version(pkg.version || "0.0.0-dev")
   .usage("<command> [options]")
   .command("run", "run the bot")
   .command("receive", "Receive a single event and payload")

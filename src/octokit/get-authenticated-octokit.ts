@@ -1,6 +1,6 @@
-import type { State } from "../types";
-import type { ProbotOctokit } from "./probot-octokit";
-import type { OctokitOptions } from "../types";
+import type { State } from "../types.js";
+import type { ProbotOctokit } from "./probot-octokit.js";
+import type { OctokitOptions } from "../types.js";
 import type { LogFn, Level } from "pino";
 
 type FactoryOptions = {

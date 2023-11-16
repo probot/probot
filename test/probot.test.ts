@@ -6,13 +6,15 @@ import type {
 } from "@octokit/webhooks";
 import Bottleneck from "bottleneck";
 import fetchMock from "fetch-mock";
-import pino, { type LogFn } from "pino";
+import { pino, type LogFn } from "pino";
 import { describe, expect, test, beforeEach, it, vi, type Mock } from "vitest";
 
-import { Probot, ProbotOctokit, Context } from "../src";
+import { Probot, ProbotOctokit, Context } from "../src/index.js";
 
-import webhookExamples from "@octokit/webhooks-examples";
-import type { EmitterWebhookEventName } from "@octokit/webhooks/dist-types/types";
+import webhookExamples, {
+  type WebhookDefinition,
+} from "@octokit/webhooks-examples";
+import type { EmitterWebhookEventName } from "@octokit/webhooks/dist-types/types.js";
 
 const appId = 1;
 const privateKey = `-----BEGIN RSA PRIVATE KEY-----
@@ -46,8 +48,9 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
 const getPayloadExamples = <TName extends EmitterWebhookEventName>(
   name: TName,
 ) => {
-  return webhookExamples.filter((event) => event.name === name.split(".")[0])[0]
-    .examples as EmitterWebhookEvent<TName>["payload"][];
+  return (webhookExamples as unknown as WebhookDefinition[]).filter(
+    (event) => event.name === name.split(".")[0],
+  )[0].examples as EmitterWebhookEvent<TName>["payload"][];
 };
 const getPayloadExample = <TName extends EmitterWebhookEventName>(
   name: TName,

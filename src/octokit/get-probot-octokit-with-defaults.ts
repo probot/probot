@@ -1,12 +1,12 @@
 import type { LRUCache } from "lru-cache";
-import { ProbotOctokit } from "./probot-octokit";
+import { ProbotOctokit } from "./probot-octokit.js";
 import type { RedisOptions } from "ioredis";
 
-import { getOctokitThrottleOptions } from "./get-octokit-throttle-options";
+import { getOctokitThrottleOptions } from "./get-octokit-throttle-options.js";
 
 import type { Logger } from "pino";
 import type { RequestRequestOptions } from "@octokit/types";
-import { OctokitOptions } from "../types";
+import type { OctokitOptions } from "../types.js";
 
 type Options = {
   cache: LRUCache<number, string>;

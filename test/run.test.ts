@@ -4,9 +4,9 @@ import request from "supertest";
 import { sign } from "@octokit/webhooks-methods";
 import { describe, expect, it, beforeEach } from "vitest";
 
-import { Probot, run, Server } from "../src";
+import { Probot, run, Server } from "../src/index.js";
 
-import { captureLogOutput } from "./helpers/capture-log-output";
+import { captureLogOutput } from "./helpers/capture-log-output.js";
 import WebhookExamples, {
   type WebhookDefinition,
 } from "@octokit/webhooks-examples";
@@ -93,7 +93,7 @@ describe("run", () => {
 
   describe("webhooks", () => {
     const pushEvent = (
-      WebhookExamples.filter(
+      (WebhookExamples as unknown as WebhookDefinition[]).filter(
         (event) => event.name === "push",
       )[0] as WebhookDefinition<"push">
     ).examples[0];

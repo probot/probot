@@ -11,6 +11,7 @@ export const createWebhookProxy = async (
       logger: opts.logger,
       source: opts.url,
       target: `http://localhost:${opts.port}${opts.path}`,
+      fetch: opts.fetch,
     });
     return smee.start();
   } catch (error) {
@@ -26,4 +27,5 @@ export interface WebhookProxyOptions {
   port?: number;
   path?: string;
   logger: Logger;
+  fetch?: Function;
 }

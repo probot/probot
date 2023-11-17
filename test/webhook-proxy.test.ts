@@ -72,15 +72,13 @@ describe("webhook-proxy", () => {
         targetPort = (server.address() as net.AddressInfo).port;
         const url = `http://127.0.0.1:${targetPort}/events`;
 
-
         const fetch = fetchMock
           .sandbox()
-          .postOnce(
-            `http://localhost:${targetPort}/test`, {
+          .postOnce(`http://localhost:${targetPort}/test`, {
             status: 200,
             then: () => {
               finishedPromise.resolve!();
-            }
+            },
           });
 
         proxy = (await createWebhookProxy({
@@ -103,7 +101,7 @@ describe("webhook-proxy", () => {
       });
 
       await finishedPromise.promise;
-    })
+    });
   });
 
   test("logs an error when the proxy server is not found", async () => {
@@ -139,5 +137,4 @@ describe("webhook-proxy", () => {
 
     await finishedPromise.promise;
   });
-
 });

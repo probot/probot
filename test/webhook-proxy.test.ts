@@ -1,14 +1,15 @@
+import { randomInt } from "crypto";
 import express, { type Response } from "express";
 const sse: (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction,
 ) => void = require("connect-sse")();
+import fetchMock from "fetch-mock";
 import EventSource from "eventsource";
 import http from "http";
 import net from "net";
-import nock from "nock";
-import { describe, expect, afterEach, beforeEach, test, vi } from "vitest";
+import { describe, expect, afterEach, test, vi } from "vitest";
 import { getLog } from "../src/helpers/get-log";
 import { createWebhookProxy } from "../src/helpers/webhook-proxy";
 
@@ -29,63 +30,111 @@ describe("webhook-proxy", () => {
   });
 
   describe("with a valid proxy server", () => {
-    beforeEach(
-      () =>
-        new Promise<void>((done) => {
-          const app = express();
+    test("forwards events to server", async () => {
+      let readyPromise = {
+        promise: undefined,
+        reject: undefined,
+        resolve: undefined,
+      } as {
+        promise?: Promise<any>;
+        resolve?: (value?: any) => any;
+        reject?: (reason?: any) => any;
+      };
 
-          app.get("/events", sse, (_req, res: SSEResponse) => {
-            res.json({}, "ready");
-            emit = res.json;
+      readyPromise.promise = new Promise((resolve, reject) => {
+        readyPromise.resolve = resolve;
+        readyPromise.reject = reject;
+      });
+
+      let finishedPromise = {
+        promise: undefined,
+        reject: undefined,
+        resolve: undefined,
+      } as {
+        promise?: Promise<any>;
+        resolve?: (value?: any) => any;
+        reject?: (reason?: any) => any;
+      };
+
+      finishedPromise.promise = new Promise((resolve, reject) => {
+        finishedPromise.resolve = resolve;
+        finishedPromise.reject = reject;
+      });
+
+      const app = express();
+
+      app.get("/events", sse, (_req, res: SSEResponse) => {
+        res.json({}, "ready");
+        emit = res.json;
+      });
+
+      server = app.listen(0, async () => {
+        targetPort = (server.address() as net.AddressInfo).port;
+        const url = `http://127.0.0.1:${targetPort}/events`;
+
+        const fetch = fetchMock
+          .sandbox()
+          .postOnce(`http://localhost:${targetPort}/test`, {
+            status: 200,
+            then: () => {
+              finishedPromise.resolve!();
+            },
           });
 
-          server = app.listen(0, async () => {
-            targetPort = (server.address() as net.AddressInfo).port;
-            const url = `http://127.0.0.1:${targetPort}/events`;
-            proxy = (await createWebhookProxy({
-              url,
-              port: targetPort,
-              path: "/test",
-              logger: getLog({ level: "fatal" }),
-            })) as EventSource;
+        proxy = (await createWebhookProxy({
+          url,
+          port: targetPort,
+          path: "/test",
+          logger: getLog({ level: "fatal" }),
+          fetch,
+        })) as EventSource;
 
-            // Wait for proxy to be ready
-            proxy.addEventListener("ready", () => done());
-          });
-        }),
-    );
+        // Wait for proxy to be ready
+        proxy.addEventListener("ready", readyPromise.resolve!);
+      });
 
-    test("forwards events to server", () =>
-      new Promise<void>((done) => {
-        nock(`http://localhost:${targetPort}`)
-          .post("/test")
-          .reply(200, () => {
-            done();
-          });
+      await readyPromise.promise;
 
-        const body = { action: "foo" };
+      emit({
+        body: { action: "foo" },
+        "x-github-event": "test",
+      });
 
-        emit({
-          body,
-          "x-github-event": "test",
-        });
-      }));
+      await finishedPromise.promise;
+    });
   });
 
-  test("logs an error when the proxy server is not found", () =>
-    new Promise<void>((done) => {
-      const url = "http://bad.proxy/events";
-      nock("http://bad.proxy").get("/events").reply(404);
+  test("logs an error when the proxy server is not found", async () => {
+    expect.assertions(2);
 
-      const log = getLog({ level: "fatal" }).child({});
-      log.error = vi.fn() as any;
+    let finishedPromise = {
+      promise: undefined,
+      reject: undefined,
+      resolve: undefined,
+    } as {
+      promise?: Promise<any>;
+      resolve?: (value?: any) => any;
+      reject?: (reason?: any) => any;
+    };
 
-      createWebhookProxy({ url, logger: log })!.then((proxy) => {
-        (proxy as EventSource).addEventListener("error", (error: any) => {
-          expect(error.status).toBe(404);
-          expect(log.error).toHaveBeenCalledWith(error);
-          done();
-        });
+    finishedPromise.promise = new Promise((resolve, reject) => {
+      finishedPromise.resolve = resolve;
+      finishedPromise.reject = reject;
+    });
+
+    const url = `http://bad.n${randomInt(1e10).toString(36)}.proxy/events`;
+
+    const logger = getLog({ level: "fatal" }).child({});
+    logger.error = vi.fn() as any;
+
+    createWebhookProxy({ url, logger })!.then((proxy) => {
+      (proxy as EventSource).addEventListener("error", (error: any) => {
+        expect(error.message).toMatch(/^getaddrinfo ENOTFOUND/);
+        expect(logger.error).toHaveBeenCalledWith(error);
+        finishedPromise.resolve!();
       });
-    }));
+    });
+
+    await finishedPromise.promise;
+  });
 });

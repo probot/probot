@@ -12,7 +12,7 @@ export class ManifestCreation {
     return loadPackageJson();
   }
 
-  public async createWebhookChannel() {
+  public async createWebhookChannel(): Promise<string | undefined> {
     try {
       const SmeeClient = (await import("smee-client")).default;
 
@@ -24,6 +24,7 @@ export class ManifestCreation {
     } catch (error) {
       // Smee is not available, so we'll just move on
       console.warn("Unable to connect to smee.io, try restarting your server.");
+      return void 0;
     }
   }
 

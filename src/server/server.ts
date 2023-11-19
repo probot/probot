@@ -5,7 +5,6 @@ import { join } from "path";
 import type { Logger } from "pino";
 import { createNodeMiddleware as createWebhooksMiddleware } from "@octokit/webhooks";
 
-import { getLog } from "../helpers/get-log.js";
 import { getLoggingMiddleware } from "./logging-middleware.js";
 import { createWebhookProxy } from "../helpers/webhook-proxy.js";
 import { VERSION } from "../version.js";
@@ -38,10 +37,10 @@ export class Server {
 
   constructor(options: ServerOptions = {} as ServerOptions) {
     this.expressApp = express();
-    this.log = options.log || getLog().child({ name: "server" });
     this.probotApp = new options.Probot({
       request: options.request,
     });
+    this.log = options.log || this.probotApp.log.child({ name: "server" });
 
     this.state = {
       cwd: options.cwd || process.cwd(),

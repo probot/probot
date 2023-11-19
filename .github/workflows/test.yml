@@ -114,7 +114,7 @@ jobs:
         run: npm run test
         env:
           REDIS_HOST: 127.0.0.1
-                
+
   test:
     runs-on: ubuntu-latest
     needs:
@@ -122,6 +122,8 @@ jobs:
       - test-redis
 
     steps:
+      - run: exit 1
+        if: ${{ needs.test-unit.result != 'success' || needs.test-redis.result != 'success' }}
       - name: Check out repository
         uses: actions/checkout@v4
         with:
@@ -141,3 +143,4 @@ jobs:
         run: npx codecov
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    if: ${{ always() }}

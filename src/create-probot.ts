@@ -1,10 +1,10 @@
 import type { LogLevel, Options as PinoOptions } from "@probot/pino";
 import { getPrivateKey } from "@probot/get-private-key";
 
-import { getLog } from "./helpers/get-log";
-import type { Options } from "./types";
-import { Probot } from "./probot";
-import { defaultWebhooksPath } from "./server/server";
+import { getLog } from "./helpers/get-log.js";
+import type { Options } from "./types.js";
+import { Probot } from "./probot.js";
+import { defaultWebhooksPath } from "./server/server.js";
 
 type CreateProbotOptions = {
   overrides?: Options;

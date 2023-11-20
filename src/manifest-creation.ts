@@ -2,9 +2,9 @@ import fs from "fs";
 import yaml from "js-yaml";
 import path from "path";
 import updateDotenv from "update-dotenv";
-import { ProbotOctokit } from "./octokit/probot-octokit";
-import { loadPackageJson } from "./helpers/load-package-json";
-import type { Env, Manifest, OctokitOptions, PackageJson } from "./types";
+import { ProbotOctokit } from "./octokit/probot-octokit.js";
+import { loadPackageJson } from "./helpers/load-package-json.js";
+import type { Env, Manifest, OctokitOptions, PackageJson } from "./types.js";
 import type { RequestParameters } from "@octokit/types";
 
 export class ManifestCreation {

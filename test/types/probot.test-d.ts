@@ -1,6 +1,6 @@
 import { RepositoryEditedEvent } from "@octokit/webhooks-types";
 import { expectType } from "tsd";
-import { Probot } from "../../src";
+import { Probot } from "../../src/index.js";
 
 const app = new Probot({});
 

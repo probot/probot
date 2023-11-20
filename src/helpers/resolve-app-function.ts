@@ -1,4 +1,4 @@
-import { sync } from "resolve";
+import resolveModule from "resolve";
 
 const defaultOptions: ResolveOptions = {};
 
@@ -9,7 +9,7 @@ export const resolveAppFunction = async (
   opts = opts || defaultOptions;
   // These are mostly to ease testing
   const basedir = opts.basedir || process.cwd();
-  const resolver: Resolver = opts.resolver || sync;
+  const resolver: Resolver = opts.resolver || resolveModule.sync;
   const appFnPath = resolver(appFnId, { basedir });
   // On windows, an absolute path may start with a drive letter, e.g. C:/path/to/file.js
   // This can be interpreted as a protocol, so ensure it's prefixed with file://

@@ -1,8 +1,8 @@
-import type { ApplicationFunctionOptions, Probot } from "../index";
-import { loadPackageJson } from "../helpers/load-package-json";
+import type { ApplicationFunctionOptions, Probot } from "../index.js";
+import { loadPackageJson } from "../helpers/load-package-json.js";
 import { resolve } from "path";
 
-import { probotView } from "../views/probot";
+import { probotView } from "../views/probot.js";
 
 export function defaultApp(
   _app: Probot,

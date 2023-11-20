@@ -2,7 +2,7 @@ import Stream from "stream";
 
 import type { NextFunction, Request, Response } from "express";
 import request from "supertest";
-import pino from "pino";
+import { pino } from "pino";
 import { sign } from "@octokit/webhooks-methods";
 import getPort from "get-port";
 import WebhookExamples, {
@@ -10,7 +10,7 @@ import WebhookExamples, {
 } from "@octokit/webhooks-examples";
 import { describe, expect, it, beforeEach, test } from "vitest";
 
-import { Server, Probot } from "../src";
+import { Server, Probot } from "../src/index.js";
 
 const appId = 1;
 const privateKey = `-----BEGIN RSA PRIVATE KEY-----
@@ -41,7 +41,7 @@ ZcJjRIt8w8g/s4X6MhKasBYm9s3owALzCuJjGzUKcDHiO2DKu1xXAb0SzRcTzUCn
 x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
 -----END RSA PRIVATE KEY-----`;
 const pushEvent = (
-  WebhookExamples.filter(
+  (WebhookExamples as unknown as WebhookDefinition[]).filter(
     (event) => event.name === "push",
   )[0] as WebhookDefinition<"push">
 ).examples[0];

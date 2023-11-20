@@ -5,11 +5,11 @@ import { join } from "path";
 import type { Logger } from "pino";
 import { createNodeMiddleware as createWebhooksMiddleware } from "@octokit/webhooks";
 
-import { getLoggingMiddleware } from "./logging-middleware";
-import { createWebhookProxy } from "../helpers/webhook-proxy";
-import { VERSION } from "../version";
-import type { ApplicationFunction, ServerOptions } from "../types";
-import type { Probot } from "../";
+import { getLoggingMiddleware } from "./logging-middleware.js";
+import { createWebhookProxy } from "../helpers/webhook-proxy.js";
+import { VERSION } from "../version.js";
+import type { ApplicationFunction, ServerOptions } from "../types.js";
+import type { Probot } from "../index.js";
 import type EventSource from "eventsource";
 
 // the default path as defined in @octokit/webhooks

@@ -10,8 +10,8 @@ import EventSource from "eventsource";
 import http from "http";
 import net from "net";
 import { describe, expect, afterEach, test, vi } from "vitest";
-import { getLog } from "../src/helpers/get-log";
-import { createWebhookProxy } from "../src/helpers/webhook-proxy";
+import { getLog } from "../src/helpers/get-log.js";
+import { createWebhookProxy } from "../src/helpers/webhook-proxy.js";
 
 let targetPort = 999999;
 

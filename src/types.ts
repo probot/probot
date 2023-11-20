@@ -7,9 +7,9 @@ import type { LRUCache } from "lru-cache";
 import type { RedisOptions } from "ioredis";
 import type { Options as LoggingOptions } from "pino-http";
 
-import { Probot } from "./index";
-import { Context } from "./context";
-import { ProbotOctokit } from "./octokit/probot-octokit";
+import { Probot } from "./index.js";
+import { Context } from "./context.js";
+import { ProbotOctokit } from "./octokit/probot-octokit.js";
 
 import type { Logger } from "pino";
 import type { RequestRequestOptions } from "@octokit/types";

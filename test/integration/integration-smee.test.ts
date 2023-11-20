@@ -1,9 +1,9 @@
 import { Writable } from "stream";
-import { ManifestCreation } from "../../src/manifest-creation";
+import { ManifestCreation } from "../../src/manifest-creation.js";
 import { describe, test, expect, afterEach } from "vitest";
 import getPort from "get-port";
-import { ApplicationFunction, Probot, Server } from "../../src";
-import pino from "pino";
+import { ApplicationFunction, Probot, Server } from "../../src/index.js";
+import { pino } from "pino";
 import WebhookExamples, {
   type WebhookDefinition,
 } from "@octokit/webhooks-examples";
@@ -58,7 +58,7 @@ describe("smee-client", () => {
     const WEBHOOK_SECRET = "secret";
 
     const pushEvent = (
-      WebhookExamples.filter(
+      (WebhookExamples as unknown as WebhookDefinition[]).filter(
         (event) => event.name === "push",
       )[0] as WebhookDefinition<"push">
     ).examples[0];

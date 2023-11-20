@@ -1,4 +1,4 @@
-import { loadPackageJson } from "../../src/helpers/load-package-json";
+import { loadPackageJson } from "../../src/helpers/load-package-json.js";
 import { resolve } from "path";
 import { describe, expect, it } from "vitest";
 

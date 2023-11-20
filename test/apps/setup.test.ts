@@ -1,5 +1,13 @@
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 
+import fetchMock from "fetch-mock";
+import { Stream } from "stream";
+import request from "supertest";
+import { pino } from "pino";
+
+import { Probot, Server } from "../../src/index.js";
+import { setupAppFactory } from "../../src/apps/setup.js";
+
 const mocks = vi.hoisted(() => {
   return {
     createChannel: vi.fn().mockResolvedValue("mocked proxy URL"),
@@ -13,14 +21,6 @@ vi.mock("smee-client", () => ({
 vi.mock("update-dotenv", () => ({
   default: mocks.updateDotenv,
 }));
-
-import fetchMock from "fetch-mock";
-import { Stream } from "stream";
-import request from "supertest";
-import pino from "pino";
-
-import { Probot, Server } from "../../src";
-import { setupAppFactory } from "../../src/apps/setup";
 
 describe("Setup app", () => {
   let server: Server;

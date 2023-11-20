@@ -1,6 +1,6 @@
 import fs from "fs";
 import pkg from "../package.json";
-import { ManifestCreation } from "../src/manifest-creation";
+import { ManifestCreation } from "../src/manifest-creation.js";
 import response from "./fixtures/setup/response.json";
 import fetchMock from "fetch-mock";
 import { describe, expect, test, beforeEach, afterEach, vi } from "vitest";

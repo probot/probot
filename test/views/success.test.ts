@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { successView } from "../../src/views/success";
+import { successView } from "../../src/views/success.js";
 
 describe("setupView", () => {
   test("not providing name ", () => {

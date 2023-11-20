@@ -1,9 +1,9 @@
 import type { RequestListener } from "http";
 import { createNodeMiddleware as createWebhooksMiddleware } from "@octokit/webhooks";
 
-import type { ApplicationFunction, MiddlewareOptions } from "./types";
-import { defaultWebhooksPath } from "./server/server";
-import { createProbot } from ".";
+import type { ApplicationFunction, MiddlewareOptions } from "./types.js";
+import { defaultWebhooksPath } from "./server/server.js";
+import { createProbot } from "./create-probot.js";
 
 export function createNodeMiddleware(
   appFn: ApplicationFunction,

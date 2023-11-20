@@ -1,8 +1,8 @@
 import { Webhooks } from "@octokit/webhooks";
 
-import type { State } from "../types";
-import { getErrorHandler } from "../helpers/get-error-handler";
-import { webhookTransform } from "./octokit-webhooks-transform";
+import type { State } from "../types.js";
+import { getErrorHandler } from "../helpers/get-error-handler.js";
+import { webhookTransform } from "./octokit-webhooks-transform.js";
 
 export function getWebhooks(state: State) {
   const webhooks = new Webhooks({

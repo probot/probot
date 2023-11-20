@@ -1,6 +1,6 @@
-import { getAuthenticatedOctokit } from "./octokit/get-authenticated-octokit";
-import { ProbotOctokit } from "./octokit/probot-octokit";
-import type { State } from "./types";
+import { getAuthenticatedOctokit } from "./octokit/get-authenticated-octokit.js";
+import { ProbotOctokit } from "./octokit/probot-octokit.js";
+import type { State } from "./types.js";
 
 /**
  * Authenticate and get a GitHub client that can be used to make API calls.

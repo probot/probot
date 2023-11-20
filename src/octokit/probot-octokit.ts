@@ -8,8 +8,8 @@ import { throttling } from "@octokit/plugin-throttling";
 import { config } from "@probot/octokit-plugin-config";
 import { createProbotAuth } from "octokit-auth-probot";
 
-import { probotRequestLogging } from "./octokit-plugin-probot-request-logging";
-import { VERSION } from "../version";
+import { probotRequestLogging } from "./octokit-plugin-probot-request-logging.js";
+import { VERSION } from "../version.js";
 
 const defaultOptions = {
   authStrategy: createProbotAuth,

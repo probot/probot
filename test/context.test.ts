@@ -7,22 +7,22 @@ import type { WebhookDefinition } from "@octokit/webhooks-examples";
 import fetchMock from "fetch-mock";
 import { describe, expect, test, beforeEach, it, vi } from "vitest";
 
-import { Context } from "../src";
-import { ProbotOctokit } from "../src/octokit/probot-octokit";
+import { Context } from "../src/index.js";
+import { ProbotOctokit } from "../src/octokit/probot-octokit.js";
 import type { PushEvent } from "@octokit/webhooks-types";
 
 const pushEventPayload = (
-  WebhookExamples.filter(
+  (WebhookExamples as unknown as WebhookDefinition[]).filter(
     (event) => event.name === "push",
   )[0] as WebhookDefinition<"push">
 ).examples[0];
 const issuesEventPayload = (
-  WebhookExamples.filter(
+  (WebhookExamples as unknown as WebhookDefinition[]).filter(
     (event) => event.name === "issues",
   )[0] as WebhookDefinition<"issues">
 ).examples[0];
 const pullRequestEventPayload = (
-  WebhookExamples.filter(
+  (WebhookExamples as unknown as WebhookDefinition[]).filter(
     (event) => event.name === "pull_request",
   )[0] as WebhookDefinition<"pull_request">
 ).examples[0] as WebhookEvent<"pull_request">["payload"];

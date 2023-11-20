@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import type { PackageJson } from "../types";
+import type { PackageJson } from "../types.js";
 
 export function loadPackageJson(
   filepath = path.join(process.cwd(), "package.json"),

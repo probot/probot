@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { setupView } from "../../src/views/setup";
+import { setupView } from "../../src/views/setup.js";
 
 describe("setupView", () => {
   test("providing bare minimum ", () => {

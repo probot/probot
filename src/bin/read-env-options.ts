@@ -10,8 +10,8 @@ export function readEnvOptions(env = process.env) {
         ? "pretty"
         : "json"
       : env.NODE_ENV === "production"
-      ? "json"
-      : "pretty";
+        ? "json"
+        : "pretty";
 
   return {
     args: [],

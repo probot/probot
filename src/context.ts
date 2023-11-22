@@ -27,12 +27,12 @@ type RepoIssueNumberType<T extends WebhookEvents> =
   WebhookEvent<T>["payload"] extends { issue: { number: number } }
     ? number
     : never | WebhookEvent<T>["payload"] extends {
-        pull_request: { number: number };
-      }
-    ? number
-    : never | WebhookEvent<T>["payload"] extends { number: number }
-    ? number
-    : never;
+          pull_request: { number: number };
+        }
+      ? number
+      : never | WebhookEvent<T>["payload"] extends { number: number }
+        ? number
+        : never;
 
 /** Context.repo return type */
 type RepoResultType<E extends WebhookEvents> = {

@@ -50,6 +50,12 @@ export type State = {
   request?: RequestRequestOptions;
 };
 
+// Omit the `payload`, `id`,`name` properties from the `Context` class as they are already present in the types of `WebhookEvent`
+// The `Webhooks` class accepts a type parameter (`TTransformed`) that is used to transform the event payload in the form of
+// WebhookEvent["payload"] & T
+// Simply passing `Context` as `TTransformed` would result in the payload types being too complex for TypeScript to infer
+// See https://github.com/probot/probot/issues/1388
+// See https://github.com/probot/probot/issues/1815 as for why this is in a seperate type, and not directly passed to `Webhooks`
 type SimplifiedObject = Omit<Context, keyof WebhookEvent>;
 export type ProbotWebhooks = Webhooks<SimplifiedObject>;
 

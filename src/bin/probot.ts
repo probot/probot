@@ -1,8 +1,10 @@
+import { resolve } from "node:path";
+
 import { program } from "commander";
+import { config as dotenvConfig } from "dotenv";
 import { isSupportedNodeVersion } from "../helpers/is-supported-node-version.js";
 import { loadPackageJson } from "../helpers/load-package-json.js";
-import { config as dotenvConfig } from "dotenv";
-import { resolve } from "path";
+
 /*import { dirname } from 'path';
 import { fileURLToPath } from 'url';*/
 

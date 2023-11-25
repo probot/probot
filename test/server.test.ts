@@ -1,4 +1,4 @@
-import Stream from "stream";
+import Stream from "node:stream";
 
 import type { NextFunction, Request, Response } from "express";
 import request from "supertest";

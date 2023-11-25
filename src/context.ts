@@ -1,4 +1,4 @@
-import path from "path";
+import path from "node:path";
 import merge from "deepmerge";
 
 import type { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";

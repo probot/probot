@@ -1,4 +1,4 @@
-import { Writable } from "stream";
+import { Writable } from "node:stream";
 import { ManifestCreation } from "../../src/manifest-creation.js";
 import { describe, test, expect, afterEach } from "vitest";
 import getPort from "get-port";

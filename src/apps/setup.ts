@@ -1,6 +1,6 @@
-import express from "express";
-import { exec } from "child_process";
-import type { Request, Response } from "express";
+import { exec } from "node:child_process";
+
+import express, { type Request, type Response } from "express";
 import updateDotenv from "update-dotenv";
 
 import { Probot } from "../probot.js";

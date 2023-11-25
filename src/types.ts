@@ -97,6 +97,9 @@ export type PackageJson = {
   description?: string;
   homepage?: string;
   repository?: string;
+  engines?: {
+    [key: string]: string;
+  };
 };
 
 export type Env = Record<Uppercase<string>, string>;

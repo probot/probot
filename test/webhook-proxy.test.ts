@@ -1,4 +1,7 @@
-import { randomInt } from "crypto";
+import { randomInt } from "node:crypto";
+import http from "node:http";
+import net from "node:net";
+
 import express, { type Response } from "express";
 const sse: (
   req: express.Request,
@@ -7,8 +10,6 @@ const sse: (
 ) => void = require("connect-sse")();
 import fetchMock from "fetch-mock";
 import EventSource from "eventsource";
-import http from "http";
-import net from "net";
 import { describe, expect, afterEach, test, vi } from "vitest";
 import { getLog } from "../src/helpers/get-log.js";
 import { createWebhookProxy } from "../src/helpers/webhook-proxy.js";

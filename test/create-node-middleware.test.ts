@@ -1,5 +1,5 @@
-import { createServer, IncomingMessage, ServerResponse } from "http";
-import Stream from "stream";
+import { createServer, IncomingMessage, ServerResponse } from "node:http";
+import Stream from "node:stream";
 
 import { pino } from "pino";
 import getPort from "get-port";

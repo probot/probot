@@ -1,7 +1,8 @@
+import { exec } from "node:child_process";
+
 import type { IncomingMessage, ServerResponse } from "http";
 import { parse as parseQuery } from "querystring";
 import express from "express";
-import { exec } from "child_process";
 import updateDotenv from "update-dotenv";
 
 import { Probot } from "../probot.js";

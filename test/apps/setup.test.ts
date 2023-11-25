@@ -1,9 +1,9 @@
-import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
+import { Stream } from "node:stream";
 
 import fetchMock from "fetch-mock";
-import { Stream } from "stream";
-import request from "supertest";
 import { pino } from "pino";
+import request from "supertest";
+import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 
 import { Probot, Server } from "../../src/index.js";
 import { setupAppFactory } from "../../src/apps/setup.js";

@@ -1,11 +1,12 @@
 import { describe, it, expect } from "vitest";
 
 import { isSupportedNodeVersion } from "../../src/helpers/is-supported-node-version.js";
-import { engines } from "../../package.json";
+import { loadPackageJson } from "../../src/helpers/load-package-json.js";
 
 describe("isSupportedNodeVersion", () => {
+  const { engines } = loadPackageJson();
   it(`engines value is set to ">=18"`, () => {
-    expect(engines.node).toBe(">=18");
+    expect(engines!.node).toBe(">=18");
   });
 
   it("returns true if node is bigger or equal v18", () => {

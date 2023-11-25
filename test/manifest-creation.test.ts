@@ -1,13 +1,21 @@
-import fs from "fs";
-import pkg from "../package.json";
-import { ManifestCreation } from "../src/manifest-creation.js";
-import response from "./fixtures/setup/response.json";
+import fs from "node:fs";
+import path from "node:path";
 import fetchMock from "fetch-mock";
 import { describe, expect, test, beforeEach, afterEach, vi } from "vitest";
+
+import { ManifestCreation } from "../src/manifest-creation.js";
+import { loadPackageJson } from "../src/helpers/load-package-json.js";
 
 describe("ManifestCreation", () => {
   let setup: ManifestCreation;
 
+  const pkg = loadPackageJson();
+  const response = JSON.parse(
+    fs.readFileSync(
+      path.resolve(process.cwd(), "./test/fixtures/setup/response.json"),
+      "utf8",
+    ),
+  );
   beforeEach(() => {
     setup = new ManifestCreation();
   });

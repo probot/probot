@@ -1,12 +1,12 @@
 // Usage: probot receive -e push -p path/to/payload app.js
+import fs from "node:fs";
+import path from "node:path";
+import { randomUUID as uuidv4 } from "node:crypto";
 
 import express, { Router } from "express";
 import { config as dotenvConfig } from "dotenv";
 dotenvConfig();
 
-import fs from "fs";
-import path from "path";
-import { randomUUID as uuidv4 } from "crypto";
 import { program } from "commander";
 import { getPrivateKey } from "@probot/get-private-key";
 import { getLog } from "../helpers/get-log.js";

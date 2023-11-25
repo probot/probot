@@ -1,4 +1,4 @@
-import { IncomingMessage, ServerResponse } from "http";
+import type { IncomingMessage, ServerResponse } from "http";
 import { parse as parseQuery } from "querystring";
 import express from "express";
 import { exec } from "child_process";

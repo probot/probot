@@ -7,7 +7,7 @@ import { createProbot } from "./create-probot.js";
 
 export function createNodeMiddleware(
   appFn: ApplicationFunction,
-  { probot = createProbot(), webhooksPath }: MiddlewareOptions,
+  { probot = createProbot(), webhooksPath } = {} as MiddlewareOptions,
 ): RequestListener {
   probot.load(appFn);
 

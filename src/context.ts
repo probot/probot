@@ -1,10 +1,12 @@
 import path from "path";
 import merge from "deepmerge";
 
-import type { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
+import type {
+  EmitterWebhookEvent as WebhookEvent,
+  EmitterWebhookEventName as WebhookEvents,
+} from "@octokit/webhooks";
 import type { Logger } from "pino";
 import type { ProbotOctokit } from "./octokit/probot-octokit.js";
-import type { EmitterWebhookEventName as WebhookEvents } from "@octokit/webhooks/dist-types/types.js";
 
 export type MergeOptions = merge.Options;
 

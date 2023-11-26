@@ -9,7 +9,7 @@ import { getLoggingMiddleware } from "./logging-middleware.js";
 import { createWebhookProxy } from "../helpers/webhook-proxy.js";
 import { VERSION } from "../version.js";
 import type { ApplicationFunction, ServerOptions } from "../types.js";
-import type { Probot } from "../index.js";
+import { Probot } from "../index.js";
 import type EventSource from "eventsource";
 
 // the default path as defined in @octokit/webhooks
@@ -37,10 +37,34 @@ export class Server {
 
   constructor(options: ServerOptions = {} as ServerOptions) {
     this.expressApp = express();
-    this.probotApp = new options.Probot({
+    options = {
+      ...options,
       request: options.request,
-    });
-    this.log = options.log || this.probotApp.log.child({ name: "server" });
+      secret: options.secret || process.env.WEBHOOK_SECRET,
+      appId: options.appId || process.env.APP_ID,
+      port:
+        options.port ||
+        (process.env.PORT && parseInt(process.env.PORT, 10)) ||
+        3000,
+      privateKey: options.privateKey || process.env.PRIVATE_KEY,
+      webhookPath:
+        options.webhookPath || process.env.WEBHOOK_PATH || defaultWebhooksPath,
+      Probot: options.Probot,
+      loggingOptions: {
+        ...options.loggingOptions,
+        level: options.loggingOptions?.level || process.env.LOG_LEVEL || "info",
+      },
+    };
+    this.probotApp =
+      (options.Probot && new options.Probot(options)) || new Probot(options);
+    this.log =
+      options.log ||
+      this.probotApp.log.child({
+        level: options.loggingOptions?.level,
+        name: "server",
+      });
+    this.probotApp.log.level = "silent";
+    this.log.level = "silent";
 
     this.state = {
       cwd: options.cwd || process.cwd(),

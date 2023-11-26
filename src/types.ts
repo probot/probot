@@ -76,6 +76,9 @@ export type ServerOptions = {
   host?: string;
   webhookPath?: string;
   webhookProxy?: string;
+  appId?: string;
+  privateKey?: string;
+  secret?: string;
   Probot: typeof Probot;
   loggingOptions?: LoggingOptions;
   request?: RequestRequestOptions;

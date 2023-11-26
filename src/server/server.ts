@@ -1,11 +1,17 @@
-import type { Server as HttpServer } from "node:http";
-import { join } from "node:path";
+import {
+  type Server as HttpServer,
+  createServer,
+  IncomingMessage,
+  ServerResponse,
+} from "node:http";
+import fs from "node:fs";
+import path from "node:path";
 
 import express, { Router, type Application } from "express";
 import type { Logger } from "pino";
-import { createNodeMiddleware as createWebhooksMiddleware } from "@octokit/webhooks";
+import { createNodeHandler as createWebhooksHandler } from "@octokit/webhooks";
 
-import { getLoggingMiddleware } from "./logging-middleware.js";
+// import { getLoggingMiddleware } from "./logging-middleware.js";
 import { createWebhookProxy } from "../helpers/webhook-proxy.js";
 import { VERSION } from "../version.js";
 import type { ApplicationFunction, ServerOptions } from "../types.js";
@@ -73,25 +79,11 @@ export class Server {
       webhookPath: options.webhookPath || defaultWebhooksPath,
       webhookProxy: options.webhookProxy,
     };
-
-    this.expressApp.use(getLoggingMiddleware(this.log, options.loggingOptions));
-    this.expressApp.use(
-      "/probot/static/",
-      express.static(join(__dirname, "..", "..", "static")),
-    );
-    this.expressApp.use(
-      createWebhooksMiddleware(this.probotApp.webhooks, {
-        path: this.state.webhookPath,
-      }),
-    );
-
-    this.expressApp.get("/ping", (_req, res) => res.end("PONG"));
   }
 
   public async load(appFn: ApplicationFunction) {
     await appFn(this.probotApp, {
       cwd: this.state.cwd,
-      getRouter: (path) => this.router(path),
     });
   }
 
@@ -99,27 +91,80 @@ export class Server {
     this.log.info(
       `Running Probot v${this.version} (Node.js: ${process.version})`,
     );
-    const port = this.state.port || 3000;
-    const { host, webhookPath, webhookProxy } = this.state;
+    const { host, webhookPath, webhookProxy, port = 3000 } = this.state;
     const printableHost = host ?? "localhost";
 
-    this.state.httpServer = await new Promise((resolve, reject) => {
-      const server = this.expressApp.listen(
-        port,
-        ...((host ? [host] : []) as any),
-        async () => {
-          if (webhookProxy) {
-            this.state.eventSource = await createWebhookProxy({
-              logger: this.log,
-              path: webhookPath,
-              port: port,
-              url: webhookProxy,
-            });
-          }
-          this.log.info(`Listening on http://${printableHost}:${port}`);
-          resolve(server);
+    const primerCss = fs.readFileSync(
+      path.join(__dirname, "..", "..", "static", "primer.css"),
+    );
+    const robotSvg = fs.readFileSync(
+      path.join(__dirname, "..", "..", "static", "robot.svg"),
+    );
+    const probotHeadPng = fs.readFileSync(
+      path.join(__dirname, "..", "..", "static", "probot-head.png"),
+    );
+
+    const notFoundHandler = (_req: IncomingMessage, res: ServerResponse) => {
+      res.writeHead(404).end();
+    };
+    const simpleRouter = {
+      POST: {
+        [this.state.webhookPath]: createWebhooksHandler(
+          this.probotApp.webhooks,
+          { log: this.log },
+        ),
+      },
+      GET: {
+        "/ping": (_req: IncomingMessage, res: ServerResponse) =>
+          res.end("PONG"),
+        "/probot/static/primer.css": (
+          _req: IncomingMessage,
+          res: ServerResponse,
+        ) => {
+          res.writeHead(200, { "content-type": "text/css" }).end(primerCss);
         },
-      );
+        "/probot/static/robot.svg": (
+          _req: IncomingMessage,
+          res: ServerResponse,
+        ) => {
+          res
+            .writeHead(200, {
+              "content-type": "image/svg+xml",
+            })
+            .end(robotSvg);
+        },
+        "/probot/static/probot-head.png": (
+          _req: IncomingMessage,
+          res: ServerResponse,
+        ) => {
+          res
+            .writeHead(200, {
+              "content-type": "image/png",
+            })
+            .end(probotHeadPng);
+        },
+      },
+    };
+
+    this.state.httpServer = await new Promise((resolve, reject) => {
+      const server = createServer(
+        async (req: IncomingMessage, res: ServerResponse) => {
+          const handler =
+            simpleRouter[req.method as "POST"]?.[req.url!] || notFoundHandler;
+          await handler(req, res);
+        },
+      ).listen(port, ...((host ? [host] : []) as any), async () => {
+        if (webhookProxy) {
+          this.state.eventSource = await createWebhookProxy({
+            logger: this.log,
+            path: webhookPath,
+            port: port,
+            url: webhookProxy,
+          });
+        }
+        this.log.info(`Listening on http://${printableHost}:${port}`);
+        resolve(server);
+      });
 
       server.on("error", (error: NodeJS.ErrnoException) => {
         if (error.code === "EADDRINUSE") {

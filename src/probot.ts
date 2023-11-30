@@ -74,7 +74,7 @@ export class Probot {
     });
     const octokitLogger = this.log.child({ name: "octokit" });
     const octokit = new Octokit({
-      request: options.request,
+      request: options.request || global.fetch,
       log: {
         debug: octokitLogger.debug.bind(octokitLogger),
         info: octokitLogger.info.bind(octokitLogger),
@@ -97,7 +97,7 @@ export class Probot {
       host: options.host,
       port: options.port,
       webhookPath: options.webhookPath || defaultWebhooksPath,
-      request: options.request,
+      request: options.request || global.fetch,
     };
 
     this.auth = auth.bind(null, this.state);

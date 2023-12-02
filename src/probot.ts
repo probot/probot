@@ -97,7 +97,7 @@ export class Probot {
       host: options.host,
       port: options.port,
       webhookPath: options.webhookPath || defaultWebhooksPath,
-      request: options.request || {},
+      request: options.request,
     };
 
     this.auth = auth.bind(null, this.state);

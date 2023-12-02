@@ -38,7 +38,7 @@ export class Server {
   constructor(options: ServerOptions = {} as ServerOptions) {
     this.expressApp = express();
     this.probotApp = new options.Probot({
-      request: options.request || global.fetch,
+      request: options.request || {},
     });
     this.log = options.log || this.probotApp.log.child({ name: "server" });
 

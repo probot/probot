@@ -35,13 +35,13 @@ export function getProbotOctokitWithDefaults(options: Options) {
   const authOptions = options.githubToken
     ? {
         token: options.githubToken,
-        request: options.request || global.fetch,
+        request: options.request || {},
       }
     : {
         cache: options.cache,
         appId: options.appId,
         privateKey: options.privateKey,
-        request: options.request || global.fetch,
+        request: options.request || {},
       };
 
   const octokitThrottleOptions = getOctokitThrottleOptions({

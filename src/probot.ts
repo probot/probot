@@ -74,7 +74,7 @@ export class Probot {
     });
     const octokitLogger = this.log.child({ name: "octokit" });
     const octokit = new Octokit({
-      request: options.request || {},
+      request: options.request,
       log: {
         debug: octokitLogger.debug.bind(octokitLogger),
         info: octokitLogger.info.bind(octokitLogger),

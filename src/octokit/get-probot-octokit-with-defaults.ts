@@ -1,6 +1,7 @@
 import type { LRUCache } from "lru-cache";
 import { ProbotOctokit } from "./probot-octokit.js";
 import type { RedisOptions } from "ioredis";
+import { request } from "@octokit/request";
 
 import { getOctokitThrottleOptions } from "./get-octokit-throttle-options.js";
 
@@ -35,14 +36,21 @@ export function getProbotOctokitWithDefaults(options: Options) {
   const authOptions = options.githubToken
     ? {
         token: options.githubToken,
-        request: options.request || {},
       }
     : {
         cache: options.cache,
         appId: options.appId,
         privateKey: options.privateKey,
-        request: options.request || {},
       };
+
+  // auth-app uses RequestInterface instead of RequestRequestOptions
+  // need to instantiate a new request instance with the passed options
+  if (options.request) {
+    // @ts-ignore
+    authOptions.request = request.defaults({
+      request: options.request,
+    });
+  }
 
   const octokitThrottleOptions = getOctokitThrottleOptions({
     log: options.log,

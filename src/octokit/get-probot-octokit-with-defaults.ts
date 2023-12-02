@@ -45,12 +45,12 @@ export function getProbotOctokitWithDefaults(options: Options) {
 
   // auth-app uses RequestInterface instead of RequestRequestOptions
   // need to instantiate a new request instance with the passed options
-  if (options.request) {
-    // @ts-ignore
-    authOptions.request = request.defaults({
+  // @ts-ignore
+  authOptions.request =
+    options.request &&
+    request.defaults({
       request: options.request,
     });
-  }
 
   const octokitThrottleOptions = getOctokitThrottleOptions({
     log: options.log,

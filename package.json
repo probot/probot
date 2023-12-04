@@ -42,6 +42,7 @@
     "@octokit/plugin-rest-endpoint-methods": "^10.1.5",
     "@octokit/plugin-retry": "^6.0.1",
     "@octokit/plugin-throttling": "^8.1.3",
+    "@octokit/request": "^8.1.6",
     "@octokit/types": "^12.3.0",
     "@octokit/webhooks": "^12.0.8",
     "@probot/get-private-key": "^1.1.2",

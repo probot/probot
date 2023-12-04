@@ -1,6 +1,7 @@
 import type { LRUCache } from "lru-cache";
 import { ProbotOctokit } from "./probot-octokit.js";
 import type { RedisOptions } from "ioredis";
+import { request } from "@octokit/request";
 
 import { getOctokitThrottleOptions } from "./get-octokit-throttle-options.js";
 
@@ -35,13 +36,21 @@ export function getProbotOctokitWithDefaults(options: Options) {
   const authOptions = options.githubToken
     ? {
         token: options.githubToken,
-        request: options.request,
+        request: request.defaults({
+          request: {
+            fetch: options.request?.fetch,
+          },
+        }),
       }
     : {
         cache: options.cache,
         appId: options.appId,
         privateKey: options.privateKey,
-        request: options.request,
+        request: request.defaults({
+          request: {
+            fetch: options.request?.fetch,
+          },
+        }),
       };
 
   const octokitThrottleOptions = getOctokitThrottleOptions({

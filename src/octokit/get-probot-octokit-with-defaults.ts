@@ -36,21 +36,22 @@ export function getProbotOctokitWithDefaults(options: Options) {
   const authOptions = options.githubToken
     ? {
         token: options.githubToken,
+        request: request.defaults({
+          request: {
+            fetch: options.request?.fetch,
+          },
+        }),
       }
     : {
         cache: options.cache,
         appId: options.appId,
         privateKey: options.privateKey,
+        request: request.defaults({
+          request: {
+            fetch: options.request?.fetch,
+          },
+        }),
       };
-
-  // auth-app uses RequestInterface instead of RequestRequestOptions
-  // need to instantiate a new request instance with the passed options
-  // @ts-ignore
-  authOptions.request =
-    options.request &&
-    request.defaults({
-      request: options.request,
-    });
 
   const octokitThrottleOptions = getOctokitThrottleOptions({
     log: options.log,

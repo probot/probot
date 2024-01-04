@@ -15,10 +15,14 @@ To save a copy of the payload, go to the [settings](https://github.com/settings/
 
 Next, simulate receiving this event being delivered by running:
 
-    $ node_modules/.bin/probot receive -e <event-name> -p <path-to-fixture> <path-to-app>
+```bash
+$ node_modules/.bin/probot receive -e <event-name> -p <path-to-fixture> <path-to-app>
+```
 
 Note that `event-name` here is just the name of the event (like pull_request or issues) and not the action (like labeled). You can find it in the GitHub deliveries history under the `X-GitHub-Event` header.
 
 For example, to simulate receiving the `pull_request.labeled` event, run:
 
-    $ node_modules/.bin/probot receive -e pull_request -p test/fixtures/pull_request.labeled.json ./index.js
+```bash
+$ node_modules/.bin/probot receive -e pull_request -p test/fixtures/pull_request.labeled.json ./index.js
+```

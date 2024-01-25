@@ -88,7 +88,7 @@
     "smee-client": "^2.0.0",
     "sonic-boom": "^3.7.0",
     "supertest": "^6.3.3",
-    "tsd": "^0.29.0",
+    "tsd": "^0.30.0",
     "typedoc": "^0.25.3",
     "typescript": "^5.2.2",
     "vitest": "^0.34.6"

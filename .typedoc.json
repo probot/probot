@@ -5,7 +5,6 @@
   "theme": "default",
   "excludePrivate": true,
   "excludeExternals": true,
-  "listInvalidSymbolLinks": true,
   "excludeInternal": true,
   "entryPointStrategy": "expand",
   "readme": "none",

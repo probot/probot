@@ -73,7 +73,7 @@
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^18.18.1",
     "@types/resolve": "^1.20.5",
-    "@types/supertest": "^2.0.16",
+    "@types/supertest": "^6.0.0",
     "@vitest/coverage-v8": "^0.34.6",
     "@vitest/ui": "^0.34.6",
     "bottleneck": "^2.19.5",

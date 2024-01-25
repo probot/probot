@@ -71,7 +71,7 @@
     "@octokit/webhooks-types": "^7.3.1",
     "@types/eventsource": "^1.1.15",
     "@types/js-yaml": "^4.0.9",
-    "@types/node": "^18.18.1",
+    "@types/node": "^20.0.0",
     "@types/resolve": "^1.20.5",
     "@types/supertest": "^6.0.0",
     "@vitest/coverage-v8": "^0.34.6",

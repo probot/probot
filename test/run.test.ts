@@ -1,13 +1,16 @@
-import path = require("path");
+import path from "node:path";
 
 import request from "supertest";
 import { sign } from "@octokit/webhooks-methods";
+import { describe, expect, it, beforeEach } from "vitest";
 
-import { Probot, run, Server } from "../src";
+import { Probot, run, Server } from "../src/index.js";
 
-import { captureLogOutput } from "./helpers/capture-log-output";
+import { captureLogOutput } from "./helpers/capture-log-output.js";
+import WebhookExamples, {
+  type WebhookDefinition,
+} from "@octokit/webhooks-examples";
 
-// tslint:disable:no-empty
 describe("run", () => {
   let server: Server;
   let env: NodeJS.ProcessEnv;
@@ -18,7 +21,7 @@ describe("run", () => {
       PRIVATE_KEY_PATH: path.join(
         __dirname,
         "fixtures",
-        "test-private-key.pem"
+        "test-private-key.pem",
       ),
       WEBHOOK_PROXY_URL: "https://smee.io/EfHXC9BFfGAxbM6J",
       WEBHOOK_SECRET: "secret",
@@ -34,7 +37,7 @@ describe("run", () => {
         () => {
           initialized = true;
         },
-        { env }
+        { env },
       );
       expect(initialized).toBeTruthy();
       await server.stop();
@@ -58,10 +61,10 @@ describe("run", () => {
 
       return new Promise(async (resolve) => {
         server = await run(
-          (app: Probot) => {
+          (_app: Probot) => {
             initialized = true;
           },
-          { env }
+          { env },
         );
         expect(initialized).toBeFalsy();
         await server.stop();
@@ -71,33 +74,39 @@ describe("run", () => {
     });
 
     it("defaults to JSON logs if NODE_ENV is set to 'production'", async () => {
-      const outputData = await captureLogOutput(async () => {
-        env.NODE_ENV = "production";
+      let outputData = "";
+      env.NODE_ENV = "production";
 
-        server = await run(
-          (app) => {
+      server = await run(
+        async (app) => {
+          outputData = await captureLogOutput(async () => {
             app.log.fatal("test");
-          },
-          { env }
-        );
-        await server.stop();
-      });
+          }, app.log);
+        },
+        { env },
+      );
+      await server.stop();
 
       expect(outputData).toMatch(/"msg":"test"/);
     });
   });
 
   describe("webhooks", () => {
-    const pushEvent = require("./fixtures/webhook/push.json");
+    const pushEvent = (
+      (WebhookExamples as unknown as WebhookDefinition[]).filter(
+        (event) => event.name === "push",
+      )[0] as WebhookDefinition<"push">
+    ).examples[0];
 
-    it("POST /", async () => {
+    it("POST /api/github/webhooks", async () => {
       server = await run(() => {}, { env });
 
       const dataString = JSON.stringify(pushEvent);
 
       await request(server.expressApp)
-        .post("/")
+        .post("/api/github/webhooks")
         .send(dataString)
+        .set("content-type", "application/json")
         .set("x-github-event", "push")
         .set("x-hub-signature-256", await sign("secret", dataString))
         .set("x-github-delivery", "123")
@@ -120,6 +129,7 @@ describe("run", () => {
         await request(server.expressApp)
           .post("/custom-webhook")
           .send(dataString)
+          .set("content-type", "application/json")
           .set("x-github-event", "push")
           .set("x-hub-signature-256", await sign("secret", dataString))
           .set("x-github-delivery", "123")

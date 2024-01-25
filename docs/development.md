@@ -5,7 +5,7 @@ title: Developing an app
 
 # Developing an app
 
-To develop a Probot app, you will first need a recent version of [Node.js](https://nodejs.org/) installed. Open a terminal and run `node -v` to verify that it is installed and is at least 10.0.0 or later. Otherwise, [install the latest version](https://nodejs.org/).
+To develop a Probot app, you will first need a recent version of [Node.js](https://nodejs.org/) installed. Open a terminal and run `node -v` to verify that it is installed and is at least 18.0.0 or later. Otherwise, [install the latest version](https://nodejs.org/).
 
 **Contents:**
 
@@ -224,7 +224,7 @@ const app = require("./index.js");
 module.exports = createNodeMiddleware(app, { probot: createProbot() });
 ```
 
-By default, `createNodeMiddleware()` uses `/` as the webhook endpoint. To customize this behaviour, you can use the `webhooksPath` option.
+By default, `createNodeMiddleware()` uses `/api/github/webhooks` as the webhook endpoint. To customize this behaviour, you can use the `webhooksPath` option.
 
 ```js
 module.exports = createNodeMiddleware(app, {

@@ -1,15 +1,26 @@
-const createChannel = jest.fn().mockResolvedValue("mocked proxy URL");
-const updateDotenv = jest.fn().mockResolvedValue({});
-jest.mock("smee-client", () => ({ createChannel }));
-jest.mock("update-dotenv", () => updateDotenv);
+import { Stream } from "node:stream";
 
-import nock from "nock";
-import { Stream } from "stream";
+import fetchMock from "fetch-mock";
+import { pino } from "pino";
 import request from "supertest";
-import pino from "pino";
+import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 
-import { Probot, Server } from "../../src";
-import { setupAppFactory } from "../../src/apps/setup";
+import { Probot, Server } from "../../src/index.js";
+import { setupAppFactory } from "../../src/apps/setup.js";
+
+const mocks = vi.hoisted(() => {
+  return {
+    createChannel: vi.fn().mockResolvedValue("mocked proxy URL"),
+    updateDotenv: vi.fn().mockResolvedValue({}),
+  };
+});
+vi.mock("smee-client", () => ({
+  default: { createChannel: mocks.createChannel },
+  createChannel: mocks.createChannel,
+}));
+vi.mock("update-dotenv", () => ({
+  default: mocks.updateDotenv,
+}));
 
 describe("Setup app", () => {
   let server: Server;
@@ -37,7 +48,7 @@ describe("Setup app", () => {
   });
 
   afterEach(async () => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("logs", () => {
@@ -91,31 +102,98 @@ describe("Setup app", () => {
 
   describe("GET /probot/setup", () => {
     it("returns a redirect", async () => {
-      nock("https://api.github.com")
-        .post("/app-manifests/123/conversions")
-        .reply(201, {
-          html_url: "/apps/my-app",
-          id: "id",
-          pem: "pem",
-          webhook_secret: "webhook_secret",
-          client_id: "Iv1.8a61f9b3a7aba766",
-          client_secret: "1726be1638095a19edd134c77bde3aa2ece1e5d8",
+      const fetch = fetchMock
+        .sandbox()
+        .postOnce("https://api.github.com/app-manifests/123/conversions", {
+          status: 201,
+          body: {
+            html_url: "/apps/my-app",
+            id: "id",
+            pem: "pem",
+            webhook_secret: "webhook_secret",
+            client_id: "Iv1.8a61f9b3a7aba766",
+            client_secret: "1726be1638095a19edd134c77bde3aa2ece1e5d8",
+          },
         });
 
-      await request(server.expressApp)
+      const server = new Server({
+        Probot: Probot.defaults({
+          log: pino(streamLogsToOutput),
+          // workaround for https://github.com/probot/probot/issues/1512
+          appId: 1,
+          privateKey: "dummy value for setup, see #1512",
+        }),
+        log: pino(streamLogsToOutput),
+        request: {
+          fetch: async (url: string, options: { [key: string]: any }) => {
+            return fetch(url, options);
+          },
+        },
+      });
+
+      await server.load(setupAppFactory(undefined, undefined));
+
+      const setupResponse = await request(server.expressApp)
         .get("/probot/setup")
         .query({ code: "123" })
         .expect(302)
         .expect("Location", "/apps/my-app/installations/new");
 
-      expect(createChannel).toHaveBeenCalledTimes(1);
-      expect(updateDotenv.mock.calls).toMatchSnapshot();
+      expect(setupResponse.text).toMatchSnapshot();
+
+      expect(mocks.createChannel).toHaveBeenCalledTimes(2);
+      expect(mocks.updateDotenv.mock.calls).toMatchSnapshot();
+    });
+
+    it("throws a 400 Error if code is not provided", async () => {
+      const server = new Server({
+        Probot: Probot.defaults({
+          log: pino(streamLogsToOutput),
+          // workaround for https://github.com/probot/probot/issues/1512
+          appId: 1,
+          privateKey: "dummy value for setup, see #1512",
+        }),
+        log: pino(streamLogsToOutput),
+      });
+
+      await server.load(setupAppFactory(undefined, undefined));
+
+      const setupResponse = await request(server.expressApp)
+        .get("/probot/setup")
+        .expect(400);
+
+      expect(setupResponse.text).toMatchSnapshot();
+    });
+
+    it("throws a 400 Error if code is an empty string", async () => {
+      const server = new Server({
+        Probot: Probot.defaults({
+          log: pino(streamLogsToOutput),
+          // workaround for https://github.com/probot/probot/issues/1512
+          appId: 1,
+          privateKey: "dummy value for setup, see #1512",
+        }),
+        log: pino(streamLogsToOutput),
+      });
+
+      await server.load(setupAppFactory(undefined, undefined));
+
+      const setupResponse = await request(server.expressApp)
+        .get("/probot/setup")
+        .query({ code: "" })
+        .expect(400);
+
+      expect(setupResponse.text).toMatchSnapshot();
     });
   });
 
   describe("GET /probot/import", () => {
-    it("renders import.handlebars", async () => {
-      await request(server.expressApp).get("/probot/import").expect(200);
+    it("renders importView", async () => {
+      const importView = await request(server.expressApp)
+        .get("/probot/import")
+        .expect(200);
+
+      expect(importView.text).toMatchSnapshot();
     });
   });
 
@@ -134,7 +212,7 @@ describe("Setup app", () => {
         .expect(200)
         .expect("");
 
-      expect(updateDotenv.mock.calls).toMatchSnapshot();
+      expect(mocks.updateDotenv.mock.calls).toMatchSnapshot();
     });
 
     it("400 when keys are missing", async () => {
@@ -144,19 +222,25 @@ describe("Setup app", () => {
         webhook_secret: "baz",
       });
 
-      await request(server.expressApp)
+      const importResponse = await request(server.expressApp)
         .post("/probot/import")
         .set("content-type", "application/json")
         .send(body)
         .expect(400);
+
+      expect(importResponse.text).toMatchSnapshot();
     });
   });
 
   describe("GET /probot/success", () => {
     it("returns a 200 response", async () => {
-      await request(server.expressApp).get("/probot/success").expect(200);
+      const successResponse = await request(server.expressApp)
+        .get("/probot/success")
+        .expect(200);
 
-      expect(createChannel).toHaveBeenCalledTimes(1);
+      expect(successResponse.text).toMatchSnapshot();
+
+      expect(mocks.createChannel).toHaveBeenCalledTimes(1);
     });
   });
 });

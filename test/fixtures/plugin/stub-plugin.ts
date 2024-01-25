@@ -1,2 +1,1 @@
-// tslint:disable-next-line:no-empty
-export = () => {};
+export default () => {};

@@ -1,18 +1,27 @@
-import SonicBoom from "sonic-boom";
+import { symbols as pinoSymbols } from "pino";
+import type { Logger } from "pino";
+import { type SpyInstance, vi } from "vitest";
 
-export async function captureLogOutput(action: () => any): Promise<string> {
+export async function captureLogOutput(
+  action: () => any,
+  log: Logger,
+): Promise<string> {
   let outputData = "";
 
-  const sbWrite = SonicBoom.prototype.write;
-  SonicBoom.prototype.write = function (data) {
+  const stdoutSpy: SpyInstance = vi.spyOn(
+    // @ts-expect-error
+    log[pinoSymbols.streamSym],
+    "write",
+  );
+  stdoutSpy.mockImplementation((data) => {
     outputData += data;
-  };
+  });
 
   try {
     await action();
 
     return outputData;
   } finally {
-    SonicBoom.prototype.write = sbWrite;
+    stdoutSpy.mockRestore();
   }
 }

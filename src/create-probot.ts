@@ -1,24 +1,26 @@
-import { LogLevel, Options as PinoOptions } from "@probot/pino";
+import type { LogLevel, Options as PinoOptions } from "@probot/pino";
 import { getPrivateKey } from "@probot/get-private-key";
 
-import { getLog, GetLogOptions } from "./helpers/get-log";
-import { Options } from "./types";
-import { Probot } from "./probot";
+import { getLog } from "./helpers/get-log.js";
+import type { Options } from "./types.js";
+import { Probot } from "./probot.js";
+import { defaultWebhooksPath } from "./server/server.js";
 
 type CreateProbotOptions = {
   overrides?: Options;
   defaults?: Options;
-  env?: NodeJS.ProcessEnv;
+  env?: Partial<NodeJS.ProcessEnv>;
 };
 
-const DEFAULTS = {
+const DEFAULTS: Partial<NodeJS.ProcessEnv> = {
   APP_ID: "",
   WEBHOOK_SECRET: "",
+  WEBHOOK_PATH: defaultWebhooksPath,
   GHE_HOST: "",
-  GHE_PROTOCOL: "",
-  LOG_FORMAT: "",
+  GHE_PROTOCOL: "https",
+  LOG_FORMAT: undefined,
   LOG_LEVEL: "warn",
-  LOG_LEVEL_IN_STRING: "",
+  LOG_LEVEL_IN_STRING: "false",
   LOG_MESSAGE_KEY: "msg",
   REDIS_URL: "",
   SENTRY_DSN: "",
@@ -47,6 +49,7 @@ export function createProbot({
     privateKey: (privateKey && privateKey.toString()) || undefined,
     secret: envWithDefaults.WEBHOOK_SECRET,
     redisConfig: envWithDefaults.REDIS_URL,
+    webhookPath: envWithDefaults.WEBHOOK_PATH,
     baseUrl: envWithDefaults.GHE_HOST
       ? `${envWithDefaults.GHE_PROTOCOL || "https"}://${
           envWithDefaults.GHE_HOST
@@ -60,15 +63,13 @@ export function createProbot({
     ...overrides,
   };
 
-  const logOptions: GetLogOptions = {
+  const log = getLog({
     level: probotOptions.logLevel,
     logFormat: envWithDefaults.LOG_FORMAT as PinoOptions["logFormat"],
     logLevelInString: envWithDefaults.LOG_LEVEL_IN_STRING === "true",
     logMessageKey: envWithDefaults.LOG_MESSAGE_KEY,
     sentryDsn: envWithDefaults.SENTRY_DSN,
-  };
-
-  const log = getLog(logOptions).child({ name: "server" });
+  }).child({ name: "server" });
 
   return new Probot({
     log: log.child({ name: "probot" }),

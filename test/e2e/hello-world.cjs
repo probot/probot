@@ -13,9 +13,7 @@ module.exports = (app) => {
     const params = context.issue({ body: "Hello World!" });
 
     // Post a comment on the issue
-    await context.octokit.issues.createComment(params).then(
-      () => console.log("issue comment created"),
-      (error) => console.log("not ok", error)
-    );
+    await context.octokit.issues.createComment(params);
+    console.log("issue comment created");
   });
 };

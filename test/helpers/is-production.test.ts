@@ -1,4 +1,5 @@
-import { isProduction } from "../../src/helpers/is-production";
+import { isProduction } from "../../src/helpers/is-production.js";
+import { describe, expect, it } from "vitest";
 
 describe("isProduction", () => {
   it("returns true if the NODE_ENV is set to production", () => {
@@ -11,6 +12,6 @@ describe("isProduction", () => {
     (value) => {
       process.env.NODE_ENV = value;
       expect(isProduction()).toBe(false);
-    }
+    },
   );
 });

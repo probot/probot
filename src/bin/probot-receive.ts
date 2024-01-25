@@ -1,17 +1,18 @@
 // Usage: probot receive -e push -p path/to/payload app.js
+import fs from "node:fs";
+import path from "node:path";
+import { randomUUID as uuidv4 } from "node:crypto";
 
 import express, { Router } from "express";
+import { config as dotenvConfig } from "dotenv";
+dotenvConfig();
 
-require("dotenv").config();
-
-import path from "path";
-import { v4 as uuidv4 } from "uuid";
-import program from "commander";
+import { program } from "commander";
 import { getPrivateKey } from "@probot/get-private-key";
-import { getLog } from "../helpers/get-log";
+import { getLog } from "../helpers/get-log.js";
 
-import { ApplicationFunctionOptions, Probot } from "../";
-import { resolveAppFunction } from "../helpers/resolve-app-function";
+import { Probot, type ApplicationFunctionOptions } from "../index.js";
+import { resolveAppFunction } from "../helpers/resolve-app-function.js";
 
 async function main() {
   program
@@ -19,48 +20,48 @@ async function main() {
     .option(
       "-e, --event <event-name>",
       "Event name",
-      process.env.GITHUB_EVENT_NAME
+      process.env.GITHUB_EVENT_NAME,
     )
     .option(
       "-p, --payload-path <payload-path>",
       "Path to the event payload",
-      process.env.GITHUB_EVENT_PATH
+      process.env.GITHUB_EVENT_PATH,
     )
     .option(
       "-t, --token <access-token>",
       "Access token",
-      process.env.GITHUB_TOKEN
+      process.env.GITHUB_TOKEN,
     )
     .option("-a, --app <id>", "ID of the GitHub App", process.env.APP_ID)
     .option(
       "-P, --private-key <file>",
       "Path to private key file (.pem) for the GitHub App",
-      process.env.PRIVATE_KEY_PATH
+      process.env.PRIVATE_KEY_PATH,
     )
     .option(
       "-L, --log-level <level>",
       'One of: "trace" | "debug" | "info" | "warn" | "error" | "fatal"',
-      process.env.LOG_LEVEL
+      process.env.LOG_LEVEL,
     )
     .option(
       "--log-format <format>",
       'One of: "pretty", "json"',
-      process.env.LOG_LEVEL || "pretty"
+      process.env.LOG_LEVEL || "pretty",
     )
     .option(
       "--log-level-in-string",
       "Set to log levels (trace, debug, info, ...) as words instead of numbers (10, 20, 30, ...)",
-      process.env.LOG_LEVEL_IN_STRING === "true"
+      process.env.LOG_LEVEL_IN_STRING === "true",
     )
     .option(
       "--log-message-key",
       "Set to the string key for the 'message' in the log JSON object",
-      process.env.LOG_MESSAGE_KEY || "msg"
+      process.env.LOG_MESSAGE_KEY || "msg",
     )
     .option(
       "--sentry-dsn <dsn>",
       'Set to your Sentry DSN, e.g. "https://1234abcd@sentry.io/12345"',
-      process.env.SENTRY_DSN
+      process.env.SENTRY_DSN,
     )
     .option(
       "--base-url <url>",
@@ -69,38 +70,51 @@ async function main() {
         ? `${process.env.GHE_PROTOCOL || "https"}://${
             process.env.GHE_HOST
           }/api/v3`
-        : "https://api.github.com"
+        : "https://api.github.com",
     )
     .parse(process.argv);
 
-  const githubToken = program.token;
+  const {
+    app: appId,
+    baseUrl,
+    token: githubToken,
+    event,
+    payloadPath,
+    logLevel,
+    logFormat,
+    logLevelInString,
+    logMessageKey,
+    sentryDsn,
+  } = program.opts();
 
-  if (!program.event || !program.payloadPath) {
+  if (!event || !payloadPath) {
     program.help();
   }
 
   const privateKey = getPrivateKey();
-  if (!githubToken && (!program.app || !privateKey)) {
+  if (!githubToken && (!appId || !privateKey)) {
     console.warn(
-      "No token specified and no certificate found, which means you will not be able to do authenticated requests to GitHub"
+      "No token specified and no certificate found, which means you will not be able to do authenticated requests to GitHub",
     );
   }
 
-  const payload = require(path.resolve(program.payloadPath));
+  const payload = JSON.parse(
+    fs.readFileSync(path.resolve(payloadPath), "utf8"),
+  );
   const log = getLog({
-    level: program.logLevel,
-    logFormat: program.logFormat,
-    logLevelInString: program.logLevelInString,
-    logMessageKey: program.logMessageKey,
-    sentryDsn: program.sentryDsn,
+    level: logLevel,
+    logFormat,
+    logLevelInString,
+    logMessageKey,
+    sentryDsn,
   });
 
   const probot = new Probot({
-    appId: program.app,
+    appId,
     privateKey: String(privateKey),
     githubToken: githubToken,
     log,
-    baseUrl: program.baseUrl,
+    baseUrl: baseUrl,
   });
 
   const expressApp = express();
@@ -113,12 +127,12 @@ async function main() {
   };
 
   const appFn = await resolveAppFunction(
-    path.resolve(process.cwd(), program.args[0])
+    path.resolve(process.cwd(), program.args[0]),
   );
   await probot.load(appFn, options);
 
-  probot.log.debug("Receiving event", program.event);
-  probot.receive({ name: program.event, payload, id: uuidv4() }).catch(() => {
+  probot.log.debug("Receiving event", event);
+  probot.receive({ name: event, payload, id: uuidv4() }).catch(() => {
     // Process must exist non-zero to indicate that the action failed to run
     process.exit(1);
   });

@@ -1,13 +1,17 @@
 import { getPrivateKey } from "@probot/get-private-key";
-import { Options as PinoOptions, LogLevel } from "@probot/pino";
+import type { Options as PinoOptions, LogLevel } from "@probot/pino";
 
-export function readEnvOptions(
-  env: Record<string, string | undefined> = process.env
-) {
+export function readEnvOptions(env = process.env) {
   const privateKey = getPrivateKey({ env });
 
-  const logFormat =
-    env.LOG_FORMAT || (env.NODE_ENV === "production" ? "json" : "pretty");
+  const logFormat: PinoOptions["logFormat"] =
+    env.LOG_FORMAT && env.LOG_FORMAT.length !== 0
+      ? env.LOG_FORMAT === "pretty"
+        ? "pretty"
+        : "json"
+      : env.NODE_ENV === "production"
+        ? "json"
+        : "pretty";
 
   return {
     args: [],
@@ -19,7 +23,7 @@ export function readEnvOptions(
     webhookPath: env.WEBHOOK_PATH,
     webhookProxy: env.WEBHOOK_PROXY_URL,
     logLevel: env.LOG_LEVEL as LogLevel,
-    logFormat: logFormat as PinoOptions["logFormat"],
+    logFormat: logFormat,
     logLevelInString: env.LOG_LEVEL_IN_STRING === "true",
     logMessageKey: env.LOG_MESSAGE_KEY,
     sentryDsn: env.SENTRY_DSN,

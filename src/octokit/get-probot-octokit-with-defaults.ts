@@ -1,11 +1,13 @@
-import LRUCache from "lru-cache";
-import { ProbotOctokit } from "./probot-octokit";
-import Redis from "ioredis";
+import type { LRUCache } from "lru-cache";
+import { ProbotOctokit } from "./probot-octokit.js";
+import type { RedisOptions } from "ioredis";
+import { request } from "@octokit/request";
 
-import { getOctokitThrottleOptions } from "./get-octokit-throttle-options";
-import { aliasLog } from "../helpers/alias-log";
+import { getOctokitThrottleOptions } from "./get-octokit-throttle-options.js";
 
 import type { Logger } from "pino";
+import type { RequestRequestOptions } from "@octokit/types";
+import type { OctokitOptions } from "../types.js";
 
 type Options = {
   cache: LRUCache<number, string>;
@@ -14,8 +16,10 @@ type Options = {
   githubToken?: string;
   appId?: number;
   privateKey?: string;
-  redisConfig?: Redis.RedisOptions | string;
+  redisConfig?: RedisOptions | string;
+  webhookPath?: string;
   baseUrl?: string;
+  request?: RequestRequestOptions;
 };
 
 /**
@@ -32,11 +36,21 @@ export function getProbotOctokitWithDefaults(options: Options) {
   const authOptions = options.githubToken
     ? {
         token: options.githubToken,
+        request: request.defaults({
+          request: {
+            fetch: options.request?.fetch,
+          },
+        }),
       }
     : {
         cache: options.cache,
         appId: options.appId,
         privateKey: options.privateKey,
+        request: request.defaults({
+          request: {
+            fetch: options.request?.fetch,
+          },
+        }),
       };
 
   const octokitThrottleOptions = getOctokitThrottleOptions({
@@ -44,10 +58,10 @@ export function getProbotOctokitWithDefaults(options: Options) {
     redisConfig: options.redisConfig,
   });
 
-  let defaultOptions: any = {
+  let defaultOptions: Partial<OctokitOptions> = {
     auth: authOptions,
     log: options.log.child
-      ? aliasLog(options.log.child({ name: "octokit" }))
+      ? options.log.child({ name: "octokit" })
       : options.log,
   };
 
@@ -59,7 +73,7 @@ export function getProbotOctokitWithDefaults(options: Options) {
     defaultOptions.throttle = octokitThrottleOptions;
   }
 
-  return options.Octokit.defaults((instanceOptions: any) => {
+  return options.Octokit.defaults((instanceOptions: OctokitOptions) => {
     const options = Object.assign({}, defaultOptions, instanceOptions, {
       auth: instanceOptions.auth
         ? Object.assign({}, defaultOptions.auth, instanceOptions.auth)
@@ -70,7 +84,7 @@ export function getProbotOctokitWithDefaults(options: Options) {
       options.throttle = Object.assign(
         {},
         defaultOptions.throttle,
-        instanceOptions.throttle
+        instanceOptions.throttle,
       );
     }
 

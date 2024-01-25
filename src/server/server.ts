@@ -1,20 +1,23 @@
-import { Server as HttpServer } from "http";
+import type { Server as HttpServer } from "node:http";
+import { join } from "node:path";
 
-import express, { Application, Router } from "express";
-import { join } from "path";
-import { Logger } from "pino";
+import express, { Router, type Application } from "express";
+import type { Logger } from "pino";
 import { createNodeMiddleware as createWebhooksMiddleware } from "@octokit/webhooks";
 
-import { getLog } from "../helpers/get-log";
-import { getLoggingMiddleware } from "./logging-middleware";
-import { createWebhookProxy } from "../helpers/webhook-proxy";
-import { VERSION } from "../version";
-import { ApplicationFunction, ServerOptions } from "../types";
-import { Probot } from "../";
-import { engine } from "express-handlebars";
-import EventSource from "eventsource";
+import { getLoggingMiddleware } from "./logging-middleware.js";
+import { createWebhookProxy } from "../helpers/webhook-proxy.js";
+import { VERSION } from "../version.js";
+import type { ApplicationFunction, ServerOptions } from "../types.js";
+import type { Probot } from "../index.js";
+import type EventSource from "eventsource";
+import { rebindLog } from "../helpers/rebind-log.js";
+
+// the default path as defined in @octokit/webhooks
+export const defaultWebhooksPath = "/api/github/webhooks";
 
 type State = {
+  cwd?: string;
   httpServer?: HttpServer;
   port?: number;
   host?: string;
@@ -35,69 +38,66 @@ export class Server {
 
   constructor(options: ServerOptions = {} as ServerOptions) {
     this.expressApp = express();
-    this.log = options.log || getLog().child({ name: "server" });
-    this.probotApp = new options.Probot();
+    this.probotApp = new options.Probot({
+      request: options.request,
+    });
+    this.log = options.log
+      ? rebindLog(options.log)
+      : rebindLog(this.probotApp.log.child({ name: "server" }));
 
     this.state = {
+      cwd: options.cwd || process.cwd(),
       port: options.port,
       host: options.host,
-      webhookPath: options.webhookPath || "/",
+      webhookPath: options.webhookPath || defaultWebhooksPath,
       webhookProxy: options.webhookProxy,
     };
 
     this.expressApp.use(getLoggingMiddleware(this.log, options.loggingOptions));
     this.expressApp.use(
       "/probot/static/",
-      express.static(join(__dirname, "..", "..", "static"))
+      express.static(join(__dirname, "..", "..", "static")),
     );
     this.expressApp.use(
-      this.state.webhookPath,
       createWebhooksMiddleware(this.probotApp.webhooks, {
-        path: "/",
-      })
+        path: this.state.webhookPath,
+      }),
     );
 
-    this.expressApp.engine(
-      "handlebars",
-      engine({
-        defaultLayout: false,
-      })
-    );
-    this.expressApp.set("view engine", "handlebars");
-    this.expressApp.set("views", join(__dirname, "..", "..", "views"));
-    this.expressApp.get("/ping", (req, res) => res.end("PONG"));
+    this.expressApp.get("/ping", (_req, res) => res.end("PONG"));
   }
 
   public async load(appFn: ApplicationFunction) {
     await appFn(this.probotApp, {
+      cwd: this.state.cwd,
       getRouter: (path) => this.router(path),
     });
   }
 
   public async start() {
     this.log.info(
-      `Running Probot v${this.version} (Node.js: ${process.version})`
+      `Running Probot v${this.version} (Node.js: ${process.version})`,
     );
     const port = this.state.port || 3000;
     const { host, webhookPath, webhookProxy } = this.state;
     const printableHost = host ?? "localhost";
 
-    this.state.httpServer = (await new Promise((resolve, reject) => {
+    this.state.httpServer = await new Promise((resolve, reject) => {
       const server = this.expressApp.listen(
         port,
         ...((host ? [host] : []) as any),
-        () => {
+        async () => {
           if (webhookProxy) {
-            this.state.eventSource = createWebhookProxy({
+            this.state.eventSource = await createWebhookProxy({
               logger: this.log,
               path: webhookPath,
               port: port,
               url: webhookProxy,
-            }) as EventSource;
+            });
           }
           this.log.info(`Listening on http://${printableHost}:${port}`);
           resolve(server);
-        }
+        },
       );
 
       server.on("error", (error: NodeJS.ErrnoException) => {
@@ -110,7 +110,7 @@ export class Server {
         this.log.error(error);
         reject(error);
       });
-    })) as HttpServer;
+    });
 
     return this.state.httpServer;
   }

@@ -74,8 +74,8 @@
     "@types/node": "^20.0.0",
     "@types/resolve": "^1.20.5",
     "@types/supertest": "^6.0.0",
-    "@vitest/coverage-v8": "^0.34.6",
-    "@vitest/ui": "^0.34.6",
+    "@vitest/coverage-v8": "^1.0.0",
+    "@vitest/ui": "^1.0.0",
     "bottleneck": "^2.19.5",
     "connect-sse": "^1.2.0",
     "execa": "^5.0.0",
@@ -91,7 +91,7 @@
     "tsd": "^0.30.0",
     "typedoc": "^0.25.3",
     "typescript": "^5.2.2",
-    "vitest": "^0.34.6"
+    "vitest": "^1.0.0"
   },
   "engines": {
     "node": ">=18"

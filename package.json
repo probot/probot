@@ -83,7 +83,7 @@
     "get-port": "^5.1.1",
     "prettier": "^3.0.3",
     "rimraf": "^5.0.5",
-    "semantic-release": "^22.0.7",
+    "semantic-release": "^23.0.0",
     "semantic-release-plugin-update-version-in-files": "^1.1.0",
     "smee-client": "^2.0.0",
     "sonic-boom": "^3.7.0",

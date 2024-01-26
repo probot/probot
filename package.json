@@ -59,7 +59,7 @@
     "lru-cache": "^10.0.3",
     "octokit-auth-probot": "^2.0.0",
     "pino": "^8.16.1",
-    "pino-http": "^8.5.1",
+    "pino-http": "^9.0.0",
     "pkg-conf": "^3.1.0",
     "resolve": "^1.22.8",
     "update-dotenv": "^1.1.1"

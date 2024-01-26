@@ -1,4 +1,4 @@
-import {execa, ExecaChildProcess} from "execa";
+import { execa, ExecaChildProcess } from "execa";
 import getPort from "get-port";
 
 import { sign } from "@octokit/webhooks-methods";

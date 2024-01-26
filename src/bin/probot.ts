@@ -1,5 +1,5 @@
 import { resolve, dirname } from "node:path";
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from "node:url";
 
 import { program } from "commander";
 import { config as dotenvConfig } from "dotenv";

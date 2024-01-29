@@ -1,7 +1,7 @@
 /**
  * @param {import('../../lib').Probot} app
  */
-export default (app) => {
+module.exports = (app) => {
   // Your code here
   app.log.info("Yay! The app was loaded!");
 

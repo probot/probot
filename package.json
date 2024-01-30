@@ -10,8 +10,8 @@
   },
   "scripts": {
     "build": "rimraf lib && tsc -p tsconfig.json",
-    "lint": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\" \"docs/*.md\" *.md package.json tsconfig.json --end-of-line auto",
-    "lint:fix": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"docs/*.md\" *.md package.json tsconfig.json --end-of-line auto",
+    "lint": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\" \"docs/*.md\" *.md package.json --end-of-line auto",
+    "lint:fix": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"docs/*.md\" *.md package.json --end-of-line auto",
     "pretest": "npm run build && tsc --noEmit -p test",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",

@@ -17,8 +17,8 @@
     "resolveJsonModule": true,
     "allowJs": true,
     "lib": ["es2023", "dom"],
-    "moduleResolution": "node16",
+    "moduleResolution": "node16"
   },
   "include": ["src/**/*"],
-  "compileOnSave": false,
+  "compileOnSave": false
 }

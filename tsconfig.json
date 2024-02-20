@@ -12,7 +12,7 @@
     "esModuleInterop": true,
     "declaration": true,
     "allowJs": true,
-    "lib": ["es2023", "dom"],
+    "lib": ["es2023", "dom"]
   },
   "include": ["src/**/*"],
   "compileOnSave": false

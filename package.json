@@ -78,7 +78,7 @@
     "@vitest/ui": "^1.0.0",
     "bottleneck": "^2.19.5",
     "connect-sse": "^1.2.0",
-    "execa": "^5.0.0",
+    "execa": "^8.0.0",
     "fetch-mock": "npm:@gr2m/fetch-mock@9.11.0-pull-request-644.1",
     "get-port": "^5.1.1",
     "prettier": "^3.0.3",

@@ -16,7 +16,7 @@ Your Probot app has access to an authenticated [Octokit client](https://octokit.
 Here is an example of an autoresponder app that comments on opened issues:
 
 ```js
-module.exports = (app) => {
+export default (app) => {
   app.on("issues.opened", async (context) => {
     // `context` extracts information from the event, which can be passed to
     // GitHub API calls. This will return:
@@ -47,7 +47,7 @@ const addComment = `
   }
 `;
 
-module.exports = (app) => {
+export default (app) => {
   app.on("issues.opened", async (context) => {
     // Post a comment on the issue
     context.octokit.graphql(addComment, {
@@ -70,7 +70,7 @@ const pinIssue = `
   }
 `;
 
-module.exports = (app) => {
+export default (app) => {
   app.on("issues.opened", async (context) => {
     context.octokit.graphql(pinIssue, {
       id: context.payload.issue.node_id,

@@ -10,7 +10,7 @@ A clear and concise description of the behavior.
 
 ```js
 // Your code here
-module.exports = (app) => {
+export default (app) => {
   app.log.info("There is a bug");
 };
 ```

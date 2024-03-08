@@ -47,7 +47,7 @@ type RepoResultType<E extends WebhookEvents> = {
  * helpers for extracting information can be passed to GitHub API calls.
  *
  *  ```js
- *  module.exports = app => {
+ *  export default app => {
  *    app.on('push', context => {
  *      context.log.info('Code was pushed to the repo, what should we do with it?');
  *    });

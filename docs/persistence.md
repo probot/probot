@@ -45,7 +45,7 @@ For when you absolutely do need external data storage, here are some examples us
 ```js
 // PeopleSchema.js
 
-const mongoose = require("mongoose");
+import * as mongoose from "mongoose";
 
 const Schema = mongoose.Schema;
 
@@ -56,13 +56,13 @@ const PeopleSchema = new Schema({
   },
 });
 
-module.exports = mongoose.model("People", PeopleSchema);
+export default mongoose.model("People", PeopleSchema);
 ```
 
 ```js
 // index.js
 
-const mongoose = require("mongoose");
+import * as mongoose from "mongoose";
 
 // Connect to the Mongo database using credentials
 // in your environment variables
@@ -75,9 +75,9 @@ mongoose.connect(mongoUri, {
 });
 
 // Register the mongoose model
-const People = require("./PeopleSchema");
+import People from "./PeopleSchema.js";
 
-module.exports = (app) => {
+export default (app) => {
   app.on("issues.opened", async (context) => {
     // Find all the people in the database
     const people = await People.find().exec();
@@ -105,20 +105,20 @@ Using the [`@databases/mysql`](https://www.atdatabases.org/docs/mysql.html) modu
 
 ```js
 // connection.js
-const mysql = require("@databases/mysql");
+import { connect } from "@databases/mysql";
 
 // DATABASE_URL = mysql://my-user:my-password@localhost/my-db
 const connection = connect(process.env.DATABASE_URL);
 
-module.exports = connection;
+export default connection;
 ```
 
 ```js
 // index.js
-const { sql } = require("@databases/mysql");
-const connection = require("./connection");
+import { sql } from "@databases/mysql";
+import connection from "./connection.js";
 
-module.exports = (app) => {
+export default (app) => {
   app.on("issues.opened", async (context) => {
     // Find all the people in the database
     const people = await connection.query(sql`SELECT * FROM people`);
@@ -146,20 +146,20 @@ Using the [`@databases/pg`](https://www.atdatabases.org/docs/pg.html) module, we
 
 ```js
 // connection.js
-const mysql = require("@databases/pg");
+import { connect } from "@databases/pg";
 
 // DATABASE_URL = postgresql://my-user:my-password@localhost/my-db
 const connection = connect(process.env.DATABASE_URL);
 
-module.exports = connection;
+export default connection;
 ```
 
 ```js
 // index.js
-const { sql } = require("@databases/pg");
-const connection = require("./connection");
+import { sql } from "@databases/pg";
+import connection from "./connection.js";
 
-module.exports = (app) => {
+export default (app) => {
   app.on("issues.opened", async (context) => {
     // Find all the people in the database
     const people = await connection.query(sql`SELECT * FROM people`);
@@ -188,7 +188,7 @@ module.exports = (app) => {
 ```js
 // index.js
 
-const firebase = require("firebase");
+import * as firebase from "firebase";
 // Set the configuration for your app
 // TODO: Replace with your project's config object
 const config = {
@@ -200,7 +200,7 @@ firebase.initializeApp(config);
 
 const database = firebase.database();
 
-module.exports = (app) => {
+export default (app) => {
   app.on("issues.opened", async (context) => {
     // Find all the people in the database
     const people = await database

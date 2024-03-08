@@ -13,9 +13,9 @@ import { isProduction } from "./helpers/is-production.js";
 import { config as dotenvConfig } from "dotenv";
 
 type AdditionalOptions = {
-  env: NodeJS.ProcessEnv;
-  Octokit: typeof ProbotOctokit;
-  log: Logger;
+  env?: NodeJS.ProcessEnv;
+  Octokit?: typeof ProbotOctokit;
+  log?: Logger;
 };
 
 /**

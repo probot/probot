@@ -126,11 +126,11 @@ Probot runs like [any other Node app](https://devcenter.heroku.com/articles/depl
 When deploying your Probot app to a serverless/function environment, you don't need to worry about handling the http webhook requests coming from GitHub, the platform takes care of that. In many cases you can use [`createNodeMiddleware`](/docs/development/#use-createNodeMiddleware) directly, e.g. for Vercel or Google Cloud Function.
 
 ```js
-const { Probot, createProbot } = require("probot");
-const { createMyMiddleware } = require("my-probot-middleware");
-const myApp = require("./my-app.js");
+import { Probot, createProbot } from "probot";
+import { createMyMiddleware } from "my-probot-middleware";
+import myApp from "./my-app.js";
 
-module.exports = createMyMiddleware(myApp, { probot: createProbot() });
+export default createMyMiddleware(myApp, { probot: createProbot() });
 ```
 
 For other environments such as AWS Lambda, Netlify Functions or GitHub Actions, you can use one of [Probot's adapters](https://github.com/probot/?q=adapter).
@@ -139,13 +139,13 @@ For other environments such as AWS Lambda, Netlify Functions or GitHub Actions, 
 
 ```js
 // handler.js
-const {
+import {
   createLambdaFunction,
   createProbot,
-} = require("@probot/adapter-aws-lambda-serverless");
-const appFn = require("./app");
+} from "@probot/adapter-aws-lambda-serverless";
+import appFn from "./app.js";
 
-module.exports.webhooks = createLambdaFunction(appFn, {
+export const webhooks = createLambdaFunction(appFn, {
   probot: createProbot(),
 });
 ```
@@ -166,13 +166,13 @@ Please add yours!
 
 ```js
 // ProbotFunction/index.js
-const {
+import {
   createProbot,
   createAzureFunction,
-} = require("@probot/adapter-azure-functions");
-const app = require("../app");
+} from "@probot/adapter-azure-functions";
+import app from "../app.js";
 
-module.exports = createAzureFunction(app, { probot: createProbot() });
+export default createAzureFunction(app, { probot: createProbot() });
 ```
 
 Learn more
@@ -189,8 +189,8 @@ Please add yours!
 
 ```js
 // function.js
-const { createNodeMiddleware, createProbot } = require("probot");
-const app = require("./app");
+import { createNodeMiddleware, createProbot } from "probot";
+import app from "./app.js";
 
 exports.probotApp = createNodeMiddleware(app, { probot: createProbot() });
 ```
@@ -204,8 +204,8 @@ Please add yours!
 #### GitHub Actions
 
 ```js
-const { run } = require("@probot/adapter-github-actions");
-const app = require("./app");
+import { run } from "@probot/adapter-github-actions";
+import app from "./app.js";
 
 run(app);
 ```
@@ -258,7 +258,7 @@ Please add yours!
    /**
     * @param {import('probot').Probot} app
     */
-   module.exports = (app) => {
+   export default (app) => {
      app.log("Yay! The app was loaded!");
 
      app.on("issues.opened", async (context) => {
@@ -281,11 +281,11 @@ Please add yours!
 
 ```js
 // api/github/webhooks/index.js
-const { createNodeMiddleware, createProbot } = require("probot");
+import { createNodeMiddleware, createProbot } from "probot";
 
-const app = require("../../../app");
+import app from "../../../app.js";
 
-module.exports = createNodeMiddleware(app, {
+export default createNodeMiddleware(app, {
   probot: createProbot(),
   webhooksPath: "/api/github/webhooks",
 });
@@ -306,13 +306,13 @@ Please add yours!
 
 ```js
 // functions/index.js
-const {
+import {
   createLambdaFunction,
   createProbot,
-} = require("@probot/adapter-aws-lambda-serverless");
-const appFn = require("../src/app");
+} from "@probot/adapter-aws-lambda-serverless";
+import appFn from "../src/app";
 
-module.exports.handler = createLambdaFunction(appFn, {
+export const handler = createLambdaFunction(appFn, {
   probot: createProbot(),
 });
 ```
@@ -346,10 +346,10 @@ Note that this feature is only supported when [run as Node app](#as-node-app). F
 
 ```js
 // app.js
-const autoresponder = require("probot-autoresponder");
-const settings = require("probot-settings");
+import autoresponder from "probot-autoresponder";
+import settings from "probot-settings";
 
-module.exports = async (app, options) => {
+export default async (app, options) => {
   await autoresponder(app, options);
   await settings(app, options);
 };

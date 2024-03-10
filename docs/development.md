@@ -159,8 +159,8 @@ If you take a look to the `npm start` script, this is what it runs: `probot run 
 
 ```js
 // main.js
-const { run } = require("probot");
-const app = require("./index.js");
+import { run } from "probot";
+import app from "./index.js";
 
 // pass a probot app function
 run(app);
@@ -178,8 +178,8 @@ The [`run`](https://github.com/probot/probot/blob/master/src/run.ts) function th
 Among other things, using the Server instance permits you to set your own [`Octokit` constructor](https://github.com/octokit/core.js) with custom plugins and a custom logger.
 
 ```js
-const { Server, Probot } = require("probot");
-const app = require("./index.js");
+import { Server, Probot } from "probot";
+import app from "./index.js";
 
 async function startServer() {
   const server = new Server({
@@ -203,8 +203,8 @@ The `server` instance gives you access to the express app instance (`server.expr
 If you have your own server or deploy to a serverless environment that supports loading [Express-style middleware](https://expressjs.com/en/guide/using-middleware.html) or Node's http middleware (`(request, response) => { ... }`), you can use `createNodeMiddleware`.
 
 ```js
-const { createNodeMiddleware, Probot } = require("probot");
-const app = require("./index.js");
+import { createNodeMiddleware, Probot } from "probot";
+import app from "./index.js";
 
 const probot = new Probot({
   appId: 123,
@@ -212,22 +212,22 @@ const probot = new Probot({
   secret: "webhooksecret123",
 });
 
-module.exports = createNodeMiddleware(app, { probot });
+export default createNodeMiddleware(app, { probot });
 ```
 
 If you want to read probot's configuration from the same environment variables as [`run`](#run), use the [`createProbot`](https://probot.github.io/api/latest/index.html#createprobot) export
 
 ```js
-const { createNodeMiddleware, createProbot } = require("probot");
-const app = require("./index.js");
+import { createNodeMiddleware, createProbot } from "probot";
+import app from "./index.js";
 
-module.exports = createNodeMiddleware(app, { probot: createProbot() });
+export default createNodeMiddleware(app, { probot: createProbot() });
 ```
 
 By default, `createNodeMiddleware()` uses `/api/github/webhooks` as the webhook endpoint. To customize this behaviour, you can use the `webhooksPath` option.
 
 ```js
-module.exports = createNodeMiddleware(app, {
+export default createNodeMiddleware(app, {
   probot: createProbot(),
   webhooksPath: "/path/to/webhook/endpoint",
 });
@@ -238,8 +238,8 @@ module.exports = createNodeMiddleware(app, {
 If you don't use Probot's http handling in order to receive and verify events from GitHub via webhook requests, you can use the [`Probot`](https://probot.github.io/api/latest/classes/probot.Probot.html) class directly.
 
 ```js
-const { Probot } = require("probot");
-const app = require("./index.js");
+import { Probot } from "probot";
+import app from "./index.js";
 
 async function example() {
   const probot = new Probot({
@@ -266,7 +266,7 @@ Using the `Probot` class directly is great for [writing tests](/docs/testing) fo
 Sometimes you may need to create your own instance of Probot's internally used [Octokit](https://github.com/octokit/rest.js/#readme) class, for example when using the [OAuth user authorization flow](https://docs.github.com/en/developers/apps/identifying-and-authorizing-users-for-github-apps). You may access the class by importing `ProbotOctokit`:
 
 ```js
-const { ProbotOctokit } = require("probot");
+import { ProbotOctokit } from "probot";
 
 function myProbotApp(app) {
   const octokit = new ProbotOctokit({

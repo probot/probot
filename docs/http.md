@@ -10,12 +10,14 @@ When starting your app using `probot run ./app.js` or using the [`Server`](/docs
 Calling `getRouter('/my-app')` will return an [express](http://expressjs.com/) router that you can use to expose custom HTTP endpoints from your app.
 
 ```js
-module.exports = (app, { getRouter }) => {
+import * as express from "express";
+
+export default (app, { getRouter }) => {
   // Get an express router to expose new HTTP endpoints
   const router = getRouter("/my-app");
 
   // Use any middleware
-  router.use(require("express").static("public"));
+  router.use(express.static("public"));
 
   // Add a new route
   router.get("/hello-world", (req, res) => {

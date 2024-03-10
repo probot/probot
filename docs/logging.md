@@ -10,7 +10,7 @@ Probot comes with [`pino`](https://getpino.io), a minimal logging library that o
 `app.log`, `context.log` in an event handler, and `req.log` in an HTTP request are all loggers that you can use to get more information about what your app is doing.
 
 ```js
-module.exports = (app, { getRouter }) => {
+export default (app, { getRouter }) => {
   app.log.info("Yay, my app is loaded");
 
   app.on("issues.opened", (context) => {
@@ -34,7 +34,7 @@ When you start up your Probot app you should see your log message appear in your
 Occasionally you will want to log more detailed information that is useful for debugging, but you might not want to see it all the time.
 
 ```js
-module.exports = (app) => {
+export default (app) => {
   // …
   app.log.trace("Really low-level logging");
   app.log.debug({ data: "here" }, "End-line specs on the rotary girder");
@@ -63,7 +63,7 @@ When `NODE_ENV` is set (as it should be in production), the log output is struct
 For example, given this log:
 
 ```js
-module.exports = (app) => {
+export default (app) => {
   app.on("issue_comment.created", (context) => {
     context.log.info("Comment created");
   });

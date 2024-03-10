@@ -1,22 +1,17 @@
 {
   "extends": "@octokit/tsconfig",
   "compilerOptions": {
-    "module": "Node16",
     "verbatimModuleSyntax": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "noUnusedLocals": true,
     "pretty": true,
-    "strict": true,
     "sourceMap": true,
     "outDir": "./lib",
     "skipLibCheck": true,
     "noImplicitAny": true,
     "declaration": true,
-    "resolveJsonModule": true,
     "allowJs": true,
-    "lib": ["es2023", "dom"],
-    "moduleResolution": "node16"
+    "lib": ["es2023", "dom"]
   },
   "include": ["src/**/*"],
   "compileOnSave": false

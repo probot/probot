@@ -12,7 +12,7 @@ import type { State } from "./types.js";
  * to wait for the magic to happen.
  *
  * ```js
- *  module.exports = (app) => {
+ *  export default (app) => {
  *    app.on('issues.opened', async context => {
  *      const octokit = await app.auth();
  *    });

@@ -1,7 +1,7 @@
 import pkgConf from "pkg-conf";
 
 import type { ApplicationFunction, Options, ServerOptions } from "./types.js";
-import { Probot } from "./index.js";
+import { Logger, Probot, ProbotOctokit } from "./index.js";
 import { setupAppFactory } from "./apps/setup.js";
 import { getLog } from "./helpers/get-log.js";
 import { readCliOptions } from "./bin/read-cli-options.js";
@@ -13,7 +13,9 @@ import { isProduction } from "./helpers/is-production.js";
 import { config as dotenvConfig } from "dotenv";
 
 type AdditionalOptions = {
-  env: NodeJS.ProcessEnv;
+  env?: NodeJS.ProcessEnv;
+  Octokit?: typeof ProbotOctokit;
+  log?: Logger;
 };
 
 /**
@@ -70,7 +72,8 @@ export async function run(
     redisConfig,
     secret,
     baseUrl,
-    log: log.child({ name: "probot" }),
+    log: additionalOptions?.log || log.child({ name: "probot" }),
+    Octokit: additionalOptions?.Octokit || undefined,
   };
 
   const serverOptions: ServerOptions = {

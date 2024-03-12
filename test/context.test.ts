@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 import type { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
 import WebhookExamples from "@octokit/webhooks-examples";
@@ -10,6 +11,8 @@ import { describe, expect, test, beforeEach, it, vi } from "vitest";
 import { Context } from "../src/index.js";
 import { ProbotOctokit } from "../src/octokit/probot-octokit.js";
 import type { PushEvent } from "@octokit/webhooks-types";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const pushEventPayload = (
   (WebhookExamples as unknown as WebhookDefinition[]).filter(

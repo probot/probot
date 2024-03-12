@@ -17,7 +17,7 @@
 import { pino } from "pino";
 import type { Logger, LoggerOptions } from "pino";
 import { getTransformStream, type Options, type LogLevel } from "@probot/pino";
-import { rebindLog } from "./rebind-log";
+import { rebindLog } from "./rebind-log.js";
 
 export type GetLogOptions = {
   level?: LogLevel;

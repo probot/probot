@@ -111,5 +111,8 @@
         }
       ]
     ]
+  },
+  "publishConfig": {
+    "provenance": true
   }
 }

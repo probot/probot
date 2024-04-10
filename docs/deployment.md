@@ -291,6 +291,9 @@ export default createNodeMiddleware(app, {
 });
 ```
 
+**WARNING:** You should set Environment Variable with name `NODEJS_HELPERS` and value `0`, or vercel will try to parse the body before the `probot` receive it.
+See [Disable Helpers](https://vercel.com/docs/functions/runtimes/node-js#disabling-helpers-for-node.js) for detail.
+
 Examples
 
 - [probot/example-vercel](https://github.com/probot/example-vercel#readme)

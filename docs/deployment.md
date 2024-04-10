@@ -291,6 +291,9 @@ export default createNodeMiddleware(app, {
 });
 ```
 
+**Important:** Set `NODEJS_HELPERS` environment variable to `0` in order to prevent Vercel from parsing the response body.
+See [Disable Helpers](https://vercel.com/docs/functions/runtimes/node-js#disabling-helpers-for-node.js) for detail.
+
 Examples
 
 - [probot/example-vercel](https://github.com/probot/example-vercel#readme)

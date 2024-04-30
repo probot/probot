@@ -625,5 +625,21 @@ describe("Probot", () => {
         expect(error.message).toMatch(/error from app/);
       }
     });
+
+    it.only("passes logger to webhooks", async () => {
+      const probot = new Probot({
+        appId,
+        privateKey,
+        log: pino(streamLogsToOutput),
+      });
+
+      // @ts-expect-error
+      probot.on("unknown-event", () => {});
+
+      expect(output.length).toEqual(1);
+      expect(output[0].msg).toEqual(
+        '"unknown-event" is not a known webhook name (https://developer.github.com/v3/activity/events/types/)'
+      );
+    });
   });
 });

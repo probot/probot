@@ -133,7 +133,6 @@ describe("createProbot", () => {
       },
     });
     const outputData = await captureLogOutput(async () => {
-
       const octokit = await probot.auth();
       octokit.log.info("Ciao");
       // @ts-expect-error We need to access this private prop for debugging

@@ -55,7 +55,6 @@ describe("webhook-proxy", () => {
     });
 
     test("forwards events to server", (done) => {
-      console.log(`http://localhost:${targetPort}`);
       nock(`http://localhost:${targetPort}`)
         .post("/test")
         .reply(200, () => {

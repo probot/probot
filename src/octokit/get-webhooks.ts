@@ -11,6 +11,7 @@ export function getWebhooks(state: State) {
   //       > The context of the event that was triggered, including the payload and
   //         helpers for extracting information can be passed to GitHub API calls
   const webhooks = new Webhooks({
+    log: state.log,
     secret: state.webhooks.secret!,
     transform: webhookTransform.bind(null, state),
   });

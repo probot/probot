@@ -643,7 +643,7 @@ describe("Probot", () => {
       }
     });
 
-    it.only("passes logger to webhooks", async () => {
+    it("passes logger to webhooks", async () => {
       const probot = new Probot({
         appId,
         privateKey,

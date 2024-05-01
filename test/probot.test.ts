@@ -655,7 +655,7 @@ describe("Probot", () => {
 
       expect(output.length).toEqual(1);
       expect(output[0].msg).toEqual(
-        '"unknown-event" is not a known webhook name (https://developer.github.com/v3/activity/events/types/)'
+        '"unknown-event" is not a known webhook name (https://developer.github.com/v3/activity/events/types/)',
       );
     });
   });

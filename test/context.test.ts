@@ -41,7 +41,6 @@ type WebhookDefinition<
   >;
 };
 
-
 type PushEvent = GetWebhookEventPayload<"push">;
 
 const webhookExamples = WebhookExamples as unknown as WebhookDefinition[];

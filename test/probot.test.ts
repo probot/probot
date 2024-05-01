@@ -2,7 +2,7 @@ import Stream from "node:stream";
 
 import type {
   EmitterWebhookEvent as WebhookEvent,
-  EmitterWebhookEventName
+  EmitterWebhookEventName,
 } from "@octokit/webhooks";
 import Bottleneck from "bottleneck";
 import fetchMock from "fetch-mock";

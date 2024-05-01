@@ -166,6 +166,20 @@ import app from "./index.js";
 run(app);
 ```
 
+You can also set your own [`Octokit` constructor](https://github.com/octokit/core.js) with custom plugins and a custom logger while still reading default options from `.env`:
+
+```js
+// main.js
+import { run } from "probot";
+import app from "./index.js";
+
+// pass a probot app function by overriding Probot options
+run(app, {
+  Octokit: ProbotOctokit.plugin(myPlugin),
+  log: pino(),
+});
+```
+
 Now you can run `main.js` however you want.
 
 ### Use server
@@ -175,7 +189,7 @@ The [`run`](https://github.com/probot/probot/blob/master/src/run.ts) function th
 1. Read configuration from environment variables and local files
 2. Start a [`Server`](https://probot.github.io/api/latest/classes/server_server.Server.html) instance
 
-Among other things, using the Server instance permits you to set your own [`Octokit` constructor](https://github.com/octokit/core.js) with custom plugins and a custom logger.
+If you need more control over the Server instance, you can use the `Server` class directly:
 
 ```js
 import { Server, Probot } from "probot";

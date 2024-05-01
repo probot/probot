@@ -16,9 +16,11 @@ jobs:
           - 12
           - 14
         os:
-          - ubuntu-latest
-          - macos-latest
-          - windows-latest
+          # use runners that support the outdated node versions
+          # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
+          - ubuntu-20.04
+          - macos-11
+          - windows-2019
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2

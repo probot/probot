@@ -12,7 +12,7 @@ import nock from "nock";
 import { getLog } from "../src/helpers/get-log";
 import { createWebhookProxy } from "../src/helpers/webhook-proxy";
 
-const targetPort = 999999;
+const targetPort = 55555;
 
 interface SSEResponse extends Response {
   json(body: any, status?: string): this;

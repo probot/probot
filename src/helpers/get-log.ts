@@ -31,7 +31,7 @@ export function getLog(options: GetLogOptions = {}): Logger {
     messageKey: logMessageKey || "msg",
   };
   const transform = getTransformStream(getTransformStreamOptions);
-  // @ts-ignore TODO: check out what's wrong here
+  // @ts-expect-error TODO: check out what's wrong here
   transform.pipe(pino.destination(1));
   const log = pino(pinoOptions, transform);
 

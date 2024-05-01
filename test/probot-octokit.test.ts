@@ -35,7 +35,7 @@ describe("ProbotOctokit", () => {
     try {
       await octokit.request("/");
       throw new Error("should throw");
-    } catch (error) {
+    } catch (error: any) {
       expect(error.status).toBe(500);
     }
   });
@@ -104,14 +104,15 @@ describe("ProbotOctokit", () => {
     test("retries requests when hitting the abuse limiter", async () => {
       nock("https://api.github.com").get("/").once().reply(403, {
         message:
-          "The throttle plugin just looks for the word abuse in the error message",
+          "The throttle plugin just looks for 'secondary rate' in the error message",
       });
 
       nock("https://api.github.com").get("/").once().reply(200, {});
 
       const response = await octokit.request("/");
+
       expect(response.status).toBe(200);
-    });
+    }, 10_000);
   });
 
   describe("paginate", () => {

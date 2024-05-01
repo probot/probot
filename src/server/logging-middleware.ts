@@ -2,7 +2,10 @@ import pinoHttp from "pino-http";
 import type { Logger } from "pino";
 import { v4 as uuidv4 } from "uuid";
 
-export function getLoggingMiddleware(logger: Logger, options?: pinoHttp.Options) {
+export function getLoggingMiddleware(
+  logger: Logger,
+  options?: pinoHttp.Options
+) {
   return pinoHttp({
     ...options,
     logger: logger.child({ name: "http" }),

@@ -19,7 +19,7 @@ jobs:
           # use runners that support the outdated node versions
           # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
           - ubuntu-20.04
-          - macos-12
+          - macos-11
           - windows-2019
     runs-on: ${{ matrix.os }}
     steps:

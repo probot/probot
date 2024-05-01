@@ -223,17 +223,16 @@ export class Context<E extends WebhookEvents = WebhookEvents> {
   ): Promise<T | null> {
     const params = this.repo({
       path: path.posix.join(".github", fileName),
-      defaults(configs: object[]) {
+      defaults(configs: Record<string, unknown>[]) {
         const result = merge.all(
           [defaultConfig || {}, ...configs],
           deepMergeOptions,
         );
 
-        return result;
+        return result as Record<string, unknown>;
       },
     });
 
-    // @ts-expect-error
     const { config, files } = await this.octokit.config.get(params);
 
     // if no default config is set, and no config files are found, return null

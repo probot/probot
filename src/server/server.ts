@@ -1,5 +1,6 @@
 import type { Server as HttpServer } from "node:http";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import express, { Router, type Application } from "express";
 import type { Logger } from "pino";
@@ -15,6 +16,8 @@ import { rebindLog } from "../helpers/rebind-log.js";
 
 // the default path as defined in @octokit/webhooks
 export const defaultWebhooksPath = "/api/github/webhooks";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 type State = {
   cwd?: string;

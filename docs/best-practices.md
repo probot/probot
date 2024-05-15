@@ -8,7 +8,7 @@ First and foremost, your app must obey the [The Three Laws of Robotics](https://
 
 > 0. A robot may not harm humanity, or through inaction allow humanity to come to harm.
 > 1. A robot may not injure a human being or, through inaction, allow a human being to come to harm.
-> 2. A robot must obey the orders given it by human beings except where such orders would conflict with the First Law.
+> 2. A robot must obey the orders given to it by human beings except where such orders would conflict with the First Law.
 > 3. A robot must protect its own existence as long as such protection does not conflict with the First or Second Laws.
 
 Now that we agree that nobody will get hurt, here are some tips to make your app more effective.
@@ -50,13 +50,13 @@ Your app should be empathetic, but it shouldn't pretend to be human. It is an ap
 
 ### Never take bulk actions without explicit permission
 
-Being installed on an account is sufficient permission for actions in response to a user action, like replying on a single issue. But a app _must_ have explicit permission before performing bulk actions, like labeling all open issues.
+Being installed on an account is sufficient permission for actions in response to a user action, like replying on a single issue. But an app _must_ have explicit permission before performing bulk actions, like labeling all open issues.
 
 For example, the [stale](https://github.com/probot/stale) app will only scan a target repository for stale issues and pull requests if `.github/stale.yml` exists in that target repository.
 
 ### Include "dry run" functionality
 
-A dry run is when a app, instead of actually taking an action, only logs what actions it would have taken if it wasn't a dry run. A app _must_ offer a dry run feature if it does anything destructive and _should_ offer a dry run feature in all cases.
+A dry run is when an app, instead of actually taking an action, only logs what actions it would have taken if it wasn't a dry run. An app _must_ offer a dry run feature if it does anything destructive and _should_ offer a dry run feature in all cases.
 
 For example, the [stale](https://github.com/probot/stale) app will perform a dry run if there is no `.github/stale.yml` file in the target repository.
 
@@ -76,7 +76,7 @@ Any configuration _should_ be stored in the target repository. Unless the app is
 
 `context.config` supports sharing configs between repositories. If configuration for your app is not available in the target repository, it will be loaded from the `.github` directory of the target organization's `.github` repository.
 
-User's can also choose their own shared location. Use the `_extends` option in the configuration file to extend settings from another repository.
+Users can also choose their own shared location. Use the `_extends` option in the configuration file to extend settings from another repository.
 
 For example, given `.github/test.yml`:
 

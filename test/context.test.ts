@@ -33,9 +33,9 @@ describe("Context", () => {
   };
   let octokit = {
     hook: {
-      before: jest.fn()
-    }
-  }
+      before: jest.fn(),
+    },
+  };
   let context: Context<"push"> = new Context<"push">(
     event,
     octokit as any,
@@ -58,9 +58,9 @@ describe("Context", () => {
 
       let octokit = {
         hook: {
-          before: jest.fn()
-        }
-      }
+          before: jest.fn(),
+        },
+      };
       context = new Context<"push">(event, octokit as any, {} as any);
     });
 
@@ -94,9 +94,9 @@ describe("Context", () => {
 
       let octokit = {
         hook: {
-          before: jest.fn()
-        }
-      }
+          before: jest.fn(),
+        },
+      };
       context = new Context<"push">(event, octokit as any, {} as any);
       expect(context.repo()).toEqual({ owner: "bkeepers-inc", repo: "test" });
     });
@@ -110,9 +110,9 @@ describe("Context", () => {
 
       let octokit = {
         hook: {
-          before: jest.fn()
-        }
-      }
+          before: jest.fn(),
+        },
+      };
       context = new Context<"push">(event, octokit as any, {} as any);
       try {
         context.repo();
@@ -136,9 +136,9 @@ describe("Context", () => {
 
       let octokit = {
         hook: {
-          before: jest.fn()
-        }
-      }
+          before: jest.fn(),
+        },
+      };
       context = new Context<"issues">(event, octokit as any, {} as any);
     });
     it("returns attributes from repository payload", () => {
@@ -180,9 +180,9 @@ describe("Context", () => {
 
       let octokit = {
         hook: {
-          before: jest.fn()
-        }
-      }
+          before: jest.fn(),
+        },
+      };
       context = new Context<"pull_request">(event, octokit as any, {} as any);
     });
     it("returns attributes from repository payload", () => {
@@ -288,7 +288,7 @@ describe("Context", () => {
 
       await context.config("test-file.yml");
       expect(mock.activeMocks()).toStrictEqual([]);
-    })
+    });
   });
 
   describe("isBot", () => {
@@ -296,9 +296,9 @@ describe("Context", () => {
       event.payload.sender.type = "Bot";
       let octokit = {
         hook: {
-          before: jest.fn()
-        }
-      }
+          before: jest.fn(),
+        },
+      };
       context = new Context(event, octokit as any, {} as any);
 
       expect(context.isBot).toBe(true);
@@ -308,9 +308,9 @@ describe("Context", () => {
       event.payload.sender.type = "User";
       let octokit = {
         hook: {
-          before: jest.fn()
-        }
-      }
+          before: jest.fn(),
+        },
+      };
       context = new Context(event, octokit as any, {} as any);
 
       expect(context.isBot).toBe(false);

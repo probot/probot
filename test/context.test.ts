@@ -31,9 +31,14 @@ describe("Context", () => {
     name: "push",
     payload: pushEventPayload,
   };
+  let octokit = {
+    hook: {
+      before: jest.fn()
+    }
+  }
   let context: Context<"push"> = new Context<"push">(
     event,
-    {} as any,
+    octokit as any,
     {} as any
   );
 
@@ -51,7 +56,12 @@ describe("Context", () => {
         payload: pushEventPayload,
       };
 
-      context = new Context<"push">(event, {} as any, {} as any);
+      let octokit = {
+        hook: {
+          before: jest.fn()
+        }
+      }
+      context = new Context<"push">(event, octokit as any, {} as any);
     });
 
     it("returns attributes from repository payload", () => {
@@ -82,7 +92,12 @@ describe("Context", () => {
     it("properly handles the push event", () => {
       event.payload = require("./fixtures/webhook/push") as PushEvent;
 
-      context = new Context<"push">(event, {} as any, {} as any);
+      let octokit = {
+        hook: {
+          before: jest.fn()
+        }
+      }
+      context = new Context<"push">(event, octokit as any, {} as any);
       expect(context.repo()).toEqual({ owner: "bkeepers-inc", repo: "test" });
     });
 
@@ -93,7 +108,12 @@ describe("Context", () => {
         payload: { ...pushEventPayload, repository: undefined as any },
       };
 
-      context = new Context<"push">(event, {} as any, {} as any);
+      let octokit = {
+        hook: {
+          before: jest.fn()
+        }
+      }
+      context = new Context<"push">(event, octokit as any, {} as any);
       try {
         context.repo();
       } catch (e: any) {
@@ -114,7 +134,12 @@ describe("Context", () => {
         payload: issuesEventPayload,
       };
 
-      context = new Context<"issues">(event, {} as any, {} as any);
+      let octokit = {
+        hook: {
+          before: jest.fn()
+        }
+      }
+      context = new Context<"issues">(event, octokit as any, {} as any);
     });
     it("returns attributes from repository payload", () => {
       expect(context.issue()).toEqual({
@@ -153,7 +178,12 @@ describe("Context", () => {
         payload: pullRequestEventPayload,
       };
 
-      context = new Context<"pull_request">(event, {} as any, {} as any);
+      let octokit = {
+        hook: {
+          before: jest.fn()
+        }
+      }
+      context = new Context<"pull_request">(event, octokit as any, {} as any);
     });
     it("returns attributes from repository payload", () => {
       expect(context.pullRequest()).toEqual({
@@ -246,19 +276,42 @@ describe("Context", () => {
       expect(customMerge).toHaveBeenCalled();
       expect(mock.activeMocks()).toStrictEqual([]);
     });
+
+    it("sets x-github-delivery header to event id", async () => {
+      const mock = nock("https://api.github.com", {
+        reqheaders: {
+          "x-github-delivery": event.id,
+        },
+      })
+        .get("/repos/Codertocat/Hello-World/contents/.github%2Ftest-file.yml")
+        .reply(200, nockConfigResponseDataFile("basic.yml"));
+
+      await context.config("test-file.yml");
+      expect(mock.activeMocks()).toStrictEqual([]);
+    })
   });
 
   describe("isBot", () => {
     test("returns true if sender is a bot", () => {
       event.payload.sender.type = "Bot";
-      context = new Context(event, {} as any, {} as any);
+      let octokit = {
+        hook: {
+          before: jest.fn()
+        }
+      }
+      context = new Context(event, octokit as any, {} as any);
 
       expect(context.isBot).toBe(true);
     });
 
     test("returns false if sender is not a bot", () => {
       event.payload.sender.type = "User";
-      context = new Context(event, {} as any, {} as any);
+      let octokit = {
+        hook: {
+          before: jest.fn()
+        }
+      }
+      context = new Context(event, octokit as any, {} as any);
 
       expect(context.isBot).toBe(false);
     });

@@ -10,7 +10,6 @@ We highly recommend working in the style of [test-driven development](http://agi
 For our testing examples, we use [jest](https://facebook.github.io/jest/), but there are other options that can perform similar operations. We also recommend using [nock](https://github.com/nock/nock), a tool for mocking HTTP requests, which is often crucial to testing in Probot, considering how much of Probot depends on GitHub's APIs. Here's an example of creating an app instance and using nock to test that we correctly hit the GitHub API:
 
 ```js
-import {OctokitOptions} from "probot/lib/types";
 import nock from "nock";
 // Requiring our app implementation
 import myProbotApp from "../index.js";
@@ -27,7 +26,7 @@ describe("My Probot app", () => {
     probot = new Probot({
       githubToken: "test",
       // Disable throttling & retrying requests for easier testing
-      Octokit: ProbotOctokit.defaults((instanceOptions:OctokitOptions):OctokitOptions =>{
+      Octokit: ProbotOctokit.defaults((instanceOptions: any) =>{
           return {
               ...instanceOptions,
               retry: { enabled: false },

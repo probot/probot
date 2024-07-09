@@ -16,7 +16,7 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:dev": "vitest --ui --coverage",
-    "doc": "typedoc --options .typedoc.json"
+    "doc": "typedoc --options .typedoc.json --plugin .typedoc/typedoc_ga.mjs"
   },
   "files": [
     "lib",

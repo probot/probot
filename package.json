@@ -82,7 +82,7 @@
     "fetch-mock": "npm:@gr2m/fetch-mock@9.11.0-pull-request-644.1",
     "get-port": "^5.1.1",
     "prettier": "^3.0.3",
-    "rimraf": "^5.0.5",
+    "rimraf": "^6.0.0",
     "semantic-release": "^24.0.0",
     "semantic-release-plugin-update-version-in-files": "^1.1.0",
     "smee-client": "^2.0.0",

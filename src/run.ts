@@ -1,4 +1,4 @@
-import { packageConfig } from "pkg-conf";
+import { packageConfig } from "package-config";
 
 import type { ApplicationFunction, Options, ServerOptions } from "./types.js";
 import { Logger, Probot, ProbotOctokit } from "./index.js";

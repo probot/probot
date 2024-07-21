@@ -1,3 +1,7 @@
+import { createRequire } from 'node:module';
+
+// Replace with import.meta.resolve when available in all supported Node.js versions
+const require = createRequire(import.meta.url);
 export const resolveAppFunction = async (
   appFnId: string,
   opts = {} as ResolveOptions,

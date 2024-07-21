@@ -16,7 +16,7 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:dev": "vitest --ui --coverage",
-    "doc": "typedoc --options .typedoc.json"
+    "doc": "typedoc --options .typedoc.json --plugin .typedoc/typedoc_ga.mjs"
   },
   "files": [
     "lib",
@@ -53,16 +53,14 @@
     "commander": "^12.0.0",
     "deepmerge": "^4.3.1",
     "dotenv": "^16.3.1",
-    "eventsource": "^2.0.2",
     "express": "^4.18.2",
     "ioredis": "^5.3.2",
     "js-yaml": "^4.1.0",
     "lru-cache": "^10.0.3",
     "octokit-auth-probot": "^2.0.0",
-    "pino": "^8.16.1",
-    "pino-http": "^9.0.0",
+    "pino": "^9.0.0",
+    "pino-http": "^10.0.0",
     "pkg-conf": "^5.0.0",
-    "resolve": "^1.22.8",
     "update-dotenv": "^1.1.1"
   },
   "devDependencies": {
@@ -70,28 +68,26 @@
     "@octokit/tsconfig": "^3.0.0",
     "@octokit/webhooks-examples": "^7.3.1",
     "@octokit/webhooks-methods": "^5.1.0",
-    "@types/eventsource": "^1.1.15",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^20.0.0",
-    "@types/resolve": "^1.20.5",
     "@types/supertest": "^6.0.0",
-    "@vitest/coverage-v8": "^1.0.0",
-    "@vitest/ui": "^1.0.0",
+    "@vitest/coverage-v8": "^2.0.0",
+    "@vitest/ui": "^2.0.0",
     "connect-sse": "^1.2.0",
     "execa": "^8.0.1",
     "fetch-mock": "npm:@gr2m/fetch-mock@9.11.0-pull-request-644.1",
     "get-port": "^7.0.0",
     "prettier": "^3.0.3",
-    "rimraf": "^5.0.5",
-    "semantic-release": "^23.0.0",
+    "rimraf": "^6.0.0",
+    "semantic-release": "^24.0.0",
     "semantic-release-plugin-update-version-in-files": "^1.1.0",
     "smee-client": "^2.0.0",
     "sonic-boom": "^4.0.0",
     "supertest": "^7.0.0",
     "tsd": "^0.31.0",
-    "typedoc": "^0.25.3",
+    "typedoc": "^0.26.0",
     "typescript": "^5.2.2",
-    "vitest": "^1.0.0"
+    "vitest": "^2.0.0"
   },
   "engines": {
     "node": ">=18"

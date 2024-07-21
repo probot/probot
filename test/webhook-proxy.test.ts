@@ -9,7 +9,6 @@ const sse: (
   next: express.NextFunction,
 ) => void = require("connect-sse")();
 import fetchMock from "fetch-mock";
-import EventSource from "eventsource";
 import { describe, expect, afterEach, test, vi } from "vitest";
 import { getLog } from "../src/helpers/get-log.js";
 import { createWebhookProxy } from "../src/helpers/webhook-proxy.js";

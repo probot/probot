@@ -1,6 +1,6 @@
 import { symbols as pinoSymbols } from "pino";
 import type { Logger } from "pino";
-import { type SpyInstance, vi } from "vitest";
+import { type MockInstance, vi } from "vitest";
 
 export async function captureLogOutput(
   action: () => any,
@@ -8,7 +8,7 @@ export async function captureLogOutput(
 ): Promise<string> {
   let outputData = "";
 
-  const stdoutSpy: SpyInstance = vi.spyOn(
+  const stdoutSpy: MockInstance = vi.spyOn(
     // @ts-expect-error
     log[pinoSymbols.streamSym],
     "write",

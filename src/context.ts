@@ -73,6 +73,16 @@ export class Context<E extends WebhookEvents = WebhookEvents> {
 
     this.octokit = octokit;
     this.log = log;
+
+    // set `x-github-delivery` header on all requests sent in response to the current
+    // event. This allows GitHub Support to correlate the request with the event.
+    // This is not documented and not considered public API, the header may change.
+    // Once we document this as best practice on https://docs.github.com/en/rest/guides/best-practices-for-integrators
+    // we will make it official
+    /* istanbul ignore next */
+    octokit.hook.before("request", (options) => {
+      options.headers["x-github-delivery"] = event.id;
+    });
   }
 
   /**

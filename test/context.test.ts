@@ -66,9 +66,14 @@ describe("Context", () => {
     name: "push",
     payload: pushEventPayload,
   };
+  let octokit = {
+    hook: {
+      before: vi.fn(),
+    },
+  };
   let context: Context<"push"> = new Context<"push">(
     event,
-    {} as any,
+    octokit as any,
     {} as any,
   );
 
@@ -85,8 +90,13 @@ describe("Context", () => {
         name: "push",
         payload: pushEventPayload,
       };
+      let octokit = {
+        hook: {
+          before: vi.fn(),
+        },
+      };
 
-      context = new Context<"push">(event, {} as any, {} as any);
+      context = new Context<"push">(event, octokit as any, {} as any);
     });
 
     it("returns attributes from repository payload", () => {
@@ -116,8 +126,13 @@ describe("Context", () => {
     // https://docs.github.com/en/developers/webhooks-and-events/webhook-events-and-payloads#push
     it("properly handles the push event", () => {
       event.payload = require("./fixtures/webhook/push") as PushEvent;
+      let octokit = {
+        hook: {
+          before: vi.fn(),
+        },
+      };
 
-      context = new Context<"push">(event, {} as any, {} as any);
+      context = new Context<"push">(event, octokit as any, {} as any);
       expect(context.repo()).toEqual({ owner: "bkeepers-inc", repo: "test" });
     });
 
@@ -127,8 +142,13 @@ describe("Context", () => {
         name: "push",
         payload: { ...pushEventPayload, repository: undefined as any },
       };
+      let octokit = {
+        hook: {
+          before: vi.fn(),
+        },
+      };
 
-      context = new Context<"push">(event, {} as any, {} as any);
+      context = new Context<"push">(event, octokit as any, {} as any);
       try {
         context.repo();
       } catch (e) {
@@ -148,8 +168,13 @@ describe("Context", () => {
         name: "issues",
         payload: issuesEventPayload,
       };
+      let octokit = {
+        hook: {
+          before: vi.fn(),
+        },
+      };
 
-      context = new Context<"issues">(event, {} as any, {} as any);
+      context = new Context<"issues">(event, octokit as any, {} as any);
     });
     it("returns attributes from repository payload", () => {
       expect(context.issue()).toEqual({
@@ -187,8 +212,13 @@ describe("Context", () => {
         name: "pull_request",
         payload: pullRequestEventPayload,
       };
+      let octokit = {
+        hook: {
+          before: vi.fn(),
+        },
+      };
 
-      context = new Context<"pull_request">(event, {} as any, {} as any);
+      context = new Context<"pull_request">(event, octokit as any, {} as any);
     });
     it("returns attributes from repository payload", () => {
       expect(context.pullRequest()).toEqual({
@@ -321,19 +351,49 @@ describe("Context", () => {
       await context.config("test-file.yml", {}, { arrayMerge: customMerge });
       expect(customMerge).toHaveBeenCalled();
     });
+
+    it("sets x-github-delivery header to event id", async () => {
+      const fetch = fetchMock.sandbox().getOnce((_url, { headers }) => {
+        expect(
+          // @ts-expect-error
+          headers["x-github-delivery"],
+        ).toBe("0");
+        return true;
+      }, getConfigFile("basic.yml"));
+
+      const octokit = new ProbotOctokit({
+        retry: { enabled: false },
+        throttle: { enabled: false },
+        request: {
+          fetch,
+        },
+      });
+      const context = new Context(event, octokit, {} as any);
+      await context.config("test-file.yml");
+    });
   });
 
   describe("isBot", () => {
     test("returns true if sender is a bot", () => {
       event.payload.sender!.type = "Bot";
-      context = new Context(event, {} as any, {} as any);
+      let octokit = {
+        hook: {
+          before: vi.fn(),
+        },
+      };
+      context = new Context(event, octokit as any, {} as any);
 
       expect(context.isBot).toBe(true);
     });
 
     test("returns false if sender is not a bot", () => {
       event.payload.sender!.type = "User";
-      context = new Context(event, {} as any, {} as any);
+      let octokit = {
+        hook: {
+          before: vi.fn(),
+        },
+      };
+      context = new Context(event, octokit as any, {} as any);
 
       expect(context.isBot).toBe(false);
     });

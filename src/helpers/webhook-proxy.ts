@@ -1,5 +1,3 @@
-import EventSource from "eventsource";
-
 import type { Logger } from "pino";
 
 export const createWebhookProxy = async (
@@ -13,7 +11,7 @@ export const createWebhookProxy = async (
       target: `http://localhost:${opts.port}${opts.path}`,
       fetch: opts.fetch,
     });
-    return smee.start();
+    return smee.start() as EventSource;
   } catch (error) {
     opts.logger.warn(
       "Run `npm install --save-dev smee-client` to proxy webhooks to localhost.",

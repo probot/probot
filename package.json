@@ -58,9 +58,9 @@
     "js-yaml": "^4.1.0",
     "lru-cache": "^10.0.3",
     "octokit-auth-probot": "^3.0.0",
+    "package-config": "^5.0.0",
     "pino": "^9.0.0",
     "pino-http": "^10.0.0",
-    "package-config": "^5.0.0",
     "update-dotenv": "^1.1.1"
   },
   "devDependencies": {

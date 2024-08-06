@@ -76,7 +76,7 @@
     "connect-sse": "^1.2.0",
     "execa": "^5.0.0",
     "fetch-mock": "^11.0.0",
-    "get-port": "^5.1.1",
+    "get-port": "^7.0.0",
     "prettier": "^3.0.3",
     "rimraf": "^6.0.0",
     "semantic-release": "^24.0.0",

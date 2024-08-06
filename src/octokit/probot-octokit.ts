@@ -10,6 +10,7 @@ import { createProbotAuth } from "octokit-auth-probot";
 
 import { probotRequestLogging } from "./octokit-plugin-probot-request-logging.js";
 import { VERSION } from "../version.js";
+import type { Constructor } from "../probot.js";
 
 const defaultOptions = {
   authStrategy: createProbotAuth,
@@ -38,8 +39,13 @@ const defaultOptions = {
   },
   userAgent: `probot/${VERSION}`,
 };
-
-export const ProbotOctokit = Octokit.plugin(
+export const ProbotOctokit: typeof Octokit &
+  Constructor<
+    ReturnType<typeof retry> &
+      ReturnType<typeof paginateRest> &
+      ReturnType<typeof legacyRestEndpointMethods> &
+      ReturnType<typeof config>
+  > = Octokit.plugin(
   throttling,
   retry,
   paginateRest,

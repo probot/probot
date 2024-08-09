@@ -1,4 +1,4 @@
-import pkgConf from "pkg-conf";
+juntylpro1-patch-1https://github.com/juntylpro1/core.js/pull/1#issue-2458722294.github/dependabot.ymlimport pkgConf from "pkg-conf";
 
 import type { ApplicationFunction, Options, ServerOptions } from "./types.js";
 import { Logger, Probot, ProbotOctokit } from "./index.js";

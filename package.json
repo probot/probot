@@ -69,6 +69,7 @@
     "@octokit/tsconfig": "^3.0.0",
     "@octokit/webhooks-examples": "^7.3.1",
     "@octokit/webhooks-methods": "^5.1.0",
+    "@sebbo2002/semantic-release-jsr": "^2.0.1",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^20.0.0",
     "@types/supertest": "^6.0.0",
@@ -106,7 +107,11 @@
             "lib/version.*"
           ]
         }
-      ]
+      ],
+      ["@sebbo2002/semantic-release-jsr",{
+        "publishArgs": ["--provenance"]
+      }]
+
     ]
   },
   "type": "module",

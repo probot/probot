@@ -22,7 +22,11 @@ export type Constructor<T = any> = new (...args: any[]) => T;
 
 export class Probot {
   static version = VERSION;
-  static defaults<S extends Constructor>(this: S, defaults: Options) {
+  static defaults<S extends Constructor>(this: S, defaults: Options): {
+        new (...args: any[]): {
+            [x: string]: any;
+        };
+    } & S {
     const ProbotWithDefaults = class extends this {
       constructor(...args: any[]) {
         const options = args[0] || {};
@@ -115,7 +119,7 @@ export class Probot {
     this.version = VERSION;
   }
 
-  public receive(event: WebhookEvent) {
+  public receive(event: WebhookEvent): Promise<void> {
     this.log.debug({ event }, "Webhook received");
     return this.webhooks.receive(event);
   }
@@ -123,7 +127,7 @@ export class Probot {
   public async load(
     appFn: ApplicationFunction | ApplicationFunction[],
     options: ApplicationFunctionOptions = {},
-  ) {
+  ): Promise<void> {
     if (Array.isArray(appFn)) {
       for (const fn of appFn) {
         await this.load(fn);

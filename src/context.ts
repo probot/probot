@@ -171,7 +171,7 @@ export class Context<E extends WebhookEvents = WebhookEvents> {
    * Returns a boolean if the actor on the event was a bot.
    * @type {boolean}
    */
-  get isBot() {
+  get isBot(): boolean {
     // @ts-expect-error - `sender` key is currently not present in all events
     // see https://github.com/octokit/webhooks/issues/510
     return this.payload.sender.type === "Bot";

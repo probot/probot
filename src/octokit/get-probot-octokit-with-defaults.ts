@@ -32,7 +32,9 @@ type Options = {
  * Besides the authentication, the Octokit's baseUrl is set as well when run
  * against a GitHub Enterprise Server with a custom domain.
  */
-export function getProbotOctokitWithDefaults(options: Options) {
+export function getProbotOctokitWithDefaults(
+  options: Options,
+): typeof ProbotOctokit {
   const authOptions = options.githubToken
     ? {
         token: options.githubToken,

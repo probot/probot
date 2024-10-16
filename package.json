@@ -108,10 +108,14 @@
           ]
         }
       ],
-      ["@sebbo2002/semantic-release-jsr",{
-        "publishArgs": ["--provenance"]
-      }]
-
+      [
+        "@sebbo2002/semantic-release-jsr",
+        {
+          "publishArgs": [
+            "--provenance"
+          ]
+        }
+      ]
     ]
   },
   "type": "module",

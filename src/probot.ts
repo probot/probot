@@ -22,11 +22,14 @@ export type Constructor<T = any> = new (...args: any[]) => T;
 
 export class Probot {
   static version = VERSION;
-  static defaults<S extends Constructor>(this: S, defaults: Options): {
-        new (...args: any[]): {
-            [x: string]: any;
-        };
-    } & S {
+  static defaults<S extends Constructor>(
+    this: S,
+    defaults: Options,
+  ): {
+    new (...args: any[]): {
+      [x: string]: any;
+    };
+  } & S {
     const ProbotWithDefaults = class extends this {
       constructor(...args: any[]) {
         const options = args[0] || {};

@@ -39,7 +39,7 @@ export function createProbot({
   overrides = {},
   defaults = {},
   env = process.env,
-}: CreateProbotOptions = {}) {
+}: CreateProbotOptions = {}): Probot {
   const privateKey = getPrivateKey({ env });
   const envWithDefaults = { ...DEFAULTS, ...env };
 

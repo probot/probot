@@ -25,7 +25,7 @@ type AdditionalOptions = {
 export async function run(
   appFnOrArgv: ApplicationFunction | string[],
   additionalOptions?: AdditionalOptions,
-) {
+): Promise<Server> {
   dotenvConfig();
 
   const envOptions = readEnvOptions(additionalOptions?.env);

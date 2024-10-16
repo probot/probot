@@ -76,7 +76,7 @@ export class Server {
     });
   }
 
-  public async start() {
+  public async start(): Promise<HttpServer> {
     this.log.info(
       `Running Probot v${this.version} (Node.js: ${process.version})`,
     );
@@ -117,14 +117,14 @@ export class Server {
     return this.state.httpServer;
   }
 
-  public async stop() {
+  public async stop(): Promise<unknown> {
     if (this.state.eventSource) this.state.eventSource.close();
     if (!this.state.httpServer) return;
     const server = this.state.httpServer;
     return new Promise((resolve) => server.close(resolve));
   }
 
-  public router(path: string = "/") {
+  public router(path: string = "/"): Router {
     const newRouter = Router();
     this.expressApp.use(path, newRouter);
     return newRouter;

@@ -1,3 +1,4 @@
+import type { Logger } from "pino";
 import { getAuthenticatedOctokit } from "./octokit/get-authenticated-octokit.js";
 import { ProbotOctokit } from "./octokit/probot-octokit.js";
 import type { State } from "./types.js";
@@ -31,6 +32,7 @@ import type { State } from "./types.js";
 export async function auth(
   state: State,
   installationId?: number,
+  log?: Logger,
 ): Promise<InstanceType<typeof ProbotOctokit>> {
-  return getAuthenticatedOctokit(Object.assign({}, state), installationId);
+  return getAuthenticatedOctokit(Object.assign({}, state), installationId, log);
 }

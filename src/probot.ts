@@ -1,4 +1,4 @@
-import { LRUCache } from "lru-cache";
+import { Lru } from "toad-cache";
 import type { Logger } from "pino";
 import type { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
 
@@ -65,12 +65,12 @@ export class Probot {
       : getLog({ level, logMessageKey });
 
     // TODO: support redis backend for access token cache if `options.redisConfig`
-    const cache = new LRUCache<number, string>({
+    const cache = new Lru<string>(
       // cache max. 15000 tokens, that will use less than 10mb memory
-      max: 15000,
+      15000,
       // Cache for 1 minute less than GitHub expiry
-      ttl: 1000 * 60 * 59,
-    });
+      1000 * 60 * 59
+    );
 
     const Octokit = getProbotOctokitWithDefaults({
       githubToken: options.githubToken,

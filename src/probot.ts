@@ -69,7 +69,7 @@ export class Probot {
       // cache max. 15000 tokens, that will use less than 10mb memory
       15000,
       // Cache for 1 minute less than GitHub expiry
-      1000 * 60 * 59
+      1000 * 60 * 59,
     );
 
     const Octokit = getProbotOctokitWithDefaults({

@@ -1,7 +1,7 @@
 import type { State } from "../types.js";
 import type { ProbotOctokit } from "./probot-octokit.js";
 import type { OctokitOptions } from "../types.js";
-import type { LogFn, Level } from "pino";
+import type { LogFn, Level, Logger } from "pino";
 
 type FactoryOptions = {
   octokit: ProbotOctokit;
@@ -12,8 +12,9 @@ type FactoryOptions = {
 export async function getAuthenticatedOctokit(
   state: State,
   installationId?: number,
+   log?: Logger,
 ): Promise<ProbotOctokit> {
-  const { log, octokit } = state;
+  const { octokit } = state;
 
   if (!installationId) return octokit;
 
@@ -21,7 +22,7 @@ export async function getAuthenticatedOctokit(
     type: "installation",
     installationId,
     factory: ({ octokit, octokitOptions, ...otherOptions }: FactoryOptions) => {
-      const pinoLog = log.child({ name: "github" });
+      const pinoLog = log || state.log.child({ name: "github" });
 
       const options: ConstructorParameters<typeof ProbotOctokit>[0] & {
         log: Record<Level, LogFn>;

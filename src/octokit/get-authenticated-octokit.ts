@@ -12,7 +12,7 @@ type FactoryOptions = {
 export async function getAuthenticatedOctokit(
   state: State,
   installationId?: number,
-   log?: Logger,
+  log?: Logger,
 ): Promise<ProbotOctokit> {
   const { octokit } = state;
 

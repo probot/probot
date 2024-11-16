@@ -98,7 +98,7 @@
   "release": {
     "branches": [
       "+([0-9]).x",
-      "main",
+      "master",
       "next",
       {
         "name": "beta",

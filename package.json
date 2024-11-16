@@ -1,6 +1,6 @@
 {
   "name": "probot",
-  "version": "0.0.0-development",
+  "version": "0.0.0-development.esm",
   "description": "A framework for building GitHub Apps to automate and improve your workflow",
   "repository": "github:probot/probot",
   "main": "lib/index.js",
@@ -22,7 +22,8 @@
     "lib",
     "bin",
     "static",
-    "views"
+    "views",
+    "!lib/index.jsr.*"
   ],
   "keywords": [
     "probot",
@@ -95,6 +96,19 @@
     "node": ">=18"
   },
   "release": {
+    "branches": [
+      "+([0-9]).x",
+      "main",
+      "next",
+      {
+        "name": "beta",
+        "prerelease": true
+      },
+      {
+        "name": "full-esm",
+        "prerelease": true
+      }
+    ],
     "plugins": [
       "@semantic-release/commit-analyzer",
       "@semantic-release/release-notes-generator",

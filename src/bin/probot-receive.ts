@@ -11,7 +11,7 @@ import { program } from "commander";
 import { getPrivateKey } from "@probot/get-private-key";
 import { getLog } from "../helpers/get-log.js";
 
-import { Probot, type ApplicationFunctionOptions } from "../index.js";
+import { Probot, type ApplicationFunctionOptions } from "../exports.js";
 import { resolveAppFunction } from "../helpers/resolve-app-function.js";
 
 async function main() {

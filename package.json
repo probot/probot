@@ -122,14 +122,7 @@
           ]
         }
       ],
-      [
-        "@sebbo2002/semantic-release-jsr",
-        {
-          "publishArgs": [
-            "--provenance"
-          ]
-        }
-      ]
+      "@sebbo2002/semantic-release-jsr"
     ]
   },
   "type": "module",

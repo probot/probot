@@ -1,7 +1,7 @@
 import { packageConfig } from "package-config";
 
 import type { ApplicationFunction, Options, ServerOptions } from "./types.js";
-import { Logger, Probot, ProbotOctokit } from "./index.js";
+import { Logger, Probot, ProbotOctokit } from "./exports.js";
 import { setupAppFactory } from "./apps/setup.js";
 import { getLog } from "./helpers/get-log.js";
 import { readCliOptions } from "./bin/read-cli-options.js";

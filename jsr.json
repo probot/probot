@@ -7,7 +7,9 @@
       "src",
       "bin",
       "static",
-      "views"
+      "views",
+      "README.md",
+      "LICENSE"
     ],
     "exclude": [
       "test",
@@ -15,5 +17,6 @@
       "scripts"
     ]
   },
-  "exports": "./src/index.ts"
+  "exports": "./src/index.jsr.ts",
+  "exclude": ["./src/index.ts"]
 }

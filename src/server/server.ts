@@ -10,7 +10,7 @@ import { getLoggingMiddleware } from "./logging-middleware.js";
 import { createWebhookProxy } from "../helpers/webhook-proxy.js";
 import { VERSION } from "../version.js";
 import type { ApplicationFunction, ServerOptions } from "../types.js";
-import type { Probot } from "../index.js";
+import type { Probot } from "../exports.js";
 import { rebindLog } from "../helpers/rebind-log.js";
 
 // the default path as defined in @octokit/webhooks

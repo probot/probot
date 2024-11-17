@@ -1,4 +1,4 @@
-import type { LRUCache } from "lru-cache";
+import type { Lru } from "toad-cache";
 import { ProbotOctokit } from "./probot-octokit.js";
 import type { RedisOptions } from "ioredis";
 import { request } from "@octokit/request";
@@ -10,7 +10,7 @@ import type { RequestRequestOptions } from "@octokit/types";
 import type { OctokitOptions } from "../types.js";
 
 type Options = {
-  cache: LRUCache<number, string>;
+  cache: Lru<string>;
   Octokit: typeof ProbotOctokit;
   log: Logger;
   githubToken?: string;

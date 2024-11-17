@@ -58,11 +58,11 @@
     "import-meta-resolve": "^4.1.0",
     "ioredis": "^5.3.2",
     "js-yaml": "^4.1.0",
-    "lru-cache": "npm:@wolfy1339/lru-cache@^11.0.2-patch.1",
     "octokit-auth-probot": "^3.0.1",
     "package-config": "^5.0.0",
     "pino": "^9.0.0",
     "pino-http": "^10.0.0",
+    "toad-cache": "^3.7.0",
     "update-dotenv": "^1.1.1"
   },
   "devDependencies": {

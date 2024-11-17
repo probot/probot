@@ -6,6 +6,7 @@ on:
       - next
       - beta
       - "*.x"
+      - "full-esm"
 
 # These are recommended by the semantic-release docs: https://github.com/semantic-release/npm#npm-provenance
 permissions:

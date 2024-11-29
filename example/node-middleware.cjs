@@ -1,8 +1,8 @@
-'use strict';
+"use strict";
 
 const { createServer } = require("http");
-const { createNodeMiddleware } = require('../lib/create-node-middleware');
-const { createProbot } = require('../lib/create-probot');
+const { createNodeMiddleware } = require("../lib/create-node-middleware");
+const { createProbot } = require("../lib/create-probot");
 const { sign } = require("@octokit/webhooks-methods");
 const WebhookExamples = require("@octokit/webhooks-examples");
 
@@ -37,11 +37,9 @@ x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
 process.env.WEBHOOK_SECRET = "secret";
 process.env.WEBHOOK_PATH = "/";
 
-const pushEvent = JSON.stringify((
-  WebhookExamples.filter(
-    (event) => event.name === "push",
-  )[0]
-).examples[0]);
+const pushEvent = JSON.stringify(
+  WebhookExamples.filter((event) => event.name === "push")[0].examples[0],
+);
 
 const appFn = (app) => {
   app.on("issues.opened", async (context) => {
@@ -50,21 +48,20 @@ const appFn = (app) => {
     });
     return context.octokit.issues.createComment(issueComment);
   });
-
-  app.onAny(async (context) => {
-    context.log.info({ event: context.name, action: context.payload.action });
-  });
-
-  app.onError(async (error) => {
-    app.log.error(error);
-  });
 };
 
 const middleware = createNodeMiddleware(appFn, { probot: createProbot() });
 
-const server = createServer(middleware);
+const server = createServer((req, res) => {
+  middleware(req, res, () => {
+    res.writeHead(404);
+    res.end();
+  });
+});
 
 server.listen(3000, async () => {
-  console.log("Probot started http://localhost:3000/")
-  console.log(`autocannon -m POST -b '${pushEvent}' -H content-type=application/json -H x-github-event=push -H x-github-delivery=1 -H x-hub-signature-256=${await sign("secret", pushEvent)} http://127.0.0.1:3000/`)
+  console.log("Probot started http://localhost:3000/");
+  console.log(
+    `autocannon -m POST -b '${pushEvent}' -H content-type=application/json -H x-github-event=push -H x-github-delivery=1 -H x-hub-signature-256=${await sign("secret", pushEvent)} http://127.0.0.1:3000/`,
+  );
 });

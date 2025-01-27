@@ -1,4 +1,3 @@
-import { spawn } from "node:child_process";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
@@ -6,6 +5,8 @@ import { parseArgs } from "node:util";
 import { config as dotenvConfig } from "dotenv";
 import { isSupportedNodeVersion } from "../helpers/is-supported-node-version.js";
 import { loadPackageJson } from "../helpers/load-package-json.js";
+import { run } from "../run.js";
+import { receive } from "./receive.js";
 
 dotenvConfig();
 
@@ -46,17 +47,12 @@ if (values.version) {
   printHelp();
   process.exit(0);
 } else if (positionals[0] === "run") {
-  spawn(
-    process.argv[0],
-    [resolve(__dirname, "probot-run.js"), ...process.argv.slice(3)],
-    { stdio: "inherit" },
-  );
+  run(process.argv.slice(3));
 } else if (positionals[0] === "receive") {
-  spawn(
-    process.argv[0],
-    [resolve(__dirname, "probot-receive.js"), ...process.argv.slice(3)],
-    { stdio: "inherit" },
-  );
+  receive(process.argv.slice(3)).catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
 } else if (values.help) {
   printHelp();
   process.exit(0);

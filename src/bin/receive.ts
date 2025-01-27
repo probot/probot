@@ -37,7 +37,7 @@ Options:
 `);
 }
 
-async function main() {
+export async function receive(args: string[]) {
   const { values, positionals } = parseArgs({
     allowPositionals: true,
     options: {
@@ -101,6 +101,7 @@ async function main() {
         default: false,
       },
     },
+    args,
   });
 
   const {
@@ -185,8 +186,3 @@ async function main() {
     process.exit(1);
   });
 }
-
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});

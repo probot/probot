@@ -7,7 +7,6 @@ import type { Options } from "../types.js";
 export function readCliOptions(
   args: string[],
 ): Options & PinoOptions & { args: string[] } {
-  
   program
     .usage("[options] <apps...>")
     .option(

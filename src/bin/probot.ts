@@ -42,7 +42,7 @@ const { values, positionals } = parseArgs({
 if (values.version) {
   console.log(pkg.version || "0.0.0-dev");
   process.exit(0);
-} else if (values.help || positionals.length === 0) {
+} else if (positionals.length === 0) {
   printHelp();
   process.exit(0);
 } else if (positionals[0] === "run") {
@@ -57,6 +57,9 @@ if (values.version) {
     [resolve(__dirname, "probot-receive.js"), ...process.argv.slice(3)],
     { stdio: "inherit" },
   );
+} else if (values.help) {
+  printHelp();
+  process.exit(0);
 } else {
   console.error(`Invalid command: ${positionals[0]}\n`);
   printHelp();

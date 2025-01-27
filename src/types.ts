@@ -30,6 +30,7 @@ export interface Options {
   baseUrl?: string;
   request?: RequestRequestOptions;
   webhookPath?: string;
+  webhookProxy?: string;
 }
 
 export type State = {

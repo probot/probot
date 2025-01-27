@@ -42,6 +42,8 @@ type RepoResultType<E extends WebhookEvents> = {
   repo: RepoNameType<E>;
 };
 
+const kOctokitRequestHookAdded = Symbol("octokit request hook added");
+
 /**
  * The context of the event that was triggered, including the payload and
  * helpers for extracting information can be passed to GitHub API calls.
@@ -81,10 +83,13 @@ export class Context<Event extends WebhookEvents = WebhookEvents> {
     // This is not documented and not considered public API, the header may change.
     // Once we document this as best practice on https://docs.github.com/en/rest/guides/best-practices-for-integrators
     // we will make it official
-    /* istanbul ignore next */
-    octokit.hook.before("request", (options) => {
-      options.headers["x-github-delivery"] = event.id;
-    });
+    if ((octokit as any)[kOctokitRequestHookAdded] !== true) {
+      /* istanbul ignore next */
+      octokit.hook.before("request", (options) => {
+        options.headers["x-github-delivery"] = event.id;
+      });
+      (octokit as any)[kOctokitRequestHookAdded] = true;
+    }
   }
 
   /**

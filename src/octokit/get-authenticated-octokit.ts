@@ -2,6 +2,7 @@ import type { State } from "../types.js";
 import type { ProbotOctokit } from "./probot-octokit.js";
 import type { OctokitOptions } from "../types.js";
 import type { LogFn, Level, Logger } from "pino";
+import { rebindLog } from "../helpers/rebind-log.js";
 
 type FactoryOptions = {
   octokit: ProbotOctokit;
@@ -28,14 +29,7 @@ export async function getAuthenticatedOctokit(
         log: Record<Level, LogFn>;
       } = {
         ...octokitOptions,
-        log: {
-          fatal: pinoLog.fatal.bind(pinoLog),
-          error: pinoLog.error.bind(pinoLog),
-          warn: pinoLog.warn.bind(pinoLog),
-          info: pinoLog.info.bind(pinoLog),
-          debug: pinoLog.debug.bind(pinoLog),
-          trace: pinoLog.trace.bind(pinoLog),
-        },
+        log: rebindLog(pinoLog),
         throttle: octokitOptions.throttle?.enabled
           ? {
               ...octokitOptions.throttle,

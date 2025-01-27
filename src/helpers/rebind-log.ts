@@ -1,17 +1,11 @@
 import type { Logger } from "pino";
 
-const kIsBound = Symbol("is-bound");
-
 export function rebindLog(log: Logger): Logger {
-  // @ts-ignore
-  if (log[kIsBound]) return log;
   for (const key in log) {
-    // @ts-ignore
+    // @ts-expect-error
     if (typeof log[key] !== "function") continue;
-    // @ts-ignore
+    // @ts-expect-error
     log[key] = log[key].bind(log);
   }
-  // @ts-ignore
-  log[kIsBound] = true;
   return log;
 }

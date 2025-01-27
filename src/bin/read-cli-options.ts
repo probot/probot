@@ -5,8 +5,9 @@ import type { Options as PinoOptions } from "@probot/pino";
 import type { Options } from "../types.js";
 
 export function readCliOptions(
-  argv: string[],
+  args: string[],
 ): Options & PinoOptions & { args: string[] } {
+  
   program
     .usage("[options] <apps...>")
     .option(
@@ -70,7 +71,7 @@ export function readCliOptions(
           }/api/v3`
         : "https://api.github.com",
     )
-    .parse(argv);
+    .parse(args);
 
   const {
     app: appId,

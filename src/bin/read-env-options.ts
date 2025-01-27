@@ -2,7 +2,11 @@ import { getPrivateKey } from "@probot/get-private-key";
 import type { Options as PinoOptions, LogLevel } from "@probot/pino";
 
 export function readEnvOptions(env = process.env) {
-  const privateKey = getPrivateKey({ env });
+  let privateKey;
+
+  try {
+    privateKey = getPrivateKey({ env });
+  } catch {}
 
   const logFormat: PinoOptions["logFormat"] =
     env.LOG_FORMAT && env.LOG_FORMAT.length !== 0

@@ -40,7 +40,12 @@ export function createProbot({
   defaults = {},
   env = process.env,
 }: CreateProbotOptions = {}): Probot {
-  const privateKey = getPrivateKey({ env });
+  let privateKey;
+
+  try {
+    privateKey = getPrivateKey({ env });
+  } catch {}
+
   const envWithDefaults = { ...DEFAULTS, ...env };
 
   const envOptions: Options = {

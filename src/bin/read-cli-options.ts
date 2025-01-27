@@ -5,7 +5,7 @@ import type { Options as PinoOptions } from "@probot/pino";
 import type { Options } from "../types.js";
 
 export function readCliOptions(
-  args: string[],
+  argv: string[],
 ): Options & PinoOptions & { args: string[] } {
   program
     .usage("[options] <apps...>")
@@ -70,7 +70,7 @@ export function readCliOptions(
           }/api/v3`
         : "https://api.github.com",
     )
-    .parse(args);
+    .parse(argv);
 
   const {
     app: appId,
@@ -79,8 +79,14 @@ export function readCliOptions(
     ...options
   } = program.opts();
 
+  let privateKey;
+
+  try {
+    privateKey = getPrivateKey({ filepath: privateKeyPath }) || undefined;
+  } catch {}
+
   return {
-    privateKey: getPrivateKey({ filepath: privateKeyPath }) || undefined,
+    privateKey,
     appId,
     redisConfig: redisUrl,
     args: program.args,

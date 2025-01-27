@@ -133,7 +133,12 @@ async function main() {
     process.exit(1);
   }
 
-  const privateKey = getPrivateKey();
+  let privateKey;
+
+  try {
+    privateKey = getPrivateKey();
+  } catch {}
+
   if (!githubToken && (!appId || !privateKey)) {
     console.warn(
       "No token specified and no certificate found, which means you will not be able to do authenticated requests to GitHub",

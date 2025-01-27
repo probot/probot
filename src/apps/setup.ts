@@ -1,6 +1,6 @@
 import { exec } from "node:child_process";
 
-import type { IncomingMessage, ServerResponse } from "http";
+import type { IncomingMessage, ServerResponse } from "node:http";
 import { parse as parseQuery } from "querystring";
 import express from "express";
 import updateDotenv from "update-dotenv";

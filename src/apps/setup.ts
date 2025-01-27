@@ -1,6 +1,6 @@
 import { exec } from "node:child_process";
 
-import type { IncomingMessage } from "node:http";
+import type { IncomingMessage, ServerResponse } from "node:http";
 import { parse as parseQuery } from "querystring";
 import express from "express";
 import updateDotenv from "update-dotenv";
@@ -64,39 +64,43 @@ export const setupAppFactory = (
       );
     });
 
-    route.get("/probot/setup", async (req, res) => {
-      const { code } = req.query || parseQuery(req.url?.split("?")[1] || "");
+    route.get(
+      "/probot/setup",
+      async (req: IncomingMessage, res: ServerResponse) => {
+        // @ts-expect-error query could be set by a framework, e.g. express
+        const { code } = req.query || parseQuery(req.url?.split("?")[1] || "");
 
-      if (!code || typeof code !== "string" || code.length === 0) {
-        res
-          .writeHead(400, { "content-type": "text/plain" })
-          .end("code missing or invalid");
-        return;
-      }
+        if (!code || typeof code !== "string" || code.length === 0) {
+          res
+            .writeHead(400, { "content-type": "text/plain" })
+            .end("code missing or invalid");
+          return;
+        }
 
-      const response = await setup.createAppFromCode(code, {
-        // @ts-expect-error
-        request: app.state.request,
-      });
-
-      // If using glitch, restart the app
-      if (process.env.PROJECT_DOMAIN) {
-        exec("refresh", (error) => {
-          if (error) {
-            app.log.error(error);
-          }
+        const response = await setup.createAppFromCode(code, {
+          // @ts-expect-error
+          request: app.state.request,
         });
-      } else {
-        printRestartMessage(app);
-      }
 
-      res
-        .writeHead(302, {
-          "content-type": "text/plain",
-          location: `${response}/installations/new`,
-        })
-        .end(`Found. Redirecting to ${response}/installations/new`);
-    });
+        // If using glitch, restart the app
+        if (process.env.PROJECT_DOMAIN) {
+          exec("refresh", (error) => {
+            if (error) {
+              app.log.error(error);
+            }
+          });
+        } else {
+          printRestartMessage(app);
+        }
+
+        res
+          .writeHead(302, {
+            "content-type": "text/plain",
+            location: `${response}/installations/new`,
+          })
+          .end(`Found. Redirecting to ${response}/installations/new`);
+      },
+    );
 
     const { WEBHOOK_PROXY_URL, GHE_HOST } = process.env;
     const GH_HOST = `https://${GHE_HOST ?? "github.com"}`;
@@ -107,7 +111,7 @@ export const setupAppFactory = (
       GH_HOST,
     });
 
-    route.get("/probot/import", (_req, res) => {
+    route.get("/probot/import", (_req, res: ServerResponse) => {
       res
         .writeHead(200, {
           "content-type": "text/html",
@@ -115,29 +119,33 @@ export const setupAppFactory = (
         .end(importViewRendered);
     });
 
-    route.post("/probot/import", express.json(), (req, res) => {
-      const { appId, pem, webhook_secret } = (req as unknown as { body: any })
-        .body;
-      if (!appId || !pem || !webhook_secret) {
-        res
-          .writeHead(400, {
-            "content-type": "text/plain",
-          })
-          .end("appId and/or pem and/or webhook_secret missing");
-        return;
-      }
-      updateDotenv({
-        APP_ID: appId,
-        PRIVATE_KEY: `"${pem}"`,
-        WEBHOOK_SECRET: webhook_secret,
-      });
-      res.end();
-      printRestartMessage(app);
-    });
+    route.post(
+      "/probot/import",
+      express.json(),
+      (req: IncomingMessage, res: ServerResponse) => {
+        const { appId, pem, webhook_secret } = (req as unknown as { body: any })
+          .body;
+        if (!appId || !pem || !webhook_secret) {
+          res
+            .writeHead(400, {
+              "content-type": "text/plain",
+            })
+            .end("appId and/or pem and/or webhook_secret missing");
+          return;
+        }
+        updateDotenv({
+          APP_ID: appId,
+          PRIVATE_KEY: `"${pem}"`,
+          WEBHOOK_SECRET: webhook_secret,
+        });
+        res.end();
+        printRestartMessage(app);
+      },
+    );
 
     const successViewRendered = successView({ name: pkg.name });
 
-    route.get("/probot/success", (_req, res) => {
+    route.get("/probot/success", (_req, res: ServerResponse) => {
       res
         .writeHead(200, { "content-type": "text/html" })
         .end(successViewRendered);

@@ -48,7 +48,7 @@ export const setupAppFactory = (
 
     printWelcomeMessage(app, host, port);
 
-    route.get("/probot", async (req, res) => {
+    route.get("/probot", async (req: IncomingMessage, res: ServerResponse) => {
       const baseUrl = getBaseUrl(req);
       const manifest = setup.getManifest(pkg, baseUrl);
       const createAppUrl = setup.createAppUrl;
@@ -111,13 +111,16 @@ export const setupAppFactory = (
       GH_HOST,
     });
 
-    route.get("/probot/import", (_req, res: ServerResponse) => {
-      res
-        .writeHead(200, {
-          "content-type": "text/html",
-        })
-        .end(importViewRendered);
-    });
+    route.get(
+      "/probot/import",
+      (_req: IncomingMessage, res: ServerResponse) => {
+        res
+          .writeHead(200, {
+            "content-type": "text/html",
+          })
+          .end(importViewRendered);
+      },
+    );
 
     route.post(
       "/probot/import",
@@ -145,13 +148,16 @@ export const setupAppFactory = (
 
     const successViewRendered = successView({ name: pkg.name });
 
-    route.get("/probot/success", (_req, res: ServerResponse) => {
-      res
-        .writeHead(200, { "content-type": "text/html" })
-        .end(successViewRendered);
-    });
+    route.get(
+      "/probot/success",
+      (_req: IncomingMessage, res: ServerResponse) => {
+        res
+          .writeHead(200, { "content-type": "text/html" })
+          .end(successViewRendered);
+      },
+    );
 
-    route.get("/", (_req, res) => {
+    route.get("/", (_req, res: ServerResponse) => {
       res
         .writeHead(302, { "content-type": "text/plain", location: `/probot` })
         .end(`Found. Redirecting to /probot`);

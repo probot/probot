@@ -1,4 +1,4 @@
-import type { Server as HttpServer } from "node:http";
+import { createServer, type Server as HttpServer } from "node:http";
 import { join } from "node:path";
 
 import express, { Router, type Application } from "express";
@@ -87,7 +87,7 @@ export class Server {
     const printableHost = host ?? "localhost";
 
     this.state.httpServer = await new Promise((resolve, reject) => {
-      const server = this.expressApp.listen(
+      const server = createServer(this.expressApp).listen(
         port,
         ...((host ? [host] : []) as any),
         async () => {

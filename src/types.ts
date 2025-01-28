@@ -64,10 +64,16 @@ export type ApplicationFunctionOptions = {
   cwd?: string;
   [key: string]: unknown;
 };
-export type ApplicationFunction = (
+
+export type HandlerFactory = (
   app: Probot,
   options: ApplicationFunctionOptions,
 ) => Handler | Promise<Handler>;
+
+export type ApplicationFunction = (
+  app: Probot,
+  options: ApplicationFunctionOptions,
+) => void | Promise<void>;
 
 export type Handler = (
   req: IncomingMessage,

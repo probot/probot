@@ -6,7 +6,7 @@ import { getLog } from "./helpers/get-log.js";
 import { readCliOptions } from "./bin/read-cli-options.js";
 import { readEnvOptions } from "./bin/read-env-options.js";
 import { Server } from "./server/server.js";
-import { defaultApp } from "./apps/default.js";
+import { defaultApp as defaultAppHandler } from "./apps/default.js";
 import { resolveAppFunction } from "./helpers/resolve-app-function.js";
 import { isProduction } from "./helpers/is-production.js";
 import { type Logger, Probot, type ProbotOctokit } from "./exports.js";
@@ -116,8 +116,8 @@ export async function run(
         privateKey: "dummy value for setup, see #1512",
       }),
     });
-    const setupApp = setupAppFactory(host, port);
-    await server.load(setupApp);
+    const setupAppHandler = setupAppFactory(host, port);
+    await server.loadHandler(setupAppHandler);
     await server.start();
     return server;
   }
@@ -135,7 +135,7 @@ export async function run(
     const pkg = await packageConfig("probot");
     server = new Server(serverOptions);
 
-    await server.load(defaultApp);
+    await server.loadHandler(defaultAppHandler);
 
     if (Array.isArray(pkg.apps)) {
       for (const appPath of pkg.apps) {

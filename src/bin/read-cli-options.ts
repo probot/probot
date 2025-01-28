@@ -124,7 +124,7 @@ export function readCliOptions(
     privateKey,
     appId: values["app"],
     redisConfig: values["redis-url"],
-    args: positionals,
+    args: positionals ? positionals.slice(-1) : [],
     baseUrl: values["base-url"],
     host: values.host,
     port: Number(values.port),

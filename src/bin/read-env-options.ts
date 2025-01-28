@@ -6,7 +6,9 @@ export function readEnvOptions(env = process.env) {
 
   try {
     privateKey = getPrivateKey({ env });
-  } catch {}
+  } catch (e) {
+    console.error(e);
+  }
 
   const logFormat: PinoOptions["logFormat"] =
     env.LOG_FORMAT && env.LOG_FORMAT.length !== 0

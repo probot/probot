@@ -1,4 +1,4 @@
-import type express from "express";
+import { IncomingMessage, ServerResponse } from "node:http";
 import type {
   EmitterWebhookEvent as WebhookEvent,
   Webhooks,
@@ -61,14 +61,18 @@ type SimplifiedObject = Omit<Context, keyof WebhookEvent>;
 export type ProbotWebhooks = Webhooks<SimplifiedObject>;
 
 export type ApplicationFunctionOptions = {
-  getRouter?: (path?: string) => express.Router;
   cwd?: string;
   [key: string]: unknown;
 };
 export type ApplicationFunction = (
   app: Probot,
   options: ApplicationFunctionOptions,
-) => void | Promise<void>;
+) => Handler | Promise<Handler>;
+
+export type Handler = (
+  req: IncomingMessage,
+  res: ServerResponse,
+) => boolean | Promise<boolean>;
 
 export type ServerOptions = {
   cwd?: string;

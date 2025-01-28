@@ -49,7 +49,7 @@ if (values.version) {
   printHelp();
   process.exit(0);
 } else if (positionals[0] === "run") {
-  run(process.argv.slice(3));
+  run(process.argv.slice(3), { env: process.env });
 } else if (positionals[0] === "receive") {
   receive(process.argv.slice(3)).catch((error) => {
     console.error(error);

@@ -116,31 +116,37 @@ export async function run(
         privateKey: "dummy value for setup, see #1512",
       }),
     });
-    await server.load(setupAppFactory(host, port));
+    const setupApp = setupAppFactory(host, port);
+    await server.load(setupApp);
     await server.start();
     return server;
   }
 
   if (Array.isArray(appFnOrArgv)) {
+    const [appPath] = args;
+
+    if (!appPath) {
+      console.error(
+        "No app path provided. Please provide the path to the app you want to run.",
+      );
+      process.exit(1);
+    }
+
     const pkg = await packageConfig("probot");
-
-    const combinedApps: ApplicationFunction = async (_app) => {
-      await server.load(defaultApp);
-
-      if (Array.isArray(pkg.apps)) {
-        for (const appPath of pkg.apps) {
-          const appFn = await resolveAppFunction(appPath);
-          await server.load(appFn);
-        }
-      }
-
-      const [appPath] = args;
-      const appFn = await resolveAppFunction(appPath);
-      await server.load(appFn);
-    };
-
     server = new Server(serverOptions);
-    await server.load(combinedApps);
+
+    await server.load(defaultApp);
+
+    if (Array.isArray(pkg.apps)) {
+      for (const appPath of pkg.apps) {
+        const appFn = await resolveAppFunction(appPath);
+        await server.load(appFn);
+      }
+    }
+
+    const appFn = await resolveAppFunction(appPath);
+    await server.load(appFn);
+
     await server.start();
     return server;
   }

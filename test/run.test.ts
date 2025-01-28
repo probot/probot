@@ -1,8 +1,8 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import request from "supertest";
 import { sign } from "@octokit/webhooks-methods";
+import getPort from "get-port";
 import { describe, expect, it, beforeEach } from "vitest";
 
 import { Probot, run, Server } from "../src/index.js";
@@ -14,9 +14,10 @@ import WebhookExamples, {
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-describe("run", () => {
+describe("run", async () => {
   let server: Server;
   let env: NodeJS.ProcessEnv;
+  let port = await getPort();
 
   beforeEach(() => {
     env = {
@@ -40,7 +41,7 @@ describe("run", () => {
         () => {
           initialized = true;
         },
-        { env },
+        { env: { ...env, PORT: port + "" } },
       );
       expect(initialized).toBeTruthy();
       await server.stop();
@@ -102,18 +103,25 @@ describe("run", () => {
     ).examples[0];
 
     it("POST /api/github/webhooks", async () => {
-      server = await run(() => {}, { env });
+      server = await run(() => {}, { env: { ...env, PORT: port + "" } });
 
       const dataString = JSON.stringify(pushEvent);
 
-      await request(server.expressApp)
-        .post("/api/github/webhooks")
-        .send(dataString)
-        .set("content-type", "application/json")
-        .set("x-github-event", "push")
-        .set("x-hub-signature-256", await sign("secret", dataString))
-        .set("x-github-delivery", "123")
-        .expect(200);
+      const response = await fetch(
+        `http://localhost:${port}/api/github/webhooks`,
+        {
+          method: "POST",
+          body: dataString,
+          headers: {
+            "content-type": "application/json",
+            "x-github-event": "push",
+            "x-hub-signature-256": await sign("secret", dataString),
+            "x-github-delivery": "123",
+          },
+        },
+      );
+
+      expect(response.status).toBe(200);
 
       await server.stop();
     });
@@ -123,20 +131,27 @@ describe("run", () => {
         env: {
           ...env,
           WEBHOOK_PATH: "/custom-webhook",
+          PORT: port + "",
         },
       });
 
       const dataString = JSON.stringify(pushEvent);
 
       try {
-        await request(server.expressApp)
-          .post("/custom-webhook")
-          .send(dataString)
-          .set("content-type", "application/json")
-          .set("x-github-event", "push")
-          .set("x-hub-signature-256", await sign("secret", dataString))
-          .set("x-github-delivery", "123")
-          .expect(200);
+        const response = await fetch(
+          `http://localhost:${port}/custom-webhook`,
+          {
+            method: "POST",
+            body: dataString,
+            headers: {
+              "content-type": "application/json",
+              "x-github-event": "push",
+              "x-hub-signature-256": await sign("secret", dataString),
+              "x-github-delivery": "123",
+            },
+          },
+        );
+        expect(response.status).toBe(200);
       } finally {
         await server.stop();
       }

@@ -7,7 +7,7 @@ import getPort from "get-port";
 import { describe, expect, it } from "vitest";
 
 import { Probot, Server } from "../../src/index.js";
-import { defaultApp } from "../../src/apps/default.js";
+import { defaultApp as defaultAppHandler } from "../../src/apps/default.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -34,7 +34,7 @@ describe("default app", async () => {
       port,
     });
 
-    await server.load(defaultApp);
+    await server.loadHandler(defaultAppHandler);
     return server;
   }
 

@@ -9,7 +9,12 @@ import { createNodeHandler } from "@octokit/webhooks";
 import { getLoggingMiddleware } from "./logging-middleware.js";
 import { createWebhookProxy } from "../helpers/webhook-proxy.js";
 import { VERSION } from "../version.js";
-import type { ApplicationFunction, Handler, ServerOptions } from "../types.js";
+import type {
+  ApplicationFunction,
+  Handler,
+  HandlerFactory,
+  ServerOptions,
+} from "../types.js";
 import type { Probot } from "../exports.js";
 import { rebindLog } from "../helpers/rebind-log.js";
 
@@ -134,12 +139,18 @@ export class Server {
     this.handlers.push(pingPongHandler);
   }
 
-  public async load(appFn: ApplicationFunction) {
+  public async loadHandler(appFn: HandlerFactory) {
     this.handlers.push(
       await appFn(this.probotApp, {
         cwd: this.state.cwd,
       }),
     );
+  }
+
+  public async load(appFn: ApplicationFunction) {
+    await appFn(this.probotApp, {
+      cwd: this.state.cwd,
+    });
   }
 
   public async start(): Promise<HttpServer> {

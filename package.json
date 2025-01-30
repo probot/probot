@@ -48,7 +48,7 @@
     "@octokit/webhooks": "^13.2.6",
     "@probot/get-private-key": "^2.0.0",
     "@probot/octokit-plugin-config": "^3.0.2",
-    "@probot/pino": "^2.5.0",
+    "@probot/pino": "^3.0.0",
     "@types/express": "^4.17.21",
     "bottleneck": "^2.19.5",
     "deepmerge": "^4.3.1",

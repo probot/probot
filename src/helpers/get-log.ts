@@ -33,7 +33,7 @@ export function getLog(options: GetLogOptions = {}): Logger {
     messageKey: logMessageKey || "msg",
   };
   const transform = getTransformStream(getTransformStreamOptions);
-  transform.pipe(pino.destination(1));
+  transform.pipe(pino.destination(1) as unknown as NodeJS.WritableStream);
 
   return rebindLog(pino(pinoOptions, transform));
 }

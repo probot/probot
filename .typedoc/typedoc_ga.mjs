@@ -1,5 +1,5 @@
 // Apache License 2.0 - https://github.com/TypeStrong/typedoc/blob/master/LICENSE
-import td from "typedoc";
+import * as td from "typedoc";
 
 /** @param {td.Application} app */
 export function load(app) {

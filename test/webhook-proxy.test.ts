@@ -72,8 +72,8 @@ describe("webhook-proxy", () => {
         targetPort = (server.address() as net.AddressInfo).port;
         const url = `http://127.0.0.1:${targetPort}/events`;
 
-        const fetch = fetchMock
-          .sandbox()
+        const mock = fetchMock
+          .createInstance()
           .postOnce(`http://localhost:${targetPort}/test`, {
             status: 200,
             then: () => {
@@ -86,7 +86,7 @@ describe("webhook-proxy", () => {
           port: targetPort,
           path: "/test",
           logger: getLog({ level: "fatal" }),
-          fetch,
+          fetch: mock.fetchHandler,
         })) as EventSource;
 
         // Wait for proxy to be ready

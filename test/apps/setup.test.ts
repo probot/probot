@@ -102,8 +102,8 @@
 
 //   describe("GET /probot/setup", () => {
 //     it("returns a redirect", async () => {
-//       const fetch = fetchMock
-//         .sandbox()
+//       const mock = fetchMock
+//         .createInstance()
 //         .postOnce("https://api.github.com/app-manifests/123/conversions", {
 //           status: 201,
 //           body: {
@@ -125,9 +125,7 @@
 //         }),
 //         log: pino(streamLogsToOutput),
 //         request: {
-//           fetch: async (url: string, options: { [key: string]: any }) => {
-//             return fetch(url, options);
-//           },
+//           fetch: mock.fetchHandler,
 //         },
 //       });
 

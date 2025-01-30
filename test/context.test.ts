@@ -234,8 +234,8 @@ describe("Context", () => {
     });
 
     it("gets a valid configuration", async () => {
-      const fetch = fetchMock
-        .sandbox()
+      const mock = fetchMock
+        .createInstance()
         .getOnce(
           "https://api.github.com/repos/Codertocat/Hello-World/contents/.github%2Ftest-file.yml",
           getConfigFile("basic.yml"),
@@ -245,7 +245,7 @@ describe("Context", () => {
         retry: { enabled: false },
         throttle: { enabled: false },
         request: {
-          fetch,
+          fetch: mock.fetchHandler,
         },
       });
       const context = new Context(event, octokit, {} as any);
@@ -268,8 +268,8 @@ describe("Context", () => {
         },
       };
 
-      const fetch = fetchMock
-        .sandbox()
+      const mock = fetchMock
+        .createInstance()
         .getOnce(
           "https://api.github.com/repos/Codertocat/Hello-World/contents/.github%2Ftest-file.yml",
           NOT_FOUND_RESPONSE,
@@ -283,7 +283,7 @@ describe("Context", () => {
         retry: { enabled: false },
         throttle: { enabled: false },
         request: {
-          fetch,
+          fetch: mock.fetchHandler,
         },
       });
       const context = new Context(event, octokit, {} as any);
@@ -292,8 +292,8 @@ describe("Context", () => {
     });
 
     it("accepts deepmerge options", async () => {
-      const fetch = fetchMock
-        .sandbox()
+      const mock = fetchMock
+        .createInstance()
         .getOnce(
           "https://api.github.com/repos/Codertocat/Hello-World/contents/.github%2Ftest-file.yml",
           "foo:\n  - name: master\n    shouldChange: changed\n_extends: .github",
@@ -307,7 +307,7 @@ describe("Context", () => {
         retry: { enabled: false },
         throttle: { enabled: false },
         request: {
-          fetch,
+          fetch: mock.fetchHandler,
         },
       });
       const context = new Context(event, octokit, {} as any);
@@ -320,19 +320,19 @@ describe("Context", () => {
     });
 
     it("sets x-github-delivery header to event id", async () => {
-      const fetch = fetchMock.sandbox().getOnce((_url, { headers }) => {
+      const mock = fetchMock.createInstance().getOnce("*", ({ options }) => {
         expect(
           // @ts-expect-error
-          headers["x-github-delivery"],
+          options.headers["x-github-delivery"],
         ).toBe("0");
-        return true;
-      }, getConfigFile("basic.yml"));
+        return getConfigFile("basic.yml");
+      });
 
       const octokit = new ProbotOctokit({
         retry: { enabled: false },
         throttle: { enabled: false },
         request: {
-          fetch,
+          fetch: mock.fetchHandler,
         },
       });
       const context = new Context(event, octokit, {} as any);

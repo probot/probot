@@ -109,8 +109,8 @@ describe("ManifestCreation", () => {
     });
 
     test("creates an app from a code", async () => {
-      const fetch = fetchMock
-        .sandbox()
+      const mock = fetchMock
+        .createInstance()
         .postOnce("https://api.github.com/app-manifests/123abc/conversions", {
           status: 200,
           body: response,
@@ -118,7 +118,7 @@ describe("ManifestCreation", () => {
 
       const createdApp = await setup.createAppFromCode("123abc", {
         request: {
-          fetch,
+          fetch: mock.fetchHandler,
         },
       });
       expect(createdApp).toEqual("https://github.com/apps/testerino0000000");
@@ -134,8 +134,8 @@ describe("ManifestCreation", () => {
     test("creates an app from a code when github host env is set", async () => {
       process.env.GHE_HOST = "swinton.github.com";
 
-      const fetch = fetchMock
-        .sandbox()
+      const mock = fetchMock
+        .createInstance()
         .postOnce(
           "https://swinton.github.com/api/v3/app-manifests/123abc/conversions",
           {
@@ -146,7 +146,7 @@ describe("ManifestCreation", () => {
 
       const createdApp = await setup.createAppFromCode("123abc", {
         request: {
-          fetch,
+          fetch: mock.fetchHandler,
         },
       });
       expect(createdApp).toEqual("https://github.com/apps/testerino0000000");

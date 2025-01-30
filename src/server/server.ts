@@ -1,4 +1,4 @@
-import type { Server as HttpServer } from "node:http";
+import { createServer, type Server as HttpServer } from "node:http";
 import { join } from "node:path";
 
 import express, { Router, type Application } from "express";
@@ -57,13 +57,18 @@ export class Server {
       "/probot/static/",
       express.static(join(__dirname, "..", "..", "static")),
     );
-    this.expressApp.use(
-      createWebhooksMiddleware(this.probotApp.webhooks, {
+    // Wrap the webhooks middleware in a function that returns void due to changes in the types for express@v5
+    // Before, the express types for middleware simply had a return type of void,
+    // now they have a return type of `void | Promise<void>`.
+    this.expressApp.use(async (req, res, next) => {
+      await createWebhooksMiddleware(this.probotApp.webhooks, {
         path: this.state.webhookPath,
-      }),
-    );
+      })(req, res, next);
+    });
 
-    this.expressApp.get("/ping", (_req, res) => res.end("PONG"));
+    this.expressApp.get("/ping", (_req, res) => {
+      res.end("PONG");
+    });
   }
 
   public async load(appFn: ApplicationFunction) {
@@ -82,7 +87,7 @@ export class Server {
     const printableHost = host ?? "localhost";
 
     this.state.httpServer = await new Promise((resolve, reject) => {
-      const server = this.expressApp.listen(
+      const server = createServer(this.expressApp).listen(
         port,
         ...((host ? [host] : []) as any),
         async () => {

@@ -27,7 +27,9 @@ describe("logging", () => {
       res.set("X-Test-Header", "testing");
       res.send("OK");
     });
-    server.post("/", (_req, res) => res.send("OK"));
+    server.post("/", (_req, res) => {
+      res.send("OK");
+    });
   }
 
   beforeEach(() => {

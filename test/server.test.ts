@@ -262,14 +262,18 @@ describe("Server", () => {
   describe("router", () => {
     it("prefixes paths with route name", () => {
       const router = server.router("/my-app");
-      router.get("/foo", (_req, res) => res.end("foo"));
+      router.get("/foo", (_req, res) => {
+        res.end("foo");
+      });
 
       return request(server.expressApp).get("/my-app/foo").expect(200, "foo");
     });
 
     it("allows routes with no path", () => {
       const router = server.router();
-      router.get("/foo", (_req, res) => res.end("foo"));
+      router.get("/foo", (_req, res) => {
+        res.end("foo");
+      });
 
       return request(server.expressApp).get("/foo").expect(200, "foo");
     });
@@ -293,7 +297,9 @@ describe("Server", () => {
         },
       );
       const router = server.router();
-      router.get("/", (_req, res) => res.end("foo"));
+      router.get("/", (_req, res) => {
+        res.end("foo");
+      });
 
       return request(server.expressApp).get("/").expect(200, "foo");
     });
@@ -307,7 +313,9 @@ describe("Server", () => {
           next();
         });
 
-        router.get("/hello", (_req, res) => res.end(name));
+        router.get("/hello", (_req, res) => {
+          res.end(name);
+        });
       });
 
       await request(server.expressApp)

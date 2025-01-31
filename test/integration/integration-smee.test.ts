@@ -1,8 +1,7 @@
 import { Writable } from "node:stream";
 import { ManifestCreation } from "../../src/manifest-creation.js";
 import { describe, test, expect, afterEach } from "vitest";
-import getPort from "get-port";
-import { type ApplicationFunction, Probot, Server } from "../../src/index.js";
+import { ApplicationFunction, Probot, Server } from "../../src/index.js";
 import { pino } from "pino";
 import WebhookExamples, {
   type WebhookDefinition,
@@ -101,8 +100,6 @@ describe("smee-client", () => {
           });
         };
 
-        const port = await getPort();
-
         const server = new Server({
           Probot: Probot.defaults({
             appId: APP_ID,
@@ -110,7 +107,7 @@ describe("smee-client", () => {
             secret: WEBHOOK_SECRET,
           }),
           log: pino(streamLogsToOutput),
-          port,
+          port: 0,
           webhookProxy: WEBHOOK_PROXY_URL,
           webhookPath: "/",
         });

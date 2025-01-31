@@ -1,244 +1,270 @@
-// import { Stream } from "node:stream";
+import { Stream } from "node:stream";
 
-// import fetchMock from "fetch-mock";
-// import { pino } from "pino";
-// import request from "supertest";
-// import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
+import fetchMock from "fetch-mock";
+import { pino } from "pino";
+import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 
-// import { Probot, Server } from "../../src/index.js";
-// import { setupAppFactory } from "../../src/apps/setup.js";
+import { Probot, Server } from "../../src/index.js";
+import { setupAppFactory } from "../../src/apps/setup.js";
+import getPort from "get-port";
 
-// const mocks = vi.hoisted(() => {
-//   return {
-//     createChannel: vi.fn().mockResolvedValue("mocked proxy URL"),
-//     updateDotenv: vi.fn().mockResolvedValue({}),
-//   };
-// });
-// vi.mock("smee-client", () => ({
-//   default: { createChannel: mocks.createChannel },
-//   createChannel: mocks.createChannel,
-// }));
-// vi.mock("update-dotenv", () => ({
-//   default: mocks.updateDotenv,
-// }));
+const mocks = vi.hoisted(() => {
+  return {
+    createChannel: vi.fn().mockResolvedValue("mocked proxy URL"),
+    updateDotenv: vi.fn().mockResolvedValue({}),
+  };
+});
+vi.mock("smee-client", () => ({
+  default: { createChannel: mocks.createChannel },
+  createChannel: mocks.createChannel,
+}));
+vi.mock("update-dotenv", () => ({
+  default: mocks.updateDotenv,
+}));
 
-// describe("Setup app", () => {
-//   let server: Server;
-//   let logOutput: any[] = [];
+describe("Setup app", async () => {
+  const port = await getPort();
+  let server: Server;
+  let logOutput: any[] = [];
 
-//   const streamLogsToOutput = new Stream.Writable({ objectMode: true });
-//   streamLogsToOutput._write = (msg, _encoding, done) => {
-//     logOutput.push(JSON.parse(msg));
-//     done();
-//   };
+  const streamLogsToOutput = new Stream.Writable({ objectMode: true });
+  streamLogsToOutput._write = (msg, _encoding, done) => {
+    logOutput.push(JSON.parse(msg));
+    done();
+  };
 
-//   beforeEach(async () => {
-//     logOutput = [];
-//     server = new Server({
-//       Probot: Probot.defaults({
-//         log: pino(streamLogsToOutput),
-//         // workaround for https://github.com/probot/probot/issues/1512
-//         appId: 1,
-//         privateKey: "dummy value for setup, see #1512",
-//       }),
-//       log: pino(streamLogsToOutput),
-//     });
+  beforeEach(async () => {
+    logOutput = [];
+    server = new Server({
+      Probot: Probot.defaults({
+        log: pino(streamLogsToOutput),
+        // workaround for https://github.com/probot/probot/issues/1512
+        appId: 1,
+        privateKey: "dummy value for setup, see #1512",
+      }),
+      log: pino(streamLogsToOutput),
+      port,
+    });
 
-//     await server.load(setupAppFactory(undefined, undefined));
-//   });
+    await server.loadHandler(setupAppFactory(undefined, port));
 
-//   afterEach(async () => {
-//     vi.clearAllMocks();
-//   });
+    await server.start();
+  });
 
-//   describe("logs", () => {
-//     it("should log welcome message", () => {
-//       const expMsgs = [
-//         "",
-//         "Welcome to Probot!",
-//         "Probot is in setup mode, webhooks cannot be received and",
-//         "custom routes will not work until APP_ID and PRIVATE_KEY",
-//         "are configured in .env.",
-//         "Please follow the instructions at http://localhost:3000 to configure .env.",
-//         "Once you are done, restart the server.",
-//         "",
-//       ];
+  afterEach(async () => {
+    vi.clearAllMocks();
+    await server.stop();
+  });
 
-//       const infoLogs = logOutput
-//         .filter((output: any) => output.level === pino.levels.values.info)
-//         .map((o) => o.msg);
+  describe("logs", () => {
+    it("should log welcome message", () => {
+      const expMsgs = [
+        "",
+        "Welcome to Probot!",
+        "Probot is in setup mode, webhooks cannot be received and",
+        "custom routes will not work until APP_ID and PRIVATE_KEY",
+        "are configured in .env.",
+        `Please follow the instructions at http://localhost:${port} to configure .env.`,
+        "Once you are done, restart the server.",
+        "",
+        `Running Probot v0.0.0-development (Node.js: ${process.version})`,
+        `Listening on http://localhost:${port}`,
+      ];
 
-//       expect(infoLogs).toEqual(expect.arrayContaining(expMsgs));
-//     });
+      const infoLogs = logOutput
+        .filter((output: any) => output.level === pino.levels.values.info)
+        .map((o) => o.msg);
 
-//     it("should log welcome message with custom host and port", async () => {
-//       const server2 = new Server({
-//         log: pino(streamLogsToOutput),
-//         Probot: Probot.defaults({
-//           log: pino(streamLogsToOutput),
-//           // workaround for https://github.com/probot/probot/issues/1512
-//           appId: 1,
-//           privateKey: "dummy value for setup, see #1512",
-//         }),
-//       });
+      expect(infoLogs).toEqual(expect.arrayContaining(expMsgs));
+    });
 
-//       await server2.load(setupAppFactory("127.0.0.1", 8080));
+    it("should log welcome message with custom host and port", async () => {
+      const server2 = new Server({
+        log: pino(streamLogsToOutput),
+        Probot: Probot.defaults({
+          log: pino(streamLogsToOutput),
+          // workaround for https://github.com/probot/probot/issues/1512
+          appId: 1,
+          privateKey: "dummy value for setup, see #1512",
+        }),
+        host: "127.0.0.1",
+        port,
+      });
 
-//       const expMsg =
-//         "Please follow the instructions at http://127.0.0.1:8080 to configure .env.";
+      await server2.loadHandler(setupAppFactory("127.0.0.1", port));
 
-//       const infoLogs = logOutput
-//         .filter((output: any) => output.level === pino.levels.values.info)
-//         .map((o) => o.msg);
-//       expect(infoLogs).toContain(expMsg);
-//     });
-//   });
+      const expMsg = `Please follow the instructions at http://127.0.0.1:${port} to configure .env.`;
 
-//   describe("GET /probot", () => {
-//     it("returns a 200 response", async () => {
-//       await request(server.expressApp).get("/probot").expect(200);
-//     });
-//   });
+      const infoLogs = logOutput
+        .filter((output: any) => output.level === pino.levels.values.info)
+        .map((o) => o.msg);
+      expect(infoLogs).toContain(expMsg);
+    });
+  });
 
-//   describe("GET /probot/setup", () => {
-//     it("returns a redirect", async () => {
-//       const mock = fetchMock
-//         .createInstance()
-//         .postOnce("https://api.github.com/app-manifests/123/conversions", {
-//           status: 201,
-//           body: {
-//             html_url: "/apps/my-app",
-//             id: "id",
-//             pem: "pem",
-//             webhook_secret: "webhook_secret",
-//             client_id: "Iv1.8a61f9b3a7aba766",
-//             client_secret: "1726be1638095a19edd134c77bde3aa2ece1e5d8",
-//           },
-//         });
+  describe("GET /probot", () => {
+    it("returns a 200 response", async () => {
+      const response = await fetch(`http://localhost:${port}/probot`);
+      expect(response.status).toBe(200);
+    });
+  });
 
-//       const server = new Server({
-//         Probot: Probot.defaults({
-//           log: pino(streamLogsToOutput),
-//           // workaround for https://github.com/probot/probot/issues/1512
-//           appId: 1,
-//           privateKey: "dummy value for setup, see #1512",
-//         }),
-//         log: pino(streamLogsToOutput),
-//         request: {
-//           fetch: mock.fetchHandler,
-//         },
-//       });
+  describe("GET /probot/setup", () => {
+    it("returns a redirect", async () => {
+      const mock = fetchMock
+        .createInstance()
+        .postOnce("https://api.github.com/app-manifests/123/conversions", {
+          status: 201,
+          body: {
+            html_url: "/apps/my-app",
+            id: "id",
+            pem: "pem",
+            webhook_secret: "webhook_secret",
+            client_id: "Iv1.8a61f9b3a7aba766",
+            client_secret: "1726be1638095a19edd134c77bde3aa2ece1e5d8",
+          },
+        });
 
-//       await server.load(setupAppFactory(undefined, undefined));
+      const server = new Server({
+        Probot: Probot.defaults({
+          log: pino(streamLogsToOutput),
+          // workaround for https://github.com/probot/probot/issues/1512
+          appId: 1,
+          privateKey: "dummy value for setup, see #1512",
+        }),
+        log: pino(streamLogsToOutput),
+        request: {
+          fetch: mock.fetchHandler,
+        },
+      });
 
-//       const setupResponse = await request(server.expressApp)
-//         .get("/probot/setup")
-//         .query({ code: "123" })
-//         .expect(302)
-//         .expect("Location", "/apps/my-app/installations/new");
+      await server.loadHandler(setupAppFactory(undefined, port));
 
-//       expect(setupResponse.text).toMatchSnapshot();
+      const setupResponse = await fetch(
+        `http://localhost:${port}/probot/setup?code=123`,
+        { redirect: "manual" },
+      );
 
-//       expect(mocks.createChannel).toHaveBeenCalledTimes(2);
-//       expect(mocks.updateDotenv.mock.calls).toMatchSnapshot();
-//     });
+      expect(setupResponse.status).toBe(302);
+      expect(setupResponse.headers.get("Location")).toBe(
+        "/apps/my-app/installations/new",
+      );
 
-//     it("throws a 400 Error if code is not provided", async () => {
-//       const server = new Server({
-//         Probot: Probot.defaults({
-//           log: pino(streamLogsToOutput),
-//           // workaround for https://github.com/probot/probot/issues/1512
-//           appId: 1,
-//           privateKey: "dummy value for setup, see #1512",
-//         }),
-//         log: pino(streamLogsToOutput),
-//       });
+      expect(await setupResponse.text()).toMatchSnapshot();
 
-//       await server.load(setupAppFactory(undefined, undefined));
+      expect(mocks.createChannel).toHaveBeenCalledTimes(2);
+      expect(mocks.updateDotenv.mock.calls).toMatchSnapshot();
+    });
 
-//       const setupResponse = await request(server.expressApp)
-//         .get("/probot/setup")
-//         .expect(400);
+    it("throws a 400 Error if code is not provided", async () => {
+      const server = new Server({
+        Probot: Probot.defaults({
+          log: pino(streamLogsToOutput),
+          // workaround for https://github.com/probot/probot/issues/1512
+          appId: 1,
+          privateKey: "dummy value for setup, see #1512",
+        }),
+        log: pino(streamLogsToOutput),
+      });
 
-//       expect(setupResponse.text).toMatchSnapshot();
-//     });
+      await server.loadHandler(setupAppFactory(undefined, port));
 
-//     it("throws a 400 Error if code is an empty string", async () => {
-//       const server = new Server({
-//         Probot: Probot.defaults({
-//           log: pino(streamLogsToOutput),
-//           // workaround for https://github.com/probot/probot/issues/1512
-//           appId: 1,
-//           privateKey: "dummy value for setup, see #1512",
-//         }),
-//         log: pino(streamLogsToOutput),
-//       });
+      const setupResponse = await fetch(
+        `http://localhost:${port}/probot/setup`,
+      );
 
-//       await server.load(setupAppFactory(undefined, undefined));
+      expect(setupResponse.status).toBe(400);
+      expect(await setupResponse.text()).toMatchSnapshot();
+    });
 
-//       const setupResponse = await request(server.expressApp)
-//         .get("/probot/setup")
-//         .query({ code: "" })
-//         .expect(400);
+    it("throws a 400 Error if code is an empty string", async () => {
+      const server = new Server({
+        Probot: Probot.defaults({
+          log: pino(streamLogsToOutput),
+          // workaround for https://github.com/probot/probot/issues/1512
+          appId: 1,
+          privateKey: "dummy value for setup, see #1512",
+        }),
+        log: pino(streamLogsToOutput),
+      });
 
-//       expect(setupResponse.text).toMatchSnapshot();
-//     });
-//   });
+      await server.loadHandler(setupAppFactory(undefined, port));
 
-//   describe("GET /probot/import", () => {
-//     it("renders importView", async () => {
-//       const importView = await request(server.expressApp)
-//         .get("/probot/import")
-//         .expect(200);
+      const setupResponse = await fetch(
+        `http://localhost:${port}/probot/setup?code=`,
+      );
 
-//       expect(importView.text).toMatchSnapshot();
-//     });
-//   });
+      expect(setupResponse.status).toBe(400);
 
-//   describe("POST /probot/import", () => {
-//     it("updates .env", async () => {
-//       const body = JSON.stringify({
-//         appId: "foo",
-//         pem: "bar",
-//         webhook_secret: "baz",
-//       });
+      expect(await setupResponse.text()).toMatchSnapshot();
+    });
+  });
 
-//       await request(server.expressApp)
-//         .post("/probot/import")
-//         .set("content-type", "application/json")
-//         .send(body)
-//         .expect(200)
-//         .expect("");
+  describe("GET /probot/import", () => {
+    it("renders importView", async () => {
+      const importView = await fetch(`http://localhost:${port}/probot/import`);
 
-//       expect(mocks.updateDotenv.mock.calls).toMatchSnapshot();
-//     });
+      expect(importView.status).toBe(200);
+      expect(await importView.text()).toMatchSnapshot();
+    });
+  });
 
-//     it("400 when keys are missing", async () => {
-//       const body = JSON.stringify({
-//         appId: "foo",
-//         /* no pem */
-//         webhook_secret: "baz",
-//       });
+  describe("POST /probot/import", () => {
+    it("updates .env", async () => {
+      const body = JSON.stringify({
+        appId: "foo",
+        pem: "bar",
+        webhook_secret: "baz",
+      });
 
-//       const importResponse = await request(server.expressApp)
-//         .post("/probot/import")
-//         .set("content-type", "application/json")
-//         .send(body)
-//         .expect(400);
+      const response = await fetch(`http://localhost:${port}/probot/import`, {
+        body,
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+      });
 
-//       expect(importResponse.text).toMatchSnapshot();
-//     });
-//   });
+      expect(response.status).toBe(200);
+      expect(await response.text()).toBe("");
 
-//   describe("GET /probot/success", () => {
-//     it("returns a 200 response", async () => {
-//       const successResponse = await request(server.expressApp)
-//         .get("/probot/success")
-//         .expect(200);
+      expect(mocks.updateDotenv.mock.calls).toMatchSnapshot();
+    });
 
-//       expect(successResponse.text).toMatchSnapshot();
+    it("400 when keys are missing", async () => {
+      const body = JSON.stringify({
+        appId: "foo",
+        /* no pem */
+        webhook_secret: "baz",
+      });
 
-//       expect(mocks.createChannel).toHaveBeenCalledTimes(1);
-//     });
-//   });
-// });
+      const importResponse = await fetch(
+        `http://localhost:${port}/probot/import`,
+        {
+          body,
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+          },
+        },
+      );
+
+      expect(importResponse.status).toBe(400);
+      expect(await importResponse.text()).toMatchSnapshot();
+    });
+  });
+
+  describe("GET /probot/success", () => {
+    it("returns a 200 response", async () => {
+      const successResponse = await fetch(
+        `http://localhost:${port}/probot/success`,
+      );
+
+      expect(successResponse.status).toBe(200);
+
+      expect(await successResponse.text()).toMatchSnapshot();
+
+      expect(mocks.createChannel).toHaveBeenCalledTimes(1);
+    });
+  });
+});

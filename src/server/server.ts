@@ -4,7 +4,7 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import type { Logger } from "pino";
-import { createNodeHandler } from "@octokit/webhooks";
+import { createNodeMiddleware } from "@octokit/webhooks";
 
 import { getLoggingMiddleware } from "./logging-middleware.js";
 import { createWebhookProxy } from "../helpers/webhook-proxy.js";
@@ -124,17 +124,12 @@ export class Server {
 
     this.handlers.push(staticFilesHandler);
 
-    const webhookHandler = createNodeHandler(this.probotApp.webhooks, {
+    const webhookHandler = createNodeMiddleware(this.probotApp.webhooks, {
       log: this.log,
+      path: this.state.webhookPath,
     });
 
-    this.handlers.push((req, res) => {
-      if (req.url === this.state.webhookPath) {
-        webhookHandler(req, res);
-        return true;
-      }
-      return false;
-    });
+    this.handlers.push(webhookHandler);
 
     this.handlers.push(pingPongHandler);
   }

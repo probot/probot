@@ -128,6 +128,7 @@ describe("run", async () => {
         env: {
           ...env,
           WEBHOOK_PATH: "/custom-webhook",
+          PORT: "0",
         },
       });
 

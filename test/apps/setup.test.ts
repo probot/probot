@@ -87,13 +87,13 @@ describe("Setup app", async () => {
           appId: 1,
           privateKey: "dummy value for setup, see #1512",
         }),
-        host: "127.0.0.1",
+        host: "localhost",
         port,
       });
 
-      await server2.loadHandler(setupAppFactory("127.0.0.1", port));
+      await server2.loadHandler(setupAppFactory("localhost", port));
 
-      const expMsg = `Please follow the instructions at http://127.0.0.1:${port} to configure .env.`;
+      const expMsg = `Please follow the instructions at http://localhost:${port} to configure .env.`;
 
       const infoLogs = logOutput
         .filter((output: any) => output.level === pino.levels.values.info)
@@ -136,9 +136,11 @@ describe("Setup app", async () => {
         request: {
           fetch: mock.fetchHandler,
         },
+        host: "localhost",
+        port,
       });
 
-      await server.loadHandler(setupAppFactory(undefined, port));
+      await server.loadHandler(setupAppFactory("localhost", port));
 
       const setupResponse = await fetch(
         `http://localhost:${port}/probot/setup?code=123`,
@@ -167,7 +169,7 @@ describe("Setup app", async () => {
         log: pino(streamLogsToOutput),
       });
 
-      await server.loadHandler(setupAppFactory(undefined, port));
+      await server.loadHandler(setupAppFactory("localhost", port));
 
       const setupResponse = await fetch(
         `http://localhost:${port}/probot/setup`,

@@ -96,17 +96,18 @@ export class Server {
 
     const staticFilesHandler: Handler = (req, res) => {
       if (req.method === "GET") {
-        if (req.url === "/probot/static/robot.svg") {
+        const path = req.url?.split("?")[0] || "";
+        if (path === "/probot/static/robot.svg") {
           res.writeHead(200, { "content-type": "image/svg+xml" }).end(robotSvg);
           return true;
         }
-        if (req.url === "/probot/static/probot-head.png") {
+        if (path === "/probot/static/probot-head.png") {
           res
             .writeHead(200, { "content-type": "image/png" })
             .end(probotHeadPng);
           return true;
         }
-        if (req.url === "/probot/static/primer.css") {
+        if (path === "/probot/static/primer.css") {
           res.writeHead(200, { "content-type": "text/css" }).end(primerCss);
           return true;
         }
@@ -115,9 +116,12 @@ export class Server {
     };
 
     const pingPongHandler: Handler = (req, res) => {
-      if (req.method === "GET" && req.url === "/ping") {
-        res.writeHead(200, { "content-type": "text/plain" }).end("PONG");
-        return true;
+      if (req.method === "GET") {
+        const path = req.url?.split("?")[0] || "";
+        if (path === "/ping") {
+          res.writeHead(200, { "content-type": "text/plain" }).end("PONG");
+          return true;
+        }
       }
       return false;
     };

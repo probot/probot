@@ -46,8 +46,9 @@ export const setupAppFactory = (
     printWelcomeMessage(app, host, port);
 
     const setupHandler: Handler = async (req, res) => {
+      const [path, query = ""] = req.url?.split("?") ?? [req.url, ""];
       if (req.method === "GET") {
-        if (req.url === "/") {
+        if (path === "/") {
           res
             .writeHead(302, {
               "content-type": "text/plain",
@@ -56,7 +57,7 @@ export const setupAppFactory = (
             .end(`Found. Redirecting to /probot`);
           return true;
         }
-        if (req.url === "/probot") {
+        if (path === "/probot") {
           const baseUrl = getBaseUrl(req);
           const manifest = setup.getManifest(pkg, baseUrl);
           const createAppUrl = setup.createAppUrl;
@@ -72,10 +73,10 @@ export const setupAppFactory = (
           );
           return true;
         }
-        if (req.url === "/probot/setup") {
+        if (path === "/probot/setup") {
           const { code } =
             // @ts-expect-error query could be set by a framework, e.g. express
-            req.query || parseQuery(req.url?.split("?")[1] || "");
+            req.query || parseQuery(query);
 
           if (!code || typeof code !== "string" || code.length === 0) {
             res
@@ -108,7 +109,7 @@ export const setupAppFactory = (
             .end(`Found. Redirecting to ${response}/installations/new`);
           return true;
         }
-        if (req.url === "/probot/import") {
+        if (path === "/probot/import") {
           res
             .writeHead(200, {
               "content-type": "text/html",
@@ -116,7 +117,7 @@ export const setupAppFactory = (
             .end(importViewRendered);
           return true;
         }
-        if (req.url === "/probot/success") {
+        if (path === "/probot/success") {
           res
             .writeHead(200, { "content-type": "text/html" })
             .end(successViewRendered);
@@ -125,7 +126,7 @@ export const setupAppFactory = (
       }
 
       if (req.method === "POST") {
-        if (req.url === "/probot/import") {
+        if (path === "/probot/import") {
           const { appId, pem, webhook_secret } = JSON.parse(
             await getPayload(req),
           );

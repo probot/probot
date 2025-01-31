@@ -5,7 +5,7 @@ import { sign } from "@octokit/webhooks-methods";
 import getPort from "get-port";
 import { describe, expect, it, beforeEach } from "vitest";
 
-import { Probot, run, Server } from "../src/index.js";
+import { Probot, run } from "../src/index.js";
 
 import { captureLogOutput } from "./helpers/capture-log-output.js";
 import WebhookExamples, {
@@ -15,7 +15,6 @@ import WebhookExamples, {
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 describe("run", async () => {
-  let server: Server;
   let env: NodeJS.ProcessEnv;
   let port = await getPort();
 
@@ -37,7 +36,7 @@ describe("run", async () => {
     it("runs with a function as argument", async () => {
       let initialized = false;
 
-      server = await run(
+      const server = await run(
         () => {
           initialized = true;
         },
@@ -48,7 +47,7 @@ describe("run", async () => {
     });
 
     it("runs with an array of strings", async () => {
-      server = await run([
+      const server = await run([
         "node",
         "probot-run",
         "./test/fixtures/example.js",
@@ -64,7 +63,7 @@ describe("run", async () => {
       env.PORT = "3003";
 
       return new Promise(async (resolve) => {
-        server = await run(
+        const server = await run(
           (_app: Probot) => {
             initialized = true;
           },
@@ -81,7 +80,7 @@ describe("run", async () => {
       let outputData = "";
       env.NODE_ENV = "production";
 
-      server = await run(
+      const server = await run(
         async (app) => {
           outputData = await captureLogOutput(async () => {
             app.log.fatal("test");
@@ -103,7 +102,7 @@ describe("run", async () => {
     ).examples[0];
 
     it("POST /api/github/webhooks", async () => {
-      server = await run(() => {}, { env: { ...env, PORT: port + "" } });
+      const server = await run(() => {}, { env: { ...env, PORT: port + "" } });
 
       const dataString = JSON.stringify(pushEvent);
 
@@ -127,7 +126,7 @@ describe("run", async () => {
     });
 
     it("custom webhook path", async () => {
-      server = await run(() => {}, {
+      const server = await run(() => {}, {
         env: {
           ...env,
           WEBHOOK_PATH: "/custom-webhook",

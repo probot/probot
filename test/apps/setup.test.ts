@@ -111,6 +111,8 @@ describe("Setup app", async () => {
 
   describe("GET /probot/setup", () => {
     it("returns a redirect", async () => {
+      const port = await getPort();
+
       const mock = fetchMock
         .createInstance()
         .postOnce("https://api.github.com/app-manifests/123/conversions", {
@@ -142,6 +144,8 @@ describe("Setup app", async () => {
 
       await server.loadHandler(setupAppFactory("localhost", port));
 
+      await server.start();
+
       const setupResponse = await fetch(
         `http://localhost:${port}/probot/setup?code=123`,
         { redirect: "manual" },
@@ -156,6 +160,8 @@ describe("Setup app", async () => {
 
       expect(mocks.createChannel).toHaveBeenCalledTimes(2);
       expect(mocks.updateDotenv.mock.calls).toMatchSnapshot();
+
+      await server.stop();
     });
 
     it("throws a 400 Error if code is not provided", async () => {

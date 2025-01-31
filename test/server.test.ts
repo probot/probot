@@ -1,7 +1,6 @@
 import { Writable } from "node:stream";
 
-// import type { NextFunction, Request, Response } from "express";
-// import request from "supertest";
+import http from "http";
 import { pino } from "pino";
 import { sign } from "@octokit/webhooks-methods";
 import WebhookExamples, {
@@ -136,6 +135,8 @@ describe("Server", async () => {
     });
 
     test("respond with a friendly error when x-hub-signature-256 is missing", async () => {
+      expect.assertions(2);
+
       await server.load(() => {});
 
       const response = await fetch(
@@ -208,6 +209,8 @@ describe("Server", async () => {
 
     describe("GET unknown URL", () => {
       it("responds with 404", async () => {
+        expect.assertions(3);
+
         const response = await fetch(
           `http://localhost:${server.port}/notfound`,
         );
@@ -224,7 +227,6 @@ describe("Server", async () => {
           expect.assertions(1);
 
           // block port 3001
-          const http = require("http");
           const blockade = http.createServer().listen(3001, async () => {
             const server = new Server({
               Probot: Probot.defaults({ appId, privateKey }),

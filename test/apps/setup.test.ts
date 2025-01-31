@@ -6,7 +6,6 @@ import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 
 import { Probot, Server } from "../../src/index.js";
 import { setupAppFactory } from "../../src/apps/setup.js";
-import getPort from "get-port";
 
 const mocks = vi.hoisted(() => {
   return {
@@ -23,9 +22,9 @@ vi.mock("update-dotenv", () => ({
 }));
 
 describe("Setup app", async () => {
-  const port = await getPort();
   let server: Server;
   let logOutput: any[] = [];
+  let port = 0;
 
   const streamLogsToOutput = new Stream.Writable({ objectMode: true });
   streamLogsToOutput._write = (msg, _encoding, done) => {
@@ -43,12 +42,14 @@ describe("Setup app", async () => {
         privateKey: "dummy value for setup, see #1512",
       }),
       log: pino(streamLogsToOutput),
-      port,
+      port: 0,
     });
 
-    await server.loadHandler(setupAppFactory(undefined, port));
-
     await server.start();
+
+    port = server.port!;
+
+    await server.loadHandler(setupAppFactory(undefined, port));
   });
 
   afterEach(async () => {
@@ -111,8 +112,6 @@ describe("Setup app", async () => {
 
   describe("GET /probot/setup", () => {
     it("returns a redirect", async () => {
-      const port = await getPort();
-
       const mock = fetchMock
         .createInstance()
         .postOnce("https://api.github.com/app-manifests/123/conversions", {
@@ -139,15 +138,15 @@ describe("Setup app", async () => {
           fetch: mock.fetchHandler,
         },
         host: "localhost",
-        port,
+        port: 0,
       });
 
-      await server.loadHandler(setupAppFactory("localhost", port));
+      await server.loadHandler(setupAppFactory("localhost", server.port));
 
       await server.start();
 
       const setupResponse = await fetch(
-        `http://localhost:${port}/probot/setup?code=123`,
+        `http://localhost:${server.port}/probot/setup?code=123`,
         { redirect: "manual" },
       );
 

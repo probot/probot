@@ -163,17 +163,17 @@ export class Server {
 
     this.state.httpServer = await new Promise((resolve, reject) => {
       const server = this.state.httpServer!.listen(port, host, async () => {
+        this.state.port = (server.address() as AddressInfo).port;
+
         if (webhookProxy) {
           this.state.eventSource = await createWebhookProxy({
             logger: this.log,
             path: webhookPath,
-            port: port,
+            port: this.port,
             url: webhookProxy,
           });
         }
-        const { port: serverPort } = server.address() as AddressInfo;
-        this.state.port = serverPort;
-        this.log.info(`Listening on http://${printableHost}:${serverPort}`);
+        this.log.info(`Listening on http://${printableHost}:${this.port}`);
         resolve(server);
       });
 

@@ -1,12 +1,14 @@
 import { Writable } from "node:stream";
-import { ManifestCreation } from "../../src/manifest-creation.js";
-import { describe, test, expect, afterEach } from "vitest";
-import { ApplicationFunction, Probot, Server } from "../../src/index.js";
+
+import { sign } from "@octokit/webhooks-methods";
 import { pino } from "pino";
+import { describe, test, expect, afterEach } from "vitest";
+
+import { ManifestCreation } from "../../src/manifest-creation.js";
+import { ApplicationFunction, Probot, Server } from "../../src/index.js";
 import WebhookExamples, {
   type WebhookDefinition,
 } from "@octokit/webhooks-examples";
-import { sign } from "@octokit/webhooks-methods";
 
 describe("smee-client", () => {
   afterEach(async () => {

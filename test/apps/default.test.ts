@@ -40,7 +40,7 @@ describe("default app", async () => {
       const server = await instantiateServer();
       await server.start();
       expect(
-        (await fetch(`http://localhost:${server.port}/probot`)).status,
+        (await fetch(`http://${server.host}:${server.port}/probot`)).status,
       ).toBe(200);
       await server.stop();
     });
@@ -49,7 +49,9 @@ describe("default app", async () => {
       it("returns the correct HTML with values", async () => {
         const server = await instantiateServer();
         await server.start();
-        const response = await fetch(`http://localhost:${server.port}/probot`);
+        const response = await fetch(
+          `http://${server.host}:${server.port}/probot`,
+        );
         expect(response.status).toBe(200);
 
         const actualText = await response.text();
@@ -63,7 +65,9 @@ describe("default app", async () => {
       it("returns the correct HTML without values", async () => {
         const server = await instantiateServer(__dirname);
         await server.start();
-        const response = await fetch(`http://localhost:${server.port}/probot`);
+        const response = await fetch(
+          `http://${server.host}:${server.port}/probot`,
+        );
         expect(response.status).toBe(200);
 
         const actualText = await response.text();
@@ -79,7 +83,7 @@ describe("default app", async () => {
     it("redirects to /probot", async () => {
       const server = await instantiateServer(__dirname);
       await server.start();
-      const response = await fetch(`http://localhost:${server.port}/`, {
+      const response = await fetch(`http://${server.host}:${server.port}/`, {
         redirect: "manual",
       });
 

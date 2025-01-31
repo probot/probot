@@ -1,6 +1,6 @@
+import http from "node:http";
 import { Writable } from "node:stream";
 
-import http from "http";
 import { pino } from "pino";
 import { sign } from "@octokit/webhooks-methods";
 import WebhookExamples, {
@@ -80,7 +80,7 @@ describe("Server", async () => {
 
   describe("GET /ping", () => {
     it("returns a 200 response", async () => {
-      const response = await fetch(`http://localhost:${server.port}/ping`);
+      const response = await fetch(`http://${server.host}:${server.port}/ping`);
       expect(response.status).toBe(200);
       expect(await response.text()).toBe("PONG");
 
@@ -116,7 +116,7 @@ describe("Server", async () => {
 
       const dataString = JSON.stringify(pushEvent);
 
-      const response = await fetch(`http://localhost:${server.port}/`, {
+      const response = await fetch(`http://${server.host}:${server.port}/`, {
         body: dataString,
         method: "POST",
         headers: {
@@ -140,7 +140,7 @@ describe("Server", async () => {
       await server.load(() => {});
 
       const response = await fetch(
-        `http://localhost:${server.port}/api/github/webhooks`,
+        `http://${server.host}:${server.port}/api/github/webhooks`,
         {
           body: JSON.stringify(pushEvent),
           method: "POST",
@@ -186,7 +186,7 @@ describe("Server", async () => {
       const dataString = JSON.stringify(pushEvent);
 
       const response = await fetch(
-        `http://localhost:${server.port}/api/github/webhooks`,
+        `http://${server.host}:${server.port}/api/github/webhooks`,
         {
           method: "POST",
           body: dataString,
@@ -212,7 +212,7 @@ describe("Server", async () => {
         expect.assertions(3);
 
         const response = await fetch(
-          `http://localhost:${server.port}/notfound`,
+          `http://${server.host}:${server.port}/notfound`,
         );
 
         expect(response.status).toBe(404);
@@ -257,7 +257,9 @@ describe("Server", async () => {
         await testApp.start();
 
         expect(output.length).toEqual(2);
-        expect(output[1].msg).toEqual("Listening on http://localhost:3001");
+        expect(output[1].msg).toEqual(
+          `Listening on http://${server.host}:3001`,
+        );
 
         await testApp.stop();
       });

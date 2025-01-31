@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import { isIPv6 } from "node:net";
 import { Server as HttpServer } from "node:http";
 import { join, dirname } from "node:path";
 import type { AddressInfo } from "node:net";
@@ -159,11 +160,15 @@ export class Server {
     );
     const port = this.state.port ?? 3000;
     const { host, webhookPath, webhookProxy } = this.state;
-    const printableHost = host ?? "localhost";
 
     this.state.httpServer = await new Promise((resolve, reject) => {
       const server = this.state.httpServer!.listen(port, host, async () => {
         this.state.port = (server.address() as AddressInfo).port;
+        this.state.host = (server.address() as AddressInfo).address;
+
+        if (isIPv6(this.state.host)) {
+          this.state.host = `[${this.state.host}]`;
+        }
 
         if (webhookProxy) {
           this.state.eventSource = await createWebhookProxy({
@@ -173,7 +178,7 @@ export class Server {
             url: webhookProxy,
           });
         }
-        this.log.info(`Listening on http://${printableHost}:${this.port}`);
+        this.log.info(`Listening on http://${this.host}:${this.port}`);
         resolve(server);
       });
 

@@ -161,22 +161,18 @@ export class Server {
     const printableHost = host ?? "localhost";
 
     this.state.httpServer = await new Promise((resolve, reject) => {
-      const server = this.state.httpServer!.listen(
-        port,
-        ...((host ? [host] : []) as any),
-        async () => {
-          if (webhookProxy) {
-            this.state.eventSource = await createWebhookProxy({
-              logger: this.log,
-              path: webhookPath,
-              port: port,
-              url: webhookProxy,
-            });
-          }
-          this.log.info(`Listening on http://${printableHost}:${port}`);
-          resolve(server);
-        },
-      );
+      const server = this.state.httpServer!.listen(port, host, async () => {
+        if (webhookProxy) {
+          this.state.eventSource = await createWebhookProxy({
+            logger: this.log,
+            path: webhookPath,
+            port: port,
+            url: webhookProxy,
+          });
+        }
+        this.log.info(`Listening on http://${printableHost}:${port}`);
+        resolve(server);
+      });
 
       server.on("error", (error: NodeJS.ErrnoException) => {
         if (error.code === "EADDRINUSE") {

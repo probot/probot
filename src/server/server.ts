@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import { Server as HttpServer } from "node:http";
 import { join, dirname } from "node:path";
+import type { AddressInfo } from "node:net";
 import { fileURLToPath } from "node:url";
 
 import type { Logger } from "pino";
@@ -156,7 +157,7 @@ export class Server {
     this.log.info(
       `Running Probot v${this.version} (Node.js: ${process.version})`,
     );
-    const port = this.state.port || 3000;
+    const port = this.state.port ?? 3000;
     const { host, webhookPath, webhookProxy } = this.state;
     const printableHost = host ?? "localhost";
 
@@ -170,7 +171,9 @@ export class Server {
             url: webhookProxy,
           });
         }
-        this.log.info(`Listening on http://${printableHost}:${port}`);
+        const { port: serverPort } = server.address() as AddressInfo;
+        this.state.port = serverPort;
+        this.log.info(`Listening on http://${printableHost}:${serverPort}`);
         resolve(server);
       });
 
@@ -194,5 +197,13 @@ export class Server {
     if (!this.state.httpServer) return;
     const server = this.state.httpServer;
     return new Promise((resolve) => server.close(resolve));
+  }
+
+  get port() {
+    return this.state.port;
+  }
+
+  get host() {
+    return this.state.host;
   }
 }

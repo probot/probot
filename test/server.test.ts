@@ -4,7 +4,6 @@ import { Writable } from "node:stream";
 // import request from "supertest";
 import { pino } from "pino";
 import { sign } from "@octokit/webhooks-methods";
-import getPort from "get-port";
 import WebhookExamples, {
   type WebhookDefinition,
 } from "@octokit/webhooks-examples";
@@ -49,8 +48,6 @@ const pushEvent = (
 describe("Server", async () => {
   let server: Server;
 
-  const port = await getPort();
-
   let output: any[];
   const streamLogsToOutput = new Writable({ objectMode: true });
   streamLogsToOutput._write = (object, _encoding, done) => {
@@ -68,7 +65,7 @@ describe("Server", async () => {
         secret: "secret",
         log: log.child({ name: "probot" }),
       }),
-      port,
+      port: 0,
       log: log.child({ name: "server" }),
     });
     await server.start();
@@ -84,7 +81,7 @@ describe("Server", async () => {
 
   describe("GET /ping", () => {
     it("returns a 200 response", async () => {
-      const response = await fetch(`http://localhost:${port}/ping`);
+      const response = await fetch(`http://localhost:${server.port}/ping`);
       expect(response.status).toBe(200);
       expect(await response.text()).toBe("PONG");
 
@@ -97,7 +94,6 @@ describe("Server", async () => {
     it("should return 200 and run event handlers in app function", async () => {
       expect.assertions(4);
 
-      const port = await getPort();
       output = [];
 
       const server = new Server({
@@ -108,7 +104,7 @@ describe("Server", async () => {
           secret: "secret",
         }),
         log: pino(streamLogsToOutput),
-        port,
+        port: 0,
       });
 
       await server.load((app) => {
@@ -121,7 +117,7 @@ describe("Server", async () => {
 
       const dataString = JSON.stringify(pushEvent);
 
-      const response = await fetch(`http://localhost:${port}/`, {
+      const response = await fetch(`http://localhost:${server.port}/`, {
         body: dataString,
         method: "POST",
         headers: {
@@ -143,7 +139,7 @@ describe("Server", async () => {
       await server.load(() => {});
 
       const response = await fetch(
-        `http://localhost:${port}/api/github/webhooks`,
+        `http://localhost:${server.port}/api/github/webhooks`,
         {
           body: JSON.stringify(pushEvent),
           method: "POST",
@@ -166,8 +162,6 @@ describe("Server", async () => {
     it("should return 200 and run event handlers in app function", async () => {
       expect.assertions(4);
 
-      const port = await getPort();
-
       output = [];
 
       const server = new Server({
@@ -177,7 +171,7 @@ describe("Server", async () => {
           secret: "secret",
         }),
         log: pino(streamLogsToOutput),
-        port,
+        port: 0,
       });
 
       await server.load((app) => {
@@ -191,7 +185,7 @@ describe("Server", async () => {
       const dataString = JSON.stringify(pushEvent);
 
       const response = await fetch(
-        `http://localhost:${port}/api/github/webhooks`,
+        `http://localhost:${server.port}/api/github/webhooks`,
         {
           method: "POST",
           body: dataString,
@@ -214,7 +208,9 @@ describe("Server", async () => {
 
     describe("GET unknown URL", () => {
       it("responds with 404", async () => {
-        const response = await fetch(`http://localhost:${port}/notfound`);
+        const response = await fetch(
+          `http://localhost:${server.port}/notfound`,
+        );
 
         expect(response.status).toBe(404);
         expect(output.length).toEqual(3);

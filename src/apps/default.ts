@@ -18,13 +18,14 @@ export function defaultApp(
 
   const defaultHandler: Handler = (req, res) => {
     if (req.method === "GET") {
-      if (req.url === "/") {
+      const path = req.url?.split("?")[0] || "";
+      if (path === "/") {
         res
           .writeHead(302, { "content-type": "text/plain", location: `/probot` })
           .end(`Found. Redirecting to /probot`);
         return true;
       }
-      if (req.url === "/probot") {
+      if (path === "/probot") {
         res
           .writeHead(200, { "content-type": "text/html" })
           .end(probotViewRendered);

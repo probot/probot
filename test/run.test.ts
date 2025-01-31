@@ -105,7 +105,7 @@ describe("run", async () => {
       const dataString = JSON.stringify(pushEvent);
 
       const response = await fetch(
-        `http://localhost:${server.port}/api/github/webhooks`,
+        `http://${server.host}:${server.port}/api/github/webhooks`,
         {
           method: "POST",
           body: dataString,
@@ -136,7 +136,7 @@ describe("run", async () => {
 
       try {
         const response = await fetch(
-          `http://localhost:${server.port}/custom-webhook`,
+          `http://${server.host}:${server.port}/custom-webhook`,
           {
             method: "POST",
             body: dataString,

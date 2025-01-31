@@ -47,9 +47,7 @@ describe("Setup app", async () => {
 
     await server.start();
 
-    port = server.port!;
-
-    await server.loadHandler(setupAppFactory(undefined, port));
+    await server.loadHandler(setupAppFactory(server.host, server.port));
   });
 
   afterEach(async () => {
@@ -65,11 +63,11 @@ describe("Setup app", async () => {
         "Probot is in setup mode, webhooks cannot be received and",
         "custom routes will not work until APP_ID and PRIVATE_KEY",
         "are configured in .env.",
-        `Please follow the instructions at http://localhost:${port} to configure .env.`,
+        `Please follow the instructions at http://${server.host}:${server.port} to configure .env.`,
         "Once you are done, restart the server.",
         "",
         `Running Probot v0.0.0-development (Node.js: ${process.version})`,
-        `Listening on http://localhost:${port}`,
+        `Listening on http://${server.host}:${server.port}`,
       ];
 
       const infoLogs = logOutput
@@ -92,9 +90,9 @@ describe("Setup app", async () => {
         port,
       });
 
-      await server2.loadHandler(setupAppFactory("localhost", port));
+      await server2.loadHandler(setupAppFactory(server.host, port));
 
-      const expMsg = `Please follow the instructions at http://localhost:${port} to configure .env.`;
+      const expMsg = `Please follow the instructions at http://${server.host}:${server.port} to configure .env.`;
 
       const infoLogs = logOutput
         .filter((output: any) => output.level === pino.levels.values.info)
@@ -105,7 +103,9 @@ describe("Setup app", async () => {
 
   describe("GET /probot", () => {
     it("returns a 200 response", async () => {
-      const response = await fetch(`http://localhost:${port}/probot`);
+      const response = await fetch(
+        `http://${server.host}:${server.port}/probot`,
+      );
       expect(response.status).toBe(200);
     });
   });
@@ -141,12 +141,12 @@ describe("Setup app", async () => {
         port: 0,
       });
 
-      await server.loadHandler(setupAppFactory("localhost", server.port));
-
       await server.start();
 
+      await server.loadHandler(setupAppFactory(server.host, server.port));
+
       const setupResponse = await fetch(
-        `http://localhost:${server.port}/probot/setup?code=123`,
+        `http://${server.host}:${server.port}/probot/setup?code=123`,
         { redirect: "manual" },
       );
 
@@ -172,16 +172,21 @@ describe("Setup app", async () => {
           privateKey: "dummy value for setup, see #1512",
         }),
         log: pino(streamLogsToOutput),
+        port: 0,
       });
 
-      await server.loadHandler(setupAppFactory("localhost", port));
+      await server.start();
+
+      await server.loadHandler(setupAppFactory(server.host, server.port));
 
       const setupResponse = await fetch(
-        `http://localhost:${port}/probot/setup`,
+        `http://${server.host}:${server.port}/probot/setup`,
       );
 
       expect(setupResponse.status).toBe(400);
       expect(await setupResponse.text()).toMatchSnapshot();
+
+      await server.stop();
     });
 
     it("throws a 400 Error if code is an empty string", async () => {
@@ -193,23 +198,30 @@ describe("Setup app", async () => {
           privateKey: "dummy value for setup, see #1512",
         }),
         log: pino(streamLogsToOutput),
+        port: 0,
       });
 
-      await server.loadHandler(setupAppFactory(undefined, port));
+      await server.start();
+
+      await server.loadHandler(setupAppFactory(server.host, server.port));
 
       const setupResponse = await fetch(
-        `http://localhost:${port}/probot/setup?code=`,
+        `http://${server.host}:${server.port}/probot/setup?code=`,
       );
 
       expect(setupResponse.status).toBe(400);
 
       expect(await setupResponse.text()).toMatchSnapshot();
+
+      await server.stop();
     });
   });
 
   describe("GET /probot/import", () => {
     it("renders importView", async () => {
-      const importView = await fetch(`http://localhost:${port}/probot/import`);
+      const importView = await fetch(
+        `http://${server.host}:${server.port}/probot/import`,
+      );
 
       expect(importView.status).toBe(200);
       expect(await importView.text()).toMatchSnapshot();
@@ -224,13 +236,16 @@ describe("Setup app", async () => {
         webhook_secret: "baz",
       });
 
-      const response = await fetch(`http://localhost:${port}/probot/import`, {
-        body,
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
+      const response = await fetch(
+        `http://${server.host}:${server.port}/probot/import`,
+        {
+          body,
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+          },
         },
-      });
+      );
 
       expect(response.status).toBe(200);
       expect(await response.text()).toBe("");
@@ -246,7 +261,7 @@ describe("Setup app", async () => {
       });
 
       const importResponse = await fetch(
-        `http://localhost:${port}/probot/import`,
+        `http://${server.host}:${server.port}/probot/import`,
         {
           body,
           method: "POST",
@@ -264,7 +279,7 @@ describe("Setup app", async () => {
   describe("GET /probot/success", () => {
     it("returns a 200 response", async () => {
       const successResponse = await fetch(
-        `http://localhost:${port}/probot/success`,
+        `http://${server.host}:${server.port}/probot/success`,
       );
 
       expect(successResponse.status).toBe(200);

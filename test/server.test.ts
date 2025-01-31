@@ -87,7 +87,7 @@ describe("Server", async () => {
       const response = await fetch(`http://localhost:${port}/ping`);
       expect(response.status).toBe(200);
       expect(await response.text()).toBe("PONG");
-      console.log(output);
+
       expect(output.length).toEqual(3);
       expect(output[2].msg).toContain("GET /ping 200 -");
     });
@@ -211,147 +211,73 @@ describe("Server", async () => {
       await server.stop();
     });
 
-      describe("GET unknown URL", () => {
-        it("responds with 404", async () => {
-          const response = await fetch(`http://localhost:${port}/notfound`);
+    describe("GET unknown URL", () => {
+      it("responds with 404", async () => {
+        const response = await fetch(`http://localhost:${port}/notfound`);
 
-          expect(response.status).toBe(404);
-          expect(output.length).toEqual(3);
-          expect(output[2].msg).toContain("GET /notfound 404 -");
+        expect(response.status).toBe(404);
+        expect(output.length).toEqual(3);
+        expect(output[2].msg).toContain("GET /notfound 404 -");
+      });
+    });
+
+    describe(".start() / .stop()", () => {
+      it("should expect the correct error if port already in use", () =>
+        new Promise<void>((next) => {
+          expect.assertions(1);
+
+          // block port 3001
+          const http = require("http");
+          const blockade = http.createServer().listen(3001, async () => {
+            const server = new Server({
+              Probot: Probot.defaults({ appId, privateKey }),
+              log: pino(streamLogsToOutput),
+              port: 3001,
+            });
+
+            try {
+              await server.start();
+            } catch (error) {
+              expect((error as Error).message).toEqual(
+                "Port 3001 is already in use. You can define the PORT environment variable to use a different port.",
+              );
+            }
+
+            await server.stop();
+            blockade.close(() => next());
+          });
+        }));
+
+      it("should listen to port when not in use", async () => {
+        output = [];
+        const testApp = new Server({
+          Probot: Probot.defaults({ appId, privateKey }),
+          port: 3001,
+          log: pino(streamLogsToOutput),
         });
+        await testApp.start();
+
+        expect(output.length).toEqual(2);
+        expect(output[1].msg).toEqual("Listening on http://localhost:3001");
+
+        await testApp.stop();
       });
 
-  //   describe(".start() / .stop()", () => {
-  //     it("should expect the correct error if port already in use", () =>
-  //       new Promise<void>((next) => {
-  //         expect.assertions(1);
+      it("respects host/ip config when starting up HTTP server", async () => {
+        output = [];
+        const testApp = new Server({
+          Probot: Probot.defaults({ appId, privateKey }),
+          port: 3002,
+          host: "127.0.0.1",
+          log: pino(streamLogsToOutput),
+        });
+        await testApp.start();
 
-  //         // block port 3001
-  //         const http = require("http");
-  //         const blockade = http.createServer().listen(3001, async () => {
-  //           const server = new Server({
-  //             Probot: Probot.defaults({ appId, privateKey }),
-  //             log: pino(streamLogsToOutput),
-  //             port: 3001,
-  //           });
+        expect(output.length).toEqual(2);
+        expect(output[1].msg).toEqual("Listening on http://127.0.0.1:3002");
 
-  //           try {
-  //             await server.start();
-  //           } catch (error) {
-  //             expect((error as Error).message).toEqual(
-  //               "Port 3001 is already in use. You can define the PORT environment variable to use a different port.",
-  //             );
-  //           }
-
-  //           await server.stop();
-  //           blockade.close(() => next());
-  //         });
-  //       }));
-
-  //     it("should listen to port when not in use", async () => {
-  //       const testApp = new Server({
-  //         Probot: Probot.defaults({ appId, privateKey }),
-  //         port: 3001,
-  //         log: pino(streamLogsToOutput),
-  //       });
-  //       await testApp.start();
-
-  //       expect(output.length).toEqual(2);
-  //       expect(output[1].msg).toEqual("Listening on http://localhost:3001");
-
-  //       await testApp.stop();
-  //     });
-
-  //     it("respects host/ip config when starting up HTTP server", async () => {
-  //       const testApp = new Server({
-  //         Probot: Probot.defaults({ appId, privateKey }),
-  //         port: 3002,
-  //         host: "127.0.0.1",
-  //         log: pino(streamLogsToOutput),
-  //       });
-  //       await testApp.start();
-
-  //       expect(output.length).toEqual(2);
-  //       expect(output[1].msg).toEqual("Listening on http://127.0.0.1:3002");
-
-  //       await testApp.stop();
-  //     });
-  //   });
-
-  //   describe("router", () => {
-  //     it("prefixes paths with route name", () => {
-  //       const router = server.router("/my-app");
-  //       router.get("/foo", (_req, res) => {
-  //         res.end("foo"));
-  //       });
-
-  //       return request(server.expressApp).get("/my-app/foo").expect(200, "foo");
-  //     });
-
-  //     it("allows routes with no path", () => {
-  //       const router = server.router();
-  //       router.get("/foo", (_req, res) => {
-  //         res.end("foo"));
-  //       });
-
-  //       return request(server.expressApp).get("/foo").expect(200, "foo");
-  //     });
-
-  //     it("allows you to overwrite the root path when webhookPath is not defined", () => {
-  //       const log = pino(streamLogsToOutput);
-  //       server = new Server({
-  //         Probot: Probot.defaults({
-  //           appId,
-  //           privateKey,
-  //           secret: "secret",
-  //           log: log.child({ name: "probot" }),
-  //         }),
-  //         log: log.child({ name: "server" }),
-  //       });
-
-  //       // Error handler to avoid printing logs
-  //       server.expressApp.use(
-  //         (error: Error, _req: Request, res: Response, _next: NextFunction) => {
-  //           res.status(500).send(error.message);
-  //         },
-  //       );
-  //       const router = server.router();
-  //       router.get("/", (_req, res) => res.end("foo"));
-
-  //       return request(server.expressApp).get("/").expect(200, "foo");
-  //     });
-
-  //     it("isolates apps from affecting each other", async () => {
-  //       ["foo", "bar"].forEach((name) => {
-  //         const router = server.router("/" + name);
-
-  //         router.use((_req, res, next) => {
-  //           res.append("X-Test", name);
-  //           next();
-  //         });
-
-  //         router.get("/hello", (_req, res) => {
-  //           res.end(name);
-  //         });
-  //       });
-
-  //       await request(server.expressApp)
-  //         .get("/foo/hello")
-  //         .expect(200, "foo")
-  //         .expect("X-Test", "foo");
-
-  //       await request(server.expressApp)
-  //         .get("/bar/hello")
-  //         .expect(200, "bar")
-  //         .expect("X-Test", "bar");
-  //     });
-
-  //     it("responds with 500 on error", async () => {
-  //       server.expressApp.get("/boom", () => {
-  //         throw new Error("boom");
-  //       });
-
-  //       await request(server.expressApp).get("/boom").expect(500);
-  //     });
+        await testApp.stop();
+      });
+    });
   });
 });

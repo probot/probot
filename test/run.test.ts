@@ -2,7 +2,6 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { sign } from "@octokit/webhooks-methods";
-import getPort from "get-port";
 import { describe, expect, it, beforeEach } from "vitest";
 
 import { Probot, run } from "../src/index.js";
@@ -16,7 +15,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 describe("run", async () => {
   let env: NodeJS.ProcessEnv;
-  let port = await getPort();
 
   beforeEach(() => {
     env = {
@@ -40,7 +38,7 @@ describe("run", async () => {
         () => {
           initialized = true;
         },
-        { env: { ...env, PORT: port + "" } },
+        { env },
       );
       expect(initialized).toBeTruthy();
       await server.stop();
@@ -102,12 +100,12 @@ describe("run", async () => {
     ).examples[0];
 
     it("POST /api/github/webhooks", async () => {
-      const server = await run(() => {}, { env: { ...env, PORT: port + "" } });
+      const server = await run(() => {}, { env });
 
       const dataString = JSON.stringify(pushEvent);
 
       const response = await fetch(
-        `http://localhost:${port}/api/github/webhooks`,
+        `http://localhost:${server.port}/api/github/webhooks`,
         {
           method: "POST",
           body: dataString,
@@ -130,7 +128,6 @@ describe("run", async () => {
         env: {
           ...env,
           WEBHOOK_PATH: "/custom-webhook",
-          PORT: port + "",
         },
       });
 
@@ -138,7 +135,7 @@ describe("run", async () => {
 
       try {
         const response = await fetch(
-          `http://localhost:${port}/custom-webhook`,
+          `http://localhost:${server.port}/custom-webhook`,
           {
             method: "POST",
             body: dataString,

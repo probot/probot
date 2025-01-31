@@ -3,7 +3,6 @@ import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { pino } from "pino";
-import getPort from "get-port";
 import { describe, expect, it } from "vitest";
 
 import { Probot, Server } from "../../src/index.js";
@@ -13,8 +12,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 describe("default app", async () => {
   let output = [];
-
-  const port = await getPort();
 
   const streamLogsToOutput = new Stream.Writable({ objectMode: true });
   streamLogsToOutput._write = (object, _encoding, done) => {
@@ -31,7 +28,7 @@ describe("default app", async () => {
       }),
       log: pino(streamLogsToOutput),
       cwd,
-      port,
+      port: 0,
     });
 
     await server.loadHandler(defaultAppHandler);
@@ -42,7 +39,9 @@ describe("default app", async () => {
     it("returns a 200 response", async () => {
       const server = await instantiateServer();
       await server.start();
-      expect((await fetch(`http://localhost:${port}/probot`)).status).toBe(200);
+      expect(
+        (await fetch(`http://localhost:${server.port}/probot`)).status,
+      ).toBe(200);
       await server.stop();
     });
 
@@ -50,7 +49,7 @@ describe("default app", async () => {
       it("returns the correct HTML with values", async () => {
         const server = await instantiateServer();
         await server.start();
-        const response = await fetch(`http://localhost:${port}/probot`);
+        const response = await fetch(`http://localhost:${server.port}/probot`);
         expect(response.status).toBe(200);
 
         const actualText = await response.text();
@@ -64,7 +63,7 @@ describe("default app", async () => {
       it("returns the correct HTML without values", async () => {
         const server = await instantiateServer(__dirname);
         await server.start();
-        const response = await fetch(`http://localhost:${port}/probot`);
+        const response = await fetch(`http://localhost:${server.port}/probot`);
         expect(response.status).toBe(200);
 
         const actualText = await response.text();
@@ -80,7 +79,7 @@ describe("default app", async () => {
     it("redirects to /probot", async () => {
       const server = await instantiateServer(__dirname);
       await server.start();
-      const response = await fetch(`http://localhost:${port}/`, {
+      const response = await fetch(`http://localhost:${server.port}/`, {
         redirect: "manual",
       });
 

@@ -98,6 +98,7 @@ describe("Server", async () => {
       expect.assertions(4);
 
       const port = await getPort();
+      output = [];
 
       const server = new Server({
         webhookPath: "/",
@@ -132,8 +133,8 @@ describe("Server", async () => {
       });
 
       expect(response.status).toBe(200);
-      expect(output.length).toEqual(5);
-      expect(output[4].msg).toContain("POST / 200 -");
+      expect(output.length).toEqual(3);
+      expect(output[2].msg).toContain("POST / 200 -");
 
       await server.stop();
     });
@@ -166,6 +167,8 @@ describe("Server", async () => {
       expect.assertions(4);
 
       const port = await getPort();
+
+      output = [];
 
       const server = new Server({
         Probot: Probot.defaults({
@@ -203,10 +206,8 @@ describe("Server", async () => {
 
       expect(response.status).toBe(200);
 
-      expect(output.length).toEqual(5);
-      expect(output[output.length - 1].msg).toContain(
-        "POST /api/github/webhooks 200 -",
-      );
+      expect(output.length).toEqual(3);
+      expect(output[2].msg).toContain("POST /api/github/webhooks 200 -");
 
       await server.stop();
     });

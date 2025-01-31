@@ -1,4 +1,4 @@
-import type { LRUCache } from "lru-cache";
+import type { Lru } from "toad-cache";
 import { ProbotOctokit } from "./probot-octokit.js";
 import type { RedisOptions } from "ioredis";
 import { request } from "@octokit/request";
@@ -10,7 +10,7 @@ import type { RequestRequestOptions } from "@octokit/types";
 import type { OctokitOptions } from "../types.js";
 
 type Options = {
-  cache: LRUCache<number, string>;
+  cache: Lru<string>;
   Octokit: typeof ProbotOctokit;
   log: Logger;
   githubToken?: string;
@@ -32,7 +32,9 @@ type Options = {
  * Besides the authentication, the Octokit's baseUrl is set as well when run
  * against a GitHub Enterprise Server with a custom domain.
  */
-export function getProbotOctokitWithDefaults(options: Options) {
+export function getProbotOctokitWithDefaults(
+  options: Options,
+): typeof ProbotOctokit {
   const authOptions = options.githubToken
     ? {
         token: options.githubToken,

@@ -226,7 +226,14 @@ const probot = new Probot({
   secret: "webhooksecret123",
 });
 
-export default createNodeMiddleware(app, { probot });
+const middleware = createNodeMiddleware(app, { probot });
+
+export default (req, res) => {
+  middleware(req, res, () => {
+    res.writeHead(404);
+    res.end();
+  });
+};
 ```
 
 If you want to read probot's configuration from the same environment variables as [`run`](#run), use the [`createProbot`](https://probot.github.io/api/latest/index.html#createprobot) export

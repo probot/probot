@@ -38,7 +38,7 @@
   "dependencies": {
     "@octokit/core": "^5.0.2",
     "@octokit/plugin-enterprise-compatibility": "^4.0.1",
-    "@octokit/plugin-paginate-rest": "^9.1.4",
+    "@octokit/plugin-paginate-rest": "^11.4.2",
     "@octokit/plugin-rest-endpoint-methods": "^10.1.5",
     "@octokit/plugin-retry": "^6.0.1",
     "@octokit/plugin-throttling": "^8.1.3",

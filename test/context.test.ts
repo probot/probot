@@ -1,30 +1,63 @@
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-import type { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
+import type {
+  EmitterWebhookEvent as WebhookEvent,
+  EmitterWebhookEventName,
+} from "@octokit/webhooks";
 import WebhookExamples from "@octokit/webhooks-examples";
-import type { WebhookDefinition } from "@octokit/webhooks-examples";
 import fetchMock from "fetch-mock";
 import { describe, expect, test, beforeEach, it, vi } from "vitest";
 
 import { Context } from "../src/index.js";
 import { ProbotOctokit } from "../src/octokit/probot-octokit.js";
-import type { PushEvent } from "@octokit/webhooks-types";
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+type GetWebhookEventPayload<T extends EmitterWebhookEventName> =
+  WebhookEvent<T>["payload"];
+
+type WebhookDefinition<
+  TName extends EmitterWebhookEventName = EmitterWebhookEventName,
+> = {
+  name: TName;
+  actions: string[];
+  description: string;
+  examples: GetWebhookEventPayload<TName>[];
+  properties: Record<
+    string,
+    {
+      description: string;
+      type:
+        | "string"
+        | "number"
+        | "boolean"
+        | "object"
+        | "integer"
+        | "array"
+        | "null";
+    }
+  >;
+};
+
+type PushEvent = GetWebhookEventPayload<"push">;
+
+const webhookExamples = WebhookExamples as unknown as WebhookDefinition[];
 const pushEventPayload = (
-  (WebhookExamples as unknown as WebhookDefinition[]).filter(
+  webhookExamples.filter(
     (event) => event.name === "push",
-  )[0] as WebhookDefinition<"push">
+  )[0] as unknown as WebhookDefinition<"push">
 ).examples[0];
 const issuesEventPayload = (
-  (WebhookExamples as unknown as WebhookDefinition[]).filter(
+  webhookExamples.filter(
     (event) => event.name === "issues",
-  )[0] as WebhookDefinition<"issues">
+  )[0] as unknown as WebhookDefinition<"issues">
 ).examples[0];
 const pullRequestEventPayload = (
-  (WebhookExamples as unknown as WebhookDefinition[]).filter(
+  webhookExamples.filter(
     (event) => event.name === "pull_request",
-  )[0] as WebhookDefinition<"pull_request">
+  )[0] as unknown as WebhookDefinition<"pull_request">
 ).examples[0] as WebhookEvent<"pull_request">["payload"];
 
 describe("Context", () => {
@@ -342,7 +375,7 @@ describe("Context", () => {
 
   describe("isBot", () => {
     test("returns true if sender is a bot", () => {
-      event.payload.sender.type = "Bot";
+      event.payload.sender!.type = "Bot";
       let octokit = {
         hook: {
           before: vi.fn(),
@@ -354,7 +387,7 @@ describe("Context", () => {
     });
 
     test("returns false if sender is not a bot", () => {
-      event.payload.sender.type = "User";
+      event.payload.sender!.type = "User";
       let octokit = {
         hook: {
           before: vi.fn(),

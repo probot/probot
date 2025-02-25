@@ -9,7 +9,6 @@
     "outDir": "./lib",
     "skipLibCheck": true,
     "noImplicitAny": true,
-    "esModuleInterop": true,
     "declaration": true,
     "allowJs": true,
     "lib": ["es2023", "dom"]

@@ -8,7 +8,7 @@ type Options = {
   redisConfig?: RedisOptions | string;
 };
 
-export function getOctokitThrottleOptions(options: Options) {
+export function getOctokitThrottleOptions(options: Options): ThrottlingOptions {
   let { log, redisConfig } = options;
 
   const throttlingOptions: ThrottlingOptions = {

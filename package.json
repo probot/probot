@@ -94,19 +94,6 @@
     "node": ">=18"
   },
   "release": {
-    "branches": [
-      "+([0-9]).x",
-      "master",
-      "next",
-      {
-        "name": "beta",
-        "prerelease": true
-      },
-      {
-        "name": "full-esm",
-        "prerelease": true
-      }
-    ],
     "plugins": [
       "@semantic-release/commit-analyzer",
       "@semantic-release/release-notes-generator",

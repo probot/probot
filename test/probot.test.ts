@@ -1,8 +1,8 @@
 import Stream from "node:stream";
 
 import type {
-  EmitterWebhookEvent,
   EmitterWebhookEvent as WebhookEvent,
+  EmitterWebhookEventName,
 } from "@octokit/webhooks";
 import Bottleneck from "bottleneck";
 import fetchMock from "fetch-mock";
@@ -14,7 +14,6 @@ import { Probot, ProbotOctokit, Context } from "../src/index.js";
 import webhookExamples, {
   type WebhookDefinition,
 } from "@octokit/webhooks-examples";
-import type { EmitterWebhookEventName } from "@octokit/webhooks/dist-types/types.js";
 
 const appId = 1;
 const privateKey = `-----BEGIN RSA PRIVATE KEY-----
@@ -50,7 +49,7 @@ const getPayloadExamples = <TName extends EmitterWebhookEventName>(
 ) => {
   return (webhookExamples as unknown as WebhookDefinition[]).filter(
     (event) => event.name === name.split(".")[0],
-  )[0].examples as EmitterWebhookEvent<TName>["payload"][];
+  )[0].examples as WebhookEvent<TName>["payload"][];
 };
 const getPayloadExample = <TName extends EmitterWebhookEventName>(
   name: TName,

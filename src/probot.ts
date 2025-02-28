@@ -1,4 +1,4 @@
-import { LRUCache } from "lru-cache";
+import { Lru } from "toad-cache";
 import type { Logger } from "pino";
 import type { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
 
@@ -22,7 +22,14 @@ export type Constructor<T = any> = new (...args: any[]) => T;
 
 export class Probot {
   static version = VERSION;
-  static defaults<S extends Constructor>(this: S, defaults: Options) {
+  static defaults<S extends Constructor>(
+    this: S,
+    defaults: Options,
+  ): {
+    new (...args: any[]): {
+      [x: string]: any;
+    };
+  } & S {
     const ProbotWithDefaults = class extends this {
       constructor(...args: any[]) {
         const options = args[0] || {};
@@ -58,12 +65,12 @@ export class Probot {
       : getLog({ level, logMessageKey });
 
     // TODO: support redis backend for access token cache if `options.redisConfig`
-    const cache = new LRUCache<number, string>({
+    const cache = new Lru<string>(
       // cache max. 15000 tokens, that will use less than 10mb memory
-      max: 15000,
+      15000,
       // Cache for 1 minute less than GitHub expiry
-      ttl: 1000 * 60 * 59,
-    });
+      1000 * 60 * 59,
+    );
 
     const Octokit = getProbotOctokitWithDefaults({
       githubToken: options.githubToken,
@@ -110,7 +117,7 @@ export class Probot {
     this.version = VERSION;
   }
 
-  public receive(event: WebhookEvent) {
+  public receive(event: WebhookEvent): Promise<void> {
     this.log.debug({ event }, "Webhook received");
     return this.webhooks.receive(event);
   }
@@ -118,7 +125,7 @@ export class Probot {
   public async load(
     appFn: ApplicationFunction | ApplicationFunction[],
     options: ApplicationFunctionOptions = {},
-  ) {
+  ): Promise<void> {
     if (Array.isArray(appFn)) {
       for (const fn of appFn) {
         await this.load(fn);

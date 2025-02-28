@@ -1,6 +1,6 @@
 import { resolve } from "node:path";
 
-import type { ApplicationFunctionOptions, Probot } from "../index.js";
+import type { ApplicationFunctionOptions, Probot } from "../exports.js";
 import { loadPackageJson } from "../helpers/load-package-json.js";
 import { probotView } from "../views/probot.js";
 

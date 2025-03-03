@@ -1,4 +1,4 @@
-import type { RequestListener } from "http";
+import type { RequestListener } from "node:http";
 import { createNodeMiddleware as createWebhooksMiddleware } from "@octokit/webhooks";
 
 import type { ApplicationFunction, MiddlewareOptions } from "./types.js";

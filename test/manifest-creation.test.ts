@@ -5,6 +5,7 @@ import { describe, expect, test, beforeEach, afterEach, vi } from "vitest";
 
 import { ManifestCreation } from "../src/manifest-creation.js";
 import { loadPackageJson } from "../src/helpers/load-package-json.js";
+import SmeeClient from "smee-client";
 
 describe("ManifestCreation", () => {
   let setup: ManifestCreation;
@@ -28,7 +29,6 @@ describe("ManifestCreation", () => {
 
       setup.updateEnv = vi.fn();
 
-      const SmeeClient: typeof import("smee-client") = require("smee-client");
       SmeeClient.createChannel = vi
         .fn()
         .mockReturnValue("https://smee.io/1234abc");

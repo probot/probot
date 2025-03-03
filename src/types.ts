@@ -1,18 +1,18 @@
-import express from "express";
+import type express from "express";
 import type {
   EmitterWebhookEvent as WebhookEvent,
   Webhooks,
 } from "@octokit/webhooks";
-import type { LRUCache } from "lru-cache";
 import type { RedisOptions } from "ioredis";
 import type { Options as LoggingOptions } from "pino-http";
 
-import { Probot } from "./index.js";
+import { Probot } from "./exports.js";
 import { Context } from "./context.js";
 import { ProbotOctokit } from "./octokit/probot-octokit.js";
 
 import type { Logger } from "pino";
 import type { RequestRequestOptions } from "@octokit/types";
+import type { Lru } from "toad-cache";
 
 export interface Options {
   privateKey?: string;
@@ -30,6 +30,7 @@ export interface Options {
   baseUrl?: string;
   request?: RequestRequestOptions;
   webhookPath?: string;
+  webhookProxy?: string;
 }
 
 export type State = {
@@ -39,7 +40,7 @@ export type State = {
   log: Logger;
   Octokit: typeof ProbotOctokit;
   octokit: ProbotOctokit;
-  cache?: LRUCache<number, string>;
+  cache?: Lru<string>;
   webhooks: {
     secret?: string;
   };

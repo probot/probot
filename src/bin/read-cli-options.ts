@@ -102,7 +102,7 @@ export function readCliOptions(
           : "https://api.github.com",
       },
     },
-    args,
+    args: args.slice(2),
   });
 
   if (values.help) {

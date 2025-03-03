@@ -14,7 +14,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkg = loadPackageJson(resolve(__dirname, "package.json"));
 
 if (!isSupportedNodeVersion()) {
-  console.log(`Node.js version 20.17 or 22 is required. You have ${process.version}.`);
+  console.log(
+    `Node.js version 20.17 or 22 is required. You have ${process.version}.`,
+  );
   process.exit(1);
 }
 

@@ -1,4 +1,4 @@
-import express from "express";
+import type express from "express";
 import type {
   EmitterWebhookEvent as WebhookEvent,
   Webhooks,
@@ -12,7 +12,7 @@ import { ProbotOctokit } from "./octokit/probot-octokit.js";
 
 import type { Logger } from "pino";
 import type { RequestRequestOptions } from "@octokit/types";
-import { Lru } from "toad-cache";
+import type { Lru } from "toad-cache";
 
 export interface Options {
   privateKey?: string;

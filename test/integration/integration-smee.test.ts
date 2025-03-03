@@ -2,7 +2,7 @@ import { Writable } from "node:stream";
 import { ManifestCreation } from "../../src/manifest-creation.js";
 import { describe, test, expect, afterEach } from "vitest";
 import getPort from "get-port";
-import { ApplicationFunction, Probot, Server } from "../../src/index.js";
+import { type ApplicationFunction, Probot, Server } from "../../src/index.js";
 import { pino } from "pino";
 import WebhookExamples, {
   type WebhookDefinition,

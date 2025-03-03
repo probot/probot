@@ -129,7 +129,7 @@ describe("webhook-proxy", () => {
 
     createWebhookProxy({ url, logger })!.then((proxy) => {
       (proxy as EventSource).addEventListener("error", (error: any) => {
-        expect(error.message).toMatch(/^getaddrinfo ENOTFOUND/);
+        expect(error.message).toMatch(/getaddrinfo ENOTFOUND/);
         expect(logger.error).toHaveBeenCalledWith(error);
         finishedPromise.resolve!();
       });

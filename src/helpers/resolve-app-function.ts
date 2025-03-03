@@ -4,7 +4,7 @@ export const resolveAppFunction = async (
 ) => {
   // These are mostly to ease testing
   const basedir = process.cwd();
-  const resolver: RequireResolve = opts.resolver || require.resolve;
+  const resolver: NodeJS.RequireResolve = opts.resolver || require.resolve;
   const appFnPath = resolver(appFnId, { paths: [basedir] });
   // On windows, an absolute path may start with a drive letter, e.g. C:/path/to/file.js
   // This can be interpreted as a protocol, so ensure it's prefixed with file://
@@ -19,5 +19,5 @@ export const resolveAppFunction = async (
 
 export interface ResolveOptions {
   basedir?: string;
-  resolver?: RequireResolve;
+  resolver?: NodeJS.RequireResolve;
 }

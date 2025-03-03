@@ -80,13 +80,22 @@ describe("webhook-proxy", () => {
               finishedPromise.resolve!();
             },
           });
+        const customFetch = async (url: string | URL, options: RequestInit) => {
+          if (
+            (typeof url === "string" && url.startsWith("http://127.0.0.1")) ||
+            (url instanceof URL && url.hostname === "127.0.0.1")
+          ) {
+            return await fetch(url, options);
+          }
+          return await mock.fetchHandler(url, options);
+        };
 
         proxy = (await createWebhookProxy({
           url,
           port: targetPort,
           path: "/test",
           logger: getLog({ level: "fatal" }),
-          fetch: mock.fetchHandler,
+          fetch: customFetch,
         })) as EventSource;
 
         // Wait for proxy to be ready

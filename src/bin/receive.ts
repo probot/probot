@@ -42,7 +42,7 @@ export async function receive(args: string[]) {
     allowPositionals: true,
     options: {
       event: {
-        type: "string" as "string",
+        type: "string" as const,
         short: "e",
         default: process.env.GITHUB_EVENT_NAME,
       },

@@ -1,11 +1,11 @@
 import { exec } from "node:child_process";
 
-import type { IncomingMessage, ServerResponse } from "http";
-import { parse as parseQuery } from "querystring";
+import type { IncomingMessage, ServerResponse } from "node:http";
+import { parse as parseQuery } from "node:querystring";
 import express from "express";
 import updateDotenv from "update-dotenv";
 
-import { Probot } from "../probot.js";
+import type { Probot } from "../probot.js";
 import { ManifestCreation } from "../manifest-creation.js";
 import { getLoggingMiddleware } from "../server/logging-middleware.js";
 import type { ApplicationFunctionOptions } from "../types.js";
@@ -48,7 +48,7 @@ export const setupAppFactory = (
 
     printWelcomeMessage(app, host, port);
 
-    route.get("/probot", async (req: IncomingMessage, res: ServerResponse) => {
+    route.get("/probot", (req: IncomingMessage, res: ServerResponse) => {
       const baseUrl = getBaseUrl(req);
       const manifest = setup.getManifest(pkg, baseUrl);
       const createAppUrl = setup.createAppUrl;

@@ -45,7 +45,7 @@
     "@octokit/plugin-throttling": "^9.4.0",
     "@octokit/request": "^9.2.2",
     "@octokit/types": "^13.8.0",
-    "@octokit/webhooks": "^13.6.1",
+    "@octokit/webhooks": "^13.7.4",
     "@probot/get-private-key": "^2.0.0",
     "@probot/octokit-plugin-config": "^3.0.2",
     "@probot/pino": "^4.0.0",
@@ -65,7 +65,8 @@
     "update-dotenv": "^1.1.1"
   },
   "devDependencies": {
-    "@octokit/openapi-webhooks-types": "^8.2.1",
+    "@octokit/openapi-webhooks-types": "^10.1.1",
+    "@octokit/openapi-webhooks-types-transition": "^10.1.1",
     "@octokit/tsconfig": "^3.0.0",
     "@octokit/webhooks-examples": "^7.3.1",
     "@octokit/webhooks-methods": "^5.1.0",

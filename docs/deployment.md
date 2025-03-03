@@ -191,7 +191,13 @@ Please add yours!
 import { createNodeMiddleware, createProbot } from "probot";
 import app from "./app.js";
 
-exports.probotApp = createNodeMiddleware(app, { probot: createProbot() });
+const middleware = createNodeMiddleware(app, { probot: createProbot() });
+exports.probotApp = (req, res) => {
+  middleware(req, res, () => {
+    res.writeHead(404);
+    res.end();
+  });
+};
 ```
 
 Examples

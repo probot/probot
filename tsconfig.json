@@ -1,7 +1,6 @@
 {
   "extends": "@octokit/tsconfig",
   "compilerOptions": {
-    "verbatimModuleSyntax": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "pretty": true,

@@ -60,9 +60,6 @@ export default (app) => {
 };
 ```
 
-## Testing Webhooks Locally
-
-You can test incoming webhooks using services like [Beeceptor](https://beeceptor.com/) or [RequestBin](https://pipedream.com/requestbin). These tools provide temporary endpoints to inspect webhook payloads before deploying your application.
 
 ## Further Reading
 

@@ -5,7 +5,7 @@ import { pino } from "pino";
 import { describe, test, expect, afterEach } from "vitest";
 
 import { ManifestCreation } from "../../src/manifest-creation.js";
-import { ApplicationFunction, Probot, Server } from "../../src/index.js";
+import { type ApplicationFunction, Probot, Server } from "../../src/index.js";
 import WebhookExamples, {
   type WebhookDefinition,
 } from "@octokit/webhooks-examples";

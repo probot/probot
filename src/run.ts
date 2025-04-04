@@ -1,7 +1,6 @@
-import pkgConf from "pkg-conf";
+import { packageConfig } from "package-config";
 
 import type { ApplicationFunction, Options, ServerOptions } from "./types.js";
-import { Logger, Probot, ProbotOctokit } from "./index.js";
 import { setupAppFactory } from "./apps/setup.js";
 import { getLog } from "./helpers/get-log.js";
 import { readCliOptions } from "./bin/read-cli-options.js";
@@ -10,6 +9,7 @@ import { Server } from "./server/server.js";
 import { defaultApp } from "./apps/default.js";
 import { resolveAppFunction } from "./helpers/resolve-app-function.js";
 import { isProduction } from "./helpers/is-production.js";
+import { type Logger, Probot, type ProbotOctokit } from "./exports.js";
 import { config as dotenvConfig } from "dotenv";
 
 type AdditionalOptions = {
@@ -25,7 +25,7 @@ type AdditionalOptions = {
 export async function run(
   appFnOrArgv: ApplicationFunction | string[],
   additionalOptions?: AdditionalOptions,
-) {
+): Promise<Server> {
   dotenvConfig();
 
   const envOptions = readEnvOptions(additionalOptions?.env);
@@ -122,7 +122,7 @@ export async function run(
   }
 
   if (Array.isArray(appFnOrArgv)) {
-    const pkg = await pkgConf("probot");
+    const pkg = await packageConfig("probot");
 
     const combinedApps: ApplicationFunction = async (_app) => {
       await server.load(defaultApp);

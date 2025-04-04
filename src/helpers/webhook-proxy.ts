@@ -11,7 +11,7 @@ export const createWebhookProxy = async (
       target: `http://localhost:${opts.port}${opts.path}`,
       fetch: opts.fetch,
     });
-    return smee.start() as EventSource;
+    return smee.start() as unknown as EventSource;
   } catch (error) {
     opts.logger.warn(
       "Run `npm install --save-dev smee-client` to proxy webhooks to localhost.",

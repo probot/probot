@@ -60,7 +60,6 @@ export default (app) => {
 };
 ```
 
-
 ## Further Reading
 
 - [GitHub Webhook Events](https://docs.github.com/en/developers/webhooks-and-events)

@@ -91,6 +91,10 @@
     "typescript": "^5.2.2",
     "vitest": "^3.0.0"
   },
+  "exports": {
+    "types": "./lib/index.d.ts",
+    "default": "./lib/index.js"
+  },
   "engines": {
     "node": "^20.17 || >= 22"
   },

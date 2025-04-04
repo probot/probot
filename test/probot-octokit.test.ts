@@ -17,14 +17,14 @@ describe("ProbotOctokit", () => {
   };
 
   test("works without options", async () => {
-    const fetch = fetchMock
-      .sandbox()
+    const mock = fetchMock
+      .createInstance()
       .getOnce("https://api.github.com/user", '{"login": "ohai"}');
 
     const octokit = new ProbotOctokit({
       ...defaultOptions,
       request: {
-        fetch,
+        fetch: mock.fetchHandler,
       },
     });
 
@@ -34,7 +34,7 @@ describe("ProbotOctokit", () => {
   });
 
   test("logs request errors", async () => {
-    const fetch = fetchMock.sandbox().getOnce("https://api.github.com/", {
+    const mock = fetchMock.createInstance().getOnce("https://api.github.com/", {
       status: 500,
       body: {
         message: "Internal Server Error",
@@ -46,7 +46,7 @@ describe("ProbotOctokit", () => {
     const octokit = new ProbotOctokit({
       ...defaultOptions,
       request: {
-        fetch,
+        fetch: mock.fetchHandler,
       },
     });
 

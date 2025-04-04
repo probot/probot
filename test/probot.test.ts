@@ -90,16 +90,18 @@ describe("Probot", () => {
 
   describe(".defaults()", () => {
     test("sets default options for constructor", async () => {
-      const fetch = fetchMock.sandbox().getOnce("https://api.github.com/app", {
-        status: 200,
-        body: {
-          id: 1,
-        },
-      });
+      const mock = fetchMock
+        .createInstance()
+        .getOnce("https://api.github.com/app", {
+          status: 200,
+          body: {
+            id: 1,
+          },
+        });
 
       const MyProbot = Probot.defaults({ appId, privateKey });
       const probot = new MyProbot({
-        request: { fetch },
+        request: { fetch: mock.fetchHandler },
       });
       const octokit = await probot.auth();
       await octokit.apps.getAuthenticated();
@@ -452,8 +454,8 @@ describe("Probot", () => {
     });
 
     it("returns an authenticated client for installation.created", async () => {
-      const fetch = fetchMock
-        .sandbox()
+      const mock = fetchMock
+        .createInstance()
         .postOnce("https://api.github.com/app/installations/1/access_tokens", {
           status: 201,
           body: {
@@ -465,7 +467,7 @@ describe("Probot", () => {
           },
         })
         .getOnce(
-          function (url, opts) {
+          function ({ url, options: opts }) {
             if (url === "https://api.github.com/") {
               expect(
                 (opts.headers as Record<string, string>).authorization,
@@ -484,7 +486,7 @@ describe("Probot", () => {
         appId,
         privateKey,
         request: {
-          fetch,
+          fetch: mock.fetchHandler,
         },
       });
 
@@ -503,8 +505,8 @@ describe("Probot", () => {
     });
 
     it("returns an unauthenticated client for installation.deleted", async () => {
-      const fetch = fetchMock.sandbox().getOnce(
-        function (url, opts) {
+      const mock = fetchMock.createInstance().getOnce(
+        function ({ url, options: opts }) {
           if (url === "https://api.github.com/") {
             expect(
               (opts.headers as Record<string, string>).authorization,
@@ -522,7 +524,7 @@ describe("Probot", () => {
         appId,
         privateKey,
         request: {
-          fetch,
+          fetch: mock.fetchHandler,
         },
       });
 
@@ -541,8 +543,8 @@ describe("Probot", () => {
     });
 
     it("returns an authenticated client for events without an installation", async () => {
-      const fetch = fetchMock.sandbox().mock(
-        function (url, opts) {
+      const mock = fetchMock.createInstance().route(
+        function ({ url, options: opts }) {
           if (url === "https://api.github.com/") {
             expect(
               (opts.headers as Record<string, string>).authorization,
@@ -560,7 +562,7 @@ describe("Probot", () => {
         appId,
         privateKey,
         request: {
-          fetch,
+          fetch: mock.fetchHandler,
         },
       });
 

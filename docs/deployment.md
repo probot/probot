@@ -23,7 +23,6 @@ Every app can either be deployed stand-alone, or combined with other apps in one
     - [Azure Functions](#azure-functions)
     - [Google Cloud Functions](#google-cloud-functions)
     - [GitHub Actions](#github-actions)
-    - [Begin](#begin)
     - [Vercel](#vercel)
     - [Netlify Functions](#netlify-functions)
 - [Share the app](#share-the-app)
@@ -192,7 +191,13 @@ Please add yours!
 import { createNodeMiddleware, createProbot } from "probot";
 import app from "./app.js";
 
-exports.probotApp = createNodeMiddleware(app, { probot: createProbot() });
+const middleware = createNodeMiddleware(app, { probot: createProbot() });
+exports.probotApp = (req, res) => {
+  middleware(req, res, () => {
+    res.writeHead(404);
+    res.end();
+  });
+};
 ```
 
 Examples
@@ -217,63 +222,6 @@ Learn more
 Examples
 
 - Probot's "Hello, world!" example deployed as a GitHub Action: [probot/example-github-action](https://github.com/probot/example-github-action/#readme)
-
-Please add yours!
-
-#### Begin
-
-[Begin](https://begin.com/) is a service to deploy serverless applications build using the [Architect](https://arc.codes/) to AWS.
-
-1. Add the `@http` pragma to your `app.arc` file
-
-   ```
-   @app
-   my-app-name
-
-   @http
-   post /api/github/webhooks
-   ```
-
-2. Make sure to [configure your app](../confinguration) using environment variables
-
-3. Create the `src/http/post-api-github-webhooks` folder with the following files
-
-   ```js
-   {
-     "name": "http-post-api-github-webhooks",
-     "dependencies": {}
-   }
-   ```
-
-   in the new directory, install the `probot` and `@architect/functions`
-
-   ```
-   cd src/http/post-api-github-webhooks
-   npm install probot @architect/functions
-   ```
-
-4. Create `src/http/post-api-github-webhooks/app.js` with your Probot application function, e.g.
-
-   ```
-   /**
-    * @param {import('probot').Probot} app
-    */
-   export default (app) => {
-     app.log("Yay! The app was loaded!");
-
-     app.on("issues.opened", async (context) => {
-       return context.octokit.issues.createComment(
-         context.issue({ body: "Hello, World!" })
-       );
-     });
-   };
-   ```
-
-5. Create `src/http/post-api-github-webhooks/index.js` with the request handler. See [/probot/example-begin/src/http/post-api-github-webhooks/index.js](https://github.com/probot/example-begin/blob/main/src/http/post-api-github-webhooks/index.js) for an example.
-
-Examples
-
-- [probot/example-begin](https://github.com/probot/example-begin#readme)
 
 Please add yours!
 

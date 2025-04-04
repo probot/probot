@@ -72,6 +72,7 @@ describe("smee-client", () => {
 
     test(
       "with createProbot and setting the webhookPath via WEBHOOK_PATH to the root",
+      { retry: 10, timeout: 3000 },
       async () => {
         expect.assertions(1);
 
@@ -135,7 +136,6 @@ describe("smee-client", () => {
 
         server.stop();
       },
-      { retry: 10, timeout: 3000 },
     );
   });
 });

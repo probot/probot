@@ -80,7 +80,7 @@
     "prettier": "^3.0.3",
     "rimraf": "^6.0.0",
     "semantic-release": "^24.0.0",
-    "semantic-release-plugin-update-version-in-files": "^1.1.0",
+    "semantic-release-plugin-update-version-in-files": "^2.0.0",
     "smee-client": "^2.0.0",
     "sonic-boom": "^4.0.0",
     "supertest": "^7.0.0",

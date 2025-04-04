@@ -62,7 +62,12 @@ const appFn = (app) => {
 
 const middleware = createNodeMiddleware(appFn, { probot: createProbot() });
 
-const server = createServer(middleware);
+const server = createServer((req, res) => {
+  middleware(req, res, () => {
+    res.writeHead(404);
+    res.end();
+  });
+});
 
 server.listen(3000, async () => {
   console.log("Probot started http://localhost:3000/")

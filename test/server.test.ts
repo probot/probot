@@ -1,5 +1,5 @@
 import http from "node:http";
-import { Writable } from "node:stream";
+import { Writable as WritableStream } from "node:stream";
 
 import { pino } from "pino";
 import { sign } from "@octokit/webhooks-methods";
@@ -48,7 +48,7 @@ describe("Server", async () => {
   let server: Server;
 
   let output: any[];
-  const streamLogsToOutput = new Writable({ objectMode: true });
+  const streamLogsToOutput = new WritableStream({ objectMode: true });
   streamLogsToOutput._write = (object, _encoding, done) => {
     output.push(JSON.parse(object));
     done();

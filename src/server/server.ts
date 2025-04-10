@@ -174,7 +174,7 @@ export class Server {
           this.state.eventSource = await createWebhookProxy({
             logger: this.log,
             path: webhookPath,
-            port: this.port,
+            port: this.state.port,
             url: webhookProxy,
           });
         }

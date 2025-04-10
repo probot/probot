@@ -1,13 +1,10 @@
-// remove type imports from http for Deno compatibility
-// see https://github.com/octokit/octokit.js/issues/2075#issuecomment-817361886
-// import type { IncomingMessage } from "node:http";
-// declare module "node:http" {
-//    interface IncomingMessage {
-//      body?: string;
-//    }
-// }
-type IncomingMessage = any;
-
+import type { IncomingMessage } from "node:http";
+declare module "node:http" {
+    interface IncomingMessage {
+      body?: string | Record<string, unknown> | undefined;
+      rawBody?: Buffer | undefined;
+    }
+ }
 export function getPayload(request: IncomingMessage): Promise<string> {
   if (
     typeof request.body === "object" &&

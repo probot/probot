@@ -1,10 +1,10 @@
 import type { IncomingMessage } from "node:http";
 declare module "node:http" {
-    interface IncomingMessage {
-      body?: string | Record<string, unknown> | undefined;
-      rawBody?: Buffer | undefined;
-    }
- }
+  interface IncomingMessage {
+    body?: string | Record<string, unknown> | undefined;
+    rawBody?: Buffer | undefined;
+  }
+}
 export function getPayload(request: IncomingMessage): Promise<string> {
   if (
     typeof request.body === "object" &&

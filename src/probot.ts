@@ -133,6 +133,7 @@ export class Probot {
       return;
     }
 
-    return appFn(this, options);
+    await appFn(this, options);
+    return;
   }
 }

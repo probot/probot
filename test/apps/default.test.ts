@@ -1,4 +1,6 @@
 import Stream from "node:stream";
+import { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { pino } from "pino";
 import request from "supertest";
@@ -6,6 +8,8 @@ import { describe, expect, it } from "vitest";
 
 import { Probot, Server } from "../../src/index.js";
 import { defaultApp } from "../../src/apps/default.js";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 describe("default app", () => {
   let output = [];

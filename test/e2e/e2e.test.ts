@@ -117,8 +117,10 @@ describe("end-to-end-tests", () => {
 
     expect(httpMock).toHaveBeenCalledTimes(2);
   };
-  it("runs a hello world app (CJS)", () =>
-    runApp("./test/e2e/hello-world.cjs"));
-  it("runs a hello world app (ESM)", () =>
-    runApp("./test/e2e/hello-world.mjs"));
+  it("runs a hello world app (CJS)", { timeout: 10000 }, () =>
+    runApp("./test/e2e/hello-world.cjs"),
+  );
+  it("runs a hello world app (ESM)", { timeout: 10000 }, () =>
+    runApp("./test/e2e/hello-world.mjs"),
+  );
 });

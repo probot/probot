@@ -22,8 +22,8 @@ export const createWebhookProxy = async (
 
 export interface WebhookProxyOptions {
   url: string;
-  port?: number;
-  path?: string;
+  port: number;
+  path: string;
   logger: Logger;
-  fetch?: Function;
+  fetch?: typeof fetch;
 }

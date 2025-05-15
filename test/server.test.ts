@@ -381,16 +381,41 @@ describe("Server", () => {
 
       const server = new Server({
         Probot: Probot.defaults({ appId, privateKey }),
-        port: 3002,
+        port: await getPort(),
         host: "127.0.0.1",
         log: pino(streamLogsToOutput(output)),
       });
       await server.start();
 
-      expect(server.port).toEqual(3002);
-      expect(server.host).toEqual(server.host);
+      expect(server.port).toEqual(server.port);
+      expect(server.host).toEqual("127.0.0.1");
       expect(output.length).toEqual(2);
-      expect(output[1].msg).toEqual("Listening on http://127.0.0.1:3002");
+      expect(output[1].msg).toEqual(
+        `Listening on http://${server.host}:${server.port}`,
+      );
+
+      await server.stop();
+    });
+
+    it("respects ip with IPv6 config when starting up HTTP server", async () => {
+      expect.assertions(4);
+
+      const output: any[] = [];
+
+      const server = new Server({
+        Probot: Probot.defaults({ appId, privateKey }),
+        port: await getPort(),
+        host: "::",
+        log: pino(streamLogsToOutput(output)),
+      });
+      await server.start();
+
+      expect(server.port).toEqual(server.port);
+      expect(server.host).toEqual("::");
+      expect(output.length).toEqual(2);
+      expect(output[1].msg).toEqual(
+        `Listening on http://[${server.host}]:${server.port}`,
+      );
 
       await server.stop();
     });
@@ -401,7 +426,7 @@ describe("Server", () => {
       const server = new Server({
         Probot: Probot.defaults({ appId, privateKey }),
         port: await getPort(),
-        host: "127.0.0.1",
+        host: "localhost",
         log: pino(streamLogsToOutput([])),
       });
 
@@ -426,7 +451,7 @@ describe("Server", () => {
       const server = new Server({
         Probot: Probot.defaults({ appId, privateKey }),
         port: await getPort(),
-        host: "127.0.0.1",
+        host: "localhost",
         log: pino(streamLogsToOutput([])),
       });
 
@@ -483,7 +508,7 @@ describe("Server", () => {
       const server = new Server({
         Probot: Probot.defaults({ appId, privateKey }),
         port: await getPort(),
-        host: "127.0.0.1",
+        host: "localhost",
         log: pino(streamLogsToOutput([])),
       });
       ["foo", "bar"].forEach(async (name) => {
@@ -523,7 +548,7 @@ describe("Server", () => {
       const server = new Server({
         Probot: Probot.defaults({ appId, privateKey }),
         port: await getPort(),
-        host: "127.0.0.1",
+        host: "localhost",
         log: pino(streamLogsToOutput([])),
       });
 

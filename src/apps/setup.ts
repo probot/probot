@@ -172,8 +172,7 @@ function printWelcomeMessage(
   // use glitch env to get correct domain welcome message
   // https://glitch.com/help/project/
   const domain =
-    process.env.PROJECT_DOMAIN ||
-    `http://${host ?? "localhost"}:${port || 3000}`;
+    process.env.PROJECT_DOMAIN || `http://${host ?? "localhost"}:${port}`;
 
   [
     ``,

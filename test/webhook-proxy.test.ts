@@ -2,6 +2,7 @@ import { randomInt } from "node:crypto";
 import http from "node:http";
 import net from "node:net";
 
+import getPort from "get-port";
 import express, { type Response } from "express";
 const sse: (
   req: express.Request,
@@ -68,7 +69,7 @@ describe("webhook-proxy", () => {
         emit = res.json;
       });
 
-      server = app.listen(0, async () => {
+      server = app.listen(await getPort(), async () => {
         targetPort = (server.address() as net.AddressInfo).port;
         const url = `http://127.0.0.1:${targetPort}/events`;
 

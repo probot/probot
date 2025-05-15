@@ -12,6 +12,7 @@ import { VERSION } from "../version.js";
 import type { ApplicationFunction, ServerOptions } from "../types.js";
 import type { Probot } from "../exports.js";
 import { rebindLog } from "../helpers/rebind-log.js";
+import { getPrintableHost } from "./get-printable-host.js";
 
 // the default path as defined in @octokit/webhooks
 export const defaultWebhooksPath = "/api/github/webhooks";
@@ -86,7 +87,7 @@ export class Server {
       `Running Probot v${this.version} (Node.js: ${process.version})`,
     );
     const { host, webhookPath, webhookProxy, port } = this.state;
-    const printableHost = host ?? "localhost";
+    const printableHost = getPrintableHost(host);
 
     this.state.httpServer = await new Promise((resolve, reject) => {
       const server = createServer(this.expressApp).listen(

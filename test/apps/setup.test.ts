@@ -86,14 +86,13 @@ describe("Setup app", () => {
           // workaround for https://github.com/probot/probot/issues/1512
           appId: 1,
           privateKey: "dummy value for setup, see #1512",
+          port: await getPort(),
         }),
       });
 
-      const port = await getPort();
+      await server.load(setupAppFactory(server.host, server.port));
 
-      await server.load(setupAppFactory("127.0.0.1", port));
-
-      const expMsg = `Please follow the instructions at http://127.0.0.1:${port} to configure .env.`;
+      const expMsg = `Please follow the instructions at http://${server.host}:${server.port} to configure .env.`;
 
       const infoLogs = logOutput
         .filter((output: any) => output.level === pino.levels.values.info)

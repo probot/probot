@@ -9,6 +9,7 @@ import type { Probot } from "../probot.js";
 import { ManifestCreation } from "../manifest-creation.js";
 import { getLoggingMiddleware } from "../server/logging-middleware.js";
 import type { ApplicationFunctionOptions } from "../types.js";
+import { getPrintableHost } from "../server/get-printable-host.js";
 import { isProduction } from "../helpers/is-production.js";
 
 import { importView } from "../views/import.js";
@@ -172,8 +173,7 @@ function printWelcomeMessage(
   // use glitch env to get correct domain welcome message
   // https://glitch.com/help/project/
   const domain =
-    process.env.PROJECT_DOMAIN ||
-    `http://${host ?? "localhost"}:${port || 3000}`;
+    process.env.PROJECT_DOMAIN || `http://${getPrintableHost(host)}:${port}`;
 
   [
     ``,

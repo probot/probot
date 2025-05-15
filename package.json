@@ -85,7 +85,6 @@
     "semantic-release-plugin-update-version-in-files": "^2.0.0",
     "smee-client": "^3.1.1",
     "sonic-boom": "^4.0.0",
-    "supertest": "^7.0.0",
     "tsd": "^0.31.0",
     "typedoc": "^0.27.0",
     "typescript": "^5.2.2",

@@ -84,14 +84,19 @@ describe("webhook-proxy", () => {
               finishedPromise.resolve!();
             },
           });
-        const customFetch = async (url: string | URL, options: RequestInit) => {
+        const customFetch: typeof fetch = async (
+          input: string | URL | Request,
+          init: RequestInit | undefined,
+        ) => {
           if (
-            (typeof url === "string" && url.startsWith("http://127.0.0.1")) ||
-            (url instanceof URL && url.hostname === "127.0.0.1")
+            (typeof input === "string" &&
+              input.startsWith("http://127.0.0.1")) ||
+            (input instanceof URL && input.hostname === "127.0.0.1") ||
+            (input instanceof Request && input.url.includes("127.0.0.1"))
           ) {
-            return await fetch(url, options);
+            return await fetch(input, init);
           }
-          return await mock.fetchHandler(url, options);
+          return await mock.fetchHandler(input, init);
         };
 
         proxy = (await createWebhookProxy({
@@ -141,15 +146,18 @@ describe("webhook-proxy", () => {
     const logger = getLog({ level: "fatal" }).child({});
     logger.error = vi.fn() as any;
 
-    createWebhookProxy({ url, logger, host: "localhost", port: 1234 })!.then(
-      (proxy) => {
-        (proxy as EventSource).addEventListener("error", (error: any) => {
-          expect(error.message).toMatch(/getaddrinfo ENOTFOUND/);
-          expect(logger.error).toHaveBeenCalledWith(error);
-          finishedPromise.resolve!();
-        });
-      },
-    );
+    const proxy = (await createWebhookProxy({
+      url,
+      port: 1234,
+      host: "localhost",
+      path: "",
+      logger,
+    }))!;
+    proxy.addEventListener("error", (error: any) => {
+      expect(error.message).toMatch(/getaddrinfo ENOTFOUND/);
+      expect(logger.error).toHaveBeenCalledWith(error);
+      finishedPromise.resolve!();
+    });
 
     await finishedPromise.promise;
   });

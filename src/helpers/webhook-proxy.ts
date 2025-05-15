@@ -22,9 +22,9 @@ export const createWebhookProxy = async (
 
 export interface WebhookProxyOptions {
   url: string;
-  host: string;
   port: number;
-  path?: string;
+  path: string;
+  host: string;
   logger: Logger;
   fetch?: Function;
 }

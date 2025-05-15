@@ -13,8 +13,7 @@ import fetchMock from "fetch-mock";
 import { describe, expect, afterEach, test, vi } from "vitest";
 import { getLog } from "../src/helpers/get-log.js";
 import { createWebhookProxy } from "../src/helpers/webhook-proxy.js";
-
-let targetPort = 999999;
+import { getPrintableHost } from "../src/server/get-printable-host.js";
 
 interface SSEResponse extends Response {
   json(body: any, status?: string): this;
@@ -70,12 +69,16 @@ describe("webhook-proxy", () => {
       });
 
       server = app.listen(await getPort(), async () => {
-        targetPort = (server.address() as net.AddressInfo).port;
+        let { address: targetHost, port: targetPort } =
+          server.address() as net.AddressInfo;
+
+        targetHost = getPrintableHost(targetHost);
+
         const url = `http://127.0.0.1:${targetPort}/events`;
 
         const mock = fetchMock
           .createInstance()
-          .postOnce(`http://localhost:${targetPort}/test`, {
+          .postOnce(`http://${targetHost}:${targetPort}/test`, {
             status: 200,
             then: () => {
               finishedPromise.resolve!();
@@ -93,6 +96,7 @@ describe("webhook-proxy", () => {
 
         proxy = (await createWebhookProxy({
           url,
+          host: targetHost,
           port: targetPort,
           path: "/test",
           logger: getLog({ level: "fatal" }),
@@ -137,13 +141,15 @@ describe("webhook-proxy", () => {
     const logger = getLog({ level: "fatal" }).child({});
     logger.error = vi.fn() as any;
 
-    createWebhookProxy({ url, logger })!.then((proxy) => {
-      (proxy as EventSource).addEventListener("error", (error: any) => {
-        expect(error.message).toMatch(/getaddrinfo ENOTFOUND/);
-        expect(logger.error).toHaveBeenCalledWith(error);
-        finishedPromise.resolve!();
-      });
-    });
+    createWebhookProxy({ url, logger, host: "localhost", port: 1234 })!.then(
+      (proxy) => {
+        (proxy as EventSource).addEventListener("error", (error: any) => {
+          expect(error.message).toMatch(/getaddrinfo ENOTFOUND/);
+          expect(logger.error).toHaveBeenCalledWith(error);
+          finishedPromise.resolve!();
+        });
+      },
+    );
 
     await finishedPromise.promise;
   });

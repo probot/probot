@@ -96,9 +96,10 @@ export class Server {
         async () => {
           if (webhookProxy) {
             this.state.eventSource = await createWebhookProxy({
-              logger: this.log,
+              host,
+              port,
               path: webhookPath,
-              port: port,
+              logger: this.log,
               url: webhookProxy,
             });
           }

@@ -25,5 +25,5 @@ export interface WebhookProxyOptions {
   port: number;
   path: string;
   logger: Logger;
-  fetch?: typeof fetch;
+  fetch?: Function;
 }

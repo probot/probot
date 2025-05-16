@@ -1,10 +1,15 @@
+import { once } from "node:events";
+import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+
 import { execa } from "execa";
 import getPort from "get-port";
 
 import { sign } from "@octokit/webhooks-methods";
-import express from "express";
 
-import { describe, expect, it, vi } from "vitest";
+
+import { describe, expect, it } from "vitest";
+
+type RequestHandler = (req: IncomingMessage, res: ServerResponse) => void;
 
 /**
  * In these tests we are starting probot apps by running "npm run [path to app.js]" using ghub.io/execa.
@@ -18,35 +23,82 @@ describe("end-to-end-tests", () => {
     const mockServerPort = await getPort();
     const probotPort = await getPort();
 
-    const app = express();
-    const httpMock = vi
-      .fn()
-      .mockImplementationOnce((req, res) => {
-        expect(req.method).toEqual("POST");
-        expect(req.path).toEqual("/app/installations/1/access_tokens");
+    const bodyParser =
+      (handler: RequestHandler): RequestHandler =>
+      (req, res) => {
+        const chunks: Uint8Array[] = [];
 
-        res.status(201).json({
-          token: "v1.1f699f1069f60xxx",
-          permissions: {
-            issues: "write",
-            contents: "read",
-          },
-          repository_selection: "all",
+        req.on("data", (chunk: Uint8Array) => {
+          chunks.push(chunk);
         });
-      })
-      .mockImplementationOnce((req, res) => {
-        expect(req.method).toEqual("POST");
-        expect(req.path).toEqual(
-          "/repos/octocat/hello-world/issues/1/comments",
-        );
-        expect(req.body).toStrictEqual({ body: "Hello World!" });
 
-        res.status(201).json({});
-      });
+        req.on("end", () => {
+          const payload = Buffer.concat(chunks);
+          const body = new TextDecoder("utf-8").decode(payload);
 
-    app.use(express.json());
-    app.use("/api/v3", httpMock);
-    const server = app.listen(mockServerPort, "localhost");
+          // @ts-ignore
+          req.body = body;
+
+          handler(req, res);
+        });
+      };
+
+    let callCount = 0;
+    const handler: RequestHandler = (req, res) => {
+      expect(req.method).toEqual("POST");
+      expect(
+        new URL(`http://localhost${req.url!}`).pathname.startsWith("/api/v3"),
+      ).toBeTruthy();
+
+      switch (callCount++) {
+        case 0:
+          {
+            expect(new URL(`http://localhost${req.url!}`).pathname).toEqual(
+              "/api/v3/app/installations/1/access_tokens",
+            );
+
+            const body = JSON.stringify({
+              token: "v1.1f699f1069f60xxx",
+              permissions: {
+                issues: "write",
+                contents: "read",
+              },
+              repository_selection: "all",
+            });
+            res.writeHead(201, {
+              "content-type": "application/json",
+              "content-length": Buffer.byteLength(body),
+            });
+            res.end(body);
+          }
+          break;
+        case 1:
+          {
+            expect(new URL(`http://localhost${req.url!}`).pathname).toEqual(
+              "/api/v3/repos/octocat/hello-world/issues/1/comments",
+            );
+
+            // @ts-ignore
+            expect(req.body).toStrictEqual(
+              JSON.stringify({ body: "Hello World!" }),
+            );
+
+            res.writeHead(201, {
+              "content-type": "application/json",
+              "content-length": Buffer.byteLength("{}"),
+            });
+            res.end("{}");
+          }
+          break;
+      }
+    };
+
+    const server = createServer(bodyParser(handler)).listen(
+      mockServerPort,
+      "localhost",
+    );
+
+    await once(server, "listening");
 
     const probotProcess = execa("node", ["bin/probot.js", "run", file], {
       env: {
@@ -59,11 +111,17 @@ describe("end-to-end-tests", () => {
         LOG_LEVEL: "trace",
         WEBHOOK_PATH: "/",
       },
-      stdio: "inherit",
+      stdio: "pipe",
     });
 
-    // give probot a moment to start
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await new Promise<void>((resolve) => {
+      probotProcess.stdout?.on("data", (data) => {
+        if (data.toString().includes("Listening on")) {
+          resolve();
+        }
+      });
+    });
+
     // the probot process should be successfully started
     expect(probotProcess.exitCode).toBeNull();
 
@@ -85,13 +143,15 @@ describe("end-to-end-tests", () => {
     });
 
     try {
+      const signature = await sign("test", body);
+
       await fetch(`http://localhost:${probotPort}/`, {
         method: "POST",
         headers: {
           "content-type": "application/json",
           "x-github-event": "issues",
           "x-github-delivery": "1",
-          "x-hub-signature-256": await sign("test", body),
+          "x-hub-signature-256": signature,
         },
         body,
       });
@@ -104,12 +164,10 @@ describe("end-to-end-tests", () => {
       probotProcess.cancel();
     }
 
-    expect(httpMock).toHaveBeenCalledTimes(2);
+    expect(callCount).toEqual(2);
   };
-  it("runs a hello world app (CJS)", { timeout: 10000 }, () =>
-    runApp("./test/e2e/hello-world.cjs"),
-  );
-  it("runs a hello world app (ESM)", { timeout: 10000 }, () =>
-    runApp("./test/e2e/hello-world.mjs"),
-  );
+  it("runs a hello world app (CJS)", () =>
+    runApp("./test/e2e/hello-world.cjs"));
+  it("runs a hello world app (ESM)", () =>
+    runApp("./test/e2e/hello-world.mjs"));
 });

@@ -9,7 +9,8 @@
     "probot": "./bin/probot.js"
   },
   "scripts": {
-    "build": "rimraf lib && tsc -p tsconfig.json",
+    "build": "npm run rm:lib && tsc -p tsconfig.json",
+    "rm:lib": "node -e \"(require('fs').rmSync('lib', { recursive: true, force: true }));\"",
     "lint": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\" \"docs/*.md\" *.md tsconfig.json package.json --end-of-line auto",
     "lint:fix": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"docs/*.md\" *.md tsconfig.json package.json --end-of-line auto",
     "pretest": "npm run build && tsc --noEmit -p test",
@@ -81,7 +82,6 @@
     "fetch-mock": "^12.0.0",
     "get-port": "^7.0.0",
     "prettier": "^3.0.3",
-    "rimraf": "^6.0.0",
     "semantic-release-plugin-update-version-in-files": "^2.0.0",
     "smee-client": "^3.1.1",
     "sonic-boom": "^4.0.0",

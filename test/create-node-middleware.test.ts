@@ -93,7 +93,7 @@ describe("createNodeMiddleware", () => {
 
     const body = JSON.stringify(pushEvent);
 
-    await fetch(`http://127.0.0.1:${port}/api/github/webhooks`, {
+    await fetch(`http://localhost:${port}/api/github/webhooks`, {
       method: "POST",
       headers: {
         "content-type": "application/json",
@@ -140,7 +140,7 @@ describe("createNodeMiddleware", () => {
 
     const body = JSON.stringify(pushEvent);
 
-    await fetch(`http://127.0.0.1:${port}`, {
+    await fetch(`http://localhost:${port}`, {
       method: "POST",
       headers: {
         "content-type": "application/json",
@@ -187,7 +187,7 @@ describe("createNodeMiddleware", () => {
 
     const body = JSON.stringify(pushEvent);
 
-    await fetch(`http://127.0.0.1:${port}`, {
+    await fetch(`http://localhost:${port}`, {
       method: "POST",
       headers: {
         "content-type": "application/json",

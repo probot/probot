@@ -9,6 +9,7 @@ import { type ApplicationFunction, Probot, Server } from "../../src/index.js";
 import WebhookExamples, {
   type WebhookDefinition,
 } from "@octokit/webhooks-examples";
+import getPort from "get-port";
 
 describe("smee-client", () => {
   afterEach(async () => {
@@ -109,7 +110,7 @@ describe("smee-client", () => {
             secret: WEBHOOK_SECRET,
           }),
           log: pino(streamLogsToOutput),
-          port: 0,
+          port: await getPort(),
           webhookProxy: WEBHOOK_PROXY_URL,
           webhookPath: "/",
         });

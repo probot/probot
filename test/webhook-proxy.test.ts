@@ -2,6 +2,7 @@ import { randomInt } from "node:crypto";
 import http from "node:http";
 import net from "node:net";
 
+import getPort from "get-port";
 import express, { type Response } from "express";
 const sse: (
   req: express.Request,
@@ -12,8 +13,7 @@ import fetchMock from "fetch-mock";
 import { describe, expect, afterEach, test, vi } from "vitest";
 import { getLog } from "../src/helpers/get-log.js";
 import { createWebhookProxy } from "../src/helpers/webhook-proxy.js";
-
-let targetPort = 999999;
+import { getPrintableHost } from "../src/server/get-printable-host.js";
 
 interface SSEResponse extends Response {
   json(body: any, status?: string): this;
@@ -68,30 +68,40 @@ describe("webhook-proxy", () => {
         emit = res.json;
       });
 
-      server = app.listen(0, async () => {
-        targetPort = (server.address() as net.AddressInfo).port;
+      server = app.listen(await getPort(), async () => {
+        let { address: targetHost, port: targetPort } =
+          server.address() as net.AddressInfo;
+
+        targetHost = getPrintableHost(targetHost);
+
         const url = `http://127.0.0.1:${targetPort}/events`;
 
         const mock = fetchMock
           .createInstance()
-          .postOnce(`http://localhost:${targetPort}/test`, {
+          .postOnce(`http://${targetHost}:${targetPort}/test`, {
             status: 200,
             then: () => {
               finishedPromise.resolve!();
             },
           });
-        const customFetch = async (url: string | URL, options: RequestInit) => {
+        const customFetch: typeof fetch = async (
+          input: string | URL | Request,
+          init: RequestInit | undefined,
+        ) => {
           if (
-            (typeof url === "string" && url.startsWith("http://127.0.0.1")) ||
-            (url instanceof URL && url.hostname === "127.0.0.1")
+            (typeof input === "string" &&
+              input.startsWith("http://127.0.0.1")) ||
+            (input instanceof URL && input.hostname === "127.0.0.1") ||
+            (input instanceof Request && input.url.includes("127.0.0.1"))
           ) {
-            return await fetch(url, options);
+            return await fetch(input, init);
           }
-          return await mock.fetchHandler(url, options);
+          return await mock.fetchHandler(input, init);
         };
 
         proxy = (await createWebhookProxy({
           url,
+          host: targetHost,
           port: targetPort,
           path: "/test",
           logger: getLog({ level: "fatal" }),
@@ -136,12 +146,17 @@ describe("webhook-proxy", () => {
     const logger = getLog({ level: "fatal" }).child({});
     logger.error = vi.fn() as any;
 
-    createWebhookProxy({ url, logger })!.then((proxy) => {
-      (proxy as EventSource).addEventListener("error", (error: any) => {
-        expect(error.message).toMatch(/getaddrinfo ENOTFOUND/);
-        expect(logger.error).toHaveBeenCalledWith(error);
-        finishedPromise.resolve!();
-      });
+    const proxy = (await createWebhookProxy({
+      url,
+      port: 1234,
+      host: "localhost",
+      path: "",
+      logger,
+    }))!;
+    proxy.addEventListener("error", (error: any) => {
+      expect(error.message).toMatch(/getaddrinfo ENOTFOUND/);
+      expect(logger.error).toHaveBeenCalledWith(error);
+      finishedPromise.resolve!();
     });
 
     await finishedPromise.promise;

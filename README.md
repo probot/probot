@@ -3,7 +3,7 @@
 </p>
 <h3 align="center"><a href="https://probot.github.io">Probot</a></h3>
 <p align="center">A framework for building GitHub Apps to automate and improve your workflow</p>
-<p align="center"><a href="https://npmjs.com/package/probot"><img src="https://badgen.net/npm/v/probot" alt="npm"></a> <a href="https://github.com/probot/probot/actions?query=workflow%3ACI"><img src="https://github.com/probot/probot/workflows/CI/badge.svg" alt="Build Status"></a> <a href="https://twitter.com/ProbotTheRobot"><img src="https://img.shields.io/twitter/follow/ProbotTheRobot.svg?style=social&logo=twitter&label=Follow" alt="@ProbotTheRobot on Twitter"></a>
+<p align="center"><a href="https://npmjs.com/package/probot"><img src="https://badgen.net/npm/v/probot" alt="npm"></a> <a href="https://github.com/probot/probot/actions"><img src="https://github.com/probot/probot/actions/workflows/test.yml/badge.svg" alt="Build Status"></a> <a href="https://twitter.com/ProbotTheRobot"><img src="https://img.shields.io/twitter/follow/ProbotTheRobot" alt="@ProbotTheRobot on Twitter"></a>
 </p>
 
 ---

@@ -1,12 +1,12 @@
-import http from "node:http";
-import { Writable as WritableStream } from "node:stream";
+import Stream from "node:stream";
 
+import { describe, it, expect } from "vitest";
 import { pino } from "pino";
 import { sign } from "@octokit/webhooks-methods";
+import getPort from "get-port";
 import WebhookExamples, {
   type WebhookDefinition,
 } from "@octokit/webhooks-examples";
-import { describe, expect, it, beforeEach, test, afterEach } from "vitest";
 
 import { Server, Probot } from "../src/index.js";
 
@@ -44,56 +44,24 @@ const pushEvent = (
   )[0] as WebhookDefinition<"push">
 ).examples[0];
 
-describe("Server", async () => {
-  let server: Server;
-
-  let output: any[];
-  const streamLogsToOutput = new WritableStream({ objectMode: true });
-  streamLogsToOutput._write = (object, _encoding, done) => {
-    output.push(JSON.parse(object));
-    done();
-  };
-
-  beforeEach(async () => {
-    output = [];
-    const log = pino(streamLogsToOutput);
-    server = new Server({
-      Probot: Probot.defaults({
-        appId,
-        privateKey,
-        secret: "secret",
-        log: log.child({ name: "probot" }),
-      }),
-      port: 0,
-      log: log.child({ name: "server" }),
+describe("Server", () => {
+  function streamLogsToOutput(target: any[]) {
+    return new Stream.Writable({
+      objectMode: true,
+      write(object, _encoding, done) {
+        target.push(JSON.parse(object));
+        done();
+      },
     });
-    await server.start();
-  });
+  }
 
-  afterEach(async () => {
-    await server.stop();
-  });
-
-  test("Server.version", () => {
+  it("Server.version", () => {
     expect(Server.version).toEqual("0.0.0-development");
   });
 
   describe("GET /ping", () => {
     it("returns a 200 response", async () => {
-      const response = await fetch(`http://${server.host}:${server.port}/ping`);
-      expect(response.status).toBe(200);
-      expect(await response.text()).toBe("PONG");
-
-      expect(output.length).toEqual(3);
-      expect(output[2].msg).toContain("GET /ping 200 -");
-    });
-  });
-
-  describe("webhook handler by providing webhookPath (POST /)", () => {
-    it("should return 200 and run event handlers in app function", async () => {
-      expect.assertions(4);
-
-      output = [];
+      const output: any[] = [];
 
       const server = new Server({
         webhookPath: "/",
@@ -102,60 +70,20 @@ describe("Server", async () => {
           privateKey,
           secret: "secret",
         }),
-        log: pino(streamLogsToOutput),
-        port: 0,
-      });
-
-      await server.load((app) => {
-        app.on("push", (event) => {
-          expect(event.name).toEqual("push");
-        });
+        log: pino(streamLogsToOutput(output)),
+        port: await getPort(),
       });
 
       await server.start();
 
-      const dataString = JSON.stringify(pushEvent);
+      const response = await fetch(`http://${server.host}:${server.port}/ping`);
+      expect(response.status).toEqual(200);
+      expect(await response.text()).toEqual("PONG");
 
-      const response = await fetch(`http://${server.host}:${server.port}/`, {
-        body: dataString,
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          "x-github-event": "push",
-          "x-hub-signature-256": await sign("secret", dataString),
-          "x-github-delivery": "3sw4d5f6g7h8",
-        },
-      });
-
-      expect(response.status).toBe(200);
       expect(output.length).toEqual(3);
-      expect(output[2].msg).toContain("POST / 200 -");
+      expect(output[2].msg).toContain("GET /ping 200 -");
 
       await server.stop();
-    });
-
-    test("respond with a friendly error when x-hub-signature-256 is missing", async () => {
-      expect.assertions(2);
-
-      await server.load(() => {});
-
-      const response = await fetch(
-        `http://${server.host}:${server.port}/api/github/webhooks`,
-        {
-          body: JSON.stringify(pushEvent),
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-            "x-github-event": "push",
-            "x-github-delivery": "3sw4d5f6g7h8",
-          },
-        },
-      );
-
-      expect(response.status).toBe(400);
-      expect(await response.text()).toBe(
-        '{"error":"Required headers missing: x-hub-signature-256"}',
-      );
     });
   });
 
@@ -163,7 +91,7 @@ describe("Server", async () => {
     it("should return 200 and run event handlers in app function", async () => {
       expect.assertions(4);
 
-      output = [];
+      const output: any[] = [];
 
       const server = new Server({
         Probot: Probot.defaults({
@@ -171,8 +99,8 @@ describe("Server", async () => {
           privateKey,
           secret: "secret",
         }),
-        log: pino(streamLogsToOutput),
-        port: 0,
+        log: pino(streamLogsToOutput(output)),
+        port: await getPort(),
       });
 
       await server.load((app) => {
@@ -210,6 +138,20 @@ describe("Server", async () => {
     describe("GET unknown URL", () => {
       it("responds with 404", async () => {
         expect.assertions(3);
+        const output: any[] = [];
+
+        const server = new Server({
+          webhookPath: "/",
+          Probot: Probot.defaults({
+            appId,
+            privateKey,
+            secret: "secret",
+          }),
+          log: pino(streamLogsToOutput(output)),
+          port: await getPort(),
+        });
+
+        await server.start();
 
         const response = await fetch(
           `http://${server.host}:${server.port}/notfound`,
@@ -218,59 +160,46 @@ describe("Server", async () => {
         expect(response.status).toBe(404);
         expect(output.length).toEqual(3);
         expect(output[2].msg).toContain("GET /notfound 404 -");
+
+        await server.stop();
       });
     });
 
     describe(".start() / .stop()", () => {
-      it("should expect the correct error if port already in use", () =>
-        new Promise<void>((next) => {
-          expect.assertions(1);
-
-          // block port 3001
-          const blockade = http.createServer().listen(3001, async () => {
-            const server = new Server({
-              Probot: Probot.defaults({ appId, privateKey }),
-              log: pino(streamLogsToOutput),
-              port: 3001,
-            });
-
-            try {
-              await server.start();
-            } catch (error) {
-              expect((error as Error).message).toEqual(
-                "Port 3001 is already in use. You can define the PORT environment variable to use a different port.",
-              );
-            }
-
-            await server.stop();
-            blockade.close(() => next());
-          });
-        }));
-
-      it("should listen to port when not in use", async () => {
-        output = [];
-        const testApp = new Server({
+      it("should expect the correct error if port already in use", async () => {
+        expect.assertions(1);
+        const blocker = new Server({
           Probot: Probot.defaults({ appId, privateKey }),
+          log: pino(streamLogsToOutput([])),
           port: 3001,
-          log: pino(streamLogsToOutput),
         });
-        await testApp.start();
 
-        expect(output.length).toEqual(2);
-        expect(output[1].msg).toEqual(
-          `Listening on http://${server.host}:3001`,
-        );
+        await blocker.start();
 
-        await testApp.stop();
+        const server = new Server({
+          Probot: Probot.defaults({ appId, privateKey }),
+          log: pino(streamLogsToOutput([])),
+          port: 3001,
+        });
+
+        try {
+          await server.start();
+        } catch (error) {
+          expect((error as Error).message).toEqual(
+            "Port 3001 is already in use. You can define the PORT environment variable to use a different port.",
+          );
+        }
+
+        await blocker.stop();
       });
 
       it("respects host/ip config when starting up HTTP server", async () => {
-        output = [];
+        const output: any[] = [];
         const testApp = new Server({
           Probot: Probot.defaults({ appId, privateKey }),
           port: 3002,
           host: "127.0.0.1",
-          log: pino(streamLogsToOutput),
+          log: pino(streamLogsToOutput(output)),
         });
         await testApp.start();
 

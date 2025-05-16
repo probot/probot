@@ -19,6 +19,7 @@ import type {
 } from "../types.js";
 import type { Probot } from "../exports.js";
 import { rebindLog } from "../helpers/rebind-log.js";
+import { getPrintableHost } from "./get-printable-host.js";
 
 // the default path as defined in @octokit/webhooks
 export const defaultWebhooksPath = "/api/github/webhooks";
@@ -41,8 +42,8 @@ const primerCss = fs.readFileSync(
 type State = {
   cwd?: string;
   httpServer?: HttpServer;
-  port?: number;
-  host?: string;
+  port: number;
+  host: string;
   webhookPath: string;
   webhookProxy?: string;
   eventSource?: EventSource;
@@ -90,8 +91,8 @@ export class Server {
     this.state = {
       httpServer: new HttpServer(handler),
       cwd: options.cwd || process.cwd(),
-      port: options.port,
-      host: options.host,
+      port: options.port || 3000,
+      host: options.host || "localhost",
       webhookPath: options.webhookPath || defaultWebhooksPath,
       webhookProxy: options.webhookProxy,
     };
@@ -158,8 +159,8 @@ export class Server {
     this.log.info(
       `Running Probot v${this.version} (Node.js: ${process.version})`,
     );
-    const port = this.state.port ?? 3000;
-    const { host, webhookPath, webhookProxy } = this.state;
+    const { port, host, webhookPath, webhookProxy } = this.state;
+    const printableHost = getPrintableHost(host);
 
     this.state.httpServer = await new Promise((resolve, reject) => {
       const server = this.state.httpServer!.listen(port, host, async () => {
@@ -172,13 +173,14 @@ export class Server {
 
         if (webhookProxy) {
           this.state.eventSource = await createWebhookProxy({
-            logger: this.log,
+            host,
+            port,
             path: webhookPath,
-            port: this.state.port,
+            logger: this.log,
             url: webhookProxy,
           });
         }
-        this.log.info(`Listening on http://${this.host}:${this.port}`);
+        this.log.info(`Listening on http://${printableHost}:${port}`);
         resolve(server);
       });
 
@@ -197,18 +199,22 @@ export class Server {
     return this.state.httpServer;
   }
 
-  public async stop(): Promise<unknown> {
+  public async stop(): Promise<void> {
     if (this.state.eventSource) this.state.eventSource.close();
     if (!this.state.httpServer) return;
     const server = this.state.httpServer;
-    return new Promise((resolve) => server.close(resolve));
+    return new Promise((resolve, reject) =>
+      server.close((err) => {
+        err ? reject(err) : resolve();
+      }),
+    );
   }
 
-  get port() {
+  get port(): number {
     return this.state.port;
   }
 
-  get host() {
+  get host(): string {
     return this.state.host;
   }
 }

@@ -8,7 +8,7 @@ export const createWebhookProxy = async (
     const smee = new SmeeClient({
       logger: opts.logger,
       source: opts.url,
-      target: `http://localhost:${opts.port}${opts.path}`,
+      target: `http://${opts.host}:${opts.port}${opts.path}`,
       fetch: opts.fetch,
     });
     return smee.start() as unknown as EventSource;
@@ -22,8 +22,9 @@ export const createWebhookProxy = async (
 
 export interface WebhookProxyOptions {
   url: string;
-  port?: number;
-  path?: string;
+  port: number;
+  path: string;
+  host: string;
   logger: Logger;
   fetch?: Function;
 }

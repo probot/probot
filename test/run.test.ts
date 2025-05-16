@@ -2,9 +2,9 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { sign } from "@octokit/webhooks-methods";
-import { describe, expect, it, beforeEach } from "vitest";
+import { describe, expect, it } from "vitest";
 
-import { Probot, run } from "../src/index.js";
+import { Probot, run, type Server } from "../src/index.js";
 
 import { captureLogOutput } from "./helpers/capture-log-output.js";
 import WebhookExamples, {
@@ -13,25 +13,21 @@ import WebhookExamples, {
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-describe("run", async () => {
-  let env: NodeJS.ProcessEnv;
+const defaultEnv: NodeJS.ProcessEnv = {
+  APP_ID: "1",
+  PRIVATE_KEY_PATH: path.join(__dirname, "fixtures", "test-private-key.pem"),
+  WEBHOOK_PROXY_URL: "https://smee.io/EfHXC9BFfGAxbM6J",
+  WEBHOOK_SECRET: "secret",
+  LOG_LEVEL: "fatal",
+};
 
-  beforeEach(() => {
-    env = {
-      APP_ID: "1",
-      PRIVATE_KEY_PATH: path.join(
-        __dirname,
-        "fixtures",
-        "test-private-key.pem",
-      ),
-      WEBHOOK_PROXY_URL: "https://smee.io/EfHXC9BFfGAxbM6J",
-      WEBHOOK_SECRET: "secret",
-      LOG_LEVEL: "fatal",
-    };
-  });
+describe("run", () => {
+  let server: Server;
 
   describe("params", () => {
     it("runs with a function as argument", async () => {
+      const env = { ...defaultEnv };
+
       let initialized = false;
 
       const server = await run(
@@ -57,6 +53,9 @@ describe("run", async () => {
 
     it("runs without config and loads the setup app", async () => {
       let initialized = false;
+
+      const env = { ...defaultEnv };
+
       delete env.PRIVATE_KEY_PATH;
       env.PORT = "3003";
 
@@ -76,6 +75,7 @@ describe("run", async () => {
 
     it("defaults to JSON logs if NODE_ENV is set to 'production'", async () => {
       let outputData = "";
+      const env = { ...defaultEnv };
       env.NODE_ENV = "production";
 
       const server = await run(
@@ -100,7 +100,8 @@ describe("run", async () => {
     ).examples[0];
 
     it("POST /api/github/webhooks", async () => {
-      const server = await run(() => {}, { env });
+      const env = { ...defaultEnv };
+      server = await run(() => {}, { env });
 
       const dataString = JSON.stringify(pushEvent);
 
@@ -112,8 +113,8 @@ describe("run", async () => {
           headers: {
             "content-type": "application/json",
             "x-github-event": "push",
-            "x-hub-signature-256": await sign("secret", dataString),
             "x-github-delivery": "123",
+            "x-hub-signature-256": await sign("secret", dataString),
           },
         },
       );
@@ -124,7 +125,8 @@ describe("run", async () => {
     });
 
     it("custom webhook path", async () => {
-      const server = await run(() => {}, {
+      const env = { ...defaultEnv };
+      server = await run(() => {}, {
         env: {
           ...env,
           WEBHOOK_PATH: "/custom-webhook",

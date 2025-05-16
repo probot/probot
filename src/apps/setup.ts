@@ -6,6 +6,7 @@ import updateDotenv from "update-dotenv";
 
 import type { Probot } from "../probot.js";
 import { ManifestCreation } from "../manifest-creation.js";
+import { getPrintableHost } from "../server/get-printable-host.js";
 import { isProduction } from "../helpers/is-production.js";
 import type { Handler } from "../types.js";
 import { getPayload } from "../helpers/get-payload.js";
@@ -163,8 +164,7 @@ function printWelcomeMessage(
   // use glitch env to get correct domain welcome message
   // https://glitch.com/help/project/
   const domain =
-    process.env.PROJECT_DOMAIN ||
-    `http://${host ?? "localhost"}:${port || 3000}`;
+    process.env.PROJECT_DOMAIN || `http://${getPrintableHost(host)}:${port}`;
 
   [
     ``,

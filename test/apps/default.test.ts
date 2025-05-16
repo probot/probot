@@ -3,6 +3,7 @@ import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { pino } from "pino";
+import getPort from "get-port";
 import { describe, expect, it } from "vitest";
 
 import { Probot, Server } from "../../src/index.js";
@@ -26,53 +27,58 @@ describe("default app", async () => {
         appId: 1,
         privateKey: "private key",
       }),
+      port: await getPort(),
       log: pino(streamLogsToOutput),
       cwd,
-      port: 0,
     });
 
     await server.loadHandler(defaultAppHandler);
+
     return server;
   }
 
   describe("GET /probot", () => {
     it("returns a 200 response", async () => {
       const server = await instantiateServer();
+
       await server.start();
-      expect(
-        (await fetch(`http://${server.host}:${server.port}/probot`)).status,
-      ).toBe(200);
+
+      const response = await fetch(
+        `http://${server.host}:${server.port}/probot`,
+      );
+
+      expect(response.status).toBe(200);
       await server.stop();
     });
 
     describe("get info from package.json", () => {
       it("returns the correct HTML with values", async () => {
         const server = await instantiateServer();
+
         await server.start();
+
         const response = await fetch(
           `http://${server.host}:${server.port}/probot`,
         );
+
         expect(response.status).toBe(200);
 
-        const actualText = await response.text();
-        expect(actualText).toMatch("Welcome to probot");
-        expect(actualText).toMatch("A framework for building GitHub Apps");
-        expect(actualText).toMatch(/v\d+\.\d+\.\d+/);
-        expect(actualText).toMatchSnapshot();
+        expect(await response.text()).toMatchSnapshot();
+
         await server.stop();
       });
 
       it("returns the correct HTML without values", async () => {
         const server = await instantiateServer(__dirname);
+
         await server.start();
+
         const response = await fetch(
           `http://${server.host}:${server.port}/probot`,
         );
         expect(response.status).toBe(200);
+        expect(await response.text()).toMatchSnapshot();
 
-        const actualText = await response.text();
-        expect(actualText).toMatch("Welcome to your Probot App");
-        expect(actualText).toMatchSnapshot();
         await server.stop();
       });
     });
@@ -83,12 +89,14 @@ describe("default app", async () => {
     it("redirects to /probot", async () => {
       const server = await instantiateServer(__dirname);
       await server.start();
+
       const response = await fetch(`http://${server.host}:${server.port}/`, {
         redirect: "manual",
       });
 
       expect(response.status).toBe(302);
       expect(response.headers.get("location")).toBe("/probot");
+
       await server.stop();
     });
   });

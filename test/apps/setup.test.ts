@@ -2,6 +2,7 @@ import { Stream } from "node:stream";
 
 import fetchMock from "fetch-mock";
 import { pino } from "pino";
+import getPort from "get-port";
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 
 import { Probot, Server } from "../../src/index.js";
@@ -42,12 +43,12 @@ describe("Setup app", async () => {
         privateKey: "dummy value for setup, see #1512",
       }),
       log: pino(streamLogsToOutput),
-      port: 0,
+      port: await getPort(),
     });
 
-    await server.start();
-
     await server.loadHandler(setupAppFactory(server.host, server.port));
+
+    await server.start();
   });
 
   afterEach(async () => {
@@ -63,34 +64,35 @@ describe("Setup app", async () => {
         "Probot is in setup mode, webhooks cannot be received and",
         "custom routes will not work until APP_ID and PRIVATE_KEY",
         "are configured in .env.",
-        `Please follow the instructions at http://${server.host}:${server.port} to configure .env.`,
+        `Please follow the instructions at http://localhost:${server.port} to configure .env.`,
         "Once you are done, restart the server.",
         "",
         `Running Probot v0.0.0-development (Node.js: ${process.version})`,
-        `Listening on http://${server.host}:${server.port}`,
+        `Listening on http://localhost:${server.port}`,
       ];
 
       const infoLogs = logOutput
         .filter((output: any) => output.level === pino.levels.values.info)
         .map((o) => o.msg);
 
-      expect(infoLogs).toEqual(expect.arrayContaining(expMsgs));
+      expect(infoLogs).toEqual(expMsgs);
     });
 
     it("should log welcome message with custom host and port", async () => {
-      const server2 = new Server({
+      const server = new Server({
         log: pino(streamLogsToOutput),
         Probot: Probot.defaults({
           log: pino(streamLogsToOutput),
           // workaround for https://github.com/probot/probot/issues/1512
           appId: 1,
           privateKey: "dummy value for setup, see #1512",
+          port: await getPort(),
         }),
         host: "localhost",
         port,
       });
 
-      await server2.loadHandler(setupAppFactory(server.host, port));
+      await server.loadHandler(setupAppFactory(server.host, server.port));
 
       const expMsg = `Please follow the instructions at http://${server.host}:${server.port} to configure .env.`;
 
@@ -137,21 +139,20 @@ describe("Setup app", async () => {
         request: {
           fetch: mock.fetchHandler,
         },
-        host: "localhost",
-        port: 0,
+        port: await getPort(),
       });
-
-      await server.start();
 
       await server.loadHandler(setupAppFactory(server.host, server.port));
 
+      await server.start();
+
       const setupResponse = await fetch(
         `http://${server.host}:${server.port}/probot/setup?code=123`,
-        { redirect: "manual" },
+        { method: "GET", redirect: "manual" },
       );
 
       expect(setupResponse.status).toBe(302);
-      expect(setupResponse.headers.get("Location")).toBe(
+      expect(setupResponse.headers.get("location")).toBe(
         "/apps/my-app/installations/new",
       );
 
@@ -172,12 +173,12 @@ describe("Setup app", async () => {
           privateKey: "dummy value for setup, see #1512",
         }),
         log: pino(streamLogsToOutput),
-        port: 0,
+        port: await getPort(),
       });
 
-      await server.start();
-
       await server.loadHandler(setupAppFactory(server.host, server.port));
+
+      await server.start();
 
       const setupResponse = await fetch(
         `http://${server.host}:${server.port}/probot/setup`,
@@ -198,19 +199,18 @@ describe("Setup app", async () => {
           privateKey: "dummy value for setup, see #1512",
         }),
         log: pino(streamLogsToOutput),
-        port: 0,
+        port: await getPort(),
       });
 
-      await server.start();
-
       await server.loadHandler(setupAppFactory(server.host, server.port));
+
+      await server.start();
 
       const setupResponse = await fetch(
         `http://${server.host}:${server.port}/probot/setup?code=`,
       );
 
       expect(setupResponse.status).toBe(400);
-
       expect(await setupResponse.text()).toMatchSnapshot();
 
       await server.stop();
@@ -239,11 +239,11 @@ describe("Setup app", async () => {
       const response = await fetch(
         `http://${server.host}:${server.port}/probot/import`,
         {
-          body,
           method: "POST",
           headers: {
             "content-type": "application/json",
           },
+          body,
         },
       );
 
@@ -263,11 +263,11 @@ describe("Setup app", async () => {
       const importResponse = await fetch(
         `http://${server.host}:${server.port}/probot/import`,
         {
-          body,
           method: "POST",
           headers: {
             "content-type": "application/json",
           },
+          body,
         },
       );
 
@@ -283,7 +283,6 @@ describe("Setup app", async () => {
       );
 
       expect(successResponse.status).toBe(200);
-
       expect(await successResponse.text()).toMatchSnapshot();
 
       expect(mocks.createChannel).toHaveBeenCalledTimes(1);

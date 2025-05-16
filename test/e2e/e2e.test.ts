@@ -112,6 +112,8 @@ describe("end-to-end-tests", () => {
 
     await once(server, "listening");
 
+    const probotProcessAbortController = new AbortController();
+
     const probotProcess = execa("node", ["bin/probot.js", "run", file], {
       env: {
         APP_ID: "1",
@@ -124,7 +126,10 @@ describe("end-to-end-tests", () => {
         WEBHOOK_PATH: "/",
       },
       stdio: "pipe",
+      cancelSignal: probotProcessAbortController.signal,
     });
+
+    probotProcess.catch(() => {});
 
     await new Promise<void>((resolve) => {
       probotProcess.stdout?.on("data", (data) => {
@@ -175,7 +180,9 @@ describe("end-to-end-tests", () => {
       console.log(awaitedProcess.stderr);
     } finally {
       server.close();
-      probotProcess.cancel();
+      try {
+        probotProcessAbortController.abort();
+      } catch {}
     }
 
     expect(callCount).toEqual(2);

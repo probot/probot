@@ -167,7 +167,9 @@ describe("Probot", () => {
       try {
         await probot.webhooks.receive(event);
       } catch (e) {
-        expect((probot.log.error as Mock).mock.calls[0][1]).toMatchSnapshot();
+        expect((probot.log.error as Mock).mock.calls[0][1]).toEqual(
+          "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
+        );
       }
     });
 
@@ -182,7 +184,9 @@ describe("Probot", () => {
       try {
         await probot.webhooks.receive(event);
       } catch (e) {
-        expect((probot.log.error as Mock).mock.calls[0][1]).toMatchSnapshot();
+        expect((probot.log.error as Mock).mock.calls[0][1]).toEqual(
+          "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
+        );
       }
     });
 
@@ -199,7 +203,9 @@ describe("Probot", () => {
       try {
         await probot.webhooks.receive(event);
       } catch (e) {
-        expect((probot.log.error as Mock).mock.calls[0][1]).toMatchSnapshot();
+        expect((probot.log.error as Mock).mock.calls[0][1]).toEqual(
+          "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
+        );
       }
     });
 
@@ -216,7 +222,9 @@ describe("Probot", () => {
       try {
         await probot.webhooks.receive(event);
       } catch (e) {
-        expect((probot.log.error as Mock).mock.calls[0][1]).toMatchSnapshot();
+        expect((probot.log.error as Mock).mock.calls[0][1]).toEqual(
+          "Your private key (a .pem file or PRIVATE_KEY environment variable) or APP_ID is incorrect. Go to https://github.com/settings/apps/YOUR_APP, verify that APP_ID is set correctly, and generate a new PEM file if necessary.",
+        );
       }
     });
 
@@ -233,7 +241,9 @@ describe("Probot", () => {
       try {
         await probot.webhooks.receive(event);
       } catch (e) {
-        expect((probot.log.error as Mock).mock.calls[0][1]).toMatchSnapshot();
+        expect((probot.log.error as Mock).mock.calls[0][1]).toEqual(
+          "Your private key (a .pem file or PRIVATE_KEY environment variable) or APP_ID is incorrect. Go to https://github.com/settings/apps/YOUR_APP, verify that APP_ID is set correctly, and generate a new PEM file if necessary.",
+        );
       }
     });
   });

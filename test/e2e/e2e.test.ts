@@ -1,11 +1,14 @@
 import { once } from "node:events";
-import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import {
+  createServer,
+  type IncomingMessage,
+  type ServerResponse,
+} from "node:http";
 
 import { execa } from "execa";
 import getPort from "get-port";
 
 import { sign } from "@octokit/webhooks-methods";
-
 
 import { describe, expect, it } from "vitest";
 
@@ -33,7 +36,17 @@ describe("end-to-end-tests", () => {
         });
 
         req.on("end", () => {
-          const payload = Buffer.concat(chunks);
+          let totalLength = 0;
+          for (let i = 0; i < chunks.length; i++) {
+            totalLength += chunks[i].byteLength;
+          }
+          const payload = new Uint8Array(totalLength);
+          let offset = 0;
+          for (let i = 0; i < chunks.length; i++) {
+            payload.set(chunks[i], offset);
+            offset += chunks[i].byteLength;
+          }
+
           const body = new TextDecoder("utf-8").decode(payload);
 
           // @ts-ignore
@@ -57,19 +70,19 @@ describe("end-to-end-tests", () => {
               "/api/v3/app/installations/1/access_tokens",
             );
 
-            const body = JSON.stringify({
-              token: "v1.1f699f1069f60xxx",
-              permissions: {
-                issues: "write",
-                contents: "read",
-              },
-              repository_selection: "all",
-            });
             res.writeHead(201, {
               "content-type": "application/json",
-              "content-length": Buffer.byteLength(body),
             });
-            res.end(body);
+            res.end(
+              JSON.stringify({
+                token: "v1.1f699f1069f60xxx",
+                permissions: {
+                  issues: "write",
+                  contents: "read",
+                },
+                repository_selection: "all",
+              }),
+            );
           }
           break;
         case 1:
@@ -85,7 +98,6 @@ describe("end-to-end-tests", () => {
 
             res.writeHead(201, {
               "content-type": "application/json",
-              "content-length": Buffer.byteLength("{}"),
             });
             res.end("{}");
           }
@@ -145,7 +157,7 @@ describe("end-to-end-tests", () => {
     try {
       const signature = await sign("test", body);
 
-      await fetch(`http://localhost:${probotPort}/`, {
+      const response = await fetch(`http://localhost:${probotPort}/`, {
         method: "POST",
         headers: {
           "content-type": "application/json",
@@ -155,6 +167,8 @@ describe("end-to-end-tests", () => {
         },
         body,
       });
+
+      expect(await response.text()).toEqual("ok\n");
     } catch (error) {
       const awaitedProcess = await probotProcess;
       console.log(awaitedProcess.stdout);

@@ -81,6 +81,7 @@ export class Probot {
       log: rebindLog(this.log),
       redisConfig: options.redisConfig,
       baseUrl: options.baseUrl,
+      request: options.request,
     });
     const octokitLogger = rebindLog(this.log.child({ name: "octokit" }));
     const octokit = new Octokit({

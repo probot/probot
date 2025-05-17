@@ -2,14 +2,15 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { sign } from "@octokit/webhooks-methods";
+import WebhookExamples, {
+  type WebhookDefinition,
+} from "@octokit/webhooks-examples";
 import { describe, expect, it } from "vitest";
+import getPort from "get-port";
 
 import { Probot, run, Server } from "../src/index.js";
 
 import { captureLogOutput } from "./helpers/capture-log-output.js";
-import WebhookExamples, {
-  type WebhookDefinition,
-} from "@octokit/webhooks-examples";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -57,7 +58,7 @@ describe("run", () => {
       const env = { ...defaultEnv };
 
       delete env.PRIVATE_KEY_PATH;
-      env.PORT = "3003";
+      env.PORT = (await getPort()).toString();
 
       return new Promise(async (resolve) => {
         server = await run(

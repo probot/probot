@@ -179,9 +179,9 @@ export class Context<Event extends WebhookEvents = WebhookEvents> {
    * @type {boolean}
    */
   get isBot(): boolean {
-    // @ts-expect-error - `sender` key is currently not present in all events
+    // `sender` key is not present in all events
     // see https://github.com/octokit/webhooks/issues/510
-    return this.payload.sender.type === "Bot";
+    return this.payload.sender?.type === "Bot";
   }
 
   /**

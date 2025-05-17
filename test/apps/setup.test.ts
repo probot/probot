@@ -45,7 +45,9 @@ describe("Setup app", () => {
       port: await getPort(),
     });
 
-    await server.load(setupAppFactory(server.host, server.port));
+    await server.load(
+      setupAppFactory({ host: server.host, port: server.port }),
+    );
 
     await server.start();
   });
@@ -90,7 +92,9 @@ describe("Setup app", () => {
         }),
       });
 
-      await server.load(setupAppFactory(server.host, server.port));
+      await server.load(
+        setupAppFactory({ host: server.host, port: server.port }),
+      );
 
       const expMsg = `Please follow the instructions at http://${server.host}:${server.port} to configure .env.`;
 
@@ -140,7 +144,15 @@ describe("Setup app", () => {
         port: await getPort(),
       });
 
-      await server.load(setupAppFactory(undefined, undefined));
+      await server.load(
+        setupAppFactory({
+          host: server.host,
+          port: server.port,
+          request: {
+            fetch: mock.fetchHandler,
+          },
+        }),
+      );
 
       await server.start();
 
@@ -174,7 +186,9 @@ describe("Setup app", () => {
         port: await getPort(),
       });
 
-      await server.load(setupAppFactory(undefined, undefined));
+      await server.load(
+        setupAppFactory({ host: server.host, port: server.port }),
+      );
 
       await server.start();
 
@@ -200,7 +214,9 @@ describe("Setup app", () => {
         port: await getPort(),
       });
 
-      await server.load(setupAppFactory(undefined, undefined));
+      await server.load(
+        setupAppFactory({ host: server.host, port: server.port }),
+      );
 
       await server.start();
 

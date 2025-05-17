@@ -116,8 +116,13 @@ export async function run(
         privateKey: "dummy value for setup, see #1512",
       }),
     });
-    await server.load(setupAppFactory(host, port));
+
+    await server.load(
+      setupAppFactory({ host: server.host, port: server.port }),
+    );
+
     await server.start();
+
     return server;
   }
 

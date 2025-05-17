@@ -1,14 +1,12 @@
 import Stream from "node:stream";
 
-import type { NextFunction, Request, Response } from "express";
-import request from "supertest";
+import { describe, it, expect } from "vitest";
 import { pino } from "pino";
 import { sign } from "@octokit/webhooks-methods";
 import getPort from "get-port";
 import WebhookExamples, {
   type WebhookDefinition,
 } from "@octokit/webhooks-examples";
-import { describe, expect, it, beforeEach, test } from "vitest";
 
 import { Server, Probot } from "../src/index.js";
 
@@ -47,112 +45,62 @@ const pushEvent = (
 ).examples[0];
 
 describe("Server", () => {
-  let server: Server;
-
-  let output: any[];
-  const streamLogsToOutput = new Stream.Writable({ objectMode: true });
-  streamLogsToOutput._write = (object, _encoding, done) => {
-    output.push(JSON.parse(object));
-    done();
-  };
-
-  beforeEach(async () => {
-    output = [];
-    const log = pino(streamLogsToOutput);
-    server = new Server({
-      Probot: Probot.defaults({
-        appId,
-        privateKey,
-        secret: "secret",
-        log: log.child({ name: "probot" }),
-      }),
-      log: log.child({ name: "server" }),
-    });
-
-    // Error handler to avoid printing logs
-    server.expressApp.use(
-      (error: Error, _req: Request, res: Response, _next: NextFunction) => {
-        res.status(500).send(error.message);
+  function streamLogsToOutput(target: any[]) {
+    return new Stream.Writable({
+      objectMode: true,
+      write(object, _encoding, done) {
+        target.push(JSON.parse(object));
+        done();
       },
-    );
-  });
+    });
+  }
 
-  test("Server.version", () => {
+  it("Server.version", () => {
     expect(Server.version).toEqual("0.0.0-development");
   });
 
   describe("GET /ping", () => {
     it("returns a 200 response", async () => {
-      await request(server.expressApp).get("/ping").expect(200, "PONG");
-      expect(output.length).toEqual(1);
-      expect(output[0].msg).toContain("GET /ping 200 -");
-    });
-  });
+      const output: any[] = [];
 
-  describe("webhook handler by providing webhookPath (POST /)", () => {
-    it("should return 200 and run event handlers in app function", async () => {
-      expect.assertions(3);
-
-      server = new Server({
+      const server = new Server({
         webhookPath: "/",
         Probot: Probot.defaults({
           appId,
           privateKey,
           secret: "secret",
         }),
-        log: pino(streamLogsToOutput),
+        log: pino(streamLogsToOutput(output)),
         port: await getPort(),
       });
 
-      await server.load((app) => {
-        app.on("push", (event) => {
-          expect(event.name).toEqual("push");
-        });
-      });
+      await server.start();
 
-      const dataString = JSON.stringify(pushEvent);
+      const response = await fetch(`http://${server.host}:${server.port}/ping`);
+      expect(response.status).toEqual(200);
+      expect(await response.text()).toEqual("PONG");
 
-      await request(server.expressApp)
-        .post("/")
-        .send(dataString)
-        .set("content-type", "application/json")
-        .set("x-github-event", "push")
-        .set("x-hub-signature-256", await sign("secret", dataString))
-        .set("x-github-delivery", "3sw4d5f6g7h8");
+      expect(output.length).toEqual(3);
+      expect(output[2].msg).toContain("GET /ping 200 -");
 
-      expect(output.length).toEqual(1);
-      expect(output[0].msg).toContain("POST / 200 -");
-    });
-
-    test("respond with a friendly error when x-hub-signature-256 is missing", async () => {
-      await server.load(() => {});
-
-      await request(server.expressApp)
-        .post("/api/github/webhooks")
-        .send(JSON.stringify(pushEvent))
-        .set("content-type", "application/json")
-        .set("x-github-event", "push")
-        .set("content-type", "application/json")
-        // Note: 'x-hub-signature-256' is missing
-        .set("x-github-delivery", "3sw4d5f6g7h8")
-        .expect(
-          400,
-          '{"error":"Required headers missing: x-hub-signature-256"}',
-        );
+      await server.stop();
     });
   });
 
-  describe("webhook handler (POST /api/github/webhooks)", () => {
+  describe("webhook handler by providing webhookPath (POST /)", () => {
     it("should return 200 and run event handlers in app function", async () => {
-      expect.assertions(3);
+      expect.assertions(5);
 
-      server = new Server({
+      const output: any[] = [];
+
+      const server = new Server({
+        webhookPath: "/",
         Probot: Probot.defaults({
           appId,
           privateKey,
           secret: "secret",
         }),
-        log: pino(streamLogsToOutput),
+        log: pino(streamLogsToOutput(output)),
         port: await getPort(),
       });
 
@@ -162,125 +110,369 @@ describe("Server", () => {
         });
       });
 
+      await server.start();
+
       const dataString = JSON.stringify(pushEvent);
 
-      await request(server.expressApp)
-        .post("/api/github/webhooks")
-        .send(dataString)
-        .set("content-type", "application/json")
-        .set("x-github-event", "push")
-        .set("x-hub-signature-256", await sign("secret", dataString))
-        .set("x-github-delivery", "3sw4d5f6g7h8");
+      const response = await fetch(`http://${server.host}:${server.port}/`, {
+        method: "POST",
+        body: dataString,
+        headers: {
+          "content-type": "application/json",
+          "x-github-event": "push",
+          "x-hub-signature-256": await sign("secret", dataString),
+          "x-github-delivery": "3sw4d5f6g7h8",
+        },
+      });
 
-      expect(output.length).toEqual(1);
-      expect(output[0].msg).toContain("POST /api/github/webhooks 200 -");
+      expect(response.status).toEqual(200);
+      expect(await response.text()).toEqual("ok\n");
+
+      expect(output.length).toEqual(3);
+      expect(output[2].msg).toContain("POST / 200 -");
+
+      await server.stop();
     });
 
-    test("respond with a friendly error when x-hub-signature-256 is missing", async () => {
+    it("respond with a friendly error when x-hub-signature-256 is missing", async () => {
+      const output: any[] = [];
+
+      const server = new Server({
+        Probot: Probot.defaults({
+          appId,
+          privateKey,
+          secret: "secret",
+        }),
+        log: pino(streamLogsToOutput(output)),
+        port: await getPort(),
+      });
+
       await server.load(() => {});
 
-      await request(server.expressApp)
-        .post("/api/github/webhooks")
-        .send(JSON.stringify(pushEvent))
-        .set("content-type", "application/json")
-        .set("x-github-event", "push")
-        .set("content-type", "application/json")
-        // Note: 'x-hub-signature-256' is missing
-        .set("x-github-delivery", "3sw4d5f6g7h8")
-        .expect(
-          400,
-          '{"error":"Required headers missing: x-hub-signature-256"}',
-        );
+      await server.start();
+
+      const response = await fetch(
+        `http://${server.host}:${server.port}/api/github/webhooks`,
+        {
+          method: "POST",
+          body: JSON.stringify(pushEvent),
+          headers: {
+            "content-type": "application/json",
+            "x-github-event": "push",
+            // Note: 'x-hub-signature-256' is missing
+            "x-github-delivery": "3sw4d5f6g7h8",
+          },
+        },
+      );
+      expect(response.status).toEqual(400);
+      expect(await response.text()).toEqual(
+        '{"error":"Required headers missing: x-hub-signature-256"}',
+      );
+
+      await server.stop();
+    });
+  });
+
+  describe("webhook handler (POST /api/github/webhooks)", () => {
+    it("should return 200 and run event handlers in app function", async () => {
+      expect.assertions(5);
+
+      const output: any[] = [];
+
+      const server = new Server({
+        Probot: Probot.defaults({
+          appId,
+          privateKey,
+          secret: "secret",
+        }),
+        log: pino(streamLogsToOutput(output)),
+        port: await getPort(),
+      });
+
+      await server.load((app) => {
+        app.on("push", (event) => {
+          expect(event.name).toEqual("push");
+        });
+      });
+
+      await server.start();
+
+      const dataString = JSON.stringify(pushEvent);
+
+      const response = await fetch(
+        `http://${server.host}:${server.port}/api/github/webhooks`,
+        {
+          method: "POST",
+          body: dataString,
+          headers: {
+            "content-type": "application/json",
+            "x-github-event": "push",
+            "x-hub-signature-256": await sign("secret", dataString),
+            "x-github-delivery": "3sw4d5f6g7h8",
+          },
+        },
+      );
+
+      expect(response.status).toEqual(200);
+      expect(await response.text()).toEqual("ok\n");
+
+      expect(output.length).toEqual(3);
+      expect(output[2].msg).toContain("POST /api/github/webhooks 200 -");
+
+      await server.stop();
+    });
+
+    it("respond with a friendly error when x-hub-signature-256 is missing", async () => {
+      expect.assertions(2);
+
+      const output: any[] = [];
+
+      const server = new Server({
+        webhookPath: "/api/github/webhooks",
+        Probot: Probot.defaults({
+          appId,
+          privateKey,
+          secret: "secret",
+        }),
+        log: pino(streamLogsToOutput(output)),
+        port: await getPort(),
+      });
+
+      await server.load(() => {});
+
+      await server.start();
+
+      const response = await fetch(
+        `http://${server.host}:${server.port}/api/github/webhooks`,
+        {
+          method: "POST",
+          body: JSON.stringify(pushEvent),
+          headers: {
+            "content-type": "application/json",
+            "x-github-event": "push",
+            // Note: 'x-hub-signature-256' is missing
+            "x-github-delivery": "3sw4d5f6g7h8",
+          },
+        },
+      );
+
+      expect(response.status).toEqual(400);
+      expect(await response.text()).toEqual(
+        '{"error":"Required headers missing: x-hub-signature-256"}',
+      );
+
+      await server.stop();
     });
   });
 
   describe("GET unknown URL", () => {
     it("responds with 404", async () => {
-      await request(server.expressApp).get("/notfound").expect(404);
-      expect(output.length).toEqual(1);
-      expect(output[0].msg).toContain("GET /notfound 404 -");
+      expect.assertions(3);
+
+      const output: any[] = [];
+
+      const server = new Server({
+        webhookPath: "/",
+        Probot: Probot.defaults({
+          appId,
+          privateKey,
+          secret: "secret",
+        }),
+        log: pino(streamLogsToOutput(output)),
+        port: await getPort(),
+      });
+
+      await server.start();
+
+      const response = await fetch(
+        `http://${server.host}:${server.port}/notfound`,
+      );
+
+      expect(response.status).toEqual(404);
+
+      expect(output.length).toEqual(3);
+      expect(output[2].msg).toContain("GET /notfound 404 -");
+
+      await server.stop();
+    });
+
+    it("html formatted response", async () => {
+      expect.assertions(3);
+
+      const output: any[] = [];
+
+      const server = new Server({
+        webhookPath: "/",
+        Probot: Probot.defaults({
+          appId,
+          privateKey,
+          secret: "secret",
+        }),
+        log: pino(streamLogsToOutput(output)),
+        port: await getPort(),
+      });
+
+      await server.start();
+
+      const response = await fetch(
+        `http://${server.host}:${server.port}/notfound`,
+      );
+
+      expect(await response.text()).toMatchSnapshot("not-found-response");
+
+      expect(output.length).toEqual(3);
+      expect(output[2].msg).toContain("GET /notfound 404 -");
+
+      await server.stop();
     });
   });
 
   describe(".start() / .stop()", () => {
-    it("should expect the correct error if port already in use", () =>
-      new Promise<void>((next) => {
-        expect.assertions(1);
+    it("should expect the correct error if port already in use", async () => {
+      expect.assertions(1);
 
-        // block port 3001
-        const http = require("http");
-        const blockade = http.createServer().listen(3001, async () => {
-          const server = new Server({
-            Probot: Probot.defaults({ appId, privateKey }),
-            log: pino(streamLogsToOutput),
-            port: 3001,
-          });
+      const blocker = new Server({
+        Probot: Probot.defaults({ appId, privateKey }),
+        log: pino(streamLogsToOutput([])),
+        port: 3001,
+      });
 
-          try {
-            await server.start();
-          } catch (error) {
-            expect((error as Error).message).toEqual(
-              "Port 3001 is already in use. You can define the PORT environment variable to use a different port.",
-            );
-          }
+      await blocker.start();
 
-          await server.stop();
-          blockade.close(() => next());
-        });
-      }));
+      const server = new Server({
+        Probot: Probot.defaults({ appId, privateKey }),
+        log: pino(streamLogsToOutput([])),
+        port: 3001,
+      });
+
+      try {
+        await server.start();
+      } catch (error) {
+        expect((error as Error).message).toEqual(
+          "Port 3001 is already in use. You can define the PORT environment variable to use a different port.",
+        );
+      }
+
+      await blocker.stop();
+    });
 
     it("should listen to port when not in use", async () => {
-      const testApp = new Server({
+      const output: any[] = [];
+
+      const server = new Server({
         Probot: Probot.defaults({ appId, privateKey }),
-        port: 3001,
-        log: pino(streamLogsToOutput),
+        port: await getPort(),
+        log: pino(streamLogsToOutput(output)),
       });
-      await testApp.start();
+      await server.start();
 
       expect(output.length).toEqual(2);
-      expect(output[1].msg).toEqual("Listening on http://localhost:3001");
+      expect(output[1].msg).toEqual(
+        `Listening on http://${server.host}:${server.port}`,
+      );
 
-      await testApp.stop();
+      await server.stop();
     });
 
     it("respects host/ip config when starting up HTTP server", async () => {
-      const testApp = new Server({
+      expect.assertions(4);
+
+      const output: any[] = [];
+
+      const server = new Server({
         Probot: Probot.defaults({ appId, privateKey }),
-        port: 3002,
+        port: await getPort(),
         host: "127.0.0.1",
-        log: pino(streamLogsToOutput),
+        log: pino(streamLogsToOutput(output)),
       });
-      await testApp.start();
+      await server.start();
 
+      expect(server.port).toEqual(server.port);
+      expect(server.host).toEqual("127.0.0.1");
       expect(output.length).toEqual(2);
-      expect(output[1].msg).toEqual("Listening on http://127.0.0.1:3002");
+      expect(output[1].msg).toEqual(
+        `Listening on http://${server.host}:${server.port}`,
+      );
 
-      await testApp.stop();
+      await server.stop();
+    });
+
+    it("respects ip with IPv6 config when starting up HTTP server", async () => {
+      expect.assertions(4);
+
+      const output: any[] = [];
+
+      const server = new Server({
+        Probot: Probot.defaults({ appId, privateKey }),
+        port: await getPort(),
+        host: "::",
+        log: pino(streamLogsToOutput(output)),
+      });
+      await server.start();
+
+      expect(server.port).toEqual(server.port);
+      expect(server.host).toEqual("::");
+      expect(output.length).toEqual(2);
+      expect(output[1].msg).toEqual(
+        `Listening on http://[${server.host}]:${server.port}`,
+      );
+
+      await server.stop();
     });
   });
 
   describe("router", () => {
-    it("prefixes paths with route name", () => {
+    it("prefixes paths with route name", async () => {
+      const server = new Server({
+        Probot: Probot.defaults({ appId, privateKey }),
+        port: await getPort(),
+        host: "localhost",
+        log: pino(streamLogsToOutput([])),
+      });
+
       const router = server.router("/my-app");
       router.get("/foo", (_req, res) => {
         res.end("foo");
       });
 
-      return request(server.expressApp).get("/my-app/foo").expect(200, "foo");
+      await server.start();
+
+      const response = await fetch(
+        `http://${server.host}:${server.port}/my-app/foo`,
+      );
+
+      expect(response.status).toEqual(200);
+      expect(await response.text()).toEqual("foo");
+
+      await server.stop();
     });
 
-    it("allows routes with no path", () => {
+    it("allows routes with no path", async () => {
+      const server = new Server({
+        Probot: Probot.defaults({ appId, privateKey }),
+        port: await getPort(),
+        host: "localhost",
+        log: pino(streamLogsToOutput([])),
+      });
+
       const router = server.router();
       router.get("/foo", (_req, res) => {
         res.end("foo");
       });
 
-      return request(server.expressApp).get("/foo").expect(200, "foo");
+      await server.start();
+
+      const response = await fetch(`http://${server.host}:${server.port}/foo`);
+
+      expect(response.status).toEqual(200);
+      expect(await response.text()).toEqual("foo");
+
+      await server.stop();
     });
 
-    it("allows you to overwrite the root path when webhookPath is not defined", () => {
-      const log = pino(streamLogsToOutput);
-      server = new Server({
+    it("allows you to overwrite the root path when webhookPath is not defined", async () => {
+      const log = pino(streamLogsToOutput([]));
+      const server = new Server({
         Probot: Probot.defaults({
           appId,
           privateKey,
@@ -292,7 +484,8 @@ describe("Server", () => {
 
       // Error handler to avoid printing logs
       server.expressApp.use(
-        (error: Error, _req: Request, res: Response, _next: NextFunction) => {
+        // @ts-ignore
+        (error, _req, res, _next) => {
           res.status(500).send(error.message);
         },
       );
@@ -301,11 +494,24 @@ describe("Server", () => {
         res.end("foo");
       });
 
-      return request(server.expressApp).get("/").expect(200, "foo");
+      await server.start();
+
+      const response = await fetch(`http://${server.host}:${server.port}/`);
+
+      expect(response.status).toEqual(200);
+      expect(await response.text()).toEqual("foo");
+
+      await server.stop();
     });
 
     it("isolates apps from affecting each other", async () => {
-      ["foo", "bar"].forEach((name) => {
+      const server = new Server({
+        Probot: Probot.defaults({ appId, privateKey }),
+        port: await getPort(),
+        host: "localhost",
+        log: pino(streamLogsToOutput([])),
+      });
+      ["foo", "bar"].forEach(async (name) => {
         const router = server.router("/" + name);
 
         router.use((_req, res, next) => {
@@ -318,23 +524,45 @@ describe("Server", () => {
         });
       });
 
-      await request(server.expressApp)
-        .get("/foo/hello")
-        .expect(200, "foo")
-        .expect("X-Test", "foo");
+      await server.start();
 
-      await request(server.expressApp)
-        .get("/bar/hello")
-        .expect(200, "bar")
-        .expect("X-Test", "bar");
+      const fooResponse = await fetch(
+        `http://${server.host}:${server.port}/foo/hello`,
+      );
+
+      expect(fooResponse.status).toEqual(200);
+      expect(await fooResponse.text()).toEqual("foo");
+      expect(fooResponse.headers.get("X-Test")).toEqual("foo");
+
+      const barResponse = await fetch(
+        `http://${server.host}:${server.port}/bar/hello`,
+      );
+      expect(barResponse.status).toEqual(200);
+      expect(await barResponse.text()).toEqual("bar");
+      expect(barResponse.headers.get("X-Test")).toEqual("bar");
+
+      await server.stop();
     });
 
     it("responds with 500 on error", async () => {
+      const server = new Server({
+        Probot: Probot.defaults({ appId, privateKey }),
+        port: await getPort(),
+        host: "localhost",
+        log: pino(streamLogsToOutput([])),
+      });
+
       server.expressApp.get("/boom", () => {
         throw new Error("boom");
       });
 
-      await request(server.expressApp).get("/boom").expect(500);
+      await server.start();
+
+      const response = await fetch(`http://${server.host}:${server.port}/boom`);
+
+      expect(response.status).toEqual(500);
+
+      await server.stop();
     });
   });
 });

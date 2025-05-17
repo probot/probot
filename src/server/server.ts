@@ -1,5 +1,6 @@
 import { createServer, type Server as HttpServer } from "node:http";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import express, { Router, type Application } from "express";
 import type { Logger } from "pino";
@@ -9,17 +10,20 @@ import { getLoggingMiddleware } from "./logging-middleware.js";
 import { createWebhookProxy } from "../helpers/webhook-proxy.js";
 import { VERSION } from "../version.js";
 import type { ApplicationFunction, ServerOptions } from "../types.js";
-import type { Probot } from "../index.js";
+import type { Probot } from "../exports.js";
 import { rebindLog } from "../helpers/rebind-log.js";
+import { getPrintableHost } from "./get-printable-host.js";
 
 // the default path as defined in @octokit/webhooks
 export const defaultWebhooksPath = "/api/github/webhooks";
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 type State = {
   cwd?: string;
   httpServer?: HttpServer;
-  port?: number;
-  host?: string;
+  port: number;
+  host: string;
   webhookPath: string;
   webhookProxy?: string;
   eventSource?: EventSource;
@@ -33,7 +37,7 @@ export class Server {
   public version = VERSION;
   public probotApp: Probot;
 
-  private state: State;
+  #state: State;
 
   constructor(options: ServerOptions = {} as ServerOptions) {
     this.expressApp = express();
@@ -44,10 +48,10 @@ export class Server {
       ? rebindLog(options.log)
       : rebindLog(this.probotApp.log.child({ name: "server" }));
 
-    this.state = {
+    this.#state = {
       cwd: options.cwd || process.cwd(),
-      port: options.port,
-      host: options.host,
+      port: options.port || 3000,
+      host: options.host || "localhost",
       webhookPath: options.webhookPath || defaultWebhooksPath,
       webhookProxy: options.webhookProxy,
     };
@@ -62,7 +66,7 @@ export class Server {
     // now they have a return type of `void | Promise<void>`.
     this.expressApp.use(async (req, res, next) => {
       await createWebhooksMiddleware(this.probotApp.webhooks, {
-        path: this.state.webhookPath,
+        path: this.#state.webhookPath,
       })(req, res, next);
     });
 
@@ -73,29 +77,29 @@ export class Server {
 
   public async load(appFn: ApplicationFunction) {
     await appFn(this.probotApp, {
-      cwd: this.state.cwd,
+      cwd: this.#state.cwd,
       getRouter: (path) => this.router(path),
     });
   }
 
-  public async start() {
+  public async start(): Promise<HttpServer> {
     this.log.info(
       `Running Probot v${this.version} (Node.js: ${process.version})`,
     );
-    const port = this.state.port || 3000;
-    const { host, webhookPath, webhookProxy } = this.state;
-    const printableHost = host ?? "localhost";
+    const { host, webhookPath, webhookProxy, port } = this.#state;
+    const printableHost = getPrintableHost(host);
 
-    this.state.httpServer = await new Promise((resolve, reject) => {
+    this.#state.httpServer = await new Promise((resolve, reject) => {
       const server = createServer(this.expressApp).listen(
         port,
         ...((host ? [host] : []) as any),
         async () => {
           if (webhookProxy) {
-            this.state.eventSource = await createWebhookProxy({
-              logger: this.log,
+            this.#state.eventSource = await createWebhookProxy({
+              host,
+              port,
               path: webhookPath,
-              port: port,
+              logger: this.log,
               url: webhookProxy,
             });
           }
@@ -116,17 +120,29 @@ export class Server {
       });
     });
 
-    return this.state.httpServer;
+    return this.#state.httpServer;
   }
 
-  public async stop() {
-    if (this.state.eventSource) this.state.eventSource.close();
-    if (!this.state.httpServer) return;
-    const server = this.state.httpServer;
-    return new Promise((resolve) => server.close(resolve));
+  public async stop(): Promise<void> {
+    if (this.#state.eventSource) this.#state.eventSource.close();
+    if (!this.#state.httpServer) return;
+    const server = this.#state.httpServer;
+    return new Promise((resolve, reject) =>
+      server.close((err) => {
+        err ? reject(err) : resolve();
+      }),
+    );
   }
 
-  public router(path: string = "/") {
+  get port(): number {
+    return this.#state.port;
+  }
+
+  get host(): string {
+    return this.#state.host;
+  }
+
+  public router(path: string = "/"): Router {
     const newRouter = Router();
     this.expressApp.use(path, newRouter);
     return newRouter;

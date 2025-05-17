@@ -1,8 +1,8 @@
 import Stream from "node:stream";
 
 import type {
-  EmitterWebhookEvent,
   EmitterWebhookEvent as WebhookEvent,
+  EmitterWebhookEventName,
 } from "@octokit/webhooks";
 import Bottleneck from "bottleneck";
 import fetchMock from "fetch-mock";
@@ -14,7 +14,6 @@ import { Probot, ProbotOctokit, Context } from "../src/index.js";
 import webhookExamples, {
   type WebhookDefinition,
 } from "@octokit/webhooks-examples";
-import type { EmitterWebhookEventName } from "@octokit/webhooks/dist-types/types.js";
 
 const appId = 1;
 const privateKey = `-----BEGIN RSA PRIVATE KEY-----
@@ -50,7 +49,7 @@ const getPayloadExamples = <TName extends EmitterWebhookEventName>(
 ) => {
   return (webhookExamples as unknown as WebhookDefinition[]).filter(
     (event) => event.name === name.split(".")[0],
-  )[0].examples as EmitterWebhookEvent<TName>["payload"][];
+  )[0].examples as WebhookEvent<TName>["payload"][];
 };
 const getPayloadExample = <TName extends EmitterWebhookEventName>(
   name: TName,
@@ -168,7 +167,9 @@ describe("Probot", () => {
       try {
         await probot.webhooks.receive(event);
       } catch (e) {
-        expect((probot.log.error as Mock).mock.calls[0][1]).toMatchSnapshot();
+        expect((probot.log.error as Mock).mock.calls[0][1]).toEqual(
+          "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
+        );
       }
     });
 
@@ -183,7 +184,9 @@ describe("Probot", () => {
       try {
         await probot.webhooks.receive(event);
       } catch (e) {
-        expect((probot.log.error as Mock).mock.calls[0][1]).toMatchSnapshot();
+        expect((probot.log.error as Mock).mock.calls[0][1]).toEqual(
+          "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
+        );
       }
     });
 
@@ -200,7 +203,9 @@ describe("Probot", () => {
       try {
         await probot.webhooks.receive(event);
       } catch (e) {
-        expect((probot.log.error as Mock).mock.calls[0][1]).toMatchSnapshot();
+        expect((probot.log.error as Mock).mock.calls[0][1]).toEqual(
+          "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
+        );
       }
     });
 
@@ -217,7 +222,9 @@ describe("Probot", () => {
       try {
         await probot.webhooks.receive(event);
       } catch (e) {
-        expect((probot.log.error as Mock).mock.calls[0][1]).toMatchSnapshot();
+        expect((probot.log.error as Mock).mock.calls[0][1]).toEqual(
+          "Your private key (a .pem file or PRIVATE_KEY environment variable) or APP_ID is incorrect. Go to https://github.com/settings/apps/YOUR_APP, verify that APP_ID is set correctly, and generate a new PEM file if necessary.",
+        );
       }
     });
 
@@ -234,7 +241,9 @@ describe("Probot", () => {
       try {
         await probot.webhooks.receive(event);
       } catch (e) {
-        expect((probot.log.error as Mock).mock.calls[0][1]).toMatchSnapshot();
+        expect((probot.log.error as Mock).mock.calls[0][1]).toEqual(
+          "Your private key (a .pem file or PRIVATE_KEY environment variable) or APP_ID is incorrect. Go to https://github.com/settings/apps/YOUR_APP, verify that APP_ID is set correctly, and generate a new PEM file if necessary.",
+        );
       }
     });
   });

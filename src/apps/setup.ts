@@ -1,25 +1,29 @@
 import { exec } from "node:child_process";
-
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { parse as parseQuery } from "querystring";
+import type { TLSSocket } from "node:tls";
+import { parse as parseQuery } from "node:querystring";
+
 import express from "express";
 import updateDotenv from "update-dotenv";
 
-import { Probot } from "../probot.js";
+import type { Probot } from "../probot.js";
 import { ManifestCreation } from "../manifest-creation.js";
 import { getLoggingMiddleware } from "../server/logging-middleware.js";
-import type { ApplicationFunctionOptions } from "../types.js";
+import type { ApplicationFunctionOptions, ServerOptions } from "../types.js";
+import { getPrintableHost } from "../server/get-printable-host.js";
 import { isProduction } from "../helpers/is-production.js";
 
 import { importView } from "../views/import.js";
 import { setupView } from "../views/setup.js";
 import { successView } from "../views/success.js";
 
-export const setupAppFactory = (
-  host: string | undefined,
-  port: number | undefined,
-) =>
-  async function setupApp(
+type SetupFactoryOptions = Required<Pick<ServerOptions, "port" | "host">> &
+  Pick<ServerOptions, "request">;
+
+export const setupAppFactory = (options: SetupFactoryOptions) => {
+  const { host, port, request } = options || {};
+
+  return async function setupApp(
     app: Probot,
     { getRouter }: ApplicationFunctionOptions,
   ) {
@@ -48,7 +52,7 @@ export const setupAppFactory = (
 
     printWelcomeMessage(app, host, port);
 
-    route.get("/probot", async (req: IncomingMessage, res: ServerResponse) => {
+    route.get("/probot", (req: IncomingMessage, res: ServerResponse) => {
       const baseUrl = getBaseUrl(req);
       const manifest = setup.getManifest(pkg, baseUrl);
       const createAppUrl = setup.createAppUrl;
@@ -67,8 +71,9 @@ export const setupAppFactory = (
     route.get(
       "/probot/setup",
       async (req: IncomingMessage, res: ServerResponse) => {
-        // @ts-expect-error query could be set by a framework, e.g. express
-        const { code } = req.query || parseQuery(req.url?.split("?")[1] || "");
+        const { code } =
+          // @ts-expect-error query could be set by a framework, e.g. express
+          req.query || parseQuery(req.url?.split("?", 2)[1] || "");
 
         if (!code || typeof code !== "string" || code.length === 0) {
           res
@@ -78,8 +83,7 @@ export const setupAppFactory = (
         }
 
         const response = await setup.createAppFromCode(code, {
-          // @ts-expect-error
-          request: app.state.request,
+          request,
         });
 
         // If using glitch, restart the app
@@ -163,6 +167,7 @@ export const setupAppFactory = (
         .end(`Found. Redirecting to /probot`);
     });
   };
+};
 
 function printWelcomeMessage(
   app: Probot,
@@ -172,8 +177,7 @@ function printWelcomeMessage(
   // use glitch env to get correct domain welcome message
   // https://glitch.com/help/project/
   const domain =
-    process.env.PROJECT_DOMAIN ||
-    `http://${host ?? "localhost"}:${port || 3000}`;
+    process.env.PROJECT_DOMAIN || `http://${getPrintableHost(host)}:${port}`;
 
   [
     ``,
@@ -197,9 +201,7 @@ function printRestartMessage(app: Probot) {
 
 function getBaseUrl(req: IncomingMessage): string {
   const protocols =
-    req.headers["x-forwarded-proto"] ||
-    // @ts-expect-error based on the functionality of express
-    req.socket?.encrypted
+    req.headers["x-forwarded-proto"] || (req.socket as TLSSocket)?.encrypted
       ? "https"
       : "http";
   const protocol =

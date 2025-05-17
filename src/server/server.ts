@@ -37,7 +37,7 @@ export class Server {
   public version = VERSION;
   public probotApp: Probot;
 
-  private state: State;
+  #state: State;
 
   constructor(options: ServerOptions = {} as ServerOptions) {
     this.expressApp = express();
@@ -48,7 +48,7 @@ export class Server {
       ? rebindLog(options.log)
       : rebindLog(this.probotApp.log.child({ name: "server" }));
 
-    this.state = {
+    this.#state = {
       cwd: options.cwd || process.cwd(),
       port: options.port || 3000,
       host: options.host || "localhost",
@@ -66,7 +66,7 @@ export class Server {
     // now they have a return type of `void | Promise<void>`.
     this.expressApp.use(async (req, res, next) => {
       await createWebhooksMiddleware(this.probotApp.webhooks, {
-        path: this.state.webhookPath,
+        path: this.#state.webhookPath,
       })(req, res, next);
     });
 
@@ -77,7 +77,7 @@ export class Server {
 
   public async load(appFn: ApplicationFunction) {
     await appFn(this.probotApp, {
-      cwd: this.state.cwd,
+      cwd: this.#state.cwd,
       getRouter: (path) => this.router(path),
     });
   }
@@ -86,16 +86,16 @@ export class Server {
     this.log.info(
       `Running Probot v${this.version} (Node.js: ${process.version})`,
     );
-    const { host, webhookPath, webhookProxy, port } = this.state;
+    const { host, webhookPath, webhookProxy, port } = this.#state;
     const printableHost = getPrintableHost(host);
 
-    this.state.httpServer = await new Promise((resolve, reject) => {
+    this.#state.httpServer = await new Promise((resolve, reject) => {
       const server = createServer(this.expressApp).listen(
         port,
         ...((host ? [host] : []) as any),
         async () => {
           if (webhookProxy) {
-            this.state.eventSource = await createWebhookProxy({
+            this.#state.eventSource = await createWebhookProxy({
               host,
               port,
               path: webhookPath,
@@ -120,13 +120,13 @@ export class Server {
       });
     });
 
-    return this.state.httpServer;
+    return this.#state.httpServer;
   }
 
   public async stop(): Promise<void> {
-    if (this.state.eventSource) this.state.eventSource.close();
-    if (!this.state.httpServer) return;
-    const server = this.state.httpServer;
+    if (this.#state.eventSource) this.#state.eventSource.close();
+    if (!this.#state.httpServer) return;
+    const server = this.#state.httpServer;
     return new Promise((resolve, reject) =>
       server.close((err) => {
         err ? reject(err) : resolve();
@@ -135,11 +135,11 @@ export class Server {
   }
 
   get port(): number {
-    return this.state.port;
+    return this.#state.port;
   }
 
   get host(): string {
-    return this.state.host;
+    return this.#state.host;
   }
 
   public router(path: string = "/"): Router {

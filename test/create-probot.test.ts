@@ -1,6 +1,7 @@
+import { describe, expect, test } from "vitest";
+
 import { createProbot, Probot } from "../src/index.js";
 import { captureLogOutput } from "./helpers/capture-log-output.js";
-import { describe, expect, test } from "vitest";
 
 const env = {
   APP_ID: "1",
@@ -83,18 +84,53 @@ describe("createProbot", () => {
     expect(probot.log.level).toEqual("trace");
   });
 
-  test("defaults, custom host", () => {
+  test("defaults, custom host", async () => {
+    let fetchPromise = {
+      promise: undefined,
+      reject: undefined,
+      resolve: undefined,
+    } as {
+      promise?: Promise<any>;
+      resolve?: () => any;
+      reject?: (reason?: any) => any;
+    };
+
+    fetchPromise.promise = new Promise<void>((resolve, reject) => {
+      fetchPromise.resolve = resolve;
+      fetchPromise.reject = reject;
+    });
+
     const probot = createProbot({
       env: {
         ...env,
         GHE_HOST: "github.acme-inc.com",
         GHE_PROTOCOL: "https",
       },
+      defaults: {
+        request: {
+          fetch: (url: string, options: any) => {
+            try {
+              expect(url).toEqual(
+                "https://github.acme-inc.com/api/v3/app/installations/1234/access_tokens",
+              );
+              expect(options.method).toEqual("POST");
+
+              fetchPromise.resolve!();
+            } catch (e) {
+              fetchPromise.reject!(e);
+            }
+          },
+        },
+      },
     });
-    // @ts-expect-error This is private
-    expect(probot.state.octokit.request.endpoint.DEFAULTS.baseUrl).toEqual(
-      "https://github.acme-inc.com/api/v3",
-    );
+
+    const probotOctokit = await probot.auth(1234);
+    probotOctokit.request({
+      method: "GET",
+      url: "/user",
+    });
+
+    await fetchPromise.promise;
   });
 
   test("env, overrides", () => {

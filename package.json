@@ -74,7 +74,6 @@
     "@sebbo2002/semantic-release-jsr": "^3.0.0",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^22.0.0",
-    "@types/supertest": "^6.0.0",
     "@vitest/coverage-v8": "^3.0.0",
     "@vitest/ui": "^3.0.0",
     "connect-sse": "^1.2.0",

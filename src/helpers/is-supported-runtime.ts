@@ -9,6 +9,12 @@ export function isSupportedRuntime(globalThis: any): boolean {
 
       return major >= 22 || (major === 20 && minor >= 17);
     }
+    case "deno": {
+      return false;
+    }
+    case "bun": {
+      return false;
+    }
     default: {
       return false;
     }

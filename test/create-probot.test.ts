@@ -119,6 +119,7 @@ describe("createProbot", () => {
             } catch (e) {
               fetchPromise.reject!(e);
             }
+            return new Response(null, { status: 500 });
           },
         },
       },

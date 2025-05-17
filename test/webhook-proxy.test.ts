@@ -1,6 +1,6 @@
 import { randomInt } from "node:crypto";
-import http from "node:http";
-import net from "node:net";
+import type { Server, IncomingMessage } from "node:http";
+import type { AddressInfo } from "node:net";
 
 import getPort from "get-port";
 import express, { type Response } from "express";
@@ -14,6 +14,7 @@ import { describe, expect, afterEach, test, vi } from "vitest";
 import { getLog } from "../src/helpers/get-log.js";
 import { createWebhookProxy } from "../src/helpers/webhook-proxy.js";
 import { getPrintableHost } from "../src/server/get-printable-host.js";
+import { detectRuntime } from "../src/helpers/detect-runtime.js";
 
 interface SSEResponse extends Response {
   json(body: any, status?: string): this;
@@ -22,7 +23,7 @@ interface SSEResponse extends Response {
 describe("webhook-proxy", () => {
   let emit: SSEResponse["json"];
   let proxy: EventSource;
-  let server: http.Server;
+  let server: Server;
 
   afterEach(() => {
     server && server.close();
@@ -63,14 +64,14 @@ describe("webhook-proxy", () => {
 
       const app = express();
 
-      app.get("/events", sse, (_req, res: SSEResponse) => {
+      app.get("/events", sse, (_req: IncomingMessage, res: SSEResponse) => {
         res.json({}, "ready");
         emit = res.json;
       });
 
       server = app.listen(await getPort(), async () => {
         let { address: targetHost, port: targetPort } =
-          server.address() as net.AddressInfo;
+          server.address() as AddressInfo;
 
         targetHost = getPrintableHost(targetHost);
 
@@ -154,7 +155,16 @@ describe("webhook-proxy", () => {
       logger,
     }))!;
     proxy.addEventListener("error", (error: any) => {
-      expect(error.message).toMatch(/getaddrinfo ENOTFOUND/);
+      switch (detectRuntime(globalThis)) {
+        case "node":
+          expect(error.message).toMatch(/getaddrinfo ENOTFOUND/);
+          break;
+        case "bun":
+          expect(error.message).toEqual(
+            "Unable to connect. Is the computer able to access the url?",
+          );
+          break;
+      }
       expect(logger.error).toHaveBeenCalledWith(error);
       finishedPromise.resolve!();
     });

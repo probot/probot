@@ -22,9 +22,10 @@ vi.mock("update-dotenv", () => ({
   default: mocks.updateDotenv,
 }));
 
-describe("Setup app", () => {
+describe("Setup app", async () => {
   let server: Server;
   let logOutput: any[] = [];
+  let port = 0;
 
   const streamLogsToOutput = new Stream.Writable({ objectMode: true });
   streamLogsToOutput._write = (msg, _encoding, done) => {
@@ -45,15 +46,14 @@ describe("Setup app", () => {
       port: await getPort(),
     });
 
-    await server.load(setupAppFactory(server.host, server.port));
+    await server.loadHandler(setupAppFactory(server.host, server.port));
 
     await server.start();
   });
 
   afterEach(async () => {
-    await server.stop();
-
     vi.clearAllMocks();
+    await server.stop();
   });
 
   describe("logs", () => {
@@ -64,18 +64,18 @@ describe("Setup app", () => {
         "Probot is in setup mode, webhooks cannot be received and",
         "custom routes will not work until APP_ID and PRIVATE_KEY",
         "are configured in .env.",
-        `Please follow the instructions at http://${server.host}:${server.port} to configure .env.`,
+        `Please follow the instructions at http://localhost:${server.port} to configure .env.`,
         "Once you are done, restart the server.",
         "",
         `Running Probot v0.0.0-development (Node.js: ${process.version})`,
-        `Listening on http://${server.host}:${server.port}`,
+        `Listening on http://localhost:${server.port}`,
       ];
 
       const infoLogs = logOutput
         .filter((output: any) => output.level === pino.levels.values.info)
         .map((o) => o.msg);
 
-      expect(infoLogs).toEqual(expect.arrayContaining(expMsgs));
+      expect(infoLogs).toEqual(expMsgs);
     });
 
     it("should log welcome message with custom host and port", async () => {
@@ -88,9 +88,11 @@ describe("Setup app", () => {
           privateKey: "dummy value for setup, see #1512",
           port: await getPort(),
         }),
+        host: "localhost",
+        port,
       });
 
-      await server.load(setupAppFactory(server.host, server.port));
+      await server.loadHandler(setupAppFactory(server.host, server.port));
 
       const expMsg = `Please follow the instructions at http://${server.host}:${server.port} to configure .env.`;
 
@@ -140,7 +142,7 @@ describe("Setup app", () => {
         port: await getPort(),
       });
 
-      await server.load(setupAppFactory(undefined, undefined));
+      await server.loadHandler(setupAppFactory(server.host, server.port));
 
       await server.start();
 
@@ -174,7 +176,7 @@ describe("Setup app", () => {
         port: await getPort(),
       });
 
-      await server.load(setupAppFactory(undefined, undefined));
+      await server.loadHandler(setupAppFactory(server.host, server.port));
 
       await server.start();
 
@@ -200,7 +202,7 @@ describe("Setup app", () => {
         port: await getPort(),
       });
 
-      await server.load(setupAppFactory(undefined, undefined));
+      await server.loadHandler(setupAppFactory(server.host, server.port));
 
       await server.start();
 
@@ -211,7 +213,7 @@ describe("Setup app", () => {
       expect(setupResponse.status).toBe(400);
       expect(await setupResponse.text()).toMatchSnapshot();
 
-      server.stop();
+      await server.stop();
     });
   });
 
@@ -268,6 +270,7 @@ describe("Setup app", () => {
           body,
         },
       );
+
       expect(importResponse.status).toBe(400);
       expect(await importResponse.text()).toMatchSnapshot();
     });

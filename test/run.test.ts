@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { sign } from "@octokit/webhooks-methods";
 import { describe, expect, it } from "vitest";
 
-import { Probot, run, Server } from "../src/index.js";
+import { Probot, run, type Server } from "../src/index.js";
 
 import { captureLogOutput } from "./helpers/capture-log-output.js";
 import WebhookExamples, {
@@ -30,7 +30,7 @@ describe("run", () => {
 
       let initialized = false;
 
-      server = await run(
+      const server = await run(
         () => {
           initialized = true;
         },
@@ -41,7 +41,7 @@ describe("run", () => {
     });
 
     it("runs with an array of strings", async () => {
-      server = await run([
+      const server = await run([
         "node",
         "probot-run",
         "./test/fixtures/example.js",
@@ -60,7 +60,7 @@ describe("run", () => {
       env.PORT = "3003";
 
       return new Promise(async (resolve) => {
-        server = await run(
+        const server = await run(
           (_app: Probot) => {
             initialized = true;
           },
@@ -78,7 +78,7 @@ describe("run", () => {
       const env = { ...defaultEnv };
       env.NODE_ENV = "production";
 
-      server = await run(
+      const server = await run(
         async (app) => {
           outputData = await captureLogOutput(async () => {
             app.log.fatal("test");
@@ -130,28 +130,30 @@ describe("run", () => {
         env: {
           ...env,
           WEBHOOK_PATH: "/custom-webhook",
+          PORT: "0",
         },
       });
 
       const dataString = JSON.stringify(pushEvent);
 
-      const response = await fetch(
-        `http://${server.host}:${server.port}/custom-webhook`,
-        {
-          method: "POST",
-          body: dataString,
-          headers: {
-            "content-type": "application/json",
-            "x-github-event": "push",
-            "x-github-delivery": "123",
-            "x-hub-signature-256": await sign("secret", dataString),
+      try {
+        const response = await fetch(
+          `http://${server.host}:${server.port}/custom-webhook`,
+          {
+            method: "POST",
+            body: dataString,
+            headers: {
+              "content-type": "application/json",
+              "x-github-event": "push",
+              "x-hub-signature-256": await sign("secret", dataString),
+              "x-github-delivery": "123",
+            },
           },
-        },
-      );
-
-      expect(response.status).toBe(200);
-
-      await server.stop();
+        );
+        expect(response.status).toBe(200);
+      } finally {
+        await server.stop();
+      }
     });
   });
 });

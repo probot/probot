@@ -1,13 +1,15 @@
 import { Writable } from "node:stream";
-import { ManifestCreation } from "../../src/manifest-creation.js";
-import { describe, test, expect, afterEach } from "vitest";
-import getPort from "get-port";
-import { type ApplicationFunction, Probot, Server } from "../../src/index.js";
+
+import { sign } from "@octokit/webhooks-methods";
 import { pino } from "pino";
+import { describe, test, expect, afterEach } from "vitest";
+
+import { ManifestCreation } from "../../src/manifest-creation.js";
+import { type ApplicationFunction, Probot, Server } from "../../src/index.js";
 import WebhookExamples, {
   type WebhookDefinition,
 } from "@octokit/webhooks-examples";
-import { sign } from "@octokit/webhooks-methods";
+import getPort from "get-port";
 
 describe("smee-client", () => {
   afterEach(async () => {
@@ -101,8 +103,6 @@ describe("smee-client", () => {
           });
         };
 
-        const port = await getPort();
-
         const server = new Server({
           Probot: Probot.defaults({
             appId: APP_ID,
@@ -110,7 +110,7 @@ describe("smee-client", () => {
             secret: WEBHOOK_SECRET,
           }),
           log: pino(streamLogsToOutput),
-          port,
+          port: await getPort(),
           webhookProxy: WEBHOOK_PROXY_URL,
           webhookPath: "/",
         });

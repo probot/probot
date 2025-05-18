@@ -3,7 +3,7 @@ import { describe, it, expect } from "vitest";
 import { isSupportedRuntime } from "../../src/helpers/is-supported-runtime.js";
 import { loadPackageJson } from "../../src/helpers/load-package-json.js";
 
-describe("isSupportedNodeVersion", () => {
+describe("isSupportedRuntime", () => {
   const { engines } = loadPackageJson();
   it(`engines value is set to "^20.17 || >= 22"`, () => {
     expect(engines!.node).toBe("^20.17 || >= 22");

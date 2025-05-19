@@ -7,6 +7,7 @@ on:
     types:
       - opened
       - synchronize
+      - reopened
 
 permissions:
   contents: read
@@ -113,7 +114,7 @@ jobs:
       - name: Test
         run: npm run test
         env:
-          REDIS_HOST: 127.0.0.1
+          REDIS_URL: 127.0.0.1
 
   test:
     if: ${{ always() }}

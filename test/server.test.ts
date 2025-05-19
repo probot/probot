@@ -331,10 +331,12 @@ describe("Server", () => {
     it("should expect the correct error if port already in use", async () => {
       expect.assertions(1);
 
+      const port = await getPort();
+
       const blocker = new Server({
         Probot: Probot.defaults({ appId, privateKey }),
         log: pino(streamLogsToOutput([])),
-        port: 3001,
+        port,
       });
 
       await blocker.start();
@@ -342,18 +344,20 @@ describe("Server", () => {
       const server = new Server({
         Probot: Probot.defaults({ appId, privateKey }),
         log: pino(streamLogsToOutput([])),
-        port: 3001,
+        port,
       });
 
       try {
         await server.start();
+        throw new Error("Server should not start");
       } catch (error) {
         expect((error as Error).message).toEqual(
-          "Port 3001 is already in use. You can define the PORT environment variable to use a different port.",
+          `Port ${port} is already in use. You can define the PORT environment variable to use a different port.`,
         );
+      } finally {
+        await blocker.stop();
+        await server.stop();
       }
-
-      await blocker.stop();
     });
 
     it("should listen to port when not in use", async () => {

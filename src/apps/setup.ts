@@ -4,24 +4,31 @@ import type { TLSSocket } from "node:tls";
 import { parse as parseQuery } from "node:querystring";
 
 import express from "express";
-import updateDotenv from "update-dotenv";
 
 import type { Probot } from "../probot.js";
 import { ManifestCreation } from "../manifest-creation.js";
 import { getLoggingMiddleware } from "../server/logging-middleware.js";
-import type { ApplicationFunctionOptions, ServerOptions } from "../types.js";
+import type {
+  ApplicationFunctionOptions,
+  Env,
+  ServerOptions,
+} from "../types.js";
 import { getPrintableHost } from "../server/get-printable-host.js";
 import { isProduction } from "../helpers/is-production.js";
+import { updateEnv } from "../helpers/update-env.js";
 
 import { importView } from "../views/import.js";
 import { setupView } from "../views/setup.js";
 import { successView } from "../views/success.js";
 
 type SetupFactoryOptions = Required<Pick<ServerOptions, "port" | "host">> &
-  Pick<ServerOptions, "request">;
+  Pick<ServerOptions, "request"> & {
+    updateEnv?: (env: Env) => Env;
+    SmeeClient?: { createChannel: () => Promise<string | undefined> };
+  };
 
 export const setupAppFactory = (options: SetupFactoryOptions) => {
-  const { host, port, request } = options || {};
+  const { host, port, request, SmeeClient } = options || {};
 
   return async function setupApp(
     app: Probot,
@@ -31,7 +38,9 @@ export const setupAppFactory = (options: SetupFactoryOptions) => {
       throw new Error("getRouter is required to use the setup app");
     }
 
-    const setup: ManifestCreation = new ManifestCreation();
+    const setup: ManifestCreation = new ManifestCreation({
+      updateEnv: options.updateEnv || updateEnv,
+    });
     const pkg = setup.pkg;
 
     // If not on Glitch or Production, create a smee URL
@@ -43,7 +52,7 @@ export const setupAppFactory = (options: SetupFactoryOptions) => {
         process.env.NO_SMEE_SETUP === "true"
       )
     ) {
-      await setup.createWebhookChannel();
+      await setup.createWebhookChannel({ SmeeClient });
     }
 
     const route = getRouter();
@@ -54,7 +63,7 @@ export const setupAppFactory = (options: SetupFactoryOptions) => {
 
     route.get("/probot", (req: IncomingMessage, res: ServerResponse) => {
       const baseUrl = getBaseUrl(req);
-      const manifest = setup.getManifest(pkg, baseUrl);
+      const manifest = setup.getManifest({ pkg, baseUrl });
       const createAppUrl = setup.createAppUrl;
       // Pass the manifest to be POST'd
       res.writeHead(200, { "content-type": "text/html" }).end(
@@ -140,7 +149,7 @@ export const setupAppFactory = (options: SetupFactoryOptions) => {
             .end("appId and/or pem and/or webhook_secret missing");
           return;
         }
-        updateDotenv({
+        (options.updateEnv || updateEnv)({
           APP_ID: appId,
           PRIVATE_KEY: `"${pem}"`,
           WEBHOOK_SECRET: webhook_secret,

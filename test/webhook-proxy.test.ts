@@ -1,5 +1,5 @@
 import { randomInt } from "node:crypto";
-import type { Server, IncomingMessage } from "node:http";
+import type { IncomingMessage } from "node:http";
 import type { AddressInfo } from "node:net";
 
 import getPort from "get-port";
@@ -10,7 +10,7 @@ const sse: (
   next: express.NextFunction,
 ) => void = require("connect-sse")();
 import fetchMock from "fetch-mock";
-import { describe, expect, afterEach, test, vi } from "vitest";
+import { describe, expect, test } from "vitest";
 import { getLog } from "../src/helpers/get-log.js";
 import { createWebhookProxy } from "../src/helpers/webhook-proxy.js";
 import { getPrintableHost } from "../src/server/get-printable-host.js";
@@ -23,12 +23,6 @@ interface SSEResponse extends Response {
 describe("webhook-proxy", () => {
   let emit: SSEResponse["json"];
   let proxy: EventSource;
-  let server: Server;
-
-  afterEach(() => {
-    server && server.close();
-    proxy && proxy.close();
-  });
 
   describe("with a valid proxy server", () => {
     test("forwards events to server", async () => {
@@ -69,7 +63,7 @@ describe("webhook-proxy", () => {
         emit = res.json;
       });
 
-      server = app.listen(await getPort(), async () => {
+      const server = app.listen(await getPort(), async () => {
         let { address: targetHost, port: targetPort } =
           server.address() as AddressInfo;
 
@@ -121,11 +115,14 @@ describe("webhook-proxy", () => {
       });
 
       await finishedPromise.promise;
+
+      server.close();
+      proxy.close();
     });
   });
 
   test("logs an error when the proxy server is not found", async () => {
-    expect.assertions(2);
+    expect.assertions(4);
 
     let finishedPromise = {
       promise: undefined,
@@ -145,15 +142,20 @@ describe("webhook-proxy", () => {
     const url = `http://bad.n${randomInt(1e10).toString(36)}.proxy/events`;
 
     const logger = getLog({ level: "fatal" }).child({});
-    logger.error = vi.fn() as any;
+
+    const LoggerErrorCalls: any[] = [];
+    logger.error = (...args: any[]) => {
+      LoggerErrorCalls.push(args);
+    };
 
     const proxy = (await createWebhookProxy({
       url,
       port: 1234,
       host: "localhost",
-      path: "",
+      path: "/",
       logger,
     }))!;
+
     proxy.addEventListener("error", (error: any) => {
       switch (detectRuntime(globalThis)) {
         case "node":
@@ -165,10 +167,16 @@ describe("webhook-proxy", () => {
           );
           break;
       }
-      expect(logger.error).toHaveBeenCalledWith(error);
+
+      expect(LoggerErrorCalls).toHaveLength(1);
+      expect(LoggerErrorCalls[0]).toHaveLength(1);
+      expect(LoggerErrorCalls[0][0]).toEqual(error);
+
       finishedPromise.resolve!();
     });
 
     await finishedPromise.promise;
+
+    proxy.close();
   });
 });

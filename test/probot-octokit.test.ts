@@ -1,8 +1,9 @@
-import fetchMock from "fetch-mock";
-import { ProbotOctokit } from "../src/octokit/probot-octokit.js";
 import type { RequestError } from "@octokit/types";
+import fetchMock from "fetch-mock";
+import { describe, expect, test, it } from "vitest";
+
+import { ProbotOctokit } from "../src/octokit/probot-octokit.js";
 import type { OctokitOptions } from "../src/types.js";
-import { describe, expect, test, vi, it } from "vitest";
 
 describe("ProbotOctokit", () => {
   const defaultOptions: OctokitOptions = {
@@ -314,6 +315,8 @@ describe("ProbotOctokit", () => {
   });
 
   it("paginate returns an array of pages", async () => {
+    expect.assertions(33);
+
     let callCount = 0;
     const octokit = new ProbotOctokit({
       ...defaultOptions,
@@ -352,7 +355,10 @@ describe("ProbotOctokit", () => {
       },
     });
 
-    const spy = vi.fn();
+    let callCountSpy = 0;
+    const spy: any = () => {
+      callCountSpy++;
+    };
     const res = await octokit.paginate(
       octokit.issues.listForRepo.endpoint.merge({
         owner: "JasonEtco",
@@ -363,7 +369,7 @@ describe("ProbotOctokit", () => {
     );
     expect(Array.isArray(res)).toBeTruthy();
     expect(res.length).toBe(5);
-    expect(spy).toHaveBeenCalledTimes(5);
+    expect(callCountSpy).toBe(5);
   });
 
   it("paginate stops iterating if the done() function is called in the callback", async () => {
@@ -405,7 +411,9 @@ describe("ProbotOctokit", () => {
       },
     });
 
-    const spy = vi.fn((response, done) => {
+    let callCountSpy = 0;
+    const spy = ((response: any, done: Function) => {
+      callCountSpy++;
       if (response.data[0].id === 2) done();
     }) as any;
     const res = await octokit.paginate(
@@ -417,7 +425,7 @@ describe("ProbotOctokit", () => {
       spy,
     );
     expect(res.length).toBe(3);
-    expect(spy).toHaveBeenCalledTimes(3);
+    expect(callCountSpy).toBe(3);
   });
 
   it("paginate maps the responses to data by default", async () => {

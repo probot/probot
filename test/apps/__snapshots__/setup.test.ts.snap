@@ -87,36 +87,6 @@ exports[`Setup app > GET /probot/import > renders importView 1`] = `
 </html>"
 `;
 
-exports[`Setup app > GET /probot/setup > returns a redirect 1`] = `"Found. Redirecting to /apps/my-app/installations/new"`;
-
-exports[`Setup app > GET /probot/setup > returns a redirect 2`] = `
-[
-  [
-    {
-      "WEBHOOK_PROXY_URL": "mocked proxy URL",
-    },
-  ],
-  [
-    {
-      "WEBHOOK_PROXY_URL": "mocked proxy URL",
-    },
-  ],
-  [
-    {
-      "APP_ID": "id",
-      "GITHUB_CLIENT_ID": "Iv1.8a61f9b3a7aba766",
-      "GITHUB_CLIENT_SECRET": "1726be1638095a19edd134c77bde3aa2ece1e5d8",
-      "PRIVATE_KEY": ""pem"",
-      "WEBHOOK_SECRET": "webhook_secret",
-    },
-  ],
-]
-`;
-
-exports[`Setup app > GET /probot/setup > throws a 400 Error if code is an empty string 1`] = `"code missing or invalid"`;
-
-exports[`Setup app > GET /probot/setup > throws a 400 Error if code is not provided 1`] = `"code missing or invalid"`;
-
 exports[`Setup app > GET /probot/success > returns a 200 response 1`] = `
 "<!DOCTYPE html>
 <html lang="en" class="height-full" data-color-mode="auto" data-light-theme="light" data-dark-theme="dark">
@@ -149,23 +119,4 @@ exports[`Setup app > GET /probot/success > returns a 200 response 1`] = `
     </div>
   </body>
 </html>"
-`;
-
-exports[`Setup app > POST /probot/import > 400 when keys are missing 1`] = `"appId and/or pem and/or webhook_secret missing"`;
-
-exports[`Setup app > POST /probot/import > updates .env 1`] = `
-[
-  [
-    {
-      "WEBHOOK_PROXY_URL": "mocked proxy URL",
-    },
-  ],
-  [
-    {
-      "APP_ID": "foo",
-      "PRIVATE_KEY": ""bar"",
-      "WEBHOOK_SECRET": "baz",
-    },
-  ],
-]
 `;

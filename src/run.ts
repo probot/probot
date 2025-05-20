@@ -1,6 +1,11 @@
 import { packageConfig } from "package-config";
 
-import type { ApplicationFunction, Options, ServerOptions } from "./types.js";
+import type {
+  ApplicationFunction,
+  Env,
+  Options,
+  ServerOptions,
+} from "./types.js";
 import { setupAppFactory } from "./apps/setup.js";
 import { getLog } from "./helpers/get-log.js";
 import { readCliOptions } from "./bin/read-cli-options.js";
@@ -11,11 +16,14 @@ import { resolveAppFunction } from "./helpers/resolve-app-function.js";
 import { isProduction } from "./helpers/is-production.js";
 import { type Logger, Probot, type ProbotOctokit } from "./exports.js";
 import { config as dotenvConfig } from "dotenv";
+import { updateEnv } from "./helpers/update-env.js";
 
 type AdditionalOptions = {
-  env?: NodeJS.ProcessEnv;
+  env?: Env;
   Octokit?: typeof ProbotOctokit;
   log?: Logger;
+  updateEnv?: typeof updateEnv;
+  SmeeClient?: { createChannel: () => Promise<string | undefined> };
 };
 
 /**
@@ -118,7 +126,12 @@ export async function run(
     });
 
     await server.load(
-      setupAppFactory({ host: server.host, port: server.port }),
+      setupAppFactory({
+        host: server.host,
+        port: server.port,
+        updateEnv: additionalOptions?.updateEnv || updateEnv,
+        SmeeClient: additionalOptions?.SmeeClient,
+      }),
     );
 
     await server.start();

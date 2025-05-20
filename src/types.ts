@@ -103,7 +103,7 @@ export type PackageJson = {
   };
 };
 
-export type Env = Record<Uppercase<string>, string>;
+export type Env = NodeJS.ProcessEnv;
 
 type ManifestPermissionValue = "read" | "write" | "none";
 type ManifestPermissionScope =

@@ -57,7 +57,7 @@ export class Server {
   public probotApp: Probot;
   public handlers: Handler[] = [];
 
-  private state: State;
+  #state: State;
 
   constructor(options: ServerOptions = {} as ServerOptions) {
     this.probotApp = new options.Probot({
@@ -88,7 +88,7 @@ export class Server {
       return true;
     };
 
-    this.state = {
+    this.#state = {
       httpServer: new HttpServer(handler),
       cwd: options.cwd || process.cwd(),
       port: options.port || 3000,
@@ -133,7 +133,7 @@ export class Server {
 
     const webhookHandler = createNodeMiddleware(this.probotApp.webhooks, {
       log: this.log,
-      path: this.state.webhookPath,
+      path: this.#state.webhookPath,
     });
 
     this.handlers.push(webhookHandler);
@@ -144,14 +144,14 @@ export class Server {
   public async loadHandler(appFn: HandlerFactory) {
     this.handlers.push(
       await appFn(this.probotApp, {
-        cwd: this.state.cwd,
+        cwd: this.#state.cwd,
       }),
     );
   }
 
   public async load(appFn: ApplicationFunction) {
     await appFn(this.probotApp, {
-      cwd: this.state.cwd,
+      cwd: this.#state.cwd,
     });
   }
 
@@ -159,20 +159,20 @@ export class Server {
     this.log.info(
       `Running Probot v${this.version} (Node.js: ${process.version})`,
     );
-    const { port, host, webhookPath, webhookProxy } = this.state;
+    const { port, host, webhookPath, webhookProxy } = this.#state;
     const printableHost = getPrintableHost(host);
 
-    this.state.httpServer = await new Promise((resolve, reject) => {
-      const server = this.state.httpServer!.listen(port, host, async () => {
-        this.state.port = (server.address() as AddressInfo).port;
-        this.state.host = (server.address() as AddressInfo).address;
+    this.#state.httpServer = await new Promise((resolve, reject) => {
+      const server = this.#state.httpServer!.listen(port, host, async () => {
+        this.#state.port = (server.address() as AddressInfo).port;
+        this.#state.host = (server.address() as AddressInfo).address;
 
-        if (isIPv6(this.state.host)) {
-          this.state.host = `[${this.state.host}]`;
+        if (isIPv6(this.#state.host)) {
+          this.#state.host = `[${this.#state.host}]`;
         }
 
         if (webhookProxy) {
-          this.state.eventSource = await createWebhookProxy({
+          this.#state.eventSource = await createWebhookProxy({
             host,
             port,
             path: webhookPath,
@@ -196,13 +196,13 @@ export class Server {
       });
     });
 
-    return this.state.httpServer;
+    return this.#state.httpServer;
   }
 
   public async stop(): Promise<void> {
-    if (this.state.eventSource) this.state.eventSource.close();
-    if (!this.state.httpServer) return;
-    const server = this.state.httpServer;
+    if (this.#state.eventSource) this.#state.eventSource.close();
+    if (!this.#state.httpServer) return;
+    const server = this.#state.httpServer;
     return new Promise((resolve, reject) =>
       server.close((err) => {
         err ? reject(err) : resolve();
@@ -211,10 +211,10 @@ export class Server {
   }
 
   get port(): number {
-    return this.state.port;
+    return this.#state.port;
   }
 
   get host(): string {
-    return this.state.host;
+    return this.#state.host;
   }
 }

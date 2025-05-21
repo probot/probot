@@ -8,7 +8,7 @@ import type {
 } from "@octokit/webhooks";
 import WebhookExamples from "@octokit/webhooks-examples";
 import fetchMock from "fetch-mock";
-import { describe, expect, test, beforeEach, it, vi } from "vitest";
+import { describe, expect, test, beforeEach, it } from "vitest";
 
 import { Context } from "../src/index.js";
 import { ProbotOctokit } from "../src/octokit/probot-octokit.js";
@@ -68,7 +68,7 @@ describe("Context", () => {
   };
   let octokit = {
     hook: {
-      before: vi.fn(),
+      before: () => {},
     },
   };
   let context: Context<"push"> = new Context<"push">(
@@ -92,7 +92,7 @@ describe("Context", () => {
       };
       let octokit = {
         hook: {
-          before: vi.fn(),
+          before: () => {},
         },
       };
 
@@ -128,7 +128,7 @@ describe("Context", () => {
       event.payload = require("./fixtures/webhook/push") as PushEvent;
       let octokit = {
         hook: {
-          before: vi.fn(),
+          before: () => {},
         },
       };
 
@@ -144,13 +144,14 @@ describe("Context", () => {
       };
       let octokit = {
         hook: {
-          before: vi.fn(),
+          before: () => {},
         },
       };
 
       context = new Context<"push">(event, octokit as any, {} as any);
       try {
         context.repo();
+        throw new Error("Should have thrown");
       } catch (e) {
         expect((e as Error).message).toMatch(
           "context.repo() is not supported for this webhook event.",
@@ -170,7 +171,7 @@ describe("Context", () => {
       };
       let octokit = {
         hook: {
-          before: vi.fn(),
+          before: () => {},
         },
       };
 
@@ -214,7 +215,7 @@ describe("Context", () => {
       };
       let octokit = {
         hook: {
-          before: vi.fn(),
+          before: () => {},
         },
       };
 
@@ -345,11 +346,13 @@ describe("Context", () => {
       });
       const context = new Context(event, octokit, {} as any);
 
-      const customMerge = vi.fn(
-        (_target: any[], _source: any[], _options: any): any[] => [],
-      );
+      let customMergeCalled = false;
+      const customMerge = (): any[] => {
+        customMergeCalled = true;
+        return [];
+      };
       await context.config("test-file.yml", {}, { arrayMerge: customMerge });
-      expect(customMerge).toHaveBeenCalled();
+      expect(customMergeCalled).toBe(true);
     });
 
     it("sets x-github-delivery header to event id", async () => {
@@ -378,7 +381,7 @@ describe("Context", () => {
       event.payload.sender!.type = "Bot";
       let octokit = {
         hook: {
-          before: vi.fn(),
+          before: () => {},
         },
       };
       context = new Context(event, octokit as any, {} as any);
@@ -390,7 +393,7 @@ describe("Context", () => {
       event.payload.sender!.type = "User";
       let octokit = {
         hook: {
-          before: vi.fn(),
+          before: () => {},
         },
       };
       context = new Context(event, octokit as any, {} as any);

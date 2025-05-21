@@ -163,51 +163,127 @@ describe("Server", () => {
 
         await server.stop();
       });
-    });
 
-    describe(".start() / .stop()", () => {
-      it("should expect the correct error if port already in use", async () => {
-        expect.assertions(1);
-        const blocker = new Server({
-          Probot: Probot.defaults({ appId, privateKey }),
-          log: pino(streamLogsToOutput([])),
-          port: 3001,
-        });
-
-        await blocker.start();
+      it("respond with a friendly error when x-hub-signature-256 is missing", async () => {
+        const output: any[] = [];
 
         const server = new Server({
-          Probot: Probot.defaults({ appId, privateKey }),
-          log: pino(streamLogsToOutput([])),
-          port: 3001,
-        });
-
-        try {
-          await server.start();
-        } catch (error) {
-          expect((error as Error).message).toEqual(
-            "Port 3001 is already in use. You can define the PORT environment variable to use a different port.",
-          );
-        }
-
-        await blocker.stop();
-      });
-
-      it("respects host/ip config when starting up HTTP server", async () => {
-        const output: any[] = [];
-        const testApp = new Server({
-          Probot: Probot.defaults({ appId, privateKey }),
-          port: 3002,
-          host: "127.0.0.1",
+          Probot: Probot.defaults({
+            appId,
+            privateKey,
+            secret: "secret",
+          }),
           log: pino(streamLogsToOutput(output)),
+          port: await getPort(),
         });
-        await testApp.start();
 
-        expect(output.length).toEqual(2);
-        expect(output[1].msg).toEqual("Listening on http://127.0.0.1:3002");
+        await server.load(() => {});
 
-        await testApp.stop();
+        await server.start();
+
+        const response = await fetch(
+          `http://${server.host}:${server.port}/api/github/webhooks`,
+          {
+            method: "POST",
+            body: JSON.stringify(pushEvent),
+            headers: {
+              "content-type": "application/json",
+              "x-github-event": "push",
+              // Note: 'x-hub-signature-256' is missing
+              "x-github-delivery": "3sw4d5f6g7h8",
+            },
+          },
+        );
+        expect(response.status).toEqual(400);
+        expect(await response.text()).toEqual(
+          '{"error":"Required headers missing: x-hub-signature-256"}',
+        );
+
+        await server.stop();
       });
+    });
+
+    it("html formatted response", async () => {
+      expect.assertions(3);
+
+      const output: any[] = [];
+
+      const server = new Server({
+        webhookPath: "/",
+        Probot: Probot.defaults({
+          appId,
+          privateKey,
+          secret: "secret",
+        }),
+        log: pino(streamLogsToOutput(output)),
+        port: await getPort(),
+      });
+
+      await server.start();
+
+      const response = await fetch(
+        `http://${server.host}:${server.port}/notfound`,
+      );
+
+      expect(await response.text()).toMatchSnapshot("not-found-response");
+
+      expect(output.length).toEqual(3);
+      expect(output[2].msg).toContain("GET /notfound 404 -");
+
+      await server.stop();
+    });
+  });
+
+  describe(".start() / .stop()", () => {
+    it("should expect the correct error if port already in use", async () => {
+      expect.assertions(1);
+
+      const port = await getPort();
+
+      const blocker = new Server({
+        Probot: Probot.defaults({ appId, privateKey }),
+        log: pino(streamLogsToOutput([])),
+        port,
+      });
+
+      await blocker.start();
+
+      const server = new Server({
+        Probot: Probot.defaults({ appId, privateKey }),
+        log: pino(streamLogsToOutput([])),
+        port,
+      });
+
+      try {
+        await server.start();
+        throw new Error("Server should not start");
+      } catch (error) {
+        expect((error as Error).message).toEqual(
+          `Port ${port} is already in use. You can define the PORT environment variable to use a different port.`,
+        );
+      } finally {
+        await blocker.stop();
+        await server.stop();
+      }
+    });
+
+    it("respects host/ip config when starting up HTTP server", async () => {
+      const output: any[] = [];
+
+      const port = await getPort();
+
+      const testApp = new Server({
+        Probot: Probot.defaults({ appId, privateKey }),
+        port,
+        host: "127.0.0.1",
+        log: pino(streamLogsToOutput(output)),
+      });
+      await testApp.start();
+
+      expect(output.length).toEqual(2);
+      expect(output[1].msg).toEqual(`Listening on http://127.0.0.1:${port}`);
+
+      await testApp.stop();
     });
   });
 });

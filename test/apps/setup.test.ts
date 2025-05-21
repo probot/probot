@@ -3,24 +3,11 @@ import { Stream } from "node:stream";
 import fetchMock from "fetch-mock";
 import { pino } from "pino";
 import getPort from "get-port";
-import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, afterEach, describe, expect, it } from "vitest";
 
+import type { Env } from "../../src/types.js";
 import { Probot, Server } from "../../src/index.js";
 import { setupAppFactory } from "../../src/apps/setup.js";
-
-const mocks = vi.hoisted(() => {
-  return {
-    createChannel: vi.fn().mockResolvedValue("mocked proxy URL"),
-    updateDotenv: vi.fn().mockResolvedValue({}),
-  };
-});
-vi.mock("smee-client", () => ({
-  default: { createChannel: mocks.createChannel },
-  createChannel: mocks.createChannel,
-}));
-vi.mock("update-dotenv", () => ({
-  default: mocks.updateDotenv,
-}));
 
 describe("Setup app", async () => {
   let server: Server;
@@ -33,8 +20,24 @@ describe("Setup app", async () => {
     done();
   };
 
+  let updateEnvCalls: Env[] = [];
+  function updateEnv(env: Env) {
+    updateEnvCalls.push(env);
+    return env;
+  }
+
+  let SmeeClientCreateChannelCalls: any[] = [];
+  const SmeeClient = {
+    createChannel: async () => {
+      SmeeClientCreateChannelCalls.push("createChannel");
+      return "https://smee.io/1234ab1234";
+    },
+  };
   beforeEach(async () => {
     logOutput = [];
+    updateEnvCalls = [];
+    SmeeClientCreateChannelCalls = [];
+
     server = new Server({
       Probot: Probot.defaults({
         log: pino(streamLogsToOutput),
@@ -46,13 +49,19 @@ describe("Setup app", async () => {
       port: await getPort(),
     });
 
-    await server.loadHandler(setupAppFactory(server.host, server.port));
+    await server.loadHandler(
+      setupAppFactory({
+        host: server.host,
+        port: server.port,
+        updateEnv,
+        SmeeClient,
+      }),
+    );
 
     await server.start();
   });
 
   afterEach(async () => {
-    vi.clearAllMocks();
     await server.stop();
   });
 
@@ -92,7 +101,14 @@ describe("Setup app", async () => {
         port,
       });
 
-      await server.loadHandler(setupAppFactory(server.host, server.port));
+      await server.loadHandler(
+        setupAppFactory({
+          host: server.host,
+          port: server.port,
+          updateEnv,
+          SmeeClient,
+        }),
+      );
 
       const expMsg = `Please follow the instructions at http://${server.host}:${server.port} to configure .env.`;
 
@@ -142,7 +158,17 @@ describe("Setup app", async () => {
         port: await getPort(),
       });
 
-      await server.loadHandler(setupAppFactory(server.host, server.port));
+      await server.loadHandler(
+        setupAppFactory({
+          host: server.host,
+          port: server.port,
+          request: {
+            fetch: mock.fetchHandler,
+          },
+          updateEnv,
+          SmeeClient,
+        }),
+      );
 
       await server.start();
 
@@ -156,10 +182,24 @@ describe("Setup app", async () => {
         "/apps/my-app/installations/new",
       );
 
-      expect(await setupResponse.text()).toMatchSnapshot();
+      expect(await setupResponse.text()).toEqual(
+        "Found. Redirecting to /apps/my-app/installations/new",
+      );
 
-      expect(mocks.createChannel).toHaveBeenCalledTimes(2);
-      expect(mocks.updateDotenv.mock.calls).toMatchSnapshot();
+      expect(updateEnvCalls.length).toBe(3);
+      expect(updateEnvCalls[0]).toEqual({
+        WEBHOOK_PROXY_URL: "https://smee.io/1234ab1234",
+      });
+      expect(updateEnvCalls[1]).toEqual({
+        WEBHOOK_PROXY_URL: "https://smee.io/1234ab1234",
+      });
+      expect(updateEnvCalls[2]).toEqual({
+        APP_ID: "id",
+        GITHUB_CLIENT_ID: "Iv1.8a61f9b3a7aba766",
+        GITHUB_CLIENT_SECRET: "1726be1638095a19edd134c77bde3aa2ece1e5d8",
+        PRIVATE_KEY: '"pem"',
+        WEBHOOK_SECRET: "webhook_secret",
+      });
 
       await server.stop();
     });
@@ -176,7 +216,14 @@ describe("Setup app", async () => {
         port: await getPort(),
       });
 
-      await server.loadHandler(setupAppFactory(server.host, server.port));
+      await server.loadHandler(
+        setupAppFactory({
+          host: server.host,
+          port: server.port,
+          updateEnv,
+          SmeeClient,
+        }),
+      );
 
       await server.start();
 
@@ -185,7 +232,7 @@ describe("Setup app", async () => {
       );
 
       expect(setupResponse.status).toBe(400);
-      expect(await setupResponse.text()).toMatchSnapshot();
+      expect(await setupResponse.text()).toEqual("code missing or invalid");
 
       await server.stop();
     });
@@ -202,7 +249,14 @@ describe("Setup app", async () => {
         port: await getPort(),
       });
 
-      await server.loadHandler(setupAppFactory(server.host, server.port));
+      await server.loadHandler(
+        setupAppFactory({
+          host: server.host,
+          port: server.port,
+          updateEnv,
+          SmeeClient,
+        }),
+      );
 
       await server.start();
 
@@ -211,7 +265,7 @@ describe("Setup app", async () => {
       );
 
       expect(setupResponse.status).toBe(400);
-      expect(await setupResponse.text()).toMatchSnapshot();
+      expect(await setupResponse.text()).toEqual("code missing or invalid");
 
       await server.stop();
     });
@@ -250,7 +304,15 @@ describe("Setup app", async () => {
       expect(response.status).toBe(200);
       expect(await response.text()).toBe("");
 
-      expect(mocks.updateDotenv.mock.calls).toMatchSnapshot();
+      expect(updateEnvCalls.length).toBe(2);
+      expect(updateEnvCalls[0]).toEqual({
+        WEBHOOK_PROXY_URL: "https://smee.io/1234ab1234",
+      });
+      expect(updateEnvCalls[1]).toEqual({
+        APP_ID: "foo",
+        PRIVATE_KEY: '"bar"',
+        WEBHOOK_SECRET: "baz",
+      });
     });
 
     it("400 when keys are missing", async () => {
@@ -272,7 +334,9 @@ describe("Setup app", async () => {
       );
 
       expect(importResponse.status).toBe(400);
-      expect(await importResponse.text()).toMatchSnapshot();
+      expect(await importResponse.text()).toEqual(
+        "appId and/or pem and/or webhook_secret missing",
+      );
     });
   });
 
@@ -285,7 +349,11 @@ describe("Setup app", async () => {
       expect(successResponse.status).toBe(200);
       expect(await successResponse.text()).toMatchSnapshot();
 
-      expect(mocks.createChannel).toHaveBeenCalledTimes(1);
+      expect(updateEnvCalls.length).toBe(1);
+      expect(updateEnvCalls[0]).toEqual({
+        WEBHOOK_PROXY_URL: "https://smee.io/1234ab1234",
+      });
+      expect(SmeeClientCreateChannelCalls.length).toBe(1);
     });
   });
 });

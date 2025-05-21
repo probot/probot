@@ -52,7 +52,7 @@ export class Probot {
     log?: Logger,
   ) => Promise<ProbotOctokit>;
 
-  private state: State;
+  #state: State;
 
   constructor(options: Options = {}) {
     options.secret = options.secret || "development";
@@ -81,6 +81,7 @@ export class Probot {
       log: rebindLog(this.log),
       redisConfig: options.redisConfig,
       baseUrl: options.baseUrl,
+      request: options.request,
     });
     const octokitLogger = rebindLog(this.log.child({ name: "octokit" }));
     const octokit = new Octokit({
@@ -88,7 +89,7 @@ export class Probot {
       log: octokitLogger,
     });
 
-    this.state = {
+    this.#state = {
       cache,
       githubToken: options.githubToken,
       log: rebindLog(this.log),
@@ -105,10 +106,10 @@ export class Probot {
       request: options.request,
     };
 
-    this.auth = auth.bind(null, this.state);
+    this.auth = auth.bind(null, this.#state);
 
-    this.webhooks = getWebhooks(this.state);
-    this.webhookPath = this.state.webhookPath;
+    this.webhooks = getWebhooks(this.#state);
+    this.webhookPath = this.#state.webhookPath;
 
     this.on = this.webhooks.on;
     this.onAny = this.webhooks.onAny;

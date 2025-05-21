@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 
 import { config as dotenvConfig } from "dotenv";
-import { isSupportedNodeVersion } from "../helpers/is-supported-node-version.js";
+import { isSupportedRuntime } from "../helpers/is-supported-runtime.js";
 import { loadPackageJson } from "../helpers/load-package-json.js";
 import { run } from "../run.js";
 import { receive } from "./receive.js";
@@ -13,7 +13,7 @@ dotenvConfig();
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkg = loadPackageJson(resolve(__dirname, "package.json"));
 
-if (!isSupportedNodeVersion()) {
+if (!isSupportedRuntime(globalThis)) {
   console.log(
     `Node.js version 20.17 or 22 is required. You have ${process.version}.`,
   );

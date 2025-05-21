@@ -2,17 +2,17 @@ import type { LogLevel, Options as PinoOptions } from "@probot/pino";
 import { getPrivateKey } from "@probot/get-private-key";
 
 import { getLog } from "./helpers/get-log.js";
-import type { Options } from "./types.js";
+import type { Env, Options } from "./types.js";
 import { Probot } from "./probot.js";
 import { defaultWebhooksPath } from "./server/server.js";
 
 type CreateProbotOptions = {
   overrides?: Options;
   defaults?: Options;
-  env?: Partial<NodeJS.ProcessEnv>;
+  env?: Partial<Env>;
 };
 
-const DEFAULTS: Partial<NodeJS.ProcessEnv> = {
+const DEFAULTS: Partial<Env> = {
   APP_ID: "",
   WEBHOOK_SECRET: "",
   WEBHOOK_PATH: defaultWebhooksPath,

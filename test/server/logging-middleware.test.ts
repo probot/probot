@@ -56,6 +56,7 @@ describe("logging", () => {
         "accept-encoding": "gzip, deflate",
         connection: "close",
       },
+      keepalive: false,
     });
 
     expect(response.status).toBe(200);

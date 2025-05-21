@@ -1,8 +1,7 @@
 import type { IncomingMessage } from "node:http";
+import type { TLSSocket } from "node:tls";
 import { exec } from "node:child_process";
 import { parse as parseQuery } from "node:querystring";
-
-import updateDotenv from "update-dotenv";
 
 import type { Probot } from "../probot.js";
 import { ManifestCreation } from "../manifest-creation.js";
@@ -11,16 +10,27 @@ import { isProduction } from "../helpers/is-production.js";
 import type { Handler } from "../types.js";
 import { getPayload } from "../helpers/get-payload.js";
 
+import type { Env, ServerOptions } from "../types.js";
+import { updateEnv } from "../helpers/update-env.js";
+
 import { importView } from "../views/import.js";
 import { setupView } from "../views/setup.js";
 import { successView } from "../views/success.js";
 
-export const setupAppFactory = (
-  host: string | undefined,
-  port: number | undefined,
-) =>
-  async function setupApp(app: Probot): Promise<Handler> {
-    const setup: ManifestCreation = new ManifestCreation();
+type SetupFactoryOptions = Required<Pick<ServerOptions, "port" | "host">> &
+  Pick<ServerOptions, "request"> & {
+    updateEnv?: (env: Env) => Env;
+    SmeeClient?: { createChannel: () => Promise<string | undefined> };
+  };
+
+export const setupAppFactory = (options: SetupFactoryOptions) => {
+  const { host, port, request, SmeeClient } = options || {};
+
+  return async function setupApp(app: Probot): Promise<Handler> {
+    const setup: ManifestCreation = new ManifestCreation({
+      updateEnv: options.updateEnv || updateEnv,
+    });
+
     const pkg = setup.pkg;
     const { WEBHOOK_PROXY_URL, GHE_HOST } = process.env;
     const GH_HOST = `https://${GHE_HOST ?? "github.com"}`;
@@ -34,7 +44,7 @@ export const setupAppFactory = (
         process.env.NO_SMEE_SETUP === "true"
       )
     ) {
-      await setup.createWebhookChannel();
+      await setup.createWebhookChannel({ SmeeClient });
     }
 
     const importViewRendered = importView({
@@ -60,7 +70,7 @@ export const setupAppFactory = (
         }
         if (path === "/probot") {
           const baseUrl = getBaseUrl(req);
-          const manifest = setup.getManifest(pkg, baseUrl);
+          const manifest = setup.getManifest({ pkg, baseUrl });
           const createAppUrl = setup.createAppUrl;
           // Pass the manifest to be POST'd
           res.writeHead(200, { "content-type": "text/html" }).end(
@@ -87,8 +97,7 @@ export const setupAppFactory = (
           }
 
           const response = await setup.createAppFromCode(code, {
-            // @ts-expect-error
-            request: app.state.request,
+            request,
           });
 
           // If using glitch, restart the app
@@ -139,7 +148,7 @@ export const setupAppFactory = (
               .end("appId and/or pem and/or webhook_secret missing");
             return true;
           }
-          updateDotenv({
+          (options.updateEnv || updateEnv)({
             APP_ID: appId,
             PRIVATE_KEY: `"${pem}"`,
             WEBHOOK_SECRET: webhook_secret,
@@ -155,6 +164,7 @@ export const setupAppFactory = (
 
     return setupHandler;
   };
+};
 
 function printWelcomeMessage(
   app: Probot,
@@ -188,9 +198,7 @@ function printRestartMessage(app: Probot) {
 
 function getBaseUrl(req: IncomingMessage): string {
   const protocols =
-    req.headers["x-forwarded-proto"] ||
-    // @ts-expect-error based on the functionality of express
-    req.socket?.encrypted
+    req.headers["x-forwarded-proto"] || (req.socket as TLSSocket)?.encrypted
       ? "https"
       : "http";
   const protocol =

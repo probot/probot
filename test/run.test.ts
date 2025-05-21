@@ -140,7 +140,11 @@ describe("run", () => {
 
     it("custom webhook path", async () => {
       const port = await getPort();
-      const env = { ...defaultEnv, PORT: port.toString(), WEBHOOK_PATH: "/custom-webhook" };
+      const env = {
+        ...defaultEnv,
+        PORT: port.toString(),
+        WEBHOOK_PATH: "/custom-webhook",
+      };
       const server = await run(() => {}, {
         env,
         updateEnv: (env) => env,

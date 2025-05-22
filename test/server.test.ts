@@ -263,7 +263,6 @@ describe("Server", () => {
         );
       } finally {
         await blocker.stop();
-        await server.stop();
       }
     });
 

@@ -150,18 +150,16 @@ describe("run", () => {
         updateEnv: (env) => env,
       });
 
-      const dataString = JSON.stringify(pushEvent);
-
       try {
         const response = await fetch(
           `http://${server.host}:${server.port}/custom-webhook`,
           {
             method: "POST",
-            body: dataString,
+            body: pushEvent,
             headers: {
               "content-type": "application/json",
               "x-github-event": "push",
-              "x-hub-signature-256": await sign("secret", dataString),
+              "x-hub-signature-256": await sign("secret", pushEvent),
               "x-github-delivery": "123",
             },
           },

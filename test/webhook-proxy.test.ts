@@ -14,18 +14,36 @@ import { createWebhookProxy } from "../src/helpers/webhook-proxy.js";
 import { getPrintableHost } from "../src/server/get-printable-host.js";
 import { detectRuntime } from "../src/helpers/detect-runtime.js";
 
-const sse: (
+function sse(
   req: IncomingMessage,
   res: ServerResponse,
-  next: () => void,
-) => void = require("connect-sse")();
+): Promise<(obj: Record<string, any>, type?: string | undefined) => void> {
+  return new Promise<Awaited<ReturnType<typeof sse>>>((resolve, reject) => {
+    try {
+      req.socket.setTimeout(0);
+      res.statusCode = 200;
 
-interface SSEResponse extends ServerResponse {
-  json(body: any, status?: string): this;
+      res.setHeader("Content-Type", "text/event-stream");
+      res.setHeader("Cache-Control", "no-cache");
+      res.setHeader("Connection", "keep-alive");
+
+      let message_count = 0;
+
+      resolve((obj, type) => {
+        res.write("id: " + ++message_count + "\n");
+        if ("string" === typeof type) {
+          res.write("event: " + type + "\n");
+        }
+        res.write("data: " + JSON.stringify(obj) + "\n\n");
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
 }
 
 describe("webhook-proxy", () => {
-  let emit: SSEResponse["json"];
+  let emit: Awaited<ReturnType<typeof sse>>;
   let proxy: EventSource;
 
   describe("with a valid proxy server", () => {
@@ -64,13 +82,10 @@ describe("webhook-proxy", () => {
 
       const server = createServer(
         async (req: IncomingMessage, res: ServerResponse) => {
-          // @ts-ignore
-          await new Promise<void>((resolve) => sse(req, res, resolve));
-
           const path = new URL(req.url!, `http://${req.headers.host}`);
           if (path.pathname === "/events") {
-            (res as SSEResponse).json({}, "ready");
-            emit = (res as SSEResponse).json;
+            emit = await sse(req, res);
+            emit({}, "ready");
           } else {
             res.writeHead(404).end();
           }

@@ -1,14 +1,12 @@
 import { randomInt } from "node:crypto";
-import type { IncomingMessage } from "node:http";
+import {
+  createServer,
+  type IncomingMessage,
+  type ServerResponse,
+} from "node:http";
 import type { AddressInfo } from "node:net";
 
 import getPort from "get-port";
-import express, { type Response } from "express";
-const sse: (
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction,
-) => void = require("connect-sse")();
 import fetchMock from "fetch-mock";
 import { describe, expect, test } from "vitest";
 import { getLog } from "../src/helpers/get-log.js";
@@ -16,7 +14,13 @@ import { createWebhookProxy } from "../src/helpers/webhook-proxy.js";
 import { getPrintableHost } from "../src/server/get-printable-host.js";
 import { detectRuntime } from "../src/helpers/detect-runtime.js";
 
-interface SSEResponse extends Response {
+const sse: (
+  req: IncomingMessage,
+  res: ServerResponse,
+  next: () => void,
+) => void = require("connect-sse")();
+
+interface SSEResponse extends ServerResponse {
   json(body: any, status?: string): this;
 }
 
@@ -56,14 +60,24 @@ describe("webhook-proxy", () => {
         finishedPromise.reject = reject;
       });
 
-      const app = express();
+      const port = await getPort();
 
-      app.get("/events", sse, (_req: IncomingMessage, res: SSEResponse) => {
-        res.json({}, "ready");
-        emit = res.json;
-      });
+      const server = createServer(
+        async (req: IncomingMessage, res: ServerResponse) => {
+          // @ts-ignore
+          await new Promise<void>((resolve) => sse(req, res, resolve));
 
-      const server = app.listen(await getPort(), async () => {
+          const path = new URL(req.url!, `http://${req.headers.host}`);
+          if (path.pathname === "/events") {
+            (res as SSEResponse).json({}, "ready");
+            emit = (res as SSEResponse).json;
+          } else {
+            res.writeHead(404).end();
+          }
+        },
+      );
+
+      server.listen(port, async () => {
         let { address: targetHost, port: targetPort } =
           server.address() as AddressInfo;
 

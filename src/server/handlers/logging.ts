@@ -3,10 +3,7 @@ import { randomUUID as uuidv4 } from "node:crypto";
 import { pinoHttp, startTime, type Options, type HttpLogger } from "pino-http";
 import type { Logger } from "pino";
 
-export function loggingHandler(
-  logger: Logger,
-  options?: Options,
-): HttpLogger {
+export function loggingHandler(logger: Logger, options?: Options): HttpLogger {
   return pinoHttp({
     ...options,
     logger: logger.child({ name: "http" }),

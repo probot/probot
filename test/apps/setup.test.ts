@@ -49,7 +49,7 @@ describe("Setup app", async () => {
       port: await getPort(),
     });
 
-    await server.loadHandler(
+    await server.loadHandlerFactory(
       setupAppFactory({
         host: server.host,
         port: server.port,
@@ -101,7 +101,7 @@ describe("Setup app", async () => {
         port,
       });
 
-      await server.loadHandler(
+      await server.loadHandlerFactory(
         setupAppFactory({
           host: server.host,
           port: server.port,
@@ -158,7 +158,7 @@ describe("Setup app", async () => {
         port: await getPort(),
       });
 
-      await server.loadHandler(
+      await server.loadHandlerFactory(
         setupAppFactory({
           host: server.host,
           port: server.port,
@@ -216,7 +216,7 @@ describe("Setup app", async () => {
         port: await getPort(),
       });
 
-      await server.loadHandler(
+      await server.loadHandlerFactory(
         setupAppFactory({
           host: server.host,
           port: server.port,
@@ -249,7 +249,7 @@ describe("Setup app", async () => {
         port: await getPort(),
       });
 
-      await server.loadHandler(
+      await server.loadHandlerFactory(
         setupAppFactory({
           host: server.host,
           port: server.port,

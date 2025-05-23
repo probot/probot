@@ -132,7 +132,7 @@ export async function run(
       SmeeClient: additionalOptions?.SmeeClient,
     });
 
-    await server.loadHandler(setupAppHandler);
+    await server.loadHandlerFactory(setupAppHandler);
 
     await server.start();
 
@@ -152,7 +152,7 @@ export async function run(
     const pkg = await packageConfig("probot");
     server = new Server(serverOptions);
 
-    await server.loadHandler(defaultAppHandler);
+    await server.loadHandlerFactory(defaultAppHandler);
 
     if (Array.isArray(pkg.apps)) {
       for (const appPath of pkg.apps) {

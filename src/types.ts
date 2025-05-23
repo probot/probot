@@ -87,6 +87,11 @@ export type ServerOptions = {
   host?: string;
   webhookPath?: string;
   webhookProxy?: string;
+
+  enablePing?: boolean;
+  enableNotFound?: boolean;
+  enableStaticFiles?: boolean;
+
   Probot: typeof Probot;
   loggingOptions?: LoggingOptions;
   request?: RequestRequestOptions;

@@ -32,7 +32,7 @@ describe("default app", async () => {
       cwd,
     });
 
-    await server.loadHandler(defaultAppHandler);
+    await server.loadHandlerFactory(defaultAppHandler);
 
     return server;
   }

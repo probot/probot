@@ -1,9 +1,6 @@
-import fs from "node:fs";
 import { isIPv6 } from "node:net";
 import { Server as HttpServer } from "node:http";
-import { join, dirname } from "node:path";
 import type { AddressInfo } from "node:net";
-import { fileURLToPath } from "node:url";
 
 import type { Logger } from "pino";
 import { createNodeMiddleware } from "@octokit/webhooks";
@@ -22,23 +19,12 @@ import { rebindLog } from "../helpers/rebind-log.js";
 import { loggingHandler } from "./handlers/logging.js";
 import { getPrintableHost } from "./helpers/get-printable-host.js";
 
+import { notFoundHandler } from "./handlers/not-found.js";
+import { pingHandler } from "./handlers/ping.js";
+import { staticFilesHandler } from "./handlers/static-files.js";
+
 // the default path as defined in @octokit/webhooks
 export const defaultWebhooksPath = "/api/github/webhooks";
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
-const robotSvg = fs.readFileSync(
-  join(__dirname, "..", "..", "static", "robot.svg"),
-  "utf-8",
-);
-const probotHeadPng = fs.readFileSync(
-  join(__dirname, "..", "..", "static", "probot-head.png"),
-  "utf-8",
-);
-const primerCss = fs.readFileSync(
-  join(__dirname, "..", "..", "static", "primer.css"),
-  "utf-8",
-);
 
 type State = {
   cwd?: string;
@@ -70,7 +56,13 @@ export class Server {
 
     const logger = loggingHandler(this.log, options.loggingOptions);
 
-    const handler: Handler = async (req, res) => {
+    const {
+      enablePing = true,
+      enableNotFound = true,
+      enableStaticFiles = true,
+    } = options;
+
+    const mainHandler: Handler = async (req, res) => {
       logger(req, res);
 
       try {
@@ -79,18 +71,21 @@ export class Server {
             return true;
           }
         }
+
+        if (enableNotFound) {
+          notFoundHandler(req, res);
+        }
       } catch (e) {
         this.log.error(e);
         res.writeHead(500).end();
         return true;
       }
-      res.writeHead(404).end();
 
-      return true;
+      return false;
     };
 
     this.#state = {
-      httpServer: new HttpServer(handler),
+      httpServer: new HttpServer(mainHandler),
       cwd: options.cwd || process.cwd(),
       port: options.port || 3000,
       host: options.host || "localhost",
@@ -98,56 +93,32 @@ export class Server {
       webhookProxy: options.webhookProxy,
     };
 
-    const staticFilesHandler: Handler = (req, res) => {
-      if (req.method === "GET") {
-        const path = req.url?.split("?")[0] || "";
-        if (path === "/probot/static/robot.svg") {
-          res.writeHead(200, { "content-type": "image/svg+xml" }).end(robotSvg);
-          return true;
-        }
-        if (path === "/probot/static/probot-head.png") {
-          res
-            .writeHead(200, { "content-type": "image/png" })
-            .end(probotHeadPng);
-          return true;
-        }
-        if (path === "/probot/static/primer.css") {
-          res.writeHead(200, { "content-type": "text/css" }).end(primerCss);
-          return true;
-        }
-      }
-      return false;
-    };
-
-    const pingPongHandler: Handler = (req, res) => {
-      if (req.method === "GET") {
-        const path = req.url?.split("?")[0] || "";
-        if (path === "/ping") {
-          res.writeHead(200, { "content-type": "text/plain" }).end("PONG");
-          return true;
-        }
-      }
-      return false;
-    };
-
-    this.handlers.push(staticFilesHandler);
-
     const webhookHandler = createNodeMiddleware(this.probotApp.webhooks, {
       log: this.log,
       path: this.#state.webhookPath,
     });
 
-    this.handlers.push(webhookHandler);
+    this.addHandler(webhookHandler);
 
-    this.handlers.push(pingPongHandler);
+    if (enableStaticFiles) {
+      this.addHandler(staticFilesHandler);
+    }
+
+    if (enablePing) {
+      this.addHandler(pingHandler);
+    }
   }
 
-  public async loadHandler(appFn: HandlerFactory) {
-    this.handlers.push(
-      await appFn(this.probotApp, {
-        cwd: this.#state.cwd,
-      }),
-    );
+  public addHandler(handler: Handler) {
+    this.handlers.push(handler);
+  }
+
+  public async loadHandlerFactory(appFn: HandlerFactory) {
+    const handler = await appFn(this.probotApp, {
+      cwd: this.#state.cwd,
+    });
+
+    this.handlers.push(handler);
   }
 
   public async load(appFn: ApplicationFunction) {

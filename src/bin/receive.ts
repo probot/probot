@@ -18,7 +18,7 @@ import { validateLogLevel } from "../helpers/validate-log-level.js";
 import { validateEventName } from "../helpers/validate-event-name.js";
 
 function printHelp() {
-  console.log(`Usage: probot-receive [options] [path/to/app.js...]
+  console.log(`Usage: probot receive [options] [path/to/app.js...]
 
 Options:
   -e, --event <event-name>           Event name

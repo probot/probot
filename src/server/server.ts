@@ -119,6 +119,9 @@ export class Server {
   public async loadHandlerFactory(appFn: HandlerFactory) {
     const handler = await appFn(this.probotApp, {
       cwd: this.#state.cwd,
+      addHandler: (handler: NodeHandler) => {
+        this.addHandler(handler as unknown as Handler);
+      },
     });
 
     this.handlers.push(handler);

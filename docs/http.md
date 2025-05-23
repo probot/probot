@@ -7,25 +7,23 @@ title: HTTP routes
 
 When starting your app using `probot run ./app.js` or using the [`Server`](/docs/development/#use-server) class, your Probot app function will receive the `options.addHandler` function as its 2nd argument.
 
-A Handler is a function that takes a Node.js HTTP request and response object, and is called when a request is made to the app's HTTP server. The `addHandler` function allows you to add custom HTTP routes to your app.
+A Handler is a function that takes a Node.js HTTP request and response object, and is called when a request is made to the app's HTTP server. You can use different HTTP frameworks, e.g. [Express](https://expressjs.com/) or [Fastify](https://www.fastify.dev/), to extend the built-in HTTP server. The `addHandler` function will add the routes to the app's HTTP server.
 
-You can use different HTTP frameworks, e.g. [Express](https://expressjs.com/) or [Fastify](https://www.fastify.iodev/), to handle HTTP requests.
-
-Express Example:
+Express v5 Example:
 
 ```js
 import express from "express";
 
 export default (app, { addHandler }) => {
-  // Get an express router to expose new HTTP endpoints
-  const router = express.Router("/my-app");
+  // Get an express instance to expose new HTTP endpoints
+  const router = express.Router();
 
   // Use any middleware
-  router.use(express.static("public"));
+  router.use(express.json());
 
   // Add a new route
   router.get("/hello-world", (req, res) => {
-    reply.send({ hello: "world" });
+    res.send({ hello: "world" });
   });
 
   // Add the router to the app
@@ -33,14 +31,14 @@ export default (app, { addHandler }) => {
 };
 ```
 
-Fastify Example:
+Fastify v5 Example:
 
 ```js
 import Fastify from "fastify";
 
 export default async (app, { addHandler }) => {
   // Get a fastify instance to expose new HTTP endpoints
-  const fastifyInstance = Fastify();
+  const fastify = Fastify();
 
   // Declare a route
   fastify.get("/hello-world", function (request, reply) {
@@ -50,7 +48,7 @@ export default async (app, { addHandler }) => {
   await fastify.ready();
 
   // Add the router to the app
-  addHandler(fastifyInstance.routing);
+  addHandler(fastify.routing);
 };
 ```
 

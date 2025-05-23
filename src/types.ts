@@ -6,7 +6,7 @@ import type {
 import type { RedisOptions } from "ioredis";
 import type { Options as LoggingOptions } from "pino-http";
 
-import type { Probot } from "./exports.js";
+import type { Probot, Server } from "./exports.js";
 import type { Context } from "./context.js";
 import type { ProbotOctokit } from "./octokit/probot-octokit.js";
 
@@ -49,6 +49,7 @@ export type State = {
   baseUrl?: string;
   webhookPath: string;
   request?: RequestRequestOptions;
+  server?: Server;
 };
 
 // Omit the `payload`, `id`,`name` properties from the `Context` class as they are already present in the types of `WebhookEvent`
@@ -61,7 +62,7 @@ type SimplifiedObject = Omit<Context, keyof WebhookEvent>;
 export type ProbotWebhooks = Webhooks<SimplifiedObject>;
 
 export type ApplicationFunctionOptions = {
-  cwd?: string;
+  cwd: string;
   addHandler?: (handler: NodeHandler) => void;
   [key: string]: unknown;
 };

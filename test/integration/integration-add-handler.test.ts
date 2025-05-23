@@ -4,8 +4,17 @@ import Fastify from "fastify";
 import getPort from "get-port";
 import { describe, expect, it } from "vitest";
 
-import { run } from "../../src/index.js";
+import {
+  createNodeMiddleware,
+  createProbot,
+  run,
+  type ApplicationFunction,
+} from "../../src/index.js";
+import { createServer } from "node:http";
+import { once } from "node:events";
 
+const APP_ID = "123";
+const WEBHOOK_SECRET = "secret";
 const PRIVATE_KEY = `-----BEGIN RSA PRIVATE KEY-----
 MIIEpAIBAAKCAQEA1c7+9z5Pad7OejecsQ0bu3aozN3tihPmljnnudb9G3HECdnH
 lWu2/a1gB9JW5TBQ+AVpum9Okx7KfqkfBKL9mcHgSL0yWMdjMfNOqNtrQqKlN4kE
@@ -131,5 +140,111 @@ describe("run", () => {
     expect(await response.json()).toEqual({ hello: "world" });
 
     await server.stop();
+  });
+});
+
+describe("createNodeMiddleware", () => {
+  it("should work with express", async () => {
+    expect.assertions(2);
+
+    const port = await getPort();
+
+    const app: ApplicationFunction = (app, { addHandler }) => {
+      const expressApp = express();
+
+      expressApp.get("/hello-world", (_req, res) => {
+        res.status(200).send({ hello: "world" });
+      });
+
+      addHandler(expressApp);
+
+      app.on("push", (event) => {
+        expect(event.name).toEqual("push");
+      });
+    };
+    const middleware = createNodeMiddleware(app, {
+      probot: createProbot({
+        env: {
+          APP_ID,
+          PRIVATE_KEY,
+          WEBHOOK_SECRET,
+        },
+      }),
+    });
+
+    const server = createServer(middleware);
+    server.listen(port);
+
+    await once(server, "listening");
+
+    let { address: host } = server.address() as {
+      port: number;
+      address: string;
+    };
+
+    if (host.includes(":")) {
+      host = `[${host}]`;
+    }
+
+    const response = await fetch(`http://${host}:${port}/hello-world`);
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ hello: "world" });
+
+    server.close();
+  });
+
+  it("should work with fastify", async () => {
+    expect.assertions(2);
+
+    const port = await getPort();
+
+    const app: ApplicationFunction = async (app, { addHandler }) => {
+      // Get a fastify instance to expose new HTTP endpoints
+      const fastify = Fastify();
+
+      // Declare a route
+      fastify.get("/hello-world", function (_request, reply) {
+        reply.send({ hello: "world" });
+      });
+
+      await fastify.ready();
+
+      addHandler(fastify.routing);
+
+      app.on("push", (event) => {
+        expect(event.name).toEqual("push");
+      });
+    };
+    const middleware = createNodeMiddleware(app, {
+      probot: createProbot({
+        env: {
+          APP_ID,
+          PRIVATE_KEY,
+          WEBHOOK_SECRET,
+        },
+      }),
+    });
+
+    const server = createServer(middleware);
+    server.listen(port);
+
+    await once(server, "listening");
+
+    let { address: host } = server.address() as {
+      port: number;
+      address: string;
+    };
+
+    if (host.includes(":")) {
+      host = `[${host}]`;
+    }
+
+    const response = await fetch(`http://${host}:${port}/hello-world`);
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ hello: "world" });
+
+    server.close();
   });
 });

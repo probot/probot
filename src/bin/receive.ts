@@ -168,7 +168,12 @@ export async function receive(args: string[]) {
   const appFn = await resolveAppFunction(
     path.resolve(process.cwd(), appFunctionFile),
   );
-  await probot.load(appFn, { cwd: process.cwd() });
+  await probot.load(appFn, {
+    cwd: process.cwd(),
+    addHandler: () => {
+      throw new Error("No server instance");
+    },
+  });
 
   probot.log.debug("Receiving event", event);
   probot.receive({ name: event as any, payload, id: uuidv4() }).catch(() => {

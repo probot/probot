@@ -11,7 +11,6 @@ import type {
   ApplicationFunction,
   Handler,
   HandlerFactory,
-  NodeHandler,
   ServerOptions,
 } from "../types.js";
 import type { Probot } from "../exports.js";
@@ -59,6 +58,7 @@ export class Server {
 
     this.probotApp = new options.Probot({
       request: options.request,
+      server: this,
     });
     this.log = options.log
       ? rebindLog(options.log)
@@ -119,7 +119,7 @@ export class Server {
   public async loadHandlerFactory(appFn: HandlerFactory) {
     const handler = await appFn(this.probotApp, {
       cwd: this.#state.cwd,
-      addHandler: (handler: NodeHandler) => {
+      addHandler: (handler: Handler) => {
         this.addHandler(handler as unknown as Handler);
       },
     });
@@ -130,7 +130,7 @@ export class Server {
   public async load(appFn: ApplicationFunction) {
     await appFn(this.probotApp, {
       cwd: this.#state.cwd,
-      addHandler: (handler: NodeHandler) => {
+      addHandler: (handler: Handler) => {
         this.addHandler(handler as unknown as Handler);
       },
     });

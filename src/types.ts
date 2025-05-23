@@ -27,6 +27,7 @@ export interface Options {
   logMessageKey?: string;
   port?: number;
   host?: string;
+  server?: Server;
   baseUrl?: string;
   request?: RequestRequestOptions;
   webhookPath?: string;
@@ -49,7 +50,7 @@ export type State = {
   baseUrl?: string;
   webhookPath: string;
   request?: RequestRequestOptions;
-  server?: Server;
+  server?: Server | void;
 };
 
 // Omit the `payload`, `id`,`name` properties from the `Context` class as they are already present in the types of `WebhookEvent`
@@ -63,7 +64,7 @@ export type ProbotWebhooks = Webhooks<SimplifiedObject>;
 
 export type ApplicationFunctionOptions = {
   cwd: string;
-  addHandler?: (handler: NodeHandler) => void;
+  addHandler: (handler: Handler) => void;
   [key: string]: unknown;
 };
 
@@ -80,12 +81,7 @@ export type ApplicationFunction = (
 export type Handler = (
   req: IncomingMessage,
   res: ServerResponse,
-) => boolean | Promise<boolean>;
-
-export type NodeHandler = (
-  req: IncomingMessage,
-  res: ServerResponse,
-) => void | Promise<void>;
+) => void | boolean | Promise<void | boolean>;
 
 export type ServerOptions = {
   cwd?: string;

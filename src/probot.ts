@@ -104,6 +104,7 @@ export class Probot {
       port: options.port,
       webhookPath: options.webhookPath || defaultWebhooksPath,
       request: options.request,
+      server: options.server,
     };
 
     this.auth = auth.bind(null, this.#state);
@@ -127,8 +128,16 @@ export class Probot {
     appFn: ApplicationFunction | ApplicationFunction[],
     options: ApplicationFunctionOptions = {
       cwd: process.cwd(),
-    },
+    } as ApplicationFunctionOptions,
   ): Promise<void> {
+    if (typeof options.addHandler !== "function") {
+      options.addHandler = this.#state.server
+        ? this.#state.server.addHandler.bind(this.#state.server)
+        : () => {
+            throw new Error("No server instance");
+          };
+    }
+
     if (Array.isArray(appFn)) {
       for (const fn of appFn) {
         await this.load(fn, options);

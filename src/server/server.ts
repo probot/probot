@@ -28,8 +28,8 @@ import { staticFilesHandler } from "./handlers/static-files.js";
 export const defaultWebhooksPath = "/api/github/webhooks";
 
 type State = {
-  cwd?: string;
-  httpServer?: HttpServer;
+  cwd: string;
+  httpServer: HttpServer;
   port: number;
   host: string;
   webhookPath: string;
@@ -48,6 +48,15 @@ export class Server {
   #state: State;
 
   constructor(options: ServerOptions = {} as ServerOptions) {
+    this.#state = {
+      httpServer: new HttpServer(),
+      cwd: options.cwd || process.cwd(),
+      port: options.port || 3000,
+      host: options.host || "localhost",
+      webhookPath: options.webhookPath || defaultWebhooksPath,
+      webhookProxy: options.webhookProxy,
+    };
+
     this.probotApp = new options.Probot({
       request: options.request,
     });
@@ -85,15 +94,6 @@ export class Server {
       return false;
     };
 
-    this.#state = {
-      httpServer: new HttpServer(mainHandler),
-      cwd: options.cwd || process.cwd(),
-      port: options.port || 3000,
-      host: options.host || "localhost",
-      webhookPath: options.webhookPath || defaultWebhooksPath,
-      webhookProxy: options.webhookProxy,
-    };
-
     const webhookHandler = createNodeMiddleware(this.probotApp.webhooks, {
       log: this.log,
       path: this.#state.webhookPath,
@@ -108,6 +108,8 @@ export class Server {
     if (enablePing) {
       this.addHandler(pingHandler);
     }
+
+    this.#state.httpServer.on("request", mainHandler);
   }
 
   public addHandler(handler: Handler) {
@@ -147,15 +149,6 @@ export class Server {
           this.#state.host = `[${this.#state.host}]`;
         }
 
-        if (webhookProxy) {
-          this.#state.eventSource = await createWebhookProxy({
-            host,
-            port,
-            path: webhookPath,
-            logger: this.log,
-            url: webhookProxy,
-          });
-        }
         this.log.info(`Listening on http://${printableHost}:${port}`);
         resolve(server);
       });
@@ -172,12 +165,26 @@ export class Server {
       });
     });
 
+    if (webhookProxy) {
+      this.#state.eventSource = await createWebhookProxy({
+        host: this.#state.host,
+        port: this.#state.port,
+        path: webhookPath,
+        logger: this.log,
+        url: webhookProxy,
+      });
+    }
+
     return this.#state.httpServer;
   }
 
   public async stop(): Promise<void> {
-    if (this.#state.eventSource) this.#state.eventSource.close();
-    if (!this.#state.httpServer) return;
+    if (this.#state.eventSource) {
+      this.#state.eventSource.close();
+    }
+    if (this.#state.httpServer.listening === false) {
+      return;
+    }
     const server = this.#state.httpServer;
     return new Promise((resolve, reject) =>
       server.close((err) => {

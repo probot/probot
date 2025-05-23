@@ -125,7 +125,9 @@ export class Probot {
 
   public async load(
     appFn: ApplicationFunction | ApplicationFunction[],
-    options: ApplicationFunctionOptions = {},
+    options: ApplicationFunctionOptions = {
+      cwd: process.cwd(),
+    },
   ): Promise<void> {
     if (Array.isArray(appFn)) {
       for (const fn of appFn) {

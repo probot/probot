@@ -8,7 +8,6 @@ import { fileURLToPath } from "node:url";
 import type { Logger } from "pino";
 import { createNodeMiddleware } from "@octokit/webhooks";
 
-import { getLoggingMiddleware } from "./logging-middleware.js";
 import { createWebhookProxy } from "../helpers/webhook-proxy.js";
 import { VERSION } from "../version.js";
 import type {
@@ -19,7 +18,9 @@ import type {
 } from "../types.js";
 import type { Probot } from "../exports.js";
 import { rebindLog } from "../helpers/rebind-log.js";
-import { getPrintableHost } from "./get-printable-host.js";
+
+import { loggingHandler } from "./handlers/logging.js";
+import { getPrintableHost } from "./helpers/get-printable-host.js";
 
 // the default path as defined in @octokit/webhooks
 export const defaultWebhooksPath = "/api/github/webhooks";
@@ -67,7 +68,7 @@ export class Server {
       ? rebindLog(options.log)
       : rebindLog(this.probotApp.log.child({ name: "server" }));
 
-    const logger = getLoggingMiddleware(this.log, options.loggingOptions);
+    const logger = loggingHandler(this.log, options.loggingOptions);
 
     const handler: Handler = async (req, res) => {
       logger(req, res);

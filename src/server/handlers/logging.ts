@@ -3,7 +3,7 @@ import { randomUUID as uuidv4 } from "node:crypto";
 import { pinoHttp, startTime, type Options, type HttpLogger } from "pino-http";
 import type { Logger } from "pino";
 
-export function getLoggingMiddleware(
+export function loggingHandler(
   logger: Logger,
   options?: Options,
 ): HttpLogger {

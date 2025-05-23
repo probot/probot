@@ -11,7 +11,7 @@ import fetchMock from "fetch-mock";
 import { describe, expect, test } from "vitest";
 import { getLog } from "../src/helpers/get-log.js";
 import { createWebhookProxy } from "../src/helpers/webhook-proxy.js";
-import { getPrintableHost } from "../src/server/get-printable-host.js";
+import { getPrintableHost } from "../src/server/helpers/get-printable-host.js";
 import { detectRuntime } from "../src/helpers/detect-runtime.js";
 
 function sse(

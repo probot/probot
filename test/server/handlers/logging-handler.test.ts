@@ -11,8 +11,8 @@ import { pino } from "pino";
 import type { Options } from "pino-http";
 import { describe, expect, test } from "vitest";
 
-import { getLoggingMiddleware } from "../../src/server/logging-middleware.js";
-import { getPayload } from "../../src/helpers/get-payload.js";
+import { loggingHandler } from "../../../src/server/handlers/logging.js";
+import { getPayload } from "../../../src/helpers/get-payload.js";
 
 describe("logging", () => {
   function streamLogsToOutput(target: any[]) {
@@ -27,7 +27,7 @@ describe("logging", () => {
 
   function instantiateServer(output: string[], options = {} as Options) {
     const logger = pino(streamLogsToOutput(output));
-    const loggerMiddleware = getLoggingMiddleware(logger, options);
+    const loggerMiddleware = loggingHandler(logger, options);
 
     const handler = async (req: IncomingMessage, res: ServerResponse) => {
       await getPayload(req);

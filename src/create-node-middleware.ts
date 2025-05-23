@@ -39,7 +39,9 @@ export function createNodeMiddleware(
   response: ServerResponse,
   next?: () => void,
 ) => Promise<boolean> {
-  probot.load(appFn);
+  probot.load(appFn, {
+    cwd: process.cwd(),
+  });
 
   return createWebhooksMiddleware(probot.webhooks, {
     path: webhooksPath || probot.webhookPath || defaultWebhooksPath,

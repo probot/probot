@@ -225,7 +225,7 @@ describe("Server", () => {
         `http://${server.host}:${server.port}/notfound`,
       );
 
-      expect(await response.text()).toMatchSnapshot("not-found-response");
+      expect(await response.text()).toBe("");
 
       expect(output.length).toEqual(3);
       expect(output[2].msg).toContain("GET /notfound 404 -");

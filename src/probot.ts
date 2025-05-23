@@ -129,7 +129,7 @@ export class Probot {
   ): Promise<void> {
     if (Array.isArray(appFn)) {
       for (const fn of appFn) {
-        await this.load(fn);
+        await this.load(fn, options);
       }
       return;
     }

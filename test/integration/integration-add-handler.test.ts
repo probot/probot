@@ -1,3 +1,6 @@
+import { createServer } from "node:http";
+import { once } from "node:events";
+
 import express from "express";
 import Fastify from "fastify";
 
@@ -10,8 +13,7 @@ import {
   run,
   type ApplicationFunction,
 } from "../../src/index.js";
-import { createServer } from "node:http";
-import { once } from "node:events";
+import { getPrintableHost } from "../../src/helpers/get-printable-host.js";
 
 const APP_ID = "123";
 const WEBHOOK_SECRET = "secret";
@@ -182,9 +184,7 @@ describe("createNodeMiddleware", () => {
       address: string;
     };
 
-    if (host.includes(":")) {
-      host = `[${host}]`;
-    }
+    host = getPrintableHost(host);
 
     const response = await fetch(`http://${host}:${port}/hello-world`);
 
@@ -236,9 +236,7 @@ describe("createNodeMiddleware", () => {
       address: string;
     };
 
-    if (host.includes(":")) {
-      host = `[${host}]`;
-    }
+    host = getPrintableHost(host);
 
     const response = await fetch(`http://${host}:${port}/hello-world`);
 

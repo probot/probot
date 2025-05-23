@@ -5,7 +5,7 @@ import { parse as parseQuery } from "node:querystring";
 
 import type { Probot } from "../probot.js";
 import { ManifestCreation } from "../manifest-creation.js";
-import { getPrintableHost } from "../server/helpers/get-printable-host.js";
+import { getPrintableHost } from "../helpers/get-printable-host.js";
 import { isProduction } from "../helpers/is-production.js";
 import type { Handler } from "../types.js";
 import { getPayload } from "../helpers/get-payload.js";

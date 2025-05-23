@@ -17,7 +17,7 @@ import type { Probot } from "../exports.js";
 import { rebindLog } from "../helpers/rebind-log.js";
 
 import { loggingHandler } from "./handlers/logging.js";
-import { getPrintableHost } from "./helpers/get-printable-host.js";
+import { getPrintableHost } from "../helpers/get-printable-host.js";
 
 import { notFoundHandler } from "./handlers/not-found.js";
 import { pingHandler } from "./handlers/ping.js";

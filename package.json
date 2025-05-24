@@ -50,7 +50,7 @@
     "@probot/pino": "^3.0.0",
     "@types/express": "^5.0.1",
     "bottleneck": "^2.19.5",
-    "commander": "^12.0.0",
+    "commander": "^14.0.0",
     "deepmerge": "^4.3.1",
     "dotenv": "^16.3.1",
     "express": "^5.0.0",

@@ -9,10 +9,11 @@ import type { Env } from "../../src/types.js";
 import { Probot, Server } from "../../src/index.js";
 import { setupAppFactory } from "../../src/apps/setup.js";
 
-describe("Setup app", () => {
+describe("Setup app", async () => {
   let server: Server;
-
   let logOutput: any[] = [];
+  let port = 0;
+
   const streamLogsToOutput = new Stream.Writable({ objectMode: true });
   streamLogsToOutput._write = (msg, _encoding, done) => {
     logOutput.push(JSON.parse(msg));
@@ -48,7 +49,7 @@ describe("Setup app", () => {
       port: await getPort(),
     });
 
-    await server.load(
+    await server.loadHandlerFactory(
       setupAppFactory({
         host: server.host,
         port: server.port,
@@ -72,18 +73,18 @@ describe("Setup app", () => {
         "Probot is in setup mode, webhooks cannot be received and",
         "custom routes will not work until APP_ID and PRIVATE_KEY",
         "are configured in .env.",
-        `Please follow the instructions at http://${server.host}:${server.port} to configure .env.`,
+        `Please follow the instructions at http://localhost:${server.port} to configure .env.`,
         "Once you are done, restart the server.",
         "",
         `Running Probot v0.0.0-development (Node.js: ${process.version})`,
-        `Listening on http://${server.host}:${server.port}`,
+        `Listening on http://localhost:${server.port}`,
       ];
 
       const infoLogs = logOutput
         .filter((output: any) => output.level === pino.levels.values.info)
         .map((o) => o.msg);
 
-      expect(infoLogs).toEqual(expect.arrayContaining(expMsgs));
+      expect(infoLogs).toEqual(expMsgs);
     });
 
     it("should log welcome message with custom host and port", async () => {
@@ -96,9 +97,11 @@ describe("Setup app", () => {
           privateKey: "dummy value for setup, see #1512",
           port: await getPort(),
         }),
+        host: "localhost",
+        port,
       });
 
-      await server.load(
+      await server.loadHandlerFactory(
         setupAppFactory({
           host: server.host,
           port: server.port,
@@ -155,7 +158,7 @@ describe("Setup app", () => {
         port: await getPort(),
       });
 
-      await server.load(
+      await server.loadHandlerFactory(
         setupAppFactory({
           host: server.host,
           port: server.port,
@@ -213,7 +216,7 @@ describe("Setup app", () => {
         port: await getPort(),
       });
 
-      await server.load(
+      await server.loadHandlerFactory(
         setupAppFactory({
           host: server.host,
           port: server.port,
@@ -246,7 +249,7 @@ describe("Setup app", () => {
         port: await getPort(),
       });
 
-      await server.load(
+      await server.loadHandlerFactory(
         setupAppFactory({
           host: server.host,
           port: server.port,
@@ -329,6 +332,7 @@ describe("Setup app", () => {
           body,
         },
       );
+
       expect(importResponse.status).toBe(400);
       expect(await importResponse.text()).toEqual(
         "appId and/or pem and/or webhook_secret missing",

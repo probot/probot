@@ -1,15 +1,18 @@
 import { once } from "node:events";
-import { createServer } from "node:http";
+import {
+  createServer,
+  type IncomingMessage,
+  type ServerResponse,
+} from "node:http";
 import Stream from "node:stream";
 
-import express from "express";
 import getPort from "get-port";
-import { describe, expect, test } from "vitest";
-
 import { pino } from "pino";
 import type { Options } from "pino-http";
+import { describe, expect, test } from "vitest";
 
-import { getLoggingMiddleware } from "../../src/server/logging-middleware.js";
+import { loggingHandler } from "../../../src/server/handlers/logging.js";
+import { getPayload } from "../../../src/helpers/get-payload.js";
 
 describe("logging", () => {
   function streamLogsToOutput(target: any[]) {
@@ -23,20 +26,31 @@ describe("logging", () => {
   }
 
   function instantiateServer(output: string[], options = {} as Options) {
-    const app = express();
     const logger = pino(streamLogsToOutput(output));
+    const loggerMiddleware = loggingHandler(logger, options);
 
-    app.use(express.json());
-    app.use(getLoggingMiddleware(logger, options));
-    app.get("/", (_req, res) => {
-      res.set("X-Test-Header", "testing");
-      res.send("OK");
-    });
-    app.post("/", (_req, res) => {
-      res.send("OK");
-    });
+    const handler = async (req: IncomingMessage, res: ServerResponse) => {
+      await getPayload(req);
+      await new Promise<void>((resolve) => loggerMiddleware(req, res, resolve));
 
-    const server = createServer(app);
+      const path = new URL(req.url!, `http://${req.headers.host}`);
+
+      if (path.pathname === "/") {
+        if (req.method === "GET") {
+          res
+            .writeHead(200, {
+              "X-Test-Header": "testing",
+            })
+            .end("OK");
+        } else if (req.method === "POST") {
+          res.writeHead(200).end("OK");
+        } else {
+          res.writeHead(404).end();
+        }
+      }
+    };
+
+    const server = createServer(handler);
     return server;
   }
 
@@ -61,9 +75,6 @@ describe("logging", () => {
 
     expect(response.status).toBe(200);
     expect(response.headers.get("x-test-header")).toEqual("testing");
-    expect(response.headers.get("content-type")).toEqual(
-      "text/html; charset=utf-8",
-    );
 
     expect(output[0].req.id).toBeTruthy();
     expect(typeof output[0].responseTime).toEqual("number");

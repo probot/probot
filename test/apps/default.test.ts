@@ -7,11 +7,11 @@ import getPort from "get-port";
 import { describe, expect, it } from "vitest";
 
 import { Probot, Server } from "../../src/index.js";
-import { defaultApp } from "../../src/apps/default.js";
+import { defaultApp as defaultAppHandler } from "../../src/apps/default.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-describe("default app", () => {
+describe("default app", async () => {
   let output = [];
 
   const streamLogsToOutput = new Stream.Writable({ objectMode: true });
@@ -32,7 +32,7 @@ describe("default app", () => {
       cwd,
     });
 
-    await server.load(defaultApp);
+    await server.loadHandlerFactory(defaultAppHandler);
 
     return server;
   }
@@ -48,6 +48,7 @@ describe("default app", () => {
       );
 
       expect(response.status).toBe(200);
+      await server.stop();
     });
 
     describe("get info from package.json", () => {
@@ -61,6 +62,7 @@ describe("default app", () => {
         );
 
         expect(response.status).toBe(200);
+
         expect(await response.text()).toMatchSnapshot();
 
         await server.stop();
@@ -89,7 +91,6 @@ describe("default app", () => {
       await server.start();
 
       const response = await fetch(`http://${server.host}:${server.port}/`, {
-        method: "GET",
         redirect: "manual",
       });
 

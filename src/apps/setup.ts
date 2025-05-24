@@ -1,20 +1,16 @@
-import { exec } from "node:child_process";
-import type { IncomingMessage, ServerResponse } from "node:http";
+import type { IncomingMessage } from "node:http";
 import type { TLSSocket } from "node:tls";
+import { exec } from "node:child_process";
 import { parse as parseQuery } from "node:querystring";
-
-import express from "express";
 
 import type { Probot } from "../probot.js";
 import { ManifestCreation } from "../manifest-creation.js";
-import { getLoggingMiddleware } from "../server/logging-middleware.js";
-import type {
-  ApplicationFunctionOptions,
-  Env,
-  ServerOptions,
-} from "../types.js";
-import { getPrintableHost } from "../server/get-printable-host.js";
+import { getPrintableHost } from "../helpers/get-printable-host.js";
 import { isProduction } from "../helpers/is-production.js";
+import type { Handler } from "../types.js";
+import { getPayload } from "../helpers/get-payload.js";
+
+import type { Env, ServerOptions } from "../types.js";
 import { updateEnv } from "../helpers/update-env.js";
 
 import { importView } from "../views/import.js";
@@ -30,18 +26,14 @@ type SetupFactoryOptions = Required<Pick<ServerOptions, "port" | "host">> &
 export const setupAppFactory = (options: SetupFactoryOptions) => {
   const { host, port, request, SmeeClient } = options || {};
 
-  return async function setupApp(
-    app: Probot,
-    { getRouter }: ApplicationFunctionOptions,
-  ) {
-    if (!getRouter) {
-      throw new Error("getRouter is required to use the setup app");
-    }
-
+  return async function setupApp(app: Probot): Promise<Handler> {
     const setup: ManifestCreation = new ManifestCreation({
       updateEnv: options.updateEnv || updateEnv,
     });
+
     const pkg = setup.pkg;
+    const { WEBHOOK_PROXY_URL, GHE_HOST } = process.env;
+    const GH_HOST = `https://${GHE_HOST ?? "github.com"}`;
 
     // If not on Glitch or Production, create a smee URL
     if (
@@ -55,126 +47,122 @@ export const setupAppFactory = (options: SetupFactoryOptions) => {
       await setup.createWebhookChannel({ SmeeClient });
     }
 
-    const route = getRouter();
-
-    route.use(getLoggingMiddleware(app.log));
-
-    printWelcomeMessage(app, host, port);
-
-    route.get("/probot", (req: IncomingMessage, res: ServerResponse) => {
-      const baseUrl = getBaseUrl(req);
-      const manifest = setup.getManifest({ pkg, baseUrl });
-      const createAppUrl = setup.createAppUrl;
-      // Pass the manifest to be POST'd
-      res.writeHead(200, { "content-type": "text/html" }).end(
-        setupView({
-          name: pkg.name,
-          version: pkg.version,
-          description: pkg.description,
-          createAppUrl,
-          manifest,
-        }),
-      );
-    });
-
-    route.get(
-      "/probot/setup",
-      async (req: IncomingMessage, res: ServerResponse) => {
-        const { code } =
-          // @ts-expect-error query could be set by a framework, e.g. express
-          req.query || parseQuery(req.url?.split("?", 2)[1] || "");
-
-        if (!code || typeof code !== "string" || code.length === 0) {
-          res
-            .writeHead(400, { "content-type": "text/plain" })
-            .end("code missing or invalid");
-          return;
-        }
-
-        const response = await setup.createAppFromCode(code, {
-          request,
-        });
-
-        // If using glitch, restart the app
-        if (process.env.PROJECT_DOMAIN) {
-          exec("refresh", (error) => {
-            if (error) {
-              app.log.error(error);
-            }
-          });
-        } else {
-          printRestartMessage(app);
-        }
-
-        res
-          .writeHead(302, {
-            "content-type": "text/plain",
-            location: `${response}/installations/new`,
-          })
-          .end(`Found. Redirecting to ${response}/installations/new`);
-      },
-    );
-
-    const { WEBHOOK_PROXY_URL, GHE_HOST } = process.env;
-    const GH_HOST = `https://${GHE_HOST ?? "github.com"}`;
-
     const importViewRendered = importView({
       name: pkg.name,
       WEBHOOK_PROXY_URL,
       GH_HOST,
     });
-
-    route.get(
-      "/probot/import",
-      (_req: IncomingMessage, res: ServerResponse) => {
-        res
-          .writeHead(200, {
-            "content-type": "text/html",
-          })
-          .end(importViewRendered);
-      },
-    );
-
-    route.post(
-      "/probot/import",
-      express.json(),
-      (req: IncomingMessage, res: ServerResponse) => {
-        const { appId, pem, webhook_secret } = (req as unknown as { body: any })
-          .body;
-        if (!appId || !pem || !webhook_secret) {
-          res
-            .writeHead(400, {
-              "content-type": "text/plain",
-            })
-            .end("appId and/or pem and/or webhook_secret missing");
-          return;
-        }
-        (options.updateEnv || updateEnv)({
-          APP_ID: appId,
-          PRIVATE_KEY: `"${pem}"`,
-          WEBHOOK_SECRET: webhook_secret,
-        });
-        res.end();
-        printRestartMessage(app);
-      },
-    );
-
     const successViewRendered = successView({ name: pkg.name });
 
-    route.get(
-      "/probot/success",
-      (_req: IncomingMessage, res: ServerResponse) => {
-        res
-          .writeHead(200, { "content-type": "text/html" })
-          .end(successViewRendered);
-      },
-    );
+    printWelcomeMessage(app, host, port);
 
-    route.get("/", (_req, res: ServerResponse) => {
-      res
-        .writeHead(302, { "content-type": "text/plain", location: `/probot` })
-        .end(`Found. Redirecting to /probot`);
-    });
+    const setupHandler: Handler = async (req, res) => {
+      const [path, query = ""] = req.url?.split("?") ?? [req.url, ""];
+      if (req.method === "GET") {
+        if (path === "/") {
+          res
+            .writeHead(302, {
+              "content-type": "text/plain",
+              location: `/probot`,
+            })
+            .end(`Found. Redirecting to /probot`);
+          return true;
+        }
+        if (path === "/probot") {
+          const baseUrl = getBaseUrl(req);
+          const manifest = setup.getManifest({ pkg, baseUrl });
+          const createAppUrl = setup.createAppUrl;
+          // Pass the manifest to be POST'd
+          res.writeHead(200, { "content-type": "text/html" }).end(
+            setupView({
+              name: pkg.name,
+              version: pkg.version,
+              description: pkg.description,
+              createAppUrl,
+              manifest,
+            }),
+          );
+          return true;
+        }
+        if (path === "/probot/setup") {
+          const { code } =
+            // @ts-expect-error query could be set by a framework, e.g. express
+            req.query || parseQuery(query);
+
+          if (!code || typeof code !== "string" || code.length === 0) {
+            res
+              .writeHead(400, { "content-type": "text/plain" })
+              .end("code missing or invalid");
+            return true;
+          }
+
+          const response = await setup.createAppFromCode(code, {
+            request,
+          });
+
+          // If using glitch, restart the app
+          if (process.env.PROJECT_DOMAIN) {
+            exec("refresh", (error) => {
+              if (error) {
+                app.log.error(error);
+              }
+            });
+          } else {
+            printRestartMessage(app);
+          }
+
+          res
+            .writeHead(302, {
+              "content-type": "text/plain",
+              location: `${response}/installations/new`,
+            })
+            .end(`Found. Redirecting to ${response}/installations/new`);
+          return true;
+        }
+        if (path === "/probot/import") {
+          res
+            .writeHead(200, {
+              "content-type": "text/html",
+            })
+            .end(importViewRendered);
+          return true;
+        }
+        if (path === "/probot/success") {
+          res
+            .writeHead(200, { "content-type": "text/html" })
+            .end(successViewRendered);
+          return true;
+        }
+      }
+
+      if (req.method === "POST") {
+        if (path === "/probot/import") {
+          const { appId, pem, webhook_secret } = JSON.parse(
+            await getPayload(req),
+          );
+          if (!appId || !pem || !webhook_secret) {
+            res
+              .writeHead(400, {
+                "content-type": "text/plain",
+              })
+              .end("appId and/or pem and/or webhook_secret missing");
+            return true;
+          }
+          (options.updateEnv || updateEnv)({
+            APP_ID: appId,
+            PRIVATE_KEY: `"${pem}"`,
+            WEBHOOK_SECRET: webhook_secret,
+          });
+          res.end();
+          printRestartMessage(app);
+          return true;
+        }
+      }
+
+      return false;
+    };
+
+    return setupHandler;
   };
 };
 

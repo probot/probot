@@ -1,27 +1,49 @@
 import { randomInt } from "node:crypto";
-import type { IncomingMessage } from "node:http";
+import {
+  createServer,
+  type IncomingMessage,
+  type ServerResponse,
+} from "node:http";
 import type { AddressInfo } from "node:net";
 
 import getPort from "get-port";
-import express, { type Response } from "express";
-const sse: (
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction,
-) => void = require("connect-sse")();
 import fetchMock from "fetch-mock";
 import { describe, expect, test } from "vitest";
 import { getLog } from "../src/helpers/get-log.js";
 import { createWebhookProxy } from "../src/helpers/webhook-proxy.js";
-import { getPrintableHost } from "../src/server/get-printable-host.js";
+import { getPrintableHost } from "../src/helpers/get-printable-host.js";
 import { detectRuntime } from "../src/helpers/detect-runtime.js";
 
-interface SSEResponse extends Response {
-  json(body: any, status?: string): this;
+function sse(
+  req: IncomingMessage,
+  res: ServerResponse,
+): Promise<(obj: Record<string, any>, type?: string | undefined) => void> {
+  return new Promise<Awaited<ReturnType<typeof sse>>>((resolve, reject) => {
+    try {
+      req.socket.setTimeout(0);
+      res.statusCode = 200;
+
+      res.setHeader("Content-Type", "text/event-stream");
+      res.setHeader("Cache-Control", "no-cache");
+      res.setHeader("Connection", "keep-alive");
+
+      let message_count = 0;
+
+      resolve((obj, type) => {
+        res.write("id: " + ++message_count + "\n");
+        if ("string" === typeof type) {
+          res.write("event: " + type + "\n");
+        }
+        res.write("data: " + JSON.stringify(obj) + "\n\n");
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
 }
 
 describe("webhook-proxy", () => {
-  let emit: SSEResponse["json"];
+  let emit: Awaited<ReturnType<typeof sse>>;
   let proxy: EventSource;
 
   describe("with a valid proxy server", () => {
@@ -56,14 +78,21 @@ describe("webhook-proxy", () => {
         finishedPromise.reject = reject;
       });
 
-      const app = express();
+      const port = await getPort();
 
-      app.get("/events", sse, (_req: IncomingMessage, res: SSEResponse) => {
-        res.json({}, "ready");
-        emit = res.json;
-      });
+      const server = createServer(
+        async (req: IncomingMessage, res: ServerResponse) => {
+          const path = new URL(req.url!, `http://${req.headers.host}`);
+          if (path.pathname === "/events") {
+            emit = await sse(req, res);
+            emit({}, "ready");
+          } else {
+            res.writeHead(404).end();
+          }
+        },
+      );
 
-      const server = app.listen(await getPort(), async () => {
+      server.listen(port, async () => {
         let { address: targetHost, port: targetPort } =
           server.address() as AddressInfo;
 

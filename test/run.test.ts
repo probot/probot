@@ -2,15 +2,15 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { sign } from "@octokit/webhooks-methods";
-import WebhookExamples, {
-  type WebhookDefinition,
-} from "@octokit/webhooks-examples";
 import { describe, expect, it } from "vitest";
-import getPort from "get-port";
 
 import { type Probot, run } from "../src/index.js";
 
 import { captureLogOutput } from "./helpers/capture-log-output.js";
+import WebhookExamples, {
+  type WebhookDefinition,
+} from "@octokit/webhooks-examples";
+import getPort from "get-port";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -140,32 +140,34 @@ describe("run", () => {
 
     it("custom webhook path", async () => {
       const port = await getPort();
-      const env = { ...defaultEnv, PORT: port.toString() };
+      const env = {
+        ...defaultEnv,
+        PORT: port.toString(),
+        WEBHOOK_PATH: "/custom-webhook",
+      };
       const server = await run(() => {}, {
-        env: {
-          ...env,
-          WEBHOOK_PATH: "/custom-webhook",
-        },
+        env,
         updateEnv: (env) => env,
       });
 
-      const response = await fetch(
-        `http://${server.host}:${server.port}/custom-webhook`,
-        {
-          method: "POST",
-          body: pushEvent,
-          headers: {
-            "content-type": "application/json",
-            "x-github-event": "push",
-            "x-github-delivery": "123",
-            "x-hub-signature-256": await sign("secret", pushEvent),
+      try {
+        const response = await fetch(
+          `http://${server.host}:${server.port}/custom-webhook`,
+          {
+            method: "POST",
+            body: pushEvent,
+            headers: {
+              "content-type": "application/json",
+              "x-github-event": "push",
+              "x-hub-signature-256": await sign("secret", pushEvent),
+              "x-github-delivery": "123",
+            },
           },
-        },
-      );
-
-      expect(response.status).toBe(200);
-
-      await server.stop();
+        );
+        expect(response.status).toBe(200);
+      } finally {
+        await server.stop();
+      }
     });
   });
 });

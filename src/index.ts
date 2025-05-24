@@ -136,3 +136,10 @@ declare global {
     }
   }
 }
+
+declare module "node:http" {
+  interface IncomingMessage {
+    body?: string | Record<string, unknown> | undefined;
+    rawBody?: Buffer | undefined;
+  }
+}

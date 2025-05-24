@@ -11,7 +11,7 @@ import { getLog } from "./helpers/get-log.js";
 import { readCliOptions } from "./bin/read-cli-options.js";
 import { readEnvOptions } from "./bin/read-env-options.js";
 import { Server } from "./server/server.js";
-import { defaultApp } from "./apps/default.js";
+import { defaultApp as defaultAppHandler } from "./apps/default.js";
 import { resolveAppFunction } from "./helpers/resolve-app-function.js";
 import { isProduction } from "./helpers/is-production.js";
 import { type Logger, Probot, type ProbotOctokit } from "./exports.js";
@@ -125,14 +125,14 @@ export async function run(
       }),
     });
 
-    await server.load(
-      setupAppFactory({
-        host: server.host,
-        port: server.port,
-        updateEnv: additionalOptions?.updateEnv || updateEnv,
-        SmeeClient: additionalOptions?.SmeeClient,
-      }),
-    );
+    const setupAppHandler = setupAppFactory({
+      host: server.host,
+      port: server.port,
+      updateEnv: additionalOptions?.updateEnv || updateEnv,
+      SmeeClient: additionalOptions?.SmeeClient,
+    });
+
+    await server.loadHandlerFactory(setupAppHandler);
 
     await server.start();
 
@@ -140,25 +140,30 @@ export async function run(
   }
 
   if (Array.isArray(appFnOrArgv)) {
+    const [appPath] = args;
+
+    if (!appPath) {
+      console.error(
+        "No app path provided. Please provide the path to the app you want to run.",
+      );
+      process.exit(1);
+    }
+
     const pkg = await packageConfig("probot");
-
-    const combinedApps: ApplicationFunction = async (_app) => {
-      await server.load(defaultApp);
-
-      if (Array.isArray(pkg.apps)) {
-        for (const appPath of pkg.apps) {
-          const appFn = await resolveAppFunction(appPath);
-          await server.load(appFn);
-        }
-      }
-
-      const [appPath] = args;
-      const appFn = await resolveAppFunction(appPath);
-      await server.load(appFn);
-    };
-
     server = new Server(serverOptions);
-    await server.load(combinedApps);
+
+    await server.loadHandlerFactory(defaultAppHandler);
+
+    if (Array.isArray(pkg.apps)) {
+      for (const appPath of pkg.apps) {
+        const appFn = await resolveAppFunction(appPath);
+        await server.load(appFn);
+      }
+    }
+
+    const appFn = await resolveAppFunction(appPath);
+    await server.load(appFn);
+
     await server.start();
     return server;
   }

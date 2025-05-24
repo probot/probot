@@ -1,13 +1,15 @@
 import { Writable } from "node:stream";
+
+import { sign } from "@octokit/webhooks-methods";
 import { ManifestCreation } from "../../src/manifest-creation.js";
 import { describe, it, expect } from "vitest";
 import getPort from "get-port";
 import { type ApplicationFunction, Probot, Server } from "../../src/index.js";
 import { pino } from "pino";
+
 import WebhookExamples, {
   type WebhookDefinition,
 } from "@octokit/webhooks-examples";
-import { sign } from "@octokit/webhooks-methods";
 import type { Env } from "../../src/types.js";
 
 let UpdateEnvCalls: Env[] = [];

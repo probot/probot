@@ -4,14 +4,13 @@ import path from "node:path";
 import { randomUUID as uuidv4 } from "node:crypto";
 import { parseArgs } from "node:util";
 
-import express, { Router } from "express";
 import { config as dotenvConfig } from "dotenv";
 dotenvConfig();
 
 import { getPrivateKey } from "@probot/get-private-key";
 import { getLog } from "../helpers/get-log.js";
 
-import { Probot, type ApplicationFunctionOptions } from "../exports.js";
+import { Probot } from "../exports.js";
 import { resolveAppFunction } from "../helpers/resolve-app-function.js";
 import { validateLogFormat } from "../helpers/validate-log-format.js";
 import { validateLogLevel } from "../helpers/validate-log-level.js";
@@ -166,19 +165,15 @@ export async function receive(args: string[]) {
     baseUrl: baseUrl,
   });
 
-  const expressApp = express();
-  const options: ApplicationFunctionOptions = {
-    getRouter: (path: string = "/") => {
-      const newRouter = Router();
-      expressApp.use(path, newRouter);
-      return newRouter;
-    },
-  };
-
   const appFn = await resolveAppFunction(
     path.resolve(process.cwd(), appFunctionFile),
   );
-  await probot.load(appFn, options);
+  await probot.load(appFn, {
+    cwd: process.cwd(),
+    addHandler: () => {
+      throw new Error("No server instance");
+    },
+  });
 
   probot.log.debug("Receiving event", event);
   probot.receive({ name: event as any, payload, id: uuidv4() }).catch(() => {

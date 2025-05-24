@@ -191,7 +191,7 @@ Please add yours!
 import { createNodeMiddleware, createProbot } from "probot";
 import app from "./app.js";
 
-const middleware = createNodeMiddleware(app, { probot: createProbot() });
+const middleware = createNodeMiddleware(app, { probot: createProbot(), webhooksPath: "/" });
 exports.probotApp = (req, res) => {
   middleware(req, res, () => {
     res.writeHead(404);

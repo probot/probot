@@ -92,9 +92,7 @@ describe("end-to-end-tests", () => {
             );
 
             // @ts-ignore
-            expect(req.body).toStrictEqual(
-              JSON.stringify({ body: "Hello World!" }),
-            );
+            expect(req.body).toBe(JSON.stringify({ body: "Hello World!" }));
 
             res.writeHead(201, {
               "content-type": "application/json",

@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import fetchMock from "fetch-mock";
-import { describe, expect, test, beforeEach, afterEach } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import type { Env } from "../src/types.js";
 import { ManifestCreation } from "../src/manifest-creation.js";
@@ -34,26 +34,36 @@ describe("ManifestCreation", () => {
     },
   };
 
-  beforeEach(() => {
+  const reset = (env = {} as Env) => {
+    delete process.env.NODE_ENV;
+    delete process.env.PROJECT_DOMAIN;
+    delete process.env.WEBHOOK_PROXY_URL;
+
+    delete process.env.GHE_HOST;
+    delete process.env.GH_ORG;
+    delete process.env.GHE_PROTOCOL;
+
+    delete process.env.APP_ID;
+    delete process.env.PRIVATE_KEY;
+    delete process.env.WEBHOOK_SECRET;
+    delete process.env.GHE_HOST;
+
+    for (const key of Object.keys(env)) {
+      process.env[key] = env[key];
+    }
+
     updateEnvCalls = [];
+    SmeeClientCreateChannelCalls = [];
+
     setup = new ManifestCreation({
       updateEnv,
     });
-  });
+  };
 
   describe("createWebhookChannel", () => {
-    beforeEach(() => {
-      SmeeClientCreateChannelCalls = [];
-      delete process.env.NODE_ENV;
-      delete process.env.PROJECT_DOMAIN;
-      delete process.env.WEBHOOK_PROXY_URL;
-    });
-
-    afterEach(() => {
-      delete process.env.WEBHOOK_PROXY_URL;
-    });
-
     test("writes new webhook channel to .env", async () => {
+      reset();
+
       await setup.createWebhookChannel({ SmeeClient });
       expect(updateEnvCalls.length).toBe(1);
       expect(Object.keys(updateEnvCalls[0]).length).toBe(1);
@@ -65,46 +75,56 @@ describe("ManifestCreation", () => {
 
   describe("pkg", () => {
     test("gets pkg from package.json", () => {
+      reset();
+
       expect(setup.pkg).toEqual(pkg);
     });
   });
 
   describe("createAppUrl", () => {
-    afterEach(() => {
-      delete process.env.GHE_HOST;
-      delete process.env.GH_ORG;
-      delete process.env.GHE_PROTOCOL;
-    });
-
     test("creates an app url", () => {
+      reset();
+
       expect(setup.createAppUrl).toBe("https://github.com/settings/apps/new");
     });
 
     test("creates an app url when github org is set", () => {
-      process.env.GH_ORG = "testorg";
+      reset({
+        GH_ORG: "testorg",
+      });
+
       expect(setup.createAppUrl).toBe(
         "https://github.com/organizations/testorg/settings/apps/new",
       );
     });
 
     test("creates an app url when github host env is set", () => {
-      process.env.GHE_HOST = "hiimbex.github.com";
+      reset({
+        GHE_HOST: "hiimbex.github.com",
+      });
+
       expect(setup.createAppUrl).toBe(
         "https://hiimbex.github.com/settings/apps/new",
       );
     });
 
     test("creates an app url when github host env and github org is set", () => {
-      process.env.GHE_HOST = "hiimbex.github.com";
-      process.env.GH_ORG = "testorg";
+      reset({
+        GHE_HOST: "hiimbex.github.com",
+        GH_ORG: "testorg",
+      });
+
       expect(setup.createAppUrl).toBe(
         "https://hiimbex.github.com/organizations/testorg/settings/apps/new",
       );
     });
 
     test("creates an app url when github host env and protocol are set", () => {
-      process.env.GHE_HOST = "hiimbex.github.com";
-      process.env.GHE_PROTOCOL = "http";
+      reset({
+        GHE_HOST: "hiimbex.github.com",
+        GHE_PROTOCOL: "http",
+      });
+
       expect(setup.createAppUrl).toBe(
         "http://hiimbex.github.com/settings/apps/new",
       );
@@ -112,14 +132,9 @@ describe("ManifestCreation", () => {
   });
 
   describe("createAppFromCode", () => {
-    afterEach(() => {
-      delete process.env.APP_ID;
-      delete process.env.PRIVATE_KEY;
-      delete process.env.WEBHOOK_SECRET;
-      delete process.env.GHE_HOST;
-    });
-
     test("creates an app from a code", async () => {
+      reset();
+
       const mock = fetchMock
         .createInstance()
         .postOnce("https://api.github.com/app-manifests/123abc/conversions", {
@@ -147,7 +162,9 @@ describe("ManifestCreation", () => {
     });
 
     test("creates an app from a code when github host env is set", async () => {
-      process.env.GHE_HOST = "swinton.github.com";
+      reset({
+        GHE_HOST: "swinton.github.com",
+      });
 
       const mock = fetchMock
         .createInstance()
@@ -160,6 +177,9 @@ describe("ManifestCreation", () => {
         );
 
       const createdApp = await setup.createAppFromCode("123abc", {
+        throttle: {
+          enabled: false, // disable throttling for tests
+        },
         request: {
           fetch: mock.fetchHandler,
         },
@@ -181,6 +201,7 @@ describe("ManifestCreation", () => {
 
   describe("getManifest", () => {
     test("creates an app from a code", () => {
+      reset();
       // checks that getManifest returns a JSON.stringified manifest
       expect(setup.getManifest({ pkg, baseUrl: "localhost://3000" })).toBe(
         '{"description":"A framework for building GitHub Apps to automate and improve your workflow","hook_attributes":{"url":"localhost://3000/"},"name":"probot","public":true,"redirect_url":"localhost://3000/probot/setup","url":"https://probot.github.io","version":"v1"}',
@@ -188,6 +209,8 @@ describe("ManifestCreation", () => {
     });
 
     test("creates an app from a code with overrided values from app.yml", () => {
+      reset();
+
       const appYaml =
         "name: cool-app\ndescription: A description for a cool app";
 

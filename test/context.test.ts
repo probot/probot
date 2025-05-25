@@ -357,10 +357,8 @@ describe("Context", () => {
 
     it("sets x-github-delivery header to event id", async () => {
       const mock = fetchMock.createInstance().getOnce("*", ({ options }) => {
-        expect(
-          // @ts-expect-error
-          options.headers["x-github-delivery"],
-        ).toBe("0");
+        // @ts-expect-error
+        expect(options.headers["x-github-delivery"]).toBe("0");
         return getConfigFile("basic.yml");
       });
 

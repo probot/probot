@@ -457,15 +457,12 @@ describe("Probot", () => {
       });
 
       const handler = vi.fn().mockImplementation((context) => {
-        expect(context.log.info).toBeDefined();
+        expect(typeof context.log.info).toBe("function");
         context.log.info("testing");
 
-        expect(output[0]).toEqual(
-          expect.objectContaining({
-            id: context.id,
-            msg: "testing",
-          }),
-        );
+        expect(output.length).toBe(1);
+        expect(output[0].msg).toBe("testing");
+        expect(output[0].id).toBe(context.id);
       });
 
       probot.on("pull_request", handler);

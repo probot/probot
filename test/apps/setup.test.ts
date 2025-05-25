@@ -9,6 +9,9 @@ import type { Env } from "../../src/types.js";
 import { Probot, Server } from "../../src/index.js";
 import { setupAppFactory } from "../../src/apps/setup.js";
 
+import { importView as importViewTemplate } from "../../src/views/import.js";
+import { successView as successViewTemplate } from "../../src/views/success.js";
+
 describe("Setup app", async () => {
   let logOutput: any[] = [];
 
@@ -219,13 +222,20 @@ describe("Setup app", async () => {
       );
 
       expect(updateEnvCalls.length).toBe(2);
-      expect(updateEnvCalls[1]).toEqual({
-        APP_ID: "id",
-        GITHUB_CLIENT_ID: "Iv1.8a61f9b3a7aba766",
-        GITHUB_CLIENT_SECRET: "1726be1638095a19edd134c77bde3aa2ece1e5d8",
-        PRIVATE_KEY: '"pem"',
-        WEBHOOK_SECRET: "webhook_secret",
-      });
+
+      expect(Object.keys(updateEnvCalls[0]).length).toBe(1);
+      expect(updateEnvCalls[0].WEBHOOK_PROXY_URL).toBe(
+        "https://smee.io/1234ab1234",
+      );
+
+      expect(Object.keys(updateEnvCalls[1]).length).toBe(5);
+      expect(updateEnvCalls[1].APP_ID).toBe("id");
+      expect(updateEnvCalls[1].GITHUB_CLIENT_ID).toBe("Iv1.8a61f9b3a7aba766");
+      expect(updateEnvCalls[1].GITHUB_CLIENT_SECRET).toBe(
+        "1726be1638095a19edd134c77bde3aa2ece1e5d8",
+      );
+      expect(updateEnvCalls[1].PRIVATE_KEY).toBe('"pem"');
+      expect(updateEnvCalls[1].WEBHOOK_SECRET).toBe("webhook_secret");
 
       await server.stop();
     });
@@ -326,7 +336,13 @@ describe("Setup app", async () => {
       );
 
       expect(importView.status).toBe(200);
-      expect(await importView.text()).toMatchSnapshot();
+      expect(await importView.text()).toBe(
+        importViewTemplate({
+          name: "probot",
+          GH_HOST: "https://github.com",
+          WEBHOOK_PROXY_URL: "",
+        }),
+      );
 
       await server.stop();
     });
@@ -376,14 +392,17 @@ describe("Setup app", async () => {
       expect(await response.text()).toBe("");
 
       expect(updateEnvCalls.length).toBe(2);
-      expect(updateEnvCalls[0]).toEqual({
-        WEBHOOK_PROXY_URL: "https://smee.io/1234ab1234",
-      });
-      expect(updateEnvCalls[1]).toEqual({
-        APP_ID: "foo",
-        PRIVATE_KEY: '"bar"',
-        WEBHOOK_SECRET: "baz",
-      });
+
+      expect(Object.keys(updateEnvCalls[0]).length).toBe(1);
+
+      expect(updateEnvCalls[0].WEBHOOK_PROXY_URL).toBe(
+        "https://smee.io/1234ab1234",
+      );
+
+      expect(Object.keys(updateEnvCalls[1]).length).toBe(3);
+      expect(updateEnvCalls[1].APP_ID).toBe("foo");
+      expect(updateEnvCalls[1].PRIVATE_KEY).toBe('"bar"');
+      expect(updateEnvCalls[1].WEBHOOK_SECRET).toBe("baz");
 
       await server.stop();
     });
@@ -464,12 +483,17 @@ describe("Setup app", async () => {
       );
 
       expect(successResponse.status).toBe(200);
-      expect(await successResponse.text()).toMatchSnapshot();
+      expect(await successResponse.text()).toBe(
+        successViewTemplate({
+          name: "probot",
+        }),
+      );
 
       expect(updateEnvCalls.length).toBe(1);
-      expect(updateEnvCalls[0]).toEqual({
-        WEBHOOK_PROXY_URL: "https://smee.io/1234ab1234",
-      });
+      expect(Object.keys(updateEnvCalls[0]).length).toBe(1);
+      expect(updateEnvCalls[0].WEBHOOK_PROXY_URL).toBe(
+        "https://smee.io/1234ab1234",
+      );
       expect(SmeeClientCreateChannelCalls.length).toBe(1);
 
       await server.stop();

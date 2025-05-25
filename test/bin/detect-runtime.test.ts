@@ -39,7 +39,7 @@ describe("detectRuntime", () => {
           detectRuntime(value as any);
           throw new Error("Should have thrown");
         } catch (error) {
-          expect(error).toBeInstanceOf(Error);
+          expect(error instanceof Error).toBe(true);
           expect((error as Error).message).toBe("Unable to detect runtime");
         }
       });

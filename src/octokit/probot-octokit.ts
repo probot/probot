@@ -2,7 +2,7 @@ import { Octokit } from "@octokit/core";
 import { enterpriseCompatibility } from "@octokit/plugin-enterprise-compatibility";
 import type { RequestOptions } from "@octokit/types";
 import { paginateRest } from "@octokit/plugin-paginate-rest";
-import { legacyRestEndpointMethods } from "@octokit/plugin-rest-endpoint-methods";
+import { restEndpointMethods } from "@octokit/plugin-rest-endpoint-methods";
 import { retry } from "@octokit/plugin-retry";
 import { throttling } from "@octokit/plugin-throttling";
 import { config } from "@probot/octokit-plugin-config";
@@ -43,13 +43,13 @@ export const ProbotOctokit: typeof Octokit &
   Constructor<
     ReturnType<typeof retry> &
       ReturnType<typeof paginateRest> &
-      ReturnType<typeof legacyRestEndpointMethods> &
+      ReturnType<typeof restEndpointMethods> &
       ReturnType<typeof config>
   > = Octokit.plugin(
   throttling,
   retry,
   paginateRest,
-  legacyRestEndpointMethods,
+  restEndpointMethods,
   enterpriseCompatibility,
   probotRequestLogging,
   config,

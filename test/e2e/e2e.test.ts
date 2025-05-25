@@ -140,7 +140,7 @@ describe("end-to-end-tests", () => {
     });
 
     // the probot process should be successfully started
-    expect(probotProcess.exitCode).toBeNull();
+    expect(probotProcess.exitCode).toBe(null);
 
     // send webhook event request
     const body = JSON.stringify({
@@ -178,6 +178,7 @@ describe("end-to-end-tests", () => {
       const awaitedProcess = await probotProcess;
       console.log(awaitedProcess.stdout);
       console.log(awaitedProcess.stderr);
+      throw error;
     } finally {
       server.close();
       try {

@@ -13,7 +13,7 @@ describe("validateLogFormat", () => {
   it("throws on invalid file type", () => {
     try {
       validateLogFormat(1);
-      throw new Error("Expected an error to be thrown");
+      throw new Error("Should have thrown");
     } catch (error) {
       expect(error instanceof Error).toBe(true);
       expect((error as Error).message).toBe("Invalid log format");
@@ -23,7 +23,7 @@ describe("validateLogFormat", () => {
   it("throws on invalid format", () => {
     try {
       validateLogFormat("invalid");
-      throw new Error("Expected an error to be thrown");
+      throw new Error("Should have thrown");
     } catch (error) {
       expect(error instanceof Error).toBe(true);
       expect((error as Error).message).toBe("Invalid log format");

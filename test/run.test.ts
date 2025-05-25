@@ -154,24 +154,22 @@ describe("run", () => {
         updateEnv: (env) => env,
       });
 
-      try {
-        const response = await fetch(
-          `http://${server.host}:${server.port}/custom-webhook`,
-          {
-            method: "POST",
-            body: pushEvent,
-            headers: {
-              "content-type": "application/json",
-              "x-github-event": "push",
-              "x-hub-signature-256": await sign("secret", pushEvent),
-              "x-github-delivery": "123",
-            },
+      const response = await fetch(
+        `http://${server.host}:${server.port}/custom-webhook`,
+        {
+          method: "POST",
+          body: pushEvent,
+          headers: {
+            "content-type": "application/json",
+            "x-github-event": "push",
+            "x-hub-signature-256": await sign("secret", pushEvent),
+            "x-github-delivery": "123",
           },
-        );
-        expect(response.status).toBe(200);
-      } finally {
-        await server.stop();
-      }
+        },
+      );
+
+      expect(response.status).toBe(200);
+      await server.stop();
     });
   });
 });

@@ -37,7 +37,7 @@ describe("detectRuntime", () => {
       it(`throws an error if runtime cannot be detected - ${JSON.stringify(value)}`, () => {
         try {
           detectRuntime(value as any);
-          throw new Error("Expected an error to be thrown");
+          throw new Error("Should have thrown");
         } catch (error) {
           expect(error).toBeInstanceOf(Error);
           expect((error as Error).message).toBe("Unable to detect runtime");

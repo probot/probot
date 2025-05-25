@@ -81,7 +81,7 @@ describe("Server", () => {
       expect(await response.text()).toBe("PONG");
 
       expect(output.length).toBe(3);
-      expect(output[2].msg).toContain("GET /ping 200 -");
+      expect(output[2].msg.slice(0, 15)).toBe("GET /ping 200 -");
 
       await server.stop();
     });
@@ -130,7 +130,9 @@ describe("Server", () => {
       expect(response.status).toBe(200);
 
       expect(output.length).toBe(3);
-      expect(output[2].msg).toContain("POST /api/github/webhooks 200 -");
+      expect(output[2].msg.slice(0, 31)).toBe(
+        "POST /api/github/webhooks 200 -",
+      );
 
       await server.stop();
     });
@@ -159,7 +161,7 @@ describe("Server", () => {
 
         expect(response.status).toBe(404);
         expect(output.length).toBe(3);
-        expect(output[2].msg).toContain("GET /notfound 404 -");
+        expect(output[2].msg.slice(0, 19)).toBe("GET /notfound 404 -");
 
         await server.stop();
       });
@@ -228,7 +230,7 @@ describe("Server", () => {
       expect(await response.text()).toBe("");
 
       expect(output.length).toBe(3);
-      expect(output[2].msg).toContain("GET /notfound 404 -");
+      expect(output[2].msg.slice(0, 19)).toBe("GET /notfound 404 -");
 
       await server.stop();
     });

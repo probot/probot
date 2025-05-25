@@ -7,14 +7,12 @@ export async function captureLogOutput(
 ): Promise<string> {
   let outputData = "";
 
-  // @ts-expect-error
+  // @ts-expect-error Store the original write function to restore later
   const streamSymWrite = log[pinoSymbols.streamSym]["write"];
 
-  // @ts-expect-error
+  // @ts-expect-error Override the write function to capture output
   log[pinoSymbols.streamSym]["write"] = (data: string) => {
     outputData += data;
-    // @ts-expect-error
-    streamSymWrite.call(log[pinoSymbols.streamSym], data);
   };
 
   try {
@@ -22,7 +20,7 @@ export async function captureLogOutput(
 
     return outputData;
   } finally {
-    // @ts-expect-error
+    // @ts-expect-error Reset the write function to its original state
     log[pinoSymbols.streamSym]["write"] = streamSymWrite;
   }
 }

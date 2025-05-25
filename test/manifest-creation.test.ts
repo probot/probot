@@ -77,7 +77,7 @@ describe("ManifestCreation", () => {
     test("gets pkg from package.json", () => {
       reset();
 
-      expect(setup.pkg).toEqual(pkg);
+      expect(JSON.stringify(setup.pkg)).toBe(JSON.stringify(pkg));
     });
   });
 

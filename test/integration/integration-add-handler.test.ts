@@ -100,7 +100,7 @@ describe("run", () => {
     );
 
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({ hello: "world" });
+    expect(await response.text()).toBe('{"hello":"world"}');
 
     await server.stop();
   });
@@ -139,7 +139,7 @@ describe("run", () => {
     );
 
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({ hello: "world" });
+    expect(await response.text()).toBe('{"hello":"world"}');
 
     await server.stop();
   });
@@ -189,7 +189,7 @@ describe("createNodeMiddleware", () => {
     const response = await fetch(`http://${host}:${port}/hello-world`);
 
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({ hello: "world" });
+    expect(await response.text()).toBe('{"hello":"world"}');
 
     server.close();
   });
@@ -241,7 +241,7 @@ describe("createNodeMiddleware", () => {
     const response = await fetch(`http://${host}:${port}/hello-world`);
 
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({ hello: "world" });
+    expect(await response.text()).toBe('{"hello":"world"}');
 
     server.close();
   });

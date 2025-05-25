@@ -460,6 +460,6 @@ describe("ProbotOctokit", () => {
         per_page: 1,
       }),
     );
-    expect(res).toEqual(issues);
+    expect(JSON.stringify(res)).toBe(JSON.stringify(issues));
   });
 });

@@ -276,21 +276,10 @@ describe("Context", () => {
   });
 
   describe("config", () => {
-    let octokit: ProbotOctokit;
-
     function getConfigFile(fileName: string) {
       const configPath = path.join(__dirname, "fixtures", "config", fileName);
       return fs.readFileSync(configPath, { encoding: "utf8" });
     }
-
-    beforeEach(() => {
-      octokit = new ProbotOctokit({
-        retry: { enabled: false },
-        throttle: { enabled: false },
-      });
-      // @ts-ignore - Expression produces a union type that is too complex to represent
-      context = new Context(event, octokit, {} as any);
-    });
 
     it("gets a valid configuration", async () => {
       const mock = fetchMock

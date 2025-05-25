@@ -103,7 +103,7 @@ describe("Probot", () => {
         request: { fetch: mock.fetchHandler },
       });
       const octokit = await probot.auth();
-      await octokit.apps.getAuthenticated();
+      await octokit.rest.apps.getAuthenticated();
     });
   });
 

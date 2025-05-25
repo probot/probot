@@ -29,7 +29,7 @@ describe("ProbotOctokit", () => {
       },
     });
 
-    expect((await octokit.users.getAuthenticated({})).data).toEqual(
+    expect((await octokit.rest.users.getAuthenticated({})).data).toEqual(
       '{"login": "ohai"}',
     );
   });
@@ -360,7 +360,7 @@ describe("ProbotOctokit", () => {
       callCountSpy++;
     };
     const res = await octokit.paginate(
-      octokit.issues.listForRepo.endpoint.merge({
+      octokit.rest.issues.listForRepo.endpoint.merge({
         owner: "JasonEtco",
         repo: "pizza",
         per_page: 1,
@@ -417,7 +417,7 @@ describe("ProbotOctokit", () => {
       if (response.data[0].id === 2) done();
     }) as any;
     const res = await octokit.paginate(
-      octokit.issues.listForRepo.endpoint.merge({
+      octokit.rest.issues.listForRepo.endpoint.merge({
         owner: "JasonEtco",
         repo: "pizza",
         per_page: 1,
@@ -467,7 +467,7 @@ describe("ProbotOctokit", () => {
       },
     });
     const res = await octokit.paginate(
-      octokit.issues.listForRepo.endpoint.merge({
+      octokit.rest.issues.listForRepo.endpoint.merge({
         owner: "JasonEtco",
         repo: "pizza",
         per_page: 1,

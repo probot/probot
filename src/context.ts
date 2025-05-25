@@ -202,8 +202,8 @@ export class Context<Event extends WebhookEvents = WebhookEvents> {
    * const config = await context.config('config.yml')
    *
    * if (config.close) {
-   *   context.octokit.issues.comment(context.issue({body: config.comment}))
-   *   context.octokit.issues.edit(context.issue({state: 'closed'}))
+   *   context.octokit.rest.issues.comment(context.issue({body: config.comment}))
+   *   context.octokit.rest.issues.edit(context.issue({state: 'closed'}))
    * }
    * ```
    *
@@ -214,8 +214,8 @@ export class Context<Event extends WebhookEvents = WebhookEvents> {
    * const config = await context.config('config.yml', {comment: 'Make sure to check all the specs.'})
    *
    * if (config.close) {
-   *   context.octokit.issues.comment(context.issue({body: config.comment}));
-   *   context.octokit.issues.edit(context.issue({state: 'closed'}))
+   *   context.octokit.rest.issues.comment(context.issue({body: config.comment}));
+   *   context.octokit.rest.issues.edit(context.issue({state: 'closed'}))
    * }
    * ```
    *

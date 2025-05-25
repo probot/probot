@@ -27,12 +27,22 @@ describe("validateLogLevel", () => {
   });
 
   it("throws on invalid log level data type", () => {
-    expect(() => validateLogLevel(1)).toThrowError(Error(`Invalid log level`));
+    try {
+      validateLogLevel(1);
+      throw new Error("Expected an error to be thrown");
+    } catch (error) {
+      expect(error instanceof Error).toBe(true);
+      expect((error as Error).message).toBe("Invalid log level");
+    }
   });
 
   it("throws on invalid log level", () => {
-    expect(() => validateLogLevel("invalid")).toThrowError(
-      Error(`Invalid log level`),
-    );
+    try {
+      validateLogLevel("invalid");
+      throw new Error("Expected an error to be thrown");
+    } catch (error) {
+      expect(error instanceof Error).toBe(true);
+      expect((error as Error).message).toBe("Invalid log level");
+    }
   });
 });

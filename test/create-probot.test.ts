@@ -186,9 +186,11 @@ describe("createProbot", () => {
       const octokit = await probot.auth();
       octokit.log.info("Ciao");
     }, probot.log);
-    expect(JSON.parse(outputData)).toMatchObject({
-      myMessage: "Ciao",
-      name: "octokit",
-    });
+
+    const data = JSON.parse(outputData);
+
+    expect(data.level).toBe(30); // info level
+    expect(data.myMessage).toBe("Ciao");
+    expect(data.name).toBe("octokit");
   });
 });

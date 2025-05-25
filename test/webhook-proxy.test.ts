@@ -168,7 +168,8 @@ describe("webhook-proxy", () => {
       finishedPromise.reject = reject;
     });
 
-    const url = `http://bad.n${randomInt(1e10).toString(36)}.proxy/events`;
+    const domain = "bad.n" + randomInt(1e10).toString(36) + ".proxy";
+    const url = `http://${domain}/events`;
 
     const logger = getLog({ level: "fatal" }).child({});
 
@@ -188,7 +189,9 @@ describe("webhook-proxy", () => {
     proxy.addEventListener("error", (error: any) => {
       switch (detectRuntime(globalThis)) {
         case "node":
-          expect(error.message).toMatch(/getaddrinfo ENOTFOUND/);
+          expect(error.message).toBe(
+            `TypeError: fetch failed: getaddrinfo ENOTFOUND ${domain}`,
+          );
           break;
         case "bun":
           expect(error.message).toBe(

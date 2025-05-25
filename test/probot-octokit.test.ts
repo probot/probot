@@ -72,7 +72,7 @@ describe("ProbotOctokit", () => {
           expect(url).toBe("https://api.github.com/");
           expect(options.method).toBe("GET");
           expect(options.headers.accept).toBe("application/vnd.github.v3+json");
-          expect(options.headers["user-agent"]).toMatch(/^probot\//);
+          expect(options.headers["user-agent"].slice(0, 7)).toBe("probot/");
           expect(options.signal).toBe(undefined);
           expect(options.body).toBe(undefined);
 
@@ -113,7 +113,7 @@ describe("ProbotOctokit", () => {
           expect(url).toBe("https://api.github.com/");
           expect(options.method).toBe("GET");
           expect(options.headers.accept).toBe("application/vnd.github.v3+json");
-          expect(options.headers["user-agent"]).toMatch(/^probot\//);
+          expect(options.headers["user-agent"].slice(0, 7)).toBe("probot/");
           expect(options.signal).toBe(undefined);
           expect(options.body).toBe(undefined);
 
@@ -166,7 +166,7 @@ describe("ProbotOctokit", () => {
           expect(url).toBe("https://api.github.com/");
           expect(options.method).toBe("GET");
           expect(options.headers.accept).toBe("application/vnd.github.v3+json");
-          expect(options.headers["user-agent"]).toMatch(/^probot\//);
+          expect(options.headers["user-agent"].slice(0, 7)).toBe("probot/");
           expect(options.signal).toBe(undefined);
           expect(options.body).toBe(undefined);
 
@@ -215,7 +215,7 @@ describe("ProbotOctokit", () => {
           expect(url).toBe("https://api.github.com/");
           expect(options.method).toBe("GET");
           expect(options.headers.accept).toBe("application/vnd.github.v3+json");
-          expect(options.headers["user-agent"]).toMatch(/^probot\//);
+          expect(options.headers["user-agent"].slice(0, 7)).toBe("probot/");
           expect(options.signal).toBe(undefined);
           expect(options.body).toBe(undefined);
 
@@ -267,7 +267,7 @@ describe("ProbotOctokit", () => {
           expect(url).toBe("https://api.github.com/");
           expect(options.method).toBe("GET");
           expect(options.headers.accept).toBe("application/vnd.github.v3+json");
-          expect(options.headers["user-agent"]).toMatch(/^probot\//);
+          expect(options.headers["user-agent"].slice(0, 7)).toBe("probot/");
           expect(options.signal).toBe(undefined);
           expect(options.body).toBe(undefined);
 
@@ -305,7 +305,7 @@ describe("ProbotOctokit", () => {
   });
 
   it("paginate returns an array of pages", async () => {
-    expect.assertions(33);
+    expect.assertions(49);
 
     let callCount = 0;
     const octokit = new ProbotOctokit({
@@ -317,15 +317,16 @@ describe("ProbotOctokit", () => {
               "https://api.github.com/repos/JasonEtco/pizza/issues?per_page=1",
             );
           } else {
-            expect(url).toMatch(
-              new RegExp(
-                "^https://api\\.github\\.com/repositories/[0-9]+/issues\\?per_page=[0-9]+&page=[0-9]+$",
-              ),
-            );
+            const { host, protocol, pathname, searchParams } = new URL(url);
+            expect(protocol).toBe("https:");
+            expect(host).toBe("api.github.com");
+            expect(pathname).toBe("/repositories/123/issues");
+            expect(searchParams.get("per_page")).toBe("1");
+            expect(searchParams.get("page")).toBe((callCount - 1).toString());
           }
           expect(options.method).toBe("GET");
           expect(options.headers.accept).toBe("application/vnd.github.v3+json");
-          expect(options.headers["user-agent"]).toMatch(/^probot\//);
+          expect(options.headers["user-agent"].slice(0, 7)).toBe("probot/");
           expect(options.signal).toBe(undefined);
           expect(options.body).toBe(undefined);
 
@@ -371,15 +372,16 @@ describe("ProbotOctokit", () => {
               "https://api.github.com/repos/JasonEtco/pizza/issues?per_page=1",
             );
           } else {
-            expect(url).toMatch(
-              new RegExp(
-                "^https://api\\.github\\.com/repositories/[0-9]+/issues\\?per_page=[0-9]+&page=[0-9]+$",
-              ),
-            );
+            const { host, protocol, pathname, searchParams } = new URL(url);
+            expect(protocol).toBe("https:");
+            expect(host).toBe("api.github.com");
+            expect(pathname).toBe("/repositories/123/issues");
+            expect(searchParams.get("per_page")).toBe("1");
+            expect(searchParams.get("page")).toBe((callCount - 1).toString());
           }
           expect(options.method).toBe("GET");
           expect(options.headers.accept).toBe("application/vnd.github.v3+json");
-          expect(options.headers["user-agent"]).toMatch(/^probot\//);
+          expect(options.headers["user-agent"].slice(0, 7)).toBe("probot/");
           expect(options.signal).toBe(undefined);
           expect(options.body).toBe(undefined);
 
@@ -425,15 +427,16 @@ describe("ProbotOctokit", () => {
               "https://api.github.com/repos/JasonEtco/pizza/issues?per_page=1",
             );
           } else {
-            expect(url).toMatch(
-              new RegExp(
-                "^https://api\\.github\\.com/repositories/[0-9]+/issues\\?per_page=[0-9]+&page=[0-9]+$",
-              ),
-            );
+            const { host, protocol, pathname, searchParams } = new URL(url);
+            expect(protocol).toBe("https:");
+            expect(host).toBe("api.github.com");
+            expect(pathname).toBe("/repositories/123/issues");
+            expect(searchParams.get("per_page")).toBe("1");
+            expect(searchParams.get("page")).toBe((callCount - 1).toString());
           }
           expect(options.method).toBe("GET");
           expect(options.headers.accept).toBe("application/vnd.github.v3+json");
-          expect(options.headers["user-agent"]).toMatch(/^probot\//);
+          expect(options.headers["user-agent"].slice(0, 7)).toBe("probot/");
           expect(options.signal).toBe(undefined);
           expect(options.body).toBe(undefined);
 

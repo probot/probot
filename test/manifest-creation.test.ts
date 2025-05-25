@@ -56,9 +56,10 @@ describe("ManifestCreation", () => {
     test("writes new webhook channel to .env", async () => {
       await setup.createWebhookChannel({ SmeeClient });
       expect(updateEnvCalls.length).toBe(1);
-      expect(updateEnvCalls[0]).toEqual({
-        WEBHOOK_PROXY_URL: "https://smee.io/1234ab1234",
-      });
+      expect(Object.keys(updateEnvCalls[0]).length).toBe(1);
+      expect(updateEnvCalls[0].WEBHOOK_PROXY_URL).toBe(
+        "https://smee.io/1234ab1234",
+      );
     });
   });
 
@@ -134,12 +135,15 @@ describe("ManifestCreation", () => {
       expect(createdApp).toBe("https://github.com/apps/testerino0000000");
       // expect dotenv to be called with id, webhook_secret, pem
       expect(updateEnvCalls.length).toBe(1);
-      expect(updateEnvCalls[0]).toEqual({
-        APP_ID: "6666",
-        PRIVATE_KEY:
-          '"-----BEGIN RSA PRIVATE KEY-----\nsecrets\n-----END RSA PRIVATE KEY-----\n"',
-        WEBHOOK_SECRET: "12345abcde",
-      });
+
+      expect(Object.keys(updateEnvCalls[0]).length).toBe(5);
+      expect(updateEnvCalls[0].APP_ID).toBe("6666");
+      expect(updateEnvCalls[0].PRIVATE_KEY).toBe(
+        '"-----BEGIN RSA PRIVATE KEY-----\nsecrets\n-----END RSA PRIVATE KEY-----\n"',
+      );
+      expect(updateEnvCalls[0].WEBHOOK_SECRET).toBe("12345abcde");
+      expect(updateEnvCalls[0].GITHUB_CLIENT_ID).toBe(undefined);
+      expect(updateEnvCalls[0].GITHUB_CLIENT_SECRET).toBe(undefined);
     });
 
     test("creates an app from a code when github host env is set", async () => {

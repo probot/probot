@@ -3,7 +3,7 @@ import { Stream } from "node:stream";
 import fetchMock from "fetch-mock";
 import { pino } from "pino";
 import getPort from "get-port";
-import { beforeEach, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import type { Env } from "../../src/types.js";
 import { Probot, Server } from "../../src/index.js";
@@ -35,14 +35,16 @@ describe("Setup app", async () => {
     },
   };
 
-  beforeEach(async () => {
+  const reset = () => {
     logOutput = [];
     updateEnvCalls = [];
     SmeeClientCreateChannelCalls = [];
-  });
+  };
 
   describe("logs", () => {
     it("should log welcome message", async () => {
+      reset();
+
       const server = new Server({
         Probot: Probot.defaults({
           log: pino(streamLogsToOutput),
@@ -98,6 +100,8 @@ describe("Setup app", async () => {
     });
 
     it("should log welcome message with custom host and port", async () => {
+      reset();
+
       const port = await getPort();
 
       const server = new Server({
@@ -133,6 +137,8 @@ describe("Setup app", async () => {
 
   describe("GET /probot", () => {
     it("returns a 200 response", async () => {
+      reset();
+
       const server = new Server({
         Probot: Probot.defaults({
           log: pino(streamLogsToOutput),
@@ -165,6 +171,8 @@ describe("Setup app", async () => {
 
   describe("GET /probot/setup", () => {
     it("returns a redirect", async () => {
+      reset();
+
       const mock = fetchMock
         .createInstance()
         .postOnce("https://api.github.com/app-manifests/123/conversions", {
@@ -241,6 +249,8 @@ describe("Setup app", async () => {
     });
 
     it("throws a 400 Error if code is not provided", async () => {
+      reset();
+
       const server = new Server({
         Probot: Probot.defaults({
           log: pino(streamLogsToOutput),
@@ -274,6 +284,8 @@ describe("Setup app", async () => {
     });
 
     it("throws a 400 Error if code is an empty string", async () => {
+      reset();
+
       const server = new Server({
         Probot: Probot.defaults({
           log: pino(streamLogsToOutput),
@@ -309,6 +321,8 @@ describe("Setup app", async () => {
 
   describe("GET /probot/import", () => {
     it("renders importView", async () => {
+      reset();
+
       const server = new Server({
         Probot: Probot.defaults({
           log: pino(streamLogsToOutput),
@@ -350,6 +364,8 @@ describe("Setup app", async () => {
 
   describe("POST /probot/import", () => {
     it("updates .env", async () => {
+      reset();
+
       const server = new Server({
         Probot: Probot.defaults({
           log: pino(streamLogsToOutput),
@@ -408,6 +424,8 @@ describe("Setup app", async () => {
     });
 
     it("400 when keys are missing", async () => {
+      reset();
+
       const server = new Server({
         Probot: Probot.defaults({
           log: pino(streamLogsToOutput),
@@ -457,6 +475,8 @@ describe("Setup app", async () => {
 
   describe("GET /probot/success", () => {
     it("returns a 200 response", async () => {
+      reset();
+
       const server = new Server({
         Probot: Probot.defaults({
           log: pino(streamLogsToOutput),

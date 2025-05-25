@@ -8,7 +8,7 @@ import type {
 } from "@octokit/webhooks";
 import WebhookExamples from "@octokit/webhooks-examples";
 import fetchMock from "fetch-mock";
-import { describe, expect, test, beforeEach, it } from "vitest";
+import { describe, expect, test, it } from "vitest";
 
 import { Context } from "../src/index.js";
 import { ProbotOctokit } from "../src/octokit/probot-octokit.js";
@@ -82,22 +82,21 @@ describe("Context", () => {
   });
 
   describe("repo", () => {
-    let event: WebhookEvent<"push">;
-    let context: Context<"push">;
-    beforeEach(() => {
-      event = {
-        id: "123",
-        name: "push",
-        payload: pushEventPayload,
-      };
-      let octokit = {
+    const event = {
+      id: "123",
+      name: "push",
+      payload: pushEventPayload,
+    } as WebhookEvent<"push">;
+
+    const context = new Context<"push">(
+      event,
+      {
         hook: {
           before: () => {},
         },
-      };
-
-      context = new Context<"push">(event, octokit as any, {} as any);
-    });
+      } as any,
+      {} as any,
+    );
 
     it("returns attributes from repository payload", () => {
       const repository = context.repo();
@@ -131,14 +130,18 @@ describe("Context", () => {
     // The `repository` object on the push event has a different format than the other events
     // https://docs.github.com/en/developers/webhooks-and-events/webhook-events-and-payloads#push
     it("properly handles the push event", () => {
-      event.payload = require("./fixtures/webhook/push") as PushEvent;
+      const pushEvent = {
+        ...event,
+        payload: require("./fixtures/webhook/push") as PushEvent,
+      };
+
       let octokit = {
         hook: {
           before: () => {},
         },
       };
 
-      context = new Context<"push">(event, octokit as any, {} as any);
+      const context = new Context<"push">(pushEvent, octokit as any, {} as any);
 
       const repository = context.repo();
 
@@ -149,7 +152,7 @@ describe("Context", () => {
     });
 
     it("return error for context.repo() when repository doesn't exist", () => {
-      event = {
+      const event = {
         id: "123",
         name: "push",
         payload: { ...pushEventPayload, repository: undefined as any },
@@ -160,7 +163,11 @@ describe("Context", () => {
         },
       };
 
-      context = new Context<"push">(event, octokit as any, {} as any);
+      const context = new Context<"push">(
+        event as WebhookEvent<"push">,
+        octokit as any,
+        {} as any,
+      );
       try {
         context.repo();
         throw new Error("Should have thrown");
@@ -173,22 +180,20 @@ describe("Context", () => {
   });
 
   describe("issue", () => {
-    let event: WebhookEvent<"issues">;
-    let context: Context<"issues">;
-    beforeEach(() => {
-      event = {
+    const context = new Context<"issues">(
+      {
         id: "123",
         name: "issues",
         payload: issuesEventPayload,
-      };
-      let octokit = {
+      } as WebhookEvent<"issues">,
+      {
         hook: {
           before: () => {},
         },
-      };
+      } as any,
+      {} as any,
+    );
 
-      context = new Context<"issues">(event, octokit as any, {} as any);
-    });
     it("returns attributes from repository payload", () => {
       const issue = context.issue();
 
@@ -223,22 +228,21 @@ describe("Context", () => {
   });
 
   describe("pullRequest", () => {
-    let event: WebhookEvent<"pull_request">;
-    let context: Context<"pull_request">;
-    beforeEach(() => {
-      event = {
-        id: "123",
-        name: "pull_request",
-        payload: pullRequestEventPayload,
-      };
-      let octokit = {
+    const event = {
+      id: "123",
+      name: "pull_request",
+      payload: pullRequestEventPayload,
+    } as WebhookEvent<"pull_request">;
+    const context = new Context<"pull_request">(
+      event,
+      {
         hook: {
           before: () => {},
         },
-      };
+      } as any,
+      {} as any,
+    );
 
-      context = new Context<"pull_request">(event, octokit as any, {} as any);
-    });
     it("returns attributes from repository payload", () => {
       const pullRequest = context.pullRequest();
 

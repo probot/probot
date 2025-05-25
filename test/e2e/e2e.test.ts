@@ -1,4 +1,3 @@
-import { once } from "node:events";
 import {
   createServer,
   type IncomingMessage,
@@ -103,12 +102,12 @@ describe("end-to-end-tests", () => {
       }
     };
 
-    const server = createServer(bodyParser(handler)).listen(
-      mockServerPort,
-      "localhost",
+    const server = await new Promise<ReturnType<typeof createServer>>(
+      (resolve) => {
+        const server = createServer(bodyParser(handler));
+        server.listen(mockServerPort, "localhost", () => resolve(server));
+      },
     );
-
-    await once(server, "listening");
 
     const probotProcessAbortController = new AbortController();
 

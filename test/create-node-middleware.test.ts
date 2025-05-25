@@ -3,7 +3,6 @@ import {
   type IncomingMessage,
   type ServerResponse,
 } from "node:http";
-import { once } from "node:events";
 import Stream from "node:stream";
 
 import { pino } from "pino";
@@ -86,9 +85,8 @@ describe("createNodeMiddleware", () => {
     });
 
     const server = createServer(middleware);
-    server.listen();
 
-    await once(server, "listening");
+    await new Promise<void>((resolve) => server.listen(resolve));
 
     const port = (server.address() as any).port;
 
@@ -143,9 +141,8 @@ describe("createNodeMiddleware", () => {
     });
 
     const server = createServer(middleware);
-    server.listen();
 
-    await once(server, "listening");
+    await new Promise<void>((resolve) => server.listen(resolve));
 
     const port = (server.address() as any).port;
 
@@ -200,9 +197,8 @@ describe("createNodeMiddleware", () => {
     });
 
     const server = createServer(middleware);
-    server.listen();
 
-    await once(server, "listening");
+    await new Promise<void>((resolve) => server.listen(resolve));
 
     const port = (server.address() as any).port;
 

@@ -1,4 +1,3 @@
-import { once } from "node:events";
 import {
   createServer,
   type IncomingMessage,
@@ -60,9 +59,7 @@ describe("logging", () => {
 
     const port = await getPort();
 
-    server.listen(port);
-
-    await once(server, "listening");
+    await new Promise<void>((resolve) => server.listen(port, resolve));
 
     const response = await fetch(`http://localhost:${port}/`, {
       method: "GET",
@@ -97,9 +94,7 @@ describe("logging", () => {
 
     const port = await getPort();
 
-    server.listen(port);
-
-    await once(server, "listening");
+    await new Promise<void>((resolve) => server.listen(port, resolve));
 
     const response = await fetch(`http://localhost:${port}/`, {
       method: "GET",
@@ -122,9 +117,7 @@ describe("logging", () => {
 
     const port = await getPort();
 
-    server.listen(port);
-
-    await once(server, "listening");
+    await new Promise<void>((resolve) => server.listen(port, resolve));
 
     const response = await fetch(`http://localhost:${port}/`, {
       method: "GET",
@@ -152,9 +145,7 @@ describe("logging", () => {
 
     const port = await getPort();
 
-    server.listen(port);
-
-    await once(server, "listening");
+    await new Promise<void>((resolve) => server.listen(port, resolve));
 
     const response = await fetch(`http://localhost:${port}/`, {
       method: "GET",

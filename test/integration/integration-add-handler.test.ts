@@ -1,5 +1,4 @@
 import { createServer } from "node:http";
-import { once } from "node:events";
 
 import express from "express";
 import Fastify from "fastify";
@@ -175,9 +174,8 @@ describe("createNodeMiddleware", () => {
     });
 
     const server = createServer(middleware);
-    server.listen(port);
 
-    await once(server, "listening");
+    await new Promise<void>((resolve) => server.listen(port, resolve));
 
     let { address: host } = server.address() as {
       port: number;
@@ -227,9 +225,8 @@ describe("createNodeMiddleware", () => {
     });
 
     const server = createServer(middleware);
-    server.listen(port);
 
-    await once(server, "listening");
+    await new Promise<void>((resolve) => server.listen(port, resolve));
 
     let { address: host } = server.address() as {
       port: number;

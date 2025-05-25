@@ -74,14 +74,19 @@ describe("logging", () => {
     });
 
     expect(response.status).toBe(200);
-    expect(response.headers.get("x-test-header")).toEqual("testing");
+    expect(response.headers.get("x-test-header")).toBe("testing");
 
-    expect(output[0].req.id).toBeTruthy();
-    expect(typeof output[0].responseTime).toEqual("number");
+    expect(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[0-9a-f]{4}-[0-9a-f]{12}$/u.test(
+        output[0].req.id,
+      ),
+      output[0].req.id,
+    ).toBe(true);
+    expect(typeof output[0].responseTime).toBe("number");
 
-    expect(output[0].req.headers["accept-encoding"]).toEqual("gzip, deflate");
-    expect(output[0].req.headers.connection).toEqual("close");
-    expect(output[0].req.url).toEqual("/");
+    expect(output[0].req.headers["accept-encoding"]).toBe("gzip, deflate");
+    expect(output[0].req.headers.connection).toBe("close");
+    expect(output[0].req.url).toBe("/");
 
     server.close();
   });
@@ -106,7 +111,7 @@ describe("logging", () => {
     });
 
     expect(response.status).toBe(200);
-    expect(output[0].req.id).toEqual("42");
+    expect(output[0].req.id).toBe("42");
 
     server.close();
   });
@@ -131,8 +136,8 @@ describe("logging", () => {
     });
 
     expect(response.status).toBe(200);
-    expect(output[0].req.id).toEqual("a-b-c");
-    expect(output[0].req.headers["x-github-delivery"]).toEqual("a-b-c");
+    expect(output[0].req.id).toBe("a-b-c");
+    expect(output[0].req.headers["x-github-delivery"]).toBe("a-b-c");
 
     server.close();
   });
@@ -160,7 +165,7 @@ describe("logging", () => {
     });
 
     expect(response.status).toBe(200);
-    expect(output.length).toEqual(0);
+    expect(output.length).toBe(0);
 
     server.close();
   });

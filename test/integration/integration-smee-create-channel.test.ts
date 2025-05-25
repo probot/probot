@@ -14,9 +14,11 @@ describe("ManifestCreation", () => {
 
     await new ManifestCreation({ updateEnv }).createWebhookChannel();
 
-    expect(UpdateEnvCalls.length).toEqual(1);
-    expect(UpdateEnvCalls[0].WEBHOOK_PROXY_URL).toMatch(
-      /^https:\/\/smee\.io\/[0-9a-zA-Z]{10,}$/,
-    );
+    expect(UpdateEnvCalls.length).toBe(1);
+    expect(
+      /^https:\/\/smee\.io\/[0-9a-zA-Z]{10,}$/.test(
+        UpdateEnvCalls[0].WEBHOOK_PROXY_URL!,
+      ),
+    ).toBe(true);
   });
 });

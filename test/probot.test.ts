@@ -84,7 +84,7 @@ describe("Probot", () => {
   });
 
   test(".version", () => {
-    expect(Probot.version).toEqual("0.0.0-development");
+    expect(Probot.version).toBe("0.0.0-development");
   });
 
   describe(".defaults()", () => {
@@ -109,9 +109,14 @@ describe("Probot", () => {
 
   describe("constructor", () => {
     it("no options", () => {
-      expect(() => new Probot()).toThrow(
-        "[@octokit/auth-app] appId option is required",
-      );
+      try {
+        new Probot();
+        throw new Error("Expected error to be raised");
+      } catch (e) {
+        expect((e as Error).message).toBe(
+          "[@octokit/auth-app] appId option is required",
+        );
+      }
     });
 
     it('{ githubToken: "faketoken" }', () => {
@@ -128,7 +133,7 @@ describe("Probot", () => {
       expect.assertions(1);
 
       const MyOctokit = ProbotOctokit.plugin((_octokit, options) => {
-        expect(options.throttle?.enabled).toEqual(true);
+        expect(options.throttle?.enabled).toBe(true);
       }).defaults({
         appId,
         privateKey,
@@ -166,8 +171,9 @@ describe("Probot", () => {
 
       try {
         await probot.webhooks.receive(event);
+        throw new Error("Expected error to be raised");
       } catch (e) {
-        expect((probot.log.error as Mock).mock.calls[0][1]).toEqual(
+        expect((probot.log.error as Mock).mock.calls[0][1]).toBe(
           "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
         );
       }
@@ -183,8 +189,9 @@ describe("Probot", () => {
 
       try {
         await probot.webhooks.receive(event);
+        throw new Error("Expected error to be raised");
       } catch (e) {
-        expect((probot.log.error as Mock).mock.calls[0][1]).toEqual(
+        expect((probot.log.error as Mock).mock.calls[0][1]).toBe(
           "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
         );
       }
@@ -203,7 +210,7 @@ describe("Probot", () => {
       try {
         await probot.webhooks.receive(event);
       } catch (e) {
-        expect((probot.log.error as Mock).mock.calls[0][1]).toEqual(
+        expect((probot.log.error as Mock).mock.calls[0][1]).toBe(
           "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
         );
       }
@@ -221,8 +228,9 @@ describe("Probot", () => {
 
       try {
         await probot.webhooks.receive(event);
+        throw new Error("Expected error to be raised");
       } catch (e) {
-        expect((probot.log.error as Mock).mock.calls[0][1]).toEqual(
+        expect((probot.log.error as Mock).mock.calls[0][1]).toBe(
           "Your private key (a .pem file or PRIVATE_KEY environment variable) or APP_ID is incorrect. Go to https://github.com/settings/apps/YOUR_APP, verify that APP_ID is set correctly, and generate a new PEM file if necessary.",
         );
       }
@@ -240,8 +248,9 @@ describe("Probot", () => {
 
       try {
         await probot.webhooks.receive(event);
+        throw new Error("Expected error to be raised");
       } catch (e) {
-        expect((probot.log.error as Mock).mock.calls[0][1]).toEqual(
+        expect((probot.log.error as Mock).mock.calls[0][1]).toBe(
           "Your private key (a .pem file or PRIVATE_KEY environment variable) or APP_ID is incorrect. Go to https://github.com/settings/apps/YOUR_APP, verify that APP_ID is set correctly, and generate a new PEM file if necessary.",
         );
       }
@@ -252,7 +261,7 @@ describe("Probot", () => {
     it("requests from the correct API URL", async () => {
       const appFn = async (app: Probot) => {
         const octokit = await app.auth();
-        expect(octokit.request.endpoint.DEFAULTS.baseUrl).toEqual(
+        expect(octokit.request.endpoint.DEFAULTS.baseUrl).toBe(
           "https://notreallygithub.com/api/v3",
         );
       };
@@ -267,7 +276,7 @@ describe("Probot", () => {
     it("requests from the correct API URL when setting `baseUrl` on Octokit constructor", async () => {
       const appFn = async (app: Probot) => {
         const octokit = await app.auth();
-        expect(octokit.request.endpoint.DEFAULTS.baseUrl).toEqual(
+        expect(octokit.request.endpoint.DEFAULTS.baseUrl).toBe(
           "https://notreallygithub.com/api/v3",
         );
       };
@@ -286,7 +295,7 @@ describe("Probot", () => {
     it("requests from the correct API URL", async () => {
       const appFn = async (app: Probot) => {
         const octokit = await app.auth();
-        expect(octokit.request.endpoint.DEFAULTS.baseUrl).toEqual(
+        expect(octokit.request.endpoint.DEFAULTS.baseUrl).toBe(
           "http://notreallygithub.com/api/v3",
         );
       };
@@ -310,9 +319,10 @@ describe("Probot", () => {
           redisConfig: process.env.REDIS_URL,
           Octokit: ProbotOctokit.plugin((_octokit, options) => {
             expect(options.throttle?.Bottleneck).toBe(Bottleneck);
-            expect(options.throttle?.connection).toBeInstanceOf(
-              Bottleneck.IORedisConnection,
-            );
+            expect(
+              options.throttle?.connection instanceof
+                Bottleneck.IORedisConnection,
+            ).toBe(true);
           }),
         });
       });
@@ -333,9 +343,10 @@ describe("Probot", () => {
           redisConfig,
           Octokit: ProbotOctokit.plugin((_octokit, options) => {
             expect(options.throttle?.Bottleneck).toBe(Bottleneck);
-            expect(options.throttle?.connection).toBeInstanceOf(
-              Bottleneck.IORedisConnection,
-            );
+            expect(
+              options.throttle?.connection instanceof
+                Bottleneck.IORedisConnection,
+            ).toBe(true);
           }),
         });
       });
@@ -435,7 +446,7 @@ describe("Probot", () => {
 
       await probot.receive(event);
       await probot.receive(event2);
-      expect(spy.mock.calls.length).toEqual(2);
+      expect(spy.mock.calls.length).toBe(2);
     });
 
     it("adds a logger on the context", async () => {
@@ -480,7 +491,7 @@ describe("Probot", () => {
             if (url === "https://api.github.com/") {
               expect(
                 (opts.headers as Record<string, string>).authorization,
-              ).toEqual("token v1.1f699f1069f60xxx");
+              ).toBe("token v1.1f699f1069f60xxx");
               return true;
             }
             throw new Error("Should have matched");
@@ -517,9 +528,9 @@ describe("Probot", () => {
       const mock = fetchMock.createInstance().getOnce(
         function ({ url, options: opts }) {
           if (url === "https://api.github.com/") {
-            expect(
-              (opts.headers as Record<string, string>).authorization,
-            ).toEqual(undefined);
+            expect((opts.headers as Record<string, string>).authorization).toBe(
+              undefined,
+            );
             return true;
           }
           throw new Error("Should have matched");
@@ -555,9 +566,9 @@ describe("Probot", () => {
       const mock = fetchMock.createInstance().route(
         function ({ url, options: opts }) {
           if (url === "https://api.github.com/") {
-            expect(
-              (opts.headers as Record<string, string>).authorization,
-            ).toEqual(undefined);
+            expect((opts.headers as Record<string, string>).authorization).toBe(
+              undefined,
+            );
             return true;
           }
           throw new Error("Should have matched");
@@ -650,7 +661,7 @@ describe("Probot", () => {
         await probot.receive(event);
         throw new Error("expected error to be raised from app");
       } catch (error) {
-        expect((error as Error).message).toMatch(/error from app/);
+        expect((error as Error).message).toBe("error from app");
       }
     });
 
@@ -664,8 +675,8 @@ describe("Probot", () => {
       // @ts-expect-error
       probot.on("unknown-event", () => {});
 
-      expect(output.length).toEqual(1);
-      expect(output[0].msg).toEqual(
+      expect(output.length).toBe(1);
+      expect(output[0].msg).toBe(
         '"unknown-event" is not a known webhook name (https://developer.github.com/v3/activity/events/types/)',
       );
     });

@@ -182,7 +182,7 @@ describe("Setup app", async () => {
         "/apps/my-app/installations/new",
       );
 
-      expect(await setupResponse.text()).toEqual(
+      expect(await setupResponse.text()).toBe(
         "Found. Redirecting to /apps/my-app/installations/new",
       );
 
@@ -232,7 +232,7 @@ describe("Setup app", async () => {
       );
 
       expect(setupResponse.status).toBe(400);
-      expect(await setupResponse.text()).toEqual("code missing or invalid");
+      expect(await setupResponse.text()).toBe("code missing or invalid");
 
       await server.stop();
     });
@@ -265,7 +265,7 @@ describe("Setup app", async () => {
       );
 
       expect(setupResponse.status).toBe(400);
-      expect(await setupResponse.text()).toEqual("code missing or invalid");
+      expect(await setupResponse.text()).toBe("code missing or invalid");
 
       await server.stop();
     });
@@ -334,7 +334,7 @@ describe("Setup app", async () => {
       );
 
       expect(importResponse.status).toBe(400);
-      expect(await importResponse.text()).toEqual(
+      expect(await importResponse.text()).toBe(
         "appId and/or pem and/or webhook_secret missing",
       );
     });

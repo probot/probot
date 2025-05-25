@@ -58,15 +58,15 @@ describe("end-to-end-tests", () => {
 
     let callCount = 0;
     const handler: RequestHandler = (req, res) => {
-      expect(req.method).toEqual("POST");
+      expect(req.method).toBe("POST");
       expect(
         new URL(`http://localhost${req.url!}`).pathname.startsWith("/api/v3"),
-      ).toBeTruthy();
+      ).toBe(true);
 
       switch (callCount++) {
         case 0:
           {
-            expect(new URL(`http://localhost${req.url!}`).pathname).toEqual(
+            expect(new URL(`http://localhost${req.url!}`).pathname).toBe(
               "/api/v3/app/installations/1/access_tokens",
             );
 
@@ -87,7 +87,7 @@ describe("end-to-end-tests", () => {
           break;
         case 1:
           {
-            expect(new URL(`http://localhost${req.url!}`).pathname).toEqual(
+            expect(new URL(`http://localhost${req.url!}`).pathname).toBe(
               "/api/v3/repos/octocat/hello-world/issues/1/comments",
             );
 
@@ -173,7 +173,7 @@ describe("end-to-end-tests", () => {
         body,
       });
 
-      expect(await response.text()).toEqual("ok\n");
+      expect(await response.text()).toBe("ok\n");
     } catch (error) {
       const awaitedProcess = await probotProcess;
       console.log(awaitedProcess.stdout);
@@ -185,7 +185,7 @@ describe("end-to-end-tests", () => {
       } catch {}
     }
 
-    expect(callCount).toEqual(2);
+    expect(callCount).toBe(2);
   };
   it("runs a hello world app (CJS)", () =>
     runApp("./test/e2e/hello-world.cjs"));

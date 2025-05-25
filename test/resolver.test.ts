@@ -26,7 +26,7 @@ describe("resolver", () => {
       resolver: stubResolver,
     });
     expect(module).toBeInstanceOf(Function);
-    expect(stubResolverCalls).toHaveLength(1);
+    expect(stubResolverCalls.length).toBe(1);
     expect(stubResolverCalls[0][0]).toBe("foo");
     expect(stubResolverCalls[0][1]).toBe(basedir);
   });
@@ -42,7 +42,7 @@ describe("resolver", () => {
       resolver: stubResolver,
     });
     expect(module).toBeInstanceOf(Function);
-    expect(stubResolverCalls).toHaveLength(1);
+    expect(stubResolverCalls.length).toBe(1);
     expect(stubResolverCalls[0][0]).toBe("foo");
     expect(stubResolverCalls[0][1]).toBe(basedir);
   });

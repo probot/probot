@@ -14,9 +14,9 @@ describe("update-dotenv", () => {
     process.chdir(mkdtempSync(pathJoin(tmpdir(), "update-dotenv")));
 
     updateEnv({ FOO: "bar" });
-    expect(readFileSync(".env", "utf-8")).toEqual("FOO=bar");
+    expect(readFileSync(".env", "utf-8")).toBe("FOO=bar");
 
-    expect(process.env.FOO).toEqual("bar");
+    expect(process.env.FOO).toBe("bar");
     process.env = originalEnv;
     process.chdir(originalCwd);
   });
@@ -25,7 +25,7 @@ describe("update-dotenv", () => {
     process.chdir(mkdtempSync(pathJoin(tmpdir(), "update-dotenv")));
 
     updateEnv({ FOO: "bar\nbaz" });
-    expect(readFileSync(".env", "utf-8")).toEqual("FOO=bar\\nbaz");
+    expect(readFileSync(".env", "utf-8")).toBe("FOO=bar\\nbaz");
 
     process.env = originalEnv;
     process.chdir(originalCwd);
@@ -36,7 +36,7 @@ describe("update-dotenv", () => {
 
     updateEnv({ FIRST: "foo" });
     updateEnv({ SECOND: "bar" });
-    expect(readFileSync(".env", "utf-8")).toEqual("FIRST=foo\nSECOND=bar");
+    expect(readFileSync(".env", "utf-8")).toBe("FIRST=foo\nSECOND=bar");
 
     process.env = originalEnv;
     process.chdir(originalCwd);

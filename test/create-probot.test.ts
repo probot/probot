@@ -72,7 +72,7 @@ describe("createProbot", () => {
       },
       defaults: { logLevel: "trace" },
     });
-    expect(probot.log.level).toEqual("debug");
+    expect(probot.log.level).toBe("debug");
   });
 
   test("defaults, overrides", () => {
@@ -81,7 +81,7 @@ describe("createProbot", () => {
       defaults: { logLevel: "debug" },
       overrides: { logLevel: "trace" },
     });
-    expect(probot.log.level).toEqual("trace");
+    expect(probot.log.level).toBe("trace");
   });
 
   test("defaults, custom host", async () => {
@@ -110,10 +110,10 @@ describe("createProbot", () => {
         request: {
           fetch: (url: string, options: any) => {
             try {
-              expect(url).toEqual(
+              expect(url).toBe(
                 "https://github.acme-inc.com/api/v3/app/installations/1234/access_tokens",
               );
-              expect(options.method).toEqual("POST");
+              expect(options.method).toBe("POST");
 
               fetchPromise.resolve!();
             } catch (e) {
@@ -142,7 +142,7 @@ describe("createProbot", () => {
       },
       overrides: { logLevel: "trace" },
     });
-    expect(probot.log.level).toEqual("trace");
+    expect(probot.log.level).toBe("trace");
   });
 
   test("defaults, env, overrides", () => {
@@ -154,7 +154,7 @@ describe("createProbot", () => {
       defaults: { logLevel: "debug" },
       overrides: { logLevel: "trace" },
     });
-    expect(probot.log.level).toEqual("trace");
+    expect(probot.log.level).toBe("trace");
   });
 
   test("env, logger message key", async () => {
@@ -170,7 +170,7 @@ describe("createProbot", () => {
     const outputData = await captureLogOutput(() => {
       probot.log.info("Ciao");
     }, probot.log);
-    expect(JSON.parse(outputData).myMessage).toEqual("Ciao");
+    expect(JSON.parse(outputData).myMessage).toBe("Ciao");
   });
 
   test("env, octokit logger set", async () => {

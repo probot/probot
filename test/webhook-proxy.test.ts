@@ -191,15 +191,15 @@ describe("webhook-proxy", () => {
           expect(error.message).toMatch(/getaddrinfo ENOTFOUND/);
           break;
         case "bun":
-          expect(error.message).toEqual(
+          expect(error.message).toBe(
             "Unable to connect. Is the computer able to access the url?",
           );
           break;
       }
 
-      expect(LoggerErrorCalls).toHaveLength(1);
-      expect(LoggerErrorCalls[0]).toHaveLength(1);
-      expect(LoggerErrorCalls[0][0]).toEqual(error);
+      expect(LoggerErrorCalls.length).toBe(1);
+      expect(LoggerErrorCalls[0].length).toBe(1);
+      expect(LoggerErrorCalls[0][0]).toBe(error);
 
       finishedPromise.resolve!();
     });

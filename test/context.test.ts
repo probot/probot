@@ -153,7 +153,7 @@ describe("Context", () => {
         context.repo();
         throw new Error("Should have thrown");
       } catch (e) {
-        expect((e as Error).message).toMatch(
+        expect((e as Error).message).toBe(
           "context.repo() is not supported for this webhook event.",
         );
       }

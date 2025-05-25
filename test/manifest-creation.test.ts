@@ -55,7 +55,7 @@ describe("ManifestCreation", () => {
 
     test("writes new webhook channel to .env", async () => {
       await setup.createWebhookChannel({ SmeeClient });
-      expect(updateEnvCalls.length).toEqual(1);
+      expect(updateEnvCalls.length).toBe(1);
       expect(updateEnvCalls[0]).toEqual({
         WEBHOOK_PROXY_URL: "https://smee.io/1234ab1234",
       });
@@ -76,21 +76,19 @@ describe("ManifestCreation", () => {
     });
 
     test("creates an app url", () => {
-      expect(setup.createAppUrl).toEqual(
-        "https://github.com/settings/apps/new",
-      );
+      expect(setup.createAppUrl).toBe("https://github.com/settings/apps/new");
     });
 
     test("creates an app url when github org is set", () => {
       process.env.GH_ORG = "testorg";
-      expect(setup.createAppUrl).toEqual(
+      expect(setup.createAppUrl).toBe(
         "https://github.com/organizations/testorg/settings/apps/new",
       );
     });
 
     test("creates an app url when github host env is set", () => {
       process.env.GHE_HOST = "hiimbex.github.com";
-      expect(setup.createAppUrl).toEqual(
+      expect(setup.createAppUrl).toBe(
         "https://hiimbex.github.com/settings/apps/new",
       );
     });
@@ -98,7 +96,7 @@ describe("ManifestCreation", () => {
     test("creates an app url when github host env and github org is set", () => {
       process.env.GHE_HOST = "hiimbex.github.com";
       process.env.GH_ORG = "testorg";
-      expect(setup.createAppUrl).toEqual(
+      expect(setup.createAppUrl).toBe(
         "https://hiimbex.github.com/organizations/testorg/settings/apps/new",
       );
     });
@@ -106,7 +104,7 @@ describe("ManifestCreation", () => {
     test("creates an app url when github host env and protocol are set", () => {
       process.env.GHE_HOST = "hiimbex.github.com";
       process.env.GHE_PROTOCOL = "http";
-      expect(setup.createAppUrl).toEqual(
+      expect(setup.createAppUrl).toBe(
         "http://hiimbex.github.com/settings/apps/new",
       );
     });
@@ -133,9 +131,9 @@ describe("ManifestCreation", () => {
           fetch: mock.fetchHandler,
         },
       });
-      expect(createdApp).toEqual("https://github.com/apps/testerino0000000");
+      expect(createdApp).toBe("https://github.com/apps/testerino0000000");
       // expect dotenv to be called with id, webhook_secret, pem
-      expect(updateEnvCalls.length).toEqual(1);
+      expect(updateEnvCalls.length).toBe(1);
       expect(updateEnvCalls[0]).toEqual({
         APP_ID: "6666",
         PRIVATE_KEY:
@@ -162,9 +160,9 @@ describe("ManifestCreation", () => {
           fetch: mock.fetchHandler,
         },
       });
-      expect(createdApp).toEqual("https://github.com/apps/testerino0000000");
+      expect(createdApp).toBe("https://github.com/apps/testerino0000000");
       // expect dotenv to be called with id, webhook_secret, pem
-      expect(updateEnvCalls.length).toEqual(1);
+      expect(updateEnvCalls.length).toBe(1);
       expect(updateEnvCalls[0]).toEqual({
         APP_ID: "6666",
         PRIVATE_KEY:
@@ -177,7 +175,7 @@ describe("ManifestCreation", () => {
   describe("getManifest", () => {
     test("creates an app from a code", () => {
       // checks that getManifest returns a JSON.stringified manifest
-      expect(setup.getManifest({ pkg, baseUrl: "localhost://3000" })).toEqual(
+      expect(setup.getManifest({ pkg, baseUrl: "localhost://3000" })).toBe(
         '{"description":"A framework for building GitHub Apps to automate and improve your workflow","hook_attributes":{"url":"localhost://3000/"},"name":"probot","public":true,"redirect_url":"localhost://3000/probot/setup","url":"https://probot.github.io","version":"v1"}',
       );
     });
@@ -193,7 +191,7 @@ describe("ManifestCreation", () => {
       // checks that getManifest returns the correct JSON.stringified manifest
       expect(
         setup.getManifest({ pkg, baseUrl: "localhost://3000", readFileSync }),
-      ).toEqual(
+      ).toBe(
         '{"description":"A description for a cool app","hook_attributes":{"url":"localhost://3000/"},"name":"cool-app","public":true,"redirect_url":"localhost://3000/probot/setup","url":"https://probot.github.io","version":"v1"}',
       );
     });

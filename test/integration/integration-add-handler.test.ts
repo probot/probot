@@ -161,7 +161,7 @@ describe("createNodeMiddleware", () => {
       addHandler(expressApp);
 
       app.on("push", (event) => {
-        expect(event.name).toEqual("push");
+        expect(event.name).toBe("push");
       });
     };
     const middleware = createNodeMiddleware(app, {
@@ -213,7 +213,7 @@ describe("createNodeMiddleware", () => {
       addHandler(fastify.routing);
 
       app.on("push", (event) => {
-        expect(event.name).toEqual("push");
+        expect(event.name).toBe("push");
       });
     };
     const middleware = createNodeMiddleware(app, {

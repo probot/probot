@@ -29,7 +29,7 @@ describe("ProbotOctokit", () => {
       },
     });
 
-    expect((await octokit.rest.users.getAuthenticated({})).data).toEqual(
+    expect((await octokit.rest.users.getAuthenticated({})).data).toBe(
       '{"login": "ohai"}',
     );
   });
@@ -69,14 +69,12 @@ describe("ProbotOctokit", () => {
       },
       request: {
         fetch: (url: string, options: { [key: string]: any }) => {
-          expect(url).toEqual("https://api.github.com/");
-          expect(options.method).toEqual("GET");
-          expect(options.headers.accept).toEqual(
-            "application/vnd.github.v3+json",
-          );
+          expect(url).toBe("https://api.github.com/");
+          expect(options.method).toBe("GET");
+          expect(options.headers.accept).toBe("application/vnd.github.v3+json");
           expect(options.headers["user-agent"]).toMatch(/^probot\//);
-          expect(options.signal).toEqual(undefined);
-          expect(options.body).toEqual(undefined);
+          expect(options.signal).toBe(undefined);
+          expect(options.body).toBe(undefined);
 
           if (callCount++ === 0) {
             return Promise.reject({});
@@ -112,14 +110,12 @@ describe("ProbotOctokit", () => {
       },
       request: {
         fetch: (url: string, options: { [key: string]: any }) => {
-          expect(url).toEqual("https://api.github.com/");
-          expect(options.method).toEqual("GET");
-          expect(options.headers.accept).toEqual(
-            "application/vnd.github.v3+json",
-          );
+          expect(url).toBe("https://api.github.com/");
+          expect(options.method).toBe("GET");
+          expect(options.headers.accept).toBe("application/vnd.github.v3+json");
           expect(options.headers["user-agent"]).toMatch(/^probot\//);
-          expect(options.signal).toEqual(undefined);
-          expect(options.body).toEqual(undefined);
+          expect(options.signal).toBe(undefined);
+          expect(options.body).toBe(undefined);
 
           if (callCount++ === 0) {
             return Promise.resolve({
@@ -155,7 +151,7 @@ describe("ProbotOctokit", () => {
       // @ts-expect-error just need to mock the warn method
       log: {
         warn(message) {
-          expect(message).toEqual(
+          expect(message).toBe(
             'Rate limit hit with "GET /", retrying in 1 seconds.',
           );
         },
@@ -167,14 +163,12 @@ describe("ProbotOctokit", () => {
       },
       request: {
         fetch: (url: string, options: { [key: string]: any }) => {
-          expect(url).toEqual("https://api.github.com/");
-          expect(options.method).toEqual("GET");
-          expect(options.headers.accept).toEqual(
-            "application/vnd.github.v3+json",
-          );
+          expect(url).toBe("https://api.github.com/");
+          expect(options.method).toBe("GET");
+          expect(options.headers.accept).toBe("application/vnd.github.v3+json");
           expect(options.headers["user-agent"]).toMatch(/^probot\//);
-          expect(options.signal).toEqual(undefined);
-          expect(options.body).toEqual(undefined);
+          expect(options.signal).toBe(undefined);
+          expect(options.body).toBe(undefined);
 
           if (callCount++ === 0) {
             return Promise.resolve({
@@ -218,14 +212,12 @@ describe("ProbotOctokit", () => {
       },
       request: {
         fetch: (url: string, options: { [key: string]: any }) => {
-          expect(url).toEqual("https://api.github.com/");
-          expect(options.method).toEqual("GET");
-          expect(options.headers.accept).toEqual(
-            "application/vnd.github.v3+json",
-          );
+          expect(url).toBe("https://api.github.com/");
+          expect(options.method).toBe("GET");
+          expect(options.headers.accept).toBe("application/vnd.github.v3+json");
           expect(options.headers["user-agent"]).toMatch(/^probot\//);
-          expect(options.signal).toEqual(undefined);
-          expect(options.body).toEqual(undefined);
+          expect(options.signal).toBe(undefined);
+          expect(options.body).toBe(undefined);
 
           if (callCount++ === 0) {
             return Promise.resolve({
@@ -260,7 +252,7 @@ describe("ProbotOctokit", () => {
       // @ts-expect-error just need to mock the warn method
       log: {
         warn(message) {
-          expect(message).toEqual(
+          expect(message).toBe(
             'Secondary Rate limit hit with "GET /", retrying in 1 seconds.',
           );
         },
@@ -272,14 +264,12 @@ describe("ProbotOctokit", () => {
       },
       request: {
         fetch: (url: string, options: { [key: string]: any }) => {
-          expect(url).toEqual("https://api.github.com/");
-          expect(options.method).toEqual("GET");
-          expect(options.headers.accept).toEqual(
-            "application/vnd.github.v3+json",
-          );
+          expect(url).toBe("https://api.github.com/");
+          expect(options.method).toBe("GET");
+          expect(options.headers.accept).toBe("application/vnd.github.v3+json");
           expect(options.headers["user-agent"]).toMatch(/^probot\//);
-          expect(options.signal).toEqual(undefined);
-          expect(options.body).toEqual(undefined);
+          expect(options.signal).toBe(undefined);
+          expect(options.body).toBe(undefined);
 
           if (callCount++ === 0) {
             return Promise.resolve({
@@ -323,7 +313,7 @@ describe("ProbotOctokit", () => {
       request: {
         fetch: (url: string, options: { [key: string]: any }) => {
           if (callCount === 0) {
-            expect(url).toEqual(
+            expect(url).toBe(
               "https://api.github.com/repos/JasonEtco/pizza/issues?per_page=1",
             );
           } else {
@@ -333,13 +323,11 @@ describe("ProbotOctokit", () => {
               ),
             );
           }
-          expect(options.method).toEqual("GET");
-          expect(options.headers.accept).toEqual(
-            "application/vnd.github.v3+json",
-          );
+          expect(options.method).toBe("GET");
+          expect(options.headers.accept).toBe("application/vnd.github.v3+json");
           expect(options.headers["user-agent"]).toMatch(/^probot\//);
-          expect(options.signal).toEqual(undefined);
-          expect(options.body).toEqual(undefined);
+          expect(options.signal).toBe(undefined);
+          expect(options.body).toBe(undefined);
 
           return Promise.resolve({
             status: 200,
@@ -367,7 +355,7 @@ describe("ProbotOctokit", () => {
       }),
       spy,
     );
-    expect(Array.isArray(res)).toBeTruthy();
+    expect(Array.isArray(res)).toBe(true);
     expect(res.length).toBe(5);
     expect(callCountSpy).toBe(5);
   });
@@ -379,7 +367,7 @@ describe("ProbotOctokit", () => {
       request: {
         fetch: (url: string, options: { [key: string]: any }) => {
           if (callCount === 0) {
-            expect(url).toEqual(
+            expect(url).toBe(
               "https://api.github.com/repos/JasonEtco/pizza/issues?per_page=1",
             );
           } else {
@@ -389,13 +377,11 @@ describe("ProbotOctokit", () => {
               ),
             );
           }
-          expect(options.method).toEqual("GET");
-          expect(options.headers.accept).toEqual(
-            "application/vnd.github.v3+json",
-          );
+          expect(options.method).toBe("GET");
+          expect(options.headers.accept).toBe("application/vnd.github.v3+json");
           expect(options.headers["user-agent"]).toMatch(/^probot\//);
-          expect(options.signal).toEqual(undefined);
-          expect(options.body).toEqual(undefined);
+          expect(options.signal).toBe(undefined);
+          expect(options.body).toBe(undefined);
 
           return Promise.resolve({
             status: 200,
@@ -435,7 +421,7 @@ describe("ProbotOctokit", () => {
       request: {
         fetch: (url: string, options: { [key: string]: any }) => {
           if (callCount === 0) {
-            expect(url).toEqual(
+            expect(url).toBe(
               "https://api.github.com/repos/JasonEtco/pizza/issues?per_page=1",
             );
           } else {
@@ -445,13 +431,11 @@ describe("ProbotOctokit", () => {
               ),
             );
           }
-          expect(options.method).toEqual("GET");
-          expect(options.headers.accept).toEqual(
-            "application/vnd.github.v3+json",
-          );
+          expect(options.method).toBe("GET");
+          expect(options.headers.accept).toBe("application/vnd.github.v3+json");
           expect(options.headers["user-agent"]).toMatch(/^probot\//);
-          expect(options.signal).toEqual(undefined);
-          expect(options.body).toEqual(undefined);
+          expect(options.signal).toBe(undefined);
+          expect(options.body).toBe(undefined);
 
           return Promise.resolve({
             status: 200,

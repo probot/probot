@@ -56,7 +56,7 @@ describe("Server", () => {
   }
 
   it("Server.version", () => {
-    expect(Server.version).toEqual("0.0.0-development");
+    expect(Server.version).toBe("0.0.0-development");
   });
 
   describe("GET /ping", () => {
@@ -77,10 +77,10 @@ describe("Server", () => {
       await server.start();
 
       const response = await fetch(`http://${server.host}:${server.port}/ping`);
-      expect(response.status).toEqual(200);
-      expect(await response.text()).toEqual("PONG");
+      expect(response.status).toBe(200);
+      expect(await response.text()).toBe("PONG");
 
-      expect(output.length).toEqual(3);
+      expect(output.length).toBe(3);
       expect(output[2].msg).toContain("GET /ping 200 -");
 
       await server.stop();
@@ -105,7 +105,7 @@ describe("Server", () => {
 
       await server.load((app) => {
         app.on("push", (event) => {
-          expect(event.name).toEqual("push");
+          expect(event.name).toBe("push");
         });
       });
 
@@ -129,7 +129,7 @@ describe("Server", () => {
 
       expect(response.status).toBe(200);
 
-      expect(output.length).toEqual(3);
+      expect(output.length).toBe(3);
       expect(output[2].msg).toContain("POST /api/github/webhooks 200 -");
 
       await server.stop();
@@ -158,7 +158,7 @@ describe("Server", () => {
         );
 
         expect(response.status).toBe(404);
-        expect(output.length).toEqual(3);
+        expect(output.length).toBe(3);
         expect(output[2].msg).toContain("GET /notfound 404 -");
 
         await server.stop();
@@ -194,8 +194,8 @@ describe("Server", () => {
             },
           },
         );
-        expect(response.status).toEqual(400);
-        expect(await response.text()).toEqual(
+        expect(response.status).toBe(400);
+        expect(await response.text()).toBe(
           '{"error":"Required headers missing: x-hub-signature-256"}',
         );
 
@@ -227,7 +227,7 @@ describe("Server", () => {
 
       expect(await response.text()).toBe("");
 
-      expect(output.length).toEqual(3);
+      expect(output.length).toBe(3);
       expect(output[2].msg).toContain("GET /notfound 404 -");
 
       await server.stop();
@@ -258,7 +258,7 @@ describe("Server", () => {
         await server.start();
         throw new Error("Server should not start");
       } catch (error) {
-        expect((error as Error).message).toEqual(
+        expect((error as Error).message).toBe(
           `Port ${port} is already in use. You can define the PORT environment variable to use a different port.`,
         );
       } finally {
@@ -279,8 +279,8 @@ describe("Server", () => {
       });
       await testApp.start();
 
-      expect(output.length).toEqual(2);
-      expect(output[1].msg).toEqual(`Listening on http://127.0.0.1:${port}`);
+      expect(output.length).toBe(2);
+      expect(output[1].msg).toBe(`Listening on http://127.0.0.1:${port}`);
 
       await testApp.stop();
     });

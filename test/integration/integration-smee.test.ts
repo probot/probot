@@ -89,7 +89,7 @@ describe("smee-client", () => {
 
       const app: ApplicationFunction = (app) => {
         app.on("push", (event) => {
-          expect(event.name).toEqual("push");
+          expect(event.name).toBe("push");
           promise.resolve();
         });
       };

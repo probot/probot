@@ -64,12 +64,15 @@ describe("createNodeMiddleware", () => {
   });
 
   test("with createProbot", async () => {
-    expect.assertions(1);
+    expect.assertions(2);
+
+    const onPushCalls: any[] = [];
+    const onPush = (event: any) => {
+      onPushCalls.push(event);
+    };
 
     const app: ApplicationFunction = (app) => {
-      app.on("push", (event) => {
-        expect(event.name).toEqual("push");
-      });
+      app.on("push", onPush);
     };
     const middleware = createNodeMiddleware(app, {
       probot: createProbot({
@@ -104,18 +107,26 @@ describe("createNodeMiddleware", () => {
       body,
     });
 
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise<void>((resolve, reject) =>
+      server.close((err) => {
+        err ? reject(err) : resolve();
+      }),
+    );
 
-    server.close();
+    expect(onPushCalls.length).toBe(1);
+    expect(onPushCalls[0].name).toBe("push");
   });
 
   test("with createProbot and setting the webhookPath via WEBHOOK_PATH to the root", async () => {
-    expect.assertions(1);
+    expect.assertions(2);
+
+    const onPushCalls: any[] = [];
+    const onPush = (event: any) => {
+      onPushCalls.push(event);
+    };
 
     const app: ApplicationFunction = (app) => {
-      app.on("push", (event) => {
-        expect(event.name).toEqual("push");
-      });
+      app.on("push", onPush);
     };
     const middleware = createNodeMiddleware(app, {
       probot: createProbot({
@@ -151,18 +162,26 @@ describe("createNodeMiddleware", () => {
       body,
     });
 
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise<void>((resolve, reject) =>
+      server.close((err) => {
+        err ? reject(err) : resolve();
+      }),
+    );
 
-    server.close();
+    expect(onPushCalls.length).toBe(1);
+    expect(onPushCalls[0].name).toBe("push");
   });
 
   test("with createProbot and setting the webhookPath to the root via the deprecated webhooksPath", async () => {
-    expect.assertions(1);
+    expect.assertions(2);
+
+    const onPushCalls: any[] = [];
+    const onPush = (event: any) => {
+      onPushCalls.push(event);
+    };
 
     const app: ApplicationFunction = (app) => {
-      app.on("push", (event) => {
-        expect(event.name).toEqual("push");
-      });
+      app.on("push", onPush);
     };
     const middleware = createNodeMiddleware(app, {
       webhooksPath: "/",
@@ -198,10 +217,15 @@ describe("createNodeMiddleware", () => {
       body,
     });
 
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise<void>((resolve, reject) =>
+      server.close((err) => {
+        err ? reject(err) : resolve();
+      }),
+    );
 
-    server.close();
-  }, 1000);
+    expect(onPushCalls.length).toBe(1);
+    expect(onPushCalls[0].name).toBe("push");
+  });
 
   test("loads app only once", async () => {
     let counter = 0;
@@ -224,6 +248,6 @@ describe("createNodeMiddleware", () => {
       { end() {}, writeHead() {} } as unknown as ServerResponse,
     );
 
-    expect(counter).toEqual(1);
+    expect(counter).toBe(1);
   });
 });

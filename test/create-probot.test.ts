@@ -61,7 +61,7 @@ wB98bfAGtcuCZWzgjgL67CS0pcNxadFA/TFo/NnynLBC4qRXSfFslKVE+Og=
 describe("createProbot", () => {
   test("createProbot()", () => {
     const probot = createProbot({ env });
-    expect(probot).toBeInstanceOf(Probot);
+    expect(probot instanceof Probot).toBe(true);
   });
 
   test("defaults, env", () => {

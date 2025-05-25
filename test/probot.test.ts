@@ -374,7 +374,7 @@ describe("Probot", () => {
       expect(spy).toHaveBeenCalledTimes(0);
       await probot.receive(event);
       expect(spy).toHaveBeenCalled();
-      expect(spy.mock.calls[0][0]).toBeInstanceOf(Context);
+      expect(spy.mock.calls[0][0] instanceof Context).toBe(true);
       expect(spy.mock.calls[0][0].payload).toBe(event.payload);
     });
 

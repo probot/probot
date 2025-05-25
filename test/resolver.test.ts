@@ -25,7 +25,7 @@ describe("resolver", () => {
     const module = await resolveAppFunction("foo", {
       resolver: stubResolver,
     });
-    expect(module).toBeInstanceOf(Function);
+    expect(typeof module).toBe("function");
     expect(stubResolverCalls.length).toBe(1);
     expect(stubResolverCalls[0][0]).toBe("foo");
     expect(stubResolverCalls[0][1]).toBe(basedir);
@@ -41,7 +41,7 @@ describe("resolver", () => {
     const module = await resolveAppFunction("foo", {
       resolver: stubResolver,
     });
-    expect(module).toBeInstanceOf(Function);
+    expect(typeof module).toBe("function");
     expect(stubResolverCalls.length).toBe(1);
     expect(stubResolverCalls[0][0]).toBe("foo");
     expect(stubResolverCalls[0][1]).toBe(basedir);

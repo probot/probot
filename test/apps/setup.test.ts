@@ -9,8 +9,8 @@ import type { Env } from "../../src/types.js";
 import { Probot, Server } from "../../src/index.js";
 import { setupAppFactory } from "../../src/apps/setup.js";
 
-import { importView as importViewTemplate } from "../../src/views/import.js";
-import { successView as successViewTemplate } from "../../src/views/success.js";
+import { importView } from "../../src/views/import.js";
+import { successView } from "../../src/views/success.js";
 
 describe("Setup app", async () => {
   let logOutput: any[] = [];
@@ -331,13 +331,13 @@ describe("Setup app", async () => {
 
       await server.start();
 
-      const importView = await fetch(
+      const importResponse = await fetch(
         `http://${server.host}:${server.port}/probot/import`,
       );
 
-      expect(importView.status).toBe(200);
-      expect(await importView.text()).toBe(
-        importViewTemplate({
+      expect(importResponse.status).toBe(200);
+      expect(await importResponse.text()).toBe(
+        importView({
           name: "probot",
           GH_HOST: "https://github.com",
           WEBHOOK_PROXY_URL: "",
@@ -484,7 +484,7 @@ describe("Setup app", async () => {
 
       expect(successResponse.status).toBe(200);
       expect(await successResponse.text()).toBe(
-        successViewTemplate({
+        successView({
           name: "probot",
         }),
       );

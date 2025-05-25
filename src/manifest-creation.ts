@@ -2,24 +2,36 @@ import fs from "node:fs";
 import path from "node:path";
 
 import yaml from "js-yaml";
-import updateDotenv from "update-dotenv";
 import type { RequestParameters } from "@octokit/types";
 
+import type { Manifest, OctokitOptions, PackageJson } from "./types.js";
 import { ProbotOctokit } from "./octokit/probot-octokit.js";
 import { loadPackageJson } from "./helpers/load-package-json.js";
-import type { Env, Manifest, OctokitOptions, PackageJson } from "./types.js";
+import { updateEnv } from "./helpers/update-env.js";
 
 export class ManifestCreation {
+  #updateEnv: typeof updateEnv;
+
+  constructor(
+    options: {
+      updateEnv?: typeof updateEnv;
+    } = { updateEnv },
+  ) {
+    this.#updateEnv = options.updateEnv || updateEnv;
+  }
   get pkg() {
     return loadPackageJson();
   }
 
-  public async createWebhookChannel(): Promise<string | undefined> {
+  public async createWebhookChannel(
+    { SmeeClient: SmeeClientParam } = {} as { SmeeClient: any },
+  ): Promise<string | undefined> {
     try {
-      const SmeeClient = (await import("smee-client")).default;
+      const SmeeClient =
+        SmeeClientParam || (await import("smee-client")).default;
 
       const WEBHOOK_PROXY_URL = await SmeeClient.createChannel();
-      await this.updateEnv({
+      this.#updateEnv({
         WEBHOOK_PROXY_URL,
       });
       return WEBHOOK_PROXY_URL;
@@ -30,10 +42,17 @@ export class ManifestCreation {
     }
   }
 
-  public getManifest(pkg: PackageJson, baseUrl: string) {
+  public getManifest(options: {
+    pkg: PackageJson;
+    baseUrl: string;
+    readFileSync?: typeof fs.readFileSync;
+  }): string {
     let manifest: Partial<Manifest> = {};
+
+    const { pkg, baseUrl, readFileSync = fs.readFileSync } = options;
+
     try {
-      const file = fs.readFileSync(path.join(process.cwd(), "app.yml"), "utf8");
+      const file = readFileSync(path.join(process.cwd(), "app.yml"), "utf8");
       manifest = yaml.load(file) as Manifest;
     } catch (error) {
       // App config does not exist, which is ok.
@@ -80,7 +99,7 @@ export class ManifestCreation {
     );
 
     const { id, client_id, client_secret, webhook_secret, pem } = response.data;
-    await this.updateEnv({
+    this.#updateEnv({
       APP_ID: id.toString(),
       PRIVATE_KEY: `"${pem}"`,
       WEBHOOK_SECRET: webhook_secret,
@@ -89,11 +108,6 @@ export class ManifestCreation {
     });
 
     return response.data.html_url;
-  }
-
-  public async updateEnv(env: Env) {
-    // Needs to be public due to tests
-    return updateDotenv(env);
   }
 
   get createAppUrl() {

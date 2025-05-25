@@ -2,29 +2,17 @@ import { Stream } from "node:stream";
 
 import fetchMock from "fetch-mock";
 import { pino } from "pino";
-import request from "supertest";
-import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
+import getPort from "get-port";
+import { beforeEach, afterEach, describe, expect, it } from "vitest";
 
+import type { Env } from "../../src/types.js";
 import { Probot, Server } from "../../src/index.js";
 import { setupAppFactory } from "../../src/apps/setup.js";
 
-const mocks = vi.hoisted(() => {
-  return {
-    createChannel: vi.fn().mockResolvedValue("mocked proxy URL"),
-    updateDotenv: vi.fn().mockResolvedValue({}),
-  };
-});
-vi.mock("smee-client", () => ({
-  default: { createChannel: mocks.createChannel },
-  createChannel: mocks.createChannel,
-}));
-vi.mock("update-dotenv", () => ({
-  default: mocks.updateDotenv,
-}));
-
-describe("Setup app", () => {
+describe("Setup app", async () => {
   let server: Server;
   let logOutput: any[] = [];
+  let port = 0;
 
   const streamLogsToOutput = new Stream.Writable({ objectMode: true });
   streamLogsToOutput._write = (msg, _encoding, done) => {
@@ -32,8 +20,24 @@ describe("Setup app", () => {
     done();
   };
 
+  let updateEnvCalls: Env[] = [];
+  function updateEnv(env: Env) {
+    updateEnvCalls.push(env);
+    return env;
+  }
+
+  let SmeeClientCreateChannelCalls: any[] = [];
+  const SmeeClient = {
+    createChannel: async () => {
+      SmeeClientCreateChannelCalls.push("createChannel");
+      return "https://smee.io/1234ab1234";
+    },
+  };
   beforeEach(async () => {
     logOutput = [];
+    updateEnvCalls = [];
+    SmeeClientCreateChannelCalls = [];
+
     server = new Server({
       Probot: Probot.defaults({
         log: pino(streamLogsToOutput),
@@ -42,13 +46,23 @@ describe("Setup app", () => {
         privateKey: "dummy value for setup, see #1512",
       }),
       log: pino(streamLogsToOutput),
+      port: await getPort(),
     });
 
-    await server.load(setupAppFactory(undefined, undefined));
+    await server.loadHandlerFactory(
+      setupAppFactory({
+        host: server.host,
+        port: server.port,
+        updateEnv,
+        SmeeClient,
+      }),
+    );
+
+    await server.start();
   });
 
   afterEach(async () => {
-    vi.clearAllMocks();
+    await server.stop();
   });
 
   describe("logs", () => {
@@ -59,33 +73,44 @@ describe("Setup app", () => {
         "Probot is in setup mode, webhooks cannot be received and",
         "custom routes will not work until APP_ID and PRIVATE_KEY",
         "are configured in .env.",
-        "Please follow the instructions at http://localhost:3000 to configure .env.",
+        `Please follow the instructions at http://localhost:${server.port} to configure .env.`,
         "Once you are done, restart the server.",
         "",
+        `Running Probot v0.0.0-development (Node.js: ${process.version})`,
+        `Listening on http://localhost:${server.port}`,
       ];
 
       const infoLogs = logOutput
         .filter((output: any) => output.level === pino.levels.values.info)
         .map((o) => o.msg);
 
-      expect(infoLogs).toEqual(expect.arrayContaining(expMsgs));
+      expect(infoLogs).toEqual(expMsgs);
     });
 
     it("should log welcome message with custom host and port", async () => {
-      const server2 = new Server({
+      const server = new Server({
         log: pino(streamLogsToOutput),
         Probot: Probot.defaults({
           log: pino(streamLogsToOutput),
           // workaround for https://github.com/probot/probot/issues/1512
           appId: 1,
           privateKey: "dummy value for setup, see #1512",
+          port: await getPort(),
         }),
+        host: "localhost",
+        port,
       });
 
-      await server2.load(setupAppFactory("127.0.0.1", 8080));
+      await server.loadHandlerFactory(
+        setupAppFactory({
+          host: server.host,
+          port: server.port,
+          updateEnv,
+          SmeeClient,
+        }),
+      );
 
-      const expMsg =
-        "Please follow the instructions at http://127.0.0.1:8080 to configure .env.";
+      const expMsg = `Please follow the instructions at http://${server.host}:${server.port} to configure .env.`;
 
       const infoLogs = logOutput
         .filter((output: any) => output.level === pino.levels.values.info)
@@ -96,7 +121,10 @@ describe("Setup app", () => {
 
   describe("GET /probot", () => {
     it("returns a 200 response", async () => {
-      await request(server.expressApp).get("/probot").expect(200);
+      const response = await fetch(
+        `http://${server.host}:${server.port}/probot`,
+      );
+      expect(response.status).toBe(200);
     });
   });
 
@@ -127,20 +155,53 @@ describe("Setup app", () => {
         request: {
           fetch: mock.fetchHandler,
         },
+        port: await getPort(),
       });
 
-      await server.load(setupAppFactory(undefined, undefined));
+      await server.loadHandlerFactory(
+        setupAppFactory({
+          host: server.host,
+          port: server.port,
+          request: {
+            fetch: mock.fetchHandler,
+          },
+          updateEnv,
+          SmeeClient,
+        }),
+      );
 
-      const setupResponse = await request(server.expressApp)
-        .get("/probot/setup")
-        .query({ code: "123" })
-        .expect(302)
-        .expect("Location", "/apps/my-app/installations/new");
+      await server.start();
 
-      expect(setupResponse.text).toMatchSnapshot();
+      const setupResponse = await fetch(
+        `http://${server.host}:${server.port}/probot/setup?code=123`,
+        { method: "GET", redirect: "manual" },
+      );
 
-      expect(mocks.createChannel).toHaveBeenCalledTimes(2);
-      expect(mocks.updateDotenv.mock.calls).toMatchSnapshot();
+      expect(setupResponse.status).toBe(302);
+      expect(setupResponse.headers.get("location")).toBe(
+        "/apps/my-app/installations/new",
+      );
+
+      expect(await setupResponse.text()).toEqual(
+        "Found. Redirecting to /apps/my-app/installations/new",
+      );
+
+      expect(updateEnvCalls.length).toBe(3);
+      expect(updateEnvCalls[0]).toEqual({
+        WEBHOOK_PROXY_URL: "https://smee.io/1234ab1234",
+      });
+      expect(updateEnvCalls[1]).toEqual({
+        WEBHOOK_PROXY_URL: "https://smee.io/1234ab1234",
+      });
+      expect(updateEnvCalls[2]).toEqual({
+        APP_ID: "id",
+        GITHUB_CLIENT_ID: "Iv1.8a61f9b3a7aba766",
+        GITHUB_CLIENT_SECRET: "1726be1638095a19edd134c77bde3aa2ece1e5d8",
+        PRIVATE_KEY: '"pem"',
+        WEBHOOK_SECRET: "webhook_secret",
+      });
+
+      await server.stop();
     });
 
     it("throws a 400 Error if code is not provided", async () => {
@@ -152,15 +213,28 @@ describe("Setup app", () => {
           privateKey: "dummy value for setup, see #1512",
         }),
         log: pino(streamLogsToOutput),
+        port: await getPort(),
       });
 
-      await server.load(setupAppFactory(undefined, undefined));
+      await server.loadHandlerFactory(
+        setupAppFactory({
+          host: server.host,
+          port: server.port,
+          updateEnv,
+          SmeeClient,
+        }),
+      );
 
-      const setupResponse = await request(server.expressApp)
-        .get("/probot/setup")
-        .expect(400);
+      await server.start();
 
-      expect(setupResponse.text).toMatchSnapshot();
+      const setupResponse = await fetch(
+        `http://${server.host}:${server.port}/probot/setup`,
+      );
+
+      expect(setupResponse.status).toBe(400);
+      expect(await setupResponse.text()).toEqual("code missing or invalid");
+
+      await server.stop();
     });
 
     it("throws a 400 Error if code is an empty string", async () => {
@@ -172,26 +246,39 @@ describe("Setup app", () => {
           privateKey: "dummy value for setup, see #1512",
         }),
         log: pino(streamLogsToOutput),
+        port: await getPort(),
       });
 
-      await server.load(setupAppFactory(undefined, undefined));
+      await server.loadHandlerFactory(
+        setupAppFactory({
+          host: server.host,
+          port: server.port,
+          updateEnv,
+          SmeeClient,
+        }),
+      );
 
-      const setupResponse = await request(server.expressApp)
-        .get("/probot/setup")
-        .query({ code: "" })
-        .expect(400);
+      await server.start();
 
-      expect(setupResponse.text).toMatchSnapshot();
+      const setupResponse = await fetch(
+        `http://${server.host}:${server.port}/probot/setup?code=`,
+      );
+
+      expect(setupResponse.status).toBe(400);
+      expect(await setupResponse.text()).toEqual("code missing or invalid");
+
+      await server.stop();
     });
   });
 
   describe("GET /probot/import", () => {
     it("renders importView", async () => {
-      const importView = await request(server.expressApp)
-        .get("/probot/import")
-        .expect(200);
+      const importView = await fetch(
+        `http://${server.host}:${server.port}/probot/import`,
+      );
 
-      expect(importView.text).toMatchSnapshot();
+      expect(importView.status).toBe(200);
+      expect(await importView.text()).toMatchSnapshot();
     });
   });
 
@@ -203,14 +290,29 @@ describe("Setup app", () => {
         webhook_secret: "baz",
       });
 
-      await request(server.expressApp)
-        .post("/probot/import")
-        .set("content-type", "application/json")
-        .send(body)
-        .expect(200)
-        .expect("");
+      const response = await fetch(
+        `http://${server.host}:${server.port}/probot/import`,
+        {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+          },
+          body,
+        },
+      );
 
-      expect(mocks.updateDotenv.mock.calls).toMatchSnapshot();
+      expect(response.status).toBe(200);
+      expect(await response.text()).toBe("");
+
+      expect(updateEnvCalls.length).toBe(2);
+      expect(updateEnvCalls[0]).toEqual({
+        WEBHOOK_PROXY_URL: "https://smee.io/1234ab1234",
+      });
+      expect(updateEnvCalls[1]).toEqual({
+        APP_ID: "foo",
+        PRIVATE_KEY: '"bar"',
+        WEBHOOK_SECRET: "baz",
+      });
     });
 
     it("400 when keys are missing", async () => {
@@ -220,25 +322,38 @@ describe("Setup app", () => {
         webhook_secret: "baz",
       });
 
-      const importResponse = await request(server.expressApp)
-        .post("/probot/import")
-        .set("content-type", "application/json")
-        .send(body)
-        .expect(400);
+      const importResponse = await fetch(
+        `http://${server.host}:${server.port}/probot/import`,
+        {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+          },
+          body,
+        },
+      );
 
-      expect(importResponse.text).toMatchSnapshot();
+      expect(importResponse.status).toBe(400);
+      expect(await importResponse.text()).toEqual(
+        "appId and/or pem and/or webhook_secret missing",
+      );
     });
   });
 
   describe("GET /probot/success", () => {
     it("returns a 200 response", async () => {
-      const successResponse = await request(server.expressApp)
-        .get("/probot/success")
-        .expect(200);
+      const successResponse = await fetch(
+        `http://${server.host}:${server.port}/probot/success`,
+      );
 
-      expect(successResponse.text).toMatchSnapshot();
+      expect(successResponse.status).toBe(200);
+      expect(await successResponse.text()).toMatchSnapshot();
 
-      expect(mocks.createChannel).toHaveBeenCalledTimes(1);
+      expect(updateEnvCalls.length).toBe(1);
+      expect(updateEnvCalls[0]).toEqual({
+        WEBHOOK_PROXY_URL: "https://smee.io/1234ab1234",
+      });
+      expect(SmeeClientCreateChannelCalls.length).toBe(1);
     });
   });
 });

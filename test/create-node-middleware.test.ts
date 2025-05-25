@@ -1,8 +1,12 @@
-import { createServer, IncomingMessage, ServerResponse } from "node:http";
+import {
+  createServer,
+  type IncomingMessage,
+  type ServerResponse,
+} from "node:http";
+import { once } from "node:events";
 import Stream from "node:stream";
 
 import { pino } from "pino";
-import getPort from "get-port";
 import { sign } from "@octokit/webhooks-methods";
 import { describe, expect, test, beforeEach } from "vitest";
 
@@ -81,12 +85,15 @@ describe("createNodeMiddleware", () => {
     });
 
     const server = createServer(middleware);
-    const port = await getPort();
-    server.listen(port);
+    server.listen();
+
+    await once(server, "listening");
+
+    const port = (server.address() as any).port;
 
     const body = JSON.stringify(pushEvent);
 
-    await fetch(`http://127.0.0.1:${port}/api/github/webhooks`, {
+    await fetch(`http://localhost:${port}/api/github/webhooks`, {
       method: "POST",
       headers: {
         "content-type": "application/json",
@@ -125,12 +132,15 @@ describe("createNodeMiddleware", () => {
     });
 
     const server = createServer(middleware);
-    const port = await getPort();
-    server.listen(port);
+    server.listen();
+
+    await once(server, "listening");
+
+    const port = (server.address() as any).port;
 
     const body = JSON.stringify(pushEvent);
 
-    await fetch(`http://127.0.0.1:${port}`, {
+    await fetch(`http://localhost:${port}`, {
       method: "POST",
       headers: {
         "content-type": "application/json",
@@ -169,12 +179,15 @@ describe("createNodeMiddleware", () => {
     });
 
     const server = createServer(middleware);
-    const port = await getPort();
-    server.listen(port);
+    server.listen();
+
+    await once(server, "listening");
+
+    const port = (server.address() as any).port;
 
     const body = JSON.stringify(pushEvent);
 
-    await fetch(`http://127.0.0.1:${port}`, {
+    await fetch(`http://localhost:${port}`, {
       method: "POST",
       headers: {
         "content-type": "application/json",

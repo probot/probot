@@ -1,4 +1,4 @@
-import { LRUCache } from "lru-cache";
+import { Lru } from "toad-cache";
 import type { Logger } from "pino";
 import type { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
 
@@ -22,7 +22,14 @@ export type Constructor<T = any> = new (...args: any[]) => T;
 
 export class Probot {
   static version = VERSION;
-  static defaults<S extends Constructor>(this: S, defaults: Options) {
+  static defaults<S extends Constructor>(
+    this: S,
+    defaults: Options,
+  ): {
+    new (...args: any[]): {
+      [x: string]: any;
+    };
+  } & S {
     const ProbotWithDefaults = class extends this {
       constructor(...args: any[]) {
         const options = args[0] || {};
@@ -45,7 +52,7 @@ export class Probot {
     log?: Logger,
   ) => Promise<ProbotOctokit>;
 
-  private state: State;
+  #state: State;
 
   constructor(options: Options = {}) {
     options.secret = options.secret || "development";
@@ -58,12 +65,12 @@ export class Probot {
       : getLog({ level, logMessageKey });
 
     // TODO: support redis backend for access token cache if `options.redisConfig`
-    const cache = new LRUCache<number, string>({
+    const cache = new Lru<string>(
       // cache max. 15000 tokens, that will use less than 10mb memory
-      max: 15000,
+      15000,
       // Cache for 1 minute less than GitHub expiry
-      ttl: 1000 * 60 * 59,
-    });
+      1000 * 60 * 59,
+    );
 
     const Octokit = getProbotOctokitWithDefaults({
       githubToken: options.githubToken,
@@ -74,6 +81,7 @@ export class Probot {
       log: rebindLog(this.log),
       redisConfig: options.redisConfig,
       baseUrl: options.baseUrl,
+      request: options.request,
     });
     const octokitLogger = rebindLog(this.log.child({ name: "octokit" }));
     const octokit = new Octokit({
@@ -81,7 +89,7 @@ export class Probot {
       log: octokitLogger,
     });
 
-    this.state = {
+    this.#state = {
       cache,
       githubToken: options.githubToken,
       log: rebindLog(this.log),
@@ -96,12 +104,13 @@ export class Probot {
       port: options.port,
       webhookPath: options.webhookPath || defaultWebhooksPath,
       request: options.request,
+      server: options.server,
     };
 
-    this.auth = auth.bind(null, this.state);
+    this.auth = auth.bind(null, this.#state);
 
-    this.webhooks = getWebhooks(this.state);
-    this.webhookPath = this.state.webhookPath;
+    this.webhooks = getWebhooks(this.#state);
+    this.webhookPath = this.#state.webhookPath;
 
     this.on = this.webhooks.on;
     this.onAny = this.webhooks.onAny;
@@ -110,22 +119,33 @@ export class Probot {
     this.version = VERSION;
   }
 
-  public receive(event: WebhookEvent) {
+  public receive(event: WebhookEvent): Promise<void> {
     this.log.debug({ event }, "Webhook received");
     return this.webhooks.receive(event);
   }
 
   public async load(
     appFn: ApplicationFunction | ApplicationFunction[],
-    options: ApplicationFunctionOptions = {},
-  ) {
+    options: ApplicationFunctionOptions = {
+      cwd: process.cwd(),
+    } as ApplicationFunctionOptions,
+  ): Promise<void> {
+    if (typeof options.addHandler !== "function") {
+      options.addHandler = this.#state.server
+        ? this.#state.server.addHandler.bind(this.#state.server)
+        : () => {
+            throw new Error("No server instance");
+          };
+    }
+
     if (Array.isArray(appFn)) {
       for (const fn of appFn) {
-        await this.load(fn);
+        await this.load(fn, options);
       }
       return;
     }
 
-    return appFn(this, options);
+    await appFn(this, options);
+    return;
   }
 }

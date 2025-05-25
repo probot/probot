@@ -1,18 +1,18 @@
-import express from "express";
+import type { IncomingMessage, ServerResponse } from "node:http";
 import type {
   EmitterWebhookEvent as WebhookEvent,
   Webhooks,
 } from "@octokit/webhooks";
-import type { LRUCache } from "lru-cache";
 import type { RedisOptions } from "ioredis";
 import type { Options as LoggingOptions } from "pino-http";
 
-import { Probot } from "./index.js";
-import { Context } from "./context.js";
-import { ProbotOctokit } from "./octokit/probot-octokit.js";
+import type { Probot, Server } from "./exports.js";
+import type { Context } from "./context.js";
+import type { ProbotOctokit } from "./octokit/probot-octokit.js";
 
 import type { Logger } from "pino";
 import type { RequestRequestOptions } from "@octokit/types";
+import type { Lru } from "toad-cache";
 
 export interface Options {
   privateKey?: string;
@@ -27,9 +27,11 @@ export interface Options {
   logMessageKey?: string;
   port?: number;
   host?: string;
+  server?: Server;
   baseUrl?: string;
   request?: RequestRequestOptions;
   webhookPath?: string;
+  webhookProxy?: string;
 }
 
 export type State = {
@@ -39,7 +41,7 @@ export type State = {
   log: Logger;
   Octokit: typeof ProbotOctokit;
   octokit: ProbotOctokit;
-  cache?: LRUCache<number, string>;
+  cache?: Lru<string>;
   webhooks: {
     secret?: string;
   };
@@ -48,6 +50,7 @@ export type State = {
   baseUrl?: string;
   webhookPath: string;
   request?: RequestRequestOptions;
+  server?: Server | void;
 };
 
 // Omit the `payload`, `id`,`name` properties from the `Context` class as they are already present in the types of `WebhookEvent`
@@ -60,14 +63,25 @@ type SimplifiedObject = Omit<Context, keyof WebhookEvent>;
 export type ProbotWebhooks = Webhooks<SimplifiedObject>;
 
 export type ApplicationFunctionOptions = {
-  getRouter?: (path?: string) => express.Router;
-  cwd?: string;
+  cwd: string;
+  addHandler: (handler: Handler) => void;
   [key: string]: unknown;
 };
+
+export type HandlerFactory = (
+  app: Probot,
+  options: ApplicationFunctionOptions,
+) => Handler | Promise<Handler>;
+
 export type ApplicationFunction = (
   app: Probot,
   options: ApplicationFunctionOptions,
 ) => void | Promise<void>;
+
+export type Handler = (
+  req: IncomingMessage,
+  res: ServerResponse,
+) => void | boolean | Promise<void | boolean>;
 
 export type ServerOptions = {
   cwd?: string;
@@ -76,6 +90,11 @@ export type ServerOptions = {
   host?: string;
   webhookPath?: string;
   webhookProxy?: string;
+
+  enablePing?: boolean;
+  enableNotFound?: boolean;
+  enableStaticFiles?: boolean;
+
   Probot: typeof Probot;
   loggingOptions?: LoggingOptions;
   request?: RequestRequestOptions;
@@ -102,7 +121,7 @@ export type PackageJson = {
   };
 };
 
-export type Env = Record<Uppercase<string>, string>;
+export type Env = NodeJS.ProcessEnv;
 
 type ManifestPermissionValue = "read" | "write" | "none";
 type ManifestPermissionScope =

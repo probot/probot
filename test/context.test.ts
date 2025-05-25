@@ -100,26 +100,32 @@ describe("Context", () => {
     });
 
     it("returns attributes from repository payload", () => {
-      expect(context.repo()).toEqual({
-        owner: "Codertocat",
-        repo: "Hello-World",
-      });
+      const repository = context.repo();
+
+      expect(typeof repository).toBe("object");
+      expect(Object.keys(repository).length).toBe(2);
+      expect(repository.owner).toBe("Codertocat");
+      expect(repository.repo).toBe("Hello-World");
     });
 
     it("merges attributes", () => {
-      expect(context.repo({ foo: 1, bar: 2 })).toEqual({
-        bar: 2,
-        foo: 1,
-        owner: "Codertocat",
-        repo: "Hello-World",
-      });
+      const repository = context.repo({ foo: 1, bar: 2 });
+
+      expect(typeof repository).toBe("object");
+      expect(Object.keys(repository).length).toBe(4);
+      expect(repository.owner).toBe("Codertocat");
+      expect(repository.repo).toBe("Hello-World");
+      expect(repository.foo).toBe(1);
+      expect(repository.bar).toBe(2);
     });
 
     it("overrides repo attributes", () => {
-      expect(context.repo({ owner: "muahaha" })).toEqual({
-        owner: "muahaha",
-        repo: "Hello-World",
-      });
+      const repository = context.repo({ owner: "muahaha" });
+
+      expect(typeof repository).toBe("object");
+      expect(Object.keys(repository).length).toBe(2);
+      expect(repository.owner).toBe("muahaha");
+      expect(repository.repo).toBe("Hello-World");
     });
 
     // The `repository` object on the push event has a different format than the other events
@@ -133,7 +139,13 @@ describe("Context", () => {
       };
 
       context = new Context<"push">(event, octokit as any, {} as any);
-      expect(context.repo()).toEqual({ owner: "bkeepers-inc", repo: "test" });
+
+      const repository = context.repo();
+
+      expect(typeof repository).toBe("object");
+      expect(Object.keys(repository).length).toBe(2);
+      expect(repository.owner).toBe("bkeepers-inc");
+      expect(repository.repo).toBe("test");
     });
 
     it("return error for context.repo() when repository doesn't exist", () => {
@@ -178,29 +190,35 @@ describe("Context", () => {
       context = new Context<"issues">(event, octokit as any, {} as any);
     });
     it("returns attributes from repository payload", () => {
-      expect(context.issue()).toEqual({
-        owner: "Codertocat",
-        repo: "Hello-World",
-        issue_number: 1,
-      });
+      const issue = context.issue();
+
+      expect(typeof issue).toBe("object");
+      expect(Object.keys(issue).length).toBe(3);
+      expect(issue.owner).toBe("Codertocat");
+      expect(issue.repo).toBe("Hello-World");
+      expect(issue.issue_number).toBe(1);
     });
 
     it("merges attributes", () => {
-      expect(context.issue({ foo: 1, bar: 2 })).toEqual({
-        bar: 2,
-        foo: 1,
-        issue_number: 1,
-        owner: "Codertocat",
-        repo: "Hello-World",
-      });
+      const issue = context.issue({ foo: 1, bar: 2 });
+
+      expect(typeof issue).toBe("object");
+      expect(Object.keys(issue).length).toBe(5);
+      expect(issue.owner).toBe("Codertocat");
+      expect(issue.repo).toBe("Hello-World");
+      expect(issue.issue_number).toBe(1);
+      expect(issue.foo).toBe(1);
+      expect(issue.bar).toBe(2);
     });
 
     it("overrides repo attributes", () => {
-      expect(context.issue({ owner: "muahaha", issue_number: 5 })).toEqual({
-        issue_number: 5,
-        owner: "muahaha",
-        repo: "Hello-World",
-      });
+      const issue = context.issue({ owner: "muahaha", issue_number: 5 });
+
+      expect(typeof issue).toBe("object");
+      expect(Object.keys(issue).length).toBe(3);
+      expect(issue.owner).toBe("muahaha");
+      expect(issue.issue_number).toBe(5);
+      expect(issue.repo).toBe("Hello-World");
     });
   });
 
@@ -222,31 +240,38 @@ describe("Context", () => {
       context = new Context<"pull_request">(event, octokit as any, {} as any);
     });
     it("returns attributes from repository payload", () => {
-      expect(context.pullRequest()).toEqual({
-        owner: "Codertocat",
-        repo: "Hello-World",
-        pull_number: 2,
-      });
+      const pullRequest = context.pullRequest();
+
+      expect(typeof pullRequest).toBe("object");
+      expect(Object.keys(pullRequest).length).toBe(3);
+      expect(pullRequest.owner).toBe("Codertocat");
+      expect(pullRequest.repo).toBe("Hello-World");
+      expect(pullRequest.pull_number).toBe(2);
     });
 
     it("merges attributes", () => {
-      expect(context.pullRequest({ foo: 1, bar: 2 })).toEqual({
-        bar: 2,
-        foo: 1,
-        owner: "Codertocat",
-        pull_number: 2,
-        repo: "Hello-World",
-      });
+      const pullRequest = context.pullRequest({ foo: 1, bar: 2 });
+
+      expect(typeof pullRequest).toBe("object");
+      expect(Object.keys(pullRequest).length).toBe(5);
+      expect(pullRequest.owner).toBe("Codertocat");
+      expect(pullRequest.repo).toBe("Hello-World");
+      expect(pullRequest.pull_number).toBe(2);
+      expect(pullRequest.foo).toBe(1);
+      expect(pullRequest.bar).toBe(2);
     });
 
     it("overrides repo attributes", () => {
-      expect(context.pullRequest({ owner: "muahaha", pull_number: 5 })).toEqual(
-        {
-          owner: "muahaha",
-          pull_number: 5,
-          repo: "Hello-World",
-        },
-      );
+      const pullRequest = context.pullRequest({
+        owner: "muahaha",
+        pull_number: 5,
+      });
+
+      expect(typeof pullRequest).toBe("object");
+      expect(Object.keys(pullRequest).length).toBe(3);
+      expect(pullRequest.owner).toBe("muahaha");
+      expect(pullRequest.pull_number).toBe(5);
+      expect(pullRequest.repo).toBe("Hello-World");
     });
   });
 
@@ -285,11 +310,12 @@ describe("Context", () => {
       const context = new Context(event, octokit, {} as any);
 
       const config = await context.config("test-file.yml");
-      expect(config).toEqual({
-        bar: 7,
-        baz: 11,
-        foo: 5,
-      });
+
+      expect(typeof config).toBe("object");
+      expect(Object.keys(config as any).length).toBe(3);
+      expect((config as any).foo).toBe(5);
+      expect((config as any).bar).toBe(7);
+      expect((config as any).baz).toBe(11);
     });
 
     it("returns null when the file and base repository are missing", async () => {

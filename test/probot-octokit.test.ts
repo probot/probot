@@ -60,7 +60,7 @@ describe("ProbotOctokit", () => {
   });
 
   test("with retry enabled retries failed requests", async () => {
-    let callCount = 0;
+    const fetchCalls: { url: string; options: any }[] = [];
 
     const octokit = new ProbotOctokit({
       ...defaultOptions,
@@ -69,21 +69,17 @@ describe("ProbotOctokit", () => {
       },
       request: {
         fetch: (url: string, options: { [key: string]: any }) => {
-          expect(url).toBe("https://api.github.com/");
-          expect(options.method).toBe("GET");
-          expect(options.headers.accept).toBe("application/vnd.github.v3+json");
-          expect(options.headers["user-agent"].slice(0, 7)).toBe("probot/");
-          expect(options.signal).toBe(undefined);
-          expect(options.body).toBe(undefined);
+          fetchCalls.push({ url, options });
 
-          if (callCount++ === 0) {
-            return Promise.reject({});
+          if (fetchCalls.length === 1) {
+            throw new Error("Simulated request failure");
           }
 
-          return Promise.resolve({
+          return new Response("{}", {
             status: 200,
-            headers: new Headers(),
-            text: () => Promise.resolve("{}"),
+            headers: new Headers({
+              "content-type": "application/json",
+            }),
           });
         },
       },
@@ -91,10 +87,20 @@ describe("ProbotOctokit", () => {
 
     const response = await octokit.request("/");
     expect(response.status).toBe(200);
+
+    expect(fetchCalls.length).toBe(2);
+    for (const { url, options } of fetchCalls) {
+      expect(url).toBe("https://api.github.com/");
+      expect(options.method).toBe("GET");
+      expect(options.headers.accept).toBe("application/vnd.github.v3+json");
+      expect(options.headers["user-agent"].slice(0, 7)).toBe("probot/");
+      expect(options.signal).toBe(undefined);
+      expect(options.body).toBe(undefined);
+    }
   });
 
   test("with throttling enabled retries requests when being rate limited", async () => {
-    let callCount = 0;
+    const fetchCalls: { url: string; options: any }[] = [];
 
     const octokit = new ProbotOctokit({
       ...defaultOptions,
@@ -110,29 +116,25 @@ describe("ProbotOctokit", () => {
       },
       request: {
         fetch: (url: string, options: { [key: string]: any }) => {
-          expect(url).toBe("https://api.github.com/");
-          expect(options.method).toBe("GET");
-          expect(options.headers.accept).toBe("application/vnd.github.v3+json");
-          expect(options.headers["user-agent"].slice(0, 7)).toBe("probot/");
-          expect(options.signal).toBe(undefined);
-          expect(options.body).toBe(undefined);
+          fetchCalls.push({ url, options });
 
-          if (callCount++ === 0) {
-            return Promise.resolve({
+          if (fetchCalls.length === 1) {
+            return new Response("{}", {
               status: 403,
               headers: new Headers({
+                "content-type": "application/json",
                 "X-RateLimit-Limit": "60",
                 "X-RateLimit-Remaining": "0",
                 "X-RateLimit-Reset": `${new Date().getTime() / 1000}`,
               }),
-              text: () => Promise.resolve("{}"),
             });
           }
 
-          return Promise.resolve({
+          return new Response("{}", {
             status: 200,
-            headers: new Headers(),
-            text: () => Promise.resolve("{}"),
+            headers: new Headers({
+              "content-type": "application/json",
+            }),
           });
         },
       },
@@ -140,6 +142,16 @@ describe("ProbotOctokit", () => {
 
     const { status } = await octokit.request("/");
     expect(status).toBe(200);
+
+    expect(fetchCalls.length).toBe(2);
+    for (const { url, options } of fetchCalls) {
+      expect(url).toBe("https://api.github.com/");
+      expect(options.method).toBe("GET");
+      expect(options.headers.accept).toBe("application/vnd.github.v3+json");
+      expect(options.headers["user-agent"].slice(0, 7)).toBe("probot/");
+      expect(options.signal).toBe(undefined);
+      expect(options.body).toBe(undefined);
+    }
   });
 
   test("with throttling enabled using default onPrimaryRateLimit", async () => {
@@ -165,21 +177,19 @@ describe("ProbotOctokit", () => {
           fetchCalls.push({ url, options });
 
           if (fetchCalls.length === 1) {
-            return Promise.resolve({
+            return new Response("{}", {
               status: 403,
               headers: new Headers({
                 "X-RateLimit-Limit": "60",
                 "X-RateLimit-Remaining": "0",
                 "X-RateLimit-Reset": `${new Date().getTime() / 1000}`,
               }),
-              text: () => Promise.resolve("{}"),
             });
           }
 
-          return Promise.resolve({
+          return new Response("{}", {
             status: 200,
             headers: new Headers(),
-            text: () => Promise.resolve("{}"),
           });
         },
       },
@@ -200,7 +210,7 @@ describe("ProbotOctokit", () => {
   });
 
   test("with throttling enabled retries requests when hitting the secondary rate limiter", async () => {
-    let callCount = 0;
+    const fetchCalls: { url: string; options: any }[] = [];
 
     const octokit = new ProbotOctokit({
       ...defaultOptions,
@@ -216,28 +226,23 @@ describe("ProbotOctokit", () => {
       },
       request: {
         fetch: (url: string, options: { [key: string]: any }) => {
-          expect(url).toBe("https://api.github.com/");
-          expect(options.method).toBe("GET");
-          expect(options.headers.accept).toBe("application/vnd.github.v3+json");
-          expect(options.headers["user-agent"].slice(0, 7)).toBe("probot/");
-          expect(options.signal).toBe(undefined);
-          expect(options.body).toBe(undefined);
+          fetchCalls.push({ url, options });
 
-          if (callCount++ === 0) {
-            return Promise.resolve({
-              status: 403,
-              headers: new Headers(),
-              text: () =>
-                Promise.resolve(
-                  "The throttle plugin just looks for the word secondary rate in the error message",
-                ),
-            });
+          if (fetchCalls.length === 1) {
+            return new Response(
+              "The throttle plugin just looks for the word secondary rate in the error message",
+              {
+                status: 403,
+                headers: new Headers({
+                  "content-type": "application/json",
+                }),
+              },
+            );
           }
 
-          return Promise.resolve({
+          return new Response("{}", {
             status: 200,
-            headers: new Headers(),
-            text: () => Promise.resolve("{}"),
+            headers: new Headers({ "content-type": "application/json" }),
           });
         },
       },
@@ -245,6 +250,16 @@ describe("ProbotOctokit", () => {
 
     const response = await octokit.request("/");
     expect(response.status).toBe(200);
+
+    expect(fetchCalls.length).toBe(2);
+    for (const { url, options } of fetchCalls) {
+      expect(url).toBe("https://api.github.com/");
+      expect(options.method).toBe("GET");
+      expect(options.headers.accept).toBe("application/vnd.github.v3+json");
+      expect(options.headers["user-agent"].slice(0, 7)).toBe("probot/");
+      expect(options.signal).toBe(undefined);
+      expect(options.body).toBe(undefined);
+    }
   });
 
   it("with throttling enabled using default onSecondaryRateLimit", async () => {
@@ -319,21 +334,24 @@ describe("ProbotOctokit", () => {
   });
 
   it("paginate returns an array of pages", async () => {
-    let callCount = 0;
     const fetchCalls: { url: string; options: any }[] = [];
 
     const octokit = new ProbotOctokit({
       ...defaultOptions,
       request: {
         fetch: (url: string, options: { [key: string]: any }) => {
+          const curPage = Number.parseInt(
+            new URL(url).searchParams.get("page") || "0",
+          );
+
           fetchCalls.push({ url, options });
-          return Promise.resolve({
+          return new Response(JSON.stringify([issues[curPage]]), {
             status: 200,
-            text: () => Promise.resolve([issues[callCount++]]),
             headers: new Headers({
+              "content-type": "application/json",
               link:
-                callCount !== 4
-                  ? `link: '<https://api.github.com/repos/JasonEtco/pizza/issues?per_page=1&page=${callCount}>; rel="next"',`
+                curPage !== 4
+                  ? `link: '<https://api.github.com/repos/JasonEtco/pizza/issues?per_page=1&page=${curPage + 1}>; rel="next"',`
                   : "",
             }),
           });
@@ -357,18 +375,12 @@ describe("ProbotOctokit", () => {
     expect(fetchCalls.length).toBe(5);
     for (let i = 0; i < fetchCalls.length; i++) {
       const { url, options } = fetchCalls[i];
-      if (i === 0) {
-        expect(url).toBe(
-          "https://api.github.com/repos/JasonEtco/pizza/issues?per_page=1",
-        );
-      } else {
-        const { host, protocol, pathname, searchParams } = new URL(url);
-        expect(protocol).toBe("https:");
-        expect(host).toBe("api.github.com");
-        expect(pathname).toBe("/repos/JasonEtco/pizza/issues");
-        expect(searchParams.get("per_page")).toBe("1");
-        expect(searchParams.get("page")).toBe((i - 1).toString());
-      }
+      const { host, protocol, pathname, searchParams } = new URL(url);
+      expect(protocol).toBe("https:");
+      expect(host).toBe("api.github.com");
+      expect(pathname).toBe("/repos/JasonEtco/pizza/issues");
+      expect(searchParams.get("per_page")).toBe("1");
+      expect(searchParams.get("page")).toBe(i === 0 ? null : i.toString());
       expect(options.method).toBe("GET");
       expect(options.headers.accept).toBe("application/vnd.github.v3+json");
       expect(options.headers["user-agent"].slice(0, 7)).toBe("probot/");
@@ -383,36 +395,25 @@ describe("ProbotOctokit", () => {
   });
 
   it("paginate stops iterating if the done() function is called in the callback", async () => {
-    let callCount = 0;
+    const fetchCalls: { url: string; options: any }[] = [];
+
     const octokit = new ProbotOctokit({
       ...defaultOptions,
       request: {
         fetch: (url: string, options: { [key: string]: any }) => {
-          if (callCount === 0) {
-            expect(url).toBe(
-              "https://api.github.com/repos/JasonEtco/pizza/issues?per_page=1",
-            );
-          } else {
-            const { host, protocol, pathname, searchParams } = new URL(url);
-            expect(protocol).toBe("https:");
-            expect(host).toBe("api.github.com");
-            expect(pathname).toBe("/repositories/123/issues");
-            expect(searchParams.get("per_page")).toBe("1");
-            expect(searchParams.get("page")).toBe((callCount - 1).toString());
-          }
-          expect(options.method).toBe("GET");
-          expect(options.headers.accept).toBe("application/vnd.github.v3+json");
-          expect(options.headers["user-agent"].slice(0, 7)).toBe("probot/");
-          expect(options.signal).toBe(undefined);
-          expect(options.body).toBe(undefined);
+          fetchCalls.push({ url, options });
 
-          return Promise.resolve({
+          const curPage = Number.parseInt(
+            new URL(url).searchParams.get("page") || "0",
+          );
+
+          return new Response(JSON.stringify([issues[curPage]]), {
             status: 200,
-            text: () => Promise.resolve([issues[callCount++]]),
             headers: new Headers({
+              "content-type": "application/json",
               link:
-                callCount !== 4
-                  ? `link: '<https://api.github.com/repositories/123/issues?per_page=1&page=${callCount}>; rel="next"',`
+                curPage !== 4
+                  ? `link: '<https://api.github.com/repos/JasonEtco/pizza/issues?per_page=1&page=${curPage + 1}>; rel="next"',`
                   : "",
             }),
           });
@@ -433,41 +434,47 @@ describe("ProbotOctokit", () => {
       }),
       spy,
     );
+
+    expect(fetchCalls.length).toBe(3);
+    for (let i = 0; i < fetchCalls.length; i++) {
+      const { url, options } = fetchCalls[i];
+      const { host, protocol, pathname, searchParams } = new URL(url);
+      expect(protocol).toBe("https:");
+      expect(host).toBe("api.github.com");
+      expect(pathname).toBe("/repos/JasonEtco/pizza/issues");
+      expect(searchParams.get("per_page")).toBe("1");
+      expect(searchParams.get("page")).toBe(i === 0 ? null : i.toString());
+      expect(options.method).toBe("GET");
+      expect(options.headers.accept).toBe("application/vnd.github.v3+json");
+      expect(options.headers["user-agent"].slice(0, 7)).toBe("probot/");
+      expect(options.signal).toBe(undefined);
+      expect(options.body).toBe(undefined);
+    }
+
     expect(res.length).toBe(3);
     expect(callCountSpy).toBe(3);
   });
 
   it("paginate maps the responses to data by default", async () => {
-    let callCount = 0;
+    const fetchCalls: { url: string; options: any }[] = [];
+
     const octokit = new ProbotOctokit({
       ...defaultOptions,
       request: {
         fetch: (url: string, options: { [key: string]: any }) => {
-          if (callCount === 0) {
-            expect(url).toBe(
-              "https://api.github.com/repos/JasonEtco/pizza/issues?per_page=1",
-            );
-          } else {
-            const { host, protocol, pathname, searchParams } = new URL(url);
-            expect(protocol).toBe("https:");
-            expect(host).toBe("api.github.com");
-            expect(pathname).toBe("/repositories/123/issues");
-            expect(searchParams.get("per_page")).toBe("1");
-            expect(searchParams.get("page")).toBe((callCount - 1).toString());
-          }
-          expect(options.method).toBe("GET");
-          expect(options.headers.accept).toBe("application/vnd.github.v3+json");
-          expect(options.headers["user-agent"].slice(0, 7)).toBe("probot/");
-          expect(options.signal).toBe(undefined);
-          expect(options.body).toBe(undefined);
+          fetchCalls.push({ url, options });
 
-          return Promise.resolve({
+          const curPage = Number.parseInt(
+            new URL(url).searchParams.get("page") || "0",
+          );
+
+          return new Response(JSON.stringify([issues[curPage]]), {
             status: 200,
-            text: () => Promise.resolve([issues[callCount++]]),
             headers: new Headers({
+              "content-type": "application/json",
               link:
-                callCount !== 4
-                  ? `link: '<https://api.github.com/repositories/123/issues?per_page=1&page=${callCount}>; rel="next"',`
+                curPage !== 4
+                  ? `link: '<https://api.github.com/repos/JasonEtco/pizza/issues?per_page=1&page=${curPage + 1}>; rel="next"',`
                   : "",
             }),
           });
@@ -482,5 +489,21 @@ describe("ProbotOctokit", () => {
       }),
     );
     expect(JSON.stringify(res)).toBe(JSON.stringify(issues));
+
+    expect(fetchCalls.length).toBe(5);
+    for (let i = 0; i < fetchCalls.length; i++) {
+      const { url, options } = fetchCalls[i];
+      const { host, protocol, pathname, searchParams } = new URL(url);
+      expect(protocol).toBe("https:");
+      expect(host).toBe("api.github.com");
+      expect(pathname).toBe("/repos/JasonEtco/pizza/issues");
+      expect(searchParams.get("per_page")).toBe("1");
+      expect(searchParams.get("page")).toBe(i === 0 ? null : i.toString());
+      expect(options.method).toBe("GET");
+      expect(options.headers.accept).toBe("application/vnd.github.v3+json");
+      expect(options.headers["user-agent"].slice(0, 7)).toBe("probot/");
+      expect(options.signal).toBe(undefined);
+      expect(options.body).toBe(undefined);
+    }
   });
 });

@@ -15,7 +15,7 @@ import { describe, expect, it } from "vitest";
 import { sign } from "@octokit/webhooks-methods";
 
 import { getPayload } from "../../src/helpers/get-payload.js";
-import { getRuntimeName } from "../../src/helpers/detect-runtime.js";
+import { getRuntimeName } from "../../src/helpers/get-runtime-name.js";
 
 type RequestHandler = (req: IncomingMessage, res: ServerResponse) => void;
 

@@ -14,18 +14,16 @@ import type {
   ServerOptions,
 } from "../types.js";
 import type { Probot } from "../exports.js";
+
 import { rebindLog } from "../helpers/rebind-log.js";
+import { getPrintableHost } from "../helpers/get-printable-host.js";
+import { getRuntimeName } from "../helpers/get-runtime-name.js";
+import { getRuntimeVersion } from "../helpers/get-runtime-version.js";
 
 import { loggingHandler } from "./handlers/logging.js";
-import { getPrintableHost } from "../helpers/get-printable-host.js";
-
 import { notFoundHandler } from "./handlers/not-found.js";
 import { pingHandler } from "./handlers/ping.js";
 import { staticFilesHandler } from "./handlers/static-files.js";
-import {
-  getRuntimeName,
-  getRuntimeVersion,
-} from "../helpers/detect-runtime.js";
 
 // the default path as defined in @octokit/webhooks
 export const defaultWebhooksPath = "/api/github/webhooks";

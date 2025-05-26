@@ -11,10 +11,9 @@ import { setupAppFactory } from "../../src/apps/setup.js";
 
 import { importView } from "../../src/views/import.js";
 import { successView } from "../../src/views/success.js";
-import {
-  getRuntimeName,
-  getRuntimeVersion,
-} from "../../src/helpers/detect-runtime.js";
+
+import { getRuntimeName } from "../../src/helpers/get-runtime-name.js";
+import { getRuntimeVersion } from "../../src/helpers/get-runtime-version.js";
 
 describe("Setup app", () => {
   let logOutput: any[] = [];

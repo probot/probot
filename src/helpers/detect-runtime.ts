@@ -1,6 +1,6 @@
 type Runtime = "node" | "deno" | "bun" | "browser";
 
-type GlobalThis = {
+export type GlobalThis = {
   process?: {
     versions?: {
       node?: string;
@@ -35,36 +35,4 @@ export function detectRuntime(globalThis: GlobalThis): Runtime {
   }
 
   throw new Error("Unable to detect runtime");
-}
-
-export function getRuntimeVersion(globalThis: GlobalThis): string {
-  const runtime = detectRuntime(globalThis);
-  switch (runtime) {
-    case "node":
-      return globalThis.process!.versions!.node!;
-    case "deno":
-      return globalThis.process!.versions!.deno!;
-    case "bun":
-      return globalThis.process!.versions!.bun!;
-    case "browser":
-      return "N/A";
-    default:
-      throw new Error("Unknown runtime");
-  }
-}
-
-export function getRuntimeName(globalThis: GlobalThis): string {
-  const runtime = detectRuntime(globalThis);
-  switch (runtime) {
-    case "node":
-      return "Node.js";
-    case "deno":
-      return "Deno";
-    case "bun":
-      return "Bun";
-    case "browser":
-      return "Browser";
-    default:
-      throw new Error("Unknown runtime");
-  }
 }

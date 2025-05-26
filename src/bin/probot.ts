@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 
 import { config as dotenvConfig } from "dotenv";
+import { detectRuntime } from "../helpers/detect-runtime.js";
 import { isSupportedRuntime } from "../helpers/is-supported-runtime.js";
 import { loadPackageJson } from "../helpers/load-package-json.js";
 import { run } from "../run.js";
@@ -15,7 +16,7 @@ const pkg = loadPackageJson(resolve(__dirname, "package.json"));
 
 if (!isSupportedRuntime(globalThis)) {
   console.log(
-    `Node.js version 20.17 or 22 is required. You have ${process.version}.`,
+    `Node.js version 20.17 or 22, or Bun version 1.2.14 is required. You have ${detectRuntime(globalThis)} ${process.version}.`,
   );
   process.exit(1);
 }

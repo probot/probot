@@ -42,10 +42,34 @@ describe("isSupportedRuntime", () => {
     ).toBe(false);
   });
 
-  it("returns false if runtime is bun, deno or browser", () => {
+  it("returns true if bun is bigger or equal v1.2.0", () => {
+    expect(
+      isSupportedRuntime({ process: { versions: { bun: "1.2.0" } } }),
+    ).toBe(true);
+    expect(
+      isSupportedRuntime({ process: { versions: { bun: "1.2.14" } } }),
+    ).toBe(true);
+    expect(
+      isSupportedRuntime({ process: { versions: { bun: "1.3.0" } } }),
+    ).toBe(true);
+    expect(
+      isSupportedRuntime({ process: { versions: { bun: "2.0.0" } } }),
+    ).toBe(true);
+  });
+
+  it("returns false if bun is smaller than v1.2.0", () => {
     expect(
       isSupportedRuntime({ process: { versions: { bun: "1.0.0" } } }),
     ).toBe(false);
+    expect(
+      isSupportedRuntime({ process: { versions: { bun: "1.1.0" } } }),
+    ).toBe(false);
+    expect(
+      isSupportedRuntime({ process: { versions: { bun: "0.9.0" } } }),
+    ).toBe(false);
+  });
+
+  it("returns false if runtime is bun, deno or browser", () => {
     expect(
       isSupportedRuntime({ process: { versions: { deno: "1.0.0" } } }),
     ).toBe(false);

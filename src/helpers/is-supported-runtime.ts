@@ -13,7 +13,11 @@ export function isSupportedRuntime(globalThis: any): boolean {
       return false;
     }
     case "bun": {
-      return false;
+      const [major, minor] = globalThis.process.versions.bun
+        .split(".", 2)
+        .map(Number);
+
+      return major > 1 || (major === 1 && minor >= 2);
     }
     default: {
       return false;

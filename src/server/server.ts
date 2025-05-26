@@ -144,7 +144,7 @@ export class Server {
     const printableHost = getPrintableHost(host);
 
     this.#state.httpServer = await new Promise((resolve, reject) => {
-      const server = this.#state.httpServer!.listen(port, host, async () => {
+      const server = this.#state.httpServer.listen({ port, host }, async () => {
         this.#state.port = (server.address() as AddressInfo).port;
         this.#state.host = (server.address() as AddressInfo).address;
 

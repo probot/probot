@@ -9,6 +9,7 @@ import WebhookExamples, {
 } from "@octokit/webhooks-examples";
 
 import { Server, Probot } from "../src/index.js";
+import { detectRuntime } from "../src/helpers/detect-runtime.js";
 
 const appId = 1;
 const privateKey = `-----BEGIN RSA PRIVATE KEY-----
@@ -237,6 +238,10 @@ describe("Server", () => {
 
   describe(".start() / .stop()", () => {
     it("should expect the correct error if port already in use", async () => {
+      if (detectRuntime(globalThis) === "bun") {
+        // Bun runtime detected. Port reuse possible. skipping port in use error check
+        return;
+      }
       const port = await getPort();
 
       const blocker = new Server({

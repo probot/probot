@@ -117,6 +117,7 @@ jobs:
           REDIS_URL: 127.0.0.1
 
   test-bun:
+    name: Test on Bun
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository

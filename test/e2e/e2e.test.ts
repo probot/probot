@@ -1,9 +1,12 @@
+import { AssertionError } from "node:assert";
+import { dirname } from "node:path";
 import {
   createServer,
   type IncomingMessage,
   type ServerResponse,
 } from "node:http";
 import { resolve as pathResolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { execa } from "execa";
 import getPort from "get-port";
@@ -13,9 +16,10 @@ import { sign } from "@octokit/webhooks-methods";
 
 import { getPayload } from "../../src/helpers/get-payload.js";
 import { getRuntimeName } from "../../src/helpers/detect-runtime.js";
-import { AssertionError } from "node:assert";
 
 type RequestHandler = (req: IncomingMessage, res: ServerResponse) => void;
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 /**
  * In these tests we are starting probot apps by running "npm run [path to app.js]" using ghub.io/execa.

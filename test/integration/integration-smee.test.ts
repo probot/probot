@@ -66,8 +66,6 @@ describe("smee-client", () => {
   it(
     "with createProbot and setting the webhookPath via WEBHOOK_PATH to the root",
     async () => {
-      expect.assertions(1);
-
       const promise: {
         resolve: any;
         reject: any;
@@ -89,8 +87,12 @@ describe("smee-client", () => {
 
       const app: ApplicationFunction = (app) => {
         app.on("push", (event) => {
-          expect(event.name).toBe("push");
-          promise.resolve();
+          try {
+            expect(event.name).toBe("push");
+            promise.resolve();
+          } catch (error) {
+            promise.reject(error);
+          }
         });
       };
 

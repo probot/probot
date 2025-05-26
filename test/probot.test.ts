@@ -113,10 +113,9 @@ describe("Probot", () => {
     });
 
     it("shouldn't overwrite `options.throttle` passed to `{Octokit: ProbotOctokit.defaults(options)}`", () => {
-      expect.assertions(1);
-
+      const pluginCalls: any[] = [];
       const MyOctokit = ProbotOctokit.plugin((_octokit, options) => {
-        expect(options.throttle?.enabled).toBe(true);
+        pluginCalls.push(options);
       }).defaults({
         appId,
         privateKey,
@@ -126,6 +125,9 @@ describe("Probot", () => {
       });
 
       new Probot({ Octokit: MyOctokit, appId, privateKey });
+
+      expect(pluginCalls.length).toBe(1);
+      expect(pluginCalls[0].throttle?.enabled).toBe(true);
     });
 
     it("sets version", async () => {
@@ -145,8 +147,6 @@ describe("Probot", () => {
     };
 
     it("responds with the correct error if webhook secret does not match", async () => {
-      expect.assertions(1);
-
       const probot = new Probot({ githubToken: "faketoken" });
 
       const logErrorCalls: any[] = [];
@@ -169,8 +169,6 @@ describe("Probot", () => {
     });
 
     it("responds with the correct error if webhook secret is not found", async () => {
-      expect.assertions(1);
-
       const probot = new Probot({ githubToken: "faketoken" });
 
       const logErrorCalls: any[] = [];
@@ -193,8 +191,6 @@ describe("Probot", () => {
     });
 
     it("responds with the correct error if webhook secret is wrong", async () => {
-      expect.assertions(1);
-
       const probot = new Probot({ githubToken: "faketoken" });
 
       const logErrorCalls: any[] = [];
@@ -219,8 +215,6 @@ describe("Probot", () => {
     });
 
     it("responds with the correct error if the PEM file is missing", async () => {
-      expect.assertions(1);
-
       const probot = new Probot({ githubToken: "faketoken" });
 
       const logErrorCalls: any[] = [];
@@ -245,8 +239,6 @@ describe("Probot", () => {
     });
 
     it("responds with the correct error if the jwt could not be decoded", async () => {
-      expect.assertions(1);
-
       const probot = new Probot({ githubToken: "faketoken" });
 
       const logErrorCalls: any[] = [];
@@ -326,19 +318,21 @@ describe("Probot", () => {
     "options.redisConfig as string",
     () => {
       it("sets throttle options", async () => {
-        expect.assertions(2);
-
+        const pluginCalls: any[] = [];
         new Probot({
           githubToken: "faketoken",
           redisConfig: process.env.REDIS_URL,
           Octokit: ProbotOctokit.plugin((_octokit, options) => {
-            expect(options.throttle?.Bottleneck).toBe(Bottleneck);
-            expect(
-              options.throttle?.connection instanceof
-                Bottleneck.IORedisConnection,
-            ).toBe(true);
+            pluginCalls.push({ _octokit, options });
           }),
         });
+
+        expect(pluginCalls.length).toBe(1);
+        expect(pluginCalls[0].options.throttle?.Bottleneck).toBe(Bottleneck);
+        expect(
+          pluginCalls[0].options.throttle?.connection instanceof
+            Bottleneck.IORedisConnection,
+        ).toBe(true);
       });
     },
   );
@@ -347,22 +341,26 @@ describe("Probot", () => {
     "redis configuration object",
     () => {
       it("sets throttle options", async () => {
-        expect.assertions(2);
         const redisConfig = {
           host: process.env.REDIS_URL,
         };
 
+        const pluginCalls: any[] = [];
         new Probot({
           githubToken: "faketoken",
           redisConfig,
           Octokit: ProbotOctokit.plugin((_octokit, options) => {
-            expect(options.throttle?.Bottleneck).toBe(Bottleneck);
-            expect(
-              options.throttle?.connection instanceof
-                Bottleneck.IORedisConnection,
-            ).toBe(true);
+            pluginCalls.push({ _octokit, options });
           }),
         });
+
+        expect(pluginCalls.length).toBe(1);
+
+        expect(pluginCalls[0].options.throttle?.Bottleneck).toBe(Bottleneck);
+        expect(
+          pluginCalls[0].options.throttle?.connection instanceof
+            Bottleneck.IORedisConnection,
+        ).toBe(true);
       });
     },
   );
@@ -486,8 +484,6 @@ describe("Probot", () => {
     });
 
     it("adds a logger on the context", async () => {
-      expect.assertions(4);
-
       const output: any[] = [];
       const streamLogsToOutput = new Stream.Writable({ objectMode: true });
       streamLogsToOutput._write = (object, _encoding, done) => {
@@ -501,13 +497,10 @@ describe("Probot", () => {
         log: pino(streamLogsToOutput),
       });
 
+      const handlerCalls: Context[] = [];
       const handler = (context: Context) => {
-        expect(typeof context.log.info).toBe("function");
+        handlerCalls.push(context);
         context.log.info("testing");
-
-        expect(output.length).toBe(1);
-        expect(output[0].msg).toBe("testing");
-        expect(output[0].id).toBe(context.id);
       };
 
       probot.on("pull_request", handler);
@@ -518,7 +511,13 @@ describe("Probot", () => {
         payload: getPayloadExample("pull_request"),
       };
 
-      await probot.receive(event).catch(console.error);
+      await probot.receive(event);
+
+      expect(handlerCalls.length).toBe(1);
+      expect(typeof handlerCalls[0].log.info).toBe("function");
+      expect(output.length).toBe(1);
+      expect(output[0].msg).toBe("testing");
+      expect(output[0].id).toBe(handlerCalls[0].id);
     });
 
     it("returns an authenticated client for installation.created", async () => {

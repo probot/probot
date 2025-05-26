@@ -15,8 +15,6 @@ const stubTranspiledAppFnPath = resolve(
 
 describe("resolver", () => {
   it("loads the module at the resolved path", async () => {
-    expect.assertions(4);
-
     const stubResolverCalls: [string, string][] = [];
     const stubResolver = (specifier: string, parent?: string): string => {
       stubResolverCalls.push([specifier, parent!]);

@@ -89,9 +89,9 @@ describe("Server", () => {
 
   describe("webhook handler (POST /api/github/webhooks)", () => {
     it("should return 200 and run event handlers in app function", async () => {
-      expect.assertions(4);
-
       const output: any[] = [];
+
+      let pushCalls = 0;
 
       const server = new Server({
         Probot: Probot.defaults({
@@ -104,8 +104,8 @@ describe("Server", () => {
       });
 
       await server.load((app) => {
-        app.on("push", (event) => {
-          expect(event.name).toBe("push");
+        app.on("push", () => {
+          ++pushCalls;
         });
       });
 
@@ -129,6 +129,8 @@ describe("Server", () => {
 
       expect(response.status).toBe(200);
 
+      expect(pushCalls).toBe(1);
+
       expect(output.length).toBe(3);
       expect(output[2].msg.slice(0, 31)).toBe(
         "POST /api/github/webhooks 200 -",
@@ -139,7 +141,6 @@ describe("Server", () => {
 
     describe("GET unknown URL", () => {
       it("responds with 404", async () => {
-        expect.assertions(3);
         const output: any[] = [];
 
         const server = new Server({
@@ -206,8 +207,6 @@ describe("Server", () => {
     });
 
     it("html formatted response", async () => {
-      expect.assertions(3);
-
       const output: any[] = [];
 
       const server = new Server({
@@ -238,8 +237,6 @@ describe("Server", () => {
 
   describe(".start() / .stop()", () => {
     it("should expect the correct error if port already in use", async () => {
-      expect.assertions(1);
-
       const port = await getPort();
 
       const blocker = new Server({

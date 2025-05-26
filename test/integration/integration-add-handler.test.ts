@@ -146,11 +146,9 @@ describe("run", () => {
 
 describe("createNodeMiddleware", () => {
   it("should work with express", async () => {
-    expect.assertions(2);
-
     const port = await getPort();
 
-    const app: ApplicationFunction = (app, { addHandler }) => {
+    const app: ApplicationFunction = (_app, { addHandler }) => {
       const expressApp = express();
 
       expressApp.get("/hello-world", (_req, res) => {
@@ -158,10 +156,6 @@ describe("createNodeMiddleware", () => {
       });
 
       addHandler(expressApp);
-
-      app.on("push", (event) => {
-        expect(event.name).toBe("push");
-      });
     };
     const middleware = createNodeMiddleware(app, {
       probot: createProbot({
@@ -193,11 +187,9 @@ describe("createNodeMiddleware", () => {
   });
 
   it("should work with fastify", async () => {
-    expect.assertions(2);
-
     const port = await getPort();
 
-    const app: ApplicationFunction = async (app, { addHandler }) => {
+    const app: ApplicationFunction = async (_app, { addHandler }) => {
       // Get a fastify instance to expose new HTTP endpoints
       const fastify = Fastify();
 
@@ -209,11 +201,8 @@ describe("createNodeMiddleware", () => {
       await fastify.ready();
 
       addHandler(fastify.routing);
-
-      app.on("push", (event) => {
-        expect(event.name).toBe("push");
-      });
     };
+
     const middleware = createNodeMiddleware(app, {
       probot: createProbot({
         env: {

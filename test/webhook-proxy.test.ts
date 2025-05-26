@@ -151,8 +151,6 @@ describe("webhook-proxy", () => {
   });
 
   test("logs an error when the proxy server is not found", async () => {
-    expect.assertions(4);
-
     let finishedPromise = {
       promise: undefined,
       reject: undefined,
@@ -187,24 +185,27 @@ describe("webhook-proxy", () => {
     }))!;
 
     proxy.addEventListener("error", (error: any) => {
-      switch (detectRuntime(globalThis)) {
-        case "node":
-          expect(error.message).toBe(
-            `TypeError: fetch failed: getaddrinfo ENOTFOUND ${domain}`,
-          );
-          break;
-        case "bun":
-          expect(error.message).toBe(
-            "Unable to connect. Is the computer able to access the url?",
-          );
-          break;
+      try {
+        switch (detectRuntime(globalThis)) {
+          case "node":
+            expect(error.message).toBe(
+              `TypeError: fetch failed: getaddrinfo ENOTFOUND ${domain}`,
+            );
+            break;
+          case "bun":
+            expect(error.message).toBe(
+              "Unable to connect. Is the computer able to access the url?",
+            );
+            break;
+        }
+
+        expect(LoggerErrorCalls.length).toBe(1);
+        expect(LoggerErrorCalls[0].length).toBe(1);
+        expect(LoggerErrorCalls[0][0]).toBe(error);
+        finishedPromise.resolve!();
+      } catch (e) {
+        finishedPromise.reject!(e);
       }
-
-      expect(LoggerErrorCalls.length).toBe(1);
-      expect(LoggerErrorCalls[0].length).toBe(1);
-      expect(LoggerErrorCalls[0][0]).toBe(error);
-
-      finishedPromise.resolve!();
     });
 
     await finishedPromise.promise;

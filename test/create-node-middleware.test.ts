@@ -59,8 +59,6 @@ describe("createNodeMiddleware", () => {
   };
 
   test("with createProbot", async () => {
-    expect.assertions(2);
-
     output = [];
 
     const onPushCalls: any[] = [];
@@ -114,8 +112,6 @@ describe("createNodeMiddleware", () => {
   });
 
   test("with createProbot and setting the webhookPath via WEBHOOK_PATH to the root", async () => {
-    expect.assertions(2);
-
     output = [];
 
     const onPushCalls: any[] = [];
@@ -170,8 +166,6 @@ describe("createNodeMiddleware", () => {
   });
 
   test("with createProbot and setting the webhookPath to the root via the deprecated webhooksPath", async () => {
-    expect.assertions(2);
-
     output = [];
 
     const onPushCalls: any[] = [];
@@ -226,8 +220,6 @@ describe("createNodeMiddleware", () => {
   });
 
   test("loads app only once", async () => {
-    expect.assertions(1);
-
     output = [];
 
     let counter = 0;

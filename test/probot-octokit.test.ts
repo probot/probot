@@ -1,6 +1,6 @@
 import type { RequestError } from "@octokit/types";
 import fetchMock from "fetch-mock";
-import { describe, expect, test, it } from "vitest";
+import { describe, expect, it, test } from "vitest";
 
 import { ProbotOctokit } from "../src/octokit/probot-octokit.js";
 import type { OctokitOptions } from "../src/types.js";
@@ -243,19 +243,19 @@ describe("ProbotOctokit", () => {
     expect(response.status).toBe(200);
   });
 
-  test("with throttling enabled using default onSecondaryRateLimit", async () => {
-    expect.assertions(14);
-    let callCount = 0;
+  it("with throttling enabled using default onSecondaryRateLimit", async () => {
+    const fetchCalls: { url: string; options: any }[] = [];
+
+    const logWarnCalls: string[] = [];
+    const logWarn = (message: string) => {
+      logWarnCalls.push(message);
+    };
 
     const octokit = new ProbotOctokit({
       ...defaultOptions,
       // @ts-expect-error just need to mock the warn method
       log: {
-        warn(message) {
-          expect(message).toBe(
-            'Secondary Rate limit hit with "GET /", retrying in 1 seconds.',
-          );
-        },
+        warn: logWarn,
       },
       // @ts-expect-error
       throttle: {
@@ -263,35 +263,45 @@ describe("ProbotOctokit", () => {
         fallbackSecondaryRateRetryAfter: 1,
       },
       request: {
-        fetch: (url: string, options: { [key: string]: any }) => {
-          expect(url).toBe("https://api.github.com/");
-          expect(options.method).toBe("GET");
-          expect(options.headers.accept).toBe("application/vnd.github.v3+json");
-          expect(options.headers["user-agent"].slice(0, 7)).toBe("probot/");
-          expect(options.signal).toBe(undefined);
-          expect(options.body).toBe(undefined);
+        fetch: async (url: string, options: { [key: string]: any }) => {
+          fetchCalls.push({ url, options });
 
-          if (callCount++ === 0) {
-            return Promise.resolve({
-              status: 403,
-              headers: new Headers(),
-              text: () =>
-                Promise.resolve(
-                  "The throttle plugin just looks for the word secondary rate in the error message",
-                ),
-            });
+          if (fetchCalls.length === 1) {
+            return new Response(
+              "The throttle plugin just looks for the word secondary rate in the error message",
+              {
+                status: 403,
+                headers: new Headers(),
+              },
+            );
           }
 
-          return Promise.resolve({
+          return new Response("{}", {
             status: 200,
             headers: new Headers(),
-            text: () => Promise.resolve("{}"),
           });
         },
       },
     });
 
     const response = await octokit.request("/");
+
+    expect(fetchCalls.length).toBe(2);
+
+    for (const { url, options } of fetchCalls) {
+      expect(url).toBe("https://api.github.com/");
+      expect(options.method).toBe("GET");
+      expect(options.headers.accept).toBe("application/vnd.github.v3+json");
+      expect(options.headers["user-agent"].slice(0, 7)).toBe("probot/");
+      expect(options.signal).toBe(undefined);
+      expect(options.body).toBe(undefined);
+    }
+
+    expect(logWarnCalls.length).toBe(1);
+    expect(logWarnCalls[0]).toBe(
+      'Secondary Rate limit hit with "GET /", retrying in 1 seconds.',
+    );
+
     expect(response.status).toBe(200);
   });
 

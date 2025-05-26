@@ -11,6 +11,10 @@ import { setupAppFactory } from "../../src/apps/setup.js";
 
 import { importView } from "../../src/views/import.js";
 import { successView } from "../../src/views/success.js";
+import {
+  getRuntimeName,
+  getRuntimeVersion,
+} from "../../src/helpers/detect-runtime.js";
 
 describe("Setup app", async () => {
   let logOutput: any[] = [];
@@ -76,7 +80,7 @@ describe("Setup app", async () => {
         `Please follow the instructions at http://localhost:${server.port} to configure .env.`,
         "Once you are done, restart the server.",
         "",
-        `Running Probot v0.0.0-development (Node.js: ${process.version})`,
+        `Running Probot v0.0.0-development (${getRuntimeName(globalThis)}: ${getRuntimeVersion(globalThis)})`,
         `Listening on http://localhost:${server.port}`,
       ];
 

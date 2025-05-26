@@ -12,6 +12,8 @@ import { describe, expect, it } from "vitest";
 import { sign } from "@octokit/webhooks-methods";
 
 import { getPayload } from "../../src/helpers/get-payload.js";
+import { getRuntimeName } from "../../src/helpers/detect-runtime.js";
+import { AssertionError } from "node:assert";
 
 type RequestHandler = (req: IncomingMessage, res: ServerResponse) => void;
 
@@ -117,7 +119,27 @@ describe("end-to-end-tests", () => {
 
     await new Promise<void>((resolve, reject) => {
       probotProcess.stdout?.on("data", (data) => {
-        if (data.toString().includes("Listening on")) {
+        const line = data.toString().trim();
+        if (
+          line.includes("Running Probot") &&
+          line.includes(getRuntimeName(globalThis)) === false
+        ) {
+          const actualRuntime = line.slice(
+            line.lastIndexOf("(") + 1,
+            line.lastIndexOf(" ", line.lastIndexOf(")")) - 1,
+          );
+
+          reject(
+            new AssertionError({
+              message: `
+                Expected Probot to run on ${getRuntimeName(globalThis)}, but it is running on ${actualRuntime}`,
+              actual: actualRuntime,
+              expected: getRuntimeName(globalThis),
+              operator: "===",
+            }),
+          );
+        }
+        if (line.includes("Listening on")) {
           resolve();
         }
       });

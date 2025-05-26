@@ -22,6 +22,10 @@ import { getPrintableHost } from "../helpers/get-printable-host.js";
 import { notFoundHandler } from "./handlers/not-found.js";
 import { pingHandler } from "./handlers/ping.js";
 import { staticFilesHandler } from "./handlers/static-files.js";
+import {
+  getRuntimeName,
+  getRuntimeVersion,
+} from "../helpers/detect-runtime.js";
 
 // the default path as defined in @octokit/webhooks
 export const defaultWebhooksPath = "/api/github/webhooks";
@@ -137,8 +141,11 @@ export class Server {
   }
 
   public async start(): Promise<HttpServer> {
+    const runtimeName = getRuntimeName(globalThis);
+    const runtimeVersion = getRuntimeVersion(globalThis);
+
     this.log.info(
-      `Running Probot v${this.version} (Node.js: ${process.version})`,
+      `Running Probot v${this.version} (${runtimeName}: ${runtimeVersion})`,
     );
     const { port, host, webhookPath, webhookProxy } = this.#state;
     const printableHost = getPrintableHost(host);

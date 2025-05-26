@@ -149,6 +149,7 @@ jobs:
         uses: oven-sh/setup-bun@v2
       - name: Install Dependencies
         run:  bun install
+      - run: bun run build
       - name: Test
         run: bun test
         env:

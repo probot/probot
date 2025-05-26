@@ -6,10 +6,11 @@ import {
 
 import { execa } from "execa";
 import getPort from "get-port";
+import { describe, expect, it } from "vitest";
 
 import { sign } from "@octokit/webhooks-methods";
 
-import { describe, expect, it } from "vitest";
+import { getPayload } from "../../src/helpers/get-payload.js";
 
 type RequestHandler = (req: IncomingMessage, res: ServerResponse) => void;
 
@@ -27,32 +28,9 @@ describe("end-to-end-tests", () => {
 
     const bodyParser =
       (handler: RequestHandler): RequestHandler =>
-      (req, res) => {
-        const chunks: Uint8Array[] = [];
-
-        req.on("data", (chunk: Uint8Array) => {
-          chunks.push(chunk);
-        });
-
-        req.on("end", () => {
-          let totalLength = 0;
-          for (let i = 0; i < chunks.length; i++) {
-            totalLength += chunks[i].byteLength;
-          }
-          const payload = new Uint8Array(totalLength);
-          let offset = 0;
-          for (let i = 0; i < chunks.length; i++) {
-            payload.set(chunks[i], offset);
-            offset += chunks[i].byteLength;
-          }
-
-          const body = new TextDecoder("utf-8").decode(payload);
-
-          // @ts-ignore
-          req.body = body;
-
-          handler(req, res);
-        });
+      async (req, res) => {
+        req.body = await getPayload(req);
+        handler(req, res);
       };
 
     let callCount = 0;

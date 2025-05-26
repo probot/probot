@@ -13,7 +13,7 @@ import { probotView } from "../../src/views/probot.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-describe("default app", async () => {
+describe("default app", () => {
   let output = [];
 
   const streamLogsToOutput = new Stream.Writable({ objectMode: true });

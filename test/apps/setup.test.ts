@@ -16,7 +16,7 @@ import {
   getRuntimeVersion,
 } from "../../src/helpers/detect-runtime.js";
 
-describe("Setup app", async () => {
+describe("Setup app", () => {
   let logOutput: any[] = [];
 
   const streamLogsToOutput = new Stream.Writable({ objectMode: true });

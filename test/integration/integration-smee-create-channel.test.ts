@@ -2,7 +2,7 @@ import { ManifestCreation } from "../../src/manifest-creation.js";
 import { describe, test, expect } from "vitest";
 import type { Env } from "../../src/types.js";
 
-let UpdateEnvCalls: Env[] = [];
+const UpdateEnvCalls: Env[] = [];
 const updateEnv = (env: Env) => {
   UpdateEnvCalls.push(env);
   return env;

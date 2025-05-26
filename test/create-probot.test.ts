@@ -85,7 +85,7 @@ describe("createProbot", () => {
   });
 
   test("defaults, custom host", async () => {
-    let fetchPromise = {
+    const fetchPromise = {
       promise: undefined,
       reject: undefined,
       resolve: undefined,

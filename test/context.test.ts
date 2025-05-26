@@ -61,12 +61,12 @@ const pullRequestEventPayload = (
 ).examples[0] as WebhookEvent<"pull_request">["payload"];
 
 describe("Context", () => {
-  let event: WebhookEvent<"push"> = {
+  const event: WebhookEvent<"push"> = {
     id: "0",
     name: "push",
     payload: pushEventPayload,
   };
-  let octokit = {
+  const octokit = {
     hook: {
       before: () => {},
     },
@@ -135,7 +135,7 @@ describe("Context", () => {
         payload: require("./fixtures/webhook/push") as PushEvent,
       };
 
-      let octokit = {
+      const octokit = {
         hook: {
           before: () => {},
         },
@@ -157,7 +157,7 @@ describe("Context", () => {
         name: "push",
         payload: { ...pushEventPayload, repository: undefined as any },
       };
-      let octokit = {
+      const octokit = {
         hook: {
           before: () => {},
         },
@@ -396,7 +396,7 @@ describe("Context", () => {
   describe("isBot", () => {
     test("returns true if sender is a bot", () => {
       event.payload.sender!.type = "Bot";
-      let octokit = {
+      const octokit = {
         hook: {
           before: () => {},
         },
@@ -408,7 +408,7 @@ describe("Context", () => {
 
     test("returns false if sender is not a bot", () => {
       event.payload.sender!.type = "User";
-      let octokit = {
+      const octokit = {
         hook: {
           before: () => {},
         },

@@ -140,7 +140,7 @@ describe("Probot", () => {
   });
 
   describe("webhooks", () => {
-    let event: WebhookEvent<"push"> = {
+    const event: WebhookEvent<"push"> = {
       id: "0",
       name: "push",
       payload: getPayloadExample("push"),

@@ -12,7 +12,7 @@ import WebhookExamples, {
 } from "@octokit/webhooks-examples";
 import type { Env } from "../../src/types.js";
 
-let UpdateEnvCalls: Env[] = [];
+const UpdateEnvCalls: Env[] = [];
 const updateEnv = (env: Env) => {
   UpdateEnvCalls.push(env);
   return env;
@@ -56,7 +56,7 @@ describe("smee-client", () => {
     )[0] as WebhookDefinition<"push">
   ).examples[0];
 
-  let output: any[] = [];
+  const output: any[] = [];
   const streamLogsToOutput = new Writable({ objectMode: true });
   streamLogsToOutput._write = (object, _encoding, done) => {
     output.push(JSON.parse(object));

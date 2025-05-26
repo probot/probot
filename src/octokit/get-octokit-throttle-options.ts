@@ -9,7 +9,7 @@ type Options = {
 };
 
 export function getOctokitThrottleOptions(options: Options): ThrottlingOptions {
-  let { log, redisConfig } = options;
+  const { log, redisConfig } = options;
 
   const throttlingOptions: ThrottlingOptions = {
     onRateLimit: (retryAfter, options: { [key: string]: any }) => {

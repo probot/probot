@@ -48,7 +48,7 @@ describe("webhook-proxy", () => {
 
   describe("with a valid proxy server", () => {
     test("forwards events to server", async () => {
-      let readyPromise = {
+      const readyPromise = {
         promise: undefined,
         reject: undefined,
         resolve: undefined,
@@ -63,7 +63,7 @@ describe("webhook-proxy", () => {
         readyPromise.reject = reject;
       });
 
-      let finishedPromise = {
+      const finishedPromise = {
         promise: undefined,
         reject: undefined,
         resolve: undefined,
@@ -151,7 +151,7 @@ describe("webhook-proxy", () => {
   });
 
   test("logs an error when the proxy server is not found", async () => {
-    let finishedPromise = {
+    const finishedPromise = {
       promise: undefined,
       reject: undefined,
       resolve: undefined,

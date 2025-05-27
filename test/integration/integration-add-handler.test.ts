@@ -13,6 +13,7 @@ import {
   type ApplicationFunction,
 } from "../../src/index.js";
 import { getPrintableHost } from "../../src/helpers/get-printable-host.js";
+import { detectRuntime } from "../../src/helpers/detect-runtime.js";
 
 const APP_ID = "123";
 const WEBHOOK_SECRET = "secret";
@@ -104,44 +105,48 @@ describe("run", () => {
     await server.stop();
   });
 
-  it("should work with fastify", async () => {
-    const port = await getPort();
+  it(
+    "should work with fastify",
+    { skip: detectRuntime(globalThis) === "deno" },
+    async () => {
+      const port = await getPort();
 
-    // Get a fastify instance to expose new HTTP endpoints
-    const fastify = Fastify();
+      // Get a fastify instance to expose new HTTP endpoints
+      const fastify = Fastify();
 
-    // Declare a route
-    fastify.get("/hello-world", function (_request, reply) {
-      reply.send({ hello: "world" });
-    });
+      // Declare a route
+      fastify.get("/hello-world", function (_request, reply) {
+        reply.send({ hello: "world" });
+      });
 
-    await fastify.ready();
+      await fastify.ready();
 
-    const server = await run(
-      async (_app, options) => {
-        options.addHandler!(fastify.routing);
-      },
-      {
-        env: {
-          APP_ID: "123",
-          PRIVATE_KEY,
-          PORT: port.toString(),
-          LOG_LEVEL: "fatal",
+      const server = await run(
+        async (_app, options) => {
+          options.addHandler!(fastify.routing);
         },
-        updateEnv: (env) => env,
-        SmeeClient: { createChannel: async () => "dummy" },
-      },
-    );
+        {
+          env: {
+            APP_ID: "123",
+            PRIVATE_KEY,
+            PORT: port.toString(),
+            LOG_LEVEL: "fatal",
+          },
+          updateEnv: (env) => env,
+          SmeeClient: { createChannel: async () => "dummy" },
+        },
+      );
 
-    const response = await fetch(
-      `http://${server.host}:${server.port}/hello-world`,
-    );
+      const response = await fetch(
+        `http://${server.host}:${server.port}/hello-world`,
+      );
 
-    expect(response.status).toBe(200);
-    expect(await response.text()).toBe('{"hello":"world"}');
+      expect(response.status).toBe(200);
+      expect(await response.text()).toBe('{"hello":"world"}');
 
-    await server.stop();
-  });
+      await server.stop();
+    },
+  );
 });
 
 describe("createNodeMiddleware", () => {
@@ -186,49 +191,53 @@ describe("createNodeMiddleware", () => {
     server.close();
   });
 
-  it("should work with fastify", async () => {
-    const port = await getPort();
+  it(
+    "should work with fastify",
+    { skip: detectRuntime(globalThis) === "deno" },
+    async () => {
+      const port = await getPort();
 
-    const app: ApplicationFunction = async (_app, { addHandler }) => {
-      // Get a fastify instance to expose new HTTP endpoints
-      const fastify = Fastify();
+      const app: ApplicationFunction = async (_app, { addHandler }) => {
+        // Get a fastify instance to expose new HTTP endpoints
+        const fastify = Fastify();
 
-      // Declare a route
-      fastify.get("/hello-world", function (_request, reply) {
-        reply.send({ hello: "world" });
+        // Declare a route
+        fastify.get("/hello-world", function (_request, reply) {
+          reply.send({ hello: "world" });
+        });
+
+        await fastify.ready();
+
+        addHandler(fastify.routing);
+      };
+
+      const middleware = createNodeMiddleware(app, {
+        probot: createProbot({
+          env: {
+            APP_ID,
+            PRIVATE_KEY,
+            WEBHOOK_SECRET,
+          },
+        }),
       });
 
-      await fastify.ready();
+      const server = createServer(middleware);
 
-      addHandler(fastify.routing);
-    };
+      await new Promise<void>((resolve) => server.listen(port, resolve));
 
-    const middleware = createNodeMiddleware(app, {
-      probot: createProbot({
-        env: {
-          APP_ID,
-          PRIVATE_KEY,
-          WEBHOOK_SECRET,
-        },
-      }),
-    });
+      let { address: host } = server.address() as {
+        port: number;
+        address: string;
+      };
 
-    const server = createServer(middleware);
+      host = getPrintableHost(host);
 
-    await new Promise<void>((resolve) => server.listen(port, resolve));
+      const response = await fetch(`http://${host}:${port}/hello-world`);
 
-    let { address: host } = server.address() as {
-      port: number;
-      address: string;
-    };
+      expect(response.status).toBe(200);
+      expect(await response.text()).toBe('{"hello":"world"}');
 
-    host = getPrintableHost(host);
-
-    const response = await fetch(`http://${host}:${port}/hello-world`);
-
-    expect(response.status).toBe(200);
-    expect(await response.text()).toBe('{"hello":"world"}');
-
-    server.close();
-  });
+      server.close();
+    },
+  );
 });

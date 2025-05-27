@@ -11,6 +11,7 @@ import WebhookExamples, {
   type WebhookDefinition,
 } from "@octokit/webhooks-examples";
 import type { Env } from "../../src/types.js";
+import { detectRuntime } from "../../src/helpers/detect-runtime.js";
 
 const UpdateEnvCalls: Env[] = [];
 const updateEnv = (env: Env) => {
@@ -65,6 +66,7 @@ describe("smee-client", () => {
 
   it(
     "with createProbot and setting the webhookPath via WEBHOOK_PATH to the root",
+    { retry: 10, timeout: 10000, skip: detectRuntime(globalThis) === "deno" },
     async () => {
       const promise: {
         resolve: any;
@@ -131,6 +133,5 @@ describe("smee-client", () => {
 
       await server.stop();
     },
-    { retry: 10, timeout: 10000 },
   );
 });

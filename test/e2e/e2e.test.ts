@@ -16,6 +16,7 @@ import { sign } from "@octokit/webhooks-methods";
 
 import { getPayload } from "../../src/helpers/get-payload.js";
 import { getRuntimeName } from "../../src/helpers/get-runtime-name.js";
+import { detectRuntime } from "../../src/helpers/detect-runtime.js";
 
 type RequestHandler = (req: IncomingMessage, res: ServerResponse) => void;
 
@@ -102,6 +103,10 @@ describe("end-to-end-tests", () => {
 
     const executable = process.argv[0];
     const args = [pathResolve(__dirname, "../../bin/probot.js"), "run", file];
+
+    if (detectRuntime(globalThis) === "deno") {
+      args.splice(0, 0, "run", "-A");
+    }
 
     const probotProcess = execa(executable, args, {
       env: {

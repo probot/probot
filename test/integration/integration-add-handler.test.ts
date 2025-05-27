@@ -107,7 +107,6 @@ describe("run", () => {
 
   it(
     "should work with fastify",
-    { skip: detectRuntime(globalThis) === "deno" },
     async () => {
       const port = await getPort();
 
@@ -146,6 +145,7 @@ describe("run", () => {
 
       await server.stop();
     },
+    { skip: detectRuntime(globalThis) === "deno" },
   );
 });
 
@@ -193,7 +193,6 @@ describe("createNodeMiddleware", () => {
 
   it(
     "should work with fastify",
-    { skip: detectRuntime(globalThis) === "deno" },
     async () => {
       const port = await getPort();
 
@@ -239,5 +238,6 @@ describe("createNodeMiddleware", () => {
 
       server.close();
     },
+    { skip: detectRuntime(globalThis) === "deno" },
   );
 });

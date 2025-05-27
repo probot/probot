@@ -1,5 +1,5 @@
 import { ManifestCreation } from "../../src/manifest-creation.js";
-import { describe, test, expect } from "vitest";
+import { describe, it, expect } from "vitest";
 import type { Env } from "../../src/types.js";
 import { detectRuntime } from "../../src/helpers/detect-runtime.js";
 
@@ -10,9 +10,8 @@ const updateEnv = (env: Env) => {
 };
 
 describe("ManifestCreation", () => {
-  test(
+  it(
     "create a smee proxy",
-    { skip: detectRuntime(globalThis) === "deno" },
     async () => {
       delete process.env.WEBHOOK_PROXY_URL;
 
@@ -25,5 +24,6 @@ describe("ManifestCreation", () => {
         ),
       ).toBe(true);
     },
+    { skip: detectRuntime(globalThis) === "deno" },
   );
 });

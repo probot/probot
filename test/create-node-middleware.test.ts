@@ -3,12 +3,11 @@ import {
   type IncomingMessage,
   type ServerResponse,
 } from "node:http";
-import { once } from "node:events";
 import Stream from "node:stream";
 
 import { pino } from "pino";
 import { sign } from "@octokit/webhooks-methods";
-import { describe, expect, test, beforeEach } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import { createNodeMiddleware, createProbot, Probot } from "../src/index.js";
 import type { ApplicationFunction } from "../src/types.js";
@@ -59,17 +58,16 @@ describe("createNodeMiddleware", () => {
     done();
   };
 
-  beforeEach(() => {
-    output = [];
-  });
-
   test("with createProbot", async () => {
-    expect.assertions(1);
+    output = [];
+
+    const onPushCalls: any[] = [];
+    const onPush = (event: any) => {
+      onPushCalls.push(event);
+    };
 
     const app: ApplicationFunction = (app) => {
-      app.on("push", (event) => {
-        expect(event.name).toEqual("push");
-      });
+      app.on("push", onPush);
     };
     const middleware = createNodeMiddleware(app, {
       probot: createProbot({
@@ -85,9 +83,8 @@ describe("createNodeMiddleware", () => {
     });
 
     const server = createServer(middleware);
-    server.listen();
 
-    await once(server, "listening");
+    await new Promise<void>((resolve) => server.listen(resolve));
 
     const port = (server.address() as any).port;
 
@@ -104,18 +101,26 @@ describe("createNodeMiddleware", () => {
       body,
     });
 
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise<void>((resolve, reject) =>
+      server.close((err) => {
+        err ? reject(err) : resolve();
+      }),
+    );
 
-    server.close();
+    expect(onPushCalls.length).toBe(1);
+    expect(onPushCalls[0].name).toBe("push");
   });
 
   test("with createProbot and setting the webhookPath via WEBHOOK_PATH to the root", async () => {
-    expect.assertions(1);
+    output = [];
+
+    const onPushCalls: any[] = [];
+    const onPush = (event: any) => {
+      onPushCalls.push(event);
+    };
 
     const app: ApplicationFunction = (app) => {
-      app.on("push", (event) => {
-        expect(event.name).toEqual("push");
-      });
+      app.on("push", onPush);
     };
     const middleware = createNodeMiddleware(app, {
       probot: createProbot({
@@ -132,9 +137,8 @@ describe("createNodeMiddleware", () => {
     });
 
     const server = createServer(middleware);
-    server.listen();
 
-    await once(server, "listening");
+    await new Promise<void>((resolve) => server.listen(resolve));
 
     const port = (server.address() as any).port;
 
@@ -151,18 +155,26 @@ describe("createNodeMiddleware", () => {
       body,
     });
 
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise<void>((resolve, reject) =>
+      server.close((err) => {
+        err ? reject(err) : resolve();
+      }),
+    );
 
-    server.close();
+    expect(onPushCalls.length).toBe(1);
+    expect(onPushCalls[0].name).toBe("push");
   });
 
   test("with createProbot and setting the webhookPath to the root via the deprecated webhooksPath", async () => {
-    expect.assertions(1);
+    output = [];
+
+    const onPushCalls: any[] = [];
+    const onPush = (event: any) => {
+      onPushCalls.push(event);
+    };
 
     const app: ApplicationFunction = (app) => {
-      app.on("push", (event) => {
-        expect(event.name).toEqual("push");
-      });
+      app.on("push", onPush);
     };
     const middleware = createNodeMiddleware(app, {
       webhooksPath: "/",
@@ -179,9 +191,8 @@ describe("createNodeMiddleware", () => {
     });
 
     const server = createServer(middleware);
-    server.listen();
 
-    await once(server, "listening");
+    await new Promise<void>((resolve) => server.listen(resolve));
 
     const port = (server.address() as any).port;
 
@@ -198,12 +209,19 @@ describe("createNodeMiddleware", () => {
       body,
     });
 
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise<void>((resolve, reject) =>
+      server.close((err) => {
+        err ? reject(err) : resolve();
+      }),
+    );
 
-    server.close();
-  }, 1000);
+    expect(onPushCalls.length).toBe(1);
+    expect(onPushCalls[0].name).toBe("push");
+  });
 
   test("loads app only once", async () => {
+    output = [];
+
     let counter = 0;
     const appFn = () => {
       counter++;
@@ -224,6 +242,6 @@ describe("createNodeMiddleware", () => {
       { end() {}, writeHead() {} } as unknown as ServerResponse,
     );
 
-    expect(counter).toEqual(1);
+    expect(counter).toBe(1);
   });
 });

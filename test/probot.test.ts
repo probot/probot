@@ -6,8 +6,8 @@ import type {
 } from "@octokit/webhooks";
 import Bottleneck from "bottleneck";
 import fetchMock from "fetch-mock";
-import { pino, type LogFn } from "pino";
-import { describe, expect, test, beforeEach, it, vi, type Mock } from "vitest";
+import { pino } from "pino";
+import { describe, expect, it } from "vitest";
 
 import { Probot, ProbotOctokit, Context } from "../src/index.js";
 
@@ -64,31 +64,14 @@ const getPayloadExample = <TName extends EmitterWebhookEventName>(
   }
   return examples[0];
 };
+
 describe("Probot", () => {
-  let probot: Probot;
-  let event: WebhookEvent<
-    "push" | "pull_request" | "installation" | "check_run"
-  >;
-  let output: any;
-
-  const streamLogsToOutput = new Stream.Writable({ objectMode: true });
-  streamLogsToOutput._write = (object, _encoding, done) => {
-    output.push(JSON.parse(object));
-    done();
-  };
-
-  beforeEach(() => {
-    // Clear log output
-    output = [];
-    probot = new Probot({ githubToken: "faketoken" });
-  });
-
-  test(".version", () => {
-    expect(Probot.version).toEqual("0.0.0-development");
+  it(".version", () => {
+    expect(Probot.version).toBe("0.0.0-development");
   });
 
   describe(".defaults()", () => {
-    test("sets default options for constructor", async () => {
+    it("sets default options for constructor", async () => {
       const mock = fetchMock
         .createInstance()
         .getOnce("https://api.github.com/app", {
@@ -109,9 +92,14 @@ describe("Probot", () => {
 
   describe("constructor", () => {
     it("no options", () => {
-      expect(() => new Probot()).toThrow(
-        "[@octokit/auth-app] appId option is required",
-      );
+      try {
+        new Probot();
+        throw new Error("Should have thrown");
+      } catch (e) {
+        expect((e as Error).message).toBe(
+          "[@octokit/auth-app] appId option is required",
+        );
+      }
     });
 
     it('{ githubToken: "faketoken" }', () => {
@@ -125,10 +113,9 @@ describe("Probot", () => {
     });
 
     it("shouldn't overwrite `options.throttle` passed to `{Octokit: ProbotOctokit.defaults(options)}`", () => {
-      expect.assertions(1);
-
+      const pluginCalls: any[] = [];
       const MyOctokit = ProbotOctokit.plugin((_octokit, options) => {
-        expect(options.throttle?.enabled).toEqual(true);
+        pluginCalls.push(options);
       }).defaults({
         appId,
         privateKey,
@@ -138,6 +125,9 @@ describe("Probot", () => {
       });
 
       new Probot({ Octokit: MyOctokit, appId, privateKey });
+
+      expect(pluginCalls.length).toBe(1);
+      expect(pluginCalls[0].throttle?.enabled).toBe(true);
     });
 
     it("sets version", async () => {
@@ -150,50 +140,64 @@ describe("Probot", () => {
   });
 
   describe("webhooks", () => {
-    let event: WebhookEvent<"push"> = {
+    const event: WebhookEvent<"push"> = {
       id: "0",
       name: "push",
       payload: getPayloadExample("push"),
     };
 
     it("responds with the correct error if webhook secret does not match", async () => {
-      expect.assertions(1);
+      const probot = new Probot({ githubToken: "faketoken" });
 
-      probot.log.error = vi.fn() as LogFn;
+      const logErrorCalls: any[] = [];
+      probot.log.error = (...args: any[]) => {
+        logErrorCalls.push(args);
+      };
+
       probot.webhooks.on("push", () => {
         throw new Error("X-Hub-Signature-256 does not match blob signature");
       });
 
       try {
         await probot.webhooks.receive(event);
+        throw new Error("Should have thrown");
       } catch (e) {
-        expect((probot.log.error as Mock).mock.calls[0][1]).toEqual(
+        expect(logErrorCalls[0][1]).toBe(
           "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
         );
       }
     });
 
     it("responds with the correct error if webhook secret is not found", async () => {
-      expect.assertions(1);
+      const probot = new Probot({ githubToken: "faketoken" });
 
-      probot.log.error = vi.fn() as LogFn;
+      const logErrorCalls: any[] = [];
+      probot.log.error = (...args: any[]) => {
+        logErrorCalls.push(args);
+      };
+
       probot.webhooks.on("push", () => {
         throw new Error("No X-Hub-Signature-256 found on request");
       });
 
       try {
         await probot.webhooks.receive(event);
+        throw new Error("Should have thrown");
       } catch (e) {
-        expect((probot.log.error as Mock).mock.calls[0][1]).toEqual(
+        expect(logErrorCalls[0][1]).toBe(
           "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
         );
       }
     });
 
     it("responds with the correct error if webhook secret is wrong", async () => {
-      expect.assertions(1);
+      const probot = new Probot({ githubToken: "faketoken" });
 
-      probot.log.error = vi.fn() as LogFn;
+      const logErrorCalls: any[] = [];
+      probot.log.error = (...args: any[]) => {
+        logErrorCalls.push(args);
+      };
+
       probot.webhooks.on("push", () => {
         throw Error(
           "webhooks:receiver ignored: POST / due to missing headers: x-hub-signature-256",
@@ -202,17 +206,22 @@ describe("Probot", () => {
 
       try {
         await probot.webhooks.receive(event);
+        throw new Error("Should have thrown");
       } catch (e) {
-        expect((probot.log.error as Mock).mock.calls[0][1]).toEqual(
+        expect(logErrorCalls[0][1]).toBe(
           "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
         );
       }
     });
 
     it("responds with the correct error if the PEM file is missing", async () => {
-      expect.assertions(1);
+      const probot = new Probot({ githubToken: "faketoken" });
 
-      probot.log.error = vi.fn() as LogFn;
+      const logErrorCalls: any[] = [];
+      probot.log.error = (...args: any[]) => {
+        logErrorCalls.push(args);
+      };
+
       probot.webhooks.onAny(() => {
         throw new Error(
           "error:0906D06C:PEM routines:PEM_read_bio:no start line",
@@ -221,17 +230,22 @@ describe("Probot", () => {
 
       try {
         await probot.webhooks.receive(event);
+        throw new Error("Should have thrown");
       } catch (e) {
-        expect((probot.log.error as Mock).mock.calls[0][1]).toEqual(
+        expect(logErrorCalls[0][1]).toBe(
           "Your private key (a .pem file or PRIVATE_KEY environment variable) or APP_ID is incorrect. Go to https://github.com/settings/apps/YOUR_APP, verify that APP_ID is set correctly, and generate a new PEM file if necessary.",
         );
       }
     });
 
     it("responds with the correct error if the jwt could not be decoded", async () => {
-      expect.assertions(1);
+      const probot = new Probot({ githubToken: "faketoken" });
 
-      probot.log.error = vi.fn() as LogFn;
+      const logErrorCalls: any[] = [];
+      probot.log.error = (...args: any[]) => {
+        logErrorCalls.push(args);
+      };
+
       probot.webhooks.onAny(() => {
         throw new Error(
           '{"message":"A JSON web token could not be decoded","documentation_url":"https://developer.github.com/v3"}',
@@ -240,8 +254,9 @@ describe("Probot", () => {
 
       try {
         await probot.webhooks.receive(event);
+        throw new Error("Should have thrown");
       } catch (e) {
-        expect((probot.log.error as Mock).mock.calls[0][1]).toEqual(
+        expect(logErrorCalls[0][1]).toBe(
           "Your private key (a .pem file or PRIVATE_KEY environment variable) or APP_ID is incorrect. Go to https://github.com/settings/apps/YOUR_APP, verify that APP_ID is set correctly, and generate a new PEM file if necessary.",
         );
       }
@@ -252,7 +267,7 @@ describe("Probot", () => {
     it("requests from the correct API URL", async () => {
       const appFn = async (app: Probot) => {
         const octokit = await app.auth();
-        expect(octokit.request.endpoint.DEFAULTS.baseUrl).toEqual(
+        expect(octokit.request.endpoint.DEFAULTS.baseUrl).toBe(
           "https://notreallygithub.com/api/v3",
         );
       };
@@ -267,7 +282,7 @@ describe("Probot", () => {
     it("requests from the correct API URL when setting `baseUrl` on Octokit constructor", async () => {
       const appFn = async (app: Probot) => {
         const octokit = await app.auth();
-        expect(octokit.request.endpoint.DEFAULTS.baseUrl).toEqual(
+        expect(octokit.request.endpoint.DEFAULTS.baseUrl).toBe(
           "https://notreallygithub.com/api/v3",
         );
       };
@@ -286,7 +301,7 @@ describe("Probot", () => {
     it("requests from the correct API URL", async () => {
       const appFn = async (app: Probot) => {
         const octokit = await app.auth();
-        expect(octokit.request.endpoint.DEFAULTS.baseUrl).toEqual(
+        expect(octokit.request.endpoint.DEFAULTS.baseUrl).toBe(
           "http://notreallygithub.com/api/v3",
         );
       };
@@ -303,18 +318,21 @@ describe("Probot", () => {
     "options.redisConfig as string",
     () => {
       it("sets throttle options", async () => {
-        expect.assertions(2);
-
-        probot = new Probot({
+        const pluginCalls: any[] = [];
+        new Probot({
           githubToken: "faketoken",
           redisConfig: process.env.REDIS_URL,
           Octokit: ProbotOctokit.plugin((_octokit, options) => {
-            expect(options.throttle?.Bottleneck).toBe(Bottleneck);
-            expect(options.throttle?.connection).toBeInstanceOf(
-              Bottleneck.IORedisConnection,
-            );
+            pluginCalls.push({ _octokit, options });
           }),
         });
+
+        expect(pluginCalls.length).toBe(1);
+        expect(pluginCalls[0].options.throttle?.Bottleneck).toBe(Bottleneck);
+        expect(
+          pluginCalls[0].options.throttle?.connection instanceof
+            Bottleneck.IORedisConnection,
+        ).toBe(true);
       });
     },
   );
@@ -323,48 +341,56 @@ describe("Probot", () => {
     "redis configuration object",
     () => {
       it("sets throttle options", async () => {
-        expect.assertions(2);
         const redisConfig = {
           host: process.env.REDIS_URL,
         };
 
-        probot = new Probot({
+        const pluginCalls: any[] = [];
+        new Probot({
           githubToken: "faketoken",
           redisConfig,
           Octokit: ProbotOctokit.plugin((_octokit, options) => {
-            expect(options.throttle?.Bottleneck).toBe(Bottleneck);
-            expect(options.throttle?.connection).toBeInstanceOf(
-              Bottleneck.IORedisConnection,
-            );
+            pluginCalls.push({ _octokit, options });
           }),
         });
+
+        expect(pluginCalls.length).toBe(1);
+
+        expect(pluginCalls[0].options.throttle?.Bottleneck).toBe(Bottleneck);
+        expect(
+          pluginCalls[0].options.throttle?.connection instanceof
+            Bottleneck.IORedisConnection,
+        ).toBe(true);
       });
     },
   );
 
   describe("on", () => {
-    beforeEach(() => {
-      event = {
-        id: "123-456",
-        name: "pull_request",
-        payload: getPayloadExample("pull_request"),
-      };
-    });
-
     it("calls callback when no action is specified", async () => {
       const probot = new Probot({
         appId,
         privateKey,
       });
 
-      const spy = vi.fn();
+      const event: WebhookEvent<"pull_request"> = {
+        id: "123-456",
+        name: "pull_request",
+        payload: getPayloadExample("pull_request"),
+      };
+
+      const spyCalls: any[] = [];
+
+      const spy = (...args: any[]) => {
+        spyCalls.push(args);
+      };
       probot.on("pull_request", spy);
 
-      expect(spy).toHaveBeenCalledTimes(0);
+      expect(spyCalls.length).toBe(0);
       await probot.receive(event);
-      expect(spy).toHaveBeenCalled();
-      expect(spy.mock.calls[0][0]).toBeInstanceOf(Context);
-      expect(spy.mock.calls[0][0].payload).toBe(event.payload);
+      expect(spyCalls.length).toBe(1);
+
+      expect(spyCalls[0][0] instanceof Context).toBe(true);
+      expect(spyCalls[0][0].payload).toBe(event.payload);
     });
 
     it("calls callback with same action", async () => {
@@ -373,8 +399,10 @@ describe("Probot", () => {
         privateKey,
       });
 
-      const spy = vi.fn();
-      probot.on("pull_request.opened", spy);
+      let callCount = 0;
+      probot.on("pull_request.opened", () => {
+        ++callCount;
+      });
 
       const event: WebhookEvent<"pull_request.opened"> = {
         id: "123-456",
@@ -383,7 +411,7 @@ describe("Probot", () => {
       };
 
       await probot.receive(event);
-      expect(spy).toHaveBeenCalled();
+      expect(callCount).toBe(1);
     });
 
     it("does not call callback with different action", async () => {
@@ -392,11 +420,20 @@ describe("Probot", () => {
         privateKey,
       });
 
-      const spy = vi.fn();
-      probot.on("pull_request.closed", spy);
+      let hasBeenCalled = 0;
+
+      probot.on("pull_request.closed", () => {
+        ++hasBeenCalled;
+      });
+
+      const event: WebhookEvent<"pull_request"> = {
+        id: "123-456",
+        name: "pull_request",
+        payload: getPayloadExample("pull_request"),
+      };
 
       await probot.receive(event);
-      expect(spy).toHaveBeenCalledTimes(0);
+      expect(hasBeenCalled).toBe(0);
     });
 
     it("calls callback with onAny", async () => {
@@ -405,11 +442,19 @@ describe("Probot", () => {
         privateKey,
       });
 
-      const spy = vi.fn();
-      probot.onAny(spy);
+      let callCount = 0;
+      probot.onAny(() => {
+        ++callCount;
+      });
+
+      const event: WebhookEvent<"pull_request"> = {
+        id: "123-456",
+        name: "pull_request",
+        payload: getPayloadExample("pull_request"),
+      };
 
       await probot.receive(event);
-      expect(spy).toHaveBeenCalled();
+      expect(callCount).toBe(1);
     });
 
     it("calls callback x amount of times when an array of x actions is passed", async () => {
@@ -430,36 +475,49 @@ describe("Probot", () => {
         payload: getPayloadExample("issues.opened"),
       };
 
-      const spy = vi.fn();
-      probot.on(["pull_request.opened", "issues.opened"], spy);
+      let callCount = 0;
+      probot.on(["pull_request.opened", "issues.opened"], () => ++callCount);
 
       await probot.receive(event);
       await probot.receive(event2);
-      expect(spy.mock.calls.length).toEqual(2);
+      expect(callCount).toBe(2);
     });
 
     it("adds a logger on the context", async () => {
+      const output: any[] = [];
+      const streamLogsToOutput = new Stream.Writable({ objectMode: true });
+      streamLogsToOutput._write = (object, _encoding, done) => {
+        output.push(JSON.parse(object));
+        done();
+      };
+
       const probot = new Probot({
         appId,
         privateKey,
         log: pino(streamLogsToOutput),
       });
 
-      const handler = vi.fn().mockImplementation((context) => {
-        expect(context.log.info).toBeDefined();
+      const handlerCalls: Context[] = [];
+      const handler = (context: Context) => {
+        handlerCalls.push(context);
         context.log.info("testing");
-
-        expect(output[0]).toEqual(
-          expect.objectContaining({
-            id: context.id,
-            msg: "testing",
-          }),
-        );
-      });
+      };
 
       probot.on("pull_request", handler);
-      await probot.receive(event).catch(console.error);
-      expect(handler).toHaveBeenCalled();
+
+      const event: WebhookEvent<"pull_request"> = {
+        id: "123-456",
+        name: "pull_request",
+        payload: getPayloadExample("pull_request"),
+      };
+
+      await probot.receive(event);
+
+      expect(handlerCalls.length).toBe(1);
+      expect(typeof handlerCalls[0].log.info).toBe("function");
+      expect(output.length).toBe(1);
+      expect(output[0].msg).toBe("testing");
+      expect(output[0].id).toBe(handlerCalls[0].id);
     });
 
     it("returns an authenticated client for installation.created", async () => {
@@ -480,7 +538,7 @@ describe("Probot", () => {
             if (url === "https://api.github.com/") {
               expect(
                 (opts.headers as Record<string, string>).authorization,
-              ).toEqual("token v1.1f699f1069f60xxx");
+              ).toBe("token v1.1f699f1069f60xxx");
               return true;
             }
             throw new Error("Should have matched");
@@ -498,8 +556,7 @@ describe("Probot", () => {
           fetch: mock.fetchHandler,
         },
       });
-
-      event = {
+      const event: WebhookEvent<"installation.created"> = {
         id: "123-456",
         name: "installation",
         payload: getPayloadExample("installation.created"),
@@ -517,9 +574,9 @@ describe("Probot", () => {
       const mock = fetchMock.createInstance().getOnce(
         function ({ url, options: opts }) {
           if (url === "https://api.github.com/") {
-            expect(
-              (opts.headers as Record<string, string>).authorization,
-            ).toEqual(undefined);
+            expect((opts.headers as Record<string, string>).authorization).toBe(
+              undefined,
+            );
             return true;
           }
           throw new Error("Should have matched");
@@ -537,7 +594,7 @@ describe("Probot", () => {
         },
       });
 
-      event = {
+      const event: WebhookEvent<"installation.deleted"> = {
         id: "123-456",
         name: "installation",
         payload: getPayloadExample("installation.deleted"),
@@ -555,9 +612,9 @@ describe("Probot", () => {
       const mock = fetchMock.createInstance().route(
         function ({ url, options: opts }) {
           if (url === "https://api.github.com/") {
-            expect(
-              (opts.headers as Record<string, string>).authorization,
-            ).toEqual(undefined);
+            expect((opts.headers as Record<string, string>).authorization).toBe(
+              undefined,
+            );
             return true;
           }
           throw new Error("Should have matched");
@@ -575,7 +632,7 @@ describe("Probot", () => {
         },
       });
 
-      event = {
+      const event: WebhookEvent<"check_run"> = {
         id: "123-456",
         name: "check_run",
         payload: getPayloadExamples("check_run").filter(
@@ -592,26 +649,24 @@ describe("Probot", () => {
   });
 
   describe("receive", () => {
-    beforeEach(() => {
-      event = {
-        id: "123-456",
-        name: "pull_request",
-        payload: getPayloadExample("pull_request.opened"),
-      };
-    });
-
     it("delivers the event", async () => {
       const probot = new Probot({
         appId,
         privateKey,
       });
 
-      const spy = vi.fn();
-      probot.on("pull_request", spy);
+      let callCount = 0;
+      probot.on("pull_request", () => ++callCount);
+
+      const event: WebhookEvent<"pull_request.opened"> = {
+        id: "123-456",
+        name: "pull_request",
+        payload: getPayloadExample("pull_request.opened"),
+      };
 
       await probot.receive(event);
 
-      expect(spy).toHaveBeenCalled();
+      expect(callCount).toBe(1);
     });
 
     it("waits for async events to resolve", async () => {
@@ -620,41 +675,61 @@ describe("Probot", () => {
         privateKey,
       });
 
-      const spy = vi.fn();
+      let callCount = 0;
+
       probot.on("pull_request", () => {
         return new Promise((resolve) => {
           setTimeout(() => {
-            spy();
+            callCount++;
             resolve(null);
           }, 1);
         });
       });
 
+      const event: WebhookEvent<"pull_request.opened"> = {
+        id: "123-456",
+        name: "pull_request",
+        payload: getPayloadExample("pull_request.opened"),
+      };
+
       await probot.receive(event);
 
-      expect(spy).toHaveBeenCalled();
+      expect(callCount).toBe(1);
     });
 
     it("returns a reject errors thrown in apps", async () => {
       const probot = new Probot({
         appId,
         privateKey,
-        log: pino(streamLogsToOutput),
+        log: pino({ enabled: false }),
       });
 
       probot.on("pull_request", () => {
         throw new Error("error from app");
       });
 
+      const event: WebhookEvent<"pull_request.opened"> = {
+        id: "123-456",
+        name: "pull_request",
+        payload: getPayloadExample("pull_request.opened"),
+      };
+
       try {
         await probot.receive(event);
-        throw new Error("expected error to be raised from app");
+        throw new Error("Should have thrown");
       } catch (error) {
-        expect((error as Error).message).toMatch(/error from app/);
+        expect((error as Error).message).toBe("error from app");
       }
     });
 
     it("passes logger to webhooks", async () => {
+      const output: any[] = [];
+      const streamLogsToOutput = new Stream.Writable({ objectMode: true });
+      streamLogsToOutput._write = (object, _encoding, done) => {
+        output.push(JSON.parse(object));
+        done();
+      };
+
       const probot = new Probot({
         appId,
         privateKey,
@@ -664,8 +739,8 @@ describe("Probot", () => {
       // @ts-expect-error
       probot.on("unknown-event", () => {});
 
-      expect(output.length).toEqual(1);
-      expect(output[0].msg).toEqual(
+      expect(output.length).toBe(1);
+      expect(output[0].msg).toBe(
         '"unknown-event" is not a known webhook name (https://developer.github.com/v3/activity/events/types/)',
       );
     });

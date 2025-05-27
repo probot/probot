@@ -90,7 +90,7 @@ jobs:
       - name: Test
         run: npm run test
 
-  test-redis:
+  test-node-redis:
     name: Test on Node LTS and Redis 7
     runs-on: ubuntu-latest
     services:
@@ -116,13 +116,64 @@ jobs:
         env:
           REDIS_URL: 127.0.0.1
 
+  test-bun:
+    name: Test on Bun and Redis 7
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: 'redis:7'
+        ports:
+          - '6379:6379'
+        options: '--entrypoint redis-server'
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Use Bun
+        uses: oven-sh/setup-bun@v2
+      - name: Install Dependencies
+        run:  bun install
+      - run: bun run build
+      - name: Test
+        run: bun test
+        env:
+          REDIS_URL: 127.0.0.1
+
+  test-deno:
+    name: Test on Deno and Redis 7
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: 'redis:7'
+        ports:
+          - '6379:6379'
+        options: '--entrypoint redis-server'
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Install Dependencies
+        run:  deno install
+      - run: deno run build
+      - name: Test
+        run: deno run test:code
+        env:
+          REDIS_URL: 127.0.0.1
+
   test:
     if: ${{ always() }}
     runs-on: ubuntu-latest
     needs:
       - test-unit
-      - test-redis
+      - test-bun
+      - test-deno
+      - test-node-redis
 
     steps:
       - run: exit 1
-        if: ${{ needs.test-unit.result != 'success' || needs.test-redis.result != 'success' }}
+        if: ${{ needs.test-unit.result != 'success' || needs.test-node-redis.result != 'success' || needs.test-deno.result != 'success' || needs.test-bun.result != 'success' }}

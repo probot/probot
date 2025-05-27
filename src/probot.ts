@@ -43,7 +43,7 @@ export class Probot {
   public webhooks: ProbotWebhooks;
   public webhookPath: string;
   public log: Logger;
-  public version: String;
+  public version: string;
   public on: ProbotWebhooks["on"];
   public onAny: ProbotWebhooks["onAny"];
   public onError: ProbotWebhooks["onError"];
@@ -57,7 +57,7 @@ export class Probot {
   constructor(options: Options = {}) {
     options.secret = options.secret || "development";
 
-    let level = options.logLevel;
+    const level = options.logLevel;
     const logMessageKey = options.logMessageKey;
 
     this.log = options.log

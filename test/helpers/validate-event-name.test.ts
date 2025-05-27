@@ -6,15 +6,25 @@ describe("validateEventName", () => {
     validateEventName("push");
   });
 
-  it("throws on invalid event name data type", () => {
-    expect(() => validateEventName(1)).toThrowError(
-      Error(`Invalid event name`),
-    );
+  [null, undefined, {}, [], true, false, 1].forEach((value) => {
+    it(`throws on invalid event name data type - ${JSON.stringify(value)}`, () => {
+      try {
+        validateEventName(value as any);
+        throw new Error("Should have thrown");
+      } catch (error) {
+        expect(error instanceof Error).toBe(true);
+        expect((error as Error).message).toBe("Invalid event name");
+      }
+    });
   });
 
-  it("throws on invalid event name", () => {
-    expect(() => validateEventName("invalid")).toThrowError(
-      Error(`Invalid event name`),
-    );
+  it('throws on invalid event name - "invalid"', () => {
+    try {
+      validateEventName("invalid");
+      throw new Error("Should have thrown");
+    } catch (error) {
+      expect(error instanceof Error).toBe(true);
+      expect((error as Error).message).toBe("Invalid event name");
+    }
   });
 });

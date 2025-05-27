@@ -48,7 +48,7 @@ describe("webhook-proxy", () => {
 
   describe("with a valid proxy server", () => {
     test("forwards events to server", async () => {
-      let readyPromise = {
+      const readyPromise = {
         promise: undefined,
         reject: undefined,
         resolve: undefined,
@@ -63,7 +63,7 @@ describe("webhook-proxy", () => {
         readyPromise.reject = reject;
       });
 
-      let finishedPromise = {
+      const finishedPromise = {
         promise: undefined,
         reject: undefined,
         resolve: undefined,
@@ -151,9 +151,7 @@ describe("webhook-proxy", () => {
   });
 
   test("logs an error when the proxy server is not found", async () => {
-    expect.assertions(4);
-
-    let finishedPromise = {
+    const finishedPromise = {
       promise: undefined,
       reject: undefined,
       resolve: undefined,
@@ -168,7 +166,8 @@ describe("webhook-proxy", () => {
       finishedPromise.reject = reject;
     });
 
-    const url = `http://bad.n${randomInt(1e10).toString(36)}.proxy/events`;
+    const domain = "bad.n" + randomInt(1e10).toString(36) + ".proxy";
+    const url = `http://${domain}/events`;
 
     const logger = getLog({ level: "fatal" }).child({});
 
@@ -186,22 +185,28 @@ describe("webhook-proxy", () => {
     }))!;
 
     proxy.addEventListener("error", (error: any) => {
-      switch (detectRuntime(globalThis)) {
-        case "node":
-          expect(error.message).toMatch(/getaddrinfo ENOTFOUND/);
-          break;
-        case "bun":
-          expect(error.message).toEqual(
-            "Unable to connect. Is the computer able to access the url?",
-          );
-          break;
+      try {
+        switch (detectRuntime(globalThis)) {
+          case "node":
+          case "deno":
+            expect(error.message).toBe(
+              `TypeError: fetch failed: getaddrinfo ENOTFOUND ${domain}`,
+            );
+            break;
+          case "bun":
+            expect(error.message).toBe(
+              "Unable to connect. Is the computer able to access the url?",
+            );
+            break;
+        }
+
+        expect(LoggerErrorCalls.length).toBe(1);
+        expect(LoggerErrorCalls[0].length).toBe(1);
+        expect(LoggerErrorCalls[0][0]).toBe(error);
+        finishedPromise.resolve!();
+      } catch (e) {
+        finishedPromise.reject!(e);
       }
-
-      expect(LoggerErrorCalls).toHaveLength(1);
-      expect(LoggerErrorCalls[0]).toHaveLength(1);
-      expect(LoggerErrorCalls[0][0]).toEqual(error);
-
-      finishedPromise.resolve!();
     });
 
     await finishedPromise.promise;

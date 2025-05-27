@@ -60,7 +60,7 @@ export function getProbotOctokitWithDefaults(
     redisConfig: options.redisConfig,
   });
 
-  let defaultOptions: Partial<OctokitOptions> = {
+  const defaultOptions: Partial<OctokitOptions> = {
     auth: authOptions,
     log: options.log.child
       ? options.log.child({ name: "octokit" })

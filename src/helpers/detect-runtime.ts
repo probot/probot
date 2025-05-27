@@ -1,6 +1,6 @@
 type Runtime = "node" | "deno" | "bun" | "browser";
 
-type GlobalThis = {
+export type GlobalThis = {
   process?: {
     versions?: {
       node?: string;

@@ -9,9 +9,11 @@ import { describe, expect, it } from "vitest";
 import { Probot, Server } from "../../src/index.js";
 import { defaultApp as defaultAppHandler } from "../../src/apps/default.js";
 
+import { probotView } from "../../src/views/probot.js";
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-describe("default app", async () => {
+describe("default app", () => {
   let output = [];
 
   const streamLogsToOutput = new Stream.Writable({ objectMode: true });
@@ -63,7 +65,14 @@ describe("default app", async () => {
 
         expect(response.status).toBe(200);
 
-        expect(await response.text()).toMatchSnapshot();
+        expect(await response.text()).toBe(
+          probotView({
+            name: "probot",
+            description:
+              "A framework for building GitHub Apps to automate and improve your workflow",
+            version: "0.0.0-development",
+          }),
+        );
 
         await server.stop();
       });
@@ -77,7 +86,7 @@ describe("default app", async () => {
           `http://${server.host}:${server.port}/probot`,
         );
         expect(response.status).toBe(200);
-        expect(await response.text()).toMatchSnapshot();
+        expect(await response.text()).toBe(probotView({}));
 
         await server.stop();
       });

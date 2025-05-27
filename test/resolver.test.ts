@@ -15,8 +15,6 @@ const stubTranspiledAppFnPath = resolve(
 
 describe("resolver", () => {
   it("loads the module at the resolved path", async () => {
-    expect.assertions(4);
-
     const stubResolverCalls: [string, string][] = [];
     const stubResolver = (specifier: string, parent?: string): string => {
       stubResolverCalls.push([specifier, parent!]);
@@ -25,8 +23,8 @@ describe("resolver", () => {
     const module = await resolveAppFunction("foo", {
       resolver: stubResolver,
     });
-    expect(module).toBeInstanceOf(Function);
-    expect(stubResolverCalls).toHaveLength(1);
+    expect(typeof module).toBe("function");
+    expect(stubResolverCalls.length).toBe(1);
     expect(stubResolverCalls[0][0]).toBe("foo");
     expect(stubResolverCalls[0][1]).toBe(basedir);
   });
@@ -41,8 +39,8 @@ describe("resolver", () => {
     const module = await resolveAppFunction("foo", {
       resolver: stubResolver,
     });
-    expect(module).toBeInstanceOf(Function);
-    expect(stubResolverCalls).toHaveLength(1);
+    expect(typeof module).toBe("function");
+    expect(stubResolverCalls.length).toBe(1);
     expect(stubResolverCalls[0][0]).toBe("foo");
     expect(stubResolverCalls[0][1]).toBe(basedir);
   });

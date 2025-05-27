@@ -11,14 +11,22 @@ describe("validateLogFormat", () => {
   });
 
   it("throws on invalid file type", () => {
-    expect(() => validateLogFormat(1)).toThrowError(
-      Error(`Invalid log format`),
-    );
+    try {
+      validateLogFormat(1);
+      throw new Error("Should have thrown");
+    } catch (error) {
+      expect(error instanceof Error).toBe(true);
+      expect((error as Error).message).toBe("Invalid log format");
+    }
   });
 
   it("throws on invalid format", () => {
-    expect(() => validateLogFormat("invalid")).toThrowError(
-      Error(`Invalid log format`),
-    );
+    try {
+      validateLogFormat("invalid");
+      throw new Error("Should have thrown");
+    } catch (error) {
+      expect(error instanceof Error).toBe(true);
+      expect((error as Error).message).toBe("Invalid log format");
+    }
   });
 });

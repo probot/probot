@@ -40,7 +40,7 @@ describe("run", () => {
         },
         { env, updateEnv, SmeeClient: { createChannel: async () => "dummy" } },
       );
-      expect(initialized).toBeTruthy();
+      expect(initialized).toBe(true);
       await server.stop();
     });
 
@@ -67,7 +67,7 @@ describe("run", () => {
       delete env.PRIVATE_KEY_PATH;
       env.PORT = (await getPort()).toString();
 
-      return new Promise(async (resolve) => {
+      await new Promise(async (resolve) => {
         const server = await run(
           (_app: Probot) => {
             initialized = true;
@@ -78,11 +78,12 @@ describe("run", () => {
             SmeeClient: { createChannel: async () => "dummy" },
           },
         );
-        expect(initialized).toBeFalsy();
         await server.stop();
 
         resolve(null);
       });
+
+      expect(initialized).toBe(false);
     });
 
     it("defaults to JSON logs if NODE_ENV is set to 'production'", async () => {
@@ -101,7 +102,10 @@ describe("run", () => {
       );
       await server.stop();
 
-      expect(outputData).toMatch(/"msg":"test"/);
+      const parsedOutput = JSON.parse(outputData);
+      expect(parsedOutput.level).toBe(60);
+      expect(parsedOutput.msg).toBe("test");
+      expect(parsedOutput.name).toBe("probot");
     });
   });
 
@@ -150,24 +154,22 @@ describe("run", () => {
         updateEnv: (env) => env,
       });
 
-      try {
-        const response = await fetch(
-          `http://${server.host}:${server.port}/custom-webhook`,
-          {
-            method: "POST",
-            body: pushEvent,
-            headers: {
-              "content-type": "application/json",
-              "x-github-event": "push",
-              "x-hub-signature-256": await sign("secret", pushEvent),
-              "x-github-delivery": "123",
-            },
+      const response = await fetch(
+        `http://${server.host}:${server.port}/custom-webhook`,
+        {
+          method: "POST",
+          body: pushEvent,
+          headers: {
+            "content-type": "application/json",
+            "x-github-event": "push",
+            "x-hub-signature-256": await sign("secret", pushEvent),
+            "x-github-delivery": "123",
           },
-        );
-        expect(response.status).toBe(200);
-      } finally {
-        await server.stop();
-      }
+        },
+      );
+
+      expect(response.status).toBe(200);
+      await server.stop();
     });
   });
 });

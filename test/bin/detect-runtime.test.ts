@@ -32,17 +32,17 @@ describe("detectRuntime", () => {
     expect(detectRuntime({ window: {} })).toBe("browser");
   });
 
-  it("throws an error if runtime cannot be detected", () => {
-    expect(() => detectRuntime({})).toThrow("Unable to detect runtime");
-    // @ts-ignore
-    expect(() => detectRuntime(null)).toThrow("Unable to detect runtime");
-    // @ts-ignore
-    expect(() => detectRuntime({ process: null })).toThrow(
-      "Unable to detect runtime",
-    );
-    // @ts-ignore
-    expect(() => detectRuntime({ process: { versions: null } })).toThrow(
-      "Unable to detect runtime",
-    );
-  });
+  [{}, null, { process: null }, { process: { versions: null } }].forEach(
+    (value) => {
+      it(`throws an error if runtime cannot be detected - ${JSON.stringify(value)}`, () => {
+        try {
+          detectRuntime(value as any);
+          throw new Error("Should have thrown");
+        } catch (error) {
+          expect(error instanceof Error).toBe(true);
+          expect((error as Error).message).toBe("Unable to detect runtime");
+        }
+      });
+    },
+  );
 });

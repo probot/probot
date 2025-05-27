@@ -10,10 +10,18 @@ export function isSupportedRuntime(globalThis: any): boolean {
       return major >= 22 || (major === 20 && minor >= 17);
     }
     case "deno": {
-      return false;
+      const [major, minor] = globalThis.process.versions.deno
+        .split(".", 2)
+        .map(Number);
+
+      return major >= 3 || (major === 2 && minor >= 3);
     }
     case "bun": {
-      return false;
+      const [major, minor] = globalThis.process.versions.bun
+        .split(".", 2)
+        .map(Number);
+
+      return major > 1 || (major === 1 && minor >= 2);
     }
     default: {
       return false;

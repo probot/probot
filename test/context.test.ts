@@ -8,7 +8,7 @@ import type {
 } from "@octokit/webhooks";
 import WebhookExamples from "@octokit/webhooks-examples";
 import fetchMock from "fetch-mock";
-import { describe, expect, test, beforeEach, it } from "vitest";
+import { describe, expect, test, it } from "vitest";
 
 import { Context } from "../src/index.js";
 import { ProbotOctokit } from "../src/octokit/probot-octokit.js";
@@ -61,12 +61,12 @@ const pullRequestEventPayload = (
 ).examples[0] as WebhookEvent<"pull_request">["payload"];
 
 describe("Context", () => {
-  let event: WebhookEvent<"push"> = {
+  const event: WebhookEvent<"push"> = {
     id: "0",
     name: "push",
     payload: pushEventPayload,
   };
-  let octokit = {
+  const octokit = {
     hook: {
       before: () => {},
     },
@@ -82,78 +82,97 @@ describe("Context", () => {
   });
 
   describe("repo", () => {
-    let event: WebhookEvent<"push">;
-    let context: Context<"push">;
-    beforeEach(() => {
-      event = {
-        id: "123",
-        name: "push",
-        payload: pushEventPayload,
-      };
-      let octokit = {
+    const event = {
+      id: "123",
+      name: "push",
+      payload: pushEventPayload,
+    } as WebhookEvent<"push">;
+
+    const context = new Context<"push">(
+      event,
+      {
         hook: {
           before: () => {},
         },
-      };
-
-      context = new Context<"push">(event, octokit as any, {} as any);
-    });
+      } as any,
+      {} as any,
+    );
 
     it("returns attributes from repository payload", () => {
-      expect(context.repo()).toEqual({
-        owner: "Codertocat",
-        repo: "Hello-World",
-      });
+      const repository = context.repo();
+
+      expect(typeof repository).toBe("object");
+      expect(Object.keys(repository).length).toBe(2);
+      expect(repository.owner).toBe("Codertocat");
+      expect(repository.repo).toBe("Hello-World");
     });
 
     it("merges attributes", () => {
-      expect(context.repo({ foo: 1, bar: 2 })).toEqual({
-        bar: 2,
-        foo: 1,
-        owner: "Codertocat",
-        repo: "Hello-World",
-      });
+      const repository = context.repo({ foo: 1, bar: 2 });
+
+      expect(typeof repository).toBe("object");
+      expect(Object.keys(repository).length).toBe(4);
+      expect(repository.owner).toBe("Codertocat");
+      expect(repository.repo).toBe("Hello-World");
+      expect(repository.foo).toBe(1);
+      expect(repository.bar).toBe(2);
     });
 
     it("overrides repo attributes", () => {
-      expect(context.repo({ owner: "muahaha" })).toEqual({
-        owner: "muahaha",
-        repo: "Hello-World",
-      });
+      const repository = context.repo({ owner: "muahaha" });
+
+      expect(typeof repository).toBe("object");
+      expect(Object.keys(repository).length).toBe(2);
+      expect(repository.owner).toBe("muahaha");
+      expect(repository.repo).toBe("Hello-World");
     });
 
     // The `repository` object on the push event has a different format than the other events
     // https://docs.github.com/en/developers/webhooks-and-events/webhook-events-and-payloads#push
     it("properly handles the push event", () => {
-      event.payload = require("./fixtures/webhook/push") as PushEvent;
-      let octokit = {
+      const pushEvent = {
+        ...event,
+        payload: require("./fixtures/webhook/push") as PushEvent,
+      };
+
+      const octokit = {
         hook: {
           before: () => {},
         },
       };
 
-      context = new Context<"push">(event, octokit as any, {} as any);
-      expect(context.repo()).toEqual({ owner: "bkeepers-inc", repo: "test" });
+      const context = new Context<"push">(pushEvent, octokit as any, {} as any);
+
+      const repository = context.repo();
+
+      expect(typeof repository).toBe("object");
+      expect(Object.keys(repository).length).toBe(2);
+      expect(repository.owner).toBe("bkeepers-inc");
+      expect(repository.repo).toBe("test");
     });
 
     it("return error for context.repo() when repository doesn't exist", () => {
-      event = {
+      const event = {
         id: "123",
         name: "push",
         payload: { ...pushEventPayload, repository: undefined as any },
       };
-      let octokit = {
+      const octokit = {
         hook: {
           before: () => {},
         },
       };
 
-      context = new Context<"push">(event, octokit as any, {} as any);
+      const context = new Context<"push">(
+        event as WebhookEvent<"push">,
+        octokit as any,
+        {} as any,
+      );
       try {
         context.repo();
         throw new Error("Should have thrown");
       } catch (e) {
-        expect((e as Error).message).toMatch(
+        expect((e as Error).message).toBe(
           "context.repo() is not supported for this webhook event.",
         );
       }
@@ -161,111 +180,110 @@ describe("Context", () => {
   });
 
   describe("issue", () => {
-    let event: WebhookEvent<"issues">;
-    let context: Context<"issues">;
-    beforeEach(() => {
-      event = {
+    const context = new Context<"issues">(
+      {
         id: "123",
         name: "issues",
         payload: issuesEventPayload,
-      };
-      let octokit = {
+      } as WebhookEvent<"issues">,
+      {
         hook: {
           before: () => {},
         },
-      };
+      } as any,
+      {} as any,
+    );
 
-      context = new Context<"issues">(event, octokit as any, {} as any);
-    });
     it("returns attributes from repository payload", () => {
-      expect(context.issue()).toEqual({
-        owner: "Codertocat",
-        repo: "Hello-World",
-        issue_number: 1,
-      });
+      const issue = context.issue();
+
+      expect(typeof issue).toBe("object");
+      expect(Object.keys(issue).length).toBe(3);
+      expect(issue.owner).toBe("Codertocat");
+      expect(issue.repo).toBe("Hello-World");
+      expect(issue.issue_number).toBe(1);
     });
 
     it("merges attributes", () => {
-      expect(context.issue({ foo: 1, bar: 2 })).toEqual({
-        bar: 2,
-        foo: 1,
-        issue_number: 1,
-        owner: "Codertocat",
-        repo: "Hello-World",
-      });
+      const issue = context.issue({ foo: 1, bar: 2 });
+
+      expect(typeof issue).toBe("object");
+      expect(Object.keys(issue).length).toBe(5);
+      expect(issue.owner).toBe("Codertocat");
+      expect(issue.repo).toBe("Hello-World");
+      expect(issue.issue_number).toBe(1);
+      expect(issue.foo).toBe(1);
+      expect(issue.bar).toBe(2);
     });
 
     it("overrides repo attributes", () => {
-      expect(context.issue({ owner: "muahaha", issue_number: 5 })).toEqual({
-        issue_number: 5,
-        owner: "muahaha",
-        repo: "Hello-World",
-      });
+      const issue = context.issue({ owner: "muahaha", issue_number: 5 });
+
+      expect(typeof issue).toBe("object");
+      expect(Object.keys(issue).length).toBe(3);
+      expect(issue.owner).toBe("muahaha");
+      expect(issue.issue_number).toBe(5);
+      expect(issue.repo).toBe("Hello-World");
     });
   });
 
   describe("pullRequest", () => {
-    let event: WebhookEvent<"pull_request">;
-    let context: Context<"pull_request">;
-    beforeEach(() => {
-      event = {
-        id: "123",
-        name: "pull_request",
-        payload: pullRequestEventPayload,
-      };
-      let octokit = {
+    const event = {
+      id: "123",
+      name: "pull_request",
+      payload: pullRequestEventPayload,
+    } as WebhookEvent<"pull_request">;
+    const context = new Context<"pull_request">(
+      event,
+      {
         hook: {
           before: () => {},
         },
-      };
+      } as any,
+      {} as any,
+    );
 
-      context = new Context<"pull_request">(event, octokit as any, {} as any);
-    });
     it("returns attributes from repository payload", () => {
-      expect(context.pullRequest()).toEqual({
-        owner: "Codertocat",
-        repo: "Hello-World",
-        pull_number: 2,
-      });
+      const pullRequest = context.pullRequest();
+
+      expect(typeof pullRequest).toBe("object");
+      expect(Object.keys(pullRequest).length).toBe(3);
+      expect(pullRequest.owner).toBe("Codertocat");
+      expect(pullRequest.repo).toBe("Hello-World");
+      expect(pullRequest.pull_number).toBe(2);
     });
 
     it("merges attributes", () => {
-      expect(context.pullRequest({ foo: 1, bar: 2 })).toEqual({
-        bar: 2,
-        foo: 1,
-        owner: "Codertocat",
-        pull_number: 2,
-        repo: "Hello-World",
-      });
+      const pullRequest = context.pullRequest({ foo: 1, bar: 2 });
+
+      expect(typeof pullRequest).toBe("object");
+      expect(Object.keys(pullRequest).length).toBe(5);
+      expect(pullRequest.owner).toBe("Codertocat");
+      expect(pullRequest.repo).toBe("Hello-World");
+      expect(pullRequest.pull_number).toBe(2);
+      expect(pullRequest.foo).toBe(1);
+      expect(pullRequest.bar).toBe(2);
     });
 
     it("overrides repo attributes", () => {
-      expect(context.pullRequest({ owner: "muahaha", pull_number: 5 })).toEqual(
-        {
-          owner: "muahaha",
-          pull_number: 5,
-          repo: "Hello-World",
-        },
-      );
+      const pullRequest = context.pullRequest({
+        owner: "muahaha",
+        pull_number: 5,
+      });
+
+      expect(typeof pullRequest).toBe("object");
+      expect(Object.keys(pullRequest).length).toBe(3);
+      expect(pullRequest.owner).toBe("muahaha");
+      expect(pullRequest.pull_number).toBe(5);
+      expect(pullRequest.repo).toBe("Hello-World");
     });
   });
 
   describe("config", () => {
-    let octokit: ProbotOctokit;
-
     function getConfigFile(fileName: string) {
       const configPath = path.join(__dirname, "fixtures", "config", fileName);
       return fs.readFileSync(configPath, { encoding: "utf8" });
     }
-
-    beforeEach(() => {
-      octokit = new ProbotOctokit({
-        retry: { enabled: false },
-        throttle: { enabled: false },
-      });
-      // @ts-ignore - Expression produces a union type that is too complex to represent
-      context = new Context(event, octokit, {} as any);
-    });
 
     it("gets a valid configuration", async () => {
       const mock = fetchMock
@@ -285,11 +303,12 @@ describe("Context", () => {
       const context = new Context(event, octokit, {} as any);
 
       const config = await context.config("test-file.yml");
-      expect(config).toEqual({
-        bar: 7,
-        baz: 11,
-        foo: 5,
-      });
+
+      expect(typeof config).toBe("object");
+      expect(Object.keys(config as any).length).toBe(3);
+      expect((config as any).foo).toBe(5);
+      expect((config as any).bar).toBe(7);
+      expect((config as any).baz).toBe(11);
     });
 
     it("returns null when the file and base repository are missing", async () => {
@@ -357,10 +376,8 @@ describe("Context", () => {
 
     it("sets x-github-delivery header to event id", async () => {
       const mock = fetchMock.createInstance().getOnce("*", ({ options }) => {
-        expect(
-          // @ts-expect-error
-          options.headers["x-github-delivery"],
-        ).toBe("0");
+        // @ts-expect-error
+        expect(options.headers["x-github-delivery"]).toBe("0");
         return getConfigFile("basic.yml");
       });
 
@@ -379,7 +396,7 @@ describe("Context", () => {
   describe("isBot", () => {
     test("returns true if sender is a bot", () => {
       event.payload.sender!.type = "Bot";
-      let octokit = {
+      const octokit = {
         hook: {
           before: () => {},
         },
@@ -391,7 +408,7 @@ describe("Context", () => {
 
     test("returns false if sender is not a bot", () => {
       event.payload.sender!.type = "User";
-      let octokit = {
+      const octokit = {
         hook: {
           before: () => {},
         },

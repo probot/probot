@@ -7,13 +7,13 @@ export function loggingHandler(logger: Logger, options?: Options): HttpLogger {
   return pinoHttp({
     ...options,
     logger: logger.child({ name: "http" }),
-    customSuccessMessage(_req, res) {
+    customSuccessMessage(req, res) {
       const responseTime = Date.now() - res[startTime];
-      return `${res.req.method} ${res.req.url} ${res.statusCode} - ${responseTime}ms`;
+      return `${req.method} ${req.url} ${res.statusCode} - ${responseTime}ms`;
     },
-    customErrorMessage(_err, res) {
+    customErrorMessage(req, res, _err) {
       const responseTime = Date.now() - res[startTime];
-      return `${res.req.method} ${res.req.url} ${res.statusCode} - ${responseTime}ms`;
+      return `${req.method} ${req.url} ${res.statusCode} - ${responseTime}ms`;
     },
     genReqId: (req) =>
       req.headers["x-request-id"] ||

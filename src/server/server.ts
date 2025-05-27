@@ -14,11 +14,13 @@ import type {
   ServerOptions,
 } from "../types.js";
 import type { Probot } from "../exports.js";
+
 import { rebindLog } from "../helpers/rebind-log.js";
+import { getPrintableHost } from "../helpers/get-printable-host.js";
+import { getRuntimeName } from "../helpers/get-runtime-name.js";
+import { getRuntimeVersion } from "../helpers/get-runtime-version.js";
 
 import { loggingHandler } from "./handlers/logging.js";
-import { getPrintableHost } from "../helpers/get-printable-host.js";
-
 import { notFoundHandler } from "./handlers/not-found.js";
 import { pingHandler } from "./handlers/ping.js";
 import { staticFilesHandler } from "./handlers/static-files.js";
@@ -137,14 +139,17 @@ export class Server {
   }
 
   public async start(): Promise<HttpServer> {
+    const runtimeName = getRuntimeName(globalThis);
+    const runtimeVersion = getRuntimeVersion(globalThis);
+
     this.log.info(
-      `Running Probot v${this.version} (Node.js: ${process.version})`,
+      `Running Probot v${this.version} (${runtimeName}: ${runtimeVersion})`,
     );
     const { port, host, webhookPath, webhookProxy } = this.#state;
     const printableHost = getPrintableHost(host);
 
     this.#state.httpServer = await new Promise((resolve, reject) => {
-      const server = this.#state.httpServer!.listen(port, host, async () => {
+      const server = this.#state.httpServer.listen({ port, host }, async () => {
         this.#state.port = (server.address() as AddressInfo).port;
         this.#state.host = (server.address() as AddressInfo).address;
 

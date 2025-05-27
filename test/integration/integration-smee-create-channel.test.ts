@@ -15,18 +15,14 @@ describe("ManifestCreation", () => {
     await new ManifestCreation({ updateEnv }).createWebhookChannel({
       SmeeClient: {
         createChannel: async () => {
-          return (
-            "https://smee.io/" + Math.random().toString(36).substring(2, 12)
-          );
+          return "https://smee.io/1234ab1234";
         },
       },
     });
 
     expect(UpdateEnvCalls.length).toBe(1);
-    expect(
-      /^https:\/\/smee\.io\/[0-9a-zA-Z]{10,}$/.test(
-        UpdateEnvCalls[0].WEBHOOK_PROXY_URL!,
-      ),
-    ).toBe(true);
+    expect(UpdateEnvCalls[0].WEBHOOK_PROXY_URL!).toBe(
+      "https://smee.io/1234ab1234",
+    );
   });
 });

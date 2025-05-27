@@ -188,6 +188,7 @@ describe("webhook-proxy", () => {
       try {
         switch (detectRuntime(globalThis)) {
           case "node":
+          case "deno":
             expect(error.message).toBe(
               `TypeError: fetch failed: getaddrinfo ENOTFOUND ${domain}`,
             );

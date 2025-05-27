@@ -145,6 +145,7 @@ describe("run", () => {
 
       await server.stop();
     },
+    // Fastify is not supported in Deno
     { skip: detectRuntime(globalThis) === "deno" },
   );
 });
@@ -238,6 +239,7 @@ describe("createNodeMiddleware", () => {
 
       server.close();
     },
+    // Fastify is not supported in Deno
     { skip: detectRuntime(globalThis) === "deno" },
   );
 });

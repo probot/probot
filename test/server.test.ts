@@ -237,38 +237,39 @@ describe("Server", () => {
   });
 
   describe(".start() / .stop()", () => {
-    it("should expect the correct error if port already in use", async () => {
-      if (detectRuntime(globalThis) === "bun") {
+    it(
+      "should expect the correct error if port already in use",
+      async () => {
+        const port = await getPort();
+
+        const blocker = new Server({
+          Probot: Probot.defaults({ appId, privateKey }),
+          log: pino(streamLogsToOutput([])),
+          port,
+        });
+
+        await blocker.start();
+
+        const server = new Server({
+          Probot: Probot.defaults({ appId, privateKey }),
+          log: pino(streamLogsToOutput([])),
+          port,
+        });
+
+        try {
+          await server.start();
+          throw new Error("Server should not start");
+        } catch (error) {
+          expect((error as Error).message).toBe(
+            `Port ${port} is already in use. You can define the PORT environment variable to use a different port.`,
+          );
+        } finally {
+          await blocker.stop();
+        }
         // Bun runtime detected. Port reuse possible. skipping port in use error check
-        return;
-      }
-      const port = await getPort();
-
-      const blocker = new Server({
-        Probot: Probot.defaults({ appId, privateKey }),
-        log: pino(streamLogsToOutput([])),
-        port,
-      });
-
-      await blocker.start();
-
-      const server = new Server({
-        Probot: Probot.defaults({ appId, privateKey }),
-        log: pino(streamLogsToOutput([])),
-        port,
-      });
-
-      try {
-        await server.start();
-        throw new Error("Server should not start");
-      } catch (error) {
-        expect((error as Error).message).toBe(
-          `Port ${port} is already in use. You can define the PORT environment variable to use a different port.`,
-        );
-      } finally {
-        await blocker.stop();
-      }
-    });
+      },
+      { skip: detectRuntime(globalThis) === "bun" },
+    );
 
     it("respects host/ip config when starting up HTTP server", async () => {
       const output: any[] = [];

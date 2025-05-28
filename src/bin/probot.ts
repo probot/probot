@@ -16,7 +16,7 @@ const pkg = loadPackageJson(resolve(__dirname, "package.json"));
 
 if (!isSupportedRuntime(globalThis)) {
   console.log(
-    `Node.js version 20.17 or 22, Deno version 2.3.0 or Bun version 1.2.14 is required. You have ${detectRuntime(globalThis)} ${process.version}.`,
+    `Node.js version 20.18.1 or 22, Deno version 2.3.0 or Bun version 1.2.14 is required. You have ${detectRuntime(globalThis)} ${process.version}.`,
   );
   process.exit(1);
 }

@@ -3,11 +3,14 @@ import { detectRuntime } from "./detect-runtime.js";
 export function isSupportedRuntime(globalThis: any): boolean {
   switch (detectRuntime(globalThis)) {
     case "node": {
-      const [major, minor] = globalThis.process.versions.node
-        .split(".", 2)
+      const [major, minor, patch] = globalThis.process.versions.node
+        .split(".", 3)
         .map(Number);
 
-      return major >= 22 || (major === 20 && minor >= 17);
+      return (
+        major >= 22 ||
+        (major === 20 && (minor > 18 || (minor === 18 && patch >= 1)))
+      );
     }
     case "deno": {
       const [major, minor] = globalThis.process.versions.deno

@@ -5,13 +5,13 @@ import { loadPackageJson } from "../../src/helpers/load-package-json.js";
 
 describe("isSupportedRuntime", () => {
   const { engines } = loadPackageJson();
-  it(`engines value is set to "^20.17 || >= 22"`, () => {
-    expect(engines!.node).toBe("^20.17 || >= 22");
+  it(`engines value is set to "^20.18.1 || >= 22"`, () => {
+    expect(engines!.node).toBe("^20.18.1 || >= 22");
   });
 
-  it("returns true if node is bigger or equal v20.17 or v22", () => {
+  it("returns true if node is bigger or equal v20.18.1 or v22", () => {
     expect(
-      isSupportedRuntime({ process: { versions: { node: "20.17.0" } } }),
+      isSupportedRuntime({ process: { versions: { node: "20.18.1" } } }),
     ).toBe(true);
     expect(
       isSupportedRuntime({ process: { versions: { node: "22.0.0" } } }),
@@ -21,7 +21,7 @@ describe("isSupportedRuntime", () => {
     ).toBe(true);
   });
 
-  it("returns false if node is smaller than v20.17", () => {
+  it("returns false if node is smaller than v20.18.1 or v22.0.0", () => {
     expect(
       isSupportedRuntime({ process: { versions: { node: "17.0.0" } } }),
     ).toBe(false);

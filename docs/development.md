@@ -210,7 +210,7 @@ async function startServer() {
 }
 ```
 
-The `server` instance gives you access to the express app instance (`server.expressApp`) as well as the [`Probot`](https://probot.github.io/api/latest/classes/probot.Probot.html) instance (`server.probotApp`).
+The `server` instance gives you access to the [`Probot`](https://probot.github.io/api/latest/classes/probot.Probot.html) instance (`server.probotApp`).
 
 ### Use createNodeMiddleware
 

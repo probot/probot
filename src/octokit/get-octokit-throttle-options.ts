@@ -8,8 +8,8 @@ type Options = {
   redisConfig?: RedisOptions | string;
 };
 
-export function getOctokitThrottleOptions(options: Options) {
-  let { log, redisConfig } = options;
+export function getOctokitThrottleOptions(options: Options): ThrottlingOptions {
+  const { log, redisConfig } = options;
 
   const throttlingOptions: ThrottlingOptions = {
     onRateLimit: (retryAfter, options: { [key: string]: any }) => {

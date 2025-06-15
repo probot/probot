@@ -132,8 +132,7 @@ describe("webhook-proxy", () => {
           fetch: customFetch,
         })) as EventSource;
 
-        // Wait for proxy to be ready
-        proxy.addEventListener("ready", readyPromise.resolve!);
+        readyPromise.resolve!();
       });
 
       await readyPromise.promise;

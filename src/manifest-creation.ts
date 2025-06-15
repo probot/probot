@@ -28,7 +28,7 @@ export class ManifestCreation {
   ): Promise<string | undefined> {
     try {
       const SmeeClient =
-        SmeeClientParam || (await import("smee-client")).default;
+        SmeeClientParam || (await import("smee-client")).SmeeClient;
 
       const WEBHOOK_PROXY_URL = await SmeeClient.createChannel();
       this.#updateEnv({

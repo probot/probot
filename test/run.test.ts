@@ -59,18 +59,16 @@ describe("run", () => {
     });
 
     it("runs without config and loads the setup app", async () => {
-      let initialized = false;
-
       const port = await getPort();
       const env = { ...defaultEnv, PORT: port.toString() };
 
       delete env.PRIVATE_KEY_PATH;
       env.PORT = (await getPort()).toString();
 
-      await new Promise(async (resolve) => {
+      await new Promise(async (resolve, reject) => {
         const server = await run(
           (_app: Probot) => {
-            initialized = true;
+            reject(new Error("Should not start the app"));
           },
           {
             env,
@@ -82,8 +80,6 @@ describe("run", () => {
 
         resolve(null);
       });
-
-      expect(initialized).toBe(false);
     });
 
     it("defaults to JSON logs if NODE_ENV is set to 'production'", async () => {

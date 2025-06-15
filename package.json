@@ -85,7 +85,7 @@
     "get-port": "^7.0.0",
     "prettier": "^3.0.3",
     "semantic-release-plugin-update-version-in-files": "^2.0.0",
-    "smee-client": "^4.0.0",
+    "smee-client": "^4.3.1",
     "sonic-boom": "^4.0.0",
     "tsd": "^0.32.0",
     "typedoc": "^0.28.0",

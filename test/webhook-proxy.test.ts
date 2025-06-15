@@ -151,21 +151,6 @@ describe("webhook-proxy", () => {
   });
 
   test("logs an error when the proxy server is not found", async () => {
-    const finishedPromise = {
-      promise: undefined,
-      reject: undefined,
-      resolve: undefined,
-    } as {
-      promise?: Promise<any>;
-      resolve?: (value?: any) => any;
-      reject?: (reason?: any) => any;
-    };
-
-    finishedPromise.promise = new Promise((resolve, reject) => {
-      finishedPromise.resolve = resolve;
-      finishedPromise.reject = reject;
-    });
-
     const domain = "bad.n" + randomInt(1e10).toString(36) + ".proxy";
     const url = `http://${domain}/events`;
 
@@ -176,41 +161,34 @@ describe("webhook-proxy", () => {
       LoggerErrorCalls.push(args);
     };
 
-    const proxy = (await createWebhookProxy({
-      url,
-      port: 1234,
-      host: "localhost",
-      path: "/",
-      logger,
-    }))!;
-
-    proxy.addEventListener("error", (error: any) => {
-      try {
-        switch (detectRuntime(globalThis)) {
-          case "node":
-          case "deno":
-            expect(error.message).toBe(
-              `TypeError: fetch failed: getaddrinfo ENOTFOUND ${domain}`,
-            );
-            break;
-          case "bun":
-            expect(error.message).toBe(
-              "Unable to connect. Is the computer able to access the url?",
-            );
-            break;
-        }
-
-        expect(LoggerErrorCalls.length).toBe(1);
-        expect(LoggerErrorCalls[0].length).toBe(1);
-        expect(LoggerErrorCalls[0][0]).toBe(error);
-        finishedPromise.resolve!();
-      } catch (e) {
-        finishedPromise.reject!(e);
+    try {
+      await createWebhookProxy({
+        url,
+        port: 1234,
+        host: "localhost",
+        path: "/",
+        logger,
+      });
+      throw new Error("Expected an error to be thrown");
+    } catch (error: any) {
+      switch (detectRuntime(globalThis)) {
+        case "node":
+        case "deno":
+          expect(error.message).toBe(
+            `TypeError: fetch failed: getaddrinfo ENOTFOUND ${domain}`,
+          );
+          break;
+        case "bun":
+          expect(error.message).toBe(
+            "Unable to connect. Is the computer able to access the url?",
+          );
+          break;
       }
-    });
 
-    await finishedPromise.promise;
-
-    proxy.close();
+      expect(LoggerErrorCalls.length).toBe(1);
+      expect(LoggerErrorCalls[0].length).toBe(2);
+      expect(LoggerErrorCalls[0][0]).toBe('Error in connection');
+      expect(LoggerErrorCalls[0][1]).toBe(error);
+    }
   });
 });

@@ -35,7 +35,7 @@ type State = {
   host: string;
   webhookPath: string;
   webhookProxy?: string;
-  eventSource?: EventSource;
+  eventSource: EventSource | undefined;
 };
 
 export class Server {
@@ -56,6 +56,7 @@ export class Server {
       host: options.host || "localhost",
       webhookPath: options.webhookPath || defaultWebhooksPath,
       webhookProxy: options.webhookProxy,
+      eventSource: undefined,
     };
 
     this.probotApp = new options.Probot({
@@ -189,6 +190,7 @@ export class Server {
   public async stop(): Promise<void> {
     if (this.#state.eventSource) {
       this.#state.eventSource.close();
+      this.#state.eventSource = undefined;
     }
     if (this.#state.httpServer.listening === false) {
       return;

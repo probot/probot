@@ -187,7 +187,7 @@ describe("webhook-proxy", () => {
 
       expect(LoggerErrorCalls.length).toBe(1);
       expect(LoggerErrorCalls[0].length).toBe(2);
-      expect(LoggerErrorCalls[0][0]).toBe('Error in connection');
+      expect(LoggerErrorCalls[0][0]).toBe("Error in connection");
       expect(LoggerErrorCalls[0][1]).toBe(error);
     }
   });

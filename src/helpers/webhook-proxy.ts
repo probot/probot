@@ -1,6 +1,6 @@
 import type { Logger } from "pino";
 
-let SmeeClient
+let SmeeClient;
 
 export const createWebhookProxy = async (
   opts: WebhookProxyOptions,

@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`setupView > not providing name  1`] = `
+exports[`successView > not providing name  1`] = `
 "<!DOCTYPE html>
 <html lang="en" class="height-full" data-color-mode="auto" data-light-theme="light" data-dark-theme="dark">
   <head>
@@ -34,7 +34,7 @@ exports[`setupView > not providing name  1`] = `
 </html>"
 `;
 
-exports[`setupView > providing with name  1`] = `
+exports[`successView > providing with name  1`] = `
 "<!DOCTYPE html>
 <html lang="en" class="height-full" data-color-mode="auto" data-light-theme="light" data-dark-theme="dark">
   <head>

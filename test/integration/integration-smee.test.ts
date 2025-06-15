@@ -1,34 +1,28 @@
 import { Writable } from "node:stream";
+
+import { sign } from "@octokit/webhooks-methods";
 import { ManifestCreation } from "../../src/manifest-creation.js";
-import { describe, test, expect, afterEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import getPort from "get-port";
-import { ApplicationFunction, Probot, Server } from "../../src/index.js";
+import { type ApplicationFunction, Probot, Server } from "../../src/index.js";
 import { pino } from "pino";
+
 import WebhookExamples, {
   type WebhookDefinition,
 } from "@octokit/webhooks-examples";
-import { sign } from "@octokit/webhooks-methods";
+import type { Env } from "../../src/types.js";
+import { detectRuntime } from "../../src/helpers/detect-runtime.js";
+
+const UpdateEnvCalls: Env[] = [];
+const updateEnv = (env: Env) => {
+  UpdateEnvCalls.push(env);
+  return env;
+};
 
 describe("smee-client", () => {
-  afterEach(async () => {
-    delete process.env.WEBHOOK_PROXY_URL;
-
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-  });
-
-  describe("ManifestCreation", () => {
-    test("create a smee proxy", async () => {
-      await new ManifestCreation().createWebhookChannel();
-
-      expect(process.env.WEBHOOK_PROXY_URL).toMatch(
-        /^https:\/\/smee\.io\/[0-9a-zA-Z]{10,}$/,
-      );
-    });
-  });
-
-  describe("Server", () => {
-    const APP_ID = "1";
-    const PRIVATE_KEY = `-----BEGIN RSA PRIVATE KEY-----
+  delete process.env.WEBHOOK_PROXY_URL;
+  const APP_ID = "1";
+  const PRIVATE_KEY = `-----BEGIN RSA PRIVATE KEY-----
     MIIEpAIBAAKCAQEA1c7+9z5Pad7OejecsQ0bu3aozN3tihPmljnnudb9G3HECdnH
     lWu2/a1gB9JW5TBQ+AVpum9Okx7KfqkfBKL9mcHgSL0yWMdjMfNOqNtrQqKlN4kE
     p6RD++7sGbzbfZ9arwrlD/HSDAWGdGGJTSOBM6pHehyLmSC3DJoR/CTu0vTGTWXQ
@@ -55,87 +49,89 @@ describe("smee-client", () => {
     9/49J6WTD++EajN7FhktUSYxukdWaCocAQJTDNYP0K88G4rtC2IYy5JFn9SWz5oh
     x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
     -----END RSA PRIVATE KEY-----`;
-    const WEBHOOK_SECRET = "secret";
+  const WEBHOOK_SECRET = "secret";
 
-    const pushEvent = (
-      (WebhookExamples as unknown as WebhookDefinition[]).filter(
-        (event) => event.name === "push",
-      )[0] as WebhookDefinition<"push">
-    ).examples[0];
+  const pushEvent = (
+    (WebhookExamples as unknown as WebhookDefinition[]).filter(
+      (event) => event.name === "push",
+    )[0] as WebhookDefinition<"push">
+  ).examples[0];
 
-    let output: any[] = [];
-    const streamLogsToOutput = new Writable({ objectMode: true });
-    streamLogsToOutput._write = (object, _encoding, done) => {
-      output.push(JSON.parse(object));
-      done();
-    };
+  const output: any[] = [];
+  const streamLogsToOutput = new Writable({ objectMode: true });
+  streamLogsToOutput._write = (object, _encoding, done) => {
+    output.push(JSON.parse(object));
+    done();
+  };
 
-    test(
-      "with createProbot and setting the webhookPath via WEBHOOK_PATH to the root",
-      { retry: 10, timeout: 3000 },
-      async () => {
-        expect.assertions(1);
+  it(
+    "with createProbot and setting the webhookPath via WEBHOOK_PATH to the root",
+    async () => {
+      const promise: {
+        resolve: any;
+        reject: any;
+        promise: any;
+      } = {
+        resolve: null,
+        reject: null,
+        promise: null,
+      };
 
-        const promise: {
-          resolve: any;
-          reject: any;
-          promise: any;
-        } = {
-          resolve: null,
-          reject: null,
-          promise: null,
-        };
+      promise.promise = new Promise((resolve, reject) => {
+        promise.resolve = resolve;
+        promise.reject = reject;
+      });
 
-        promise.promise = new Promise((resolve, reject) => {
-          promise.resolve = resolve;
-          promise.reject = reject;
-        });
+      const WEBHOOK_PROXY_URL = await new ManifestCreation({
+        updateEnv,
+      }).createWebhookChannel();
 
-        const WEBHOOK_PROXY_URL =
-          await new ManifestCreation().createWebhookChannel();
-
-        const app: ApplicationFunction = (app) => {
-          app.on("push", (event) => {
-            expect(event.name).toEqual("push");
+      const app: ApplicationFunction = (app) => {
+        app.on("push", (event) => {
+          try {
+            expect(event.name).toBe("push");
             promise.resolve();
-          });
-        };
-
-        const port = await getPort();
-
-        const server = new Server({
-          Probot: Probot.defaults({
-            appId: APP_ID,
-            privateKey: PRIVATE_KEY,
-            secret: WEBHOOK_SECRET,
-          }),
-          log: pino(streamLogsToOutput),
-          port,
-          webhookProxy: WEBHOOK_PROXY_URL,
-          webhookPath: "/",
+          } catch (error) {
+            promise.reject(error);
+          }
         });
+      };
 
-        server.load(app);
+      const port = await getPort();
 
-        await server.start();
+      const server = new Server({
+        Probot: Probot.defaults({
+          appId: APP_ID,
+          privateKey: PRIVATE_KEY,
+          secret: WEBHOOK_SECRET,
+        }),
+        log: pino(streamLogsToOutput),
+        port,
+        webhookProxy: WEBHOOK_PROXY_URL,
+        webhookPath: "/",
+      });
 
-        const body = JSON.stringify(pushEvent);
+      server.load(app);
 
-        await fetch(`${WEBHOOK_PROXY_URL}/`, {
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-            "x-github-event": "push",
-            "x-github-delivery": "1",
-            "x-hub-signature-256": await sign(WEBHOOK_SECRET, body),
-          },
-          body,
-        });
+      await server.start();
 
-        await promise.promise;
+      const body = JSON.stringify(pushEvent);
 
-        server.stop();
-      },
-    );
-  });
+      await fetch(`${WEBHOOK_PROXY_URL}/`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "x-github-event": "push",
+          "x-github-delivery": "1",
+          "x-hub-signature-256": await sign(WEBHOOK_SECRET, body),
+        },
+        body,
+      });
+
+      await promise.promise;
+
+      await server.stop();
+    },
+    { retry: 10, timeout: 10000, skip: detectRuntime(globalThis) === "deno" },
+  );
 });

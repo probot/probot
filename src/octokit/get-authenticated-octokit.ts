@@ -14,7 +14,7 @@ export async function getAuthenticatedOctokit(
   state: State,
   installationId?: number,
   log?: Logger,
-) {
+): Promise<ProbotOctokit> {
   const { octokit } = state;
 
   if (!installationId) return octokit;

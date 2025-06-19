@@ -132,6 +132,10 @@ declare global {
        */
       WEBHOOK_SECRET?: string;
 
+      NO_SMEE_SETUP?: "true";
+
+      PROJECT_DOMAIN?: string;
+
       NODE_ENV?: string;
     }
   }

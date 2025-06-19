@@ -3,6 +3,7 @@ import path from "node:path";
 
 import yaml from "js-yaml";
 import type { RequestParameters } from "@octokit/types";
+import type { Logger } from "pino";
 
 import type { Manifest, OctokitOptions, PackageJson } from "./types.js";
 import { ProbotOctokit } from "./octokit/probot-octokit.js";
@@ -24,20 +25,26 @@ export class ManifestCreation {
   }
 
   public async createWebhookChannel(
-    { SmeeClient: SmeeClientParam } = {} as { SmeeClient: any },
+    { SmeeClient: SmeeClientParam, log = console } = {} as {
+      SmeeClient: any;
+      log?: Logger;
+    },
   ): Promise<string | undefined> {
+    let SmeeClient: any;
     try {
-      const SmeeClient =
-        SmeeClientParam || (await import("smee-client")).SmeeClient;
-
+      SmeeClient = SmeeClientParam || (await import("smee-client")).SmeeClient;
+    } catch (error) {
+      log.warn("SmeeClient is not available");
+      return void 0;
+    }
+    try {
       const WEBHOOK_PROXY_URL = await SmeeClient.createChannel();
       this.#updateEnv({
         WEBHOOK_PROXY_URL,
       });
       return WEBHOOK_PROXY_URL;
     } catch (error) {
-      // Smee is not available, so we'll just move on
-      console.warn("Unable to connect to smee.io, try restarting your server.");
+      log.warn("Unable to connect to smee.io, try restarting your server.");
       return void 0;
     }
   }

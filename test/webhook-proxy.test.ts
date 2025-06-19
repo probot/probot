@@ -42,12 +42,18 @@ function sse(
   });
 }
 
+// @ts-ignore
+const smeeClientInstalled = await import("smee-client")
+  .then(() => true)
+  .catch(() => false);
+
 describe("webhook-proxy", () => {
   let emit: Awaited<ReturnType<typeof sse>>;
   let proxy: EventSource;
 
-  describe("with a valid proxy server", () => {
-    test("forwards events to server", async () => {
+  test(
+    "with a valid proxy server forwards events to server",
+    async () => {
       const readyPromise = {
         promise: undefined,
         reject: undefined,
@@ -132,6 +138,11 @@ describe("webhook-proxy", () => {
           fetch: customFetch,
         })) as EventSource;
 
+        if (!proxy) {
+          readyPromise.reject!(new Error("proxy is undefined"));
+          return;
+        }
+
         readyPromise.resolve!();
       });
 
@@ -146,48 +157,53 @@ describe("webhook-proxy", () => {
 
       server.close();
       proxy.close();
-    });
-  });
+    },
+    { skip: !smeeClientInstalled },
+  );
 
-  test("logs an error when the proxy server is not found", async () => {
-    const domain = "bad.n" + randomInt(1e10).toString(36) + ".proxy";
-    const url = `http://${domain}/events`;
+  test(
+    "logs an error when the proxy server is not found",
+    async () => {
+      const domain = "bad.n" + randomInt(1e10).toString(36) + ".proxy";
+      const url = `http://${domain}/events`;
 
-    const logger = getLog({ level: "fatal" }).child({});
+      const logger = getLog({ level: "fatal" }).child({});
 
-    const LoggerErrorCalls: any[] = [];
-    logger.error = (...args: any[]) => {
-      LoggerErrorCalls.push(args);
-    };
+      const LoggerErrorCalls: any[] = [];
+      logger.error = (...args: any[]) => {
+        LoggerErrorCalls.push(args);
+      };
 
-    try {
-      await createWebhookProxy({
-        url,
-        port: 1234,
-        host: "localhost",
-        path: "/",
-        logger,
-      });
-      throw new Error("Expected an error to be thrown");
-    } catch (error: any) {
-      switch (detectRuntime(globalThis)) {
-        case "node":
-        case "deno":
-          expect(error.message).toBe(
-            `TypeError: fetch failed: getaddrinfo ENOTFOUND ${domain}`,
-          );
-          break;
-        case "bun":
-          expect(error.message).toBe(
-            "Unable to connect. Is the computer able to access the url?",
-          );
-          break;
+      try {
+        await createWebhookProxy({
+          url,
+          port: 1234,
+          host: "localhost",
+          path: "/",
+          logger,
+        });
+        throw new Error("Expected an error to be thrown");
+      } catch (error: any) {
+        switch (detectRuntime(globalThis)) {
+          case "node":
+          case "deno":
+            expect(error.message).toBe(
+              `TypeError: fetch failed: getaddrinfo ENOTFOUND ${domain}`,
+            );
+            break;
+          case "bun":
+            expect(error.message).toBe(
+              "Unable to connect. Is the computer able to access the url?",
+            );
+            break;
+        }
+
+        expect(LoggerErrorCalls.length).toBe(1);
+        expect(LoggerErrorCalls[0].length).toBe(2);
+        expect(LoggerErrorCalls[0][0]).toBe("Error in connection");
+        expect(LoggerErrorCalls[0][1]).toBe(error);
       }
-
-      expect(LoggerErrorCalls.length).toBe(1);
-      expect(LoggerErrorCalls[0].length).toBe(2);
-      expect(LoggerErrorCalls[0][0]).toBe("Error in connection");
-      expect(LoggerErrorCalls[0][1]).toBe(error);
-    }
-  });
+    },
+    { skip: !smeeClientInstalled },
+  );
 });

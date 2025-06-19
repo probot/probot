@@ -44,7 +44,7 @@ export const setupAppFactory = (options: SetupFactoryOptions) => {
         process.env.NO_SMEE_SETUP === "true"
       )
     ) {
-      await setup.createWebhookChannel({ SmeeClient });
+      await setup.createWebhookChannel({ SmeeClient, log: app.log });
     }
 
     const importViewRendered = importView({

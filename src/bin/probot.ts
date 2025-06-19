@@ -25,7 +25,7 @@ function printHelp() {
   console.log(`Usage: probot <command> [options]
 
 Options:
-  -V, --version   output the version number
+  -v, --version   output the version number
   -h, --help      display help for command
 
 Commands:
@@ -39,7 +39,7 @@ const { values, positionals } = parseArgs({
   allowPositionals: true,
   options: {
     help: { type: "boolean", short: "h", default: false },
-    version: { type: "boolean", short: "V", default: false },
+    version: { type: "boolean", short: "v", default: false },
   },
 });
 

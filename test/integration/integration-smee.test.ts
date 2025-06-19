@@ -19,6 +19,11 @@ const updateEnv = (env: Env) => {
   return env;
 };
 
+// @ts-ignore
+const smeeClientInstalled = await import("smee-client")
+  .then(() => true)
+  .catch(() => false);
+
 describe("smee-client", () => {
   delete process.env.WEBHOOK_PROXY_URL;
   const APP_ID = "1";
@@ -86,6 +91,8 @@ describe("smee-client", () => {
         updateEnv,
       }).createWebhookChannel();
 
+      expect(WEBHOOK_PROXY_URL).toBeDefined();
+
       const app: ApplicationFunction = (app) => {
         app.on("push", (event) => {
           try {
@@ -132,6 +139,10 @@ describe("smee-client", () => {
 
       await server.stop();
     },
-    { retry: 10, timeout: 10000, skip: detectRuntime(globalThis) === "deno" },
+    {
+      retry: 10,
+      timeout: 10000,
+      skip: detectRuntime(globalThis) === "deno" || !smeeClientInstalled,
+    },
   );
 });

@@ -21,6 +21,9 @@ async function prepareTestProjectWithProbot() {
 
   const testDirectories: string[] = [];
   const tmpDirectory = setupTestDirectory();
+
+  const originalCwd = process.cwd();
+  process.chdir(tmpDirectory);
   const projectPackage = createTmpDir(tmpDirectory, testDirectories);
 
   scaffoldProject(projectPackage, [
@@ -47,6 +50,7 @@ async function prepareTestProjectWithProbot() {
     for (const tempDirectory of testDirectories) {
       fs.rmSync(tempDirectory, { recursive: true, force: true });
     }
+    process.chdir(originalCwd);
   }
 
   return {

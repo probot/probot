@@ -11,7 +11,6 @@ export function setupTestDirectory() {
   );
 
   fs.mkdirSync(tmpDirectory, { recursive: true });
-  process.chdir(tmpDirectory);
 
   return tmpDirectory;
 }

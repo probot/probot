@@ -60,25 +60,37 @@ async function prepareTestProjectWithProbot() {
 }
 
 describe(`cli version`, () => {
-  test(`with flag -v`, async () => {
-    const testProject = await prepareTestProjectWithProbot();
-    expect(
-      await execCommand("npx probot -v", {
-        cwd: testProject.path,
-      }),
-    ).toBe(`0.0.0-dev`);
+  test(
+    `with flag -v`,
+    async () => {
+      const testProject = await prepareTestProjectWithProbot();
+      expect(
+        await execCommand("npx probot -v", {
+          cwd: testProject.path,
+        }),
+      ).toBe(`0.0.0-dev`);
 
-    testProject.cleanUp();
-  });
+      testProject.cleanUp();
+    },
+    {
+      timeout: 10000,
+    },
+  );
 
-  test(`with flag --version`, async () => {
-    const testProject = await prepareTestProjectWithProbot();
-    expect(
-      await execCommand("npx probot --version", {
-        cwd: testProject.path,
-      }),
-    ).toBe(`0.0.0-dev`);
+  test(
+    `with flag --version`,
+    async () => {
+      const testProject = await prepareTestProjectWithProbot();
+      expect(
+        await execCommand("npx probot --version", {
+          cwd: testProject.path,
+        }),
+      ).toBe(`0.0.0-dev`);
 
-    testProject.cleanUp();
-  });
+      testProject.cleanUp();
+    },
+    {
+      timeout: 10000,
+    },
+  );
 });

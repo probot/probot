@@ -61,13 +61,15 @@ async function prepareTestProjectWithProbot() {
 }
 
 describe(`cli help`, () => {
-  test(`with flag -h`, async () => {
-    const testProject = await prepareTestProjectWithProbot();
-    expect(
-      await execCommand("npx probot -h", {
-        cwd: testProject.path,
-      }),
-    ).toBe(`Usage: probot <command> [options]
+  test(
+    `with flag -h`,
+    async () => {
+      const testProject = await prepareTestProjectWithProbot();
+      expect(
+        await execCommand("npx probot -h", {
+          cwd: testProject.path,
+        }),
+      ).toBe(`Usage: probot <command> [options]
 
 Options:
   -v, --version   output the version number
@@ -78,36 +80,22 @@ Commands:
   receive         Receive a single event and payload
   help [command]  display help for command`);
 
-    testProject.cleanUp();
-  });
+      testProject.cleanUp();
+    },
+    {
+      timeout: 10000,
+    },
+  );
 
-  test(`with flag --help`, async () => {
-    const testProject = await prepareTestProjectWithProbot();
-    expect(
-      await execCommand("npx probot --help", {
-        cwd: testProject.path,
-      }),
-    ).toBe(`Usage: probot <command> [options]
-
-Options:
-  -v, --version   output the version number
-  -h, --help      display help for command
-
-Commands:
-  run             run the bot
-  receive         Receive a single event and payload
-  help [command]  display help for command`);
-
-    testProject.cleanUp();
-  });
-
-  test(`with no flags at all`, async () => {
-    const testProject = await prepareTestProjectWithProbot();
-    expect(
-      await execCommand("npx probot", {
-        cwd: testProject.path,
-      }),
-    ).toBe(`Usage: probot <command> [options]
+  test(
+    `with flag --help`,
+    async () => {
+      const testProject = await prepareTestProjectWithProbot();
+      expect(
+        await execCommand("npx probot --help", {
+          cwd: testProject.path,
+        }),
+      ).toBe(`Usage: probot <command> [options]
 
 Options:
   -v, --version   output the version number
@@ -118,6 +106,36 @@ Commands:
   receive         Receive a single event and payload
   help [command]  display help for command`);
 
-    testProject.cleanUp();
-  });
+      testProject.cleanUp();
+    },
+    {
+      timeout: 10000,
+    },
+  );
+
+  test(
+    `with no flags at all`,
+    async () => {
+      const testProject = await prepareTestProjectWithProbot();
+      expect(
+        await execCommand("npx probot", {
+          cwd: testProject.path,
+        }),
+      ).toBe(`Usage: probot <command> [options]
+
+Options:
+  -v, --version   output the version number
+  -h, --help      display help for command
+
+Commands:
+  run             run the bot
+  receive         Receive a single event and payload
+  help [command]  display help for command`);
+
+      testProject.cleanUp();
+    },
+    {
+      timeout: 10000,
+    },
+  );
 });

@@ -26,6 +26,7 @@ import { staticFilesHandler } from "./handlers/static-files.js";
 
 // the default path as defined in @octokit/webhooks
 export const defaultWebhooksPath = "/api/github/webhooks";
+export const defaultWebhooksSecret = "development";
 
 type State = {
   cwd: string;

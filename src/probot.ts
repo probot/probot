@@ -22,7 +22,7 @@ import type {
   ProbotWebhooks,
   State,
 } from "./types.js";
-import { defaultWebhooksPath } from "./server/server.js";
+import { defaultWebhooksPath, defaultWebhooksSecret } from "./server/server.js";
 import { rebindLog } from "./helpers/rebind-log.js";
 
 export type Constructor<T = any> = new (...args: any[]) => T;
@@ -69,7 +69,7 @@ export class Probot {
       webhooks: null,
       log: options.log!,
       githubToken: options.githubToken,
-      webhooksSecret: options.secret || "development",
+      webhooksSecret: options.secret || defaultWebhooksSecret,
       appId: Number.parseInt(options.appId as string, 10),
       privateKey: options.privateKey,
       host: options.host,
@@ -85,7 +85,7 @@ export class Probot {
     this.initialize().catch(() => {});
   }
 
-  public async initialize(): Promise<void> {
+  public initialize(): Promise<void> {
     if (this.#state.initialized === true) {
       return this.#initialized.promise;
     }
@@ -169,7 +169,7 @@ export class Probot {
   public async auth(installationId?: number): Promise<ProbotOctokit> {
     await this.initialize();
 
-    return getAuthenticatedOctokit({
+    return await getAuthenticatedOctokit({
       log: this.#state.log,
       octokit: this.#state.octokit!,
       installationId,

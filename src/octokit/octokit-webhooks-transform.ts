@@ -1,7 +1,13 @@
 import type { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
+import type { Logger } from "pino";
 
 import { Context } from "../context.js";
-import type { State } from "../types.js";
+import type { ProbotOctokit } from "../exports.js";
+
+type WebhookTransformOptions = {
+  octokit: ProbotOctokit;
+  log: Logger;
+};
 
 /**
  * Probot's transform option, which extends the `event` object that is passed
@@ -9,13 +15,13 @@ import type { State } from "../types.js";
  * @see https://github.com/octokit/webhooks.js/#constructor
  */
 export async function webhookTransform(
-  state: Pick<State, "octokit" | "log">,
+  options: WebhookTransformOptions,
   event: WebhookEvent,
 ) {
-  const log = state.log.child({ name: "event", id: event.id });
-  const octokit = (await state.octokit.auth({
+  const log = options.log.child({ name: "event", id: event.id });
+  const octokit = (await options.octokit.auth({
     type: "event-octokit",
     event,
-  })) as typeof state.octokit;
+  })) as ProbotOctokit;
   return new Context(event, octokit, log);
 }

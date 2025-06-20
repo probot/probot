@@ -44,8 +44,6 @@ export class Probot {
   #state: State;
 
   constructor(options: Options = {}) {
-    options.secret = options.secret || "development";
-
     const log = rebindLog(
       options.log ||
         getLog({
@@ -85,9 +83,7 @@ export class Probot {
       log,
       Octokit,
       octokit,
-      webhooks: {
-        secret: options.secret,
-      },
+      webhooksSecret: options.secret || "development",
       appId: Number(options.appId),
       privateKey: options.privateKey,
       host: options.host,
@@ -111,7 +107,7 @@ export class Probot {
       this.#webhooks = getWebhooks({
         log: this.#state.log,
         octokit: this.#state.octokit,
-        webhooks: this.#state.webhooks,
+        webhooksSecret: this.#state.webhooksSecret,
       });
     }
     return this.#webhooks;

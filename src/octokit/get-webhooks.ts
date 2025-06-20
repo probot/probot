@@ -1,17 +1,23 @@
+import type { Logger } from "pino";
 import { Webhooks } from "@octokit/webhooks";
 
-import type { State } from "../types.js";
+import type { ProbotOctokit } from "../exports.js";
+import type { ProbotWebhooks } from "../types.js";
 import { getErrorHandler } from "../helpers/get-error-handler.js";
 import { webhookTransform } from "./octokit-webhooks-transform.js";
 
-export function getWebhooks(
-  state: Pick<State, "log" | "webhooks" | "octokit">,
-) {
+type GetWebhooksOptions = {
+  log: Logger;
+  webhooksSecret?: string;
+  octokit: ProbotOctokit;
+};
+
+export function getWebhooks(options: GetWebhooksOptions): ProbotWebhooks {
   const webhooks = new Webhooks({
-    log: state.log,
-    secret: state.webhooks.secret!,
-    transform: (hook) => webhookTransform(state, hook),
+    log: options.log,
+    secret: options.webhooksSecret!,
+    transform: (hook) => webhookTransform(options, hook),
   });
-  webhooks.onError(getErrorHandler(state.log));
+  webhooks.onError(getErrorHandler(options.log));
   return webhooks;
 }

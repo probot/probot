@@ -69,9 +69,7 @@ export class Probot {
       baseUrl: options.baseUrl,
       request: options.request,
     });
-    const octokit = new Octokit({
-      request: options.request,
-    });
+    const octokit = new Octokit();
 
     this.#state = {
       cache,

@@ -61,6 +61,7 @@ export function getProbotOctokitWithDefaults(
   });
 
   const defaultOptions: Partial<OctokitOptions> = {
+    request: options.request,
     auth: authOptions,
     log: rebindLog(
       options.log.child ? options.log.child({ name: "octokit" }) : options.log,

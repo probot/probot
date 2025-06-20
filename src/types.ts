@@ -34,12 +34,9 @@ export interface Options {
 }
 
 export type State = {
-  cache: Lru<string> | null;
   log: Logger;
   logLevel?: "trace" | "debug" | "info" | "warn" | "error" | "fatal";
   logMessageKey?: string;
-  octokit: ProbotOctokit | null;
-  webhooks: ProbotWebhooks | null;
   appId?: number;
   privateKey?: string;
   githubToken?: string;
@@ -52,7 +49,20 @@ export type State = {
   webhooksSecret?: string;
   request?: RequestRequestOptions;
   server?: Server | void;
-};
+} & (
+  | {
+      initialized: false;
+      cache: null;
+      octokit: null;
+      webhooks: null;
+    }
+  | {
+      initialized: true | Error;
+      cache: Lru<string>;
+      octokit: ProbotOctokit;
+      webhooks: ProbotWebhooks;
+    }
+);
 
 // Omit the `payload`, `id`,`name` properties from the `Context` class as they are already present in the types of `WebhookEvent`
 // The `Webhooks` class accepts a type parameter (`TTransformed`) that is used to transform the event payload in the form of

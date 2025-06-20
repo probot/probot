@@ -1,5 +1,4 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { createNodeMiddleware as createWebhooksMiddleware } from "@octokit/webhooks";
 
 import type {
   ApplicationFunction,
@@ -35,14 +34,16 @@ import { createProbot } from "./create-probot.js";
  * });
  * ```
  */
-export function createNodeMiddleware(
+export async function createNodeMiddleware(
   appFn: ApplicationFunction,
   { probot = createProbot(), webhooksPath } = {} as MiddlewareOptions,
-): (
-  request: IncomingMessage,
-  response: ServerResponse,
-  next?: () => void,
-) => boolean | void | Promise<void | boolean> {
+): Promise<
+  (
+    request: IncomingMessage,
+    response: ServerResponse,
+    next?: () => void,
+  ) => boolean | void | Promise<void | boolean>
+> {
   const handlers: Handler[] = [];
 
   probot.load(appFn, {
@@ -69,7 +70,7 @@ export function createNodeMiddleware(
   };
 
   handlers.push(
-    createWebhooksMiddleware(probot.webhooks, {
+    await probot.getNodeMiddleware({
       path: webhooksPath || probot.webhookPath || defaultWebhooksPath,
     }),
   );

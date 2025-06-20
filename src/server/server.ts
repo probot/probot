@@ -3,7 +3,6 @@ import { Server as HttpServer } from "node:http";
 import type { AddressInfo } from "node:net";
 
 import type { Logger } from "pino";
-import { createNodeMiddleware } from "@octokit/webhooks";
 
 import { createWebhookProxy } from "../helpers/webhook-proxy.js";
 import { VERSION } from "../version.js";
@@ -33,22 +32,29 @@ type State = {
   httpServer: HttpServer;
   port: number;
   host: string;
+  log: Logger;
+  probot: Probot;
   webhookPath: string;
   webhookProxy?: string;
   eventSource: EventSource | undefined;
+  handlers: Handler[];
+  addedHandlers: Handler[];
+  enablePing?: boolean;
+  enableNotFound?: boolean;
+  enableStaticFiles?: boolean;
 };
 
 export class Server {
   static version = VERSION;
 
-  public log: Logger;
-  public version = VERSION;
-  public probotApp: Probot;
-  public handlers: Handler[] = [];
-
   #state: State;
 
   constructor(options: ServerOptions = {} as ServerOptions) {
+    const probot = new options.Probot({
+      request: options.request,
+      server: this,
+      webhookPath: options.webhookPath || defaultWebhooksPath,
+    });
     this.#state = {
       httpServer: new HttpServer(),
       cwd: options.cwd || process.cwd(),
@@ -57,81 +63,57 @@ export class Server {
       webhookPath: options.webhookPath || defaultWebhooksPath,
       webhookProxy: options.webhookProxy,
       eventSource: undefined,
+      probot,
+      log: rebindLog(options.log || probot.log.child({ name: "server" })),
+      handlers: [],
+      addedHandlers: [],
+      enablePing: options.enablePing ?? true,
+      enableNotFound: options.enableNotFound ?? true,
+      enableStaticFiles: options.enableStaticFiles ?? true,
     };
 
-    this.probotApp = new options.Probot({
-      request: options.request,
-      server: this,
-    });
-    this.log = options.log
-      ? rebindLog(options.log)
-      : rebindLog(this.probotApp.log.child({ name: "server" }));
+    const logger = loggingHandler(this.#state.log, options.loggingOptions);
 
-    const logger = loggingHandler(this.log, options.loggingOptions);
-
-    const {
-      enablePing = true,
-      enableNotFound = true,
-      enableStaticFiles = true,
-    } = options;
-
-    const mainHandler: Handler = async (req, res) => {
+    this.#state.httpServer.on("request", async (req, res) => {
       logger(req, res);
 
       try {
-        for (const handler of this.handlers) {
+        for (const handler of this.#state.handlers) {
           if (await handler(req, res)) {
             return true;
           }
         }
-
-        if (enableNotFound) {
-          notFoundHandler(req, res);
-        }
       } catch (e) {
-        this.log.error(e);
+        this.#state.log.error(e);
         res.writeHead(500).end();
         return true;
       }
 
       return false;
-    };
-
-    const webhookHandler = createNodeMiddleware(this.probotApp.webhooks, {
-      log: this.log,
-      path: this.#state.webhookPath,
     });
-
-    this.addHandler(webhookHandler);
-
-    if (enableStaticFiles) {
-      this.addHandler(staticFilesHandler);
-    }
-
-    if (enablePing) {
-      this.addHandler(pingHandler);
-    }
-
-    this.#state.httpServer.on("request", mainHandler);
   }
 
   public addHandler(handler: Handler) {
-    this.handlers.push(handler);
+    this.#state.addedHandlers.push(handler);
   }
 
   public async loadHandlerFactory(appFn: HandlerFactory) {
-    const handler = await appFn(this.probotApp, {
+    const handler = await appFn(this.#state.probot, {
       cwd: this.#state.cwd,
       addHandler: (handler: Handler) => {
         this.addHandler(handler as unknown as Handler);
       },
     });
 
-    this.handlers.push(handler);
+    this.addHandler(handler);
+  }
+
+  get version(): string {
+    return VERSION;
   }
 
   public async load(appFn: ApplicationFunction) {
-    await appFn(this.probotApp, {
+    await appFn(this.#state.probot, {
       cwd: this.#state.cwd,
       addHandler: (handler: Handler) => {
         this.addHandler(handler as unknown as Handler);
@@ -140,47 +122,73 @@ export class Server {
   }
 
   public async start(): Promise<HttpServer> {
+    this.#state.handlers = [];
+
+    if (this.#state.enableStaticFiles === true) {
+      this.#state.handlers.unshift(staticFilesHandler);
+    }
+
+    if (this.#state.enablePing === true) {
+      this.#state.handlers.unshift(pingHandler);
+    }
+
+    this.#state.handlers.unshift(
+      await this.#state.probot.getNodeMiddleware({
+        log: this.#state.log,
+      }),
+    );
+
+    this.#state.handlers.push(...this.#state.addedHandlers);
+
+    if (this.#state.enableNotFound === true) {
+      this.#state.handlers.push(notFoundHandler);
+    }
+
     const runtimeName = getRuntimeName(globalThis);
     const runtimeVersion = getRuntimeVersion(globalThis);
 
-    this.log.info(
+    this.#state.log.info(
       `Running Probot v${this.version} (${runtimeName}: ${runtimeVersion})`,
     );
-    const { port, host, webhookPath, webhookProxy } = this.#state;
-    const printableHost = getPrintableHost(host);
+    const printableHost = getPrintableHost(this.#state.host);
 
     this.#state.httpServer = await new Promise((resolve, reject) => {
-      const server = this.#state.httpServer.listen({ port, host }, async () => {
-        this.#state.port = (server.address() as AddressInfo).port;
-        this.#state.host = (server.address() as AddressInfo).address;
+      const server = this.#state.httpServer.listen(
+        { port: this.#state.port, host: this.#state.host },
+        async () => {
+          this.#state.port = (server.address() as AddressInfo).port;
+          this.#state.host = (server.address() as AddressInfo).address;
 
-        if (isIPv6(this.#state.host)) {
-          this.#state.host = `[${this.#state.host}]`;
-        }
+          if (isIPv6(this.#state.host)) {
+            this.#state.host = `[${this.#state.host}]`;
+          }
 
-        this.log.info(`Listening on http://${printableHost}:${port}`);
-        resolve(server);
-      });
+          this.#state.log.info(
+            `Listening on http://${printableHost}:${this.#state.port}`,
+          );
+          resolve(server);
+        },
+      );
 
       server.on("error", (error: NodeJS.ErrnoException) => {
         if (error.code === "EADDRINUSE") {
           error = Object.assign(error, {
-            message: `Port ${port} is already in use. You can define the PORT environment variable to use a different port.`,
+            message: `Port ${this.#state.port} is already in use. You can define the PORT environment variable to use a different port.`,
           });
         }
 
-        this.log.error(error);
+        this.#state.log.error(error);
         reject(error);
       });
     });
 
-    if (webhookProxy) {
+    if (this.#state.webhookProxy) {
       this.#state.eventSource = await createWebhookProxy({
         host: this.#state.host,
         port: this.#state.port,
-        path: webhookPath,
-        logger: this.log,
-        url: webhookProxy,
+        path: this.#state.webhookPath,
+        logger: this.#state.log,
+        url: this.#state.webhookProxy,
       });
     }
 

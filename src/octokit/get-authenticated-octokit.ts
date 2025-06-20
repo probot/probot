@@ -1,7 +1,6 @@
-import type { State } from "../types.js";
 import type { ProbotOctokit } from "./probot-octokit.js";
 import type { OctokitOptions } from "../types.js";
-import type { LogFn, Level } from "pino";
+import type { LogFn, Level, Logger } from "pino";
 import { rebindLog } from "../helpers/rebind-log.js";
 
 type FactoryOptions = {
@@ -10,11 +9,40 @@ type FactoryOptions = {
   [key: string]: unknown;
 };
 
-export async function getAuthenticatedOctokit(
-  state: Pick<State, "octokit" | "log">,
-  installationId?: number,
-): Promise<ProbotOctokit> {
-  const { octokit, log } = state;
+/**
+ * Authenticate and get a GitHub client that can be used to make API calls.
+ *
+ * You'll probably want to use `context.octokit` instead.
+ *
+ * **Note**: `app.auth` is asynchronous, so it needs to be prefixed with a
+ * [`await`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await)
+ * to wait for the magic to happen.
+ *
+ * ```js
+ *  export default (app) => {
+ *    app.on('issues.opened', async context => {
+ *      const octokit = await app.auth();
+ *    });
+ *  };
+ * ```
+ * @param {object} options - Options for the authenticated client, including the
+ * `octokit` instance and a logger.
+ * @param {ProbotOctokit} options.octokit - The Octokit instance to use for authentication.
+ * @param {Logger} options.log - A logger instance, typically created with `getLog()`.
+ * @param {number} [options.installationId] - ID of the installation, which can be extracted from
+ * `context.payload.installation.id`. If called without this parameter, the
+ * client wil authenticate [as the app](https://docs.github.com/en/developers/apps/authenticating-with-github-apps#authenticating-as-a-github-app)
+ * instead of as a specific installation, which means it can only be used for
+ * [app APIs](https://docs.github.com/apps/).
+ *
+ * @returns An authenticated GitHub API client
+ */
+export async function getAuthenticatedOctokit(options: {
+  octokit: ProbotOctokit;
+  log: Logger;
+  installationId?: number;
+}): Promise<ProbotOctokit> {
+  const { octokit, log, installationId } = options;
 
   if (!installationId) return octokit;
 

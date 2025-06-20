@@ -1,9 +1,9 @@
 import { Lru } from "toad-cache";
 import type { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
 
-import { auth } from "./auth.js";
 import { getLog } from "./helpers/get-log.js";
 import { getProbotOctokitWithDefaults } from "./octokit/get-probot-octokit-with-defaults.js";
+import { getAuthenticatedOctokit } from "./octokit/get-authenticated-octokit.js";
 import { getWebhooks } from "./octokit/get-webhooks.js";
 import { ProbotOctokit } from "./octokit/probot-octokit.js";
 import { VERSION } from "./version.js";
@@ -108,7 +108,11 @@ export class Probot {
 
   get webhooks(): ProbotWebhooks {
     if (this.#webhooks === null) {
-      this.#webhooks = getWebhooks(this.#state);
+      this.#webhooks = getWebhooks({
+        log: this.#state.log,
+        octokit: this.#state.octokit,
+        webhooks: this.#state.webhooks,
+      });
     }
     return this.#webhooks;
   }
@@ -118,7 +122,11 @@ export class Probot {
   }
 
   public async auth(installationId?: number): Promise<ProbotOctokit> {
-    return auth(this.#state, installationId);
+    return getAuthenticatedOctokit({
+      octokit: this.#state.octokit,
+      log: this.#state.log,
+      installationId,
+    });
   }
 
   // @ts-ignore

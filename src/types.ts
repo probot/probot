@@ -35,12 +35,14 @@ export interface Options {
 
 export type State = {
   cache: Lru<string> | null;
+  log: Logger;
+  logLevel?: "trace" | "debug" | "info" | "warn" | "error" | "fatal";
+  logMessageKey?: string;
   octokit: ProbotOctokit | null;
   webhooks: ProbotWebhooks | null;
   appId?: number;
   privateKey?: string;
   githubToken?: string;
-  log: Logger;
   OctokitBase: typeof ProbotOctokit;
   port?: number;
   host?: string;

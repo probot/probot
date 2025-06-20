@@ -42,20 +42,12 @@ export class Probot {
   #state: State;
 
   constructor(options: Options = {}) {
-    const log = rebindLog(
-      options.log ||
-        getLog({
-          level: options.logLevel,
-          logMessageKey: options.logMessageKey,
-        }),
-    );
-
     this.#state = {
       cache: null,
       octokit: null,
       webhooks: null,
+      log: options.log!,
       githubToken: options.githubToken,
-      log,
       webhooksSecret: options.secret || "development",
       appId: Number.parseInt(options.appId as string, 10),
       privateKey: options.privateKey,
@@ -79,6 +71,14 @@ export class Probot {
       15000,
       // Cache for 1 minute less than GitHub expiry
       1000 * 60 * 59,
+    );
+
+    this.#state.log = rebindLog(
+      this.#state.log ||
+        getLog({
+          level: this.#state.logLevel,
+          logMessageKey: this.#state.logMessageKey,
+        }),
     );
 
     const Octokit = getProbotOctokitWithDefaults({

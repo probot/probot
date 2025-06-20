@@ -8,7 +8,10 @@ import type { State } from "../types.js";
  * to webhook event handlers by `@octokit/webhooks`
  * @see https://github.com/octokit/webhooks.js/#constructor
  */
-export async function webhookTransform(state: State, event: WebhookEvent) {
+export async function webhookTransform(
+  state: Pick<State, "octokit" | "log">,
+  event: WebhookEvent,
+) {
   const log = state.log.child({ name: "event", id: event.id });
   const octokit = (await state.octokit.auth({
     type: "event-octokit",

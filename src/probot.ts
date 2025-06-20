@@ -1,5 +1,4 @@
 import { Lru } from "toad-cache";
-import type { Logger } from "pino";
 import type { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
 
 import { auth } from "./auth.js";
@@ -40,29 +39,20 @@ export class Probot {
     return ProbotWithDefaults;
   }
 
-  public webhooks: ProbotWebhooks;
-  public webhookPath: string;
-  public log: Logger;
-  public version: string;
-  public on: ProbotWebhooks["on"];
-  public onAny: ProbotWebhooks["onAny"];
-  public onError: ProbotWebhooks["onError"];
-  public auth: (
-    installationId?: number,
-    log?: Logger,
-  ) => Promise<ProbotOctokit>;
+  #webhooks: ProbotWebhooks | null = null;
 
   #state: State;
 
   constructor(options: Options = {}) {
     options.secret = options.secret || "development";
 
-    const level = options.logLevel;
-    const logMessageKey = options.logMessageKey;
-
-    this.log = options.log
-      ? rebindLog(options.log)
-      : getLog({ level, logMessageKey });
+    const log = rebindLog(
+      options.log ||
+        getLog({
+          level: options.logLevel,
+          logMessageKey: options.logMessageKey,
+        }),
+    );
 
     // TODO: support redis backend for access token cache if `options.redisConfig`
     const cache = new Lru<string>(
@@ -78,12 +68,12 @@ export class Probot {
       appId: Number(options.appId),
       privateKey: options.privateKey,
       cache,
-      log: rebindLog(this.log),
+      log,
       redisConfig: options.redisConfig,
       baseUrl: options.baseUrl,
       request: options.request,
     });
-    const octokitLogger = rebindLog(this.log.child({ name: "octokit" }));
+    const octokitLogger = rebindLog(log.child({ name: "octokit" }));
     const octokit = new Octokit({
       request: options.request,
       log: octokitLogger,
@@ -92,7 +82,7 @@ export class Probot {
     this.#state = {
       cache,
       githubToken: options.githubToken,
-      log: rebindLog(this.log),
+      log,
       Octokit,
       octokit,
       webhooks: {
@@ -106,21 +96,53 @@ export class Probot {
       request: options.request,
       server: options.server,
     };
-
-    this.auth = auth.bind(null, this.#state);
-
-    this.webhooks = getWebhooks(this.#state);
-    this.webhookPath = this.#state.webhookPath;
-
-    this.on = this.webhooks.on;
-    this.onAny = this.webhooks.onAny;
-    this.onError = this.webhooks.onError;
-
-    this.version = VERSION;
   }
 
+  get log() {
+    return this.#state.log;
+  }
+
+  get version(): string {
+    return VERSION;
+  }
+
+  get webhooks(): ProbotWebhooks {
+    if (this.#webhooks === null) {
+      this.#webhooks = getWebhooks(this.#state);
+    }
+    return this.#webhooks;
+  }
+
+  get webhookPath(): string {
+    return this.#state.webhookPath;
+  }
+
+  public async auth(installationId?: number): Promise<ProbotOctokit> {
+    return auth(this.#state, installationId);
+  }
+
+  // @ts-ignore
+  public on: ProbotWebhooks["on"] = (
+    eventName: Parameters<ProbotWebhooks["on"]>[0],
+    callback: Parameters<ProbotWebhooks["on"]>[1],
+  ): ReturnType<ProbotWebhooks["on"]> => {
+    this.webhooks.on(eventName, callback);
+  };
+
+  public onAny: ProbotWebhooks["onAny"] = (
+    callback: Parameters<ProbotWebhooks["onAny"]>[0],
+  ): ReturnType<ProbotWebhooks["onAny"]> => {
+    this.webhooks.onAny(callback);
+  };
+
+  public onError: ProbotWebhooks["onError"] = (
+    callback: Parameters<ProbotWebhooks["onError"]>[0],
+  ): ReturnType<ProbotWebhooks["onError"]> => {
+    this.webhooks.onError(callback);
+  };
+
   public receive(event: WebhookEvent): Promise<void> {
-    this.log.debug({ event }, "Webhook received");
+    this.#state.log.debug({ event }, "Webhook received");
     return this.webhooks.receive(event);
   }
 

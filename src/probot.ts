@@ -69,10 +69,8 @@ export class Probot {
       baseUrl: options.baseUrl,
       request: options.request,
     });
-    const octokitLogger = rebindLog(log.child({ name: "octokit" }));
     const octokit = new Octokit({
       request: options.request,
-      log: octokitLogger,
     });
 
     this.#state = {

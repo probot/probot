@@ -46,7 +46,7 @@ export type State = {
   baseUrl?: string;
   redisConfig?: RedisOptions | string;
   webhookPath: string;
-  webhooksSecret?: string;
+  webhookSecret?: string;
   request?: RequestRequestOptions;
   server?: Server | void;
 } & (

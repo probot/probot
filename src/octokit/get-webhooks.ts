@@ -8,14 +8,14 @@ import { webhookTransform } from "./octokit-webhooks-transform.js";
 
 type GetWebhooksOptions = {
   log: Logger;
-  webhooksSecret?: string;
+  webhookSecret?: string;
   octokit: ProbotOctokit;
 };
 
 export function getWebhooks(options: GetWebhooksOptions): ProbotWebhooks {
   const webhooks = new Webhooks({
     log: options.log,
-    secret: options.webhooksSecret!,
+    secret: options.webhookSecret!,
     transform: (hook) => webhookTransform(options, hook),
   });
   webhooks.onError(getErrorHandler(options.log));

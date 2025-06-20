@@ -22,7 +22,7 @@ import type {
   ProbotWebhooks,
   State,
 } from "./types.js";
-import { defaultWebhooksPath, defaultWebhooksSecret } from "./server/server.js";
+import { defaultWebhookPath, defaultWebhookSecret } from "./server/server.js";
 import { rebindLog } from "./helpers/rebind-log.js";
 
 export type Constructor<T = any> = new (...args: any[]) => T;
@@ -69,7 +69,7 @@ export class Probot {
       webhooks: null,
       log: options.log!,
       githubToken: options.githubToken,
-      webhooksSecret: options.secret || defaultWebhooksSecret,
+      webhookSecret: options.secret || defaultWebhookSecret,
       appId: Number.parseInt(options.appId as string, 10),
       privateKey: options.privateKey,
       host: options.host,
@@ -77,7 +77,7 @@ export class Probot {
       OctokitBase: options.Octokit || ProbotOctokit,
       baseUrl: options.baseUrl,
       redisConfig: options.redisConfig,
-      webhookPath: options.webhookPath || defaultWebhooksPath,
+      webhookPath: options.webhookPath || defaultWebhookPath,
       request: options.request,
       server: options.server,
     };
@@ -124,7 +124,7 @@ export class Probot {
       this.#state.webhooks = getWebhooks({
         log: this.#state.log,
         octokit: this.#state.octokit,
-        webhooksSecret: this.#state.webhooksSecret,
+        webhookSecret: this.#state.webhookSecret,
       });
 
       this.#initialized.resolve();

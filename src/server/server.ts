@@ -25,8 +25,8 @@ import { pingHandler } from "./handlers/ping.js";
 import { staticFilesHandler } from "./handlers/static-files.js";
 
 // the default path as defined in @octokit/webhooks
-export const defaultWebhooksPath = "/api/github/webhooks";
-export const defaultWebhooksSecret = "development";
+export const defaultWebhookPath = "/api/github/webhooks";
+export const defaultWebhookSecret = "development";
 
 type State = {
   cwd: string;
@@ -54,14 +54,14 @@ export class Server {
     const probot = new options.Probot({
       request: options.request,
       server: this,
-      webhookPath: options.webhookPath || defaultWebhooksPath,
+      webhookPath: options.webhookPath || defaultWebhookPath,
     });
     this.#state = {
       httpServer: new HttpServer(),
       cwd: options.cwd || process.cwd(),
       port: options.port || 3000,
       host: options.host || "localhost",
-      webhookPath: options.webhookPath || defaultWebhooksPath,
+      webhookPath: options.webhookPath || defaultWebhookPath,
       webhookProxy: options.webhookProxy,
       eventSource: undefined,
       probot,

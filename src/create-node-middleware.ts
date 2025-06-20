@@ -5,7 +5,7 @@ import type {
   Handler,
   MiddlewareOptions,
 } from "./types.js";
-import { defaultWebhooksPath } from "./server/server.js";
+import { defaultWebhookPath } from "./server/server.js";
 import { createProbot } from "./create-probot.js";
 
 /**
@@ -71,7 +71,7 @@ export async function createNodeMiddleware(
 
   handlers.push(
     await probot.getNodeMiddleware({
-      path: webhooksPath || probot.webhookPath || defaultWebhooksPath,
+      path: webhooksPath || probot.webhookPath || defaultWebhookPath,
     }),
   );
 

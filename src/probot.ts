@@ -1,6 +1,10 @@
 import { Lru } from "toad-cache";
 import type { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
 
+import {
+  createDeferredPromise,
+  type DeferredPromise,
+} from "./helpers/create-deferred-promise.js";
 import { getLog } from "./helpers/get-log.js";
 import { getProbotOctokitWithDefaults } from "./octokit/get-probot-octokit-with-defaults.js";
 import { getAuthenticatedOctokit } from "./octokit/get-authenticated-octokit.js";
@@ -41,6 +45,8 @@ export class Probot {
 
   #state: State;
 
+  #initialized: DeferredPromise<void> = createDeferredPromise<void>();
+
   constructor(options: Options = {}) {
     this.#state = {
       cache: null,
@@ -64,7 +70,7 @@ export class Probot {
     this.initialize();
   }
 
-  public initialize(): void {
+  public initialize(): Promise<void> {
     // TODO: support redis backend for access token cache if `options.redisConfig`
     this.#state.cache = new Lru<string>(
       // cache max. 15000 tokens, that will use less than 10mb memory
@@ -98,6 +104,10 @@ export class Probot {
       octokit: this.#state.octokit,
       webhooksSecret: this.#state.webhooksSecret,
     });
+
+    this.#initialized.resolve();
+
+    return this.#initialized.promise;
   }
 
   get log() {

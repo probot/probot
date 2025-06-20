@@ -12,6 +12,7 @@ import WebhookExamples, {
 } from "@octokit/webhooks-examples";
 import type { Env } from "../../src/types.js";
 import { detectRuntime } from "../../src/helpers/detect-runtime.js";
+import { createDeferredPromise } from "../../src/helpers/create-deferred-promise.js";
 
 const UpdateEnvCalls: Env[] = [];
 const updateEnv = (env: Env) => {
@@ -72,20 +73,7 @@ describe("smee-client", () => {
   it(
     "with createProbot and setting the webhookPath via WEBHOOK_PATH to the root",
     async () => {
-      const promise: {
-        resolve: any;
-        reject: any;
-        promise: any;
-      } = {
-        resolve: null,
-        reject: null,
-        promise: null,
-      };
-
-      promise.promise = new Promise((resolve, reject) => {
-        promise.resolve = resolve;
-        promise.reject = reject;
-      });
+      const eventPromise = createDeferredPromise<void>();
 
       const WEBHOOK_PROXY_URL = await new ManifestCreation({
         updateEnv,
@@ -97,9 +85,9 @@ describe("smee-client", () => {
         app.on("push", (event) => {
           try {
             expect(event.name).toBe("push");
-            promise.resolve();
+            eventPromise.resolve();
           } catch (error) {
-            promise.reject(error);
+            eventPromise.reject(error);
           }
         });
       };
@@ -135,7 +123,7 @@ describe("smee-client", () => {
         body,
       });
 
-      await promise.promise;
+      await eventPromise.promise;
 
       await server.stop();
     },

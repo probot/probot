@@ -42,11 +42,12 @@ export type State = {
   Octokit: typeof ProbotOctokit;
   octokit: ProbotOctokit;
   cache?: Lru<string>;
-  webhooksSecret?: string;
   port?: number;
   host?: string;
   baseUrl?: string;
+  webhooks?: ProbotWebhooks | null;
   webhookPath: string;
+  webhooksSecret?: string;
   request?: RequestRequestOptions;
   server?: Server | void;
 };

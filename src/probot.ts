@@ -39,8 +39,6 @@ export class Probot {
     return ProbotWithDefaults;
   }
 
-  #webhooks: ProbotWebhooks | null = null;
-
   #state: State;
 
   constructor(options: Options = {}) {
@@ -88,6 +86,7 @@ export class Probot {
       privateKey: options.privateKey,
       host: options.host,
       port: options.port,
+      webhooks: null,
       webhookPath: options.webhookPath || defaultWebhooksPath,
       request: options.request,
       server: options.server,
@@ -103,14 +102,14 @@ export class Probot {
   }
 
   get webhooks(): ProbotWebhooks {
-    if (this.#webhooks === null) {
-      this.#webhooks = getWebhooks({
+    if (this.#state.webhooks === null) {
+      this.#state.webhooks = getWebhooks({
         log: this.#state.log,
         octokit: this.#state.octokit,
         webhooksSecret: this.#state.webhooksSecret,
       });
     }
-    return this.#webhooks;
+    return this.#state.webhooks!;
   }
 
   get webhookPath(): string {

@@ -50,8 +50,31 @@ export class Probot {
         }),
     );
 
+    this.#state = {
+      cache: null,
+      octokit: null,
+      webhooks: null,
+      githubToken: options.githubToken,
+      log,
+      webhooksSecret: options.secret || "development",
+      appId: Number.parseInt(options.appId as string, 10),
+      privateKey: options.privateKey,
+      host: options.host,
+      port: options.port,
+      OctokitBase: options.Octokit || ProbotOctokit,
+      baseUrl: options.baseUrl,
+      redisConfig: options.redisConfig,
+      webhookPath: options.webhookPath || defaultWebhooksPath,
+      request: options.request,
+      server: options.server,
+    };
+
+    this.initialize();
+  }
+
+  public initialize(): void {
     // TODO: support redis backend for access token cache if `options.redisConfig`
-    const cache = new Lru<string>(
+    this.#state.cache = new Lru<string>(
       // cache max. 15000 tokens, that will use less than 10mb memory
       15000,
       // Cache for 1 minute less than GitHub expiry
@@ -59,34 +82,22 @@ export class Probot {
     );
 
     const Octokit = getProbotOctokitWithDefaults({
-      githubToken: options.githubToken,
-      Octokit: options.Octokit || ProbotOctokit,
-      appId: Number(options.appId),
-      privateKey: options.privateKey,
-      cache,
-      log,
-      redisConfig: options.redisConfig,
-      baseUrl: options.baseUrl,
-      request: options.request,
+      githubToken: this.#state.githubToken,
+      Octokit: this.#state.OctokitBase,
+      appId: this.#state.appId,
+      privateKey: this.#state.privateKey,
+      cache: this.#state.cache,
+      log: this.#state.log,
+      redisConfig: this.#state.redisConfig,
+      baseUrl: this.#state.baseUrl,
+      request: this.#state.request,
     });
-    const octokit = new Octokit();
-
-    this.#state = {
-      cache,
-      githubToken: options.githubToken,
-      log,
-      Octokit,
-      octokit,
-      webhooksSecret: options.secret || "development",
-      appId: Number(options.appId),
-      privateKey: options.privateKey,
-      host: options.host,
-      port: options.port,
-      webhooks: null,
-      webhookPath: options.webhookPath || defaultWebhooksPath,
-      request: options.request,
-      server: options.server,
-    };
+    this.#state.octokit = new Octokit();
+    this.#state.webhooks = getWebhooks({
+      log: this.#state.log,
+      octokit: this.#state.octokit,
+      webhooksSecret: this.#state.webhooksSecret,
+    });
   }
 
   get log() {
@@ -101,7 +112,7 @@ export class Probot {
     if (this.#state.webhooks === null) {
       this.#state.webhooks = getWebhooks({
         log: this.#state.log,
-        octokit: this.#state.octokit,
+        octokit: this.#state.octokit!,
         webhooksSecret: this.#state.webhooksSecret,
       });
     }
@@ -114,29 +125,21 @@ export class Probot {
 
   public async auth(installationId?: number): Promise<ProbotOctokit> {
     return getAuthenticatedOctokit({
-      octokit: this.#state.octokit,
       log: this.#state.log,
+      octokit: this.#state.octokit!,
       installationId,
     });
   }
 
-  // @ts-ignore
-  public on: ProbotWebhooks["on"] = (
-    eventName: Parameters<ProbotWebhooks["on"]>[0],
-    callback: Parameters<ProbotWebhooks["on"]>[1],
-  ): ReturnType<ProbotWebhooks["on"]> => {
+  public on: ProbotWebhooks["on"] = (eventName, callback) => {
     this.webhooks.on(eventName, callback);
   };
 
-  public onAny: ProbotWebhooks["onAny"] = (
-    callback: Parameters<ProbotWebhooks["onAny"]>[0],
-  ): ReturnType<ProbotWebhooks["onAny"]> => {
+  public onAny: ProbotWebhooks["onAny"] = (callback) => {
     this.webhooks.onAny(callback);
   };
 
-  public onError: ProbotWebhooks["onError"] = (
-    callback: Parameters<ProbotWebhooks["onError"]>[0],
-  ): ReturnType<ProbotWebhooks["onError"]> => {
+  public onError: ProbotWebhooks["onError"] = (callback) => {
     this.webhooks.onError(callback);
   };
 

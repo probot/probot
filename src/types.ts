@@ -34,17 +34,18 @@ export interface Options {
 }
 
 export type State = {
+  cache: Lru<string> | null;
+  octokit: ProbotOctokit | null;
+  webhooks: ProbotWebhooks | null;
   appId?: number;
   privateKey?: string;
   githubToken?: string;
   log: Logger;
-  Octokit: typeof ProbotOctokit;
-  octokit: ProbotOctokit;
-  cache?: Lru<string>;
+  OctokitBase: typeof ProbotOctokit;
   port?: number;
   host?: string;
   baseUrl?: string;
-  webhooks: ProbotWebhooks | null;
+  redisConfig?: RedisOptions | string;
   webhookPath: string;
   webhooksSecret?: string;
   request?: RequestRequestOptions;

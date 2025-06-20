@@ -18,7 +18,6 @@ export interface Options {
   privateKey?: string;
   githubToken?: string;
   appId?: number | string;
-
   Octokit?: typeof ProbotOctokit;
   log?: Logger;
   redisConfig?: RedisOptions | string;
@@ -45,7 +44,7 @@ export type State = {
   port?: number;
   host?: string;
   baseUrl?: string;
-  webhooks?: ProbotWebhooks | null;
+  webhooks: ProbotWebhooks | null;
   webhookPath: string;
   webhooksSecret?: string;
   request?: RequestRequestOptions;

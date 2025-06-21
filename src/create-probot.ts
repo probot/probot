@@ -4,7 +4,7 @@ import { getPrivateKey } from "@probot/get-private-key";
 import { getLog } from "./helpers/get-log.js";
 import type { Env, Options } from "./types.js";
 import { Probot } from "./probot.js";
-import { defaultWebhooksPath } from "./server/server.js";
+import { defaultWebhookPath } from "./server/server.js";
 
 type CreateProbotOptions = {
   overrides?: Options;
@@ -15,7 +15,7 @@ type CreateProbotOptions = {
 const DEFAULTS: Partial<Env> = {
   APP_ID: "",
   WEBHOOK_SECRET: "",
-  WEBHOOK_PATH: defaultWebhooksPath,
+  WEBHOOK_PATH: defaultWebhookPath,
   GHE_HOST: "",
   GHE_PROTOCOL: "https",
   LOG_FORMAT: undefined,

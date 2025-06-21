@@ -82,10 +82,10 @@ export class Probot {
       server: options.server,
     };
 
-    this.initialize().catch(() => {});
+    this.#initialize().catch(() => {});
   }
 
-  public initialize(): Promise<void> {
+  #initialize(): Promise<void> {
     if (this.#state.initialized === true) {
       return this.#initialized.promise;
     }
@@ -158,7 +158,7 @@ export class Probot {
   }: { log?: Logger; path?: string } = {}): Promise<
     ReturnType<typeof createNodeMiddleware>
   > {
-    await this.initialize();
+    await this.#initialize();
 
     return createNodeMiddleware(this.#state.webhooks!, {
       log: log || this.#state.log,
@@ -167,7 +167,7 @@ export class Probot {
   }
 
   public async auth(installationId?: number): Promise<ProbotOctokit> {
-    await this.initialize();
+    await this.#initialize();
 
     return await getAuthenticatedOctokit({
       log: this.#state.log,

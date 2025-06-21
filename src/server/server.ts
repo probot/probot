@@ -1,7 +1,7 @@
-import { isIPv6 } from "node:net";
 import { Server as HttpServer } from "node:http";
 import type { AddressInfo } from "node:net";
 
+import type { RequestRequestOptions } from "@octokit/types";
 import type { Logger } from "pino";
 
 import { createWebhookProxy } from "../helpers/webhook-proxy.js";
@@ -29,12 +29,16 @@ export const defaultWebhookPath = "/api/github/webhooks";
 export const defaultWebhookSecret = "development";
 
 type State = {
+  initialized: boolean;
   cwd: string;
   httpServer: HttpServer;
   port: number;
   host: string;
-  log: Logger;
-  probot: Probot;
+  log?: Logger;
+  loggingOptions?: Record<string, unknown>;
+  probot: Probot | null;
+  ProbotBase: typeof Probot;
+  request?: RequestRequestOptions;
   webhookPath: string;
   webhookProxy?: string;
   eventSource: EventSource | undefined;
@@ -51,12 +55,10 @@ export class Server {
   #state: State;
 
   constructor(options: ServerOptions = {} as ServerOptions) {
-    const probot = new options.Probot({
-      request: options.request,
-      server: this,
-      webhookPath: options.webhookPath || defaultWebhookPath,
-    });
     this.#state = {
+      initialized: false,
+      probot: null,
+      log: options.log,
       httpServer: new HttpServer(),
       cwd: options.cwd || process.cwd(),
       port: options.port || 3000,
@@ -64,16 +66,32 @@ export class Server {
       webhookPath: options.webhookPath || defaultWebhookPath,
       webhookProxy: options.webhookProxy,
       eventSource: undefined,
-      probot,
-      log: rebindLog(options.log || probot.log.child({ name: "server" })),
+      request: options.request,
+      ProbotBase: options.Probot,
       handlers: [],
       addedHandlers: [],
       enablePing: options.enablePing ?? true,
       enableNotFound: options.enableNotFound ?? true,
       enableStaticFiles: options.enableStaticFiles ?? true,
     };
+  }
 
-    const logger = loggingHandler(this.#state.log, options.loggingOptions);
+  #initialize(): void {
+    if (this.#state.initialized) {
+      return;
+    }
+    const probot = new this.#state.ProbotBase({
+      request: this.#state.request,
+      server: this,
+      webhookPath: this.#state.webhookPath,
+    });
+
+    this.#state.probot = probot;
+    this.#state.log = rebindLog(
+      this.#state.log || probot.log.child({ name: "server" }),
+    );
+
+    const logger = loggingHandler(this.#state.log, this.#state.loggingOptions);
 
     this.#state.httpServer.on("request", async (req, res) => {
       logger(req, res);
@@ -85,13 +103,14 @@ export class Server {
           }
         }
       } catch (e) {
-        this.#state.log.error(e);
+        this.#state.log!.error(e);
         res.writeHead(500).end();
         return true;
       }
 
       return false;
     });
+    this.#state.initialized = true;
   }
 
   public addHandler(handler: Handler) {
@@ -99,7 +118,9 @@ export class Server {
   }
 
   public async loadHandlerFactory(appFn: HandlerFactory) {
-    const handler = await appFn(this.#state.probot, {
+    this.#initialize();
+
+    const handler = await appFn(this.#state.probot!, {
       cwd: this.#state.cwd,
       addHandler: (handler: Handler) => {
         this.addHandler(handler as unknown as Handler);
@@ -114,7 +135,9 @@ export class Server {
   }
 
   public async load(appFn: ApplicationFunction) {
-    await appFn(this.#state.probot, {
+    this.#initialize();
+
+    await appFn(this.#state.probot!, {
       cwd: this.#state.cwd,
       addHandler: (handler: Handler) => {
         this.addHandler(handler as unknown as Handler);
@@ -123,6 +146,8 @@ export class Server {
   }
 
   public async start(): Promise<HttpServer> {
+    this.#initialize();
+
     this.#state.handlers = [];
 
     if (this.#state.enableStaticFiles === true) {
@@ -133,11 +158,7 @@ export class Server {
       this.#state.handlers.unshift(pingHandler);
     }
 
-    this.#state.handlers.unshift(
-      await this.#state.probot.getNodeMiddleware({
-        log: this.#state.log,
-      }),
-    );
+    this.#state.handlers.unshift(await this.#state.probot!.getNodeMiddleware());
 
     this.#state.handlers.push(...this.#state.addedHandlers);
 
@@ -148,26 +169,32 @@ export class Server {
     const runtimeName = getRuntimeName(globalThis);
     const runtimeVersion = getRuntimeVersion(globalThis);
 
-    this.#state.log.info(
+    this.#state.log!.info(
       `Running Probot v${this.version} (${runtimeName}: ${runtimeVersion})`,
     );
     const printableHost = getPrintableHost(this.#state.host);
 
-    this.#state.httpServer = await new Promise((resolve, reject) => {
+    await new Promise<void>((resolve, reject) => {
       const server = this.#state.httpServer.listen(
         { port: this.#state.port, host: this.#state.host },
         async () => {
-          this.#state.port = (server.address() as AddressInfo).port;
-          this.#state.host = (server.address() as AddressInfo).address;
+          let {
+            port,
+            address: host,
+            family,
+          } = this.#state.httpServer.address() as AddressInfo;
 
-          if (isIPv6(this.#state.host)) {
-            this.#state.host = `[${this.#state.host}]`;
+          if (family === "ipv6") {
+            host = `[${host}]`;
           }
 
-          this.#state.log.info(
+          this.#state.host = host;
+          this.#state.port = port;
+
+          this.#state.log!.info(
             `Listening on http://${printableHost}:${this.#state.port}`,
           );
-          resolve(server);
+          resolve();
         },
       );
 
@@ -178,7 +205,7 @@ export class Server {
           });
         }
 
-        this.#state.log.error(error);
+        this.#state.log!.error(error);
         reject(error);
       });
     });
@@ -188,7 +215,7 @@ export class Server {
         host: this.#state.host,
         port: this.#state.port,
         path: this.#state.webhookPath,
-        logger: this.#state.log,
+        logger: this.#state.log!,
         url: this.#state.webhookProxy,
       });
     }

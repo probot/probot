@@ -5,10 +5,7 @@ import {
 import type { Logger } from "pino";
 import { Lru } from "toad-cache";
 
-import {
-  createDeferredPromise,
-  type DeferredPromise,
-} from "./helpers/create-deferred-promise.js";
+import { createDeferredPromise } from "./helpers/create-deferred-promise.js";
 import { getLog } from "./helpers/get-log.js";
 import { getProbotOctokitWithDefaults } from "./octokit/get-probot-octokit-with-defaults.js";
 import { getAuthenticatedOctokit } from "./octokit/get-authenticated-octokit.js";
@@ -49,8 +46,6 @@ export class Probot {
 
   #state: State;
 
-  #initialized: DeferredPromise<void> = createDeferredPromise<void>();
-
   constructor(options: Options = {}) {
     if (!options.githubToken) {
       if (!options.appId) {
@@ -63,7 +58,8 @@ export class Probot {
     }
 
     this.#state = {
-      initialized: false,
+      initialized: 0,
+      initializedPromise: createDeferredPromise<void>(),
       cache: null,
       octokit: null,
       webhooks: null,
@@ -86,12 +82,16 @@ export class Probot {
   }
 
   async #initialize(): Promise<void> {
-    if (this.#state.initialized === true) {
-      return this.#initialized.promise;
+    if (
+      this.#state.initialized === 1 ||
+      this.#state.initialized === 2 ||
+      this.#state.initialized instanceof Error
+    ) {
+      return this.#state.initializedPromise.promise;
     }
-    if (this.#state.initialized instanceof Error) {
-      return Promise.reject(this.#state.initialized);
-    }
+
+    this.#state.initialized = 1;
+
     try {
       // TODO: support redis backend for access token cache if `options.redisConfig`
       this.#state.cache = new Lru<string>(
@@ -127,15 +127,14 @@ export class Probot {
         webhookSecret: this.#state.webhookSecret,
       });
 
-      this.#initialized.resolve();
-
-      this.#state.initialized = true;
+      this.#state.initialized = 2;
+      this.#state.initializedPromise.resolve();
     } catch (error) {
       this.#state.log.error({ err: error }, "Failed to initialize Probot");
       this.#state.initialized = error as Error;
-      this.#initialized.reject(error);
+      this.#state.initializedPromise.reject(error);
     } finally {
-      return this.#initialized.promise;
+      return this.#state.initializedPromise.promise;
     }
   }
 
@@ -193,7 +192,7 @@ export class Probot {
       cwd: process.cwd(),
     } as ApplicationFunctionOptions,
   ): Promise<void> {
-    await this.#initialized.promise;
+    await this.#state.initializedPromise.promise;
 
     if (typeof options.addHandler !== "function") {
       options.addHandler = this.#state.server
@@ -215,12 +214,12 @@ export class Probot {
   }
 
   public async ready(): Promise<this> {
-    await this.#initialized.promise;
+    await this.#state.initializedPromise.promise;
     return this;
   }
 
   public async receive(event: WebhookEvent): Promise<void> {
-    await this.#initialized.promise;
+    await this.#state.initializedPromise.promise;
 
     this.#state.log.debug({ event }, "Webhook received");
     await this.#state.webhooks!.receive(event);

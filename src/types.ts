@@ -1,18 +1,18 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
+import type { RequestRequestOptions } from "@octokit/types";
 import type {
   EmitterWebhookEvent as WebhookEvent,
   Webhooks,
 } from "@octokit/webhooks";
 import type { RedisOptions } from "ioredis";
+import type { Logger } from "pino";
 import type { Options as LoggingOptions } from "pino-http";
+import type { Lru } from "toad-cache";
 
 import type { Probot, Server } from "./exports.js";
 import type { Context } from "./context.js";
 import type { ProbotOctokit } from "./octokit/probot-octokit.js";
-
-import type { Logger } from "pino";
-import type { RequestRequestOptions } from "@octokit/types";
-import type { Lru } from "toad-cache";
+import type { DeferredPromise } from "./helpers/create-deferred-promise.js";
 
 export interface Options {
   privateKey?: string;
@@ -34,6 +34,7 @@ export interface Options {
 }
 
 export type State = {
+  initializedPromise: DeferredPromise<void>;
   log: Logger;
   logLevel?: "trace" | "debug" | "info" | "warn" | "error" | "fatal";
   logMessageKey?: string;
@@ -51,13 +52,13 @@ export type State = {
   server?: Server | void;
 } & (
   | {
-      initialized: false;
+      initialized: 0 | Error;
       cache: null;
       octokit: null;
       webhooks: null;
     }
   | {
-      initialized: true | Error;
+      initialized: 1 | 2;
       cache: Lru<string>;
       octokit: ProbotOctokit;
       webhooks: ProbotWebhooks;

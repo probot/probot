@@ -19,17 +19,22 @@ import { getPrintableHost } from "../helpers/get-printable-host.js";
 import { getRuntimeName } from "../helpers/get-runtime-name.js";
 import { getRuntimeVersion } from "../helpers/get-runtime-version.js";
 
-import { loggingHandler } from "./handlers/logging.js";
+import { httpLogger } from "./handlers/http-logger.js";
 import { notFoundHandler } from "./handlers/not-found.js";
 import { pingHandler } from "./handlers/ping.js";
 import { staticFilesHandler } from "./handlers/static-files.js";
+import {
+  createDeferredPromise,
+  type DeferredPromise,
+} from "../helpers/create-deferred-promise.js";
 
 // the default path as defined in @octokit/webhooks
 export const defaultWebhookPath = "/api/github/webhooks";
 export const defaultWebhookSecret = "development";
 
 type State = {
-  initialized: boolean;
+  initialized: 0 | 1 | 2 | Error;
+  initializedPromise: DeferredPromise<void>;
   cwd: string;
   httpServer: HttpServer;
   port: number;
@@ -42,6 +47,7 @@ type State = {
   webhookPath: string;
   webhookProxy?: string;
   eventSource: EventSource | undefined;
+  httpLogger?: ReturnType<typeof httpLogger>;
   handlers: Handler[];
   addedHandlers: Handler[];
   enablePing?: boolean;
@@ -56,7 +62,8 @@ export class Server {
 
   constructor(options: ServerOptions = {} as ServerOptions) {
     this.#state = {
-      initialized: false,
+      initialized: 0,
+      initializedPromise: createDeferredPromise<void>(),
       probot: null,
       log: options.log,
       httpServer: new HttpServer(),
@@ -74,27 +81,9 @@ export class Server {
       enableNotFound: options.enableNotFound ?? true,
       enableStaticFiles: options.enableStaticFiles ?? true,
     };
-  }
-
-  #initialize(): void {
-    if (this.#state.initialized) {
-      return;
-    }
-    const probot = new this.#state.ProbotBase({
-      request: this.#state.request,
-      server: this,
-      webhookPath: this.#state.webhookPath,
-    });
-
-    this.#state.probot = probot;
-    this.#state.log = rebindLog(
-      this.#state.log || probot.log.child({ name: "server" }),
-    );
-
-    const logger = loggingHandler(this.#state.log, this.#state.loggingOptions);
 
     this.#state.httpServer.on("request", async (req, res) => {
-      logger(req, res);
+      this.#state.httpLogger!(req, res);
 
       try {
         for (const handler of this.#state.handlers) {
@@ -110,7 +99,47 @@ export class Server {
 
       return false;
     });
-    this.#state.initialized = true;
+  }
+
+  get version(): string {
+    return VERSION;
+  }
+
+  async #initialize(): Promise<void> {
+    if (this.#state.initialized !== 0) {
+      return this.#state.initializedPromise.promise;
+    }
+
+    this.#state.initialized = 1;
+
+    try {
+      this.#state.probot = new this.#state.ProbotBase({
+        request: this.#state.request,
+        server: this,
+        webhookPath: this.#state.webhookPath,
+      });
+      this.#state.log = rebindLog(
+        this.#state.log || this.#state.probot.log.child({ name: "server" }),
+      );
+
+      this.#state.httpLogger = httpLogger(
+        this.#state.log,
+        this.#state.loggingOptions,
+      );
+
+      this.#state.initialized = 2;
+      this.#state.initializedPromise.resolve();
+    } catch (error) {
+      this.#state.initialized = error as Error;
+      this.#state.initializedPromise.reject(error);
+      (this.#state.log || console).error(
+        { err: error },
+        "Failed to initialize Server",
+      );
+      throw error;
+    } finally {
+      return this.#state.initializedPromise.promise;
+    }
   }
 
   public addHandler(handler: Handler) {
@@ -118,7 +147,7 @@ export class Server {
   }
 
   public async loadHandlerFactory(appFn: HandlerFactory) {
-    this.#initialize();
+    await this.#initialize();
 
     const handler = await appFn(this.#state.probot!, {
       cwd: this.#state.cwd,
@@ -130,12 +159,8 @@ export class Server {
     this.addHandler(handler);
   }
 
-  get version(): string {
-    return VERSION;
-  }
-
   public async load(appFn: ApplicationFunction) {
-    this.#initialize();
+    await this.#initialize();
 
     await appFn(this.#state.probot!, {
       cwd: this.#state.cwd,
@@ -146,7 +171,7 @@ export class Server {
   }
 
   public async start(): Promise<HttpServer> {
-    this.#initialize();
+    await this.#initialize();
 
     this.#state.handlers = [];
 

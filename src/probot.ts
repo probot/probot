@@ -85,7 +85,7 @@ export class Probot {
     this.#initialize().catch(() => {});
   }
 
-  #initialize(): Promise<void> {
+  async #initialize(): Promise<void> {
     if (this.#state.initialized === true) {
       return this.#initialized.promise;
     }
@@ -165,16 +165,6 @@ export class Probot {
     });
   }
 
-  public async auth(installationId?: number): Promise<ProbotOctokit> {
-    await this.#initialize();
-
-    return await getAuthenticatedOctokit({
-      log: this.#state.log,
-      octokit: this.#state.octokit!,
-      installationId,
-    });
-  }
-
   public on: ProbotWebhooks["on"] = (eventName, callback) => {
     this.#state.webhooks!.on(eventName, callback);
   };
@@ -187,10 +177,14 @@ export class Probot {
     this.#state.webhooks!.onError(callback);
   };
 
-  public async receive(event: WebhookEvent): Promise<void> {
-    this.#state.log.debug({ event }, "Webhook received");
-    await this.#state.webhooks!.receive(event);
-    return;
+  public async auth(installationId?: number): Promise<ProbotOctokit> {
+    await this.#initialize();
+
+    return await getAuthenticatedOctokit({
+      log: this.#state.log,
+      octokit: this.#state.octokit!,
+      installationId,
+    });
   }
 
   public async load(
@@ -217,6 +211,19 @@ export class Probot {
     }
 
     await appFn(this, options);
+    return;
+  }
+
+  public async ready(): Promise<this> {
+    await this.#initialized.promise;
+    return this;
+  }
+
+  public async receive(event: WebhookEvent): Promise<void> {
+    await this.#initialized.promise;
+
+    this.#state.log.debug({ event }, "Webhook received");
+    await this.#state.webhooks!.receive(event);
     return;
   }
 }

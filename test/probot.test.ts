@@ -121,7 +121,7 @@ describe("Probot", () => {
       new Probot({ appId, privateKey });
     });
 
-    it("shouldn't overwrite `options.throttle` passed to `{Octokit: ProbotOctokit.defaults(options)}`", () => {
+    it("shouldn't overwrite `options.throttle` passed to `{Octokit: ProbotOctokit.defaults(options)}`", async () => {
       const pluginCalls: any[] = [];
       const MyOctokit = ProbotOctokit.plugin((_octokit, options) => {
         pluginCalls.push(options);
@@ -133,17 +133,17 @@ describe("Probot", () => {
         },
       });
 
-      new Probot({ Octokit: MyOctokit, appId, privateKey });
+      await new Probot({ Octokit: MyOctokit, appId, privateKey }).ready();
 
       expect(pluginCalls.length).toBe(1);
       expect(pluginCalls[0].throttle?.enabled).toBe(true);
     });
 
     it("sets version", async () => {
-      const probot = new Probot({
+      const probot = await new Probot({
         appId,
         privateKey,
-      });
+      }).ready();
       expect(probot.version).toBe("0.0.0-development");
     });
   });
@@ -156,7 +156,7 @@ describe("Probot", () => {
     };
 
     it("responds with the correct error if webhook secret does not match", async () => {
-      const probot = new Probot({ githubToken: "faketoken" });
+      const probot = await new Probot({ githubToken: "faketoken" }).ready();
 
       const logErrorCalls: any[] = [];
       probot.log.error = (...args: any[]) => {
@@ -178,7 +178,7 @@ describe("Probot", () => {
     });
 
     it("responds with the correct error if webhook secret is not found", async () => {
-      const probot = new Probot({ githubToken: "faketoken" });
+      const probot = await new Probot({ githubToken: "faketoken" }).ready();
 
       const logErrorCalls: any[] = [];
       probot.log.error = (...args: any[]) => {
@@ -200,7 +200,7 @@ describe("Probot", () => {
     });
 
     it("responds with the correct error if webhook secret is wrong", async () => {
-      const probot = new Probot({ githubToken: "faketoken" });
+      const probot = await new Probot({ githubToken: "faketoken" }).ready();
 
       const logErrorCalls: any[] = [];
       probot.log.error = (...args: any[]) => {
@@ -224,7 +224,7 @@ describe("Probot", () => {
     });
 
     it("responds with the correct error if the PEM file is missing", async () => {
-      const probot = new Probot({ githubToken: "faketoken" });
+      const probot = await new Probot({ githubToken: "faketoken" }).ready();
 
       const logErrorCalls: any[] = [];
       probot.log.error = (...args: any[]) => {
@@ -248,7 +248,7 @@ describe("Probot", () => {
     });
 
     it("responds with the correct error if the jwt could not be decoded", async () => {
-      const probot = new Probot({ githubToken: "faketoken" });
+      const probot = await new Probot({ githubToken: "faketoken" }).ready();
 
       const logErrorCalls: any[] = [];
       probot.log.error = (...args: any[]) => {
@@ -376,10 +376,10 @@ describe("Probot", () => {
 
   describe("on", () => {
     it("calls callback when no action is specified", async () => {
-      const probot = new Probot({
+      const probot = await new Probot({
         appId,
         privateKey,
-      });
+      }).ready();
 
       const event: WebhookEvent<"pull_request"> = {
         id: "123-456",
@@ -403,10 +403,10 @@ describe("Probot", () => {
     });
 
     it("calls callback with same action", async () => {
-      const probot = new Probot({
+      const probot = await new Probot({
         appId,
         privateKey,
-      });
+      }).ready();
 
       let callCount = 0;
       probot.on("pull_request.opened", () => {
@@ -424,10 +424,10 @@ describe("Probot", () => {
     });
 
     it("does not call callback with different action", async () => {
-      const probot = new Probot({
+      const probot = await new Probot({
         appId,
         privateKey,
-      });
+      }).ready();
 
       let hasBeenCalled = 0;
 
@@ -446,10 +446,10 @@ describe("Probot", () => {
     });
 
     it("calls callback with onAny", async () => {
-      const probot = new Probot({
+      const probot = await new Probot({
         appId,
         privateKey,
-      });
+      }).ready();
 
       let callCount = 0;
       probot.onAny(() => {
@@ -467,10 +467,10 @@ describe("Probot", () => {
     });
 
     it("calls callback x amount of times when an array of x actions is passed", async () => {
-      const probot = new Probot({
+      const probot = await new Probot({
         appId,
         privateKey,
-      });
+      }).ready();
 
       const event: WebhookEvent<"pull_request.opened"> = {
         id: "123-456",
@@ -500,11 +500,11 @@ describe("Probot", () => {
         done();
       };
 
-      const probot = new Probot({
+      const probot = await new Probot({
         appId,
         privateKey,
         log: pino(streamLogsToOutput),
-      });
+      }).ready();
 
       const handlerCalls: Context[] = [];
       const handler = (context: Context) => {
@@ -558,13 +558,13 @@ describe("Probot", () => {
           },
         );
 
-      const probot = new Probot({
+      const probot = await new Probot({
         appId,
         privateKey,
         request: {
           fetch: mock.fetchHandler,
         },
-      });
+      }).ready();
       const event: WebhookEvent<"installation.created"> = {
         id: "123-456",
         name: "installation",
@@ -595,13 +595,13 @@ describe("Probot", () => {
         },
       );
 
-      const probot = new Probot({
+      const probot = await new Probot({
         appId,
         privateKey,
         request: {
           fetch: mock.fetchHandler,
         },
-      });
+      }).ready();
 
       const event: WebhookEvent<"installation.deleted"> = {
         id: "123-456",
@@ -633,13 +633,13 @@ describe("Probot", () => {
         },
       );
 
-      const probot = new Probot({
+      const probot = await new Probot({
         appId,
         privateKey,
         request: {
           fetch: mock.fetchHandler,
         },
-      });
+      }).ready();
 
       const event: WebhookEvent<"check_run"> = {
         id: "123-456",
@@ -659,10 +659,10 @@ describe("Probot", () => {
 
   describe("receive", () => {
     it("delivers the event", async () => {
-      const probot = new Probot({
+      const probot = await new Probot({
         appId,
         privateKey,
-      });
+      }).ready();
 
       let callCount = 0;
       probot.on("pull_request", () => ++callCount);
@@ -679,10 +679,10 @@ describe("Probot", () => {
     });
 
     it("waits for async events to resolve", async () => {
-      const probot = new Probot({
+      const probot = await new Probot({
         appId,
         privateKey,
-      });
+      }).ready();
 
       let callCount = 0;
 
@@ -707,11 +707,11 @@ describe("Probot", () => {
     });
 
     it("returns a reject errors thrown in apps", async () => {
-      const probot = new Probot({
+      const probot = await new Probot({
         appId,
         privateKey,
         log: pino({ enabled: false }),
-      });
+      }).ready();
 
       probot.on("pull_request", () => {
         throw new Error("error from app");
@@ -739,11 +739,11 @@ describe("Probot", () => {
         done();
       };
 
-      const probot = new Probot({
+      const probot = await new Probot({
         appId,
         privateKey,
         log: pino(streamLogsToOutput),
-      });
+      }).ready();
 
       // @ts-expect-error
       probot.on("unknown-event", () => {});

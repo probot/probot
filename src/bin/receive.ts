@@ -168,6 +168,7 @@ export async function receive(args: string[]) {
   const appFn = await resolveAppFunction(
     path.resolve(process.cwd(), appFunctionFile),
   );
+
   await probot.load(appFn, {
     cwd: process.cwd(),
     addHandler: () => {

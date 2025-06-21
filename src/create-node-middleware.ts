@@ -46,12 +46,20 @@ export async function createNodeMiddleware(
 > {
   const handlers: Handler[] = [];
 
+  await probot.ready();
+
   probot.load(appFn, {
     cwd: process.cwd(),
     addHandler: (handler) => {
       handlers.push(handler);
     },
   });
+
+  handlers.push(
+    await probot.getNodeMiddleware({
+      path: webhooksPath || probot.webhookPath || defaultWebhookPath,
+    }),
+  );
 
   const mainHandler: Handler = async (req, res) => {
     try {
@@ -68,12 +76,6 @@ export async function createNodeMiddleware(
 
     return false;
   };
-
-  handlers.push(
-    await probot.getNodeMiddleware({
-      path: webhooksPath || probot.webhookPath || defaultWebhookPath,
-    }),
-  );
 
   return mainHandler;
 }

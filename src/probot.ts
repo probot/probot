@@ -2,7 +2,7 @@ import { Lru } from "toad-cache";
 import type { Logger } from "pino";
 import type { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
 
-import { auth } from "./auth.js";
+import { getAuthenticatedOctokit } from "./octokit/get-authenticated-octokit.js";
 import { getLog } from "./helpers/get-log.js";
 import { getProbotOctokitWithDefaults } from "./octokit/get-probot-octokit-with-defaults.js";
 import { getWebhooks } from "./octokit/get-webhooks.js";
@@ -47,10 +47,6 @@ export class Probot {
   public on: ProbotWebhooks["on"];
   public onAny: ProbotWebhooks["onAny"];
   public onError: ProbotWebhooks["onError"];
-  public auth: (
-    installationId?: number,
-    log?: Logger,
-  ) => Promise<ProbotOctokit>;
 
   #state: State;
 
@@ -107,8 +103,6 @@ export class Probot {
       server: options.server,
     };
 
-    this.auth = auth.bind(null, this.#state);
-
     this.webhooks = getWebhooks(this.#state);
     this.webhookPath = this.#state.webhookPath;
 
@@ -122,6 +116,14 @@ export class Probot {
   public receive(event: WebhookEvent): Promise<void> {
     this.log.debug({ event }, "Webhook received");
     return this.webhooks.receive(event);
+  }
+
+  public async auth(installationId?: number): Promise<ProbotOctokit> {
+    return await getAuthenticatedOctokit({
+      log: this.#state.log,
+      octokit: this.#state.octokit!,
+      installationId,
+    });
   }
 
   public async load(

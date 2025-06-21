@@ -184,7 +184,7 @@ export class Server {
             family,
           } = this.#state.httpServer.address() as AddressInfo;
 
-          if (family === "ipv6") {
+          if (family === "IPv6") {
             host = `[${host}]`;
           }
 

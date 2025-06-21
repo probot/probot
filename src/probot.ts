@@ -134,7 +134,6 @@ export class Probot {
       this.#state.log.error({ err: error }, "Failed to initialize Probot");
       this.#state.initialized = error as Error;
       this.#initialized.reject(error);
-      return this.#initialized.promise;
     } finally {
       return this.#initialized.promise;
     }

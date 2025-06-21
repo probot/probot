@@ -15,7 +15,7 @@ async function prepareTestProjectWithProbot() {
     "..",
   );
 
-  await execCommand("npm link", {
+  await execCommand("npm link --force", {
     cwd: projectRoot,
   });
 

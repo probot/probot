@@ -6,9 +6,9 @@ import type { Logger } from "pino";
 import { Lru } from "toad-cache";
 
 import { createDeferredPromise } from "./helpers/create-deferred-promise.js";
+import { getAuthenticatedOctokit } from "./octokit/get-authenticated-octokit.js";
 import { getLog } from "./helpers/get-log.js";
 import { getProbotOctokitWithDefaults } from "./octokit/get-probot-octokit-with-defaults.js";
-import { getAuthenticatedOctokit } from "./octokit/get-authenticated-octokit.js";
 import { getWebhooks } from "./octokit/get-webhooks.js";
 import { ProbotOctokit } from "./octokit/probot-octokit.js";
 import { VERSION } from "./version.js";
@@ -65,7 +65,6 @@ export class Probot {
       webhooks: null,
       log: options.log!,
       githubToken: options.githubToken,
-      webhookSecret: options.secret || defaultWebhookSecret,
       appId: Number.parseInt(options.appId as string, 10),
       privateKey: options.privateKey,
       host: options.host,
@@ -74,6 +73,7 @@ export class Probot {
       baseUrl: options.baseUrl,
       redisConfig: options.redisConfig,
       webhookPath: options.webhookPath || defaultWebhookPath,
+      webhookSecret: options.secret || defaultWebhookSecret,
       request: options.request,
       server: options.server,
     };

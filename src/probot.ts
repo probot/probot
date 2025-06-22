@@ -159,7 +159,7 @@ export class Probot {
     return VERSION;
   }
 
-  get webhookPath() {
+  get webhookPath(): string {
     return this.#state.webhookPath;
   }
 }

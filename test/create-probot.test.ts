@@ -86,7 +86,7 @@ describe("createProbot", () => {
   });
 
   test("defaults, custom host", async () => {
-    const fetchPromise = createDeferredPromise();
+    const fetchPromise = createDeferredPromise<void>();
 
     const probot = createProbot({
       env: {

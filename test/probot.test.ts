@@ -95,14 +95,34 @@ describe("Probot", () => {
       try {
         new Probot();
         throw new Error("Should have thrown");
-      } catch (e) {
-        expect((e as Error).message).toBe("appId option is required");
+      } catch (e: any) {
+        expect(e.message.includes("appId option is required"), e.message).toBe(
+          true,
+        );
       }
     });
 
-    it('{ githubToken: "faketoken" }', () => {
-      // probot with token. Should not throw
-      new Probot({ githubToken: "faketoken" });
+    it("{}", () => {
+      try {
+        new Probot({});
+        throw new Error("Should have thrown");
+      } catch (e: any) {
+        expect(e.message.includes("appId option is required"), e.message).toBe(
+          true,
+        );
+      }
+    });
+
+    it("{ appId }", () => {
+      try {
+        new Probot({ appId });
+        throw new Error("Should have thrown");
+      } catch (e: any) {
+        expect(
+          e.message.includes("privateKey option is required"),
+          e.message,
+        ).toBe(true);
+      }
     });
 
     it('{ appId, privateKey" }', () => {
@@ -110,18 +130,12 @@ describe("Probot", () => {
       new Probot({ appId, privateKey });
     });
 
-    it("{ appId }", () => {
-      try {
-        new Probot({ appId });
-        throw new Error("Should have thrown");
-      } catch (e) {
-        expect((e as Error).message).toBe("privateKey option is required");
-      }
-      // probot with appId/privateKey
-      new Probot({ appId, privateKey });
+    it('{ githubToken: "faketoken" }', () => {
+      // probot with token. Should not throw
+      new Probot({ githubToken: "faketoken" });
     });
 
-    it("shouldn't overwrite `options.throttle` passed to `{Octokit: ProbotOctokit.defaults(options)}`", async () => {
+    it("shouldn't overwrite `options.throttle` passed to `{Octokit: ProbotOctokit.defaults(options)}`", () => {
       const pluginCalls: any[] = [];
       const MyOctokit = ProbotOctokit.plugin((_octokit, options) => {
         pluginCalls.push(options);

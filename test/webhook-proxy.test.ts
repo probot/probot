@@ -9,6 +9,8 @@ import type { AddressInfo } from "node:net";
 import getPort from "get-port";
 import fetchMock from "fetch-mock";
 import { describe, expect, test } from "vitest";
+
+import { createDeferredPromise } from "../src/helpers/create-deferred-promise.js";
 import { getLog } from "../src/helpers/get-log.js";
 import { createWebhookProxy } from "../src/helpers/webhook-proxy.js";
 import { getPrintableHost } from "../src/helpers/get-printable-host.js";
@@ -54,35 +56,8 @@ describe("webhook-proxy", () => {
   test(
     "with a valid proxy server forwards events to server",
     async () => {
-      const readyPromise = {
-        promise: undefined,
-        reject: undefined,
-        resolve: undefined,
-      } as {
-        promise?: Promise<any>;
-        resolve?: (value?: any) => any;
-        reject?: (reason?: any) => any;
-      };
-
-      readyPromise.promise = new Promise((resolve, reject) => {
-        readyPromise.resolve = resolve;
-        readyPromise.reject = reject;
-      });
-
-      const finishedPromise = {
-        promise: undefined,
-        reject: undefined,
-        resolve: undefined,
-      } as {
-        promise?: Promise<any>;
-        resolve?: (value?: any) => any;
-        reject?: (reason?: any) => any;
-      };
-
-      finishedPromise.promise = new Promise((resolve, reject) => {
-        finishedPromise.resolve = resolve;
-        finishedPromise.reject = reject;
-      });
+      const readyPromise = createDeferredPromise<void>();
+      const finishedPromise = createDeferredPromise<void>();
 
       const port = await getPort();
 

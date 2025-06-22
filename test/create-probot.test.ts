@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 
 import { createProbot, Probot } from "../src/index.js";
 import { captureLogOutput } from "./helpers/capture-log-output.js";
+import { createDeferredPromise } from "../src/helpers/create-deferred-promise.js";
 
 const env = {
   APP_ID: "1",
@@ -85,20 +86,7 @@ describe("createProbot", () => {
   });
 
   test("defaults, custom host", async () => {
-    const fetchPromise = {
-      promise: undefined,
-      reject: undefined,
-      resolve: undefined,
-    } as {
-      promise?: Promise<any>;
-      resolve?: () => any;
-      reject?: (reason?: any) => any;
-    };
-
-    fetchPromise.promise = new Promise<void>((resolve, reject) => {
-      fetchPromise.resolve = resolve;
-      fetchPromise.reject = reject;
-    });
+    const fetchPromise = createDeferredPromise<void>();
 
     const probot = createProbot({
       env: {
@@ -115,9 +103,9 @@ describe("createProbot", () => {
               );
               expect(options.method).toBe("POST");
 
-              fetchPromise.resolve!();
+              fetchPromise.resolve();
             } catch (e) {
-              fetchPromise.reject!(e);
+              fetchPromise.reject(e);
             }
             return new Response(null, { status: 500 });
           },

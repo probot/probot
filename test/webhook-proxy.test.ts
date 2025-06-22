@@ -86,7 +86,7 @@ describe("webhook-proxy", () => {
           .postOnce(`http://${targetHost}:${targetPort}/test`, {
             status: 200,
             then: () => {
-              finishedPromise.resolve!();
+              finishedPromise.resolve();
             },
           });
         const customFetch: typeof fetch = async (
@@ -114,11 +114,11 @@ describe("webhook-proxy", () => {
         })) as EventSource;
 
         if (!proxy) {
-          readyPromise.reject!(new Error("proxy is undefined"));
+          readyPromise.reject(new Error("proxy is undefined"));
           return;
         }
 
-        readyPromise.resolve!();
+        readyPromise.resolve();
       });
 
       await readyPromise.promise;

@@ -67,16 +67,13 @@ export class Probot {
       appId: Number(options.appId),
       privateKey: options.privateKey,
       cache,
-      log: rebindLog(this.log),
+      log: this.log,
       redisConfig: options.redisConfig,
       baseUrl: options.baseUrl,
       request: options.request,
     });
-    const octokitLogger = rebindLog(this.log.child({ name: "octokit" }));
-    const octokit = new Octokit({
-      request: options.request,
-      log: octokitLogger,
-    });
+
+    const octokit = new Octokit();
 
     this.#state = {
       cache,

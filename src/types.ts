@@ -45,6 +45,7 @@ export type State = {
   port?: number;
   host?: string;
   baseUrl?: string;
+  webhooks?: ProbotWebhooks;
   webhookPath: string;
   webhookSecret?: string;
   request?: RequestRequestOptions;

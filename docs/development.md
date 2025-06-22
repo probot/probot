@@ -272,7 +272,7 @@ async function example() {
   await probot.load(app);
 
   // https://github.com/octokit/webhooks.js/#webhooksreceive
-  probot.webhooks.receive({
+  probot.receive({
     id: '123',
     name: 'issues',
     payload: { ... }

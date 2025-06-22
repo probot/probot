@@ -95,21 +95,44 @@ describe("Probot", () => {
       try {
         new Probot();
         throw new Error("Should have thrown");
-      } catch (e) {
-        expect((e as Error).message).toBe(
-          "[@octokit/auth-app] appId option is required",
+      } catch (e: any) {
+        expect(e.message.includes("appId option is required"), e.message).toBe(
+          true,
         );
       }
     });
 
-    it('{ githubToken: "faketoken" }', () => {
-      // probot with token. Should not throw
-      new Probot({ githubToken: "faketoken" });
+    it("{}", () => {
+      try {
+        new Probot({});
+        throw new Error("Should have thrown");
+      } catch (e: any) {
+        expect(e.message.includes("appId option is required"), e.message).toBe(
+          true,
+        );
+      }
+    });
+
+    it("{ appId }", () => {
+      try {
+        new Probot({ appId });
+        throw new Error("Should have thrown");
+      } catch (e: any) {
+        expect(
+          e.message.includes("privateKey option is required"),
+          e.message,
+        ).toBe(true);
+      }
     });
 
     it('{ appId, privateKey" }', () => {
       // probot with appId/privateKey
       new Probot({ appId, privateKey });
+    });
+
+    it('{ githubToken: "faketoken" }', () => {
+      // probot with token. Should not throw
+      new Probot({ githubToken: "faketoken" });
     });
 
     it("shouldn't overwrite `options.throttle` passed to `{Octokit: ProbotOctokit.defaults(options)}`", () => {

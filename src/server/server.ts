@@ -20,7 +20,7 @@ import { getPrintableHost } from "../helpers/get-printable-host.js";
 import { getRuntimeName } from "../helpers/get-runtime-name.js";
 import { getRuntimeVersion } from "../helpers/get-runtime-version.js";
 
-import { loggingHandler } from "./handlers/logging.js";
+import { httpLogger } from "./handlers/http-logger.js";
 import { notFoundHandler } from "./handlers/not-found.js";
 import { pingHandler } from "./handlers/ping.js";
 import { staticFilesHandler } from "./handlers/static-files.js";
@@ -67,7 +67,7 @@ export class Server {
       ? rebindLog(options.log)
       : rebindLog(this.probotApp.log.child({ name: "server" }));
 
-    const logger = loggingHandler(this.log, options.loggingOptions);
+    const logger = httpLogger(this.log, options.loggingOptions);
 
     const {
       enablePing = true,

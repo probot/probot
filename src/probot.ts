@@ -155,7 +155,7 @@ export class Probot {
     return VERSION;
   }
 
-  get version() {
+  get version(): string {
     return VERSION;
   }
 

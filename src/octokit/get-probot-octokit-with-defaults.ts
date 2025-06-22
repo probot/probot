@@ -17,7 +17,6 @@ type Options = {
   appId?: number;
   privateKey?: string;
   redisConfig?: RedisOptions | string;
-  webhookPath?: string;
   baseUrl?: string;
   request?: RequestRequestOptions;
 };
@@ -67,6 +66,10 @@ export function getProbotOctokitWithDefaults(
       options.log.child ? options.log.child({ name: "octokit" }) : options.log,
     ),
   };
+
+  if (options.request) {
+    defaultOptions.request = options.request;
+  }
 
   if (options.baseUrl) {
     defaultOptions.baseUrl = options.baseUrl;

@@ -1,6 +1,5 @@
 import type { Logger } from "pino";
 import { Webhooks } from "@octokit/webhooks";
-import type { Logger } from "pino";
 
 import type { ProbotOctokit } from "./probot-octokit.js";
 import type { ProbotWebhooks } from "../types.js";

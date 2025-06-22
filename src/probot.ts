@@ -137,18 +137,6 @@ export class Probot {
     }
   }
 
-  get log() {
-    return this.#state.log;
-  }
-
-  get version(): string {
-    return VERSION;
-  }
-
-  get webhookPath(): string {
-    return this.#state.webhookPath;
-  }
-
   public async getNodeMiddleware({
     log,
     path,
@@ -162,18 +150,6 @@ export class Probot {
       path: path || this.#state.webhookPath,
     });
   }
-
-  public on: ProbotWebhooks["on"] = (eventName, callback) => {
-    this.#state.webhooks!.on(eventName, callback);
-  };
-
-  public onAny: ProbotWebhooks["onAny"] = (callback) => {
-    this.#state.webhooks!.onAny(callback);
-  };
-
-  public onError: ProbotWebhooks["onError"] = (callback) => {
-    this.#state.webhooks!.onError(callback);
-  };
 
   public async auth(installationId?: number): Promise<ProbotOctokit> {
     await this.#initialize();
@@ -210,6 +186,10 @@ export class Probot {
 
     await appFn(this, options);
     return;
+  }
+
+  get log() {
+    return this.#state.log;
   }
 
   public on: ProbotWebhooks["on"] = (eventName, callback) => {

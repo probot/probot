@@ -15,7 +15,6 @@ import { getLog } from "../src/helpers/get-log.js";
 import { createWebhookProxy } from "../src/helpers/webhook-proxy.js";
 import { getPrintableHost } from "../src/helpers/get-printable-host.js";
 import { detectRuntime } from "../src/helpers/detect-runtime.js";
-import { createDeferredPromise } from "../src/helpers/create-deferred-promise.js";
 
 function sse(
   req: IncomingMessage,

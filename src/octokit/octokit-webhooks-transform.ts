@@ -1,7 +1,7 @@
 import type { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
 import type { Logger } from "pino";
 
-import type { ProbotOctokit } from "../exports.js";
+import type { ProbotOctokit } from "./probot-octokit.js";
 import { Context } from "../context.js";
 
 type WebhookTransformOptions = {

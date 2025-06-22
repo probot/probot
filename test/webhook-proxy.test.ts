@@ -9,6 +9,8 @@ import type { AddressInfo } from "node:net";
 import getPort from "get-port";
 import fetchMock from "fetch-mock";
 import { describe, expect, test } from "vitest";
+
+import { createDeferredPromise } from "../src/helpers/create-deferred-promise.js";
 import { getLog } from "../src/helpers/get-log.js";
 import { createWebhookProxy } from "../src/helpers/webhook-proxy.js";
 import { getPrintableHost } from "../src/helpers/get-printable-host.js";

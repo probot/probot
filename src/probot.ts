@@ -25,7 +25,6 @@ import { rebindLog } from "./helpers/rebind-log.js";
 export type Constructor<T = any> = new (...args: any[]) => T;
 
 export class Probot {
-  static version = VERSION;
   static defaults<S extends Constructor>(
     this: S,
     defaults: Options,
@@ -213,16 +212,44 @@ export class Probot {
     return;
   }
 
+  public on: ProbotWebhooks["on"] = (eventName, callback) => {
+    this.#state.webhooks!.on(eventName, callback);
+  };
+
+  public onAny: ProbotWebhooks["onAny"] = (callback) => {
+    this.#state.webhooks!.onAny(callback);
+  };
+
+  public onError: ProbotWebhooks["onError"] = (callback) => {
+    this.#state.webhooks!.onError(callback);
+  };
+
   public async ready(): Promise<this> {
     await this.#state.initializedPromise.promise;
     return this;
   }
-
+  
   public async receive(event: WebhookEvent): Promise<void> {
     await this.#state.initializedPromise.promise;
 
     this.#state.log.debug({ event }, "Webhook received");
     await this.#state.webhooks!.receive(event);
     return;
+  }
+
+  static get version(): string {
+    return VERSION;
+  }
+
+  get version(): string {
+    return VERSION;
+  }
+
+  get webhooks(): ProbotWebhooks {
+    return this.#state.webhooks!;
+  }
+
+  get webhookPath(): string {
+    return this.#state.webhookPath;
   }
 }

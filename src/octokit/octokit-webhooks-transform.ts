@@ -1,12 +1,12 @@
 import type { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
 import type { Logger } from "pino";
 
+import type { ProbotOctokit } from "./probot-octokit.js";
 import { Context } from "../context.js";
-import type { ProbotOctokit } from "../exports.js";
 
 type WebhookTransformOptions = {
-  octokit: ProbotOctokit;
   log: Logger;
+  octokit: ProbotOctokit;
 };
 
 /**
@@ -18,10 +18,10 @@ export async function webhookTransform(
   options: WebhookTransformOptions,
   event: WebhookEvent,
 ) {
-  const log = options.log.child({ name: "event", id: event.id });
   const octokit = (await options.octokit.auth({
     type: "event-octokit",
     event,
   })) as ProbotOctokit;
+  const log = options.log.child({ name: "event", id: event.id });
   return new Context(event, octokit, log);
 }

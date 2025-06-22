@@ -11,6 +11,7 @@ import WebhookExamples, {
   type WebhookDefinition,
 } from "@octokit/webhooks-examples";
 import type { Env } from "../../src/types.js";
+import { createDeferredPromise } from "../../src/helpers/create-deferred-promise.js";
 import { detectRuntime } from "../../src/helpers/detect-runtime.js";
 import { createDeferredPromise } from "../../src/helpers/create-deferred-promise.js";
 

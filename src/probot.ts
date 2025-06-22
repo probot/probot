@@ -208,7 +208,7 @@ export class Probot {
     await this.#state.initializedPromise.promise;
     return this;
   }
-  
+
   public async receive(event: WebhookEvent): Promise<void> {
     await this.#state.initializedPromise.promise;
 

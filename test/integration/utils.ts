@@ -41,6 +41,7 @@ export async function execCommand(
     exec(command, options, (error, stdout, stderr) => {
       stderr && console.error(stderr);
       if (error) {
+        console.log("got error", error)
         reject(error);
       } else {
         resolve(stdout.trim());

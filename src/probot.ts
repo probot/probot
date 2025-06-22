@@ -151,7 +151,7 @@ export class Probot {
     return this.#state.webhooks!.receive(event);
   }
 
-  static get version() {
+  static get version(): string {
     return VERSION;
   }
 

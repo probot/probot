@@ -94,7 +94,11 @@ export class Probot {
       server: options.server,
     };
 
-    this.#state.webhooks = getWebhooks(this.#state);
+    this.#state.webhooks = getWebhooks({
+      log: this.#state.log,
+      octokit: this.#state.octokit,
+      webhookSecret: this.#state.webhookSecret,
+    });
   }
 
   public async auth(installationId?: number): Promise<ProbotOctokit> {

@@ -15,9 +15,18 @@ async function prepareTestProjectWithProbot() {
     "..",
   );
 
-  await execCommand("npm link", {
-    cwd: projectRoot,
-  });
+  try {
+    await execCommand("npm link", {
+      cwd: projectRoot,
+    });
+  } catch (error: any) {
+    if (error.code === "EEXIST") {
+      // Ignore the error if probot is already linked
+      console.warn("Probot is already linked, skipping npm link.");
+    } else {
+      throw error;
+    }
+  }
 
   const testDirectories: string[] = [];
   const tmpDirectory = setupTestDirectory();

@@ -154,12 +154,12 @@ describe("Probot", () => {
         logErrorCalls.push(args);
       };
 
-      probot.webhooks.on("push", () => {
+      probot.on("push", () => {
         throw new Error("X-Hub-Signature-256 does not match blob signature");
       });
 
       try {
-        await probot.webhooks.receive(event);
+        await probot.receive(event);
         throw new Error("Should have thrown");
       } catch (e) {
         expect(logErrorCalls[0][1]).toBe(
@@ -176,12 +176,12 @@ describe("Probot", () => {
         logErrorCalls.push(args);
       };
 
-      probot.webhooks.on("push", () => {
+      probot.on("push", () => {
         throw new Error("No X-Hub-Signature-256 found on request");
       });
 
       try {
-        await probot.webhooks.receive(event);
+        await probot.receive(event);
         throw new Error("Should have thrown");
       } catch (e) {
         expect(logErrorCalls[0][1]).toBe(
@@ -198,14 +198,14 @@ describe("Probot", () => {
         logErrorCalls.push(args);
       };
 
-      probot.webhooks.on("push", () => {
+      probot.on("push", () => {
         throw Error(
           "webhooks:receiver ignored: POST / due to missing headers: x-hub-signature-256",
         );
       });
 
       try {
-        await probot.webhooks.receive(event);
+        await probot.receive(event);
         throw new Error("Should have thrown");
       } catch (e) {
         expect(logErrorCalls[0][1]).toBe(
@@ -222,14 +222,14 @@ describe("Probot", () => {
         logErrorCalls.push(args);
       };
 
-      probot.webhooks.onAny(() => {
+      probot.onAny(() => {
         throw new Error(
           "error:0906D06C:PEM routines:PEM_read_bio:no start line",
         );
       });
 
       try {
-        await probot.webhooks.receive(event);
+        await probot.receive(event);
         throw new Error("Should have thrown");
       } catch (e) {
         expect(logErrorCalls[0][1]).toBe(
@@ -246,14 +246,14 @@ describe("Probot", () => {
         logErrorCalls.push(args);
       };
 
-      probot.webhooks.onAny(() => {
+      probot.onAny(() => {
         throw new Error(
           '{"message":"A JSON web token could not be decoded","documentation_url":"https://developer.github.com/v3"}',
         );
       });
 
       try {
-        await probot.webhooks.receive(event);
+        await probot.receive(event);
         throw new Error("Should have thrown");
       } catch (e) {
         expect(logErrorCalls[0][1]).toBe(

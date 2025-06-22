@@ -21,7 +21,6 @@ import { rebindLog } from "./helpers/rebind-log.js";
 export type Constructor<T = any> = new (...args: any[]) => T;
 
 export class Probot {
-  static version = VERSION;
   static defaults<S extends Constructor>(
     this: S,
     defaults: Options,
@@ -40,13 +39,7 @@ export class Probot {
     return ProbotWithDefaults;
   }
 
-  public webhooks: ProbotWebhooks;
-  public webhookPath: string;
   public log: Logger;
-  public version: string;
-  public on: ProbotWebhooks["on"];
-  public onAny: ProbotWebhooks["onAny"];
-  public onError: ProbotWebhooks["onError"];
 
   #state: State;
 
@@ -101,19 +94,7 @@ export class Probot {
       server: options.server,
     };
 
-    this.webhooks = getWebhooks(this.#state);
-    this.webhookPath = this.#state.webhookPath;
-
-    this.on = this.webhooks.on;
-    this.onAny = this.webhooks.onAny;
-    this.onError = this.webhooks.onError;
-
-    this.version = VERSION;
-  }
-
-  public receive(event: WebhookEvent): Promise<void> {
-    this.log.debug({ event }, "Webhook received");
-    return this.webhooks.receive(event);
+    this.#state.webhooks = getWebhooks(this.#state);
   }
 
   public async auth(installationId?: number): Promise<ProbotOctokit> {
@@ -147,5 +128,38 @@ export class Probot {
 
     await appFn(this, options);
     return;
+  }
+
+  get webhooks(): ProbotWebhooks {
+    return this.#state.webhooks!;
+  }
+
+  public on: ProbotWebhooks["on"] = (eventName, callback) => {
+    this.#state.webhooks!.on(eventName, callback);
+  };
+
+  public onAny: ProbotWebhooks["onAny"] = (callback) => {
+    this.#state.webhooks!.onAny(callback);
+  };
+
+  public onError: ProbotWebhooks["onError"] = (callback) => {
+    this.#state.webhooks!.onError(callback);
+  };
+
+  public receive(event: WebhookEvent): Promise<void> {
+    this.log.debug({ event }, "Webhook received");
+    return this.#state.webhooks!.receive(event);
+  }
+
+  static get version(): string {
+    return VERSION;
+  }
+
+  get version(): string {
+    return VERSION;
+  }
+
+  get webhookPath(): string {
+    return this.#state.webhookPath;
   }
 }

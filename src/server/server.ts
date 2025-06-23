@@ -47,7 +47,7 @@ type State = {
   webhookPath: string;
   webhookProxy?: string;
   eventSource: EventSource | undefined;
-  httpLogger: ReturnType<typeof httpLogger>;
+  httpLogger?: ReturnType<typeof httpLogger>;
   handlers: Handler[];
   addedHandlers: Handler[];
   enablePing?: boolean;
@@ -59,20 +59,11 @@ export class Server {
   #state: State;
 
   constructor(options: ServerOptions = {} as ServerOptions) {
-    this.probotApp = new options.Probot({
-      request: options.request,
-      server: this,
-    });
-    this.log = options.log
-      ? rebindLog(options.log)
-      : rebindLog(this.probotApp.log.child({ name: "server" }));
-
     this.#state = {
       initialized: 0,
       initializedPromise: createDeferredPromise<void>(),
       probot: null,
       log: options.log,
-      httpLogger: httpLogger(this.log, options.loggingOptions),
       httpServer: new HttpServer(),
       cwd: options.cwd || process.cwd(),
       port: options.port || 3000,
@@ -123,7 +114,7 @@ export class Server {
       });
       this.#state.log = rebindLog(
         this.#state.log || this.#state.probot.log.child({ name: "server" }),
-      );*
+      );
 
       this.#state.httpLogger = httpLogger(
         this.#state.log,
@@ -222,7 +213,7 @@ export class Server {
 
       server.on("error", (error: NodeJS.ErrnoException) => {
         if (error.code === "EADDRINUSE") {
-          er/ror = Object.assign(error, {
+          error = Object.assign(error, {
             message: `Port ${this.#state.port} is already in use. You can define the PORT environment variable to use a different port.`,
           });
         }

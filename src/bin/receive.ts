@@ -168,6 +168,7 @@ export async function receive(args: string[]) {
   const appFn = await resolveAppFunction(
     path.resolve(process.cwd(), appFunctionFile),
   );
+
   await probot.load(appFn, {
     cwd: process.cwd(),
     addHandler: () => {
@@ -175,7 +176,8 @@ export async function receive(args: string[]) {
     },
   });
 
-  probot.log.debug("Receiving event", event);
+  log.debug("Receiving event", event);
+
   probot.receive({ name: event as any, payload, id: uuidv4() }).catch(() => {
     // Process must exist non-zero to indicate that the action failed to run
     process.exit(1);

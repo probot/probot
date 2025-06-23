@@ -56,7 +56,9 @@ type State = {
 };
 
 export class Server {
-  static version = VERSION;
+  public log: Logger;
+  public probotApp: Probot;
+  public handlers: Handler[] = [];
 
   #state: State;
 
@@ -195,31 +197,25 @@ export class Server {
     const runtimeVersion = getRuntimeVersion(globalThis);
 
     this.#state.log!.info(
-      `Running Probot v${this.version} (${runtimeName}: ${runtimeVersion})`,
+      `Running Probot v${VERSION} (${runtimeName}: ${runtimeVersion})`,
     );
     const printableHost = getPrintableHost(this.#state.host);
 
-    await new Promise<void>((resolve, reject) => {
+    this.#state.httpServer = await new Promise((resolve, reject) => {
       const server = this.#state.httpServer.listen(
         { port: this.#state.port, host: this.#state.host },
-        async () => {
-          let {
-            port,
-            address: host,
-            family,
-          } = this.#state.httpServer.address() as AddressInfo;
+        () => {
+          const { port, address, family } = server.address() as AddressInfo;
+
+          this.#state.port = port;
+          this.#state.host = address;
 
           if (family === "IPv6") {
-            host = `[${host}]`;
+            this.#state.host = `[${address}]`;
           }
 
-          this.#state.host = host;
-          this.#state.port = port;
-
-          this.#state.log!.info(
-            `Listening on http://${printableHost}:${this.#state.port}`,
-          );
-          resolve();
+          this.log.info(`Listening on http://${printableHost}:${port}`);
+          resolve(server);
         },
       );
 
@@ -270,5 +266,13 @@ export class Server {
 
   get host(): string {
     return this.#state.host;
+  }
+
+  static get version(): string {
+    return VERSION;
+  }
+
+  get version(): string {
+    return VERSION;
   }
 }

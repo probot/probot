@@ -37,6 +37,12 @@ type State = {
   webhookPath: string;
   webhookProxy?: string;
   eventSource: EventSource | undefined;
+  httpLogger: ReturnType<typeof httpLogger>;
+  handlers: Handler[];
+  addedHandlers: Handler[];
+  enablePing?: boolean;
+  enableNotFound?: boolean;
+  enableStaticFiles?: boolean;
 };
 
 export class Server {
@@ -50,16 +56,6 @@ export class Server {
   #state: State;
 
   constructor(options: ServerOptions = {} as ServerOptions) {
-    this.#state = {
-      httpServer: new HttpServer(),
-      cwd: options.cwd || process.cwd(),
-      port: options.port || 3000,
-      host: options.host || "localhost",
-      webhookPath: options.webhookPath || defaultWebhookPath,
-      webhookProxy: options.webhookProxy,
-      eventSource: undefined,
-    };
-
     this.probotApp = new options.Probot({
       request: options.request,
       server: this,
@@ -68,56 +64,43 @@ export class Server {
       ? rebindLog(options.log)
       : rebindLog(this.probotApp.log.child({ name: "server" }));
 
-    const logger = httpLogger(this.log, options.loggingOptions);
+    this.#state = {
+      httpLogger: httpLogger(this.log, options.loggingOptions),
+      httpServer: new HttpServer(),
+      cwd: options.cwd || process.cwd(),
+      port: options.port || 3000,
+      host: options.host || "localhost",
+      webhookPath: options.webhookPath || defaultWebhookPath,
+      webhookProxy: options.webhookProxy,
+      eventSource: undefined,
+      addedHandlers: [],
+      handlers: [],
+      enablePing: options.enablePing ?? true,
+      enableNotFound: options.enableNotFound ?? true,
+      enableStaticFiles: options.enableStaticFiles ?? true,
+    };
 
-    const {
-      enablePing = true,
-      enableNotFound = true,
-      enableStaticFiles = true,
-    } = options;
-
-    const mainHandler: Handler = async (req, res) => {
-      logger(req, res);
+    this.#state.httpServer.on("request", async (req, res) => {
+      this.#state.httpLogger!(req, res);
 
       try {
-        for (const handler of this.handlers) {
+        for (const handler of this.#state.handlers) {
           if (await handler(req, res)) {
             return true;
           }
         }
-
-        if (enableNotFound) {
-          notFoundHandler(req, res);
-        }
       } catch (e) {
-        this.log.error(e);
+        this.log!.error(e);
         res.writeHead(500).end();
         return true;
       }
 
       return false;
-    };
-
-    const webhookHandler = createNodeMiddleware(this.probotApp.webhooks, {
-      log: this.log,
-      path: this.#state.webhookPath,
     });
-
-    this.addHandler(webhookHandler);
-
-    if (enableStaticFiles) {
-      this.addHandler(staticFilesHandler);
-    }
-
-    if (enablePing) {
-      this.addHandler(pingHandler);
-    }
-
-    this.#state.httpServer.on("request", mainHandler);
   }
 
   public addHandler(handler: Handler) {
-    this.handlers.push(handler);
+    this.#state.addedHandlers.push(handler);
   }
 
   public async loadHandlerFactory(appFn: HandlerFactory) {
@@ -128,7 +111,7 @@ export class Server {
       },
     });
 
-    this.handlers.push(handler);
+    this.addHandler(handler);
   }
 
   public async load(appFn: ApplicationFunction) {
@@ -141,6 +124,29 @@ export class Server {
   }
 
   public async start(): Promise<HttpServer> {
+    this.#state.handlers = [];
+
+    if (this.#state.enableStaticFiles === true) {
+      this.#state.handlers.unshift(staticFilesHandler);
+    }
+
+    if (this.#state.enablePing === true) {
+      this.#state.handlers.unshift(pingHandler);
+    }
+
+    this.#state.handlers.unshift(
+      createNodeMiddleware(this.probotApp.webhooks, {
+        log: this.log,
+        path: this.#state.webhookPath,
+      }),
+    );
+
+    this.#state.handlers.push(...this.#state.addedHandlers);
+
+    if (this.#state.enableNotFound === true) {
+      this.#state.handlers.push(notFoundHandler);
+    }
+
     const runtimeName = getRuntimeName(globalThis);
     const runtimeVersion = getRuntimeVersion(globalThis);
 

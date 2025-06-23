@@ -56,10 +56,6 @@ type State = {
 };
 
 export class Server {
-  public log: Logger;
-  public probotApp: Probot;
-  public handlers: Handler[] = [];
-
   #state: State;
 
   constructor(options: ServerOptions = {} as ServerOptions) {
@@ -101,10 +97,6 @@ export class Server {
 
       return false;
     });
-  }
-
-  get version(): string {
-    return VERSION;
   }
 
   async #initialize(): Promise<void> {
@@ -214,7 +206,7 @@ export class Server {
             this.#state.host = `[${address}]`;
           }
 
-          this.log.info(`Listening on http://${printableHost}:${port}`);
+          this.#state.log!.info(`Listening on http://${printableHost}:${port}`);
           resolve(server);
         },
       );

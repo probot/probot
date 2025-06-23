@@ -1,4 +1,3 @@
-import { isIPv6 } from "node:net";
 import { Server as HttpServer } from "node:http";
 import type { AddressInfo } from "node:net";
 
@@ -40,10 +39,7 @@ type State = {
 };
 
 export class Server {
-  static version = VERSION;
-
   public log: Logger;
-  public version = VERSION;
   public probotApp: Probot;
   public handlers: Handler[] = [];
 
@@ -145,28 +141,32 @@ export class Server {
     const runtimeVersion = getRuntimeVersion(globalThis);
 
     this.log.info(
-      `Running Probot v${this.version} (${runtimeName}: ${runtimeVersion})`,
+      `Running Probot v${VERSION} (${runtimeName}: ${runtimeVersion})`,
     );
-    const { port, host, webhookPath, webhookProxy } = this.#state;
-    const printableHost = getPrintableHost(host);
+    const printableHost = getPrintableHost(this.#state.host);
 
     this.#state.httpServer = await new Promise((resolve, reject) => {
-      const server = this.#state.httpServer.listen({ port, host }, async () => {
-        this.#state.port = (server.address() as AddressInfo).port;
-        this.#state.host = (server.address() as AddressInfo).address;
+      const server = this.#state.httpServer.listen(
+        { port: this.#state.port, host: this.#state.host },
+        () => {
+          const { port, address, family } = server.address() as AddressInfo;
 
-        if (isIPv6(this.#state.host)) {
-          this.#state.host = `[${this.#state.host}]`;
-        }
+          this.#state.port = port;
+          this.#state.host = address;
 
-        this.log.info(`Listening on http://${printableHost}:${port}`);
-        resolve(server);
-      });
+          if (family === "IPv6") {
+            this.#state.host = `[${address}]`;
+          }
+
+          this.log.info(`Listening on http://${printableHost}:${port}`);
+          resolve(server);
+        },
+      );
 
       server.on("error", (error: NodeJS.ErrnoException) => {
         if (error.code === "EADDRINUSE") {
           error = Object.assign(error, {
-            message: `Port ${port} is already in use. You can define the PORT environment variable to use a different port.`,
+            message: `Port ${this.#state.port} is already in use. You can define the PORT environment variable to use a different port.`,
           });
         }
 
@@ -175,13 +175,13 @@ export class Server {
       });
     });
 
-    if (webhookProxy) {
+    if (this.#state.webhookProxy) {
       this.#state.eventSource = await createWebhookProxy({
         host: this.#state.host,
         port: this.#state.port,
-        path: webhookPath,
+        path: this.#state.webhookPath,
         logger: this.log,
-        url: webhookProxy,
+        url: this.#state.webhookProxy,
       });
     }
 
@@ -210,5 +210,13 @@ export class Server {
 
   get host(): string {
     return this.#state.host;
+  }
+
+  static get version(): string {
+    return VERSION;
+  }
+
+  get version(): string {
+    return VERSION;
   }
 }

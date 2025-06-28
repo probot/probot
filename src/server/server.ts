@@ -27,10 +27,6 @@ import { httpLogger } from "./handlers/http-logger.js";
 import { notFoundHandler } from "./handlers/not-found.js";
 import { pingHandler } from "./handlers/ping.js";
 import { staticFilesHandler } from "./handlers/static-files.js";
-import {
-  createDeferredPromise,
-  type DeferredPromise,
-} from "../helpers/create-deferred-promise.js";
 
 // the default path as defined in @octokit/webhooks
 export const defaultWebhookPath = "/api/github/webhooks";

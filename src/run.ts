@@ -1,4 +1,5 @@
 import { packageConfig } from "package-config";
+import type { Logger } from "pino";
 
 import type {
   ApplicationFunction,
@@ -14,9 +15,10 @@ import { Server } from "./server/server.js";
 import { defaultApp as defaultAppHandler } from "./apps/default.js";
 import { resolveAppFunction } from "./helpers/resolve-app-function.js";
 import { isProduction } from "./helpers/is-production.js";
-import { type Logger, Probot, type ProbotOctokit } from "./exports.js";
 import { config as dotenvConfig } from "dotenv";
 import { updateEnv } from "./helpers/update-env.js";
+import { Probot } from "./probot.js";
+import type { ProbotOctokit } from "./octokit/probot-octokit.js";
 
 type AdditionalOptions = {
   env?: Env;

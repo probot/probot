@@ -5,7 +5,10 @@ import {
 import type { Logger } from "pino";
 import { Lru } from "toad-cache";
 
-import { createDeferredPromise } from "./helpers/create-deferred-promise.js";
+import {
+  createDeferredPromise,
+  type DeferredPromise,
+} from "./helpers/create-deferred-promise.js";
 import { getAuthenticatedOctokit } from "./octokit/get-authenticated-octokit.js";
 import { getLog } from "./helpers/get-log.js";
 import { getProbotOctokitWithDefaults } from "./octokit/get-probot-octokit-with-defaults.js";
@@ -17,12 +20,51 @@ import type {
   ApplicationFunctionOptions,
   Options,
   ProbotWebhooks,
-  State,
 } from "./types.js";
-import { defaultWebhookPath, defaultWebhookSecret } from "./server/server.js";
+import {
+  defaultWebhookPath,
+  defaultWebhookSecret,
+  Server,
+} from "./server/server.js";
 import { rebindLog } from "./helpers/rebind-log.js";
+import type { RequestRequestOptions } from "@octokit/types";
+import type { RedisOptions } from "ioredis";
 
 export type Constructor<T = any> = new (...args: any[]) => T;
+
+const UNINITIALIZED = 0b000;
+const INITIALIZED = 0b001;
+const INITIALIZING = 0b010;
+const ERRORED = 0b101;
+
+type InitializationState =
+  | typeof UNINITIALIZED
+  | typeof INITIALIZING
+  | typeof INITIALIZED
+  | typeof ERRORED;
+
+export type State = {
+  initializationState: InitializationState;
+  initializedPromise: DeferredPromise<void>;
+  cache: Lru<string> | null;
+  octokit: ProbotOctokit | null;
+  webhooks: ProbotWebhooks | null;
+  log: Logger;
+  logLevel?: "trace" | "debug" | "info" | "warn" | "error" | "fatal";
+  logMessageKey?: string;
+  appId?: number;
+  privateKey?: string;
+  githubToken?: string;
+  OctokitBase: typeof ProbotOctokit;
+  port?: number;
+  host?: string;
+  baseUrl?: string;
+  redisConfig?: RedisOptions | string;
+  webhookPath: string;
+  webhookSecret: string;
+  request?: RequestRequestOptions;
+  server?: Server | void;
+};
 
 export class Probot {
   static defaults<S extends Constructor>(
@@ -57,7 +99,7 @@ export class Probot {
     }
 
     this.#state = {
-      initialized: 0,
+      initializationState: UNINITIALIZED,
       initializedPromise: createDeferredPromise<void>(),
       cache: null,
       octokit: null,
@@ -81,15 +123,11 @@ export class Probot {
   }
 
   async #initialize(): Promise<void> {
-    if (
-      this.#state.initialized === 1 ||
-      this.#state.initialized === 2 ||
-      this.#state.initialized instanceof Error
-    ) {
+    if (this.#state.initializationState !== UNINITIALIZED) {
       return this.#state.initializedPromise.promise;
     }
 
-    this.#state.initialized = 1;
+    this.#state.initializationState = INITIALIZING;
 
     try {
       // TODO: support redis backend for access token cache if `options.redisConfig`
@@ -126,11 +164,11 @@ export class Probot {
         webhookSecret: this.#state.webhookSecret,
       });
 
-      this.#state.initialized = 2;
+      this.#state.initializationState = INITIALIZED;
       this.#state.initializedPromise.resolve();
     } catch (error) {
       this.#state.log.error({ err: error }, "Failed to initialize Probot");
-      this.#state.initialized = error as Error;
+      this.#state.initializationState = ERRORED;
       this.#state.initializedPromise.reject(error);
     } finally {
       return this.#state.initializedPromise.promise;

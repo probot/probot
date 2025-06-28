@@ -7,10 +7,10 @@ import { parseArgs } from "node:util";
 import { config as dotenvConfig } from "dotenv";
 dotenvConfig();
 
+import { Probot } from "../probot.js";
 import { getPrivateKey } from "@probot/get-private-key";
 import { getLog } from "../helpers/get-log.js";
 
-import { Probot } from "../exports.js";
 import { resolveAppFunction } from "../helpers/resolve-app-function.js";
 import { validateLogFormat } from "../helpers/validate-log-format.js";
 import { validateLogLevel } from "../helpers/validate-log-level.js";

@@ -7,12 +7,11 @@ import type {
 import type { RedisOptions } from "ioredis";
 import type { Logger } from "pino";
 import type { Options as LoggingOptions } from "pino-http";
-import type { Lru } from "toad-cache";
 
-import type { Probot, Server } from "./exports.js";
+import type { Server } from "./server/server.js";
+import type { Probot } from "./probot.js";
 import type { Context } from "./context.js";
 import type { ProbotOctokit } from "./octokit/probot-octokit.js";
-import type { DeferredPromise } from "./helpers/create-deferred-promise.js";
 
 export interface Options {
   privateKey?: string;
@@ -32,38 +31,6 @@ export interface Options {
   webhookPath?: string;
   webhookProxy?: string;
 }
-
-export type State = {
-  initializedPromise: DeferredPromise<void>;
-  log: Logger;
-  logLevel?: "trace" | "debug" | "info" | "warn" | "error" | "fatal";
-  logMessageKey?: string;
-  appId?: number;
-  privateKey?: string;
-  githubToken?: string;
-  OctokitBase: typeof ProbotOctokit;
-  port?: number;
-  host?: string;
-  baseUrl?: string;
-  redisConfig?: RedisOptions | string;
-  webhookPath: string;
-  webhookSecret: string;
-  request?: RequestRequestOptions;
-  server?: Server | void;
-} & (
-  | {
-      initialized: 0 | Error;
-      cache: null;
-      octokit: null;
-      webhooks: null;
-    }
-  | {
-      initialized: 1 | 2;
-      cache: Lru<string>;
-      octokit: ProbotOctokit;
-      webhooks: ProbotWebhooks;
-    }
-);
 
 // Omit the `payload`, `id`,`name` properties from the `Context` class as they are already present in the types of `WebhookEvent`
 // The `Webhooks` class accepts a type parameter (`TTransformed`) that is used to transform the event payload in the form of

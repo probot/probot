@@ -7,18 +7,18 @@ import type {
   Options,
   ServerOptions,
 } from "./types.js";
+import type { ProbotOctokit } from "./octokit/probot-octokit.js";
 import { setupAppFactory } from "./apps/setup.js";
 import { getLog } from "./helpers/get-log.js";
 import { readCliOptions } from "./bin/read-cli-options.js";
 import { readEnvOptions } from "./bin/read-env-options.js";
-import { Server } from "./server/server.js";
 import { defaultApp as defaultAppHandler } from "./apps/default.js";
+import { Server } from "./server/server.js";
 import { resolveAppFunction } from "./helpers/resolve-app-function.js";
 import { isProduction } from "./helpers/is-production.js";
 import { config as dotenvConfig } from "dotenv";
 import { updateEnv } from "./helpers/update-env.js";
 import { Probot } from "./probot.js";
-import type { ProbotOctokit } from "./octokit/probot-octokit.js";
 
 type AdditionalOptions = {
   env?: Env;

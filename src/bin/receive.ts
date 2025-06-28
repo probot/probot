@@ -4,12 +4,12 @@ import path from "node:path";
 import { randomUUID as uuidv4 } from "node:crypto";
 import { parseArgs } from "node:util";
 
+import { getPrivateKey } from "@probot/get-private-key";
 import { config as dotenvConfig } from "dotenv";
 dotenvConfig();
 
-import { Probot } from "../probot.js";
-import { getPrivateKey } from "@probot/get-private-key";
 import { getLog } from "../helpers/get-log.js";
+import { Probot } from "../probot.js";
 
 import { resolveAppFunction } from "../helpers/resolve-app-function.js";
 import { validateLogFormat } from "../helpers/validate-log-format.js";

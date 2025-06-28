@@ -4,7 +4,7 @@ import type { AddressInfo } from "node:net";
 import type { RequestRequestOptions } from "@octokit/types";
 import type { Logger } from "pino";
 
-import { createWebhookProxy } from "../helpers/webhook-proxy.js";
+import type { Probot } from "../probot.js";
 import { VERSION } from "../version.js";
 import type {
   ApplicationFunction,
@@ -12,12 +12,16 @@ import type {
   HandlerFactory,
   ServerOptions,
 } from "../types.js";
-import type { Probot } from "../exports.js";
 
-import { rebindLog } from "../helpers/rebind-log.js";
+import {
+  createDeferredPromise,
+  type DeferredPromise,
+} from "../helpers/create-deferred-promise.js";
+import { createWebhookProxy } from "../helpers/webhook-proxy.js";
 import { getPrintableHost } from "../helpers/get-printable-host.js";
 import { getRuntimeName } from "../helpers/get-runtime-name.js";
 import { getRuntimeVersion } from "../helpers/get-runtime-version.js";
+import { rebindLog } from "../helpers/rebind-log.js";
 
 import { httpLogger } from "./handlers/http-logger.js";
 import { notFoundHandler } from "./handlers/not-found.js";
@@ -32,9 +36,20 @@ import {
 export const defaultWebhookPath = "/api/github/webhooks";
 export const defaultWebhookSecret = "development";
 
+const UNINITIALIZED = 0b000;
+const INITIALIZED = 0b001;
+const INITIALIZING = 0b010;
+const ERRORED = 0b101;
+
+type InitializationState =
+  | typeof UNINITIALIZED
+  | typeof INITIALIZING
+  | typeof INITIALIZED
+  | typeof ERRORED;
+
 type State = {
-  initialized: 0 | 1 | 2 | Error;
-  initializedPromise: DeferredPromise<void>;
+  initializationState: InitializationState;
+  initializationPromise: DeferredPromise<void>;
   cwd: string;
   httpServer: HttpServer;
   port: number;
@@ -50,9 +65,9 @@ type State = {
   httpLogger?: ReturnType<typeof httpLogger>;
   handlers: Handler[];
   addedHandlers: Handler[];
-  enablePing?: boolean;
-  enableNotFound?: boolean;
-  enableStaticFiles?: boolean;
+  enablePing: boolean;
+  enableNotFound: boolean;
+  enableStaticFiles: boolean;
 };
 
 export class Server {
@@ -60,8 +75,8 @@ export class Server {
 
   constructor(options: ServerOptions = {} as ServerOptions) {
     this.#state = {
-      initialized: 0,
-      initializedPromise: createDeferredPromise<void>(),
+      initializationState: UNINITIALIZED,
+      initializationPromise: createDeferredPromise<void>(),
       probot: null,
       log: options.log,
       httpServer: new HttpServer(),
@@ -100,11 +115,11 @@ export class Server {
   }
 
   async #initialize(): Promise<void> {
-    if (this.#state.initialized !== 0) {
-      return this.#state.initializedPromise.promise;
+    if ((this.#state.initializationState & INITIALIZED) === INITIALIZED) {
+      return this.#state.initializationPromise.promise;
     }
 
-    this.#state.initialized = 1;
+    this.#state.initializationState = INITIALIZING;
 
     try {
       this.#state.probot = new this.#state.ProbotBase({
@@ -121,18 +136,18 @@ export class Server {
         this.#state.loggingOptions,
       );
 
-      this.#state.initialized = 2;
-      this.#state.initializedPromise.resolve();
+      this.#state.initializationState = INITIALIZED;
+      this.#state.initializationPromise.resolve();
     } catch (error) {
-      this.#state.initialized = error as Error;
-      this.#state.initializedPromise.reject(error);
+      this.#state.initializationState = ERRORED;
+      this.#state.initializationPromise.reject(error);
       (this.#state.log || console).error(
         { err: error },
         "Failed to initialize Server",
       );
       throw error;
     } finally {
-      return this.#state.initializedPromise.promise;
+      return this.#state.initializationPromise.promise;
     }
   }
 

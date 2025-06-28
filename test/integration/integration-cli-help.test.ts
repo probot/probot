@@ -20,7 +20,7 @@ async function prepareTestProjectWithProbot() {
       cwd: projectRoot,
     });
   } catch (error: any) {
-    if (error.code === "EEXIST") {
+    if (error.message.includes("EEXIST")) {
       // Ignore the error if probot is already linked
       console.warn("Probot is already linked, skipping npm link.");
     } else {

@@ -6,8 +6,9 @@ import type {
 import type { RedisOptions } from "ioredis";
 import type { Options as LoggingOptions } from "pino-http";
 
-import type { Probot, Server } from "./exports.js";
 import type { Context } from "./context.js";
+import type { Probot } from "./probot.js";
+import type { Server } from "./server/server.js";
 import type { ProbotOctokit } from "./octokit/probot-octokit.js";
 
 import type { Logger } from "pino";

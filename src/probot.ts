@@ -1,6 +1,7 @@
 import type { RequestRequestOptions } from "@octokit/types";
 import {
   createNodeMiddleware,
+  validateEventName,
   type EmitterWebhookEvent as WebhookEvent,
 } from "@octokit/webhooks";
 import type { RedisOptions } from "ioredis";
@@ -29,7 +30,6 @@ import {
   Server,
 } from "./server/server.js";
 import { rebindLog } from "./helpers/rebind-log.js";
-import { validateOnEventName } from "./helpers/validateOnEventName.js";
 
 export type Constructor<T = any> = new (...args: any[]) => T;
 
@@ -257,12 +257,12 @@ export class Probot {
   public on: ProbotWebhooks["on"] = (eventName, callback) => {
     if (Array.isArray(eventName)) {
       for (const name of eventName) {
-        validateOnEventName(name, {
+        validateEventName(name, {
           onUnknownEventName: "ignore",
         });
       }
     } else {
-      validateOnEventName(eventName, {
+      validateEventName(eventName, {
         onUnknownEventName: "ignore",
       });
     }

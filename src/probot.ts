@@ -263,14 +263,12 @@ export class Probot {
     if (Array.isArray(eventName)) {
       for (const name of eventName) {
         validateOnEventName(name, {
-          onUnknownEventName: "warn",
-          log: { warn: () => {}},
+          onUnknownEventName: "ignore",
         });
       }
     } else {
       validateOnEventName(eventName, {
-        onUnknownEventName: "warn",
-        log: { warn: () => {}},
+        onUnknownEventName: "ignore",
       });
     }
 

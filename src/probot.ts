@@ -1,5 +1,4 @@
 import type { RequestRequestOptions } from "@octokit/types";
-import type { EmitterWebhookEventName } from "@octokit/webhooks/types";
 import {
   createNodeMiddleware,
   type EmitterWebhookEvent as WebhookEvent,
@@ -45,16 +44,14 @@ type InitializationState =
   | typeof INITIALIZED
   | typeof ERRORED;
 
-type InitializationHandlerCache = {
-  on: [EmitterWebhookEventName | EmitterWebhookEventName[], any][];
-  onAny: any[];
-  onError: any[];
-};
+type OnHandler = ["on", any, any];
+type OnAnyHandler = ["onAny", any];
+type OnErrorHandler = ["onError", any];
 
 export type State = {
   initializationState: InitializationState;
   initializedPromise: DeferredPromise<void>;
-  initializationHandlerCache: InitializationHandlerCache;
+  initEventListeners: (OnHandler | OnAnyHandler | OnErrorHandler)[];
   cache: Lru<string> | null;
   octokit: ProbotOctokit | null;
   webhooks: ProbotWebhooks | null;
@@ -110,11 +107,7 @@ export class Probot {
     this.#state = {
       initializationState: UNINITIALIZED,
       initializedPromise: createDeferredPromise<void>(),
-      initializationHandlerCache: {
-        on: [],
-        onAny: [],
-        onError: [],
-      },
+      initEventListeners: [],
       cache: null,
       octokit: null,
       webhooks: null,
@@ -180,19 +173,21 @@ export class Probot {
 
       this.#state.initializationState = INITIALIZED;
 
-      // set up webhooks handlers
-      for (const [eventName, callback] of this.#state.initializationHandlerCache
-        .on) {
-        this.#state.webhooks!.on(eventName, callback);
+      for (const [type, listener, name] of this.#state.initEventListeners) {
+        switch (type) {
+          case "on":
+            this.#state.webhooks.on(name, listener);
+            break;
+          case "onAny":
+            this.#state.webhooks.onAny(listener);
+            break;
+          case "onError":
+            this.#state.webhooks.onError(listener);
+            break;
+        }
       }
 
-      for (const callback of this.#state.initializationHandlerCache.onAny) {
-        this.#state.webhooks!.onAny(callback);
-      }
-
-      for (const callback of this.#state.initializationHandlerCache.onError) {
-        this.#state.webhooks!.onError(callback);
-      }
+      this.#state.initEventListeners.length = 0;
 
       this.#state.initializedPromise.resolve();
     } catch (error) {
@@ -272,8 +267,8 @@ export class Probot {
       });
     }
 
-    if (this.#state.initializationState === UNINITIALIZED) {
-      this.#state.initializationHandlerCache.on.push([eventName, callback]);
+    if (this.#state.initializationState !== INITIALIZED) {
+      this.#state.initEventListeners.push(["on", callback, eventName]);
       return;
     }
 
@@ -281,16 +276,16 @@ export class Probot {
   };
 
   public onAny: ProbotWebhooks["onAny"] = (callback) => {
-    if (this.#state.initializationState === UNINITIALIZED) {
-      this.#state.initializationHandlerCache.onAny.push(callback);
+    if (this.#state.initializationState !== INITIALIZED) {
+      this.#state.initEventListeners.push(["onAny", callback]);
       return;
     }
     this.#state.webhooks!.onAny(callback);
   };
 
   public onError: ProbotWebhooks["onError"] = (callback) => {
-    if (this.#state.initializationState === UNINITIALIZED) {
-      this.#state.initializationHandlerCache.onError.push(callback);
+    if (this.#state.initializationState !== INITIALIZED) {
+      this.#state.initEventListeners.push(["onError", callback]);
       return;
     }
     this.#state.webhooks!.onError(callback);

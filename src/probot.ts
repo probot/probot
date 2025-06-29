@@ -1,7 +1,10 @@
+import type { RequestRequestOptions } from "@octokit/types";
+import type { EmitterWebhookEventName } from "@octokit/webhooks/types";
 import {
   createNodeMiddleware,
   type EmitterWebhookEvent as WebhookEvent,
 } from "@octokit/webhooks";
+import type { RedisOptions } from "ioredis";
 import type { Logger } from "pino";
 import { Lru } from "toad-cache";
 
@@ -27,8 +30,7 @@ import {
   Server,
 } from "./server/server.js";
 import { rebindLog } from "./helpers/rebind-log.js";
-import type { RequestRequestOptions } from "@octokit/types";
-import type { RedisOptions } from "ioredis";
+import { validateOnEventName } from "./helpers/validateOnEventName.js";
 
 export type Constructor<T = any> = new (...args: any[]) => T;
 
@@ -43,9 +45,16 @@ type InitializationState =
   | typeof INITIALIZED
   | typeof ERRORED;
 
+type InitializationHandlerCache = {
+  on: [EmitterWebhookEventName | EmitterWebhookEventName[], any][];
+  onAny: any[];
+  onError: any[];
+};
+
 export type State = {
   initializationState: InitializationState;
   initializedPromise: DeferredPromise<void>;
+  initializationHandlerCache: InitializationHandlerCache;
   cache: Lru<string> | null;
   octokit: ProbotOctokit | null;
   webhooks: ProbotWebhooks | null;
@@ -101,6 +110,11 @@ export class Probot {
     this.#state = {
       initializationState: UNINITIALIZED,
       initializedPromise: createDeferredPromise<void>(),
+      initializationHandlerCache: {
+        on: [],
+        onAny: [],
+        onError: [],
+      },
       cache: null,
       octokit: null,
       webhooks: null,
@@ -165,6 +179,21 @@ export class Probot {
       });
 
       this.#state.initializationState = INITIALIZED;
+
+      // set up webhooks handlers
+      for (const [eventName, callback] of this.#state.initializationHandlerCache
+        .on) {
+        this.#state.webhooks!.on(eventName, callback);
+      }
+
+      for (const callback of this.#state.initializationHandlerCache.onAny) {
+        this.#state.webhooks!.onAny(callback);
+      }
+
+      for (const callback of this.#state.initializationHandlerCache.onError) {
+        this.#state.webhooks!.onError(callback);
+      }
+
       this.#state.initializedPromise.resolve();
     } catch (error) {
       this.#state.log.error({ err: error }, "Failed to initialize Probot");
@@ -231,14 +260,41 @@ export class Probot {
   }
 
   public on: ProbotWebhooks["on"] = (eventName, callback) => {
+    if (Array.isArray(eventName)) {
+      for (const name of eventName) {
+        validateOnEventName(name, {
+          onUnknownEventName: "warn",
+          log: { warn: () => {}},
+        });
+      }
+    } else {
+      validateOnEventName(eventName, {
+        onUnknownEventName: "warn",
+        log: { warn: () => {}},
+      });
+    }
+
+    if (this.#state.initializationState === UNINITIALIZED) {
+      this.#state.initializationHandlerCache.on.push([eventName, callback]);
+      return;
+    }
+
     this.#state.webhooks!.on(eventName, callback);
   };
 
   public onAny: ProbotWebhooks["onAny"] = (callback) => {
+    if (this.#state.initializationState === UNINITIALIZED) {
+      this.#state.initializationHandlerCache.onAny.push(callback);
+      return;
+    }
     this.#state.webhooks!.onAny(callback);
   };
 
   public onError: ProbotWebhooks["onError"] = (callback) => {
+    if (this.#state.initializationState === UNINITIALIZED) {
+      this.#state.initializationHandlerCache.onError.push(callback);
+      return;
+    }
     this.#state.webhooks!.onError(callback);
   };
 

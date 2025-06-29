@@ -46,8 +46,6 @@ export async function createNodeMiddleware(
 > {
   const handlers: Handler[] = [];
 
-  await probot.ready();
-
   probot.load(appFn, {
     cwd: process.cwd(),
     addHandler: (handler) => {

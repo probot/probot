@@ -147,17 +147,18 @@ describe("Probot", () => {
         },
       });
 
-      await new Probot({ Octokit: MyOctokit, appId, privateKey }).ready();
+      const probot = new Probot({ Octokit: MyOctokit, appId, privateKey });
 
+      await probot.ready();
       expect(pluginCalls.length).toBe(1);
       expect(pluginCalls[0].throttle?.enabled).toBe(true);
     });
 
     it("sets version", async () => {
-      const probot = await new Probot({
+      const probot = new Probot({
         appId,
         privateKey,
-      }).ready();
+      });
       expect(probot.version).toBe("0.0.0-development");
     });
   });
@@ -170,12 +171,17 @@ describe("Probot", () => {
     };
 
     it("responds with the correct error if webhook secret does not match", async () => {
-      const probot = await new Probot({ githubToken: "faketoken" }).ready();
-
-      const logErrorCalls: any[] = [];
-      probot.log.error = (...args: any[]) => {
-        logErrorCalls.push(args);
+      const output: any[] = [];
+      const streamLogsToOutput = new Stream.Writable({ objectMode: true });
+      streamLogsToOutput._write = (object, _encoding, done) => {
+        output.push(JSON.parse(object));
+        done();
       };
+
+      const probot = new Probot({
+        githubToken: "faketoken",
+        log: pino(streamLogsToOutput),
+      });
 
       probot.on("push", () => {
         throw new Error("X-Hub-Signature-256 does not match blob signature");
@@ -185,19 +191,26 @@ describe("Probot", () => {
         await probot.receive(event);
         throw new Error("Should have thrown");
       } catch (e) {
-        expect(logErrorCalls[0][1]).toBe(
+        expect(output.length).toBe(1);
+        expect(output[0].level).toBe(50); // 50 is the error level in pino
+        expect(output[0].msg).toBe(
           "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
         );
       }
     });
 
     it("responds with the correct error if webhook secret is not found", async () => {
-      const probot = await new Probot({ githubToken: "faketoken" }).ready();
-
-      const logErrorCalls: any[] = [];
-      probot.log.error = (...args: any[]) => {
-        logErrorCalls.push(args);
+      const output: any[] = [];
+      const streamLogsToOutput = new Stream.Writable({ objectMode: true });
+      streamLogsToOutput._write = (object, _encoding, done) => {
+        output.push(JSON.parse(object));
+        done();
       };
+
+      const probot = new Probot({
+        githubToken: "faketoken",
+        log: pino(streamLogsToOutput),
+      });
 
       probot.on("push", () => {
         throw new Error("No X-Hub-Signature-256 found on request");
@@ -207,19 +220,26 @@ describe("Probot", () => {
         await probot.receive(event);
         throw new Error("Should have thrown");
       } catch (e) {
-        expect(logErrorCalls[0][1]).toBe(
+        expect(output.length).toBe(1);
+        expect(output[0].level).toBe(50); // 50 is the error level in pino
+        expect(output[0].msg).toBe(
           "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
         );
       }
     });
 
     it("responds with the correct error if webhook secret is wrong", async () => {
-      const probot = await new Probot({ githubToken: "faketoken" }).ready();
-
-      const logErrorCalls: any[] = [];
-      probot.log.error = (...args: any[]) => {
-        logErrorCalls.push(args);
+      const output: any[] = [];
+      const streamLogsToOutput = new Stream.Writable({ objectMode: true });
+      streamLogsToOutput._write = (object, _encoding, done) => {
+        output.push(JSON.parse(object));
+        done();
       };
+
+      const probot = new Probot({
+        githubToken: "faketoken",
+        log: pino(streamLogsToOutput),
+      });
 
       probot.on("push", () => {
         throw Error(
@@ -231,19 +251,26 @@ describe("Probot", () => {
         await probot.receive(event);
         throw new Error("Should have thrown");
       } catch (e) {
-        expect(logErrorCalls[0][1]).toBe(
+        expect(output.length).toBe(1);
+        expect(output[0].level).toBe(50); // 50 is the error level in pino
+        expect(output[0].msg).toBe(
           "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
         );
       }
     });
 
     it("responds with the correct error if the PEM file is missing", async () => {
-      const probot = await new Probot({ githubToken: "faketoken" }).ready();
-
-      const logErrorCalls: any[] = [];
-      probot.log.error = (...args: any[]) => {
-        logErrorCalls.push(args);
+      const output: any[] = [];
+      const streamLogsToOutput = new Stream.Writable({ objectMode: true });
+      streamLogsToOutput._write = (object, _encoding, done) => {
+        output.push(JSON.parse(object));
+        done();
       };
+
+      const probot = new Probot({
+        githubToken: "faketoken",
+        log: pino(streamLogsToOutput),
+      });
 
       probot.onAny(() => {
         throw new Error(
@@ -255,19 +282,26 @@ describe("Probot", () => {
         await probot.receive(event);
         throw new Error("Should have thrown");
       } catch (e) {
-        expect(logErrorCalls[0][1]).toBe(
+        expect(output.length).toBe(1);
+        expect(output[0].level).toBe(50); // 50 is the error level in pino
+        expect(output[0].msg).toBe(
           "Your private key (a .pem file or PRIVATE_KEY environment variable) or APP_ID is incorrect. Go to https://github.com/settings/apps/YOUR_APP, verify that APP_ID is set correctly, and generate a new PEM file if necessary.",
         );
       }
     });
 
     it("responds with the correct error if the jwt could not be decoded", async () => {
-      const probot = await new Probot({ githubToken: "faketoken" }).ready();
-
-      const logErrorCalls: any[] = [];
-      probot.log.error = (...args: any[]) => {
-        logErrorCalls.push(args);
+      const output: any[] = [];
+      const streamLogsToOutput = new Stream.Writable({ objectMode: true });
+      streamLogsToOutput._write = (object, _encoding, done) => {
+        output.push(JSON.parse(object));
+        done();
       };
+
+      const probot = new Probot({
+        githubToken: "faketoken",
+        log: pino(streamLogsToOutput),
+      });
 
       probot.onAny(() => {
         throw new Error(
@@ -279,7 +313,9 @@ describe("Probot", () => {
         await probot.receive(event);
         throw new Error("Should have thrown");
       } catch (e) {
-        expect(logErrorCalls[0][1]).toBe(
+        expect(output.length).toBe(1);
+        expect(output[0].level).toBe(50); // 50 is the error level in pino
+        expect(output[0].msg).toBe(
           "Your private key (a .pem file or PRIVATE_KEY environment variable) or APP_ID is incorrect. Go to https://github.com/settings/apps/YOUR_APP, verify that APP_ID is set correctly, and generate a new PEM file if necessary.",
         );
       }
@@ -390,10 +426,10 @@ describe("Probot", () => {
 
   describe("on", () => {
     it("calls callback when no action is specified", async () => {
-      const probot = await new Probot({
+      const probot = new Probot({
         appId,
         privateKey,
-      }).ready();
+      });
 
       const event: WebhookEvent<"pull_request"> = {
         id: "123-456",
@@ -417,10 +453,10 @@ describe("Probot", () => {
     });
 
     it("calls callback with same action", async () => {
-      const probot = await new Probot({
+      const probot = new Probot({
         appId,
         privateKey,
-      }).ready();
+      });
 
       let callCount = 0;
       probot.on("pull_request.opened", () => {
@@ -438,10 +474,10 @@ describe("Probot", () => {
     });
 
     it("does not call callback with different action", async () => {
-      const probot = await new Probot({
+      const probot = new Probot({
         appId,
         privateKey,
-      }).ready();
+      });
 
       let hasBeenCalled = 0;
 
@@ -460,10 +496,10 @@ describe("Probot", () => {
     });
 
     it("calls callback with onAny", async () => {
-      const probot = await new Probot({
+      const probot = new Probot({
         appId,
         privateKey,
-      }).ready();
+      });
 
       let callCount = 0;
       probot.onAny(() => {
@@ -481,10 +517,10 @@ describe("Probot", () => {
     });
 
     it("calls callback x amount of times when an array of x actions is passed", async () => {
-      const probot = await new Probot({
+      const probot = new Probot({
         appId,
         privateKey,
-      }).ready();
+      });
 
       const event: WebhookEvent<"pull_request.opened"> = {
         id: "123-456",
@@ -514,11 +550,11 @@ describe("Probot", () => {
         done();
       };
 
-      const probot = await new Probot({
+      const probot = new Probot({
         appId,
         privateKey,
         log: pino(streamLogsToOutput),
-      }).ready();
+      });
 
       const handlerCalls: Context[] = [];
       const handler = (context: Context) => {
@@ -572,13 +608,13 @@ describe("Probot", () => {
           },
         );
 
-      const probot = await new Probot({
+      const probot = new Probot({
         appId,
         privateKey,
         request: {
           fetch: mock.fetchHandler,
         },
-      }).ready();
+      });
       const event: WebhookEvent<"installation.created"> = {
         id: "123-456",
         name: "installation",
@@ -609,13 +645,13 @@ describe("Probot", () => {
         },
       );
 
-      const probot = await new Probot({
+      const probot = new Probot({
         appId,
         privateKey,
         request: {
           fetch: mock.fetchHandler,
         },
-      }).ready();
+      });
 
       const event: WebhookEvent<"installation.deleted"> = {
         id: "123-456",
@@ -647,13 +683,13 @@ describe("Probot", () => {
         },
       );
 
-      const probot = await new Probot({
+      const probot = new Probot({
         appId,
         privateKey,
         request: {
           fetch: mock.fetchHandler,
         },
-      }).ready();
+      });
 
       const event: WebhookEvent<"check_run"> = {
         id: "123-456",
@@ -673,10 +709,10 @@ describe("Probot", () => {
 
   describe("receive", () => {
     it("delivers the event", async () => {
-      const probot = await new Probot({
+      const probot = new Probot({
         appId,
         privateKey,
-      }).ready();
+      });
 
       let callCount = 0;
       probot.on("pull_request", () => ++callCount);
@@ -693,10 +729,10 @@ describe("Probot", () => {
     });
 
     it("waits for async events to resolve", async () => {
-      const probot = await new Probot({
+      const probot = new Probot({
         appId,
         privateKey,
-      }).ready();
+      });
 
       let callCount = 0;
 
@@ -721,11 +757,11 @@ describe("Probot", () => {
     });
 
     it("returns a reject errors thrown in apps", async () => {
-      const probot = await new Probot({
+      const probot = new Probot({
         appId,
         privateKey,
         log: pino({ enabled: false }),
-      }).ready();
+      });
 
       probot.on("pull_request", () => {
         throw new Error("error from app");
@@ -753,11 +789,11 @@ describe("Probot", () => {
         done();
       };
 
-      const probot = await new Probot({
+      const probot = new Probot({
         appId,
         privateKey,
         log: pino(streamLogsToOutput),
-      }).ready();
+      });
 
       // @ts-expect-error
       probot.on("unknown-event", () => {});

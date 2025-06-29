@@ -4,6 +4,7 @@ import path from "node:path";
 import { randomUUID as uuidv4 } from "node:crypto";
 import { parseArgs } from "node:util";
 
+import { validateEventName } from "@octokit/webhooks";
 import { getPrivateKey } from "@probot/get-private-key";
 import { config as dotenvConfig } from "dotenv";
 dotenvConfig();
@@ -14,7 +15,6 @@ import { Probot } from "../probot.js";
 import { resolveAppFunction } from "../helpers/resolve-app-function.js";
 import { validateLogFormat } from "../helpers/validate-log-format.js";
 import { validateLogLevel } from "../helpers/validate-log-level.js";
-import { validateEventName } from "../helpers/validate-event-name.js";
 
 function printHelp() {
   console.log(`Usage: probot receive [options] [path/to/app.js...]

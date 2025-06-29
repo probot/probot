@@ -27,7 +27,7 @@ import type {
 import {
   defaultWebhookPath,
   defaultWebhookSecret,
-  Server,
+  type Server,
 } from "./server/server.js";
 import { rebindLog } from "./helpers/rebind-log.js";
 

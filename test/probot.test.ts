@@ -170,12 +170,17 @@ describe("Probot", () => {
     };
 
     it("responds with the correct error if webhook secret does not match", async () => {
-      const probot = new Probot({ githubToken: "faketoken" });
-
-      const logErrorCalls: any[] = [];
-      probot.log.error = (...args: any[]) => {
-        logErrorCalls.push(args);
+      const output: any[] = [];
+      const streamLogsToOutput = new Stream.Writable({ objectMode: true });
+      streamLogsToOutput._write = (object, _encoding, done) => {
+        output.push(JSON.parse(object));
+        done();
       };
+
+      const probot = new Probot({
+        githubToken: "faketoken",
+        log: pino(streamLogsToOutput),
+      });
 
       probot.on("push", () => {
         throw new Error("X-Hub-Signature-256 does not match blob signature");
@@ -185,19 +190,26 @@ describe("Probot", () => {
         await probot.receive(event);
         throw new Error("Should have thrown");
       } catch (e) {
-        expect(logErrorCalls[0][1]).toBe(
+        expect(output.length).toBe(1);
+        expect(output[0].level).toBe(50); // 50 is the error level in pino
+        expect(output[0].msg).toBe(
           "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
         );
       }
     });
 
     it("responds with the correct error if webhook secret is not found", async () => {
-      const probot = new Probot({ githubToken: "faketoken" });
-
-      const logErrorCalls: any[] = [];
-      probot.log.error = (...args: any[]) => {
-        logErrorCalls.push(args);
+      const output: any[] = [];
+      const streamLogsToOutput = new Stream.Writable({ objectMode: true });
+      streamLogsToOutput._write = (object, _encoding, done) => {
+        output.push(JSON.parse(object));
+        done();
       };
+
+      const probot = new Probot({
+        githubToken: "faketoken",
+        log: pino(streamLogsToOutput),
+      });
 
       probot.on("push", () => {
         throw new Error("No X-Hub-Signature-256 found on request");
@@ -207,19 +219,26 @@ describe("Probot", () => {
         await probot.receive(event);
         throw new Error("Should have thrown");
       } catch (e) {
-        expect(logErrorCalls[0][1]).toBe(
+        expect(output.length).toBe(1);
+        expect(output[0].level).toBe(50); // 50 is the error level in pino
+        expect(output[0].msg).toBe(
           "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
         );
       }
     });
 
     it("responds with the correct error if webhook secret is wrong", async () => {
-      const probot = new Probot({ githubToken: "faketoken" });
-
-      const logErrorCalls: any[] = [];
-      probot.log.error = (...args: any[]) => {
-        logErrorCalls.push(args);
+      const output: any[] = [];
+      const streamLogsToOutput = new Stream.Writable({ objectMode: true });
+      streamLogsToOutput._write = (object, _encoding, done) => {
+        output.push(JSON.parse(object));
+        done();
       };
+
+      const probot = new Probot({
+        githubToken: "faketoken",
+        log: pino(streamLogsToOutput),
+      });
 
       probot.on("push", () => {
         throw Error(
@@ -231,19 +250,26 @@ describe("Probot", () => {
         await probot.receive(event);
         throw new Error("Should have thrown");
       } catch (e) {
-        expect(logErrorCalls[0][1]).toBe(
+        expect(output.length).toBe(1);
+        expect(output[0].level).toBe(50); // 50 is the error level in pino
+        expect(output[0].msg).toBe(
           "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
         );
       }
     });
 
     it("responds with the correct error if the PEM file is missing", async () => {
-      const probot = new Probot({ githubToken: "faketoken" });
-
-      const logErrorCalls: any[] = [];
-      probot.log.error = (...args: any[]) => {
-        logErrorCalls.push(args);
+      const output: any[] = [];
+      const streamLogsToOutput = new Stream.Writable({ objectMode: true });
+      streamLogsToOutput._write = (object, _encoding, done) => {
+        output.push(JSON.parse(object));
+        done();
       };
+
+      const probot = new Probot({
+        githubToken: "faketoken",
+        log: pino(streamLogsToOutput),
+      });
 
       probot.onAny(() => {
         throw new Error(
@@ -255,19 +281,26 @@ describe("Probot", () => {
         await probot.receive(event);
         throw new Error("Should have thrown");
       } catch (e) {
-        expect(logErrorCalls[0][1]).toBe(
+        expect(output.length).toBe(1);
+        expect(output[0].level).toBe(50); // 50 is the error level in pino
+        expect(output[0].msg).toBe(
           "Your private key (a .pem file or PRIVATE_KEY environment variable) or APP_ID is incorrect. Go to https://github.com/settings/apps/YOUR_APP, verify that APP_ID is set correctly, and generate a new PEM file if necessary.",
         );
       }
     });
 
     it("responds with the correct error if the jwt could not be decoded", async () => {
-      const probot = new Probot({ githubToken: "faketoken" });
-
-      const logErrorCalls: any[] = [];
-      probot.log.error = (...args: any[]) => {
-        logErrorCalls.push(args);
+      const output: any[] = [];
+      const streamLogsToOutput = new Stream.Writable({ objectMode: true });
+      streamLogsToOutput._write = (object, _encoding, done) => {
+        output.push(JSON.parse(object));
+        done();
       };
+
+      const probot = new Probot({
+        githubToken: "faketoken",
+        log: pino(streamLogsToOutput),
+      });
 
       probot.onAny(() => {
         throw new Error(
@@ -279,7 +312,9 @@ describe("Probot", () => {
         await probot.receive(event);
         throw new Error("Should have thrown");
       } catch (e) {
-        expect(logErrorCalls[0][1]).toBe(
+        expect(output.length).toBe(1);
+        expect(output[0].level).toBe(50); // 50 is the error level in pino
+        expect(output[0].msg).toBe(
           "Your private key (a .pem file or PRIVATE_KEY environment variable) or APP_ID is incorrect. Go to https://github.com/settings/apps/YOUR_APP, verify that APP_ID is set correctly, and generate a new PEM file if necessary.",
         );
       }

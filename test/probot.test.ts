@@ -798,6 +798,7 @@ describe("Probot", () => {
       // @ts-expect-error
       probot.on("unknown-event", () => {});
 
+      await probot.ready();
       expect(output.length).toBe(1);
       expect(output[0].msg).toBe(
         '"unknown-event" is not a known webhook name (https://developer.github.com/v3/activity/events/types/)',

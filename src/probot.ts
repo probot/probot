@@ -33,16 +33,14 @@ import { rebindLog } from "./helpers/rebind-log.js";
 
 export type Constructor<T = any> = new (...args: any[]) => T;
 
-const UNINITIALIZED = 0b000;
-const INITIALIZED = 0b001;
-const INITIALIZING = 0b010;
-const ERRORED = 0b101;
+const UNINITIALIZED = 0b00;
+const INITIALIZING = 0b01;
+const INITIALIZED = 0b10;
 
 type InitializationState =
   | typeof UNINITIALIZED
   | typeof INITIALIZING
-  | typeof INITIALIZED
-  | typeof ERRORED;
+  | typeof INITIALIZED;
 
 type OnHandler = ["on", any, any];
 type OnAnyHandler = ["onAny", any];
@@ -192,7 +190,6 @@ export class Probot {
       this.#state.initializedPromise.resolve();
     } catch (error) {
       this.#state.log.error({ err: error }, "Failed to initialize Probot");
-      this.#state.initializationState = ERRORED;
       this.#state.initializedPromise.reject(error);
     } finally {
       return this.#state.initializedPromise.promise;

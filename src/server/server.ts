@@ -123,6 +123,9 @@ export class Server {
         server: this,
         webhookPath: this.#state.webhookPath,
       });
+
+      await this.#state.probot.ready();
+
       this.#state.log = rebindLog(
         this.#state.log || this.#state.probot.log.child({ name: "server" }),
       );

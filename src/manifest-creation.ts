@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import { npxImport } from "@probot/npx-import";
 import yaml from "js-yaml";
 import type { RequestParameters } from "@octokit/types";
 import type { Logger } from "pino";
@@ -32,7 +33,8 @@ export class ManifestCreation {
   ): Promise<string | undefined> {
     let SmeeClient: any;
     try {
-      SmeeClient = SmeeClientParam || (await import("smee-client")).SmeeClient;
+      SmeeClient =
+        SmeeClientParam || (await npxImport("smee-client@4.3.1")).SmeeClient;
     } catch {
       log.warn("SmeeClient is not available");
       return void 0;

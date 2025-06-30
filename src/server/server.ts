@@ -33,19 +33,8 @@ import { staticFilesHandler } from "./handlers/static-files.js";
 export const defaultWebhookPath = "/api/github/webhooks";
 export const defaultWebhookSecret = "development";
 
-const UNINITIALIZED = 0b000;
-const INITIALIZED = 0b001;
-const INITIALIZING = 0b010;
-const ERRORED = 0b101;
-
-type InitializationState =
-  | typeof UNINITIALIZED
-  | typeof INITIALIZING
-  | typeof INITIALIZED
-  | typeof ERRORED;
-
 type State = {
-  initializationState: InitializationState;
+  initializeRan: boolean;
   initializationPromise: DeferredPromise<void>;
   cwd: string;
   httpServer: HttpServer;
@@ -72,7 +61,7 @@ export class Server {
 
   constructor(options: ServerOptions = {} as ServerOptions) {
     this.#state = {
-      initializationState: UNINITIALIZED,
+      initializeRan: false,
       initializationPromise: createDeferredPromise<void>(),
       probot: null,
       log: options.log,
@@ -112,11 +101,11 @@ export class Server {
   }
 
   async #initialize(): Promise<void> {
-    if ((this.#state.initializationState & INITIALIZED) === INITIALIZED) {
+    if (this.#state.initializeRan === true) {
       return this.#state.initializationPromise.promise;
     }
 
-    this.#state.initializationState = INITIALIZING;
+    this.#state.initializeRan = true;
 
     try {
       this.#state.probot = new this.#state.ProbotBase({
@@ -133,10 +122,8 @@ export class Server {
         this.#state.loggingOptions,
       );
 
-      this.#state.initializationState = INITIALIZED;
       this.#state.initializationPromise.resolve();
     } catch (error) {
-      this.#state.initializationState = ERRORED;
       this.#state.initializationPromise.reject(error);
       (this.#state.log || console).error(
         { err: error },

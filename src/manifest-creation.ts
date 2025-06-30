@@ -34,7 +34,9 @@ export class ManifestCreation {
     let SmeeClient: any;
     try {
       SmeeClient =
-        SmeeClientParam || (await npxImport("smee-client@4.3.1", { onlyPackageRunner:  true })).SmeeClient;
+        SmeeClientParam ||
+        (await npxImport("smee-client@4.3.1", { onlyPackageRunner: true }))
+          .SmeeClient;
     } catch {
       log.warn("SmeeClient is not available");
       return void 0;

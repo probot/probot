@@ -9,7 +9,9 @@ type Options = {
   redisConfig?: RedisOptions | string;
 };
 
-export async function getOctokitThrottleOptions(options: Options): Promise<ThrottlingOptions> {
+export async function getOctokitThrottleOptions(
+  options: Options,
+): Promise<ThrottlingOptions> {
   const { log, redisConfig } = options;
 
   const throttlingOptions: ThrottlingOptions = {
@@ -51,6 +53,7 @@ export async function getOctokitThrottleOptions(options: Options): Promise<Throt
 let Redis = null;
 
 async function getRedisClient({ redisConfig }: Options): Promise<any> {
-  Redis ??= (await npxImport("ioredis@5.6.1", { onlyPackageRunner: true })).Redis
+  Redis ??= (await npxImport("ioredis@5.6.1", { onlyPackageRunner: true }))
+    .Redis;
   if (redisConfig) return new Redis(redisConfig as RedisOptions);
 }

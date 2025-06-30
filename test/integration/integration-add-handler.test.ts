@@ -163,7 +163,7 @@ describe("createNodeMiddleware", () => {
 
       addHandler(expressApp);
     };
-    const middleware = createNodeMiddleware(app, {
+    const middleware = await createNodeMiddleware(app, {
       probot: createProbot({
         env: {
           APP_ID,
@@ -211,7 +211,7 @@ describe("createNodeMiddleware", () => {
         addHandler(fastify.routing);
       };
 
-      const middleware = createNodeMiddleware(app, {
+      const middleware = await createNodeMiddleware(app, {
         probot: createProbot({
           env: {
             APP_ID,

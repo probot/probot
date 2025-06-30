@@ -2,7 +2,6 @@ import { Server as HttpServer } from "node:http";
 import type { AddressInfo } from "node:net";
 
 import type { RequestRequestOptions } from "@octokit/types";
-import { createNodeMiddleware } from "@octokit/webhooks";
 import type { Logger } from "pino";
 
 import type { Probot } from "../probot.js";
@@ -113,6 +112,9 @@ export class Server {
         server: this,
         webhookPath: this.#state.webhookPath,
       });
+
+      await this.#state.probot.ready();
+
       this.#state.log = rebindLog(
         this.#state.log || this.#state.probot.log.child({ name: "server" }),
       );
@@ -175,12 +177,7 @@ export class Server {
       this.#state.handlers.unshift(pingHandler);
     }
 
-    this.#state.handlers.unshift(
-      createNodeMiddleware(this.#state.probot!.webhooks, {
-        log: this.#state.log,
-        path: this.#state.webhookPath,
-      }),
-    );
+    this.#state.handlers.unshift(await this.#state.probot!.getNodeMiddleware());
 
     this.#state.handlers.push(...this.#state.addedHandlers);
 

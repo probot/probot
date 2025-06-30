@@ -135,7 +135,7 @@ describe("Probot", () => {
       new Probot({ githubToken: "faketoken" });
     });
 
-    it("shouldn't overwrite `options.throttle` passed to `{Octokit: ProbotOctokit.defaults(options)}`", () => {
+    it("shouldn't overwrite `options.throttle` passed to `{Octokit: ProbotOctokit.defaults(options)}`", async () => {
       const pluginCalls: any[] = [];
       const MyOctokit = ProbotOctokit.plugin((_octokit, options) => {
         pluginCalls.push(options);
@@ -147,8 +147,9 @@ describe("Probot", () => {
         },
       });
 
-      new Probot({ Octokit: MyOctokit, appId, privateKey });
+      const probot = new Probot({ Octokit: MyOctokit, appId, privateKey });
 
+      await probot.ready();
       expect(pluginCalls.length).toBe(1);
       expect(pluginCalls[0].throttle?.enabled).toBe(true);
     });
@@ -797,6 +798,7 @@ describe("Probot", () => {
       // @ts-expect-error
       probot.on("unknown-event", () => {});
 
+      await probot.ready();
       expect(output.length).toBe(1);
       expect(output[0].msg).toBe(
         '"unknown-event" is not a known webhook name (https://developer.github.com/v3/activity/events/types/)',

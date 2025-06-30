@@ -191,7 +191,7 @@ Please add yours!
 import { createNodeMiddleware, createProbot } from "probot";
 import app from "./app.js";
 
-const middleware = createNodeMiddleware(app, {
+const middleware = await createNodeMiddleware(app, {
   probot: createProbot(),
   webhooksPath: "/",
 });
@@ -236,7 +236,7 @@ import { createNodeMiddleware, createProbot } from "probot";
 
 import app from "../../../app.js";
 
-export default createNodeMiddleware(app, {
+export default await createNodeMiddleware(app, {
   probot: createProbot(),
   webhooksPath: "/api/github/webhooks",
 });

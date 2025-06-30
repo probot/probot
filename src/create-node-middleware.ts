@@ -1,12 +1,10 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { createNodeMiddleware as createWebhooksMiddleware } from "@octokit/webhooks";
 
 import type {
   ApplicationFunction,
   Handler,
   MiddlewareOptions,
 } from "./types.js";
-import { defaultWebhookPath } from "./server/server.js";
 import { createProbot } from "./create-probot.js";
 
 /**
@@ -25,7 +23,7 @@ import { createProbot } from "./create-probot.js";
  *   });
  * };
  *
- * const middleware = createNodeMiddleware(appFn, { probot: createProbot() });
+ * const middleware = await createNodeMiddleware(appFn, { probot: createProbot() });
  *
  * const server = createServer((req, res) => {
  *   middleware(req, res, () => {
@@ -35,22 +33,30 @@ import { createProbot } from "./create-probot.js";
  * });
  * ```
  */
-export function createNodeMiddleware(
+export async function createNodeMiddleware(
   appFn: ApplicationFunction,
   { probot = createProbot(), webhooksPath } = {} as MiddlewareOptions,
-): (
-  request: IncomingMessage,
-  response: ServerResponse,
-  next?: () => void,
-) => boolean | void | Promise<void | boolean> {
+): Promise<
+  (
+    request: IncomingMessage,
+    response: ServerResponse,
+    next?: () => void,
+  ) => boolean | void | Promise<void | boolean>
+> {
   const handlers: Handler[] = [];
 
-  probot.load(appFn, {
+  await probot.load(appFn, {
     cwd: process.cwd(),
     addHandler: (handler) => {
       handlers.push(handler);
     },
   });
+
+  handlers.push(
+    await probot.getNodeMiddleware({
+      path: webhooksPath,
+    }),
+  );
 
   const mainHandler: Handler = async (req, res) => {
     try {
@@ -67,12 +73,6 @@ export function createNodeMiddleware(
 
     return false;
   };
-
-  handlers.push(
-    createWebhooksMiddleware(probot.webhooks, {
-      path: webhooksPath || probot.webhookPath || defaultWebhookPath,
-    }),
-  );
 
   return mainHandler;
 }

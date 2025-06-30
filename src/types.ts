@@ -1,9 +1,11 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
+import type { RequestRequestOptions } from "@octokit/types";
 import type {
   EmitterWebhookEvent as WebhookEvent,
   Webhooks,
 } from "@octokit/webhooks";
 import type { RedisOptions } from "ioredis";
+import type { Logger } from "pino";
 import type { Options as LoggingOptions } from "pino-http";
 
 import type { Context } from "./context.js";
@@ -11,15 +13,10 @@ import type { Probot } from "./probot.js";
 import type { Server } from "./server/server.js";
 import type { ProbotOctokit } from "./octokit/probot-octokit.js";
 
-import type { Logger } from "pino";
-import type { RequestRequestOptions } from "@octokit/types";
-import type { Lru } from "toad-cache";
-
 export interface Options {
   privateKey?: string;
   githubToken?: string;
   appId?: number | string;
-
   Octokit?: typeof ProbotOctokit;
   log?: Logger;
   redisConfig?: RedisOptions | string;
@@ -34,24 +31,6 @@ export interface Options {
   webhookPath?: string;
   webhookProxy?: string;
 }
-
-export type State = {
-  appId?: number;
-  privateKey?: string;
-  githubToken?: string;
-  log: Logger;
-  Octokit: typeof ProbotOctokit;
-  octokit: ProbotOctokit;
-  cache?: Lru<string>;
-  port?: number;
-  host?: string;
-  baseUrl?: string;
-  webhooks?: ProbotWebhooks;
-  webhookPath: string;
-  webhookSecret: string;
-  request?: RequestRequestOptions;
-  server?: Server | void;
-};
 
 // Omit the `payload`, `id`,`name` properties from the `Context` class as they are already present in the types of `WebhookEvent`
 // The `Webhooks` class accepts a type parameter (`TTransformed`) that is used to transform the event payload in the form of

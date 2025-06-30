@@ -247,7 +247,7 @@ export class Probot {
     return;
   }
 
-  get log() {
+  get log(): Logger {
     return this.#state.log;
   }
 

@@ -50,3 +50,16 @@ describe("smee-client", () => {
     );
   });
 });
+
+describe("ioredis", () => {
+  it("should be ensured that ioredis is the same version as in the package-lock.json", () => {
+    expect(
+      typeof packageLockJson.packages["node_modules/ioredis"].version,
+    ).toBe("string");
+    checkForFixedNpxImport(
+      join(__dirname, "../src"),
+      "ioredis",
+      packageLockJson.packages["node_modules/ioredis"].version,
+    );
+  });
+});

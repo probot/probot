@@ -151,7 +151,7 @@ export class Probot {
           }),
       );
 
-      const Octokit = getProbotOctokitWithDefaults({
+      const Octokit = await getProbotOctokitWithDefaults({
         githubToken: this.#state.githubToken,
         Octokit: this.#state.OctokitBase,
         appId: this.#state.appId,

@@ -57,7 +57,7 @@ const appFn = (app) => {
   });
 };
 
-const middleware = createNodeMiddleware(appFn, { probot: createProbot() });
+const middleware = await createNodeMiddleware(appFn, { probot: createProbot() });
 
 const server = createServer((req, res) => {
   middleware(req, res, () => {

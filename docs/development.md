@@ -226,7 +226,7 @@ const probot = new Probot({
   secret: "webhooksecret123",
 });
 
-const middleware = createNodeMiddleware(app, { probot });
+const middleware = await createNodeMiddleware(app, { probot });
 
 export default (req, res) => {
   middleware(req, res, () => {

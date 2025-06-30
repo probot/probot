@@ -7,7 +7,7 @@ export const createWebhookProxy = async (
 ): Promise<EventSource | undefined> => {
   try {
     SmeeClient ??= (await import("smee-client")).SmeeClient;
-  } catch (error) {
+  } catch {
     opts.logger.warn(
       "Run `npm install --save-dev smee-client` to proxy webhooks to localhost.",
     );

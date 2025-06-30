@@ -33,7 +33,7 @@ export class ManifestCreation {
     let SmeeClient: any;
     try {
       SmeeClient = SmeeClientParam || (await import("smee-client")).SmeeClient;
-    } catch (error) {
+    } catch {
       log.warn("SmeeClient is not available");
       return void 0;
     }
@@ -43,7 +43,7 @@ export class ManifestCreation {
         WEBHOOK_PROXY_URL,
       });
       return WEBHOOK_PROXY_URL;
-    } catch (error) {
+    } catch {
       log.warn("Unable to connect to smee.io, try restarting your server.");
       return void 0;
     }

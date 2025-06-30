@@ -242,13 +242,13 @@ If you want to read probot's configuration from the same environment variables a
 import { createNodeMiddleware, createProbot } from "probot";
 import app from "./index.js";
 
-export default createNodeMiddleware(app, { probot: createProbot() });
+export default await createNodeMiddleware(app, { probot: createProbot() });
 ```
 
 By default, `createNodeMiddleware()` uses `/api/github/webhooks` as the webhook endpoint. To customize this behaviour, you can use the `webhooksPath` option.
 
 ```js
-export default createNodeMiddleware(app, {
+export default await createNodeMiddleware(app, {
   probot: createProbot(),
   webhooksPath: "/path/to/webhook/endpoint",
 });

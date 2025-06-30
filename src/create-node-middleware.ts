@@ -5,7 +5,6 @@ import type {
   Handler,
   MiddlewareOptions,
 } from "./types.js";
-import { defaultWebhookPath } from "./server/server.js";
 import { createProbot } from "./create-probot.js";
 
 /**
@@ -24,7 +23,7 @@ import { createProbot } from "./create-probot.js";
  *   });
  * };
  *
- * const middleware = createNodeMiddleware(appFn, { probot: createProbot() });
+ * const middleware = await createNodeMiddleware(appFn, { probot: createProbot() });
  *
  * const server = createServer((req, res) => {
  *   middleware(req, res, () => {
@@ -46,7 +45,7 @@ export async function createNodeMiddleware(
 > {
   const handlers: Handler[] = [];
 
-  probot.load(appFn, {
+  await probot.load(appFn, {
     cwd: process.cwd(),
     addHandler: (handler) => {
       handlers.push(handler);
@@ -55,7 +54,7 @@ export async function createNodeMiddleware(
 
   handlers.push(
     await probot.getNodeMiddleware({
-      path: webhooksPath || probot.webhookPath || defaultWebhookPath,
+      path: webhooksPath,
     }),
   );
 

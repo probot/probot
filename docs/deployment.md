@@ -236,11 +236,10 @@ import { createNodeMiddleware, createProbot } from "probot";
 
 import app from "../../../app.js";
 
-const middleware = await createNodeMiddleware(app, {
+export default await createNodeMiddleware(app, {
   probot: createProbot(),
   webhooksPath: "/api/github/webhooks",
 });
-export default middleware;
 ```
 
 **Important:** Set `NODEJS_HELPERS` environment variable to `0` in order to prevent Vercel from parsing the response body.

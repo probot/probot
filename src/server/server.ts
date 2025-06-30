@@ -130,9 +130,8 @@ export class Server {
         "Failed to initialize Server",
       );
       throw error;
-    } finally {
-      return this.#state.initializationPromise.promise;
     }
+    return this.#state.initializationPromise.promise;
   }
 
   public addHandler(handler: Handler) {

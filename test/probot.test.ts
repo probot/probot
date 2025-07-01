@@ -378,13 +378,15 @@ describe("Probot", () => {
     () => {
       it("sets throttle options", async () => {
         const pluginCalls: any[] = [];
-        new Probot({
+        const probot = new Probot({
           githubToken: "faketoken",
           redisConfig: process.env.REDIS_URL,
           Octokit: ProbotOctokit.plugin((_octokit, options) => {
             pluginCalls.push({ _octokit, options });
           }),
         });
+
+        await probot.ready();
 
         expect(pluginCalls.length).toBe(1);
         expect(pluginCalls[0].options.throttle?.Bottleneck).toBe(Bottleneck);
@@ -405,7 +407,7 @@ describe("Probot", () => {
         };
 
         const pluginCalls: any[] = [];
-        new Probot({
+        const probot = new Probot({
           githubToken: "faketoken",
           redisConfig,
           Octokit: ProbotOctokit.plugin((_octokit, options) => {
@@ -413,6 +415,7 @@ describe("Probot", () => {
           }),
         });
 
+        await probot.ready();
         expect(pluginCalls.length).toBe(1);
 
         expect(pluginCalls[0].options.throttle?.Bottleneck).toBe(Bottleneck);

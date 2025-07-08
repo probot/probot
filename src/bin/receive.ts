@@ -7,7 +7,7 @@ import { parseArgs } from "node:util";
 import { validateEventName } from "@octokit/webhooks";
 import { getPrivateKey } from "@probot/get-private-key";
 import { config as dotenvConfig } from "dotenv";
-dotenvConfig();
+dotenvConfig({ quiet: true });
 
 import { getLog } from "../helpers/get-log.js";
 import { Probot } from "../probot.js";

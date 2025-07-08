@@ -9,7 +9,7 @@ import { loadPackageJson } from "../helpers/load-package-json.js";
 import { run } from "../run.js";
 import { receive } from "./receive.js";
 
-dotenvConfig();
+dotenvConfig({ quiet: true });
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkg = loadPackageJson(resolve(__dirname, "package.json"));

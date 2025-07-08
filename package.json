@@ -56,7 +56,7 @@
     "@probot/pino": "^4.0.0",
     "bottleneck": "^2.19.5",
     "deepmerge": "^4.3.1",
-    "dotenv": "^16.3.1",
+    "dotenv": "^17.0.0",
     "import-meta-resolve": "^4.1.0",
     "ioredis": "^5.3.2",
     "js-yaml": "^4.1.0",

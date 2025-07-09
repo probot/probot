@@ -36,7 +36,7 @@ export async function run(
   appFnOrArgv: ApplicationFunction | string[],
   additionalOptions?: AdditionalOptions,
 ): Promise<Server> {
-  dotenvConfig();
+  dotenvConfig({ quiet: true });
 
   const envOptions = readEnvOptions(additionalOptions?.env);
   const cliOptions = Array.isArray(appFnOrArgv)

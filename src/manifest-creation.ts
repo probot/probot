@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { npxImport } from "@probot/npx-import";
+import { npxImport } from "npx-import-light";
 import yaml from "js-yaml";
 import type { RequestParameters } from "@octokit/types";
 import type { Logger } from "pino";

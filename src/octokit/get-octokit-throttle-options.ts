@@ -1,4 +1,4 @@
-import { npxImport } from "@probot/npx-import";
+import { npxImport } from "npx-import-light";
 import Bottleneck from "bottleneck";
 import { type RedisOptions } from "ioredis";
 import type { Logger } from "pino";

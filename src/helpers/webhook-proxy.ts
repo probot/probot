@@ -1,5 +1,5 @@
 import type { Logger } from "pino";
-import { npxImport } from "@probot/npx-import";
+import { npxImport } from "npx-import-light";
 
 let SmeeClient: any;
 

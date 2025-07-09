@@ -16,7 +16,6 @@ Every app can either be deployed stand-alone, or combined with other apps in one
 - [Register the GitHub App](#register-the-github-app)
 - [Deploy the app](#deploy-the-app)
   - [As node app](#as-node-app)
-    - [Glitch](#glitch)
     - [Heroku](#heroku)
   - [As serverless function](#as-serverless-function)
     - [AWS Lambda](#aws-lambda)
@@ -62,25 +61,6 @@ And one of:
 ### As node app
 
 Probot can run your app function using the `probot` binary. If your app function lives in `./app.js`, you can start it as node process using `probot run ./app.js`
-
-#### Glitch
-
-Glitch lets you host node applications for free and edit them directly in your browser. It’s great for experimentation and entirely sufficient for simple apps.
-
-1. [Create a new app on Glitch](https://glitch.com/edit/#!/new-project).
-2. Click on your app name on the top-right, press on advanced options and then on `Import from GitHub` (You will need to login with your GitHub account to enable that option). Enter the full repository name you want to import, e.g. for the [welcome app](https://github.com/behaviorbot/new-issue-welcome) it would be `behaviorbot/new-issue-welcome`. The `new-issue-welcome` app is a great template to get started with your own app, too!
-3. Next open the `.env` file and replace its content with
-   ```
-   APP_ID=<your app id>
-   WEBHOOK_SECRET=<your app secret>
-   PRIVATE_KEY_PATH=.data/private-key.pem
-   NODE_ENV=production
-   ```
-   Replace the two `<...>` placeholders with the values from your app. The `.env` file cannot be accessed or seen by others.
-4. Press the `New File` button and enter `.data/private-key.pem`. Paste the content of your GitHub App’s `private-key.pem` in there and save it. Files in the `.data` folder cannot be seen or accessed by others, so your private key is safe.
-5. That’s it, your app should have already started :thumbsup: Press on the `Show` button on top and paste the URL as the value of `Webhook URL`. Ensure that you remove `/probot` from the end of the `Webhook URL` that was just pasted.
-
-Enjoy!
 
 #### Heroku
 

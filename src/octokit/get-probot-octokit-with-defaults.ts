@@ -31,9 +31,9 @@ type Options = {
  * Besides the authentication, the Octokit's baseUrl is set as well when run
  * against a GitHub Enterprise Server with a custom domain.
  */
-export function getProbotOctokitWithDefaults(
+export async function getProbotOctokitWithDefaults(
   options: Options,
-): typeof ProbotOctokit {
+): Promise<typeof ProbotOctokit> {
   const authOptions = options.githubToken
     ? {
         token: options.githubToken,
@@ -54,7 +54,7 @@ export function getProbotOctokitWithDefaults(
         }),
       };
 
-  const octokitThrottleOptions = getOctokitThrottleOptions({
+  const octokitThrottleOptions = await getOctokitThrottleOptions({
     log: options.log,
     redisConfig: options.redisConfig,
   });

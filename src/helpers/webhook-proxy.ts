@@ -1,17 +1,20 @@
 import type { Logger } from "pino";
+import { npxImport } from "npx-import-light";
 
-let SmeeClient;
+let SmeeClient: any;
 
 export const createWebhookProxy = async (
   opts: WebhookProxyOptions,
 ): Promise<EventSource | undefined> => {
   try {
-    SmeeClient ??= (await import("smee-client")).SmeeClient;
+    SmeeClient ??= (
+      await npxImport<any>("smee-client@4.3.1", { onlyPackageRunner: true })
+    ).SmeeClient;
   } catch {
     opts.logger.warn(
       "Run `npm install --save-dev smee-client` to proxy webhooks to localhost.",
     );
-    return;
+    return undefined;
   }
   const smeeClient = new SmeeClient({
     logger: opts.logger,

@@ -19,7 +19,6 @@ import { isProduction } from "./helpers/is-production.js";
 import { config as dotenvConfig } from "dotenv";
 import { updateEnv } from "./helpers/update-env.js";
 import { Probot } from "./probot.js";
-import { rebindLog } from "./helpers/rebind-log.js";
 
 type AdditionalOptions = {
   env?: Env;
@@ -69,15 +68,15 @@ export async function run(
     args,
   } = { ...envOptions, ...cliOptions };
 
-  const log = additionalOptions?.log
-    ? rebindLog(additionalOptions.log)
-    : await getLog({
-        level,
-        logFormat,
-        logLevelInString,
-        logMessageKey,
-        sentryDsn,
-      });
+  const log =
+    additionalOptions?.log ||
+    (await getLog({
+      level,
+      logFormat,
+      logLevelInString,
+      logMessageKey,
+      sentryDsn,
+    }));
 
   const probotOptions: Options = {
     appId,

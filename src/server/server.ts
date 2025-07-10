@@ -27,7 +27,6 @@ import { notFoundHandler } from "./handlers/not-found.js";
 import { pingHandler } from "./handlers/ping.js";
 import { staticFilesHandler } from "./handlers/static-files.js";
 import { getLog } from "../helpers/get-log.js";
-import { rebindLog } from "../helpers/rebind-log.js";
 
 // the default path as defined in @octokit/webhooks
 export const defaultWebhookPath = "/api/github/webhooks";
@@ -108,9 +107,7 @@ export class Server {
     this.#state.initializeRan = true;
 
     try {
-      this.#state.log = this.#state.log
-        ? rebindLog(this.#state.log)
-        : await getLog();
+      this.#state.log = this.#state.log || (await getLog());
       this.#state.log.child({ name: "server" });
 
       this.#state.probot = new this.#state.ProbotBase({

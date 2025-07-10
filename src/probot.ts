@@ -29,7 +29,6 @@ import {
   defaultWebhookSecret,
   type Server,
 } from "./server/server.js";
-import { rebindLog } from "./helpers/rebind-log.js";
 
 export type Constructor<T = any> = new (...args: any[]) => T;
 
@@ -151,15 +150,15 @@ export class Probot {
         1000 * 60 * 59,
       );
 
-      this.#state.log = this.#state.log
-        ? rebindLog(this.#state.log)
-        : await getLog({
-            logFormat: this.#state.logFormat,
-            logLevelInString: this.#state.logLevelInString,
-            level: this.#state.logLevel,
-            logMessageKey: this.#state.logMessageKey,
-            sentryDsn: this.#state.sentryDsn,
-          });
+      this.#state.log =
+        this.#state.log ||
+        (await getLog({
+          logFormat: this.#state.logFormat,
+          logLevelInString: this.#state.logLevelInString,
+          level: this.#state.logLevel,
+          logMessageKey: this.#state.logMessageKey,
+          sentryDsn: this.#state.sentryDsn,
+        }));
 
       this.#state.log = this.#state.log.child({ name: "probot" });
 
@@ -220,7 +219,7 @@ export class Probot {
     await this.#initialize();
 
     return createNodeMiddleware(this.#state.webhooks!, {
-      log: log ? rebindLog(log) : this.#state.log!,
+      log: log || this.#state.log!,
       path: path || this.#state.webhookPath,
     });
   }

@@ -3,7 +3,8 @@ import type { TLSSocket } from "node:tls";
 import { exec } from "node:child_process";
 import { parse as parseQuery } from "node:querystring";
 
-import type { Probot } from "../probot.js";
+import type { Logger } from "pino";
+
 import { ManifestCreation } from "../manifest-creation.js";
 import { getPrintableHost } from "../helpers/get-printable-host.js";
 import { isProduction } from "../helpers/is-production.js";
@@ -17,16 +18,18 @@ import { importView } from "../views/import.js";
 import { setupView } from "../views/setup.js";
 import { successView } from "../views/success.js";
 
-type SetupFactoryOptions = Required<Pick<ServerOptions, "port" | "host">> &
+type SetupFactoryOptions = Required<
+  Pick<ServerOptions, "log" | "port" | "host">
+> &
   Pick<ServerOptions, "request"> & {
     updateEnv?: (env: Env) => Env;
     SmeeClient?: { createChannel: () => Promise<string | undefined> };
   };
 
 export const setupAppFactory = (options: SetupFactoryOptions) => {
-  const { host, port, request, SmeeClient } = options || {};
+  const { host, port, log, request, SmeeClient } = options || {};
 
-  return async function setupApp(app: Probot): Promise<Handler> {
+  return async function setupApp(): Promise<Handler> {
     const setup: ManifestCreation = new ManifestCreation({
       updateEnv: options.updateEnv || updateEnv,
     });
@@ -44,7 +47,7 @@ export const setupAppFactory = (options: SetupFactoryOptions) => {
         process.env.NO_SMEE_SETUP === "true"
       )
     ) {
-      await setup.createWebhookChannel({ SmeeClient, log: app.log });
+      await setup.createWebhookChannel({ SmeeClient, log });
     }
 
     const importViewRendered = importView({
@@ -54,7 +57,7 @@ export const setupAppFactory = (options: SetupFactoryOptions) => {
     });
     const successViewRendered = successView({ name: pkg.name });
 
-    printWelcomeMessage(app, host, port);
+    printWelcomeMessage(log, host, port);
 
     const setupHandler: Handler = async (req, res) => {
       const [path, query = ""] = req.url?.split("?") ?? [req.url, ""];
@@ -104,11 +107,11 @@ export const setupAppFactory = (options: SetupFactoryOptions) => {
           if (process.env.PROJECT_DOMAIN) {
             exec("refresh", (error) => {
               if (error) {
-                app.log.error(error);
+                log.error(error);
               }
             });
           } else {
-            printRestartMessage(app);
+            printRestartMessage(log);
           }
 
           res
@@ -154,7 +157,7 @@ export const setupAppFactory = (options: SetupFactoryOptions) => {
             WEBHOOK_SECRET: webhook_secret,
           });
           res.end();
-          printRestartMessage(app);
+          printRestartMessage(log);
           return true;
         }
       }
@@ -167,7 +170,7 @@ export const setupAppFactory = (options: SetupFactoryOptions) => {
 };
 
 function printWelcomeMessage(
-  app: Probot,
+  log: Logger,
   host: string | undefined,
   port: number | undefined,
 ) {
@@ -186,14 +189,14 @@ function printWelcomeMessage(
     `Once you are done, restart the server.`,
     ``,
   ].forEach((line) => {
-    app.log.info(line);
+    log.info(line);
   });
 }
 
-function printRestartMessage(app: Probot) {
-  app.log.info("");
-  app.log.info("Probot has been set up, please restart the server!");
-  app.log.info("");
+function printRestartMessage(log: Logger) {
+  log.info("");
+  log.info("Probot has been set up, please restart the server!");
+  log.info("");
 }
 
 function getBaseUrl(req: IncomingMessage): string {

@@ -13,12 +13,13 @@ import { getLog } from "./helpers/get-log.js";
 import { readCliOptions } from "./bin/read-cli-options.js";
 import { readEnvOptions } from "./bin/read-env-options.js";
 import { defaultApp as defaultAppHandler } from "./apps/default.js";
-import { Server } from "./server/server.js";
+import { defaultWebhookPath, Server } from "./server/server.js";
 import { resolveAppFunction } from "./helpers/resolve-app-function.js";
 import { isProduction } from "./helpers/is-production.js";
 import { config as dotenvConfig } from "dotenv";
 import { updateEnv } from "./helpers/update-env.js";
 import { Probot } from "./probot.js";
+import { rebindLog } from "./helpers/rebind-log.js";
 
 type AdditionalOptions = {
   env?: Env;
@@ -52,9 +53,9 @@ export async function run(
     sentryDsn,
 
     // server options
-    host,
-    port,
-    webhookPath,
+    host = "localhost",
+    port = 3000,
+    webhookPath = defaultWebhookPath,
     webhookProxy,
 
     // probot options
@@ -68,13 +69,15 @@ export async function run(
     args,
   } = { ...envOptions, ...cliOptions };
 
-  const log = getLog({
-    level,
-    logFormat,
-    logLevelInString,
-    logMessageKey,
-    sentryDsn,
-  });
+  const log = additionalOptions?.log
+    ? rebindLog(additionalOptions.log)
+    : await getLog({
+        level,
+        logFormat,
+        logLevelInString,
+        logMessageKey,
+        sentryDsn,
+      });
 
   const probotOptions: Options = {
     appId,
@@ -82,16 +85,19 @@ export async function run(
     redisConfig,
     secret,
     baseUrl,
-    log: additionalOptions?.log || log.child({ name: "probot" }),
+    log,
     Octokit: additionalOptions?.Octokit || undefined,
   };
 
-  const serverOptions: ServerOptions = {
+  const serverOptions: Required<
+    Pick<ServerOptions, "host" | "port" | "webhookPath" | "log" | "Probot">
+  > &
+    Pick<ServerOptions, "webhookProxy"> = {
     host,
     port,
     webhookPath,
     webhookProxy,
-    log: log.child({ name: "server" }),
+    log,
     Probot: Probot.defaults(probotOptions),
   };
 
@@ -130,6 +136,7 @@ export async function run(
     const setupAppHandler = setupAppFactory({
       host: server.host,
       port: server.port,
+      log: serverOptions.log.child({ name: "setup" }),
       updateEnv: additionalOptions?.updateEnv || updateEnv,
       SmeeClient: additionalOptions?.SmeeClient,
     });

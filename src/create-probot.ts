@@ -1,7 +1,6 @@
 import type { LogLevel, Options as PinoOptions } from "@probot/pino";
 import { getPrivateKey } from "@probot/get-private-key";
 
-import { getLog } from "./helpers/get-log.js";
 import type { Env, Options } from "./types.js";
 import { Probot } from "./probot.js";
 import { defaultWebhookPath } from "./server/server.js";
@@ -68,16 +67,13 @@ export function createProbot({
     ...overrides,
   };
 
-  const log = getLog({
-    level: probotOptions.logLevel,
+  return new Probot({
+    log: probotOptions.log,
+    logLevel: probotOptions.logLevel,
     logFormat: envWithDefaults.LOG_FORMAT as PinoOptions["logFormat"],
     logLevelInString: envWithDefaults.LOG_LEVEL_IN_STRING === "true",
     logMessageKey: envWithDefaults.LOG_MESSAGE_KEY,
     sentryDsn: envWithDefaults.SENTRY_DSN,
-  }).child({ name: "server" });
-
-  return new Probot({
-    log: log.child({ name: "probot" }),
     ...probotOptions,
   });
 }

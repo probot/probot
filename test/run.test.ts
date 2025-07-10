@@ -2,15 +2,16 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { sign } from "@octokit/webhooks-methods";
+import getPort from "get-port";
+import { pino } from "pino";
 import { describe, expect, it } from "vitest";
 
 import { type Probot, run } from "../src/index.js";
+import { MockLoggerTarget } from "./utils.js";
 
-import { captureLogOutput } from "./helpers/capture-log-output.js";
 import WebhookExamples, {
   type WebhookDefinition,
 } from "@octokit/webhooks-examples";
-import getPort from "get-port";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -84,25 +85,24 @@ describe("run", () => {
     });
 
     it("defaults to JSON logs if NODE_ENV is set to 'production'", async () => {
-      let outputData = "";
       const port = await getPort();
       const env = { ...defaultEnv, PORT: port.toString() };
       env.NODE_ENV = "production";
 
+      const logTarget = new MockLoggerTarget();
+      const log = pino(logTarget);
+
       const server = await run(
         async (app) => {
-          outputData = await captureLogOutput(async () => {
-            app.log.fatal("test");
-          }, app.log);
+          app.log.fatal("test");
         },
-        { env, updateEnv },
+        { env, updateEnv, log },
       );
       await server.stop();
 
-      const parsedOutput = JSON.parse(outputData);
-      expect(parsedOutput.level).toBe(60);
-      expect(parsedOutput.msg).toBe("test");
-      expect(parsedOutput.name).toBe("probot");
+      expect(logTarget.entries[0].level).toBe(60);
+      expect(logTarget.entries[0].msg).toBe("test");
+      expect(logTarget.entries[0].name).toBe("probot");
     });
   });
 

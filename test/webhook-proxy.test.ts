@@ -109,7 +109,7 @@ describe("webhook-proxy", () => {
           host: targetHost,
           port: targetPort,
           path: "/test",
-          logger: getLog({ level: "fatal" }),
+          logger: await getLog({ level: "fatal" }),
           fetch: customFetch,
         })) as EventSource;
 
@@ -142,7 +142,7 @@ describe("webhook-proxy", () => {
       const domain = "bad.n" + randomInt(1e10).toString(36) + ".proxy";
       const url = `http://${domain}/events`;
 
-      const logger = getLog({ level: "fatal" }).child({});
+      const logger = (await getLog({ level: "fatal" })).child({});
 
       const LoggerErrorCalls: any[] = [];
       logger.error = (...args: any[]) => {

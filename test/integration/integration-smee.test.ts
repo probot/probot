@@ -1,5 +1,3 @@
-import { Writable } from "node:stream";
-
 import { sign } from "@octokit/webhooks-methods";
 import { ManifestCreation } from "../../src/manifest-creation.js";
 import { describe, it, expect } from "vitest";
@@ -13,6 +11,7 @@ import WebhookExamples, {
 import type { Env } from "../../src/types.js";
 import { createDeferredPromise } from "../../src/helpers/create-deferred-promise.js";
 import { detectRuntime } from "../../src/helpers/detect-runtime.js";
+import { MockLoggerTarget } from "../utils.js";
 
 const UpdateEnvCalls: Env[] = [];
 const updateEnv = (env: Env) => {
@@ -63,13 +62,6 @@ describe("smee-client", () => {
     )[0] as WebhookDefinition<"push">
   ).examples[0];
 
-  const output: any[] = [];
-  const streamLogsToOutput = new Writable({ objectMode: true });
-  streamLogsToOutput._write = (object, _encoding, done) => {
-    output.push(JSON.parse(object));
-    done();
-  };
-
   it(
     "with createProbot and setting the webhookPath via WEBHOOK_PATH to the root",
     async () => {
@@ -100,7 +92,7 @@ describe("smee-client", () => {
           privateKey: PRIVATE_KEY,
           secret: WEBHOOK_SECRET,
         }),
-        log: pino(streamLogsToOutput),
+        log: pino(new MockLoggerTarget()),
         port,
         webhookProxy: WEBHOOK_PROXY_URL,
         webhookPath: "/",

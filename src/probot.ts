@@ -145,7 +145,7 @@ export class Probot {
 
       this.#state.log = rebindLog(
         this.#state.log ||
-          getLog({
+          await getLog({
             level: this.#state.logLevel,
             logMessageKey: this.#state.logMessageKey,
           }),

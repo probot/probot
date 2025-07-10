@@ -35,11 +35,11 @@ const DEFAULTS: Partial<Env> = {
  * @param overrides overwrites defaults and according environment variables
  * @param env defaults to process.env
  */
-export function createProbot({
+export async function createProbot({
   overrides = {},
   defaults = {},
   env = process.env,
-}: CreateProbotOptions = {}): Probot {
+}: CreateProbotOptions = {}): Promise<Probot> {
   let privateKey;
 
   try {
@@ -68,13 +68,13 @@ export function createProbot({
     ...overrides,
   };
 
-  const log = getLog({
+  const log = (await getLog({
     level: probotOptions.logLevel,
     logFormat: envWithDefaults.LOG_FORMAT as PinoOptions["logFormat"],
     logLevelInString: envWithDefaults.LOG_LEVEL_IN_STRING === "true",
     logMessageKey: envWithDefaults.LOG_MESSAGE_KEY,
     sentryDsn: envWithDefaults.SENTRY_DSN,
-  }).child({ name: "server" });
+  })).child({ name: "server" });
 
   return new Probot({
     log: log.child({ name: "probot" }),

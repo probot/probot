@@ -164,7 +164,7 @@ describe("createNodeMiddleware", () => {
       addHandler(expressApp);
     };
     const middleware = await createNodeMiddleware(app, {
-      probot: createProbot({
+      probot: await createProbot({
         env: {
           APP_ID,
           PRIVATE_KEY,
@@ -212,7 +212,7 @@ describe("createNodeMiddleware", () => {
       };
 
       const middleware = await createNodeMiddleware(app, {
-        probot: createProbot({
+        probot: await createProbot({
           env: {
             APP_ID,
             PRIVATE_KEY,

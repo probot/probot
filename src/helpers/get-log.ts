@@ -24,7 +24,7 @@ export type GetLogOptions = {
   logMessageKey?: string;
 } & Options;
 
-export function getLog(options: GetLogOptions = {}): Logger {
+export async function getLog(options: GetLogOptions = {}): Promise<Logger> {
   const { level, logMessageKey, ...getTransformStreamOptions } = options;
 
   const pinoOptions: LoggerOptions = {
@@ -32,7 +32,7 @@ export function getLog(options: GetLogOptions = {}): Logger {
     name: "probot",
     messageKey: logMessageKey || "msg",
   };
-  const transform = getTransformStream(getTransformStreamOptions);
+  const transform = await getTransformStream(getTransformStreamOptions);
   transform.pipe(pino.destination(1) as unknown as NodeJS.WritableStream);
 
   return rebindLog(pino(pinoOptions, transform));

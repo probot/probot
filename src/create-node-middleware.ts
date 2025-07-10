@@ -45,7 +45,8 @@ export async function createNodeMiddleware(
 > {
   const handlers: Handler[] = [];
 
-  await probot.load(appFn, {
+  const probotInstance = await probot;
+  await probotInstance.load(appFn, {
     cwd: process.cwd(),
     addHandler: (handler) => {
       handlers.push(handler);
@@ -53,7 +54,7 @@ export async function createNodeMiddleware(
   });
 
   handlers.push(
-    await probot.getNodeMiddleware({
+    await probotInstance.getNodeMiddleware({
       path: webhooksPath,
     }),
   );
@@ -66,7 +67,7 @@ export async function createNodeMiddleware(
         }
       }
     } catch (e) {
-      probot.log.error(e);
+      probotInstance.log.error(e);
       res.writeHead(500).end();
       return true;
     }

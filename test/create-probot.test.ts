@@ -60,13 +60,13 @@ wB98bfAGtcuCZWzgjgL67CS0pcNxadFA/TFo/NnynLBC4qRXSfFslKVE+Og=
   WEBHOOK_SECRET: "secret",
 };
 describe("createProbot", () => {
-  test("createProbot()", () => {
-    const probot = createProbot({ env });
+  test("createProbot()", async () => {
+    const probot = await createProbot({ env });
     expect(probot instanceof Probot).toBe(true);
   });
 
-  test("defaults, env", () => {
-    const probot = createProbot({
+  test("defaults, env", async () => {
+    const probot = await createProbot({
       env: {
         ...env,
         LOG_LEVEL: "debug",
@@ -76,8 +76,8 @@ describe("createProbot", () => {
     expect(probot.log.level).toBe("debug");
   });
 
-  test("defaults, overrides", () => {
-    const probot = createProbot({
+  test("defaults, overrides", async () => {
+    const probot = await createProbot({
       env,
       defaults: { logLevel: "debug" },
       overrides: { logLevel: "trace" },
@@ -88,7 +88,7 @@ describe("createProbot", () => {
   test("defaults, custom host", async () => {
     const fetchPromise = createDeferredPromise<void>();
 
-    const probot = createProbot({
+    const probot = await createProbot({
       env: {
         ...env,
         GHE_HOST: "github.acme-inc.com",
@@ -122,8 +122,8 @@ describe("createProbot", () => {
     await fetchPromise.promise;
   });
 
-  test("env, overrides", () => {
-    const probot = createProbot({
+  test("env, overrides", async () => {
+    const probot = await createProbot({
       env: {
         ...env,
         LOG_LEVEL: "fatal",
@@ -133,8 +133,8 @@ describe("createProbot", () => {
     expect(probot.log.level).toBe("trace");
   });
 
-  test("defaults, env, overrides", () => {
-    const probot = createProbot({
+  test("defaults, env, overrides", async () => {
+    const probot = await createProbot({
       env: {
         ...env,
         LOG_LEVEL: "fatal",
@@ -146,7 +146,7 @@ describe("createProbot", () => {
   });
 
   test("env, logger message key", async () => {
-    const probot = createProbot({
+    const probot = await createProbot({
       env: {
         ...env,
         LOG_LEVEL: "info",
@@ -162,7 +162,7 @@ describe("createProbot", () => {
   });
 
   test("env, octokit logger set", async () => {
-    const probot = createProbot({
+    const probot = await createProbot({
       env: {
         ...env,
         LOG_LEVEL: "info",

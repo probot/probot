@@ -70,7 +70,7 @@ describe("createNodeMiddleware", () => {
       app.on("push", onPush);
     };
     const middleware = await createNodeMiddleware(app, {
-      probot: createProbot({
+      probot: await createProbot({
         overrides: {
           log: pino(streamLogsToOutput),
         },
@@ -123,7 +123,7 @@ describe("createNodeMiddleware", () => {
       app.on("push", onPush);
     };
     const middleware = await createNodeMiddleware(app, {
-      probot: createProbot({
+      probot: await createProbot({
         overrides: {
           log: pino(streamLogsToOutput),
         },
@@ -178,7 +178,7 @@ describe("createNodeMiddleware", () => {
     };
     const middleware = await createNodeMiddleware(app, {
       webhooksPath: "/",
-      probot: createProbot({
+      probot: await createProbot({
         overrides: {
           log: pino(streamLogsToOutput),
         },

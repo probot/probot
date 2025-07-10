@@ -68,7 +68,7 @@ export async function run(
     args,
   } = { ...envOptions, ...cliOptions };
 
-  const log = getLog({
+  const log = await getLog({
     level,
     logFormat,
     logLevelInString,

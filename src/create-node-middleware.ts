@@ -35,7 +35,7 @@ import { createProbot } from "./create-probot.js";
  */
 export async function createNodeMiddleware(
   appFn: ApplicationFunction,
-  { probot = createProbot(), webhooksPath } = {} as MiddlewareOptions,
+  { probot, webhooksPath } = {} as MiddlewareOptions,
 ): Promise<
   (
     request: IncomingMessage,
@@ -45,7 +45,7 @@ export async function createNodeMiddleware(
 > {
   const handlers: Handler[] = [];
 
-  const probotInstance = await probot;
+  const probotInstance = probot || await createProbot();
   await probotInstance.load(appFn, {
     cwd: process.cwd(),
     addHandler: (handler) => {

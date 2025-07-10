@@ -3,7 +3,6 @@ import {
   type IncomingMessage,
   type ServerResponse,
 } from "node:http";
-import Stream from "node:stream";
 
 import getPort from "get-port";
 import { pino } from "pino";
@@ -12,20 +11,11 @@ import { describe, expect, test } from "vitest";
 
 import { httpLogger } from "../../../src/server/handlers/http-logger.js";
 import { getPayload } from "../../../src/helpers/get-payload.js";
+import { MockLoggerTarget } from "../../utils.js";
 
 describe("logging", () => {
-  function streamLogsToOutput(target: any[]) {
-    return new Stream.Writable({
-      objectMode: true,
-      write(object, _encoding, done) {
-        target.push(JSON.parse(object));
-        done();
-      },
-    });
-  }
-
   function instantiateServer(output: string[], options = {} as Options) {
-    const logger = pino(streamLogsToOutput(output));
+    const logger = pino(new MockLoggerTarget(output));
     const loggerMiddleware = httpLogger(logger, options);
 
     const handler = async (req: IncomingMessage, res: ServerResponse) => {

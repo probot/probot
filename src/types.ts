@@ -22,7 +22,10 @@ export interface Options {
   redisConfig?: RedisOptions | string;
   secret?: string;
   logLevel?: "trace" | "debug" | "info" | "warn" | "error" | "fatal";
+  logFormat?: "json" | "pretty";
+  logLevelInString?: boolean;
   logMessageKey?: string;
+  sentryDsn?: string;
   port?: number;
   host?: string;
   server?: Server;

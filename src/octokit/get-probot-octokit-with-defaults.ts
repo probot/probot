@@ -7,7 +7,6 @@ import type { Lru } from "toad-cache";
 import type { OctokitOptions } from "../types.js";
 import { ProbotOctokit } from "./probot-octokit.js";
 import { getOctokitThrottleOptions } from "./get-octokit-throttle-options.js";
-import { rebindLog } from "../helpers/rebind-log.js";
 
 type Options = {
   cache: Lru<string>;
@@ -54,16 +53,16 @@ export async function getProbotOctokitWithDefaults(
         }),
       };
 
+  const log = options.log.child({ name: "octokit" });
+
   const octokitThrottleOptions = await getOctokitThrottleOptions({
-    log: options.log,
+    log,
     redisConfig: options.redisConfig,
   });
 
   const defaultOptions: Partial<OctokitOptions> = {
+    log,
     auth: authOptions,
-    log: rebindLog(
-      options.log.child ? options.log.child({ name: "octokit" }) : options.log,
-    ),
   };
 
   if (options.request) {

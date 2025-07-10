@@ -1,9 +1,10 @@
-import Stream from "node:stream";
-
 import type {
   EmitterWebhookEvent as WebhookEvent,
   EmitterWebhookEventName,
 } from "@octokit/webhooks";
+import webhookExamples, {
+  type WebhookDefinition,
+} from "@octokit/webhooks-examples";
 import Bottleneck from "bottleneck";
 import fetchMock from "fetch-mock";
 import { pino } from "pino";
@@ -11,9 +12,7 @@ import { describe, expect, it } from "vitest";
 
 import { Probot, ProbotOctokit, Context } from "../src/index.js";
 
-import webhookExamples, {
-  type WebhookDefinition,
-} from "@octokit/webhooks-examples";
+import { MockLoggerTarget } from "./utils.js";
 
 const appId = 1;
 const privateKey = `-----BEGIN RSA PRIVATE KEY-----
@@ -171,16 +170,11 @@ describe("Probot", () => {
     };
 
     it("responds with the correct error if webhook secret does not match", async () => {
-      const output: any[] = [];
-      const streamLogsToOutput = new Stream.Writable({ objectMode: true });
-      streamLogsToOutput._write = (object, _encoding, done) => {
-        output.push(JSON.parse(object));
-        done();
-      };
+      const logTarget = new MockLoggerTarget([]);
 
       const probot = new Probot({
         githubToken: "faketoken",
-        log: pino(streamLogsToOutput),
+        log: pino(logTarget),
       });
 
       probot.on("push", () => {
@@ -191,25 +185,20 @@ describe("Probot", () => {
         await probot.receive(event);
         throw new Error("Should have thrown");
       } catch (e) {
-        expect(output.length).toBe(1);
-        expect(output[0].level).toBe(50); // 50 is the error level in pino
-        expect(output[0].msg).toBe(
+        expect(logTarget.entries.length).toBe(1);
+        expect(logTarget.entries[0].level).toBe(50); // 50 is the error level in pino
+        expect(logTarget.entries[0].msg).toBe(
           "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
         );
       }
     });
 
     it("responds with the correct error if webhook secret is not found", async () => {
-      const output: any[] = [];
-      const streamLogsToOutput = new Stream.Writable({ objectMode: true });
-      streamLogsToOutput._write = (object, _encoding, done) => {
-        output.push(JSON.parse(object));
-        done();
-      };
+      const logTarget = new MockLoggerTarget();
 
       const probot = new Probot({
         githubToken: "faketoken",
-        log: pino(streamLogsToOutput),
+        log: pino(logTarget),
       });
 
       probot.on("push", () => {
@@ -220,25 +209,20 @@ describe("Probot", () => {
         await probot.receive(event);
         throw new Error("Should have thrown");
       } catch (e) {
-        expect(output.length).toBe(1);
-        expect(output[0].level).toBe(50); // 50 is the error level in pino
-        expect(output[0].msg).toBe(
+        expect(logTarget.entries.length).toBe(1);
+        expect(logTarget.entries[0].level).toBe(50); // 50 is the error level in pino
+        expect(logTarget.entries[0].msg).toBe(
           "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
         );
       }
     });
 
     it("responds with the correct error if webhook secret is wrong", async () => {
-      const output: any[] = [];
-      const streamLogsToOutput = new Stream.Writable({ objectMode: true });
-      streamLogsToOutput._write = (object, _encoding, done) => {
-        output.push(JSON.parse(object));
-        done();
-      };
+      const logTarget = new MockLoggerTarget();
 
       const probot = new Probot({
         githubToken: "faketoken",
-        log: pino(streamLogsToOutput),
+        log: pino(logTarget),
       });
 
       probot.on("push", () => {
@@ -251,25 +235,20 @@ describe("Probot", () => {
         await probot.receive(event);
         throw new Error("Should have thrown");
       } catch (e) {
-        expect(output.length).toBe(1);
-        expect(output[0].level).toBe(50); // 50 is the error level in pino
-        expect(output[0].msg).toBe(
+        expect(logTarget.entries.length).toBe(1);
+        expect(logTarget.entries[0].level).toBe(50); // 50 is the error level in pino
+        expect(logTarget.entries[0].msg).toBe(
           "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
         );
       }
     });
 
     it("responds with the correct error if the PEM file is missing", async () => {
-      const output: any[] = [];
-      const streamLogsToOutput = new Stream.Writable({ objectMode: true });
-      streamLogsToOutput._write = (object, _encoding, done) => {
-        output.push(JSON.parse(object));
-        done();
-      };
+      const logTarget = new MockLoggerTarget();
 
       const probot = new Probot({
         githubToken: "faketoken",
-        log: pino(streamLogsToOutput),
+        log: pino(logTarget),
       });
 
       probot.onAny(() => {
@@ -282,25 +261,20 @@ describe("Probot", () => {
         await probot.receive(event);
         throw new Error("Should have thrown");
       } catch (e) {
-        expect(output.length).toBe(1);
-        expect(output[0].level).toBe(50); // 50 is the error level in pino
-        expect(output[0].msg).toBe(
+        expect(logTarget.entries.length).toBe(1);
+        expect(logTarget.entries[0].level).toBe(50); // 50 is the error level in pino
+        expect(logTarget.entries[0].msg).toBe(
           "Your private key (a .pem file or PRIVATE_KEY environment variable) or APP_ID is incorrect. Go to https://github.com/settings/apps/YOUR_APP, verify that APP_ID is set correctly, and generate a new PEM file if necessary.",
         );
       }
     });
 
     it("responds with the correct error if the jwt could not be decoded", async () => {
-      const output: any[] = [];
-      const streamLogsToOutput = new Stream.Writable({ objectMode: true });
-      streamLogsToOutput._write = (object, _encoding, done) => {
-        output.push(JSON.parse(object));
-        done();
-      };
+      const logTarget = new MockLoggerTarget();
 
       const probot = new Probot({
         githubToken: "faketoken",
-        log: pino(streamLogsToOutput),
+        log: pino(logTarget),
       });
 
       probot.onAny(() => {
@@ -313,9 +287,9 @@ describe("Probot", () => {
         await probot.receive(event);
         throw new Error("Should have thrown");
       } catch (e) {
-        expect(output.length).toBe(1);
-        expect(output[0].level).toBe(50); // 50 is the error level in pino
-        expect(output[0].msg).toBe(
+        expect(logTarget.entries.length).toBe(1);
+        expect(logTarget.entries[0].level).toBe(50); // 50 is the error level in pino
+        expect(logTarget.entries[0].msg).toBe(
           "Your private key (a .pem file or PRIVATE_KEY environment variable) or APP_ID is incorrect. Go to https://github.com/settings/apps/YOUR_APP, verify that APP_ID is set correctly, and generate a new PEM file if necessary.",
         );
       }
@@ -546,17 +520,12 @@ describe("Probot", () => {
     });
 
     it("adds a logger on the context", async () => {
-      const output: any[] = [];
-      const streamLogsToOutput = new Stream.Writable({ objectMode: true });
-      streamLogsToOutput._write = (object, _encoding, done) => {
-        output.push(JSON.parse(object));
-        done();
-      };
+      const logTarget = new MockLoggerTarget();
 
       const probot = new Probot({
         appId,
         privateKey,
-        log: pino(streamLogsToOutput),
+        log: pino(logTarget),
       });
 
       const handlerCalls: Context[] = [];
@@ -577,9 +546,9 @@ describe("Probot", () => {
 
       expect(handlerCalls.length).toBe(1);
       expect(typeof handlerCalls[0].log.info).toBe("function");
-      expect(output.length).toBe(1);
-      expect(output[0].msg).toBe("testing");
-      expect(output[0].id).toBe(handlerCalls[0].id);
+      expect(logTarget.entries.length).toBe(1);
+      expect(logTarget.entries[0].msg).toBe("testing");
+      expect(logTarget.entries[0].id).toBe(handlerCalls[0].id);
     });
 
     it("returns an authenticated client for installation.created", async () => {
@@ -785,25 +754,20 @@ describe("Probot", () => {
     });
 
     it("passes logger to webhooks", async () => {
-      const output: any[] = [];
-      const streamLogsToOutput = new Stream.Writable({ objectMode: true });
-      streamLogsToOutput._write = (object, _encoding, done) => {
-        output.push(JSON.parse(object));
-        done();
-      };
+      const logTarget = new MockLoggerTarget();
 
       const probot = new Probot({
         appId,
         privateKey,
-        log: pino(streamLogsToOutput),
+        log: pino(logTarget),
       });
 
       // @ts-expect-error
       probot.on("unknown-event", () => {});
 
       await probot.ready();
-      expect(output.length).toBe(1);
-      expect(output[0].msg).toBe(
+      expect(logTarget.entries.length).toBe(1);
+      expect(logTarget.entries[0].msg).toBe(
         '"unknown-event" is not a known webhook name (https://developer.github.com/v3/activity/events/types/)',
       );
     });

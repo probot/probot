@@ -3,7 +3,6 @@ import {
   type IncomingMessage,
   type ServerResponse,
 } from "node:http";
-import Stream from "node:stream";
 
 import { pino } from "pino";
 import { sign } from "@octokit/webhooks-methods";
@@ -14,6 +13,7 @@ import type { ApplicationFunction } from "../src/types.js";
 import WebhookExamples, {
   type WebhookDefinition,
 } from "@octokit/webhooks-examples";
+import { MockLoggerTarget } from "./utils.js";
 
 const APP_ID = "1";
 const PRIVATE_KEY = `-----BEGIN RSA PRIVATE KEY-----
@@ -51,16 +51,7 @@ const pushEvent = (
 ).examples[0];
 
 describe("createNodeMiddleware", () => {
-  let output: any[];
-  const streamLogsToOutput = new Stream.Writable({ objectMode: true });
-  streamLogsToOutput._write = (object, _encoding, done) => {
-    output.push(JSON.parse(object));
-    done();
-  };
-
   test("with createProbot", async () => {
-    output = [];
-
     const onPushCalls: any[] = [];
     const onPush = (event: any) => {
       onPushCalls.push(event);
@@ -72,7 +63,7 @@ describe("createNodeMiddleware", () => {
     const middleware = await createNodeMiddleware(app, {
       probot: createProbot({
         overrides: {
-          log: pino(streamLogsToOutput),
+          log: pino(new MockLoggerTarget()),
         },
         env: {
           APP_ID,
@@ -112,8 +103,6 @@ describe("createNodeMiddleware", () => {
   });
 
   test("with createProbot and setting the webhookPath via WEBHOOK_PATH to the root", async () => {
-    output = [];
-
     const onPushCalls: any[] = [];
     const onPush = (event: any) => {
       onPushCalls.push(event);
@@ -125,7 +114,7 @@ describe("createNodeMiddleware", () => {
     const middleware = await createNodeMiddleware(app, {
       probot: createProbot({
         overrides: {
-          log: pino(streamLogsToOutput),
+          log: pino(new MockLoggerTarget()),
         },
         env: {
           APP_ID,
@@ -166,8 +155,6 @@ describe("createNodeMiddleware", () => {
   });
 
   test("with createProbot and setting the webhookPath to the root via the deprecated webhooksPath", async () => {
-    output = [];
-
     const onPushCalls: any[] = [];
     const onPush = (event: any) => {
       onPushCalls.push(event);
@@ -180,7 +167,7 @@ describe("createNodeMiddleware", () => {
       webhooksPath: "/",
       probot: createProbot({
         overrides: {
-          log: pino(streamLogsToOutput),
+          log: pino(new MockLoggerTarget()),
         },
         env: {
           APP_ID,
@@ -220,8 +207,6 @@ describe("createNodeMiddleware", () => {
   });
 
   test("loads app only once", async () => {
-    output = [];
-
     let counter = 0;
     const appFn = () => {
       counter++;

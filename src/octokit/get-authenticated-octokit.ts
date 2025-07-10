@@ -1,7 +1,6 @@
 import type { ProbotOctokit } from "./probot-octokit.js";
 import type { OctokitOptions } from "../types.js";
 import type { LogFn, Level, Logger } from "pino";
-import { rebindLog } from "../helpers/rebind-log.js";
 
 type FactoryOptions = {
   octokit: ProbotOctokit;
@@ -50,13 +49,11 @@ export async function getAuthenticatedOctokit(options: {
     type: "installation",
     installationId,
     factory: ({ octokit, octokitOptions, ...otherOptions }: FactoryOptions) => {
-      const pinoLog = log.child({ name: "github" });
-
       const options: ConstructorParameters<typeof ProbotOctokit>[0] & {
         log: Record<Level, LogFn>;
       } = {
         ...octokitOptions,
-        log: rebindLog(pinoLog),
+        log: log.child({ name: "github" }),
         throttle: octokitOptions.throttle?.enabled
           ? {
               ...octokitOptions.throttle,

@@ -29,7 +29,6 @@ import {
   defaultWebhookSecret,
   type Server,
 } from "./server/server.js";
-import { rebindLog } from "./helpers/rebind-log.js";
 
 export type Constructor<T = any> = new (...args: any[]) => T;
 
@@ -53,7 +52,10 @@ export type State = {
   cache: Lru<string> | null;
   octokit: ProbotOctokit | null;
   webhooks: ProbotWebhooks | null;
-  log: Logger;
+  log: Logger | null;
+  logFormat?: "pretty" | "json";
+  logLevelInString?: boolean;
+  sentryDsn?: string;
   logLevel?: "trace" | "debug" | "info" | "warn" | "error" | "fatal";
   logMessageKey?: string;
   appId?: number;
@@ -109,7 +111,12 @@ export class Probot {
       cache: null,
       octokit: null,
       webhooks: null,
-      log: options.log!,
+      log: options.log || null,
+      logFormat: options.logFormat || "pretty",
+      logLevelInString: options.logLevelInString || false,
+      logLevel: options.logLevel || "warn",
+      logMessageKey: options.logMessageKey,
+      sentryDsn: options.sentryDsn,
       githubToken: options.githubToken,
       appId: Number.parseInt(options.appId as string, 10),
       privateKey: options.privateKey,
@@ -143,13 +150,17 @@ export class Probot {
         1000 * 60 * 59,
       );
 
-      this.#state.log = rebindLog(
+      this.#state.log =
         this.#state.log ||
-          getLog({
-            level: this.#state.logLevel,
-            logMessageKey: this.#state.logMessageKey,
-          }),
-      );
+        (await getLog({
+          logFormat: this.#state.logFormat,
+          logLevelInString: this.#state.logLevelInString,
+          level: this.#state.logLevel,
+          logMessageKey: this.#state.logMessageKey,
+          sentryDsn: this.#state.sentryDsn,
+        }));
+
+      this.#state.log = this.#state.log.child({ name: "probot" });
 
       const Octokit = await getProbotOctokitWithDefaults({
         githubToken: this.#state.githubToken,
@@ -189,7 +200,10 @@ export class Probot {
 
       this.#state.initializedPromise.resolve();
     } catch (error) {
-      this.#state.log.error({ err: error }, "Failed to initialize Probot");
+      (this.#state.log || console).error(
+        { err: error },
+        "Failed to initialize Probot",
+      );
       this.#state.initializedPromise.reject(error);
     } finally {
       return this.#state.initializedPromise.promise;
@@ -205,7 +219,7 @@ export class Probot {
     await this.#initialize();
 
     return createNodeMiddleware(this.#state.webhooks!, {
-      log: log || this.#state.log,
+      log: log || this.#state.log!,
       path: path || this.#state.webhookPath,
     });
   }
@@ -214,7 +228,7 @@ export class Probot {
     await this.#initialize();
 
     return await getAuthenticatedOctokit({
-      log: this.#state.log,
+      log: this.#state.log!,
       octokit: this.#state.octokit!,
       installationId,
     });
@@ -248,7 +262,7 @@ export class Probot {
   }
 
   get log(): Logger {
-    return this.#state.log;
+    return this.#state.log!;
   }
 
   public on: ProbotWebhooks["on"] = (eventName, callback) => {
@@ -296,7 +310,7 @@ export class Probot {
   public async receive(event: WebhookEvent): Promise<void> {
     await this.#state.initializedPromise.promise;
 
-    this.#state.log.debug({ event }, "Webhook received");
+    this.#state.log!.debug({ event }, "Webhook received");
     await this.#state.webhooks!.receive(event);
     return;
   }

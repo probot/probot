@@ -149,7 +149,7 @@ export async function receive(args: string[]) {
     fs.readFileSync(path.resolve(payloadPath), "utf8"),
   );
 
-  const log = getLog({
+  const log = await getLog({
     level: logLevel,
     logFormat,
     logLevelInString,

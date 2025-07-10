@@ -1,5 +1,3 @@
-import { Stream } from "node:stream";
-
 import fetchMock from "fetch-mock";
 import { pino } from "pino";
 import getPort from "get-port";
@@ -14,16 +12,9 @@ import { successView } from "../../src/views/success.js";
 
 import { getRuntimeName } from "../../src/helpers/get-runtime-name.js";
 import { getRuntimeVersion } from "../../src/helpers/get-runtime-version.js";
+import { MockLoggerTarget } from "../utils.js";
 
 describe("Setup app", () => {
-  let logOutput: any[] = [];
-
-  const streamLogsToOutput = new Stream.Writable({ objectMode: true });
-  streamLogsToOutput._write = (msg, _encoding, done) => {
-    logOutput.push(JSON.parse(msg));
-    done();
-  };
-
   let updateEnvCalls: Env[] = [];
   function updateEnv(env: Env) {
     updateEnvCalls.push(env);
@@ -39,7 +30,6 @@ describe("Setup app", () => {
   };
 
   const reset = () => {
-    logOutput = [];
     updateEnvCalls = [];
     SmeeClientCreateChannelCalls = [];
   };
@@ -48,19 +38,23 @@ describe("Setup app", () => {
     it("should log welcome message", async () => {
       reset();
 
+      const logTarget = new MockLoggerTarget();
+      const log = pino(logTarget);
+
       const server = new Server({
         Probot: Probot.defaults({
-          log: pino(streamLogsToOutput),
+          log,
           // workaround for https://github.com/probot/probot/issues/1512
           appId: 1,
           privateKey: "dummy value for setup, see #1512",
         }),
-        log: pino(streamLogsToOutput),
+        log,
         port: await getPort(),
       });
 
       await server.loadHandlerFactory(
         setupAppFactory({
+          log,
           host: server.host,
           port: server.port,
           updateEnv,
@@ -83,7 +77,7 @@ describe("Setup app", () => {
         `Listening on http://localhost:${server.port}`,
       ];
 
-      const infoLogs = logOutput
+      const infoLogs = logTarget.entries
         .filter((output: any) => output.level === pino.levels.values.info)
         .map((o) => o.msg);
 
@@ -106,11 +100,13 @@ describe("Setup app", () => {
       reset();
 
       const port = await getPort();
+      const logTarget = new MockLoggerTarget();
+      const log = pino(logTarget);
 
       const server = new Server({
-        log: pino(streamLogsToOutput),
+        log,
         Probot: Probot.defaults({
-          log: pino(streamLogsToOutput),
+          log,
           // workaround for https://github.com/probot/probot/issues/1512
           appId: 1,
           privateKey: "dummy value for setup, see #1512",
@@ -121,6 +117,7 @@ describe("Setup app", () => {
 
       await server.loadHandlerFactory(
         setupAppFactory({
+          log,
           host: server.host,
           port: server.port,
           updateEnv,
@@ -130,7 +127,7 @@ describe("Setup app", () => {
 
       const expMsg = `Please follow the instructions at http://${server.host}:${server.port} to configure .env.`;
 
-      const infoLogs = logOutput
+      const infoLogs = logTarget.entries
         .filter((output: any) => output.level === pino.levels.values.info)
         .map((o) => o.msg);
 
@@ -142,19 +139,23 @@ describe("Setup app", () => {
     it("returns a 200 response", async () => {
       reset();
 
+      const logTarget = new MockLoggerTarget();
+      const log = pino(logTarget);
+
       const server = new Server({
         Probot: Probot.defaults({
-          log: pino(streamLogsToOutput),
+          log,
           // workaround for https://github.com/probot/probot/issues/1512
           appId: 1,
           privateKey: "dummy value for setup, see #1512",
         }),
-        log: pino(streamLogsToOutput),
+        log,
         port: await getPort(),
       });
 
       await server.loadHandlerFactory(
         setupAppFactory({
+          log,
           host: server.host,
           port: server.port,
           updateEnv,
@@ -175,6 +176,8 @@ describe("Setup app", () => {
   describe("GET /probot/setup", () => {
     it("returns a redirect", async () => {
       reset();
+      const logTarget = new MockLoggerTarget();
+      const log = pino(logTarget);
 
       const mock = fetchMock
         .createInstance()
@@ -192,12 +195,12 @@ describe("Setup app", () => {
 
       const server = new Server({
         Probot: Probot.defaults({
-          log: pino(streamLogsToOutput),
+          log,
           // workaround for https://github.com/probot/probot/issues/1512
           appId: 1,
           privateKey: "dummy value for setup, see #1512",
         }),
-        log: pino(streamLogsToOutput),
+        log,
         request: {
           fetch: mock.fetchHandler,
         },
@@ -206,6 +209,7 @@ describe("Setup app", () => {
 
       await server.loadHandlerFactory(
         setupAppFactory({
+          log,
           host: server.host,
           port: server.port,
           request: {
@@ -253,20 +257,23 @@ describe("Setup app", () => {
 
     it("throws a 400 Error if code is not provided", async () => {
       reset();
+      const logTarget = new MockLoggerTarget();
+      const log = pino(logTarget);
 
       const server = new Server({
         Probot: Probot.defaults({
-          log: pino(streamLogsToOutput),
+          log,
           // workaround for https://github.com/probot/probot/issues/1512
           appId: 1,
           privateKey: "dummy value for setup, see #1512",
         }),
-        log: pino(streamLogsToOutput),
+        log,
         port: await getPort(),
       });
 
       await server.loadHandlerFactory(
         setupAppFactory({
+          log,
           host: server.host,
           port: server.port,
           updateEnv,
@@ -288,20 +295,23 @@ describe("Setup app", () => {
 
     it("throws a 400 Error if code is an empty string", async () => {
       reset();
+      const logTarget = new MockLoggerTarget();
+      const log = pino(logTarget);
 
       const server = new Server({
         Probot: Probot.defaults({
-          log: pino(streamLogsToOutput),
+          log,
           // workaround for https://github.com/probot/probot/issues/1512
           appId: 1,
           privateKey: "dummy value for setup, see #1512",
         }),
-        log: pino(streamLogsToOutput),
+        log,
         port: await getPort(),
       });
 
       await server.loadHandlerFactory(
         setupAppFactory({
+          log,
           host: server.host,
           port: server.port,
           updateEnv,
@@ -325,20 +335,23 @@ describe("Setup app", () => {
   describe("GET /probot/import", () => {
     it("renders importView", async () => {
       reset();
+      const logTarget = new MockLoggerTarget();
+      const log = pino(logTarget);
 
       const server = new Server({
         Probot: Probot.defaults({
-          log: pino(streamLogsToOutput),
+          log,
           // workaround for https://github.com/probot/probot/issues/1512
           appId: 1,
           privateKey: "dummy value for setup, see #1512",
         }),
-        log: pino(streamLogsToOutput),
+        log,
         port: await getPort(),
       });
 
       await server.loadHandlerFactory(
         setupAppFactory({
+          log,
           host: server.host,
           port: server.port,
           updateEnv,
@@ -368,20 +381,23 @@ describe("Setup app", () => {
   describe("POST /probot/import", () => {
     it("updates .env", async () => {
       reset();
+      const logTarget = new MockLoggerTarget();
+      const log = pino(logTarget);
 
       const server = new Server({
         Probot: Probot.defaults({
-          log: pino(streamLogsToOutput),
+          log,
           // workaround for https://github.com/probot/probot/issues/1512
           appId: 1,
           privateKey: "dummy value for setup, see #1512",
         }),
-        log: pino(streamLogsToOutput),
+        log,
         port: await getPort(),
       });
 
       await server.loadHandlerFactory(
         setupAppFactory({
+          log,
           host: server.host,
           port: server.port,
           updateEnv,
@@ -428,20 +444,22 @@ describe("Setup app", () => {
 
     it("400 when keys are missing", async () => {
       reset();
-
+      const logTarget = new MockLoggerTarget();
+      const log = pino(logTarget);
       const server = new Server({
         Probot: Probot.defaults({
-          log: pino(streamLogsToOutput),
+          log,
           // workaround for https://github.com/probot/probot/issues/1512
           appId: 1,
           privateKey: "dummy value for setup, see #1512",
         }),
-        log: pino(streamLogsToOutput),
+        log,
         port: await getPort(),
       });
 
       await server.loadHandlerFactory(
         setupAppFactory({
+          log,
           host: server.host,
           port: server.port,
           updateEnv,
@@ -479,20 +497,23 @@ describe("Setup app", () => {
   describe("GET /probot/success", () => {
     it("returns a 200 response", async () => {
       reset();
+      const logTarget = new MockLoggerTarget();
+      const log = pino(logTarget);
 
       const server = new Server({
         Probot: Probot.defaults({
-          log: pino(streamLogsToOutput),
+          log,
           // workaround for https://github.com/probot/probot/issues/1512
           appId: 1,
           privateKey: "dummy value for setup, see #1512",
         }),
-        log: pino(streamLogsToOutput),
+        log,
         port: await getPort(),
       });
 
       await server.loadHandlerFactory(
         setupAppFactory({
+          log,
           host: server.host,
           port: server.port,
           updateEnv,

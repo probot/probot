@@ -21,12 +21,12 @@ import { createWebhookProxy } from "../helpers/webhook-proxy.js";
 import { getPrintableHost } from "../helpers/get-printable-host.js";
 import { getRuntimeName } from "../helpers/get-runtime-name.js";
 import { getRuntimeVersion } from "../helpers/get-runtime-version.js";
-import { rebindLog } from "../helpers/rebind-log.js";
 
 import { httpLogger } from "./handlers/http-logger.js";
 import { notFoundHandler } from "./handlers/not-found.js";
 import { pingHandler } from "./handlers/ping.js";
 import { staticFilesHandler } from "./handlers/static-files.js";
+import { getLog } from "../helpers/get-log.js";
 
 // the default path as defined in @octokit/webhooks
 export const defaultWebhookPath = "/api/github/webhooks";
@@ -107,17 +107,17 @@ export class Server {
     this.#state.initializeRan = true;
 
     try {
+      this.#state.log = this.#state.log || (await getLog());
+      this.#state.log.child({ name: "server" });
+
       this.#state.probot = new this.#state.ProbotBase({
         request: this.#state.request,
+        log: this.#state.log,
         server: this,
         webhookPath: this.#state.webhookPath,
       });
 
       await this.#state.probot.ready();
-
-      this.#state.log = rebindLog(
-        this.#state.log || this.#state.probot.log.child({ name: "server" }),
-      );
 
       this.#state.httpLogger = httpLogger(
         this.#state.log,

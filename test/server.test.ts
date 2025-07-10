@@ -1,5 +1,3 @@
-import Stream from "node:stream";
-
 import { describe, it, expect } from "vitest";
 import { pino } from "pino";
 import { sign } from "@octokit/webhooks-methods";
@@ -10,6 +8,7 @@ import WebhookExamples, {
 
 import { Server, Probot } from "../src/index.js";
 import { detectRuntime } from "../src/helpers/detect-runtime.js";
+import { MockLoggerTarget } from "./utils.js";
 
 const appId = 1;
 const privateKey = `-----BEGIN RSA PRIVATE KEY-----
@@ -46,23 +45,13 @@ const pushEvent = (
 ).examples[0];
 
 describe("Server", () => {
-  function streamLogsToOutput(target: any[]) {
-    return new Stream.Writable({
-      objectMode: true,
-      write(object, _encoding, done) {
-        target.push(JSON.parse(object));
-        done();
-      },
-    });
-  }
-
   it("Server.version", () => {
     expect(Server.version).toBe("0.0.0-development");
   });
 
   describe("GET /ping", () => {
     it("returns a 200 response", async () => {
-      const output: any[] = [];
+      const logTarget = new MockLoggerTarget();
 
       const server = new Server({
         webhookPath: "/",
@@ -71,7 +60,7 @@ describe("Server", () => {
           privateKey,
           secret: "secret",
         }),
-        log: pino(streamLogsToOutput(output)),
+        log: pino(logTarget),
         port: await getPort(),
       });
 
@@ -81,8 +70,8 @@ describe("Server", () => {
       expect(response.status).toBe(200);
       expect(await response.text()).toBe("PONG");
 
-      expect(output.length).toBe(3);
-      expect(output[2].msg.slice(0, 15)).toBe("GET /ping 200 -");
+      expect(logTarget.entries.length).toBe(3);
+      expect(logTarget.entries[2].msg.slice(0, 15)).toBe("GET /ping 200 -");
 
       await server.stop();
     });
@@ -90,7 +79,7 @@ describe("Server", () => {
 
   describe("webhook handler (POST /api/github/webhooks)", () => {
     it("should return 200 and run event handlers in app function", async () => {
-      const output: any[] = [];
+      const logTarget = new MockLoggerTarget();
 
       let pushCalls = 0;
 
@@ -100,7 +89,7 @@ describe("Server", () => {
           privateKey,
           secret: "secret",
         }),
-        log: pino(streamLogsToOutput(output)),
+        log: pino(logTarget),
         port: await getPort(),
       });
 
@@ -132,8 +121,8 @@ describe("Server", () => {
 
       expect(pushCalls).toBe(1);
 
-      expect(output.length).toBe(3);
-      expect(output[2].msg.slice(0, 31)).toBe(
+      expect(logTarget.entries.length).toBe(3);
+      expect(logTarget.entries[2].msg.slice(0, 31)).toBe(
         "POST /api/github/webhooks 200 -",
       );
 
@@ -142,7 +131,7 @@ describe("Server", () => {
 
     describe("GET unknown URL", () => {
       it("responds with 404", async () => {
-        const output: any[] = [];
+        const logTarget = new MockLoggerTarget();
 
         const server = new Server({
           webhookPath: "/",
@@ -151,7 +140,7 @@ describe("Server", () => {
             privateKey,
             secret: "secret",
           }),
-          log: pino(streamLogsToOutput(output)),
+          log: pino(logTarget),
           port: await getPort(),
         });
 
@@ -162,14 +151,16 @@ describe("Server", () => {
         );
 
         expect(response.status).toBe(404);
-        expect(output.length).toBe(3);
-        expect(output[2].msg.slice(0, 19)).toBe("GET /notfound 404 -");
+        expect(logTarget.entries.length).toBe(3);
+        expect(logTarget.entries[2].msg.slice(0, 19)).toBe(
+          "GET /notfound 404 -",
+        );
 
         await server.stop();
       });
 
       it("respond with a friendly error when x-hub-signature-256 is missing", async () => {
-        const output: any[] = [];
+        const logTarget = new MockLoggerTarget();
 
         const server = new Server({
           Probot: Probot.defaults({
@@ -177,7 +168,7 @@ describe("Server", () => {
             privateKey,
             secret: "secret",
           }),
-          log: pino(streamLogsToOutput(output)),
+          log: pino(logTarget),
           port: await getPort(),
         });
 
@@ -208,7 +199,7 @@ describe("Server", () => {
     });
 
     it("html formatted response", async () => {
-      const output: any[] = [];
+      const logTarget = new MockLoggerTarget();
 
       const server = new Server({
         webhookPath: "/",
@@ -217,7 +208,7 @@ describe("Server", () => {
           privateKey,
           secret: "secret",
         }),
-        log: pino(streamLogsToOutput(output)),
+        log: pino(logTarget),
         port: await getPort(),
       });
 
@@ -229,8 +220,8 @@ describe("Server", () => {
 
       expect(await response.text()).toBe("");
 
-      expect(output.length).toBe(3);
-      expect(output[2].msg.slice(0, 19)).toBe("GET /notfound 404 -");
+      expect(logTarget.entries.length).toBe(3);
+      expect(logTarget.entries[2].msg.slice(0, 19)).toBe("GET /notfound 404 -");
 
       await server.stop();
     });
@@ -238,6 +229,8 @@ describe("Server", () => {
 
   describe(".start() / .stop()", () => {
     it("should expect the correct error if port already in use", async () => {
+      const logTarget = new MockLoggerTarget();
+
       // Bun runtime detected. Port reuse possible. skipping port in use error check
       if (detectRuntime(globalThis) === "bun") {
         return;
@@ -246,7 +239,7 @@ describe("Server", () => {
 
       const blocker = new Server({
         Probot: Probot.defaults({ appId, privateKey }),
-        log: pino(streamLogsToOutput([])),
+        log: pino(logTarget),
         port,
       });
 
@@ -254,7 +247,7 @@ describe("Server", () => {
 
       const server = new Server({
         Probot: Probot.defaults({ appId, privateKey }),
-        log: pino(streamLogsToOutput([])),
+        log: pino(logTarget),
         port,
       });
 
@@ -271,7 +264,7 @@ describe("Server", () => {
     });
 
     it("respects host/ip config when starting up HTTP server", async () => {
-      const output: any[] = [];
+      const logTarget = new MockLoggerTarget();
 
       const port = await getPort();
 
@@ -279,12 +272,14 @@ describe("Server", () => {
         Probot: Probot.defaults({ appId, privateKey }),
         port,
         host: "127.0.0.1",
-        log: pino(streamLogsToOutput(output)),
+        log: pino(logTarget),
       });
       await testApp.start();
 
-      expect(output.length).toBe(2);
-      expect(output[1].msg).toBe(`Listening on http://127.0.0.1:${port}`);
+      expect(logTarget.entries.length).toBe(2);
+      expect(logTarget.entries[1].msg).toBe(
+        `Listening on http://127.0.0.1:${port}`,
+      );
 
       await testApp.stop();
     });

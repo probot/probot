@@ -1,4 +1,3 @@
-import Stream from "node:stream";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -10,27 +9,19 @@ import { Probot, Server } from "../../src/index.js";
 import { defaultApp as defaultAppHandler } from "../../src/apps/default.js";
 
 import { probotView } from "../../src/views/probot.js";
+import { MockLoggerTarget } from "../utils.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 describe("default app", () => {
-  let output = [];
-
-  const streamLogsToOutput = new Stream.Writable({ objectMode: true });
-  streamLogsToOutput._write = (object, _encoding, done) => {
-    output.push(JSON.parse(object));
-    done();
-  };
-
   async function instantiateServer(cwd = process.cwd()) {
-    output = [];
     const server = new Server({
       Probot: Probot.defaults({
         appId: 1,
         privateKey: "private key",
       }),
       port: await getPort(),
-      log: pino(streamLogsToOutput),
+      log: pino(new MockLoggerTarget()),
       cwd,
     });
 

@@ -68,13 +68,15 @@ export async function createProbot({
     ...overrides,
   };
 
-  const log = (await getLog({
-    level: probotOptions.logLevel,
-    logFormat: envWithDefaults.LOG_FORMAT as PinoOptions["logFormat"],
-    logLevelInString: envWithDefaults.LOG_LEVEL_IN_STRING === "true",
-    logMessageKey: envWithDefaults.LOG_MESSAGE_KEY,
-    sentryDsn: envWithDefaults.SENTRY_DSN,
-  })).child({ name: "server" });
+  const log = (
+    await getLog({
+      level: probotOptions.logLevel,
+      logFormat: envWithDefaults.LOG_FORMAT as PinoOptions["logFormat"],
+      logLevelInString: envWithDefaults.LOG_LEVEL_IN_STRING === "true",
+      logMessageKey: envWithDefaults.LOG_MESSAGE_KEY,
+      sentryDsn: envWithDefaults.SENTRY_DSN,
+    })
+  ).child({ name: "server" });
 
   return new Probot({
     log: log.child({ name: "probot" }),

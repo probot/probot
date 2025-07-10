@@ -145,10 +145,10 @@ export class Probot {
 
       this.#state.log = rebindLog(
         this.#state.log ||
-          await getLog({
+          (await getLog({
             level: this.#state.logLevel,
             logMessageKey: this.#state.logMessageKey,
-          }),
+          })),
       );
 
       const Octokit = await getProbotOctokitWithDefaults({

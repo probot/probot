@@ -23,7 +23,7 @@ import { createProbot } from "./create-probot.js";
  *   });
  * };
  *
- * const middleware = await createNodeMiddleware(appFn, { probot: createProbot() });
+ * const middleware = await createNodeMiddleware(appFn, { probot: await createProbot() });
  *
  * const server = createServer((req, res) => {
  *   middleware(req, res, () => {

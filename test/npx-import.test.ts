@@ -43,6 +43,9 @@ describe("smee-client", () => {
     expect(
       typeof packageLockJson.packages["node_modules/smee-client"].version,
     ).toBe("string");
+    expect(
+     packageLockJson.packages["node_modules/smee-client"].dev,
+    ).toBe(true);
     checkForFixedNpxImport(
       join(__dirname, "../src"),
       "smee-client",
@@ -56,6 +59,9 @@ describe("ioredis", () => {
     expect(
       typeof packageLockJson.packages["node_modules/ioredis"].version,
     ).toBe("string");
+    expect(
+      packageLockJson.packages["node_modules/ioredis"].dev,
+    ).toBe(true);
     checkForFixedNpxImport(
       join(__dirname, "../src"),
       "ioredis",

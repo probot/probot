@@ -45,7 +45,7 @@
     "@octokit/request": "^8.4.1",
     "@octokit/types": "^12.3.0",
     "@octokit/webhooks": "^12.3.2",
-    "@probot/get-private-key": "^1.1.2",
+    "@probot/get-private-key": "^2.0.0",
     "@probot/octokit-plugin-config": "^2.0.1",
     "@probot/pino": "^3.0.0",
     "@types/express": "^5.0.1",

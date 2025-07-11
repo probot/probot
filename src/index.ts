@@ -1,20 +1,4 @@
-export type { Logger } from "pino";
-
-export { Context } from "./context.js";
-
-export { Probot } from "./probot.js";
-export { Server } from "./server/server.js";
-export { ProbotOctokit } from "./octokit/probot-octokit.js";
-export { run } from "./run.js";
-export { createNodeMiddleware } from "./create-node-middleware.js";
-export { createProbot } from "./create-probot.js";
-
-/** NOTE: exported types might change at any point in time */
-export type {
-  Options,
-  ApplicationFunction,
-  ApplicationFunctionOptions,
-} from "./types.js";
+export * from "./exports.js";
 
 declare global {
   namespace NodeJS {
@@ -148,7 +132,18 @@ declare global {
        */
       WEBHOOK_SECRET?: string;
 
+      NO_SMEE_SETUP?: "true";
+
+      PROJECT_DOMAIN?: string;
+
       NODE_ENV?: string;
     }
+  }
+}
+
+declare module "node:http" {
+  interface IncomingMessage {
+    body?: string | Record<string, unknown> | undefined;
+    rawBody?: Buffer | undefined;
   }
 }

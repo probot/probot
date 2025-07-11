@@ -1,72 +1,83 @@
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-import request from "supertest";
 import { sign } from "@octokit/webhooks-methods";
-import { describe, expect, it, beforeEach } from "vitest";
+import getPort from "get-port";
+import { pino } from "pino";
+import { describe, expect, it } from "vitest";
 
-import { Probot, run, Server } from "../src/index.js";
+import { type Probot, run } from "../src/index.js";
+import { MockLoggerTarget } from "./utils.js";
 
-import { captureLogOutput } from "./helpers/capture-log-output.js";
 import WebhookExamples, {
   type WebhookDefinition,
 } from "@octokit/webhooks-examples";
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const defaultEnv: NodeJS.ProcessEnv = {
+  APP_ID: "1",
+  PRIVATE_KEY_PATH: path.join(__dirname, "fixtures", "test-private-key.pem"),
+  WEBHOOK_PROXY_URL: "https://smee.io/EfHXC9BFfGAxbM6J",
+  WEBHOOK_SECRET: "secret",
+  LOG_LEVEL: "fatal",
+};
+
+const updateEnv = (env: NodeJS.ProcessEnv): NodeJS.ProcessEnv => {
+  return env;
+};
+
 describe("run", () => {
-  let server: Server;
-  let env: NodeJS.ProcessEnv;
-
-  beforeEach(() => {
-    env = {
-      APP_ID: "1",
-      PRIVATE_KEY_PATH: path.join(
-        __dirname,
-        "fixtures",
-        "test-private-key.pem",
-      ),
-      WEBHOOK_PROXY_URL: "https://smee.io/EfHXC9BFfGAxbM6J",
-      WEBHOOK_SECRET: "secret",
-      LOG_LEVEL: "fatal",
-    };
-  });
-
   describe("params", () => {
     it("runs with a function as argument", async () => {
+      const port = await getPort();
+      const env = { ...defaultEnv, PORT: port.toString() };
+
       let initialized = false;
 
-      server = await run(
+      const server = await run(
         () => {
           initialized = true;
         },
-        { env },
+        { env, updateEnv, SmeeClient: { createChannel: async () => "dummy" } },
       );
-      expect(initialized).toBeTruthy();
+      expect(initialized).toBe(true);
       await server.stop();
     });
 
     it("runs with an array of strings", async () => {
-      server = await run([
-        "node",
-        "probot-run",
-        "./test/fixtures/example.js",
-        "--log-level",
-        "fatal",
-      ]);
+      const server = await run(
+        [
+          "node",
+          "probot-run",
+          "./test/fixtures/example.js",
+          "--log-level",
+          "fatal",
+        ],
+        { updateEnv, SmeeClient: { createChannel: async () => "dummy" } },
+      );
       await server.stop();
     });
 
     it("runs without config and loads the setup app", async () => {
-      let initialized = false;
-      delete env.PRIVATE_KEY_PATH;
-      env.PORT = "3003";
+      const env = {
+        WEBHOOK_PROXY_URL: "https://smee.io/EfHXC9BFfGAxbM6J",
+        WEBHOOK_SECRET: "secret",
+        LOG_LEVEL: "fatal" as const,
+        PORT: (await getPort()).toString(),
+      };
 
-      return new Promise(async (resolve) => {
-        server = await run(
+      await new Promise(async (resolve, reject) => {
+        const server = await run(
           (_app: Probot) => {
-            initialized = true;
+            reject(new Error("Should not start the app"));
           },
-          { env },
+          {
+            env,
+            updateEnv,
+            SmeeClient: { createChannel: async () => "dummy" },
+          },
         );
-        expect(initialized).toBeFalsy();
         await server.stop();
 
         resolve(null);
@@ -74,69 +85,88 @@ describe("run", () => {
     });
 
     it("defaults to JSON logs if NODE_ENV is set to 'production'", async () => {
-      let outputData = "";
+      const port = await getPort();
+      const env = { ...defaultEnv, PORT: port.toString() };
       env.NODE_ENV = "production";
 
-      server = await run(
+      const logTarget = new MockLoggerTarget();
+      const log = pino(logTarget);
+
+      const server = await run(
         async (app) => {
-          outputData = await captureLogOutput(async () => {
-            app.log.fatal("test");
-          }, app.log);
+          app.log.fatal("test");
         },
-        { env },
+        { env, updateEnv, log },
       );
       await server.stop();
 
-      expect(outputData).toMatch(/"msg":"test"/);
+      expect(logTarget.entries[0].level).toBe(60);
+      expect(logTarget.entries[0].msg).toBe("test");
+      expect(logTarget.entries[0].name).toBe("probot");
     });
   });
 
   describe("webhooks", () => {
-    const pushEvent = (
-      (WebhookExamples as unknown as WebhookDefinition[]).filter(
-        (event) => event.name === "push",
-      )[0] as WebhookDefinition<"push">
-    ).examples[0];
+    const pushEvent = JSON.stringify(
+      (
+        (WebhookExamples as unknown as WebhookDefinition[]).filter(
+          (event) => event.name === "push",
+        )[0] as WebhookDefinition<"push">
+      ).examples[0],
+    );
 
     it("POST /api/github/webhooks", async () => {
-      server = await run(() => {}, { env });
+      const port = await getPort();
+      const env = { ...defaultEnv, PORT: port.toString() };
+      const server = await run(() => {}, { env, updateEnv });
 
-      const dataString = JSON.stringify(pushEvent);
+      const response = await fetch(
+        `http://${server.host}:${server.port}/api/github/webhooks`,
+        {
+          method: "POST",
+          body: pushEvent,
+          headers: {
+            "content-type": "application/json",
+            "x-github-event": "push",
+            "x-github-delivery": "123",
+            "x-hub-signature-256": await sign("secret", pushEvent),
+          },
+        },
+      );
 
-      await request(server.expressApp)
-        .post("/api/github/webhooks")
-        .send(dataString)
-        .set("content-type", "application/json")
-        .set("x-github-event", "push")
-        .set("x-hub-signature-256", await sign("secret", dataString))
-        .set("x-github-delivery", "123")
-        .expect(200);
+      expect(response.status).toBe(200);
 
       await server.stop();
     });
 
     it("custom webhook path", async () => {
-      server = await run(() => {}, {
-        env: {
-          ...env,
-          WEBHOOK_PATH: "/custom-webhook",
-        },
+      const port = await getPort();
+      const env = {
+        ...defaultEnv,
+        PORT: port.toString(),
+        WEBHOOK_PATH: "/custom-webhook",
+      };
+      const server = await run(() => {}, {
+        env,
+        updateEnv: (env) => env,
       });
 
-      const dataString = JSON.stringify(pushEvent);
+      const response = await fetch(
+        `http://${server.host}:${server.port}/custom-webhook`,
+        {
+          method: "POST",
+          body: pushEvent,
+          headers: {
+            "content-type": "application/json",
+            "x-github-event": "push",
+            "x-hub-signature-256": await sign("secret", pushEvent),
+            "x-github-delivery": "123",
+          },
+        },
+      );
 
-      try {
-        await request(server.expressApp)
-          .post("/custom-webhook")
-          .send(dataString)
-          .set("content-type", "application/json")
-          .set("x-github-event", "push")
-          .set("x-hub-signature-256", await sign("secret", dataString))
-          .set("x-github-delivery", "123")
-          .expect(200);
-      } finally {
-        await server.stop();
-      }
+      expect(response.status).toBe(200);
+      await server.stop();
     });
   });
 });

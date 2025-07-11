@@ -16,7 +16,6 @@ import type {
   State,
 } from "./types.js";
 import { defaultWebhooksPath } from "./server/server.js";
-import { rebindLog } from "./helpers/rebind-log.js";
 
 export type Constructor<T = any> = new (...args: any[]) => T;
 
@@ -54,7 +53,7 @@ export class Probot {
     const logMessageKey = options.logMessageKey;
 
     this.log = options.log
-      ? rebindLog(options.log)
+      ? options.log
       : getLog({ level, logMessageKey });
 
     // TODO: support redis backend for access token cache if `options.redisConfig`
@@ -71,11 +70,11 @@ export class Probot {
       appId: Number(options.appId),
       privateKey: options.privateKey,
       cache,
-      log: rebindLog(this.log),
+      log: this.log,
       redisConfig: options.redisConfig,
       baseUrl: options.baseUrl,
     });
-    const octokitLogger = rebindLog(this.log.child({ name: "octokit" }));
+    const octokitLogger = this.log.child({ name: "octokit" });
     const octokit = new Octokit({
       request: options.request,
       log: octokitLogger,
@@ -84,7 +83,7 @@ export class Probot {
     this.state = {
       cache,
       githubToken: options.githubToken,
-      log: rebindLog(this.log),
+      log: this.log,
       Octokit,
       octokit,
       webhooks: {

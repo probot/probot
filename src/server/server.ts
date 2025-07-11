@@ -10,7 +10,6 @@ import { createWebhookProxy } from "../helpers/webhook-proxy.js";
 import { VERSION } from "../version.js";
 import type { ApplicationFunction, ServerOptions } from "../types.js";
 import type { Probot } from "../index.js";
-import { rebindLog } from "../helpers/rebind-log.js";
 
 // the default path as defined in @octokit/webhooks
 export const defaultWebhooksPath = "/api/github/webhooks";
@@ -41,8 +40,8 @@ export class Server {
       request: options.request,
     });
     this.log = options.log
-      ? rebindLog(options.log)
-      : rebindLog(this.probotApp.log.child({ name: "server" }));
+      ? options.log
+      : this.probotApp.log.child({ name: "server" });
 
     this.state = {
       cwd: options.cwd || process.cwd(),

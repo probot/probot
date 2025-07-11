@@ -36,7 +36,7 @@
   "author": "Brandon Keepers",
   "license": "ISC",
   "dependencies": {
-    "@octokit/core": "^5.2.0",
+    "@octokit/core": "^5.2.2",
     "@octokit/plugin-enterprise-compatibility": "^4.0.1",
     "@octokit/plugin-paginate-rest": "11.4.4-cjs.2",
     "@octokit/plugin-rest-endpoint-methods": "13.3.2-cjs.1",
@@ -57,7 +57,7 @@
     "ioredis": "^5.3.2",
     "js-yaml": "^4.1.0",
     "lru-cache": "npm:@wolfy1339/lru-cache@^11.0.2-patch.1",
-    "octokit-auth-probot": "^2.0.1",
+    "octokit-auth-probot": "^2.0.2",
     "pino": "^9.0.0",
     "pino-http": "^10.0.0",
     "pkg-conf": "^3.1.0",

@@ -112,7 +112,7 @@ INFO     (server): Listening on http://localhost:3000
 To automatically configure your GitHub App, follow these steps:
 
 1. Run the app locally by running `npm start` in your terminal.
-1. Next follow instructions to visit [http://localhost:3000](http://localhost:3000) (or your custom Glitch URL).
+1. Next follow instructions to visit [http://localhost:3000](http://localhost:3000) (or your app's Webhook URL).
 1. You should see something like this: ![Screenshot of Probot's setup wizard](/assets/img/probot-setup-wizard.png)
 1. Go ahead and click the **Register a GitHub App** button.
 1. Next, you'll get to decide on an app name that isn't already taken. Note: if you see a message "Name is already in use" although no such app exists, it means that a GitHub organization with that name exists and cannot be used as an app name.

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://jsr.io/schema/config-file.v1.json",
+  "name": "@probot/bot",
+  "version": "0.0.0-development",
+  "publish": {
+    "include": [
+      "src",
+      "bin",
+      "static",
+      "views",
+      "README.md",
+      "LICENSE"
+    ],
+    "exclude": [
+      "test",
+      "docs",
+      "scripts"
+    ]
+  },
+  "exports": "./src/index.jsr.ts",
+  "exclude": ["./src/index.ts"]
+}

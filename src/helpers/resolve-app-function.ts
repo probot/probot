@@ -1,23 +1,22 @@
+import { resolve } from "import-meta-resolve";
+import { pathToFileURL } from "node:url";
+import type { ApplicationFunction } from "../types.js";
+
+type ImportMetaResolve = (specifier: string, parent?: string) => string;
 export const resolveAppFunction = async (
   appFnId: string,
   opts = {} as ResolveOptions,
-) => {
+): Promise<ApplicationFunction> => {
   // These are mostly to ease testing
   const basedir = process.cwd();
-  const resolver: NodeJS.RequireResolve = opts.resolver || require.resolve;
-  const appFnPath = resolver(appFnId, { paths: [basedir] });
-  // On windows, an absolute path may start with a drive letter, e.g. C:/path/to/file.js
-  // This can be interpreted as a protocol, so ensure it's prefixed with file://
-  const appFnPathWithFileProtocol = appFnPath.replace(
-    /^([a-zA-Z]:)/,
-    "file://$1",
-  );
-  const { default: mod } = await import(appFnPathWithFileProtocol);
+  const resolver = opts.resolver || resolve;
+  const appFnPath = resolver(appFnId, pathToFileURL(basedir).href + "/");
+
+  const { default: mod } = await import(appFnPath);
   // mod.default gets exported by transpiled TypeScript code
   return mod.__esModule && mod.default ? mod.default : mod;
 };
-
 export interface ResolveOptions {
   basedir?: string;
-  resolver?: NodeJS.RequireResolve;
+  resolver?: ImportMetaResolve;
 }

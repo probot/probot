@@ -17,6 +17,7 @@ Every app can either be deployed stand-alone, or combined with other apps in one
 - [Deploy the app](#deploy-the-app)
   - [As node app](#as-node-app)
     - [Heroku](#heroku)
+    - [Render](#render)
   - [As serverless function](#as-serverless-function)
     - [AWS Lambda](#aws-lambda)
     - [Azure Functions](#azure-functions)
@@ -77,7 +78,7 @@ Probot runs like [any other Node app](https://devcenter.heroku.com/articles/depl
         http://arcane-lowlands-8408.herokuapp.com/ | git@heroku.com:arcane-lowlands-8408.git
         Git remote heroku added
 
-1.  Go back to your [app settings page](https://github.com/settings/apps) and update the **Webhook URL** to the URL of your deployment, e.g. `http://arcane-lowlands-8408.herokuapp.com/`.
+1.  Go back to your [app settings page](https://github.com/settings/apps) and update the **Webhook URL** to the URL of your deployment, e.g. `http://arcane-lowlands-8408.herokuapp.com/api/github/webhooks`.
 
 1.  Configure the Heroku app, replacing the `APP_ID` and `WEBHOOK_SECRET` with the values for those variables, and setting the path for the `PRIVATE_KEY`:
 
@@ -99,6 +100,35 @@ Probot runs like [any other Node app](https://devcenter.heroku.com/articles/depl
 
          $ heroku config:set LOG_LEVEL=trace
          $ heroku logs --tail
+
+#### Render
+
+Probot runs like any other Node app on [Render](https://render.com/). After [creating the GitHub App](#register-the-github-app):
+
+1.  Sign up at [Render](https://dashboard.render.com/register) and access your dashboard.
+1.  Click "New Web Service" and select your GitHub repository.
+1.  Set the "Build Command" and "Start Command". For a typical Probot app, use:
+
+        Build Command: npm install
+        Start Command: npm start
+
+1.  Set the Instance Type to "Free" or any other type you prefer.
+
+1.  Set environment variables:
+
+        APP_ID=aaa
+        WEBHOOK_SECRET=bbb
+        PRIVATE_KEY=<paste your private key here>
+        PORT=3000
+
+    - Be sure to add `PORT=3000` because Render's default port is 10000, but Probot expects 3000.
+    - For `PRIVATE_KEY`, paste the contents of your private key directly.
+
+1.  Deploy the app by clicking the Deploy Web Service button. Render will automatically build and start your service.
+
+1.  Go back to your [app settings page](https://github.com/settings/apps) and update the **Webhook URL** to the URL of your Render deployment, including the default webhook path, e.g. `https://your-app.onrender.com/api/github/webhooks`.
+
+1.  Your app should be up and running! To verify that your app is receiving webhook data, check the "Logs" tab in the Render dashboard.
 
 ### As serverless function
 

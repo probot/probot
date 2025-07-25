@@ -1,10 +1,7 @@
-'use strict';
-
-const { createServer } = require("http");
-const { createNodeMiddleware } = require('../lib/create-node-middleware');
-const { createProbot } = require('../lib/create-probot');
-const { sign } = require("@octokit/webhooks-methods");
-const WebhookExamples = require("@octokit/webhooks-examples");
+import { createServer } from "node:http";
+import { createNodeMiddleware, createProbot } from '../lib/index.js';
+import { sign } from "@octokit/webhooks-methods";
+import WebhookExamples from "@octokit/webhooks-examples" with { type: "json" };
 
 process.env.APP_ID = "123";
 process.env.PRIVATE_KEY = `-----BEGIN RSA PRIVATE KEY-----
@@ -60,7 +57,7 @@ const appFn = (app) => {
   });
 };
 
-const middleware = createNodeMiddleware(appFn, { probot: createProbot() });
+const middleware = await createNodeMiddleware(appFn, { probot: createProbot() });
 
 const server = createServer((req, res) => {
   middleware(req, res, () => {

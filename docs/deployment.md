@@ -36,7 +36,6 @@ Every app can either be deployed stand-alone, or combined with other apps in one
 Every deployment will need a [GitHub App registration](https://docs.github.com/apps).
 
 1. [Register a new GitHub App](https://github.com/settings/apps/new) with:
-
    - **Homepage URL**: the URL to the GitHub repository for your app
    - **Webhook URL**: Use `https://example.com/` for now, we'll come back in a minute to update this with the URL of your deployed app.
    - **Webhook Secret**: Generate a unique secret with (e.g. with `openssl rand -base64 32`) and save it because you'll need it in a minute to configure your Probot app.
@@ -201,7 +200,7 @@ Please add yours!
 import { createNodeMiddleware, createProbot } from "probot";
 import app from "./app.js";
 
-const middleware = createNodeMiddleware(app, {
+const middleware = await createNodeMiddleware(app, {
   probot: createProbot(),
   webhooksPath: "/",
 });
@@ -246,7 +245,7 @@ import { createNodeMiddleware, createProbot } from "probot";
 
 import app from "../../../app.js";
 
-export default createNodeMiddleware(app, {
+export default await createNodeMiddleware(app, {
   probot: createProbot(),
   webhooksPath: "/api/github/webhooks",
 });

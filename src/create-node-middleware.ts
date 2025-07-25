@@ -1,8 +1,10 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { createNodeMiddleware as createWebhooksMiddleware } from "@octokit/webhooks";
 
-import type { ApplicationFunction, MiddlewareOptions } from "./types.js";
-import { defaultWebhooksPath } from "./server/server.js";
+import type {
+  ApplicationFunction,
+  Handler,
+  MiddlewareOptions,
+} from "./types.js";
 import { createProbot } from "./create-probot.js";
 
 /**
@@ -21,7 +23,7 @@ import { createProbot } from "./create-probot.js";
  *   });
  * };
  *
- * const middleware = createNodeMiddleware(appFn, { probot: createProbot() });
+ * const middleware = await createNodeMiddleware(appFn, { probot: createProbot() });
  *
  * const server = createServer((req, res) => {
  *   middleware(req, res, () => {
@@ -31,17 +33,46 @@ import { createProbot } from "./create-probot.js";
  * });
  * ```
  */
-export function createNodeMiddleware(
+export async function createNodeMiddleware(
   appFn: ApplicationFunction,
   { probot = createProbot(), webhooksPath } = {} as MiddlewareOptions,
-): (
-  request: IncomingMessage,
-  response: ServerResponse,
-  next?: () => void,
-) => Promise<boolean> {
-  probot.load(appFn);
+): Promise<
+  (
+    request: IncomingMessage,
+    response: ServerResponse,
+    next?: () => void,
+  ) => boolean | void | Promise<void | boolean>
+> {
+  const handlers: Handler[] = [];
 
-  return createWebhooksMiddleware(probot.webhooks, {
-    path: webhooksPath || probot.webhookPath || defaultWebhooksPath,
+  await probot.load(appFn, {
+    cwd: process.cwd(),
+    addHandler: (handler) => {
+      handlers.push(handler);
+    },
   });
+
+  handlers.push(
+    await probot.getNodeMiddleware({
+      path: webhooksPath,
+    }),
+  );
+
+  const mainHandler: Handler = async (req, res) => {
+    try {
+      for (const handler of handlers) {
+        if (await handler(req, res)) {
+          return true;
+        }
+      }
+    } catch (e) {
+      probot.log.error(e);
+      res.writeHead(500).end();
+      return true;
+    }
+
+    return false;
+  };
+
+  return mainHandler;
 }

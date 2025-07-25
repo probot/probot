@@ -61,6 +61,37 @@ jobs:
       - name: Lint
         run: npm run lint
 
+  test-no-ioredis:
+    name: Test on Node ${{ matrix.node-version }} and ${{ matrix.os }} without ioredis
+    strategy:
+      matrix:
+        node-version:
+          - latest
+        os:
+          - ubuntu-latest
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run rm:lib && npm run build
+      - name: Remove ioredis
+        run: npm uninstall ioredis
+      - name: Test
+        run: npm run test:code
+        env:
+          NO_IOREDIS: "true"
+
   test-unit:
     name: Test on Node ${{ matrix.node-version }} and ${{ matrix.os }}
     strategy:
@@ -173,7 +204,8 @@ jobs:
       - test-bun
       - test-deno
       - test-node-redis
+      - test-no-ioredis
 
     steps:
       - run: exit 1
-        if: ${{ needs.test-unit.result != 'success' || needs.test-node-redis.result != 'success' || needs.test-deno.result != 'success' || needs.test-bun.result != 'success' }}
+        if: ${{ needs.test-unit.result != 'success' || needs.test-node-redis.result != 'success' || needs.test-deno.result != 'success' || needs.test-bun.result != 'success' || needs.test-no-ioredis.result != 'success' }}

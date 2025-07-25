@@ -53,15 +53,19 @@ describe("smee-client", () => {
 });
 
 describe("ioredis", () => {
-  it("should be ensured that ioredis is the same version as in the package-lock.json", () => {
-    expect(
-      typeof packageLockJson.packages["node_modules/ioredis"].version,
-    ).toBe("string");
-    expect(packageLockJson.packages["node_modules/ioredis"].dev).toBe(true);
-    checkForFixedNpxImport(
-      join(__dirname, "../src"),
-      "ioredis",
-      packageLockJson.packages["node_modules/ioredis"].version,
-    );
-  });
+  it(
+    "should be ensured that ioredis is the same version as in the package-lock.json",
+    () => {
+      expect(
+        typeof packageLockJson.packages["node_modules/ioredis"].version,
+      ).toBe("string");
+      expect(packageLockJson.packages["node_modules/ioredis"].dev).toBe(true);
+      checkForFixedNpxImport(
+        join(__dirname, "../src"),
+        "ioredis",
+        packageLockJson.packages["node_modules/ioredis"].version,
+      );
+    },
+    { skip: !!process.env.NO_IOREDIS },
+  );
 });

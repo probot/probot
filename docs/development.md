@@ -300,3 +300,42 @@ function myProbotApp(app) {
   });
 }
 ```
+
+## Using Typescript
+
+Probot has built-in support for TypeScript, requiring minimal configuration to get started.
+
+If you're using TypeScript in your app, we strongly recommend enabling the `strictNullChecks` compiler option in your `tsconfig.json`.
+
+Without this option, TypeScript may incorrectly infer some webhook payload fields as `never`. For example:
+
+```ts
+app.on("issues.opened", async (context) => {
+  // TS Error: Property 'id' does not exist on type 'never'
+  const id = context.payload.issue.id;
+});
+```
+
+This happens because the webhook types (from ` @octokit/webhooks-types`) rely on strict null checking for proper type narrowing.
+
+To fix this, add the following to your ` tsconfig.json`:
+
+```json
+{
+  "compilerOptions": {
+    "strictNullChecks": true
+  }
+}
+```
+
+Or enable full strict mode:
+
+```json
+{
+  "compilerOptions": {
+    "strict": true
+  }
+}
+```
+
+See issue [#1581](https://github.com/probot/probot/issues/1581) for more context.

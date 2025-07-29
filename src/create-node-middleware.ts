@@ -7,6 +7,8 @@ import type {
 } from "./types.js";
 import { createProbot } from "./create-probot.js";
 
+const noop = () => {};
+
 /**
  * Create a Node/Express middleware.
  *
@@ -40,7 +42,7 @@ export async function createNodeMiddleware(
   (
     request: IncomingMessage,
     response: ServerResponse,
-    next?: () => void,
+    next?: (err?: Error) => void,
   ) => boolean | void | Promise<void | boolean>
 > {
   const handlers: Handler[] = [];
@@ -58,10 +60,11 @@ export async function createNodeMiddleware(
     }),
   );
 
-  const mainHandler: Handler = async (req, res) => {
+  const mainHandler: Handler = async (req, res, next = noop) => {
     try {
       for (const handler of handlers) {
-        if (await handler(req, res)) {
+        const result = await handler(req, res);
+        if (result) {
           return true;
         }
       }
@@ -71,6 +74,7 @@ export async function createNodeMiddleware(
       return true;
     }
 
+    next();
     return false;
   };
 

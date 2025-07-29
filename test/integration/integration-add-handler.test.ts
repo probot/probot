@@ -1,5 +1,12 @@
 import { createServer } from "node:http";
 
+import type {
+  EmitterWebhookEvent as WebhookEvent,
+  EmitterWebhookEventName,
+} from "@octokit/webhooks";
+import { sign } from "@octokit/webhooks-methods";
+import WebhookExamples from "@octokit/webhooks-examples";
+
 import express from "express";
 import Fastify from "fastify";
 
@@ -44,6 +51,39 @@ ZcJjRIt8w8g/s4X6MhKasBYm9s3owALzCuJjGzUKcDHiO2DKu1xXAb0SzRcTzUCn
 9/49J6WTD++EajN7FhktUSYxukdWaCocAQJTDNYP0K88G4rtC2IYy5JFn9SWz5oh
 x//0u+zd/R/QRUzLOw4N72/Hu+UG6MNt5iDZFCtapRaKt6OvSBwy8w==
 -----END RSA PRIVATE KEY-----`;
+
+type GetWebhookEventPayload<T extends EmitterWebhookEventName> =
+  WebhookEvent<T>["payload"];
+
+type WebhookDefinition<
+  TName extends EmitterWebhookEventName = EmitterWebhookEventName,
+> = {
+  name: TName;
+  actions: string[];
+  description: string;
+  examples: GetWebhookEventPayload<TName>[];
+  properties: Record<
+    string,
+    {
+      description: string;
+      type:
+        | "string"
+        | "number"
+        | "boolean"
+        | "object"
+        | "integer"
+        | "array"
+        | "null";
+    }
+  >;
+};
+
+const webhookExamples = WebhookExamples as unknown as WebhookDefinition[];
+const pushEventPayload = (
+  webhookExamples.filter(
+    (event) => event.name === "push",
+  )[0] as unknown as WebhookDefinition<"push">
+).examples[0];
 
 describe("run", () => {
   it("addHandler is provided in the option object", async () => {
@@ -190,6 +230,122 @@ describe("createNodeMiddleware", () => {
     expect(await response.text()).toBe('{"hello":"world"}');
 
     server.close();
+  });
+
+  [
+    [true, "async"],
+    [true, "cb"],
+    [true, "plain"],
+    [false, "async"],
+    [false, "cb"],
+    [false, "plain"],
+  ].forEach(([firstMiddleware, routeHandlerType]) => {
+    it(`should work with express - load middleware ${firstMiddleware ? "before" : "after"} other ${routeHandlerType} routes`, async () => {
+      const port = await getPort();
+      const expressApp = express();
+
+      const app: ApplicationFunction = (app) => {
+        app.on("push", async () => {
+          app.log.info("Push event received");
+        });
+      };
+
+      const middleware = await createNodeMiddleware(app, {
+        probot: createProbot({
+          env: {
+            APP_ID,
+            PRIVATE_KEY,
+            WEBHOOK_SECRET,
+          },
+        }),
+      });
+
+      const asyncHelloWorldRouteHandler = async (_req: any, res: any) => {
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        res.status(200).send({ hello: "world" });
+      };
+
+      const cbHelloWorldRouteHandler = (_req: any, res: any, next: any) => {
+        new Promise((resolve) => setTimeout(resolve, 50)).then(() => {
+          res.status(200).send({ hello: "world" });
+          next();
+        });
+      };
+
+      const plainHelloWorldRouteHandler = (_req: any, res: any) => {
+        new Promise((resolve) => setTimeout(resolve, 50)).then(() => {
+          res.status(200).send({ hello: "world" });
+        });
+      };
+
+      const helloWorldRouteHandler =
+        routeHandlerType === "async"
+          ? asyncHelloWorldRouteHandler
+          : routeHandlerType === "cb"
+            ? cbHelloWorldRouteHandler
+            : plainHelloWorldRouteHandler;
+
+      if (firstMiddleware) {
+        expressApp.use(middleware);
+        expressApp.get("/hello-world", helloWorldRouteHandler);
+      } else {
+        expressApp.get("/hello-world", helloWorldRouteHandler);
+        expressApp.use(middleware);
+      }
+
+      let server: ReturnType<typeof createServer>;
+
+      await new Promise<void>((resolve, reject) => {
+        server = expressApp.listen(port, (err) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      });
+
+      let { address: host } = server!.address() as {
+        port: number;
+        address: string;
+      };
+
+      host = getPrintableHost(host);
+
+      const pushEvent = JSON.stringify(pushEventPayload);
+
+      const webhookResponse = await fetch(
+        `http://${host}:${port}/api/github/webhooks`,
+        {
+          method: "POST",
+          body: pushEvent,
+          headers: {
+            "content-type": "application/json",
+            "x-github-event": "push",
+            "x-github-delivery": "123",
+            "x-hub-signature-256": await sign("secret", pushEvent),
+          },
+        },
+      );
+
+      expect(webhookResponse.status).toBe(200);
+      expect(await webhookResponse.text()).toBe("ok\n");
+
+      const response = await fetch(`http://${host}:${port}/hello-world`);
+
+      expect(response.status).toBe(200);
+      expect(await response.text()).toBe('{"hello":"world"}');
+
+      await new Promise<void>((resolve, reject) => {
+        server!.close((err) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      });
+    });
   });
 
   it(

@@ -50,7 +50,7 @@
     "@octokit/plugin-throttling": "^11.0.1",
     "@octokit/request": "^10.0.3",
     "@octokit/types": "^14.1.0",
-    "@octokit/webhooks": "^14.1.1",
+    "@octokit/webhooks": "^14.1.2",
     "@probot/get-private-key": "^2.0.0",
     "npx-import-light": "^1.0.0",
     "@probot/octokit-plugin-config": "^3.0.2",

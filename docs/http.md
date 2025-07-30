@@ -12,44 +12,80 @@ A Handler is a function that takes a Node.js HTTP request and response object, a
 Express v5 Example:
 
 ```js
-import express from "express";
+import Express from "express";
+import { createNodeMiddleware, createProbot } from "probot";
 
-export default (app, { addHandler }) => {
-  // Get an express instance to expose new HTTP endpoints
-  const router = express.Router();
+const express = Express();
 
-  // Use any middleware
-  router.use(express.json());
-
-  // Add a new route
-  router.get("/hello-world", (req, res) => {
-    res.send({ hello: "world" });
+const app = (probot) => {
+  probot.on("push", async () => {
+    probot.log.info("Push event received");
   });
-
-  // Add the router to the app
-  addHandler(router);
 };
+
+const middleware = await createNodeMiddleware(app, {
+  webhooksPath: "/api/github/webhooks",
+  probot: createProbot({
+    env: {
+      APP_ID,
+      PRIVATE_KEY,
+      WEBHOOK_SECRET,
+    },
+  }),
+});
+
+express.use(middleware);
+express.use(Express.json());
+express.get("/custom-route", (req, res) => {
+  res.json({ status: "ok" });
+});
+
+express.listen(3000, () => {
+  console.log(`Server is running at http://localhost:3000`);
+});
 ```
 
 Fastify v5 Example:
 
 ```js
 import Fastify from "fastify";
+import { createNodeMiddleware, createProbot } from "probot";
 
-export default async (app, { addHandler }) => {
-  // Get a fastify instance to expose new HTTP endpoints
-  const fastify = Fastify();
+const fastify = Fastify();
 
-  // Declare a route
-  fastify.get("/hello-world", function (request, reply) {
-    reply.send({ hello: "world" });
+// Declare a route
+fastify.get("/hello-world", function (request, reply) {
+  reply.send({ hello: "world" });
+});
+
+const app = (app) => {
+  app.on("push", async () => {
+    app.log.info("Push event received");
   });
-
-  await fastify.ready();
-
-  // Add the router to the app
-  addHandler(fastify.routing);
 };
+
+const middleware = await createNodeMiddleware(app, {
+  webhooksPath: "/api/github/webhooks",
+  probot: createProbot({
+    env: {
+      APP_ID,
+      PRIVATE_KEY,
+      WEBHOOK_SECRET,
+    },
+  }),
+});
+
+const wrappedMiddleware = async (req, reply) => {
+  req.raw.body = JSON.stringify(req.body);
+  await middleware(req.raw, reply.raw);
+  return reply;
+};
+
+fastify.post("/api/github/webhooks", middleware);
+
+const address = await fastify.listen({ port: 3000 });
+
+console.log(`Server is running at ${address}`);
 ```
 
 Visit http://localhost:3000/my-app/hello-world to access the endpoint.

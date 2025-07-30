@@ -8,7 +8,7 @@ import { sign } from "@octokit/webhooks-methods";
 import WebhookExamples from "@octokit/webhooks-examples";
 
 import express from "express";
-import Fastify from "fastify";
+import Fastify, { type FastifyReply, type FastifyRequest } from "fastify";
 
 import getPort from "get-port";
 import { describe, expect, it } from "vitest";
@@ -240,7 +240,7 @@ describe("createNodeMiddleware", () => {
     [false, "cb"],
     [false, "plain"],
   ].forEach(([firstMiddleware, routeHandlerType]) => {
-    it(`should work with express - load middleware ${firstMiddleware ? "before" : "after"} other ${routeHandlerType} routes`, async () => {
+    it(`should work with express as standalone server - load middleware ${firstMiddleware ? "before" : "after"} other ${routeHandlerType} routes`, async () => {
       const port = await getPort();
       const expressApp = express();
 
@@ -349,7 +349,7 @@ describe("createNodeMiddleware", () => {
   });
 
   it(
-    "should work with fastify",
+    "should work with fastify when calling addHandler",
     async () => {
       const port = await getPort();
 
@@ -394,6 +394,77 @@ describe("createNodeMiddleware", () => {
       expect(await response.text()).toBe('{"hello":"world"}');
 
       server.close();
+    },
+    // Fastify is not supported in Deno
+    { skip: detectRuntime(globalThis) === "deno" },
+  );
+
+  it(
+    "should work with fastify as standalone server",
+    async () => {
+      const port = await getPort();
+
+      const fastify = Fastify();
+
+      // Declare a route
+      fastify.get("/hello-world", function (_request, reply) {
+        reply.send({ hello: "world" });
+      });
+
+      const app: ApplicationFunction = (app) => {
+        app.on("push", async () => {
+          app.log.info("Push event received");
+        });
+      };
+
+      const middleware = await createNodeMiddleware(app, {
+        path: "/",
+        probot: createProbot({
+          env: {
+            APP_ID,
+            PRIVATE_KEY,
+            WEBHOOK_SECRET,
+          },
+        }),
+      });
+
+      const wrappedMiddleware = async (
+        req: FastifyRequest,
+        reply: FastifyReply,
+      ) => {
+        req.raw.body = JSON.stringify(req.body);
+        await middleware(req.raw, reply.raw);
+        return reply;
+      };
+
+      fastify.post("/api/github/webhooks", wrappedMiddleware);
+
+      const address = await fastify.listen({
+        port,
+      });
+
+      const response = await fetch(`${address}/hello-world`);
+
+      expect(response.status).toBe(200);
+      expect(await response.text()).toBe('{"hello":"world"}');
+
+      const pushEvent = JSON.stringify(pushEventPayload);
+
+      const webhookResponse = await fetch(`${address}/api/github/webhooks`, {
+        method: "POST",
+        body: pushEvent,
+        headers: {
+          "content-type": "application/json",
+          "x-github-event": "push",
+          "x-github-delivery": "123",
+          "x-hub-signature-256": await sign("secret", pushEvent),
+        },
+      });
+
+      expect(webhookResponse.status).toBe(200);
+      expect(await webhookResponse.text()).toBe("ok\n");
+
+      await fastify.close();
     },
     // Fastify is not supported in Deno
     { skip: detectRuntime(globalThis) === "deno" },

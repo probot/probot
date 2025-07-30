@@ -3,7 +3,7 @@ import type { Octokit } from "@octokit/core";
 export function probotRequestLogging(octokit: Octokit) {
   octokit.hook.error("request", (error, options) => {
     if ("status" in error) {
-      const { method, url, request, ...params } =
+      const { method, url, ...params } =
         octokit.request.endpoint.parse(options);
       const msg = `GitHub request: ${method} ${url} - ${error.status}`;
 
@@ -15,8 +15,7 @@ export function probotRequestLogging(octokit: Octokit) {
   });
 
   octokit.hook.after("request", (result, options) => {
-    const { method, url, request, ...params } =
-      octokit.request.endpoint.parse(options);
+    const { method, url, ...params } = octokit.request.endpoint.parse(options);
     const msg = `GitHub request: ${method} ${url} - ${result.status}`;
 
     // @ts-expect-error log.debug is a pino log method and accepts a fields object

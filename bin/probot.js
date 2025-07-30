@@ -1,3 +1,3 @@
 #!/usr/bin/env node
 
-require("../lib/bin/probot");
+import "../lib/bin/probot.js";

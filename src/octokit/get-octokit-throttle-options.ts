@@ -1,5 +1,6 @@
+import { npxImport } from "npx-import-light";
 import Bottleneck from "bottleneck";
-import { Redis, type RedisOptions } from "ioredis";
+import type { RedisOptions } from "ioredis";
 import type { Logger } from "pino";
 import type { ThrottlingOptions } from "@octokit/plugin-throttling";
 
@@ -8,8 +9,10 @@ type Options = {
   redisConfig?: RedisOptions | string;
 };
 
-export function getOctokitThrottleOptions(options: Options) {
-  let { log, redisConfig } = options;
+export async function getOctokitThrottleOptions(
+  options: Options,
+): Promise<ThrottlingOptions> {
+  const { log, redisConfig } = options;
 
   const throttlingOptions: ThrottlingOptions = {
     onRateLimit: (retryAfter, options: { [key: string]: any }) => {
@@ -35,7 +38,7 @@ export function getOctokitThrottleOptions(options: Options) {
   if (!redisConfig) return throttlingOptions;
 
   const connection = new Bottleneck.IORedisConnection({
-    client: getRedisClient(options),
+    client: await getRedisClient(options),
   });
   connection.on("error", (error) => {
     log.error(Object.assign(error, { source: "bottleneck" }));
@@ -47,6 +50,10 @@ export function getOctokitThrottleOptions(options: Options) {
   return throttlingOptions;
 }
 
-function getRedisClient({ redisConfig }: Options): Redis | void {
+let Redis = null;
+
+async function getRedisClient({ redisConfig }: Options): Promise<any> {
+  Redis ??= (await npxImport("ioredis@5.6.1", { onlyPackageRunner: true }))
+    .Redis;
   if (redisConfig) return new Redis(redisConfig as RedisOptions);
 }

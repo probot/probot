@@ -1,21 +1,31 @@
-import pkgConf from "pkg-conf";
+import { packageConfig } from "package-config";
+import type { Logger } from "pino";
 
-import type { ApplicationFunction, Options, ServerOptions } from "./types.js";
-import { Logger, Probot, ProbotOctokit } from "./index.js";
+import type {
+  ApplicationFunction,
+  Env,
+  Options,
+  ServerOptions,
+} from "./types.js";
+import type { ProbotOctokit } from "./octokit/probot-octokit.js";
 import { setupAppFactory } from "./apps/setup.js";
 import { getLog } from "./helpers/get-log.js";
 import { readCliOptions } from "./bin/read-cli-options.js";
 import { readEnvOptions } from "./bin/read-env-options.js";
-import { Server } from "./server/server.js";
-import { defaultApp } from "./apps/default.js";
+import { defaultApp as defaultAppHandler } from "./apps/default.js";
+import { defaultWebhookPath, Server } from "./server/server.js";
 import { resolveAppFunction } from "./helpers/resolve-app-function.js";
 import { isProduction } from "./helpers/is-production.js";
 import { config as dotenvConfig } from "dotenv";
+import { updateEnv } from "./helpers/update-env.js";
+import { Probot } from "./probot.js";
 
 type AdditionalOptions = {
-  env?: NodeJS.ProcessEnv;
+  env?: Env;
   Octokit?: typeof ProbotOctokit;
   log?: Logger;
+  updateEnv?: typeof updateEnv;
+  SmeeClient?: { createChannel: () => Promise<string | undefined> };
 };
 
 /**
@@ -25,8 +35,8 @@ type AdditionalOptions = {
 export async function run(
   appFnOrArgv: ApplicationFunction | string[],
   additionalOptions?: AdditionalOptions,
-) {
-  dotenvConfig();
+): Promise<Server> {
+  dotenvConfig({ quiet: true });
 
   const envOptions = readEnvOptions(additionalOptions?.env);
   const cliOptions = Array.isArray(appFnOrArgv)
@@ -42,9 +52,9 @@ export async function run(
     sentryDsn,
 
     // server options
-    host,
-    port,
-    webhookPath,
+    host = "localhost",
+    port = 3000,
+    webhookPath = defaultWebhookPath,
     webhookProxy,
 
     // probot options
@@ -58,13 +68,15 @@ export async function run(
     args,
   } = { ...envOptions, ...cliOptions };
 
-  const log = getLog({
-    level,
-    logFormat,
-    logLevelInString,
-    logMessageKey,
-    sentryDsn,
-  });
+  const log =
+    additionalOptions?.log ||
+    (await getLog({
+      level,
+      logFormat,
+      logLevelInString,
+      logMessageKey,
+      sentryDsn,
+    }));
 
   const probotOptions: Options = {
     appId,
@@ -72,16 +84,19 @@ export async function run(
     redisConfig,
     secret,
     baseUrl,
-    log: additionalOptions?.log || log.child({ name: "probot" }),
+    log,
     Octokit: additionalOptions?.Octokit || undefined,
   };
 
-  const serverOptions: ServerOptions = {
+  const serverOptions: Required<
+    Pick<ServerOptions, "host" | "port" | "webhookPath" | "log" | "Probot">
+  > &
+    Pick<ServerOptions, "webhookProxy"> = {
     host,
     port,
     webhookPath,
     webhookProxy,
-    log: log.child({ name: "server" }),
+    log,
     Probot: Probot.defaults(probotOptions),
   };
 
@@ -116,31 +131,47 @@ export async function run(
         privateKey: "dummy value for setup, see #1512",
       }),
     });
-    await server.load(setupAppFactory(host, port));
+
+    const setupAppHandler = setupAppFactory({
+      host: server.host,
+      port: server.port,
+      log: serverOptions.log.child({ name: "setup" }),
+      updateEnv: additionalOptions?.updateEnv || updateEnv,
+      SmeeClient: additionalOptions?.SmeeClient,
+    });
+
+    await server.loadHandlerFactory(setupAppHandler);
+
     await server.start();
+
     return server;
   }
 
   if (Array.isArray(appFnOrArgv)) {
-    const pkg = await pkgConf("probot");
+    const [appPath] = args;
 
-    const combinedApps: ApplicationFunction = async (_app) => {
-      await server.load(defaultApp);
+    if (!appPath) {
+      console.error(
+        "No app path provided. Please provide the path to the app you want to run.",
+      );
+      process.exit(1);
+    }
 
-      if (Array.isArray(pkg.apps)) {
-        for (const appPath of pkg.apps) {
-          const appFn = await resolveAppFunction(appPath);
-          await server.load(appFn);
-        }
-      }
-
-      const [appPath] = args;
-      const appFn = await resolveAppFunction(appPath);
-      await server.load(appFn);
-    };
-
+    const pkg = await packageConfig("probot");
     server = new Server(serverOptions);
-    await server.load(combinedApps);
+
+    await server.loadHandlerFactory(defaultAppHandler);
+
+    if (Array.isArray(pkg.apps)) {
+      for (const appPath of pkg.apps) {
+        const appFn = await resolveAppFunction(appPath);
+        await server.load(appFn);
+      }
+    }
+
+    const appFn = await resolveAppFunction(appPath);
+    await server.load(appFn);
+
     await server.start();
     return server;
   }

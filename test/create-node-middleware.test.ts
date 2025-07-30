@@ -1,16 +1,19 @@
-import { createServer, IncomingMessage, ServerResponse } from "node:http";
-import Stream from "node:stream";
+import {
+  createServer,
+  type IncomingMessage,
+  type ServerResponse,
+} from "node:http";
 
 import { pino } from "pino";
-import getPort from "get-port";
 import { sign } from "@octokit/webhooks-methods";
-import { describe, expect, test, beforeEach } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import { createNodeMiddleware, createProbot, Probot } from "../src/index.js";
 import type { ApplicationFunction } from "../src/types.js";
 import WebhookExamples, {
   type WebhookDefinition,
 } from "@octokit/webhooks-examples";
+import { MockLoggerTarget } from "./utils.js";
 
 const APP_ID = "1";
 const PRIVATE_KEY = `-----BEGIN RSA PRIVATE KEY-----
@@ -48,29 +51,19 @@ const pushEvent = (
 ).examples[0];
 
 describe("createNodeMiddleware", () => {
-  let output: any[];
-  const streamLogsToOutput = new Stream.Writable({ objectMode: true });
-  streamLogsToOutput._write = (object, _encoding, done) => {
-    output.push(JSON.parse(object));
-    done();
-  };
-
-  beforeEach(() => {
-    output = [];
-  });
-
   test("with createProbot", async () => {
-    expect.assertions(1);
+    const onPushCalls: any[] = [];
+    const onPush = (event: any) => {
+      onPushCalls.push(event);
+    };
 
     const app: ApplicationFunction = (app) => {
-      app.on("push", (event) => {
-        expect(event.name).toEqual("push");
-      });
+      app.on("push", onPush);
     };
-    const middleware = createNodeMiddleware(app, {
+    const middleware = await createNodeMiddleware(app, {
       probot: createProbot({
         overrides: {
-          log: pino(streamLogsToOutput),
+          log: pino(new MockLoggerTarget()),
         },
         env: {
           APP_ID,
@@ -81,12 +74,14 @@ describe("createNodeMiddleware", () => {
     });
 
     const server = createServer(middleware);
-    const port = await getPort();
-    server.listen(port);
+
+    await new Promise<void>((resolve) => server.listen(resolve));
+
+    const port = (server.address() as any).port;
 
     const body = JSON.stringify(pushEvent);
 
-    await fetch(`http://127.0.0.1:${port}/api/github/webhooks`, {
+    await fetch(`http://localhost:${port}/api/github/webhooks`, {
       method: "POST",
       headers: {
         "content-type": "application/json",
@@ -97,23 +92,29 @@ describe("createNodeMiddleware", () => {
       body,
     });
 
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise<void>((resolve, reject) =>
+      server.close((err) => {
+        err ? reject(err) : resolve();
+      }),
+    );
 
-    server.close();
+    expect(onPushCalls.length).toBe(1);
+    expect(onPushCalls[0].name).toBe("push");
   });
 
   test("with createProbot and setting the webhookPath via WEBHOOK_PATH to the root", async () => {
-    expect.assertions(1);
+    const onPushCalls: any[] = [];
+    const onPush = (event: any) => {
+      onPushCalls.push(event);
+    };
 
     const app: ApplicationFunction = (app) => {
-      app.on("push", (event) => {
-        expect(event.name).toEqual("push");
-      });
+      app.on("push", onPush);
     };
-    const middleware = createNodeMiddleware(app, {
+    const middleware = await createNodeMiddleware(app, {
       probot: createProbot({
         overrides: {
-          log: pino(streamLogsToOutput),
+          log: pino(new MockLoggerTarget()),
         },
         env: {
           APP_ID,
@@ -125,12 +126,14 @@ describe("createNodeMiddleware", () => {
     });
 
     const server = createServer(middleware);
-    const port = await getPort();
-    server.listen(port);
+
+    await new Promise<void>((resolve) => server.listen(resolve));
+
+    const port = (server.address() as any).port;
 
     const body = JSON.stringify(pushEvent);
 
-    await fetch(`http://127.0.0.1:${port}`, {
+    await fetch(`http://localhost:${port}`, {
       method: "POST",
       headers: {
         "content-type": "application/json",
@@ -141,24 +144,30 @@ describe("createNodeMiddleware", () => {
       body,
     });
 
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise<void>((resolve, reject) =>
+      server.close((err) => {
+        err ? reject(err) : resolve();
+      }),
+    );
 
-    server.close();
+    expect(onPushCalls.length).toBe(1);
+    expect(onPushCalls[0].name).toBe("push");
   });
 
   test("with createProbot and setting the webhookPath to the root via the deprecated webhooksPath", async () => {
-    expect.assertions(1);
+    const onPushCalls: any[] = [];
+    const onPush = (event: any) => {
+      onPushCalls.push(event);
+    };
 
     const app: ApplicationFunction = (app) => {
-      app.on("push", (event) => {
-        expect(event.name).toEqual("push");
-      });
+      app.on("push", onPush);
     };
-    const middleware = createNodeMiddleware(app, {
+    const middleware = await createNodeMiddleware(app, {
       webhooksPath: "/",
       probot: createProbot({
         overrides: {
-          log: pino(streamLogsToOutput),
+          log: pino(new MockLoggerTarget()),
         },
         env: {
           APP_ID,
@@ -169,12 +178,14 @@ describe("createNodeMiddleware", () => {
     });
 
     const server = createServer(middleware);
-    const port = await getPort();
-    server.listen(port);
+
+    await new Promise<void>((resolve) => server.listen(resolve));
+
+    const port = (server.address() as any).port;
 
     const body = JSON.stringify(pushEvent);
 
-    await fetch(`http://127.0.0.1:${port}`, {
+    await fetch(`http://localhost:${port}`, {
       method: "POST",
       headers: {
         "content-type": "application/json",
@@ -185,32 +196,40 @@ describe("createNodeMiddleware", () => {
       body,
     });
 
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise<void>((resolve, reject) =>
+      server.close((err) => {
+        err ? reject(err) : resolve();
+      }),
+    );
 
-    server.close();
-  }, 1000);
+    expect(onPushCalls.length).toBe(1);
+    expect(onPushCalls[0].name).toBe("push");
+  });
 
   test("loads app only once", async () => {
     let counter = 0;
     const appFn = () => {
       counter++;
     };
-    const middleware = createNodeMiddleware(appFn, {
+    const middleware = await createNodeMiddleware(appFn, {
       probot: new Probot({
         appId: APP_ID,
         privateKey: PRIVATE_KEY,
       }),
     });
 
-    middleware(
-      {} as IncomingMessage,
-      { end() {}, writeHead() {} } as unknown as ServerResponse,
-    );
-    middleware(
-      {} as IncomingMessage,
-      { end() {}, writeHead() {} } as unknown as ServerResponse,
-    );
+    const fakeRequest = {
+      url: "/",
+    } as IncomingMessage;
 
-    expect(counter).toEqual(1);
+    const fakeResponse = {
+      writeHead: () => ({ end: () => {} }),
+      end: () => ({ writeHead: () => {} }),
+    } as unknown as ServerResponse;
+
+    middleware(fakeRequest, fakeResponse);
+    middleware(fakeRequest, fakeResponse);
+
+    expect(counter).toBe(1);
   });
 });

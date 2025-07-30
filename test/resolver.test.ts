@@ -1,28 +1,47 @@
-import { resolveAppFunction } from "../src/helpers/resolve-app-function.js";
-import { describe, expect, vi, it } from "vitest";
+import { pathToFileURL } from "node:url";
 
-const stubAppFnPath = require.resolve("./fixtures/plugin/stub-plugin.ts");
-const stubTranspiledAppFnPath = require.resolve(
-  "./fixtures/plugin/stub-typescript-transpiled-plugin.ts",
+import { resolve } from "import-meta-resolve";
+import { describe, expect, it } from "vitest";
+
+import { resolveAppFunction } from "../src/helpers/resolve-app-function.js";
+
+const basedir = pathToFileURL(process.cwd()).href + "/";
+
+const stubAppFnPath = resolve("./test/fixtures/plugin/stub-plugin.ts", basedir);
+const stubTranspiledAppFnPath = resolve(
+  "./test/fixtures/plugin/stub-typescript-transpiled-plugin.ts",
+  basedir,
 );
-const basedir = process.cwd();
 
 describe("resolver", () => {
   it("loads the module at the resolved path", async () => {
-    const stubResolver = vi.fn().mockReturnValue(stubAppFnPath);
+    const stubResolverCalls: [string, string][] = [];
+    const stubResolver = (specifier: string, parent?: string): string => {
+      stubResolverCalls.push([specifier, parent!]);
+      return stubAppFnPath;
+    };
     const module = await resolveAppFunction("foo", {
-      resolver: stubResolver as unknown as RequireResolve,
+      resolver: stubResolver,
     });
-    expect(module).toBeInstanceOf(Function);
-    expect(stubResolver).toHaveBeenCalledWith("foo", { paths: [basedir] });
+    expect(typeof module).toBe("function");
+    expect(stubResolverCalls.length).toBe(1);
+    expect(stubResolverCalls[0][0]).toBe("foo");
+    expect(stubResolverCalls[0][1]).toBe(basedir);
   });
 
   it("loads module transpiled from TypeScript (https://github.com/probot/probot/issues/1447)", async () => {
-    const stubResolver = vi.fn().mockReturnValue(stubTranspiledAppFnPath);
+    const stubResolverCalls: [string, string][] = [];
+    const stubResolver = (specifier: string, parent?: string): string => {
+      stubResolverCalls.push([specifier, parent!]);
+      return stubTranspiledAppFnPath;
+    };
+
     const module = await resolveAppFunction("foo", {
-      resolver: stubResolver as unknown as RequireResolve,
+      resolver: stubResolver,
     });
-    expect(module).toBeInstanceOf(Function);
-    expect(stubResolver).toHaveBeenCalledWith("foo", { paths: [basedir] });
+    expect(typeof module).toBe("function");
+    expect(stubResolverCalls.length).toBe(1);
+    expect(stubResolverCalls[0][0]).toBe("foo");
+    expect(stubResolverCalls[0][1]).toBe(basedir);
   });
 });

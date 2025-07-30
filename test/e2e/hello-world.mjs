@@ -13,7 +13,7 @@ export default (app) => {
     const params = context.issue({ body: "Hello World!" });
 
     // Post a comment on the issue
-    await context.octokit.issues.createComment(params);
+    await context.octokit.rest.issues.createComment(params);
     console.log("issue comment created");
   });
 };

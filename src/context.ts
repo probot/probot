@@ -178,10 +178,10 @@ export class Context<Event extends WebhookEvents = WebhookEvents> {
    * Returns a boolean if the actor on the event was a bot.
    * @type {boolean}
    */
-  get isBot() {
-    // @ts-expect-error - `sender` key is currently not present in all events
+  get isBot(): boolean {
+    // `sender` key is not present in all events
     // see https://github.com/octokit/webhooks/issues/510
-    return this.payload.sender.type === "Bot";
+    return this.payload.sender?.type === "Bot";
   }
 
   /**
@@ -202,8 +202,8 @@ export class Context<Event extends WebhookEvents = WebhookEvents> {
    * const config = await context.config('config.yml')
    *
    * if (config.close) {
-   *   context.octokit.issues.comment(context.issue({body: config.comment}))
-   *   context.octokit.issues.edit(context.issue({state: 'closed'}))
+   *   context.octokit.rest.issues.comment(context.issue({body: config.comment}))
+   *   context.octokit.rest.issues.edit(context.issue({state: 'closed'}))
    * }
    * ```
    *
@@ -214,8 +214,8 @@ export class Context<Event extends WebhookEvents = WebhookEvents> {
    * const config = await context.config('config.yml', {comment: 'Make sure to check all the specs.'})
    *
    * if (config.close) {
-   *   context.octokit.issues.comment(context.issue({body: config.comment}));
-   *   context.octokit.issues.edit(context.issue({state: 'closed'}))
+   *   context.octokit.rest.issues.comment(context.issue({body: config.comment}));
+   *   context.octokit.rest.issues.edit(context.issue({state: 'closed'}))
    * }
    * ```
    *
@@ -240,17 +240,16 @@ export class Context<Event extends WebhookEvents = WebhookEvents> {
   ): Promise<T | null> {
     const params = this.repo({
       path: path.posix.join(".github", fileName),
-      defaults(configs: object[]) {
+      defaults(configs: Record<string, unknown>[]) {
         const result = merge.all(
           [defaultConfig || {}, ...configs],
           deepMergeOptions,
         );
 
-        return result;
+        return result as Record<string, unknown>;
       },
     });
 
-    // @ts-expect-error
     const { config, files } = await this.octokit.config.get(params);
 
     // if no default config is set, and no config files are found, return null

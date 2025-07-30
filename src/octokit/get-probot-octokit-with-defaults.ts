@@ -1,23 +1,21 @@
-import type { LRUCache } from "lru-cache";
-import { ProbotOctokit } from "./probot-octokit.js";
-import type { RedisOptions } from "ioredis";
 import { request } from "@octokit/request";
+import type { RequestRequestOptions } from "@octokit/types";
+import type { RedisOptions } from "ioredis";
+import type { Logger } from "pino";
+import type { Lru } from "toad-cache";
 
+import type { OctokitOptions } from "../types.js";
+import { ProbotOctokit } from "./probot-octokit.js";
 import { getOctokitThrottleOptions } from "./get-octokit-throttle-options.js";
 
-import type { Logger } from "pino";
-import type { RequestRequestOptions } from "@octokit/types";
-import type { OctokitOptions } from "../types.js";
-
 type Options = {
-  cache: LRUCache<number, string>;
+  cache: Lru<string>;
   Octokit: typeof ProbotOctokit;
   log: Logger;
   githubToken?: string;
   appId?: number;
   privateKey?: string;
   redisConfig?: RedisOptions | string;
-  webhookPath?: string;
   baseUrl?: string;
   request?: RequestRequestOptions;
 };
@@ -32,7 +30,9 @@ type Options = {
  * Besides the authentication, the Octokit's baseUrl is set as well when run
  * against a GitHub Enterprise Server with a custom domain.
  */
-export function getProbotOctokitWithDefaults(options: Options) {
+export async function getProbotOctokitWithDefaults(
+  options: Options,
+): Promise<typeof ProbotOctokit> {
   const authOptions = options.githubToken
     ? {
         token: options.githubToken,
@@ -53,17 +53,21 @@ export function getProbotOctokitWithDefaults(options: Options) {
         }),
       };
 
-  const octokitThrottleOptions = getOctokitThrottleOptions({
-    log: options.log,
+  const log = options.log.child({ name: "octokit" });
+
+  const octokitThrottleOptions = await getOctokitThrottleOptions({
+    log,
     redisConfig: options.redisConfig,
   });
 
-  let defaultOptions: Partial<OctokitOptions> = {
+  const defaultOptions: Partial<OctokitOptions> = {
+    log,
     auth: authOptions,
-    log: options.log.child
-      ? options.log.child({ name: "octokit" })
-      : options.log,
   };
+
+  if (options.request) {
+    defaultOptions.request = options.request;
+  }
 
   if (options.baseUrl) {
     defaultOptions.baseUrl = options.baseUrl;

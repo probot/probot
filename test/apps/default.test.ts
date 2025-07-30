@@ -1,61 +1,85 @@
-import Stream from "node:stream";
+import { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { pino } from "pino";
-import request from "supertest";
+import getPort from "get-port";
 import { describe, expect, it } from "vitest";
 
 import { Probot, Server } from "../../src/index.js";
-import { defaultApp } from "../../src/apps/default.js";
+import { defaultApp as defaultAppHandler } from "../../src/apps/default.js";
+
+import { probotView } from "../../src/views/probot.js";
+import { MockLoggerTarget } from "../utils.js";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 describe("default app", () => {
-  let output = [];
-
-  const streamLogsToOutput = new Stream.Writable({ objectMode: true });
-  streamLogsToOutput._write = (object, _encoding, done) => {
-    output.push(JSON.parse(object));
-    done();
-  };
-
   async function instantiateServer(cwd = process.cwd()) {
-    output = [];
     const server = new Server({
       Probot: Probot.defaults({
         appId: 1,
         privateKey: "private key",
       }),
-      log: pino(streamLogsToOutput),
+      port: await getPort(),
+      log: pino(new MockLoggerTarget()),
       cwd,
     });
 
-    await server.load(defaultApp);
+    await server.loadHandlerFactory(defaultAppHandler);
+
     return server;
   }
 
   describe("GET /probot", () => {
     it("returns a 200 response", async () => {
       const server = await instantiateServer();
-      return request(server.expressApp).get("/probot").expect(200);
+
+      await server.start();
+
+      const response = await fetch(
+        `http://${server.host}:${server.port}/probot`,
+      );
+
+      expect(response.status).toBe(200);
+      await server.stop();
     });
 
     describe("get info from package.json", () => {
       it("returns the correct HTML with values", async () => {
         const server = await instantiateServer();
-        const actual = await request(server.expressApp)
-          .get("/probot")
-          .expect(200);
-        expect(actual.text).toMatch("Welcome to probot");
-        expect(actual.text).toMatch("A framework for building GitHub Apps");
-        expect(actual.text).toMatch(/v\d+\.\d+\.\d+/);
-        expect(actual.text).toMatchSnapshot();
+
+        await server.start();
+
+        const response = await fetch(
+          `http://${server.host}:${server.port}/probot`,
+        );
+
+        expect(response.status).toBe(200);
+
+        expect(await response.text()).toBe(
+          probotView({
+            name: "probot",
+            description:
+              "A framework for building GitHub Apps to automate and improve your workflow",
+            version: "0.0.0-development",
+          }),
+        );
+
+        await server.stop();
       });
 
       it("returns the correct HTML without values", async () => {
         const server = await instantiateServer(__dirname);
-        const actual = await request(server.expressApp)
-          .get("/probot")
-          .expect(200);
-        expect(actual.text).toMatch("Welcome to your Probot App");
-        expect(actual.text).toMatchSnapshot();
+
+        await server.start();
+
+        const response = await fetch(
+          `http://${server.host}:${server.port}/probot`,
+        );
+        expect(response.status).toBe(200);
+        expect(await response.text()).toBe(probotView({}));
+
+        await server.stop();
       });
     });
   });
@@ -64,10 +88,16 @@ describe("default app", () => {
   describe("GET /", () => {
     it("redirects to /probot", async () => {
       const server = await instantiateServer(__dirname);
-      await request(server.expressApp)
-        .get("/")
-        .expect(302)
-        .expect("location", "/probot");
+      await server.start();
+
+      const response = await fetch(`http://${server.host}:${server.port}/`, {
+        redirect: "manual",
+      });
+
+      expect(response.status).toBe(302);
+      expect(response.headers.get("location")).toBe("/probot");
+
+      await server.stop();
     });
   });
 });

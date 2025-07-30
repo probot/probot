@@ -10,14 +10,10 @@ describe("loadPackageJson", () => {
   });
 
   it("returns package.json content", () => {
-    expect(loadPackageJson()).toHaveProperty("name");
     expect(loadPackageJson().name).toBe("probot");
   });
 
   it("returns package.json content if filepath is valid", () => {
-    expect(
-      loadPackageJson(resolve(process.cwd(), "package.json")),
-    ).toHaveProperty("name");
     expect(loadPackageJson(resolve(process.cwd(), "package.json")).name).toBe(
       "probot",
     );

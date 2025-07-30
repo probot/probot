@@ -218,14 +218,17 @@ describe("createNodeMiddleware", () => {
       }),
     });
 
-    middleware(
-      {} as IncomingMessage,
-      { end() {}, writeHead() {} } as unknown as ServerResponse,
-    );
-    middleware(
-      {} as IncomingMessage,
-      { end() {}, writeHead() {} } as unknown as ServerResponse,
-    );
+    const fakeRequest = {
+      url: "/",
+    } as IncomingMessage;
+
+    const fakeResponse = {
+      writeHead: () => ({ end: () => {} }),
+      end: () => ({ writeHead: () => {} }),
+    } as unknown as ServerResponse;
+
+    middleware(fakeRequest, fakeResponse);
+    middleware(fakeRequest, fakeResponse);
 
     expect(counter).toBe(1);
   });

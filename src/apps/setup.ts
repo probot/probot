@@ -18,12 +18,14 @@ import { importView } from "../views/import.js";
 import { setupView } from "../views/setup.js";
 import { successView } from "../views/success.js";
 
-type SetupFactoryOptions = StripUndefined<Required<
-  Pick<ServerOptions, "log" | "port" | "host">
->> &
+type SetupFactoryOptions = StripUndefined<
+  Required<Pick<ServerOptions, "log" | "port" | "host">>
+> &
   Pick<ServerOptions, "request"> & {
     updateEnv?: (env: Env) => Env;
-    SmeeClient?: { createChannel: () => Promise<string | undefined> } | undefined;
+    SmeeClient?:
+      | { createChannel: () => Promise<string | undefined> }
+      | undefined;
   };
 
 export const setupAppFactory = (options: SetupFactoryOptions) => {

@@ -109,9 +109,11 @@ export type PackageJson = {
   description?: string | undefined;
   homepage?: string | undefined;
   repository?: string | undefined;
-  engines?: {
-    [key: string]: string;
-  } | undefined;
+  engines?:
+    | {
+        [key: string]: string;
+      }
+    | undefined;
 };
 
 export type Env = NodeJS.ProcessEnv;

@@ -89,9 +89,13 @@ export async function run(
     Octokit: additionalOptions?.Octokit || undefined,
   };
 
-  type ServerOptionsLocal = StripUndefined<Required<
-    NonNullable<Pick<ServerOptions, "host" | "port" | "webhookPath" | "log" | "Probot">>
-  >> &
+  type ServerOptionsLocal = StripUndefined<
+    Required<
+      NonNullable<
+        Pick<ServerOptions, "host" | "port" | "webhookPath" | "log" | "Probot">
+      >
+    >
+  > &
     Pick<ServerOptions, "webhookProxy">;
 
   const serverOptions: ServerOptionsLocal = {

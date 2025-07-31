@@ -51,7 +51,7 @@
     "@octokit/request": "^10.0.3",
     "@octokit/types": "^14.1.0",
     "@octokit/webhooks": "^14.1.2",
-    "@probot/get-private-key": "^2.0.0",
+    "@probot/get-private-key": "^2.1.1",
     "npx-import-light": "^1.0.0",
     "@probot/octokit-plugin-config": "^3.0.2",
     "@probot/pino": "^5.0.0",

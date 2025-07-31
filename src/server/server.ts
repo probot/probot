@@ -39,13 +39,13 @@ type State = {
   httpServer: HttpServer;
   port: number;
   host: string;
-  log?: Logger;
+  log?: Logger | undefined;
   loggingOptions?: Record<string, unknown>;
   probot: Probot | null;
   ProbotBase: typeof Probot;
-  request?: RequestRequestOptions;
+  request?: RequestRequestOptions | undefined;
   webhookPath: string;
-  webhookProxy?: string;
+  webhookProxy?: string | undefined;
   eventSource: EventSource | undefined;
   httpLogger?: ReturnType<typeof httpLogger>;
   handlers: Handler[];

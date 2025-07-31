@@ -14,25 +14,32 @@ import type { Server } from "./server/server.js";
 import type { ProbotOctokit } from "./octokit/probot-octokit.js";
 
 export interface Options {
-  privateKey?: string;
-  githubToken?: string;
-  appId?: number | string;
-  Octokit?: typeof ProbotOctokit;
-  log?: Logger;
-  redisConfig?: RedisOptions | string;
-  secret?: string;
-  logLevel?: "trace" | "debug" | "info" | "warn" | "error" | "fatal";
-  logFormat?: "json" | "pretty";
-  logLevelInString?: boolean;
-  logMessageKey?: string;
-  sentryDsn?: string;
-  port?: number;
-  host?: string;
-  server?: Server;
-  baseUrl?: string;
-  request?: RequestRequestOptions;
-  webhookPath?: string;
-  webhookProxy?: string;
+  privateKey?: string | undefined;
+  githubToken?: string | undefined;
+  appId?: number | string | undefined;
+  Octokit?: typeof ProbotOctokit | undefined;
+  log?: Logger | undefined;
+  redisConfig?: RedisOptions | string | undefined;
+  secret?: string | undefined;
+  logLevel?:
+    | "trace"
+    | "debug"
+    | "info"
+    | "warn"
+    | "error"
+    | "fatal"
+    | undefined;
+  logFormat?: "json" | "pretty" | undefined;
+  logLevelInString?: boolean | undefined;
+  logMessageKey?: string | undefined;
+  sentryDsn?: string | undefined;
+  port?: number | undefined;
+  host?: string | undefined;
+  server?: Server | undefined;
+  baseUrl?: string | undefined;
+  request?: RequestRequestOptions | undefined;
+  webhookPath?: string | undefined;
+  webhookProxy?: string | undefined;
 }
 
 // Omit the `payload`, `id`,`name` properties from the `Context` class as they are already present in the types of `WebhookEvent`

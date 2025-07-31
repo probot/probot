@@ -12,12 +12,12 @@ type Options = {
   cache: Lru<string>;
   Octokit: typeof ProbotOctokit;
   log: Logger;
-  githubToken?: string;
-  appId?: number;
-  privateKey?: string;
-  redisConfig?: RedisOptions | string;
-  baseUrl?: string;
-  request?: RequestRequestOptions;
+  githubToken?: string | undefined;
+  appId?: number | undefined;
+  privateKey?: string | undefined;
+  redisConfig?: RedisOptions | string | undefined;
+  baseUrl?: string | undefined;
+  request?: RequestRequestOptions | undefined;
 };
 
 /**

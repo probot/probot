@@ -5,11 +5,11 @@ export function setupView({
   createAppUrl,
   manifest,
 }: {
-  name?: string;
-  description?: string;
-  version?: string;
-  createAppUrl: string;
-  manifest: string;
+  name?: string | undefined;
+  description?: string | undefined;
+  version?: string | undefined;
+  createAppUrl: string | undefined;
+  manifest: string | undefined;
 }): string {
   return `<!DOCTYPE html>
 <!DOCTYPE html>

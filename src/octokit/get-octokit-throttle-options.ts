@@ -6,7 +6,7 @@ import type { ThrottlingOptions } from "@octokit/plugin-throttling";
 
 type Options = {
   log: Logger;
-  redisConfig?: RedisOptions | string;
+  redisConfig?: RedisOptions | string | undefined;
 };
 
 export async function getOctokitThrottleOptions(

@@ -55,20 +55,20 @@ export type State = {
   log: Logger | null;
   logFormat?: "pretty" | "json";
   logLevelInString?: boolean;
-  sentryDsn?: string;
+  sentryDsn?: string | undefined;
   logLevel?: "trace" | "debug" | "info" | "warn" | "error" | "fatal";
-  logMessageKey?: string;
-  appId?: number;
-  privateKey?: string;
-  githubToken?: string;
+  logMessageKey?: string | undefined;
+  appId?: number | undefined;
+  privateKey?: string | undefined;
+  githubToken?: string | undefined;
   OctokitBase: typeof ProbotOctokit;
-  port?: number;
-  host?: string;
-  baseUrl?: string;
-  redisConfig?: RedisOptions | string;
+  port?: number | undefined;
+  host?: string | undefined;
+  baseUrl?: string | undefined;
+  redisConfig?: RedisOptions | string | undefined;
   webhookPath: string;
   webhookSecret: string;
-  request?: RequestRequestOptions;
+  request?: RequestRequestOptions | undefined;
   server?: Server | void;
 };
 
@@ -224,7 +224,9 @@ export class Probot {
     });
   }
 
-  public async auth(installationId?: number): Promise<ProbotOctokit> {
+  public async auth(
+    installationId?: number | undefined,
+  ): Promise<ProbotOctokit> {
     await this.#initialize();
 
     return await getAuthenticatedOctokit({

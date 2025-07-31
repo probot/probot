@@ -19,8 +19,8 @@ import type { Logger, LoggerOptions } from "pino";
 import { getTransformStream, type Options, type LogLevel } from "@probot/pino";
 
 export type GetLogOptions = {
-  level?: LogLevel;
-  logMessageKey?: string;
+  level?: LogLevel | undefined;
+  logMessageKey?: string | undefined;
 } & Options;
 
 export async function getLog(options: GetLogOptions = {}): Promise<Logger> {

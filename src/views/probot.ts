@@ -3,9 +3,9 @@ export function probotView({
   description,
   version,
 }: {
-  name?: string;
-  description?: string;
-  version?: string;
+  name?: string | undefined;
+  description?: string | undefined;
+  version?: string | undefined;
 }): string {
   return `<!DOCTYPE html>
 <html lang="en" class="height-full" data-color-mode="auto" data-light-theme="light" data-dark-theme="dark">

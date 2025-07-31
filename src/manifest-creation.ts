@@ -90,7 +90,10 @@ export class ManifestCreation {
     return generatedManifest;
   }
 
-  public async createAppFromCode(code: string, probotOptions?: OctokitOptions) {
+  public async createAppFromCode(
+    code: string,
+    probotOptions?: OctokitOptions | undefined,
+  ) {
     const octokit = new ProbotOctokit(probotOptions);
     const options: RequestParameters = {
       ...probotOptions,

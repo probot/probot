@@ -100,7 +100,7 @@ export const setupAppFactory = (options: SetupFactoryOptions) => {
           }
 
           const response = await setup.createAppFromCode(code, {
-            request,
+            request: request || {},
           });
 
           // If using glitch, restart the app

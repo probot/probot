@@ -13,26 +13,37 @@ import type { Probot } from "./probot.js";
 import type { Server } from "./server/server.js";
 import type { ProbotOctokit } from "./octokit/probot-octokit.js";
 
+export type StripUndefined<T> = {
+  [K in keyof T]-?: Exclude<T[K], undefined>;
+};
+
 export interface Options {
-  privateKey?: string;
-  githubToken?: string;
-  appId?: number | string;
-  Octokit?: typeof ProbotOctokit;
-  log?: Logger;
-  redisConfig?: RedisOptions | string;
-  secret?: string;
-  logLevel?: "trace" | "debug" | "info" | "warn" | "error" | "fatal";
-  logFormat?: "json" | "pretty";
-  logLevelInString?: boolean;
-  logMessageKey?: string;
-  sentryDsn?: string;
-  port?: number;
-  host?: string;
-  server?: Server;
-  baseUrl?: string;
-  request?: RequestRequestOptions;
-  webhookPath?: string;
-  webhookProxy?: string;
+  privateKey?: string | undefined;
+  githubToken?: string | undefined;
+  appId?: number | string | undefined;
+  Octokit?: typeof ProbotOctokit | undefined;
+  log?: Logger | undefined;
+  redisConfig?: RedisOptions | string | undefined;
+  secret?: string | undefined;
+  logLevel?:
+    | "trace"
+    | "debug"
+    | "info"
+    | "warn"
+    | "error"
+    | "fatal"
+    | undefined;
+  logFormat?: "json" | "pretty" | undefined;
+  logLevelInString?: boolean | undefined;
+  logMessageKey?: string | undefined;
+  sentryDsn?: string | undefined;
+  port?: number | undefined;
+  host?: string | undefined;
+  server?: Server | undefined;
+  baseUrl?: string | undefined;
+  request?: RequestRequestOptions | undefined;
+  webhookPath?: string | undefined;
+  webhookProxy?: string | undefined;
 }
 
 // Omit the `payload`, `id`,`name` properties from the `Context` class as they are already present in the types of `WebhookEvent`
@@ -66,25 +77,25 @@ export type Handler = (
 ) => void | boolean | Promise<void | boolean>;
 
 export type ServerOptions = {
-  cwd?: string;
-  log?: Logger;
-  port?: number;
-  host?: string;
-  webhookPath?: string;
-  webhookProxy?: string;
+  cwd?: string | undefined;
+  log?: Logger | undefined;
+  port?: number | undefined;
+  host?: string | undefined;
+  webhookPath?: string | undefined;
+  webhookProxy?: string | undefined;
 
-  enablePing?: boolean;
-  enableNotFound?: boolean;
-  enableStaticFiles?: boolean;
+  enablePing?: boolean | undefined;
+  enableNotFound?: boolean | undefined;
+  enableStaticFiles?: boolean | undefined;
 
   Probot: typeof Probot;
   loggingOptions?: LoggingOptions;
-  request?: RequestRequestOptions;
+  request?: RequestRequestOptions | undefined;
 };
 
 export type MiddlewareOptions = {
   probot: Probot;
-  webhooksPath?: string;
+  webhooksPath?: string | undefined;
   [key: string]: unknown;
 };
 
@@ -93,14 +104,16 @@ export type OctokitOptions = NonNullable<
 >;
 
 export type PackageJson = {
-  name?: string;
-  version?: string;
-  description?: string;
-  homepage?: string;
-  repository?: string;
-  engines?: {
-    [key: string]: string;
-  };
+  name?: string | undefined;
+  version?: string | undefined;
+  description?: string | undefined;
+  homepage?: string | undefined;
+  repository?: string | undefined;
+  engines?:
+    | {
+        [key: string]: string;
+      }
+    | undefined;
 };
 
 export type Env = NodeJS.ProcessEnv;

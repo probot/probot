@@ -8,7 +8,7 @@ import type { Logger } from "pino";
 import { ManifestCreation } from "../manifest-creation.js";
 import { getPrintableHost } from "../helpers/get-printable-host.js";
 import { isProduction } from "../helpers/is-production.js";
-import type { Handler } from "../types.js";
+import type { Handler, StripUndefined } from "../types.js";
 import { getPayload } from "../helpers/get-payload.js";
 
 import type { Env, ServerOptions } from "../types.js";
@@ -18,12 +18,14 @@ import { importView } from "../views/import.js";
 import { setupView } from "../views/setup.js";
 import { successView } from "../views/success.js";
 
-type SetupFactoryOptions = Required<
-  Pick<ServerOptions, "log" | "port" | "host">
+type SetupFactoryOptions = StripUndefined<
+  Required<Pick<ServerOptions, "log" | "port" | "host">>
 > &
   Pick<ServerOptions, "request"> & {
     updateEnv?: (env: Env) => Env;
-    SmeeClient?: { createChannel: () => Promise<string | undefined> };
+    SmeeClient?:
+      | { createChannel: () => Promise<string | undefined> }
+      | undefined;
   };
 
 export const setupAppFactory = (options: SetupFactoryOptions) => {
@@ -100,7 +102,7 @@ export const setupAppFactory = (options: SetupFactoryOptions) => {
           }
 
           const response = await setup.createAppFromCode(code, {
-            request,
+            request: request || {},
           });
 
           // If using glitch, restart the app

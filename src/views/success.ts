@@ -1,4 +1,4 @@
-export function successView({ name }: { name?: string }): string {
+export function successView({ name }: { name?: string | undefined }): string {
   return `<!DOCTYPE html>
 <html lang="en" class="height-full" data-color-mode="auto" data-light-theme="light" data-dark-theme="dark">
   <head>

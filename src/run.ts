@@ -6,6 +6,7 @@ import type {
   Env,
   Options,
   ServerOptions,
+  StripUndefined,
 } from "./types.js";
 import type { ProbotOctokit } from "./octokit/probot-octokit.js";
 import { setupAppFactory } from "./apps/setup.js";
@@ -88,10 +89,16 @@ export async function run(
     Octokit: additionalOptions?.Octokit || undefined,
   };
 
-  const serverOptions: Required<
-    Pick<ServerOptions, "host" | "port" | "webhookPath" | "log" | "Probot">
+  type ServerOptionsLocal = StripUndefined<
+    Required<
+      NonNullable<
+        Pick<ServerOptions, "host" | "port" | "webhookPath" | "log" | "Probot">
+      >
+    >
   > &
-    Pick<ServerOptions, "webhookProxy"> = {
+    Pick<ServerOptions, "webhookProxy">;
+
+  const serverOptions: ServerOptionsLocal = {
     host,
     port,
     webhookPath,

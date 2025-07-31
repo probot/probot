@@ -28,7 +28,7 @@ export class ManifestCreation {
   public async createWebhookChannel(
     { SmeeClient: SmeeClientParam, log = console } = {} as {
       SmeeClient: any;
-      log?: Logger;
+      log?: Logger | undefined;
     },
   ): Promise<string | undefined> {
     let SmeeClient: any;
@@ -90,7 +90,10 @@ export class ManifestCreation {
     return generatedManifest;
   }
 
-  public async createAppFromCode(code: string, probotOptions?: OctokitOptions) {
+  public async createAppFromCode(
+    code: string,
+    probotOptions?: OctokitOptions | undefined,
+  ) {
     const octokit = new ProbotOctokit(probotOptions);
     const options: RequestParameters = {
       ...probotOptions,

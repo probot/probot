@@ -28,7 +28,7 @@ export class ManifestCreation {
   public async createWebhookChannel(
     { SmeeClient: SmeeClientParam, log = console } = {} as {
       SmeeClient: any;
-      log?: Logger;
+      log?: Logger | undefined;
     },
   ): Promise<string | undefined> {
     let SmeeClient: any;

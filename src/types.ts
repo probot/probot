@@ -13,6 +13,10 @@ import type { Probot } from "./probot.js";
 import type { Server } from "./server/server.js";
 import type { ProbotOctokit } from "./octokit/probot-octokit.js";
 
+export type StripUndefined<T> = {
+  [K in keyof T]-?: Exclude<T[K], undefined>;
+};
+
 export interface Options {
   privateKey?: string | undefined;
   githubToken?: string | undefined;
@@ -73,25 +77,25 @@ export type Handler = (
 ) => void | boolean | Promise<void | boolean>;
 
 export type ServerOptions = {
-  cwd?: string;
-  log?: Logger;
-  port?: number;
-  host?: string;
-  webhookPath?: string;
-  webhookProxy?: string;
+  cwd?: string | undefined;
+  log?: Logger | undefined;
+  port?: number | undefined;
+  host?: string | undefined;
+  webhookPath?: string | undefined;
+  webhookProxy?: string | undefined;
 
-  enablePing?: boolean;
-  enableNotFound?: boolean;
-  enableStaticFiles?: boolean;
+  enablePing?: boolean | undefined;
+  enableNotFound?: boolean | undefined;
+  enableStaticFiles?: boolean | undefined;
 
   Probot: typeof Probot;
   loggingOptions?: LoggingOptions;
-  request?: RequestRequestOptions;
+  request?: RequestRequestOptions | undefined;
 };
 
 export type MiddlewareOptions = {
   probot: Probot;
-  webhooksPath?: string;
+  webhooksPath?: string | undefined;
   [key: string]: unknown;
 };
 
@@ -100,14 +104,14 @@ export type OctokitOptions = NonNullable<
 >;
 
 export type PackageJson = {
-  name?: string;
-  version?: string;
-  description?: string;
-  homepage?: string;
-  repository?: string;
+  name?: string | undefined;
+  version?: string | undefined;
+  description?: string | undefined;
+  homepage?: string | undefined;
+  repository?: string | undefined;
   engines?: {
     [key: string]: string;
-  };
+  } | undefined;
 };
 
 export type Env = NodeJS.ProcessEnv;

@@ -8,7 +8,7 @@ import { defaultWebhookPath } from "./server/server.js";
 type CreateProbotOptions = {
   overrides?: Options;
   defaults?: Options;
-  env?: Partial<Env>;
+  env?: Partial<Env> | undefined;
 };
 
 const DEFAULTS: Partial<Env> = {

@@ -213,7 +213,7 @@ export class Probot {
   public async getNodeMiddleware({
     log,
     path,
-  }: { log?: Logger; path?: string } = {}): Promise<
+  }: { log?: Logger | undefined; path?: string | undefined } = {}): Promise<
     ReturnType<typeof createNodeMiddleware>
   > {
     await this.#initialize();

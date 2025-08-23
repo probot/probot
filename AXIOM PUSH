@@ -1,0 +1,307 @@
+# Memecoin Sniper - Repo Scaffold (Paper Trading)
+# -------------------------------------------------
+# This canvas contains a ready-to-run repo structure. Copy to GitHub as-is.
+# ASCII-only, safe regex, minimal deps, tests included.
+# -------------------------------------------------
+
+# ================================================
+# requirements.txt
+# ================================================
+requests
+python-dotenv
+loguru
+pytest
+
+# ================================================
+# .env.example
+# ================================================
+# Optional X/Twitter bearer (leave blank to skip Twitter)
+X_BEARER_TOKEN=
+
+# DexScreener (public, no key)
+DEXSCREENER_BASE=https://api.dexscreener.com
+
+# Bot knobs
+SCORE_THRESHOLD=10
+SLEEP_SECONDS=30
+PAPER_TRADING=true
+BUY_SIZE_USD=25
+
+# ================================================
+# src/__init__.py
+# ================================================
+# package marker
+
+# ================================================
+# src/bot.py
+# ================================================
+from __future__ import annotations
+import os, time, re, requests
+from dataclasses import dataclass
+from typing import List, Dict, Tuple
+from loguru import logger
+from dotenv import load_dotenv
+
+load_dotenv()
+
+DEX = os.getenv("DEXSCREENER_BASE", "https://api.dexscreener.com").rstrip("/")
+X_BEARER = os.getenv("X_BEARER_TOKEN") or None
+SCORE_THRESHOLD = float(os.getenv("SCORE_THRESHOLD", "10"))
+SLEEP_SECONDS = int(os.getenv("SLEEP_SECONDS", "30"))
+PAPER_TRADING = (os.getenv("PAPER_TRADING", "true").lower() == "true")
+BUY_SIZE_USD = float(os.getenv("BUY_SIZE_USD", "25"))
+
+SOL_PUBKEY_RE = re.compile(r"\b[1-9A-HJ-NP-Za-km-z]{32,44}\b")
+
+def extract_pubkeys(text: str) -> List[str]:
+    return list(set(SOL_PUBKEY_RE.findall(text or "")))
+
+@dataclass
+class Candidate:
+    mint: str
+    boosts: int = 0
+    tweets: int = 0
+    followers_sum: int = 0
+    score: float = 0.0
+
+# --- data sources ---
+
+def fetch_dex_boosts() -> List[dict]:
+    url = f"{DEX}/token-boosts/latest/v1"
+    r = requests.get(url, timeout=15)
+    if r.status_code != 200:
+        logger.warning(f"DexScreener boosts error {r.status_code}")
+        return []
+    return [b for b in r.json().get("boosts", []) if str(b.get("chainId", "")).lower().startswith("sol")]
+
+def fetch_twitter_signals() -> List[Tuple[str,int]]:
+    # returns list of (text, followers)
+    if not X_BEARER:
+        return []
+    q = "(pump.fun OR mint OR CA OR \"contract address\") (sol OR solana) -airdrop -presale -giveaway"
+    url = "https://api.x.com/2/tweets/search/recent"
+    params = {
+        "query": q,
+        "max_results": 50,
+        "tweet.fields": "created_at,public_metrics,entities",
+        "expansions": "author_id",
+        "user.fields": "id,username,public_metrics,verified"
+    }
+    r = requests.get(url, params=params, headers={"Authorization": f"Bearer {X_BEARER}"}, timeout=15)
+    if r.status_code != 200:
+        logger.warning(f"X search error {r.status_code}: {r.text[:160]}")
+        return []
+    data = r.json()
+    users = {u["id"]: u for u in data.get("includes", {}).get("users", [])}
+    out: List[Tuple[str,int]] = []
+    for t in data.get("data", []):
+        u = users.get(t.get("author_id"), {})
+        followers = int(u.get("public_metrics", {}).get("followers_count", 0))
+        out.append((t.get("text",""), followers))
+    return out
+
+# --- scoring and execution ---
+
+def score_candidate(boosts:int, tweets:int, followers_sum:int) -> float:
+    s = 0.0
+    s += min(boosts, 10) * 1.2
+    s += min(tweets, 10) * 1.0
+    s += min(followers_sum/1000, 50) * 0.5
+    return s
+
+class PaperExec:
+    def __init__(self) -> None:
+        self.trades: List[dict] = []
+    def buy(self, mint:str, usd:float, reason:str):
+        evt = {"side":"BUY","mint":mint,"usd":usd,"reason":reason,"ts":time.time()}
+        self.trades.append(evt)
+        logger.info(f"[PAPER BUY] {evt}")
+        return evt
+
+# --- main bot step ---
+
+def run_once(exec_engine: PaperExec, buy_size_usd: float | None = None):
+    buy_amt = float(buy_size_usd or BUY_SIZE_USD)
+
+    boosts = fetch_dex_boosts()
+    twitter = fetch_twitter_signals()
+
+    feats: Dict[str, Candidate] = {}
+    for b in boosts:
+        mint = str(b.get("tokenAddress") or "")
+        if mint:
+            feats.setdefault(mint, Candidate(mint=mint)).boosts += 1
+    for text, followers in twitter:
+        for mint in extract_pubkeys(text):
+            c = feats.setdefault(mint, Candidate(mint=mint))
+            c.tweets += 1
+            c.followers_sum += followers
+
+    buys = []
+    for cand in feats.values():
+        cand.score = score_candidate(cand.boosts, cand.tweets, cand.followers_sum)
+        if cand.score >= SCORE_THRESHOLD:
+            reason = f"score={cand.score:.2f} boosts={cand.boosts} tweets={cand.tweets} fol={cand.followers_sum}"
+            if PAPER_TRADING:
+                exec_engine.buy(cand.mint, buy_amt, reason)
+            else:
+                logger.info(f"[LIVE STUB] Would buy {cand.mint}: {reason}")
+            buys.append(cand)
+    logger.info(f"Cycle completed. Candidates: {len(feats)}; Buys: {len(buys)}")
+    return buys
+
+# ================================================
+# src/runner.py
+# ================================================
+from __future__ import annotations
+import time
+from loguru import logger
+from src.bot import run_once, PaperExec, SLEEP_SECONDS
+
+def main():
+    exec_engine = PaperExec()
+    logger.info("Starting sniper in PAPER_TRADING mode.")
+    while True:
+        try:
+            run_once(exec_engine)
+        except Exception as e:
+            logger.exception(e)
+        time.sleep(SLEEP_SECONDS)
+
+if __name__ == "__main__":
+    main()
+
+# ================================================
+# tests/test_pubkey.py
+# ================================================
+from src.bot import SOL_PUBKEY_RE, extract_pubkeys
+
+REAL_KEY = "9xQeWvG816bUx9EPm2jM6PZ6pnc2H56CBTo9a5uRr9jA"
+
+def test_regex_no_partial_match():
+    assert SOL_PUBKEY_RE.findall(f"xx{REAL_KEY}yy") == []
+
+def test_regex_punctuation_match():
+    assert SOL_PUBKEY_RE.findall(f"({REAL_KEY})") == [REAL_KEY]
+
+def test_extract_pubkeys_returns_unique():
+    text = f"CA1: {REAL_KEY} CA2: {REAL_KEY}"
+    keys = extract_pubkeys(text)
+    assert keys == [REAL_KEY]
+
+# ================================================
+# tests/test_bot_loop.py
+# ================================================
+import types
+from src import bot as botmod
+
+class DummyExec(botmod.PaperExec):
+    def __init__(self):
+        super().__init__()
+
+def test_run_once_with_mocks(monkeypatch):
+    # Mock data sources to avoid network
+    def mock_boosts():
+        return [{"chainId":"solana","tokenAddress":"So11111111111111111111111111111111111111112"}]
+    def mock_twitter():
+        text = "New coin CA: 9xQeWvG816bUx9EPm2jM6PZ6pnc2H56CBTo9a5uRr9jA"
+        return [(text, 5000)]
+
+    monkeypatch.setattr(botmod, "fetch_dex_boosts", mock_boosts)
+    monkeypatch.setattr(botmod, "fetch_twitter_signals", mock_twitter)
+
+    exec_engine = DummyExec()
+    buys = botmod.run_once(exec_engine, buy_size_usd=5.0)
+
+    assert isinstance(buys, list)
+    assert len(exec_engine.trades) >= 1  # paper buy happened
+
+# ================================================
+# README.md
+# ================================================
+# Memecoin Sniper - Paper Trading Bot
+
+Minimal bot that scans DexScreener boosts and optional Twitter signals for Solana mints, scores them, and performs paper buys.
+
+## Run locally
+```bash
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+cp .env.example .env       # optional: add X_BEARER_TOKEN
+python -m src.runner
+```
+
+## Tests
+```bash
+pytest -q
+```
+
+## Deploy
+- Docker: build an image and run with `--env-file .env`.
+- VPS: use `systemd` to keep it running.
+
+## Notes
+- Keep PAPER_TRADING=true until you integrate a live execution path (Jupiter swap + signing).
+- Keep secrets in `.env` and never commit them.
+
+# ================================================
+# .github/workflows/tests.yml
+# ================================================
+name: tests
+on: [push, pull_request]
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pytest
+      - name: Run tests
+        run: pytest -q
+
+# ================================================
+# Dockerfile
+# ================================================
+FROM python:3.11-slim
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+CMD ["python", "-m", "src.runner"]
+
+# ================================================
+# .dockerignore
+# ================================================
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+.build/
+.git/
+.gitignore
+.github/
+.env
+
+# ================================================
+# README.md (append)
+# ================================================
+
+## GitHub Actions CI
+A workflow is included at `.github/workflows/tests.yml`. It runs `pytest` on every push/PR.
+
+## Docker
+Build and run with your `.env` file:
+```bash
+docker build -t memecoin-sniper .
+docker run -d --name sniper --env-file .env memecoin-sniper
+```

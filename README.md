@@ -33,6 +33,15 @@ export default (app) => {
 };
 ```
 
+### How does `probot` work?
+
+Check out this interactive walkthrough of the `probot` codebase on CodeCanvas [here](https://www.code-canvas.com/?session=unauthenticatedGithub&repo=probot&owner=probot&branch=master&OnboardingTutorial=true).
+
+To update the diagram, follow the quick tutorial [here](https://docs.code-canvas.com/updating-diagram).
+
+<img width="1916" alt="CodeCanvas Screenshot" src="https://codecanvas-media-public.s3.amazonaws.com/images/codecanvas-readme-screenshot.png" />
+
+
 ## Building a Probot App
 
 If you've landed in this GitHub repository and are looking to start building your own Probot App, look no further than [probot.github.io](https://probot.github.io/docs/)! The Probot website contains our extensive getting started documentation and will guide you through the set up process.

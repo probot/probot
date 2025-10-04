@@ -176,7 +176,7 @@ export async function receive(args: string[]) {
     },
   });
 
-  log.debug("Receiving event", event);
+  log.debug({ event }, "Receiving event");
 
   probot.receive({ name: event as any, payload, id: uuidv4() }).catch(() => {
     // Process must exist non-zero to indicate that the action failed to run

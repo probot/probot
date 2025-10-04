@@ -49,7 +49,7 @@
     "@octokit/plugin-retry": "^8.0.1",
     "@octokit/plugin-throttling": "^11.0.1",
     "@octokit/request": "^10.0.3",
-    "@octokit/types": "^14.1.0",
+    "@octokit/types": "^15.0.0",
     "@octokit/webhooks": "^14.1.2",
     "@probot/get-private-key": "^2.1.1",
     "npx-import-light": "^1.0.0",

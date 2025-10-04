@@ -1,5 +1,5 @@
 import fetchMock from "fetch-mock";
-import { pino } from "pino";
+import pino from "pino";
 import getPort from "get-port";
 import { describe, expect, it } from "vitest";
 

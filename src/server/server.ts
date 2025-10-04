@@ -127,10 +127,11 @@ export class Server {
       this.#state.initializationPromise.resolve();
     } catch (error) {
       this.#state.initializationPromise.reject(error);
-      (this.#state.log || console).error(
-        { err: error },
-        "Failed to initialize Server",
-      );
+      if (this.#state.log) {
+        this.#state.log.error({ err: error }, "Failed to initialize Server");
+      } else {
+        console.error("Failed to initialize Server", error);
+      }
       throw error;
     }
     return this.#state.initializationPromise.promise;

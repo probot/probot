@@ -200,10 +200,11 @@ export class Probot {
 
       this.#state.initializedPromise.resolve();
     } catch (error) {
-      (this.#state.log || console).error(
-        { err: error },
-        "Failed to initialize Probot",
-      );
+      if (this.#state.log) {
+        this.#state.log.error({ err: error }, "Failed to initialize Probot");
+      } else {
+        console.error("Failed to initialize Probot", error);
+      }
       this.#state.initializedPromise.reject(error);
     } finally {
       return this.#state.initializedPromise.promise;

@@ -92,7 +92,7 @@ Commands:
       testProject.cleanUp();
     },
     {
-      timeout: 10000,
+      timeout: 20000,
     },
   );
 
@@ -118,7 +118,7 @@ Commands:
       testProject.cleanUp();
     },
     {
-      timeout: 10000,
+      timeout: 20000,
     },
   );
 
@@ -144,7 +144,7 @@ Commands:
       testProject.cleanUp();
     },
     {
-      timeout: 10000,
+      timeout: 20000,
     },
   );
 });

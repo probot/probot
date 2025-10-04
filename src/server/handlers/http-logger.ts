@@ -1,12 +1,16 @@
+import type { IncomingMessage, ServerResponse } from "node:http";
 import { randomUUID as uuidv4 } from "node:crypto";
 
 import { pinoHttp, startTime, type Options, type HttpLogger } from "pino-http";
 import type { Logger } from "pino";
 
-export function httpLogger(logger: Logger, options?: Options): HttpLogger {
+export function httpLogger(
+  logger: Logger,
+  options?: Options,
+): HttpLogger<IncomingMessage, ServerResponse, string> {
   return pinoHttp({
     ...options,
-    logger: logger.child({ name: "http" }),
+    logger: logger.child({ name: "http" }) as Logger<string>,
     customSuccessMessage(req, res) {
       const responseTime = Date.now() - res[startTime];
       return `${req.method} ${req.url} ${res.statusCode} - ${responseTime}ms`;

@@ -38,7 +38,6 @@ export class ManifestCreation {
         (await npxImport("smee-client@4.3.1", { onlyPackageRunner: true }))
           .SmeeClient;
     } catch {
-      // @ts-expect-error TypeScript is just being difficult here, since https://github.com/pinojs/pino/pull/2230
       log.warn("SmeeClient is not available");
       return void 0;
     }
@@ -49,7 +48,6 @@ export class ManifestCreation {
       });
       return WEBHOOK_PROXY_URL;
     } catch {
-      // @ts-expect-error TypeScript is just being difficult here, since https://github.com/pinojs/pino/pull/2230
       log.warn("Unable to connect to smee.io, try restarting your server.");
       return void 0;
     }

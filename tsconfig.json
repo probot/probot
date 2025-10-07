@@ -4,13 +4,16 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "pretty": true,
-    "sourceMap": true,
+    "sourceMap": false,
     "outDir": "./lib",
     "skipLibCheck": true,
     "noImplicitAny": true,
     "declaration": true,
     "allowJs": true,
-    "lib": ["es2023", "dom"]
+    "lib": ["es2023"],
+    "strict": true,
+    "strictNullChecks": true,
+    "erasableSyntaxOnly": true
   },
   "include": ["src/**/*"],
   "compileOnSave": false

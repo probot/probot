@@ -90,7 +90,7 @@
     "sonic-boom": "^4.0.0",
     "tsd": "^0.33.0",
     "typedoc": "^0.28.0",
-    "typescript": "^5.2.2",
+    "typescript": "^5.9.3",
     "vitest": "^3.0.0"
   },
   "exports": {

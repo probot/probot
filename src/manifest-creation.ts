@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { npxImport } from "npx-import-light";
-import yaml from "js-yaml";
+import yaml from "yaml";
 import type { RequestParameters } from "@octokit/types";
 import type { Logger } from "pino";
 
@@ -64,7 +64,7 @@ export class ManifestCreation {
 
     try {
       const file = readFileSync(path.join(process.cwd(), "app.yml"), "utf8");
-      manifest = yaml.load(file) as Manifest;
+      manifest = yaml.parse(file) as Manifest;
     } catch (error) {
       // App config does not exist, which is ok.
       if ((error as Error & { code?: string }).code !== "ENOENT") {

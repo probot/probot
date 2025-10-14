@@ -53,7 +53,7 @@ export async function getOctokitThrottleOptions(
 let Redis = null;
 
 async function getRedisClient({ redisConfig }: Options): Promise<any> {
-  Redis ??= (await npxImport("ioredis@5.7.0", { onlyPackageRunner: true }))
+  Redis ??= (await npxImport("ioredis@5.8.1", { onlyPackageRunner: true }))
     .Redis;
   if (redisConfig) return new Redis(redisConfig as RedisOptions);
 }

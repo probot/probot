@@ -9,9 +9,9 @@ import { updateEnv } from "../../src/helpers/update-env.js";
 const originalCwd = process.cwd();
 const originalEnv = Object.assign({}, process.env);
 
-describe("update-dotenv", () => {
+describe("update-env", () => {
   it("creates .env, writes new values, sets process.env", () => {
-    process.chdir(mkdtempSync(pathJoin(tmpdir(), "update-dotenv")));
+    process.chdir(mkdtempSync(pathJoin(tmpdir(), "update-env")));
 
     updateEnv({ FOO: "bar" });
     expect(readFileSync(".env", "utf-8")).toBe("FOO=bar");
@@ -22,7 +22,7 @@ describe("update-dotenv", () => {
   });
 
   it("properly writes multi-line strings", () => {
-    process.chdir(mkdtempSync(pathJoin(tmpdir(), "update-dotenv")));
+    process.chdir(mkdtempSync(pathJoin(tmpdir(), "update-env")));
 
     updateEnv({ FOO: "bar\nbaz" });
     expect(readFileSync(".env", "utf-8")).toBe("FOO=bar\\nbaz");
@@ -32,7 +32,7 @@ describe("update-dotenv", () => {
   });
 
   it("appends new variables to existing variables", () => {
-    process.chdir(mkdtempSync(pathJoin(tmpdir(), "update-dotenv")));
+    process.chdir(mkdtempSync(pathJoin(tmpdir(), "update-env")));
 
     updateEnv({ FIRST: "foo" });
     updateEnv({ SECOND: "bar" });

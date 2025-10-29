@@ -17,9 +17,9 @@ import { defaultApp as defaultAppHandler } from "./apps/default.js";
 import { defaultWebhookPath, Server } from "./server/server.js";
 import { resolveAppFunction } from "./helpers/resolve-app-function.js";
 import { isProduction } from "./helpers/is-production.js";
-import { config as dotenvConfig } from "dotenv";
 import { updateEnv } from "./helpers/update-env.js";
 import { Probot } from "./probot.js";
+import { applyEnv } from "./helpers/apply-env.js";
 
 type AdditionalOptions = {
   env?: Env;
@@ -37,7 +37,7 @@ export async function run(
   appFnOrArgv: ApplicationFunction | string[],
   additionalOptions?: AdditionalOptions,
 ): Promise<Server> {
-  dotenvConfig({ quiet: true });
+  applyEnv();
 
   const envOptions = readEnvOptions(additionalOptions?.env);
   const cliOptions = Array.isArray(appFnOrArgv)

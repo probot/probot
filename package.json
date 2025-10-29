@@ -57,7 +57,6 @@
     "@probot/pino": "^5.0.1",
     "bottleneck": "^2.19.5",
     "deepmerge": "^4.3.1",
-    "dotenv": "^17.0.0",
     "import-meta-resolve": "^4.1.0",
     "npx-import-light": "^1.0.0",
     "octokit-auth-probot": "^4.0.1",

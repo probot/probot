@@ -2,14 +2,14 @@ import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 
-import { config as dotenvConfig } from "dotenv";
 import { detectRuntime } from "../helpers/detect-runtime.js";
 import { isSupportedRuntime } from "../helpers/is-supported-runtime.js";
 import { loadPackageJson } from "../helpers/load-package-json.js";
+import { applyEnv } from "../helpers/apply-env.js";
 import { run } from "../run.js";
 import { receive } from "./receive.js";
 
-dotenvConfig({ quiet: true });
+applyEnv();
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkg = loadPackageJson(resolve(__dirname, "package.json"));

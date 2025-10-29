@@ -55,10 +55,6 @@ const kOctokitRequestHookAdded = Symbol("octokit request hook added");
  *    });
  *  };
  *  ```
- *
- * @property {octokit} octokit - An Octokit instance
- * @property {payload} payload - The webhook event payload
- * @property {log} log - A pino instance
  */
 export class Context<Event extends WebhookEvents = WebhookEvents> {
   public name: WebhookEvents;
@@ -67,10 +63,22 @@ export class Context<Event extends WebhookEvents = WebhookEvents> {
     [K in Event]: K extends WebhookEvents ? WebhookEvent<K> : never;
   }[Event]["payload"];
 
+  /**
+   * An authenticated Octokit instance that can be used to make GitHub API
+   * requests in the context of the webhook event.
+   */
   public octokit: ProbotOctokit;
+  
+  /**
+   * A logger with context about the event.
+   */
   public log: Logger;
 
-  constructor(event: WebhookEvent<Event>, octokit: ProbotOctokit, log: Logger) {
+  constructor(
+    event: WebhookEvent<Event>,
+    octokit: ProbotOctokit,
+    log: Logger,
+  ) {
     this.name = event.name;
     this.id = event.id;
     this.payload = event.payload;

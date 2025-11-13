@@ -1,4 +1,4 @@
-.mt-2{margin-top:8px!important;}
+export default `.mt-2{margin-top:8px!important;}
 .mb-2{margin-bottom:8px!important;}
 .mt-4{margin-top:24px!important;}
 .mt-6{margin-top:40px!important;}
@@ -42,7 +42,8 @@ p{margin-top:0;margin-bottom:10px;}
 .d-flex{display:flex!important;}
 .mt-3{margin-top:16px!important;}
 .py-6{padding-top:40px!important;padding-bottom:40px!important;}
+/*! CSS Used from: http://localhost:3000/probot/static/primer.css */
 body{margin:0;}
 h1{font-size:2em;margin:0.67em 0;}
 h1,h4{margin-top:0;margin-bottom:0;}
-h1{font-size:32px;font-weight:600;}
+h1{font-size:32px;font-weight:600;}` as string;

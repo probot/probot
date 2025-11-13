@@ -1,0 +1,25 @@
+export default `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 202 201.3">
+  <defs>
+    <clipPath id="a" transform="translate(-.8 -.7)">
+      <rect width="52.5" height="18.2" x="147.9" y="163.8" fill="none" rx="9.1" ry="9.1"/>
+    </clipPath>
+  </defs>
+  <path fill="#aedfe4" d="m101 9.8 9 38.4H91.8Z"/>
+  <rect width="178" height="135.9" x="12" y="46" fill="#08b0d8" rx="18.2" ry="18.6"/>
+  <rect width="149.2" height="106.8" x="26.4" y="60.1" fill="#aedfe4" rx="14.8" ry="15.1"/>
+  <ellipse cx="23.5" cy="169.4" fill="#aedfe4" rx="3.6" ry="3.7"/>
+  <ellipse cx="177.6" cy="169.4" fill="#aedfe4" rx="3.6" ry="3.7"/>
+  <ellipse cx="23.5" cy="58.7" fill="#aedfe4" rx="3.6" ry="3.7"/>
+  <ellipse cx="177.6" cy="58.7" fill="#aedfe4" rx="3.6" ry="3.7"/>
+  <ellipse cx="65.3" cy="112.3" rx="13.7" ry="14"/>
+  <path fill="#08b0d8" d="M65.3 98.3a13.7 14 0 1 1-13.6 14 13.7 14 0 0 1 13.6-14m0-20.7a34 34.7 0 1 0 34 34.7 34 34.7 0 0 0-34-34.7"/>
+  <path fill="#f1f1f2" d="M65.3 98.3a13.7 14 0 1 1-13.6 14 13.7 14 0 0 1 13.6-14m0-12.6a26 26.6 0 1 0 26 26.6 26 26.6 0 0 0-26-26.6"/>
+  <ellipse cx="137.6" cy="112.3" rx="13.7" ry="14"/>
+  <path fill="#08b0d8" d="M137.6 98.3a13.7 14 0 1 1-13.7 14 13.7 14 0 0 1 13.7-14m0-20.7a34 34.7 0 1 0 33.9 34.7 34 34.7 0 0 0-34-34.7Z"/>
+  <path fill="#f1f1f2" d="M137.6 98.3a13.7 14 0 1 1-13.7 14 13.7 14 0 0 1 13.7-14m0-12.6a26 26.6 0 1 0 26 26.6 26 26.6 0 0 0-26-26.6"/>
+  <rect width="46.3" height="16.4" x="78" y="147.5" fill="#fdbb65" rx="8" ry="8.2"/>
+  <g fill="#ef4236" clip-path="url(#a)" transform="matrix(.881 0 0 .9 -51.6 .7)">
+    <path d="M153.2 162.2h3.2v20.5h-3.2zm9 0h3.2v20.5h-3.1zm9.2 0h3v20.5h-3zm9 0h3.1v20.5h-3zm9 0h3.2v20.5h-3.1z"/>
+  </g>
+  <ellipse cx="101" cy="13.9" fill="#ef4236" rx="12.9" ry="13.2"/>
+</svg>` as string;

@@ -8,7 +8,7 @@ export const createWebhookProxy = async (
 ): Promise<EventSource | undefined> => {
   try {
     SmeeClient ??= (
-      await npxImport<any>("smee-client@4.3.1", { onlyPackageRunner: true })
+      await npxImport<any>("smee-client@5.0.0", { onlyPackageRunner: true })
     ).SmeeClient;
   } catch {
     opts.logger.warn(

@@ -38,11 +38,11 @@ p{margin-top:0;margin-bottom:10px;}
 .flex-items-center{align-items:center!important;}
 .height-full{height:100%!important;}
 .mr-2{margin-right:8px!important;}
+.ml-2{margin-left:8px!important;}
 .text-center{text-align:center!important;}
 .d-flex{display:flex!important;}
 .mt-3{margin-top:16px!important;}
 .py-6{padding-top:40px!important;padding-bottom:40px!important;}
-/*! CSS Used from: http://localhost:3000/probot/static/primer.css */
 body{margin:0;}
 h1{font-size:2em;margin:0.67em 0;}
 h1,h4{margin-top:0;margin-bottom:0;}

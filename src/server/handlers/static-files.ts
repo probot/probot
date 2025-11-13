@@ -10,7 +10,7 @@ const robotSvg = readFileSync(
   "utf-8",
 );
 const probotHeadPng = readFileSync(
-  join(__dirname, "..", "..", "..", "static", "probot-head.png"),
+  join(__dirname, "..", "..", "..", "static", "probot-head.svg"),
   "utf-8",
 );
 const primerCss = readFileSync(
@@ -30,7 +30,7 @@ export const staticFilesHandler: Handler = (req, res) => {
         .end(robotSvg);
       return true;
     }
-    if (path === "/probot/static/probot-head.png") {
+    if (path === "/probot/static/probot-head.svg") {
       res
         .writeHead(200, {
           "cache-control": "max-age=86400",

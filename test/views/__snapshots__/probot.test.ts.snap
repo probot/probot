@@ -8,7 +8,7 @@ exports[`probotView > not providing parameters 1`] = `
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Your App | built with Probot</title>
-    <link rel="icon" href="/probot/static/probot-head.png">
+    <link rel="icon" href="/probot/static/probot-head.svg">
     <link rel="stylesheet" href="/probot/static/primer.css">
   </head>
   <body class="height-full bg-gray-light">
@@ -42,7 +42,7 @@ exports[`probotView > providing description 1`] = `
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Your App | built with Probot</title>
-    <link rel="icon" href="/probot/static/probot-head.png">
+    <link rel="icon" href="/probot/static/probot-head.svg">
     <link rel="stylesheet" href="/probot/static/primer.css">
   </head>
   <body class="height-full bg-gray-light">
@@ -76,7 +76,7 @@ exports[`probotView > providing description 2`] = `
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Your App | built with Probot</title>
-    <link rel="icon" href="/probot/static/probot-head.png">
+    <link rel="icon" href="/probot/static/probot-head.svg">
     <link rel="stylesheet" href="/probot/static/primer.css">
   </head>
   <body class="height-full bg-gray-light">
@@ -111,7 +111,7 @@ exports[`probotView > providing name 1`] = `
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>My App | built with Probot</title>
-    <link rel="icon" href="/probot/static/probot-head.png">
+    <link rel="icon" href="/probot/static/probot-head.svg">
     <link rel="stylesheet" href="/probot/static/primer.css">
   </head>
   <body class="height-full bg-gray-light">

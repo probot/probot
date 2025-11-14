@@ -19,7 +19,7 @@ export const staticFilesHandler: Handler = (req, res) => {
       res
         .writeHead(200, {
           "cache-control": "max-age=86400",
-          "content-type": "image/png",
+          "content-type": "image/svg+xml",
         })
         .end(probotHeadPng);
       return true;

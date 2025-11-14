@@ -19,7 +19,7 @@ export function setupView({
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Setup ${name || "Your App"} | built with Probot</title>
-    <link rel="icon" href="/probot/static/probot-head.png">
+    <link rel="icon" href="/probot/static/probot-head.svg">
     <link rel="stylesheet" href="/probot/static/primer.css">
   </head>
   <body class="height-full bg-gray-light">

@@ -1,22 +1,7 @@
-import { readFileSync } from "node:fs";
-import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
 import type { Handler } from "../../types.js";
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
-const robotSvg = readFileSync(
-  join(__dirname, "..", "..", "..", "static", "robot.svg"),
-  "utf-8",
-);
-const probotHeadPng = readFileSync(
-  join(__dirname, "..", "..", "..", "static", "probot-head.png"),
-  "utf-8",
-);
-const primerCss = readFileSync(
-  join(__dirname, "..", "..", "..", "static", "primer.css"),
-  "utf-8",
-);
+import robotSvg from "../../static/robot.svg.js";
+import probotHeadPng from "../../static/probot-head.svg.js";
+import primerCss from "../../static/primer.css.js";
 
 export const staticFilesHandler: Handler = (req, res) => {
   if (req.method === "GET") {
@@ -30,11 +15,11 @@ export const staticFilesHandler: Handler = (req, res) => {
         .end(robotSvg);
       return true;
     }
-    if (path === "/probot/static/probot-head.png") {
+    if (path === "/probot/static/probot-head.svg") {
       res
         .writeHead(200, {
           "cache-control": "max-age=86400",
-          "content-type": "image/png",
+          "content-type": "image/svg+xml",
         })
         .end(probotHeadPng);
       return true;

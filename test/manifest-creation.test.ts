@@ -148,7 +148,7 @@ describe("ManifestCreation", () => {
         },
       });
       expect(createdApp).toBe("https://github.com/apps/testerino0000000");
-      // expect dotenv to be called with id, webhook_secret, pem
+      // expect updateEnv to be called with id, webhook_secret, pem
       expect(updateEnvCalls.length).toBe(1);
 
       expect(Object.keys(updateEnvCalls[0]).length).toBe(5);
@@ -185,7 +185,7 @@ describe("ManifestCreation", () => {
         },
       });
       expect(createdApp).toBe("https://github.com/apps/testerino0000000");
-      // expect dotenv to be called with id, webhook_secret, pem
+      // expect updateEnv to be called with id, webhook_secret, pem
       expect(updateEnvCalls.length).toBe(1);
 
       expect(Object.keys(updateEnvCalls[0]).length).toBe(5);

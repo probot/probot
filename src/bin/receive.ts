@@ -72,7 +72,7 @@ export async function receive(args: string[]) {
       },
       "log-format": {
         type: "string",
-        default: process.env.LOG_LEVEL || "pretty",
+        default: process.env.LOG_FORMAT || "pretty",
       },
       "log-level-in-string": {
         type: "boolean",

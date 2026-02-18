@@ -72,6 +72,9 @@ async function prepareTestProjectWithProbot() {
 describe(`cli help`, () => {
   test(
     `with flag -h`,
+    {
+      timeout: 20000,
+    },
     async () => {
       const testProject = await prepareTestProjectWithProbot();
       expect(
@@ -91,13 +94,13 @@ Commands:
 
       testProject.cleanUp();
     },
-    {
-      timeout: 20000,
-    },
   );
 
   test(
     `with flag --help`,
+    {
+      timeout: 20000,
+    },
     async () => {
       const testProject = await prepareTestProjectWithProbot();
       expect(
@@ -117,13 +120,13 @@ Commands:
 
       testProject.cleanUp();
     },
-    {
-      timeout: 20000,
-    },
   );
 
   test(
     `with no flags at all`,
+    {
+      timeout: 20000,
+    },
     async () => {
       const testProject = await prepareTestProjectWithProbot();
       expect(
@@ -142,9 +145,6 @@ Commands:
   help [command]  display help for command`);
 
       testProject.cleanUp();
-    },
-    {
-      timeout: 20000,
     },
   );
 });

@@ -147,6 +147,8 @@ describe("run", () => {
 
   it(
     "should work with fastify",
+    // Fastify is not supported in Deno
+    { skip: detectRuntime(globalThis) === "deno" },
     async () => {
       const port = await getPort();
 
@@ -185,8 +187,6 @@ describe("run", () => {
 
       await server.stop();
     },
-    // Fastify is not supported in Deno
-    { skip: detectRuntime(globalThis) === "deno" },
   );
 });
 
@@ -350,6 +350,8 @@ describe("createNodeMiddleware", () => {
 
   it(
     "should work with fastify when calling addHandler",
+    // Fastify is not supported in Deno
+    { skip: detectRuntime(globalThis) === "deno" },
     async () => {
       const port = await getPort();
 
@@ -395,12 +397,12 @@ describe("createNodeMiddleware", () => {
 
       server.close();
     },
-    // Fastify is not supported in Deno
-    { skip: detectRuntime(globalThis) === "deno" },
   );
 
   it(
     "should work with fastify as standalone server",
+    // Fastify is not supported in Deno
+    { skip: detectRuntime(globalThis) === "deno" },
     async () => {
       const port = await getPort();
 
@@ -466,7 +468,5 @@ describe("createNodeMiddleware", () => {
 
       await fastify.close();
     },
-    // Fastify is not supported in Deno
-    { skip: detectRuntime(globalThis) === "deno" },
   );
 });

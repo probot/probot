@@ -55,6 +55,7 @@ describe("smee-client", () => {
 describe("ioredis", () => {
   it(
     "should be ensured that ioredis is the same version as in the package-lock.json",
+    { skip: !!process.env.NO_IOREDIS },
     () => {
       expect(
         typeof packageLockJson.packages["node_modules/ioredis"].version,
@@ -66,6 +67,5 @@ describe("ioredis", () => {
         packageLockJson.packages["node_modules/ioredis"].version,
       );
     },
-    { skip: !!process.env.NO_IOREDIS },
   );
 });

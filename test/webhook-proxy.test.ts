@@ -55,6 +55,7 @@ describe("webhook-proxy", () => {
 
   test(
     "with a valid proxy server forwards events to server",
+    { skip: !smeeClientInstalled },
     async () => {
       const readyPromise = createDeferredPromise<void>();
       const finishedPromise = createDeferredPromise<void>();
@@ -133,11 +134,11 @@ describe("webhook-proxy", () => {
       server.close();
       proxy.close();
     },
-    { skip: !smeeClientInstalled },
   );
 
   test(
     "logs an error when the proxy server is not found",
+    { skip: !smeeClientInstalled },
     async () => {
       const domain = "bad.n" + randomInt(1e10).toString(36) + ".proxy";
       const url = `http://${domain}/events`;
@@ -179,6 +180,5 @@ describe("webhook-proxy", () => {
         expect(LoggerErrorCalls[0][1]).toBe(error);
       }
     },
-    { skip: !smeeClientInstalled },
   );
 });

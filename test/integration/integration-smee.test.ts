@@ -64,6 +64,11 @@ describe("smee-client", () => {
 
   it(
     "with createProbot and setting the webhookPath via WEBHOOK_PATH to the root",
+    {
+      retry: 10,
+      timeout: 10000,
+      skip: detectRuntime(globalThis) === "deno" || !smeeClientInstalled,
+    },
     async () => {
       const eventPromise = createDeferredPromise<void>();
 
@@ -118,11 +123,6 @@ describe("smee-client", () => {
       await eventPromise.promise;
 
       await server.stop();
-    },
-    {
-      retry: 10,
-      timeout: 10000,
-      skip: detectRuntime(globalThis) === "deno" || !smeeClientInstalled,
     },
   );
 });

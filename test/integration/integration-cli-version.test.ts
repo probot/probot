@@ -71,6 +71,9 @@ async function prepareTestProjectWithProbot() {
 describe(`cli version`, () => {
   test(
     `with flag -v`,
+    {
+      timeout: 20000,
+    },
     async () => {
       const testProject = await prepareTestProjectWithProbot();
       expect(
@@ -81,13 +84,13 @@ describe(`cli version`, () => {
 
       testProject.cleanUp();
     },
-    {
-      timeout: 20000,
-    },
   );
 
   test(
     `with flag --version`,
+    {
+      timeout: 20000,
+    },
     async () => {
       const testProject = await prepareTestProjectWithProbot();
       expect(
@@ -97,9 +100,6 @@ describe(`cli version`, () => {
       ).toBe(`0.0.0-dev`);
 
       testProject.cleanUp();
-    },
-    {
-      timeout: 20000,
     },
   );
 });

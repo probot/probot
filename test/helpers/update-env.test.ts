@@ -9,7 +9,7 @@ import { updateEnv } from "../../src/helpers/update-env.js";
 const originalCwd = process.cwd();
 const originalEnv = Object.assign({}, process.env);
 
-describe("update-env", () => {
+describe("update-dotenv", () => {
   it("creates .env, writes new values, sets process.env", () => {
     process.chdir(mkdtempSync(pathJoin(tmpdir(), "update-env")));
 

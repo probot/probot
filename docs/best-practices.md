@@ -60,6 +60,28 @@ A dry run is when an app, instead of actually taking an action, only logs what a
 
 For example, the [stale](https://github.com/probot/stale) app will perform a dry run if there is no `.github/stale.yml` file in the target repository.
 
+### Error Reporting
+
+Apps _should_ report failures gracefully so repository maintainers know when an action could not be completed.
+
+For example, if your app fails to perform an action due to an unexpected error, you can use the `context.reportAppFailure()` method to automatically create a GitHub Issue in the repository with the error details and the delivery ID for debugging:
+
+```js
+module.exports = (app) => {
+  app.on("push", async (context) => {
+    try {
+      // Do some work that might fail
+      await doSomethingRisky(context);
+    } catch (error) {
+      // Create an issue in the repository explaining the failure
+      await context.reportAppFailure(error, {
+        title: "Probot App failed to process push event",
+      });
+    }
+  });
+};
+```
+
 ## Configuration
 
 ### Require minimal configuration

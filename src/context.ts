@@ -263,4 +263,46 @@ export class Context<Event extends WebhookEvents = WebhookEvents> {
 
     return config as T;
   }
+
+  /**
+   * Automatically creates an issue in the repository when the Probot app experiences a failure.
+   * This is useful for alerting repository owners about problems with the app's execution.
+   *
+   * @param error - The error object or message that caused the failure
+   * @param options - Additional options for the failure report
+   * @param options.title - The title of the issue to be created (defaults to "Probot App Failure")
+   */
+  public async reportAppFailure(
+    error: Error | string,
+    options?: { title?: string },
+  ): Promise<any> {
+    let repoParams;
+    try {
+      repoParams = this.repo();
+    } catch (e) {
+      // If we can't determine the repo context, log an error and throw.
+      this.log.error(
+        "Could not determine repository context to report app failure.",
+      );
+      throw e;
+    }
+
+    const errorMessage =
+      error instanceof Error ? error.stack || error.message : error;
+
+    const title = options?.title || "Probot App Failure";
+    const body = `The Probot app encountered an error while processing an event.\n\n**Event:** \`${this.name}\`\n**Delivery ID:** \`${this.id}\`\n\n**Error Details:**\n\`\`\`\n${errorMessage}\n\`\`\`\n`;
+
+    try {
+      return await this.octokit.rest.issues.create({
+        ...repoParams,
+        title,
+        body,
+        labels: ["probot-app-failure"],
+      });
+    } catch (e) {
+      this.log.error(e, "Failed to create failure issue");
+      throw e;
+    }
+  }
 }

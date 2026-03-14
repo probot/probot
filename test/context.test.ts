@@ -8,7 +8,7 @@ import type {
 } from "@octokit/webhooks";
 import WebhookExamples from "@octokit/webhooks-examples";
 import fetchMock from "fetch-mock";
-import { describe, expect, test, it } from "vitest";
+import { describe, expect, test, it, beforeEach } from "vitest";
 
 import { Context } from "../src/index.js";
 import { ProbotOctokit } from "../src/octokit/probot-octokit.js";
@@ -416,6 +416,99 @@ describe("Context", () => {
       context = new Context(event, octokit as any, {} as any);
 
       expect(context.isBot).toBe(false);
+    });
+  });
+
+  describe("reportAppFailure", () => {
+    let mockCreateIssue: any;
+    let mockLog: any;
+    let testOctokit: any;
+    let testContext: Context<"push">;
+
+    beforeEach(async () => {
+      const { vi } = await import("vitest");
+      mockCreateIssue = vi
+        .fn()
+        .mockResolvedValue({ data: { html_url: "url" } });
+      mockLog = {
+        error: vi.fn(),
+      };
+      testOctokit = {
+        hook: { before: () => {} },
+        rest: {
+          issues: {
+            create: mockCreateIssue,
+          },
+        },
+      };
+
+      const pushEvent = {
+        id: "123",
+        name: "push",
+        payload: {
+          repository: {
+            owner: { login: "Codertocat" },
+            name: "Hello-World",
+          },
+        },
+      } as unknown as WebhookEvent<"push">;
+
+      testContext = new Context<"push">(pushEvent, testOctokit, mockLog as any);
+    });
+
+    it("creates an issue using octokit", async () => {
+      await testContext.reportAppFailure("Something went wrong");
+
+      expect(mockCreateIssue).toHaveBeenCalledWith(
+        expect.objectContaining({
+          owner: "Codertocat",
+          repo: "Hello-World",
+          title: "Probot App Failure",
+          labels: ["probot-app-failure"],
+        }),
+      );
+
+      const callArgs = mockCreateIssue.mock.calls[0][0];
+      expect(callArgs.body).toContain("Something went wrong");
+      expect(callArgs.body).toContain("**Event:** `push`");
+      expect(callArgs.body).toContain("**Delivery ID:** `123`");
+    });
+
+    it("handles Error objects", async () => {
+      const err = new Error("app failed");
+      err.stack = "Error: app failed\nat line 1";
+      await testContext.reportAppFailure(err);
+
+      const callArgs = mockCreateIssue.mock.calls[0][0];
+      expect(callArgs.body).toContain("app failed\nat line 1");
+    });
+
+    it("accepts a custom title", async () => {
+      await testContext.reportAppFailure("error", { title: "Custom Title" });
+      expect(mockCreateIssue).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: "Custom Title",
+        }),
+      );
+    });
+
+    it("throws if repo is unavailable", async () => {
+      const noRepoEvent = {
+        id: "123",
+        name: "push",
+        payload: {},
+      } as unknown as WebhookEvent<"push">;
+      const noRepoContext = new Context<"push">(
+        noRepoEvent,
+        testOctokit,
+        mockLog as any,
+      );
+
+      await expect(() =>
+        noRepoContext.reportAppFailure("fail"),
+      ).rejects.toThrow();
+      expect(mockCreateIssue).not.toHaveBeenCalled();
+      expect(mockLog.error).toHaveBeenCalled();
     });
   });
 });

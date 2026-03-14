@@ -275,7 +275,7 @@ export class Context<Event extends WebhookEvents = WebhookEvents> {
   public async reportAppFailure(
     error: Error | string,
     options?: { title?: string },
-  ): Promise<any> {
+  ): Promise<ReturnType<ProbotOctokit["rest"]["issues"]["create"]>> {
     let repoParams;
     try {
       repoParams = this.repo();

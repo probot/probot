@@ -8,7 +8,7 @@ import type {
 } from "@octokit/webhooks";
 import WebhookExamples from "@octokit/webhooks-examples";
 import fetchMock from "fetch-mock";
-import { describe, expect, test, it, beforeEach } from "vitest";
+import { describe, expect, test, it, beforeEach, vi } from "vitest";
 
 import { Context } from "../src/index.js";
 import { ProbotOctokit } from "../src/octokit/probot-octokit.js";
@@ -420,13 +420,12 @@ describe("Context", () => {
   });
 
   describe("reportAppFailure", () => {
-    let mockCreateIssue: any;
-    let mockLog: any;
-    let testOctokit: any;
+    let mockCreateIssue: ReturnType<typeof vi.fn>;
+    let mockLog: Record<string, ReturnType<typeof vi.fn>>;
+    let testOctokit: InstanceType<typeof ProbotOctokit>;
     let testContext: Context<"push">;
 
     beforeEach(async () => {
-      const { vi } = await import("vitest");
       mockCreateIssue = vi
         .fn()
         .mockResolvedValue({ data: { html_url: "url" } });
@@ -440,7 +439,7 @@ describe("Context", () => {
             create: mockCreateIssue,
           },
         },
-      };
+      } as unknown as InstanceType<typeof ProbotOctokit>;
 
       const pushEvent = {
         id: "123",

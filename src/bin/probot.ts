@@ -41,6 +41,7 @@ const { values, positionals } = parseArgs({
     help: { type: "boolean", short: "h", default: false },
     version: { type: "boolean", short: "v", default: false },
   },
+  strict: false,
 });
 
 if (values.version) {

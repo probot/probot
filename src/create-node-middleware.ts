@@ -1,4 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
+import type { ProbotOctokit } from "./octokit/probot-octokit.js";
 
 import type {
   ApplicationFunction,
@@ -35,9 +36,14 @@ const noop = () => {};
  * });
  * ```
  */
-export async function createNodeMiddleware(
-  appFn: ApplicationFunction,
-  { probot = createProbot(), webhooksPath } = {} as MiddlewareOptions,
+export async function createNodeMiddleware<
+  OctokitType extends ProbotOctokit = ProbotOctokit,
+>(
+  appFn: ApplicationFunction<OctokitType>,
+  {
+    probot = createProbot<OctokitType>(),
+    webhooksPath,
+  } = {} as MiddlewareOptions<OctokitType>,
 ): Promise<
   (
     request: IncomingMessage,

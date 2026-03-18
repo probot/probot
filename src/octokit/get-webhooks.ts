@@ -7,13 +7,15 @@ import type { ProbotWebhooks } from "../types.js";
 import { getErrorHandler } from "../helpers/get-error-handler.js";
 import { webhookTransform } from "./octokit-webhooks-transform.js";
 
-type GetWebhooksOptions = {
+type GetWebhooksOptions<OctokitType extends ProbotOctokit> = {
   log: Logger;
-  octokit: ProbotOctokit;
+  octokit: OctokitType;
   webhookSecret: string;
 };
 
-export function getWebhooks(options: GetWebhooksOptions): ProbotWebhooks {
+export function getWebhooks<OctokitType extends ProbotOctokit>(
+  options: GetWebhooksOptions<OctokitType>,
+): ProbotWebhooks<OctokitType> {
   const webhooks = new Webhooks({
     log: options.log,
     secret: options.webhookSecret,

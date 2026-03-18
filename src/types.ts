@@ -2,6 +2,7 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import type { RequestRequestOptions } from "@octokit/types";
 import type {
   EmitterWebhookEvent as WebhookEvent,
+  EmitterWebhookEventName as WebhookEvents,
   Webhooks,
 } from "@octokit/webhooks";
 import type { RedisOptions } from "ioredis";
@@ -13,15 +14,20 @@ import type { Probot } from "./probot.js";
 import type { Server } from "./server/server.js";
 import type { ProbotOctokit } from "./octokit/probot-octokit.js";
 
+export type ProbotOctokitConstructor<
+  OctokitType extends ProbotOctokit = ProbotOctokit,
+> = typeof ProbotOctokit &
+  (new (...args: ConstructorParameters<typeof ProbotOctokit>) => OctokitType);
+
 export type StripUndefined<T> = {
   [K in keyof T]-?: Exclude<T[K], undefined>;
 };
 
-export interface Options {
+export interface Options<OctokitType extends ProbotOctokit = ProbotOctokit> {
   privateKey?: string | undefined;
   githubToken?: string | undefined;
   appId?: number | string | undefined;
-  Octokit?: typeof ProbotOctokit | undefined;
+  Octokit?: ProbotOctokitConstructor<OctokitType> | undefined;
   log?: Logger | undefined;
   redisConfig?: RedisOptions | string | undefined;
   secret?: string | undefined;
@@ -52,8 +58,12 @@ export interface Options {
 // Simply passing `Context` as `TTransformed` would result in the payload types being too complex for TypeScript to infer
 // See https://github.com/probot/probot/issues/1388
 // See https://github.com/probot/probot/issues/1815 as for why this is in a seperate type, and not directly passed to `Webhooks`
-type SimplifiedObject = Omit<Context, keyof WebhookEvent>;
-export type ProbotWebhooks = Webhooks<SimplifiedObject>;
+type SimplifiedObject<OctokitType extends ProbotOctokit> = Omit<
+  Context<WebhookEvents, OctokitType>,
+  keyof WebhookEvent
+>;
+export type ProbotWebhooks<OctokitType extends ProbotOctokit = ProbotOctokit> =
+  Webhooks<SimplifiedObject<OctokitType>>;
 
 export type ApplicationFunctionOptions = {
   cwd: string;
@@ -61,13 +71,16 @@ export type ApplicationFunctionOptions = {
   [key: string]: unknown;
 };
 
-export type HandlerFactory = (
-  app: Probot,
-  options: ApplicationFunctionOptions,
-) => Handler | Promise<Handler>;
+export type HandlerFactory<OctokitType extends ProbotOctokit = ProbotOctokit> =
+  (
+    app: Probot<OctokitType>,
+    options: ApplicationFunctionOptions,
+  ) => Handler | Promise<Handler>;
 
-export type ApplicationFunction = (
-  app: Probot,
+export type ApplicationFunction<
+  OctokitType extends ProbotOctokit = ProbotOctokit,
+> = (
+  app: Probot<OctokitType>,
   options: ApplicationFunctionOptions,
 ) => void | Promise<void>;
 
@@ -93,8 +106,10 @@ export type ServerOptions = {
   request?: RequestRequestOptions | undefined;
 };
 
-export type MiddlewareOptions = {
-  probot: Probot;
+export type MiddlewareOptions<
+  OctokitType extends ProbotOctokit = ProbotOctokit,
+> = {
+  probot: Probot<OctokitType>;
   webhooksPath?: string | undefined;
   [key: string]: unknown;
 };

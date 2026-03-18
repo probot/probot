@@ -22,6 +22,7 @@ import type {
   ApplicationFunction,
   ApplicationFunctionOptions,
   Options,
+  ProbotOctokitConstructor,
   ProbotWebhooks,
 } from "./types.js";
 import {
@@ -45,13 +46,13 @@ type OnHandler = ["on", any, any];
 type OnAnyHandler = ["onAny", any];
 type OnErrorHandler = ["onError", any];
 
-export type State = {
+export type State<OctokitType extends ProbotOctokit = ProbotOctokit> = {
   initializationState: InitializationState;
   initializedPromise: DeferredPromise<void>;
   initEventListeners: (OnHandler | OnAnyHandler | OnErrorHandler)[];
   cache: Lru<string> | null;
   octokit: ProbotOctokit | null;
-  webhooks: ProbotWebhooks | null;
+  webhooks: ProbotWebhooks<OctokitType> | null;
   log: Logger | null;
   logFormat?: "pretty" | "json";
   logLevelInString?: boolean;
@@ -61,7 +62,7 @@ export type State = {
   appId?: number | undefined;
   privateKey?: string | undefined;
   githubToken?: string | undefined;
-  OctokitBase: typeof ProbotOctokit;
+  OctokitBase: ProbotOctokitConstructor;
   port?: number | undefined;
   host?: string | undefined;
   baseUrl?: string | undefined;
@@ -72,7 +73,7 @@ export type State = {
   server?: Server | void;
 };
 
-export class Probot {
+export class Probot<OctokitType extends ProbotOctokit = ProbotOctokit> {
   static defaults<S extends Constructor>(
     this: S,
     defaults: Options,
@@ -91,9 +92,9 @@ export class Probot {
     return ProbotWithDefaults;
   }
 
-  #state: State;
+  #state: State<OctokitType>;
 
-  constructor(options: Options = {}) {
+  constructor(options: Options<OctokitType> = {}) {
     if (!options.githubToken) {
       if (!options.appId) {
         throw new Error("appId option is required");
@@ -122,7 +123,8 @@ export class Probot {
       privateKey: options.privateKey,
       host: options.host,
       port: options.port,
-      OctokitBase: options.Octokit || ProbotOctokit,
+      OctokitBase: (options.Octokit ||
+        ProbotOctokit) as ProbotOctokitConstructor,
       baseUrl: options.baseUrl,
       redisConfig: options.redisConfig,
       webhookPath: options.webhookPath || defaultWebhookPath,
@@ -162,7 +164,7 @@ export class Probot {
 
       this.#state.log = this.#state.log.child({ name: "probot" });
 
-      const Octokit = await getProbotOctokitWithDefaults({
+      const Octokit = (await getProbotOctokitWithDefaults({
         githubToken: this.#state.githubToken,
         Octokit: this.#state.OctokitBase,
         appId: this.#state.appId,
@@ -172,26 +174,28 @@ export class Probot {
         redisConfig: this.#state.redisConfig,
         baseUrl: this.#state.baseUrl,
         request: this.#state.request,
-      });
-      this.#state.octokit = new Octokit();
+      })) as ProbotOctokitConstructor<OctokitType>;
+      const octokit = new Octokit();
+      this.#state.octokit = octokit;
       this.#state.webhooks = getWebhooks({
         log: this.#state.log,
-        octokit: this.#state.octokit,
+        octokit: octokit as OctokitType,
         webhookSecret: this.#state.webhookSecret,
       });
 
       this.#state.initializationState = INITIALIZED;
 
+      const webhooks = this.#state.webhooks;
       for (const [type, listener, name] of this.#state.initEventListeners) {
         switch (type) {
           case "on":
-            this.#state.webhooks.on(name, listener);
+            webhooks!.on(name, listener);
             break;
           case "onAny":
-            this.#state.webhooks.onAny(listener);
+            webhooks!.onAny(listener);
             break;
           case "onError":
-            this.#state.webhooks.onError(listener);
+            webhooks!.onError(listener);
             break;
         }
       }
@@ -225,20 +229,20 @@ export class Probot {
     });
   }
 
-  public async auth(
-    installationId?: number | undefined,
-  ): Promise<ProbotOctokit> {
+  public async auth(installationId?: number | undefined): Promise<OctokitType> {
     await this.#initialize();
 
-    return await getAuthenticatedOctokit({
+    return (await getAuthenticatedOctokit({
       log: this.#state.log!,
       octokit: this.#state.octokit!,
       installationId,
-    });
+    })) as OctokitType;
   }
 
   public async load(
-    appFn: ApplicationFunction | ApplicationFunction[],
+    appFn:
+      | ApplicationFunction<OctokitType>
+      | ApplicationFunction<OctokitType>[],
     options: ApplicationFunctionOptions = {
       cwd: process.cwd(),
     } as ApplicationFunctionOptions,
@@ -268,7 +272,7 @@ export class Probot {
     return this.#state.log!;
   }
 
-  public on: ProbotWebhooks["on"] = (eventName, callback) => {
+  public on: ProbotWebhooks<OctokitType>["on"] = (eventName, callback) => {
     if (Array.isArray(eventName)) {
       for (const name of eventName) {
         validateEventName(name, {
@@ -289,7 +293,7 @@ export class Probot {
     this.#state.webhooks!.on(eventName, callback);
   };
 
-  public onAny: ProbotWebhooks["onAny"] = (callback) => {
+  public onAny: ProbotWebhooks<OctokitType>["onAny"] = (callback) => {
     if (this.#state.initializationState !== INITIALIZED) {
       this.#state.initEventListeners.push(["onAny", callback]);
       return;
@@ -297,7 +301,7 @@ export class Probot {
     this.#state.webhooks!.onAny(callback);
   };
 
-  public onError: ProbotWebhooks["onError"] = (callback) => {
+  public onError: ProbotWebhooks<OctokitType>["onError"] = (callback) => {
     if (this.#state.initializationState !== INITIALIZED) {
       this.#state.initEventListeners.push(["onError", callback]);
       return;

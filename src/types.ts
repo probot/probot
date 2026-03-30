@@ -51,7 +51,7 @@ export interface Options {
 // WebhookEvent["payload"] & T
 // Simply passing `Context` as `TTransformed` would result in the payload types being too complex for TypeScript to infer
 // See https://github.com/probot/probot/issues/1388
-// See https://github.com/probot/probot/issues/1815 as for why this is in a seperate type, and not directly passed to `Webhooks`
+// See https://github.com/probot/probot/issues/1815 as for why this is in a separate type, and not directly passed to `Webhooks`
 type SimplifiedObject = Omit<Context, keyof WebhookEvent>;
 export type ProbotWebhooks = Webhooks<SimplifiedObject>;
 

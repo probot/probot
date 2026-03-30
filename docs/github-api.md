@@ -92,7 +92,7 @@ When [receiving webhook events](/docs/webhooks), `context.octokit` is _usually_ 
 
 - [`marketplace_purchase`](https://docs.github.com/en/developers/webhooks-and-events/webhook-events-and-payloads#marketplace_purchase) - The purchase happens before the app is installed on an account.
 
-For these events, `context.octokit` will be unauthenticated. Attemts to send any requests will fail with an error explaining the circumstances.
+For these events, `context.octokit` will be unauthenticated. Attempts to send any requests will fail with an error explaining the circumstances.
 
 ## GitHub Enterprise
 

@@ -66,8 +66,8 @@ export function importView({
         function onSubmit(e) {
             e.preventDefault();
 
-            const idEl = document.getElementById('appId');
-            const appId = idEl.value;
+            const idle = document.getElementById('appId');
+            const appId = idle.value;
 
 
             const secretEl = document.getElementById('whs');

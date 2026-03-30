@@ -60,8 +60,8 @@ exports[`importView > only providing GH_HOST  1`] = `
         function onSubmit(e) {
             e.preventDefault();
 
-            const idEl = document.getElementById('appId');
-            const appId = idEl.value;
+            const idle = document.getElementById('appId');
+            const appId = idle.value;
 
 
             const secretEl = document.getElementById('whs');
@@ -147,8 +147,8 @@ exports[`importView > providing "My App" as name  1`] = `
         function onSubmit(e) {
             e.preventDefault();
 
-            const idEl = document.getElementById('appId');
-            const appId = idEl.value;
+            const idle = document.getElementById('appId');
+            const appId = idle.value;
 
 
             const secretEl = document.getElementById('whs');
@@ -234,8 +234,8 @@ exports[`importView > providing a smee-url as WEBHOOK_PROXY_URL  1`] = `
         function onSubmit(e) {
             e.preventDefault();
 
-            const idEl = document.getElementById('appId');
-            const appId = idEl.value;
+            const idle = document.getElementById('appId');
+            const appId = idle.value;
 
 
             const secretEl = document.getElementById('whs');

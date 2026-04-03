@@ -87,7 +87,7 @@
     "prettier": "^3.0.3",
     "semantic-release-plugin-update-version-in-files": "^2.0.0",
     "smee-client": "^5.0.0",
-    "sonic-boom": "^4.0.0",
+    "sonic-boom": "^5.0.0",
     "tsd": "^0.33.0",
     "typedoc": "^0.28.0",
     "typescript": "^5.9.3",

@@ -13,7 +13,9 @@
     "lib": ["es2023"],
     "strict": true,
     "strictNullChecks": true,
-    "erasableSyntaxOnly": true
+    "erasableSyntaxOnly": true,
+    "rootDir": "./src",
+    "types": ["node"]
   },
   "include": ["src/**/*"],
   "compileOnSave": false

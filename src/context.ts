@@ -256,6 +256,34 @@ export class Context<Event extends WebhookEvents = WebhookEvents> {
 
     const { config, files } = await this.octokit.config.get(params);
 
+    // The `files` array is not part of the public API, but we need to inspect it
+    // to work around a bug in an older version of `@probot/octokit-plugin-config`.
+    // The bug is that `_extends` is not resolved correctly when the config is
+    // loaded from a `.github` repository.
+    const fromDotGitHub = (files as any[]).some(
+      (file) => file.repo === ".github",
+    );
+
+    if (fromDotGitHub) {
+      // The config was loaded from the `.github` repository.
+      // The `_extends` property may not have been processed correctly.
+      // We reload the config with an explicit `repo: ".github"` to fix this.
+      const { config: dotGitHubConfig, files: dotGitHubFiles } =
+        await this.octokit.config.get({
+          ...params,
+          repo: ".github",
+        });
+
+      if (
+        !defaultConfig &&
+        !dotGitHubFiles.find((file) => file.config !== null)
+      ) {
+        return null;
+      }
+
+      return dotGitHubConfig as T;
+    }
+
     // if no default config is set, and no config files are found, return null
     if (!defaultConfig && !files.find((file) => file.config !== null)) {
       return null;

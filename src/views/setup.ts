@@ -11,6 +11,34 @@ export function setupView({
   createAppUrl: string | undefined;
   manifest: string | undefined;
 }): string {
+  const escapeHtml = (value: string): string =>
+    value
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+
+  const sanitizeHttpUrl = (value: string | undefined): string => {
+    if (!value) return "";
+
+    try {
+      const url = new URL(value);
+      if (url.protocol === "http:" || url.protocol === "https:") return url.toString();
+    } catch {}
+
+    return "";
+  };
+
+  const safeName = escapeHtml(name || "Your App");
+  const safeWelcomeName = escapeHtml(name || "your Probot App");
+  const safeVersion = version ? escapeHtml(version) : "";
+  const safeDescription = description
+    ? escapeHtml(description)
+    : 'This app was built using <a href="https://github.com/probot/probot">Probot</a>, a framework for building GitHub Apps.';
+  const safeCreateAppUrl = escapeHtml(sanitizeHttpUrl(createAppUrl) || "#");
+  const safeManifest = escapeHtml(manifest || "");
+
   return `<!DOCTYPE html>
 <!DOCTYPE html>
 <html lang="en" class="height-full" data-color-mode="auto" data-light-theme="light" data-dark-theme="dark">
@@ -18,7 +46,7 @@ export function setupView({
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Setup ${name || "Your App"} | built with Probot</title>
+    <title>Setup ${safeName} | built with Probot</title>
     <link rel="icon" href="/probot/static/probot-head.svg">
     <link rel="stylesheet" href="/probot/static/primer.css">
   </head>
@@ -27,19 +55,15 @@ export function setupView({
       <img src="/probot/static/robot.svg" alt="Probot Logo" width="100" class="mb-6">
       <div class="box-shadow rounded-2 border p-6 bg-white">
         <h1>
-          Welcome to ${name || "your Probot App"}
+          Welcome to ${safeWelcomeName}
           ${
             version
-              ? `<span class="Label Label--outline v-align-middle ml-2 text-gray-light">v${version}</span>`
+              ? `<span class="Label Label--outline v-align-middle ml-2 text-gray-light">v${safeVersion}</span>`
               : ""
           }
         </h1>
 
-        <p>${
-          description
-            ? description
-            : 'This app was built using <a href="https://github.com/probot/probot">Probot</a>, a framework for building GitHub Apps.'
-        }</p>
+        <p>${safeDescription}</p>
 
         <div class="text-left mt-6">
           <h2 class="alt-h3 mb-2">Getting Started</h2>
@@ -47,8 +71,8 @@ export function setupView({
           <p>To start building a GitHub App, you'll need to register a new app on GitHub.</p>
           <br>
 
-          <form action="${createAppUrl}" method="post" target="_blank" class="d-flex flex-items-center">
-            <button class="btn btn-outline" name="manifest" id="manifest" value='${manifest}' >Register GitHub App</button>
+          <form action="${safeCreateAppUrl}" method="post" target="_blank" class="d-flex flex-items-center">
+            <button class="btn btn-outline" name="manifest" id="manifest" value='${safeManifest}' >Register GitHub App</button>
             <a href="/probot/import" class="ml-2">or use an existing Github App</a>
           </form>
         </div>

@@ -7,6 +7,32 @@ export function importView({
   GH_HOST: string | undefined;
   WEBHOOK_PROXY_URL?: string | undefined;
 }): string {
+  const escapeHtml = (value: string): string =>
+    value
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+
+  const sanitizeHttpUrl = (value: string | undefined): string => {
+    if (!value) return "";
+
+    try {
+      const url = new URL(value);
+      if (url.protocol === "http:" || url.protocol === "https:") return url.toString();
+    } catch {}
+
+    return "";
+  };
+
+  const safeName = escapeHtml(name || "Your App");
+  const safeWebhookProxyUrl = escapeHtml(WEBHOOK_PROXY_URL);
+  const hostUrl = sanitizeHttpUrl(GH_HOST);
+  const safeSettingsAppsUrl = escapeHtml(
+    hostUrl ? new URL("/settings/apps", hostUrl).toString() : "#",
+  );
+
   return `<!DOCTYPE html>
 <html lang="en" class="height-full" data-color-mode="auto" data-light-theme="light" data-dark-theme="dark">
 
@@ -14,7 +40,7 @@ export function importView({
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Import ${name || "Your App"} | built with Probot</title>
+    <title>Import ${safeName} | built with Probot</title>
     <link rel="icon" href="/probot/static/probot-head.svg">
     <link rel="stylesheet" href="/probot/static/primer.css">
 </head>
@@ -29,9 +55,9 @@ export function importView({
             <h3>Step 1:</h3>
             <p class="d-block mt-2">
                 Replace your app's Webhook URL with <br>
-                <b>${WEBHOOK_PROXY_URL}</b>
+                <b>${safeWebhookProxyUrl}</b>
             </p>
-            <a class="d-block mt-2" href="${GH_HOST}/settings/apps" target="__blank" rel="noreferrer">
+            <a class="d-block mt-2" href="${safeSettingsAppsUrl}" target="__blank" rel="noreferrer">
                 You can do it here
             </a>
 

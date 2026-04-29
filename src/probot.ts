@@ -46,13 +46,13 @@ type OnHandler = ["on", any, any];
 type OnAnyHandler = ["onAny", any];
 type OnErrorHandler = ["onError", any];
 
-export type State<OctokitType extends ProbotOctokit = ProbotOctokit> = {
+export type State<Octokit extends ProbotOctokit = ProbotOctokit> = {
   initializationState: InitializationState;
   initializedPromise: DeferredPromise<void>;
   initEventListeners: (OnHandler | OnAnyHandler | OnErrorHandler)[];
   cache: Lru<string> | null;
   octokit: ProbotOctokit | null;
-  webhooks: ProbotWebhooks<OctokitType> | null;
+  webhooks: ProbotWebhooks<Octokit> | null;
   log: Logger | null;
   logFormat?: "pretty" | "json";
   logLevelInString?: boolean;
@@ -73,7 +73,7 @@ export type State<OctokitType extends ProbotOctokit = ProbotOctokit> = {
   server?: Server | void;
 };
 
-export class Probot<OctokitType extends ProbotOctokit = ProbotOctokit> {
+export class Probot<Octokit extends ProbotOctokit = ProbotOctokit> {
   static defaults<S extends Constructor>(
     this: S,
     defaults: Options,
@@ -92,9 +92,9 @@ export class Probot<OctokitType extends ProbotOctokit = ProbotOctokit> {
     return ProbotWithDefaults;
   }
 
-  #state: State<OctokitType>;
+  #state: State<Octokit>;
 
-  constructor(options: Options<OctokitType> = {}) {
+  constructor(options: Options<Octokit> = {}) {
     if (!options.githubToken) {
       if (!options.appId) {
         throw new Error("appId option is required");
@@ -174,12 +174,12 @@ export class Probot<OctokitType extends ProbotOctokit = ProbotOctokit> {
         redisConfig: this.#state.redisConfig,
         baseUrl: this.#state.baseUrl,
         request: this.#state.request,
-      })) as ProbotOctokitConstructor<OctokitType>;
+      })) as ProbotOctokitConstructor<Octokit>;
       const octokit = new Octokit();
       this.#state.octokit = octokit;
       this.#state.webhooks = getWebhooks({
         log: this.#state.log,
-        octokit: octokit as OctokitType,
+        octokit: octokit as Octokit,
         webhookSecret: this.#state.webhookSecret,
       });
 
@@ -229,20 +229,20 @@ export class Probot<OctokitType extends ProbotOctokit = ProbotOctokit> {
     });
   }
 
-  public async auth(installationId?: number | undefined): Promise<OctokitType> {
+  public async auth(installationId?: number | undefined): Promise<Octokit> {
     await this.#initialize();
 
     return (await getAuthenticatedOctokit({
       log: this.#state.log!,
       octokit: this.#state.octokit!,
       installationId,
-    })) as OctokitType;
+    })) as Octokit;
   }
 
   public async load(
     appFn:
-      | ApplicationFunction<OctokitType>
-      | ApplicationFunction<OctokitType>[],
+      | ApplicationFunction<Octokit>
+      | ApplicationFunction<Octokit>[],
     options: ApplicationFunctionOptions = {
       cwd: process.cwd(),
     } as ApplicationFunctionOptions,
@@ -272,7 +272,7 @@ export class Probot<OctokitType extends ProbotOctokit = ProbotOctokit> {
     return this.#state.log!;
   }
 
-  public on: ProbotWebhooks<OctokitType>["on"] = (eventName, callback) => {
+  public on: ProbotWebhooks<Octokit>["on"] = (eventName, callback) => {
     if (Array.isArray(eventName)) {
       for (const name of eventName) {
         validateEventName(name, {
@@ -293,7 +293,7 @@ export class Probot<OctokitType extends ProbotOctokit = ProbotOctokit> {
     this.#state.webhooks!.on(eventName, callback);
   };
 
-  public onAny: ProbotWebhooks<OctokitType>["onAny"] = (callback) => {
+  public onAny: ProbotWebhooks<Octokit>["onAny"] = (callback) => {
     if (this.#state.initializationState !== INITIALIZED) {
       this.#state.initEventListeners.push(["onAny", callback]);
       return;
@@ -301,7 +301,7 @@ export class Probot<OctokitType extends ProbotOctokit = ProbotOctokit> {
     this.#state.webhooks!.onAny(callback);
   };
 
-  public onError: ProbotWebhooks<OctokitType>["onError"] = (callback) => {
+  public onError: ProbotWebhooks<Octokit>["onError"] = (callback) => {
     if (this.#state.initializationState !== INITIALIZED) {
       this.#state.initEventListeners.push(["onError", callback]);
       return;

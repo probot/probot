@@ -8,9 +8,9 @@ import type { OctokitOptions, ProbotOctokitConstructor } from "../types.js";
 import { ProbotOctokit } from "./probot-octokit.js";
 import { getOctokitThrottleOptions } from "./get-octokit-throttle-options.js";
 
-type Options<OctokitType extends ProbotOctokit = ProbotOctokit> = {
+type Options<Octokit extends ProbotOctokit = ProbotOctokit> = {
   cache: Lru<string>;
-  Octokit: ProbotOctokitConstructor<OctokitType>;
+  Octokit: ProbotOctokitConstructor<Octokit>;
   log: Logger;
   githubToken?: string | undefined;
   appId?: number | undefined;
@@ -31,10 +31,10 @@ type Options<OctokitType extends ProbotOctokit = ProbotOctokit> = {
  * against a GitHub Enterprise Server with a custom domain.
  */
 export async function getProbotOctokitWithDefaults<
-  OctokitType extends ProbotOctokit = ProbotOctokit,
+  Octokit extends ProbotOctokit = ProbotOctokit,
 >(
-  options: Options<OctokitType>,
-): Promise<ProbotOctokitConstructor<OctokitType>> {
+  options: Options<Octokit>,
+): Promise<ProbotOctokitConstructor<Octokit>> {
   const authOptions = options.githubToken
     ? {
         token: options.githubToken,
@@ -95,5 +95,5 @@ export async function getProbotOctokitWithDefaults<
     }
 
     return options;
-  }) as ProbotOctokitConstructor<OctokitType>;
+  }) as ProbotOctokitConstructor<Octokit>;
 }

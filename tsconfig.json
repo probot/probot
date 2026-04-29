@@ -5,6 +5,7 @@
     "noFallthroughCasesInSwitch": true,
     "pretty": true,
     "sourceMap": false,
+    "rootDir": "./",
     "outDir": "./lib",
     "skipLibCheck": true,
     "noImplicitAny": true,

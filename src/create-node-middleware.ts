@@ -37,13 +37,13 @@ const noop = () => {};
  * ```
  */
 export async function createNodeMiddleware<
-  OctokitType extends ProbotOctokit = ProbotOctokit,
+  Octokit extends ProbotOctokit = ProbotOctokit,
 >(
-  appFn: ApplicationFunction<OctokitType>,
+  appFn: ApplicationFunction<Octokit>,
   {
-    probot = createProbot<OctokitType>(),
+    probot = createProbot<Octokit>(),
     webhooksPath,
-  } = {} as MiddlewareOptions<OctokitType>,
+  } = {} as MiddlewareOptions<Octokit>,
 ): Promise<
   (
     request: IncomingMessage,

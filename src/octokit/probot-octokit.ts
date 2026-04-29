@@ -39,6 +39,7 @@ const defaultOptions = {
   },
   userAgent: `probot/${VERSION}`,
 };
+
 export const ProbotOctokit: typeof Octokit &
   Constructor<
     ReturnType<typeof retry> &

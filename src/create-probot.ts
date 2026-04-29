@@ -4,10 +4,11 @@ import { getPrivateKey } from "@probot/get-private-key";
 import type { Env, Options } from "./types.js";
 import { Probot } from "./probot.js";
 import { defaultWebhookPath } from "./server/server.js";
+import type { ProbotOctokit } from "./octokit/probot-octokit.js";
 
-type CreateProbotOptions = {
-  overrides?: Options;
-  defaults?: Options;
+type CreateProbotOptions<Octokit extends ProbotOctokit = ProbotOctokit> = {
+  overrides?: Options<Octokit>;
+  defaults?: Options<Octokit>;
   env?: Partial<Env> | undefined;
 };
 
@@ -34,11 +35,13 @@ const DEFAULTS: Partial<Env> = {
  * @param overrides overwrites defaults and according environment variables
  * @param env defaults to process.env
  */
-export function createProbot({
+export function createProbot<
+  Octokit extends ProbotOctokit = ProbotOctokit,
+>({
   overrides = {},
   defaults = {},
   env = process.env,
-}: CreateProbotOptions = {}): Probot {
+}: CreateProbotOptions<Octokit> = {}): Probot<Octokit> {
   let privateKey;
 
   try {
@@ -47,7 +50,7 @@ export function createProbot({
 
   const envWithDefaults = { ...DEFAULTS, ...env };
 
-  const envOptions: Options = {
+  const envOptions: Options<Octokit> = {
     logLevel: envWithDefaults.LOG_LEVEL as LogLevel,
     appId: Number(envWithDefaults.APP_ID),
     privateKey: (privateKey && privateKey.toString()) || undefined,
@@ -67,7 +70,7 @@ export function createProbot({
     ...overrides,
   };
 
-  return new Probot({
+  return new Probot<Octokit>({
     log: probotOptions.log,
     logLevel: probotOptions.logLevel,
     logFormat: envWithDefaults.LOG_FORMAT as PinoOptions["logFormat"],

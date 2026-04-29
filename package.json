@@ -68,8 +68,7 @@
     "yaml": "^2.8.1"
   },
   "devDependencies": {
-    "@octokit/openapi-webhooks-types": "^12.0.0",
-    "@octokit/openapi-webhooks-types-transition": "^12.0.0",
+    "@octokit/webhooks-types": "^7.6.1",
     "@octokit/tsconfig": "^4.0.0",
     "@octokit/webhooks-examples": "^7.3.1",
     "@octokit/webhooks-methods": "^6.0.0",
@@ -87,7 +86,6 @@
     "prettier": "^3.0.3",
     "semantic-release-plugin-update-version-in-files": "^2.0.0",
     "smee-client": "^5.0.0",
-    "sonic-boom": "^5.0.0",
     "tsd": "^0.33.0",
     "typedoc": "^0.28.18",
     "typescript": "^6.0.0",

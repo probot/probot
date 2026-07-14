@@ -11,7 +11,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v6
       - run: git fetch --depth=20 origin +refs/tags/*:refs/tags/*
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: lts/*
           cache: npm

@@ -4,7 +4,6 @@ import {
   validateEventName,
   type EmitterWebhookEvent as WebhookEvent,
 } from "@octokit/webhooks";
-import type { RedisOptions } from "ioredis";
 import type { Logger } from "pino";
 import { Lru } from "toad-cache";
 
@@ -23,6 +22,7 @@ import type {
   ApplicationFunctionOptions,
   Options,
   ProbotWebhooks,
+  RedisOptions,
 } from "./types.js";
 import {
   defaultWebhookPath,

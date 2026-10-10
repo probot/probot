@@ -1,8 +1,8 @@
 import { npxImport } from "npx-import-light";
 import Bottleneck from "bottleneck";
-import type { RedisOptions } from "ioredis";
 import type { Logger } from "pino";
 import type { ThrottlingOptions } from "@octokit/plugin-throttling";
+import type { RedisOptions } from "../types.js";
 
 type Options = {
   log: Logger;

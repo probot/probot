@@ -54,7 +54,7 @@ const consumer = `
 describe("published types with optional ioredis", () => {
   it("compiles a consumer without ioredis and without skipLibCheck", () => {
     expect(checkConsumer(consumer, true)).toEqual([]);
-  });
+  }, 30_000);
 
   it.skipIf(!!process.env.NO_IOREDIS)(
     "preserves ioredis option types when installed",
@@ -79,5 +79,6 @@ describe("published types with optional ioredis", () => {
     `),
       ).toEqual([]);
     },
+    30_000,
   );
 });

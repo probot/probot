@@ -4,7 +4,6 @@ import type {
   EmitterWebhookEvent as WebhookEvent,
   Webhooks,
 } from "@octokit/webhooks";
-import type { RedisOptions } from "ioredis";
 import type { Logger } from "pino";
 import type { Options as LoggingOptions } from "pino-http";
 
@@ -12,6 +11,9 @@ import type { Context } from "./context.js";
 import type { Probot } from "./probot.js";
 import type { Server } from "./server/server.js";
 import type { ProbotOctokit } from "./octokit/probot-octokit.js";
+import type { RedisOptions } from "./redis-options.js";
+
+export type { RedisOptions } from "./redis-options.js";
 
 export type StripUndefined<T> = {
   [K in keyof T]-?: Exclude<T[K], undefined>;

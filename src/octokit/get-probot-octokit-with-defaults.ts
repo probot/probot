@@ -1,10 +1,9 @@
 import { request } from "@octokit/request";
 import type { RequestRequestOptions } from "@octokit/types";
-import type { RedisOptions } from "ioredis";
 import type { Logger } from "pino";
 import type { Lru } from "toad-cache";
 
-import type { OctokitOptions } from "../types.js";
+import type { OctokitOptions, RedisOptions } from "../types.js";
 import { ProbotOctokit } from "./probot-octokit.js";
 import { getOctokitThrottleOptions } from "./get-octokit-throttle-options.js";
 

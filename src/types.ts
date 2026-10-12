@@ -11,14 +11,9 @@ import type { Context } from "./context.js";
 import type { Probot } from "./probot.js";
 import type { Server } from "./server/server.js";
 import type { ProbotOctokit } from "./octokit/probot-octokit.js";
+import type { RedisOptions } from "./redis-options.js";
 
-/** @ts-ignore -- ioredis is optional; preserve this directive in declaration output. */
-type IORedisOptions = import("ioredis").RedisOptions;
-
-// Keep ioredis option types when installed, otherwise accept an options object.
-export type RedisOptions = {
-  [Key in keyof IORedisOptions]: IORedisOptions[Key];
-};
+export type { RedisOptions } from "./redis-options.js";
 
 export type StripUndefined<T> = {
   [K in keyof T]-?: Exclude<T[K], undefined>;

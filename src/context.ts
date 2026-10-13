@@ -118,13 +118,12 @@ export class Context<Event extends WebhookEvents = WebhookEvents> {
       );
     }
 
-    return Object.assign(
-      {
-        owner: repo.owner.login,
-        repo: repo.name,
-      },
-      object,
-    );
+    const payload = {
+      owner: repo.owner.login,
+      repo: repo.name,
+    };
+
+    return object ? Object.assign(payload, object) : payload;
   }
 
   /**
@@ -142,15 +141,16 @@ export class Context<Event extends WebhookEvents = WebhookEvents> {
   public issue<T>(
     object?: T,
   ): RepoResultType<Event> & { issue_number: RepoIssueNumberType<Event> } & T {
-    return Object.assign(
-      {
-        issue_number:
-          // @ts-expect-error - this.payload may not have `issue` or `pull_request` keys
-          (this.payload.issue || this.payload.pull_request || this.payload)
-            .number,
-      },
-      this.repo(object),
-    );
+    const repo = this.repo();
+    const issue = {
+      issue_number:
+        // @ts-expect-error - this.payload may not have `issue` or `pull_request` keys
+        (this.payload.issue || this.payload.pull_request || this.payload)
+          .number,
+      ...repo,
+    };
+
+    return object ? Object.assign(issue, object) : issue;
   }
 
   /**
@@ -169,13 +169,14 @@ export class Context<Event extends WebhookEvents = WebhookEvents> {
     object?: T,
   ): RepoResultType<Event> & { pull_number: RepoIssueNumberType<Event> } & T {
     const payload = this.payload;
-    return Object.assign(
-      {
-        // @ts-expect-error - this.payload may not have `issue` or `pull_request` keys
-        pull_number: (payload.issue || payload.pull_request || payload).number,
-      },
-      this.repo(object),
-    );
+    const repo = this.repo();
+    const pullRequest = {
+      // @ts-expect-error - this.payload may not have `issue` or `pull_request` keys
+      pull_number: (payload.issue || payload.pull_request || payload).number,
+      ...repo,
+    };
+
+    return object ? Object.assign(pullRequest, object) : pullRequest;
   }
 
   /**

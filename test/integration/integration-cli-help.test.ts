@@ -77,11 +77,12 @@ describe(`cli help`, () => {
     },
     async () => {
       const testProject = await prepareTestProjectWithProbot();
-      expect(
-        await execCommand("npx probot -h", {
-          cwd: testProject.path,
-        }),
-      ).toBe(`Usage: probot <command> [options]
+      try {
+        expect(
+          await execCommand("npx probot -h", {
+            cwd: testProject.path,
+          }),
+        ).toBe(`Usage: probot <command> [options]
 
 Options:
   -v, --version   output the version number
@@ -91,8 +92,9 @@ Commands:
   run             run the bot
   receive         Receive a single event and payload
   help [command]  display help for command`);
-
-      testProject.cleanUp();
+      } finally {
+        testProject.cleanUp();
+      }
     },
   );
 
@@ -103,11 +105,12 @@ Commands:
     },
     async () => {
       const testProject = await prepareTestProjectWithProbot();
-      expect(
-        await execCommand("npx probot --help", {
-          cwd: testProject.path,
-        }),
-      ).toBe(`Usage: probot <command> [options]
+      try {
+        expect(
+          await execCommand("npx probot --help", {
+            cwd: testProject.path,
+          }),
+        ).toBe(`Usage: probot <command> [options]
 
 Options:
   -v, --version   output the version number
@@ -117,8 +120,9 @@ Commands:
   run             run the bot
   receive         Receive a single event and payload
   help [command]  display help for command`);
-
-      testProject.cleanUp();
+      } finally {
+        testProject.cleanUp();
+      }
     },
   );
 
@@ -129,11 +133,12 @@ Commands:
     },
     async () => {
       const testProject = await prepareTestProjectWithProbot();
-      expect(
-        await execCommand("npx probot", {
-          cwd: testProject.path,
-        }),
-      ).toBe(`Usage: probot <command> [options]
+      try {
+        expect(
+          await execCommand("npx probot", {
+            cwd: testProject.path,
+          }),
+        ).toBe(`Usage: probot <command> [options]
 
 Options:
   -v, --version   output the version number
@@ -143,8 +148,9 @@ Commands:
   run             run the bot
   receive         Receive a single event and payload
   help [command]  display help for command`);
-
-      testProject.cleanUp();
+      } finally {
+        testProject.cleanUp();
+      }
     },
   );
 });

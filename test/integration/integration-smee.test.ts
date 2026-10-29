@@ -4,6 +4,7 @@ import { describe, it, expect } from "vitest";
 import getPort from "get-port";
 import { type ApplicationFunction, Probot, Server } from "../../src/index.js";
 import { pino } from "pino";
+import "smee-client";
 
 import WebhookExamples, {
   type WebhookDefinition,
@@ -18,11 +19,6 @@ const updateEnv = (env: Env) => {
   UpdateEnvCalls.push(env);
   return env;
 };
-
-// @ts-ignore
-const smeeClientInstalled = await import("smee-client")
-  .then(() => true)
-  .catch(() => false);
 
 describe("smee-client", () => {
   delete process.env.WEBHOOK_PROXY_URL;
@@ -67,7 +63,7 @@ describe("smee-client", () => {
     {
       retry: 10,
       timeout: 10000,
-      skip: detectRuntime(globalThis) === "deno" || !smeeClientInstalled,
+      skip: detectRuntime(globalThis) === "deno",
     },
     async () => {
       const eventPromise = createDeferredPromise<void>();
@@ -103,7 +99,7 @@ describe("smee-client", () => {
         webhookPath: "/",
       });
 
-      server.load(app);
+      await server.load(app);
 
       await server.start();
 

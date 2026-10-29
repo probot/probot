@@ -47,10 +47,7 @@ describe("loadPackageJson", () => {
     expect(
       JSON.stringify(
         loadPackageJson(
-          resolve(
-            process.cwd(),
-            "test/fixtures/load-package-json/empty-string.json",
-          ),
+          resolve(process.cwd(), "test/fixtures/load-package-json/null.json"),
         ),
       ),
     ).toBe("{}");

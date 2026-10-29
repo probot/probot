@@ -1,7 +1,8 @@
 import { describe, expect, test } from "vitest";
+import { pino } from "pino";
 
 import { createProbot, Probot } from "../src/index.js";
-import { createDeferredPromise } from "../src/helpers/create-deferred-promise.js";
+import { MockLoggerTarget } from "./utils.js";
 
 const env = {
   APP_ID: "1",
@@ -64,6 +65,33 @@ describe("createProbot", () => {
     expect(probot instanceof Probot).toBe(true);
   });
 
+  test("uses HTTPS by default for GitHub Enterprise", async () => {
+    const probot = createProbot({
+      env: {
+        ...env,
+        APP_ID: "1",
+        GHE_HOST: "github.example.com",
+        GHE_PROTOCOL: "",
+      },
+    });
+
+    const octokit = await probot.auth();
+    expect(octokit.request.endpoint.DEFAULTS.baseUrl).toBe(
+      "https://github.example.com/api/v3",
+    );
+  });
+
+  test("throws when the private key cannot be read", () => {
+    expect(() =>
+      createProbot({
+        env: {
+          APP_ID: "1",
+          PRIVATE_KEY_PATH: "/path/that/does/not/exist.pem",
+        },
+      }),
+    ).toThrow("privateKey option is required");
+  });
+
   test("defaults, env", async () => {
     const probot = createProbot({
       env: {
@@ -88,7 +116,7 @@ describe("createProbot", () => {
   });
 
   test("defaults, custom host", async () => {
-    const fetchPromise = createDeferredPromise<void>();
+    const requests: string[] = [];
 
     const probot = createProbot({
       env: {
@@ -99,29 +127,54 @@ describe("createProbot", () => {
       defaults: {
         request: {
           fetch: (url: string, options: any) => {
-            try {
-              expect(url).toBe(
-                "https://github.acme-inc.com/api/v3/app/installations/1234/access_tokens",
-              );
+            requests.push(url);
+            if (
+              url ===
+              "https://github.acme-inc.com/api/v3/app/installations/1234/access_tokens"
+            ) {
               expect(options.method).toBe("POST");
-
-              fetchPromise.resolve();
-            } catch (e) {
-              fetchPromise.reject(e);
+              return new Response(JSON.stringify({ token: "token" }), {
+                status: 201,
+                headers: { "content-type": "application/json" },
+              });
             }
-            return new Response(null, { status: 500 });
+            return new Response("{}", {
+              status: 200,
+              headers: { "content-type": "application/json" },
+            });
           },
         },
       },
     });
 
     const probotOctokit = await probot.auth(1234);
-    probotOctokit.request({
+    await probotOctokit.request({
       method: "GET",
       url: "/user",
     });
 
-    await fetchPromise.promise;
+    expect(requests).toEqual([
+      "https://github.acme-inc.com/api/v3/app/installations/1234/access_tokens",
+      "https://github.acme-inc.com/api/v3/user",
+    ]);
+  });
+
+  test("passes the logger to the authenticated Octokit client", async () => {
+    const entries: any[] = [];
+    const probot = createProbot({
+      env,
+      defaults: { log: pino(new MockLoggerTarget(entries)) },
+    });
+
+    const octokit = await probot.auth();
+    octokit.log.info("Ciao");
+
+    await new Promise<void>((resolve) => setImmediate(resolve));
+
+    expect(entries).toContainEqual(expect.objectContaining({ msg: "Ciao" }));
+    expect(entries).toContainEqual(
+      expect.objectContaining({ name: "octokit" }),
+    );
   });
 
   test("env, overrides", async () => {
@@ -150,41 +203,4 @@ describe("createProbot", () => {
     await probot.ready();
     expect(probot.log.level).toBe("trace");
   });
-
-  // test("env, logger message key", async () => {
-  //   const probot = createProbot({
-  //     env: {
-  //       ...env,
-  //       LOG_LEVEL: "info",
-  //       LOG_FORMAT: "json",
-  //       LOG_MESSAGE_KEY: "myMessage",
-  //     },
-  //     defaults: { logLevel: "trace" },
-  //   });
-  //   const outputData = await captureLogOutput(() => {
-  //     probot.log.info("Ciao");
-  //   }, probot.log);
-  //   expect(JSON.parse(outputData).myMessage).toBe("Ciao");
-  // });
-
-  // test("env, octokit logger set", async () => {
-  //   const probot = createProbot({
-  //     env: {
-  //       ...env,
-  //       LOG_LEVEL: "info",
-  //       LOG_FORMAT: "json",
-  //       LOG_MESSAGE_KEY: "myMessage",
-  //     },
-  //   });
-  //   const outputData = await captureLogOutput(async () => {
-  //     const octokit = await probot.auth();
-  //     octokit.log.info("Ciao");
-  //   }, probot.log);
-
-  //   const data = JSON.parse(outputData);
-
-  //   expect(data.level).toBe(30); // info level
-  //   expect(data.myMessage).toBe("Ciao");
-  //   expect(data.name).toBe("octokit");
-  // });
 });

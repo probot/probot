@@ -107,22 +107,13 @@ export class Server {
     this.#state.initializeRan = true;
 
     try {
-      this.#state.log = this.#state.log || (await getLog());
-      this.#state.log.child({ name: "server" });
+      const log = (this.#state.log = (
+        this.#state.log || (await getLog())
+      ).child({ name: "server" }));
 
-      this.#state.probot = new this.#state.ProbotBase({
-        request: this.#state.request,
-        log: this.#state.log,
-        server: this,
-        webhookPath: this.#state.webhookPath,
-      });
+      await (this.#state.probot = createProbot(this.#state, this, log)).ready();
 
-      await this.#state.probot.ready();
-
-      this.#state.httpLogger = httpLogger(
-        this.#state.log,
-        this.#state.loggingOptions,
-      );
+      this.#state.httpLogger = httpLogger(log, this.#state.loggingOptions);
 
       this.#state.initializationPromise.resolve();
     } catch (error) {
@@ -268,4 +259,13 @@ export class Server {
   get version(): string {
     return VERSION;
   }
+}
+
+function createProbot(state: State, server: Server, log: Logger): Probot {
+  return new state.ProbotBase({
+    request: state.request,
+    log,
+    server,
+    webhookPath: state.webhookPath,
+  });
 }

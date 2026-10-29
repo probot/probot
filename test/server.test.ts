@@ -1,4 +1,5 @@
-import { describe, it, expect } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { IncomingMessage, ServerResponse } from "node:http";
 import { pino } from "pino";
 import { sign } from "@octokit/webhooks-methods";
 import getPort from "get-port";
@@ -11,6 +12,24 @@ import { detectRuntime } from "../src/helpers/detect-runtime.js";
 import { MockLoggerTarget } from "./utils.js";
 
 const appId = 1;
+const activeServers = new Set<Server>();
+const startServer = Server.prototype.start;
+
+beforeEach(() => {
+  vi.spyOn(Server.prototype, "start").mockImplementation(async function (
+    this: Server,
+  ) {
+    activeServers.add(this);
+    return startServer.call(this);
+  });
+});
+
+afterEach(async () => {
+  await Promise.all([...activeServers].map((server) => server.stop()));
+  activeServers.clear();
+  vi.restoreAllMocks();
+});
+
 const privateKey = `-----BEGIN RSA PRIVATE KEY-----
 MIIEpAIBAAKCAQEA1c7+9z5Pad7OejecsQ0bu3aozN3tihPmljnnudb9G3HECdnH
 lWu2/a1gB9JW5TBQ+AVpum9Okx7KfqkfBKL9mcHgSL0yWMdjMfNOqNtrQqKlN4kE
@@ -45,8 +64,103 @@ const pushEvent = (
 ).examples[0];
 
 describe("Server", () => {
+  it("exposes its version", () => {
+    const server = new Server();
+
+    expect(server.version).toBe("0.0.0-development");
+  });
   it("Server.version", () => {
     expect(Server.version).toBe("0.0.0-development");
+  });
+
+  it("logs and rethrows initialization failures", async () => {
+    const error = new Error("server initialization failed");
+    const logTarget = new MockLoggerTarget();
+    class BrokenProbot {
+      async ready(): Promise<void> {
+        throw error;
+      }
+    }
+    const server = new Server({
+      Probot: BrokenProbot as unknown as typeof Probot,
+      log: pino(logTarget),
+    });
+
+    await expect(server.start()).rejects.toThrow(error);
+    await expect(server.start()).rejects.toThrow(error);
+    expect(logTarget.entries).toContainEqual(
+      expect.objectContaining({ msg: "Failed to initialize Server" }),
+    );
+  });
+
+  it("passes addHandler through handler factories", async () => {
+    const server = new Server({
+      Probot: Probot.defaults({ appId, privateKey }),
+      log: pino({ level: "silent" }),
+      port: await getPort(),
+      enablePing: false,
+      enableStaticFiles: false,
+      enableNotFound: false,
+    });
+    const handler = vi.fn(
+      async (_req: IncomingMessage, res: ServerResponse) => {
+        res.writeHead(200).end("handled");
+        return true;
+      },
+    );
+
+    await server.loadHandlerFactory(async (_app, { addHandler }) => {
+      addHandler(handler);
+      return async () => false;
+    });
+
+    await server.start();
+
+    try {
+      const response = await fetch(
+        `http://${server.host}:${server.port}/custom-handler`,
+      );
+
+      expect(response.status).toBe(200);
+      expect(await response.text()).toBe("handled");
+      expect(handler).toHaveBeenCalledTimes(1);
+    } finally {
+      await server.stop();
+    }
+  });
+
+  it("returns a 500 response when a handler throws", async () => {
+    const logTarget = new MockLoggerTarget();
+    const server = new Server({
+      Probot: Probot.defaults({ appId, privateKey }),
+      log: pino(logTarget),
+      port: await getPort(),
+      enablePing: false,
+      enableStaticFiles: false,
+    });
+    const error = new Error("handler failed");
+
+    await server.load((_app, { addHandler }) => {
+      addHandler(async () => {
+        throw error;
+      });
+    });
+    await server.start();
+
+    try {
+      const response = await fetch(
+        `http://${server.host}:${server.port}/handler-error`,
+      );
+
+      expect(response.status).toBe(500);
+      expect(logTarget.entries).toContainEqual(
+        expect.objectContaining({
+          err: expect.objectContaining({ message: "handler failed" }),
+        }),
+      );
+    } finally {
+      await server.stop();
+    }
   });
 
   describe("GET /ping", () => {
@@ -198,7 +312,7 @@ describe("Server", () => {
       });
     });
 
-    it("html formatted response", async () => {
+    it("logs an unknown route response", async () => {
       const logTarget = new MockLoggerTarget();
 
       const server = new Server({
@@ -252,10 +366,7 @@ describe("Server", () => {
       });
 
       try {
-        await server.start();
-        throw new Error("Server should not start");
-      } catch (error) {
-        expect((error as Error).message).toBe(
+        await expect(server.start()).rejects.toThrow(
           `Port ${port} is already in use. You can define the PORT environment variable to use a different port.`,
         );
       } finally {
@@ -282,6 +393,23 @@ describe("Server", () => {
       );
 
       await testApp.stop();
+    });
+
+    it("formats an IPv6 host for URLs", async () => {
+      const testApp = new Server({
+        Probot: Probot.defaults({ appId, privateKey }),
+        port: await getPort(),
+        host: "::1",
+        log: pino({ level: "silent" }),
+      });
+
+      await testApp.start();
+
+      try {
+        expect(testApp.host).toBe("[::1]");
+      } finally {
+        await testApp.stop();
+      }
     });
   });
 });

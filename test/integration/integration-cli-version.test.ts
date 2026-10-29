@@ -76,13 +76,15 @@ describe(`cli version`, () => {
     },
     async () => {
       const testProject = await prepareTestProjectWithProbot();
-      expect(
-        await execCommand("npx probot -v", {
-          cwd: testProject.path,
-        }),
-      ).toBe(`0.0.0-dev`);
-
-      testProject.cleanUp();
+      try {
+        expect(
+          await execCommand("npx probot -v", {
+            cwd: testProject.path,
+          }),
+        ).toBe(`0.0.0-dev`);
+      } finally {
+        testProject.cleanUp();
+      }
     },
   );
 
@@ -93,13 +95,15 @@ describe(`cli version`, () => {
     },
     async () => {
       const testProject = await prepareTestProjectWithProbot();
-      expect(
-        await execCommand("npx probot --version", {
-          cwd: testProject.path,
-        }),
-      ).toBe(`0.0.0-dev`);
-
-      testProject.cleanUp();
+      try {
+        expect(
+          await execCommand("npx probot --version", {
+            cwd: testProject.path,
+          }),
+        ).toBe(`0.0.0-dev`);
+      } finally {
+        testProject.cleanUp();
+      }
     },
   );
 });

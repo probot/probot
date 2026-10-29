@@ -37,8 +37,10 @@ export async function getOctokitThrottleOptions(
 
   if (!redisConfig) return throttlingOptions;
 
+  const { client, Redis } = await getRedisClient(redisConfig);
   const connection = new Bottleneck.IORedisConnection({
-    client: await getRedisClient(options),
+    client,
+    Redis,
   });
   connection.on("error", (error) => {
     log.error(Object.assign(error, { source: "bottleneck" }));
@@ -52,8 +54,14 @@ export async function getOctokitThrottleOptions(
 
 let Redis = null;
 
-async function getRedisClient({ redisConfig }: Options): Promise<any> {
+async function getRedisClient(redisConfig: RedisOptions | string): Promise<{
+  client: any;
+  Redis: any;
+}> {
   Redis ??= (await npxImport("ioredis@5.10.1", { onlyPackageRunner: true }))
     .Redis;
-  if (redisConfig) return new Redis(redisConfig as RedisOptions);
+  return {
+    client: new Redis(redisConfig),
+    Redis,
+  };
 }

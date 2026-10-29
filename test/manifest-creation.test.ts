@@ -1,7 +1,16 @@
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import fetchMock from "fetch-mock";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
+
+const { npxImportMock } = vi.hoisted(() => ({
+  npxImportMock: vi.fn(),
+}));
+
+vi.mock("npx-import-light", () => ({
+  npxImport: npxImportMock,
+}));
 
 import type { Env } from "../src/types.js";
 import { ManifestCreation } from "../src/manifest-creation.js";
@@ -33,6 +42,25 @@ describe("ManifestCreation", () => {
       return "https://smee.io/1234ab1234";
     },
   };
+
+  test("uses the default updateEnv implementation", () => {
+    const previousCwd = process.cwd();
+    const tempCwd = fs.mkdtempSync(path.join(os.tmpdir(), "probot-manifest-"));
+    process.chdir(tempCwd);
+
+    return new ManifestCreation()
+      .createWebhookChannel({ SmeeClient })
+      .then((url) => {
+        expect(url).toBe("https://smee.io/1234ab1234");
+        expect(fs.readFileSync(path.join(tempCwd, ".env"), "utf8")).toContain(
+          "WEBHOOK_PROXY_URL=https://smee.io/1234ab1234",
+        );
+      })
+      .finally(() => {
+        process.chdir(previousCwd);
+        fs.rmSync(tempCwd, { recursive: true, force: true });
+      });
+  });
 
   const reset = (env = {} as Env) => {
     delete process.env.NODE_ENV;
@@ -70,6 +98,38 @@ describe("ManifestCreation", () => {
       expect(updateEnvCalls[0].WEBHOOK_PROXY_URL).toBe(
         "https://smee.io/1234ab1234",
       );
+    });
+
+    test("warns when creating a webhook channel fails", async () => {
+      reset();
+      const warn = vi.fn();
+
+      await expect(
+        setup.createWebhookChannel({
+          SmeeClient: {
+            createChannel: () => Promise.reject(new Error("offline")),
+          },
+          log: { warn } as any,
+        }),
+      ).resolves.toBeUndefined();
+      expect(warn).toHaveBeenCalledWith(
+        "Unable to connect to smee.io, try restarting your server.",
+      );
+    });
+
+    test("warns when the Smee client cannot be loaded", async () => {
+      reset();
+      const warn = vi.fn();
+      npxImportMock.mockRejectedValueOnce(new Error("module unavailable"));
+
+      await expect(
+        setup.createWebhookChannel({
+          SmeeClient: undefined,
+          log: { warn } as any,
+        }),
+      ).resolves.toBeUndefined();
+
+      expect(warn).toHaveBeenCalledWith("SmeeClient is not available");
     });
   });
 
@@ -224,6 +284,40 @@ describe("ManifestCreation", () => {
       ).toBe(
         '{"description":"A description for a cool app","hook_attributes":{"url":"localhost://3000/"},"name":"cool-app","public":true,"redirect_url":"localhost://3000/probot/setup","url":"https://probot.github.io","version":"v1"}',
       );
+    });
+
+    test("rethrows app.yml read errors other than missing files", () => {
+      reset();
+      const error = Object.assign(new Error("permission denied"), {
+        code: "EACCES",
+      });
+
+      expect(() =>
+        setup.getManifest({
+          pkg,
+          baseUrl: "localhost://3000",
+          readFileSync: () => {
+            throw error;
+          },
+        }),
+      ).toThrow(error);
+    });
+
+    test("preserves an explicitly false public value", () => {
+      reset();
+      const readFileSync: typeof fs.readFileSync = () =>
+        "public: false\nname: example" as any;
+
+      const manifest = JSON.parse(
+        setup.getManifest({
+          pkg: { name: "example", description: "description" } as any,
+          baseUrl: "http://localhost:3000",
+          readFileSync,
+        }),
+      );
+
+      expect(manifest.name).toBe("example");
+      expect(manifest.public).toBe(false);
     });
   });
 });

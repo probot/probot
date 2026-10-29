@@ -6,7 +6,7 @@ import {
 
 import { pino } from "pino";
 import { sign } from "@octokit/webhooks-methods";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 import { createNodeMiddleware, createProbot, Probot } from "../src/index.js";
 import type { ApplicationFunction } from "../src/types.js";
@@ -231,5 +231,28 @@ describe("createNodeMiddleware", () => {
     middleware(fakeRequest, fakeResponse);
 
     expect(counter).toBe(1);
+  });
+
+  test("returns 500 when a handler throws", async () => {
+    const error = new Error("handler failed");
+    const log = { error: vi.fn() };
+    const writeHead = vi.fn().mockReturnValue({ end: vi.fn() });
+    const middleware = await createNodeMiddleware(() => {}, {
+      probot: {
+        log,
+        load: async (_app: ApplicationFunction, options: any) => {
+          options.addHandler(() => {
+            throw error;
+          });
+        },
+        getNodeMiddleware: async () => async () => false,
+      } as any,
+    });
+
+    await expect(
+      middleware({} as IncomingMessage, { writeHead } as any),
+    ).resolves.toBe(true);
+    expect(log.error).toHaveBeenCalledWith(error);
+    expect(writeHead).toHaveBeenCalledWith(500);
   });
 });

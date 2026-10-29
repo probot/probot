@@ -1,7 +1,7 @@
 import fetchMock from "fetch-mock";
 import pino from "pino";
 import getPort from "get-port";
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Env } from "../../src/types.js";
 import { Probot, Server } from "../../src/index.js";
@@ -14,7 +14,28 @@ import { getRuntimeName } from "../../src/helpers/get-runtime-name.js";
 import { getRuntimeVersion } from "../../src/helpers/get-runtime-version.js";
 import { MockLoggerTarget } from "../utils.js";
 
+const exec = vi.hoisted(() => vi.fn());
+vi.mock("node:child_process", () => ({ exec }));
+
 describe("Setup app", () => {
+  const activeServers = new Set<Server>();
+  const startServer = Server.prototype.start;
+
+  beforeEach(() => {
+    vi.spyOn(Server.prototype, "start").mockImplementation(async function (
+      this: Server,
+    ) {
+      activeServers.add(this);
+      return startServer.call(this);
+    });
+  });
+
+  afterEach(async () => {
+    await Promise.all([...activeServers].map((server) => server.stop()));
+    activeServers.clear();
+    vi.restoreAllMocks();
+  });
+
   let updateEnvCalls: Env[] = [];
   function updateEnv(env: Env) {
     updateEnvCalls.push(env);
@@ -33,6 +54,30 @@ describe("Setup app", () => {
     updateEnvCalls = [];
     SmeeClientCreateChannelCalls = [];
   };
+
+  it("returns false for an unhandled request", async () => {
+    const previousNoSmeeSetup = process.env.NO_SMEE_SETUP;
+    process.env.NO_SMEE_SETUP = "true";
+
+    try {
+      const handler = await setupAppFactory({
+        log: pino({ level: "silent" }),
+        host: "localhost",
+        port: 3000,
+        updateEnv,
+      })();
+
+      await expect(
+        handler({ method: "GET", url: "/not-found" } as any, {} as any),
+      ).resolves.toBe(false);
+    } finally {
+      if (previousNoSmeeSetup === undefined) {
+        delete process.env.NO_SMEE_SETUP;
+      } else {
+        process.env.NO_SMEE_SETUP = previousNoSmeeSetup;
+      }
+    }
+  });
 
   describe("logs", () => {
     it("should log welcome message", async () => {
@@ -105,12 +150,12 @@ describe("Setup app", () => {
 
       const server = new Server({
         log,
+        port,
         Probot: Probot.defaults({
           log,
           // workaround for https://github.com/probot/probot/issues/1512
           appId: 1,
           privateKey: "dummy value for setup, see #1512",
-          port,
         }),
         host: "localhost",
       });
@@ -169,11 +214,78 @@ describe("Setup app", () => {
         `http://${server.host}:${server.port}/probot`,
       );
       expect(response.status).toBe(200);
+
+      const rootResponse = await fetch(
+        `http://${server.host}:${server.port}/`,
+        { redirect: "manual" },
+      );
+      expect(rootResponse.status).toBe(302);
+      expect(rootResponse.headers.get("location")).toBe("/probot");
+
       await server.stop();
     });
   });
 
   describe("GET /probot/setup", () => {
+    it("logs the restart message outside Glitch", async () => {
+      const mock = fetchMock
+        .createInstance()
+        .postOnce("https://api.github.com/app-manifests/123/conversions", {
+          status: 201,
+          body: {
+            html_url: "/apps/my-app",
+            id: "id",
+            pem: "pem",
+            webhook_secret: "webhook_secret",
+          },
+        });
+      const previousProjectDomain = process.env.PROJECT_DOMAIN;
+      const previousNoSmeeSetup = process.env.NO_SMEE_SETUP;
+      delete process.env.PROJECT_DOMAIN;
+      process.env.NO_SMEE_SETUP = "true";
+      const logTarget = new MockLoggerTarget();
+      const log = pino(logTarget);
+      const handler = await setupAppFactory({
+        log,
+        host: "localhost",
+        port: 3000,
+        request: { fetch: mock.fetchHandler },
+        updateEnv,
+      })();
+      const end = vi.fn();
+      const writeHead = vi.fn(() => ({ end }));
+
+      try {
+        const handled = await handler(
+          { method: "GET", url: "/probot/setup?code=123" } as any,
+          { writeHead } as any,
+        );
+
+        expect(handled).toBe(true);
+        expect(writeHead).toHaveBeenCalledWith(302, {
+          "content-type": "text/plain",
+          location: "/apps/my-app/installations/new",
+        });
+        expect(end).toHaveBeenCalledWith(
+          "Found. Redirecting to /apps/my-app/installations/new",
+        );
+        expect(logTarget.entries.map(({ msg }) => msg)).toContain(
+          "Probot has been set up, please restart the server!",
+        );
+      } finally {
+        if (previousProjectDomain === undefined) {
+          delete process.env.PROJECT_DOMAIN;
+        } else {
+          process.env.PROJECT_DOMAIN = previousProjectDomain;
+        }
+        if (previousNoSmeeSetup === undefined) {
+          delete process.env.NO_SMEE_SETUP;
+        } else {
+          process.env.NO_SMEE_SETUP = previousNoSmeeSetup;
+        }
+      }
+    });
+
     it("returns a redirect", async () => {
       reset();
       const logTarget = new MockLoggerTarget();
@@ -222,35 +334,52 @@ describe("Setup app", () => {
 
       await server.start();
 
-      const setupResponse = await fetch(
-        `http://${server.host}:${server.port}/probot/setup?code=123`,
-        { method: "GET", redirect: "manual" },
+      const previousProjectDomain = process.env.PROJECT_DOMAIN;
+      process.env.PROJECT_DOMAIN = "example-project";
+      exec.mockImplementation(
+        (_command: string, callback: (error: Error | null) => void) =>
+          callback(new Error("refresh failed")),
       );
 
-      expect(setupResponse.status).toBe(302);
-      expect(setupResponse.headers.get("location")).toBe(
-        "/apps/my-app/installations/new",
-      );
+      try {
+        const setupResponse = await fetch(
+          `http://${server.host}:${server.port}/probot/setup?code=123`,
+          { method: "GET", redirect: "manual" },
+        );
 
-      expect(await setupResponse.text()).toBe(
-        "Found. Redirecting to /apps/my-app/installations/new",
-      );
+        expect(setupResponse.status).toBe(302);
+        expect(setupResponse.headers.get("location")).toBe(
+          "/apps/my-app/installations/new",
+        );
 
-      expect(updateEnvCalls.length).toBe(2);
+        expect(await setupResponse.text()).toBe(
+          "Found. Redirecting to /apps/my-app/installations/new",
+        );
 
-      expect(Object.keys(updateEnvCalls[0]).length).toBe(1);
-      expect(updateEnvCalls[0].WEBHOOK_PROXY_URL).toBe(
-        "https://smee.io/1234ab1234",
-      );
+        expect(updateEnvCalls.length).toBe(2);
 
-      expect(Object.keys(updateEnvCalls[1]).length).toBe(5);
-      expect(updateEnvCalls[1].APP_ID).toBe("id");
-      expect(updateEnvCalls[1].GITHUB_CLIENT_ID).toBe("Iv1.8a61f9b3a7aba766");
-      expect(updateEnvCalls[1].GITHUB_CLIENT_SECRET).toBe(
-        "1726be1638095a19edd134c77bde3aa2ece1e5d8",
-      );
-      expect(updateEnvCalls[1].PRIVATE_KEY).toBe('"pem"');
-      expect(updateEnvCalls[1].WEBHOOK_SECRET).toBe("webhook_secret");
+        expect(Object.keys(updateEnvCalls[0]).length).toBe(1);
+        expect(updateEnvCalls[0].WEBHOOK_PROXY_URL).toBe(
+          "https://smee.io/1234ab1234",
+        );
+
+        expect(Object.keys(updateEnvCalls[1]).length).toBe(5);
+        expect(updateEnvCalls[1].APP_ID).toBe("id");
+        expect(updateEnvCalls[1].GITHUB_CLIENT_ID).toBe("Iv1.8a61f9b3a7aba766");
+        expect(updateEnvCalls[1].GITHUB_CLIENT_SECRET).toBe(
+          "1726be1638095a19edd134c77bde3aa2ece1e5d8",
+        );
+        expect(updateEnvCalls[1].PRIVATE_KEY).toBe('"pem"');
+        expect(updateEnvCalls[1].WEBHOOK_SECRET).toBe("webhook_secret");
+        expect(exec).toHaveBeenCalledWith("refresh", expect.any(Function));
+      } finally {
+        if (previousProjectDomain === undefined) {
+          delete process.env.PROJECT_DOMAIN;
+        } else {
+          process.env.PROJECT_DOMAIN = previousProjectDomain;
+        }
+        exec.mockReset();
+      }
 
       await server.stop();
     });

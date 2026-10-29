@@ -44,4 +44,13 @@ describe("resolver", () => {
     expect(stubResolverCalls[0][0]).toBe("foo");
     expect(stubResolverCalls[0][1]).toBe(basedir);
   });
+
+  it("returns the default export from a transpiler-marked module", async () => {
+    const module = await resolveAppFunction("foo", {
+      resolver: () =>
+        "data:text/javascript,export default {__esModule: true, default: 42}",
+    });
+
+    expect(module).toBe(42);
+  });
 });

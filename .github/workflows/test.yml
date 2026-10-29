@@ -169,7 +169,7 @@ jobs:
         run:  bun install
       - run: bun run build
       - name: Test
-        run: bun test
+        run: bun run test
         env:
           REDIS_URL: 127.0.0.1
 

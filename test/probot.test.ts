@@ -8,7 +8,7 @@ import webhookExamples, {
 import Bottleneck from "bottleneck";
 import fetchMock from "fetch-mock";
 import { pino } from "pino";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { Probot, ProbotOctokit, Context } from "../src/index.js";
 
@@ -70,6 +70,11 @@ describe("Probot", () => {
   });
 
   describe(".defaults()", () => {
+    it("supports construction without arguments", () => {
+      const MyProbot = Probot.defaults({ appId, privateKey });
+
+      expect(() => new MyProbot()).not.toThrow();
+    });
     it("sets default options for constructor", async () => {
       const mock = fetchMock
         .createInstance()
@@ -91,37 +96,17 @@ describe("Probot", () => {
 
   describe("constructor", () => {
     it("no options", () => {
-      try {
-        new Probot();
-        throw new Error("Should have thrown");
-      } catch (e: any) {
-        expect(e.message.includes("appId option is required"), e.message).toBe(
-          true,
-        );
-      }
+      expect(() => new Probot()).toThrow("appId option is required");
     });
 
     it("{}", () => {
-      try {
-        new Probot({});
-        throw new Error("Should have thrown");
-      } catch (e: any) {
-        expect(e.message.includes("appId option is required"), e.message).toBe(
-          true,
-        );
-      }
+      expect(() => new Probot({})).toThrow("appId option is required");
     });
 
     it("{ appId }", () => {
-      try {
-        new Probot({ appId });
-        throw new Error("Should have thrown");
-      } catch (e: any) {
-        expect(
-          e.message.includes("privateKey option is required"),
-          e.message,
-        ).toBe(true);
-      }
+      expect(() => new Probot({ appId })).toThrow(
+        "privateKey option is required",
+      );
     });
 
     it('{ appId, privateKey" }', () => {
@@ -160,6 +145,24 @@ describe("Probot", () => {
       });
       expect(probot.version).toBe("0.0.0-development");
     });
+
+    it("logs initialization failures", async () => {
+      const error = new Error("initialization failed");
+      const logTarget = new MockLoggerTarget();
+      const BrokenOctokit = ProbotOctokit.plugin(() => {
+        throw error;
+      });
+      const probot = new Probot({
+        githubToken: "faketoken",
+        Octokit: BrokenOctokit,
+        log: pino(logTarget),
+      });
+
+      await expect(probot.ready()).rejects.toThrow(error);
+      expect(logTarget.entries).toContainEqual(
+        expect.objectContaining({ msg: "Failed to initialize Probot" }),
+      );
+    });
   });
 
   describe("webhooks", () => {
@@ -181,16 +184,12 @@ describe("Probot", () => {
         throw new Error("X-Hub-Signature-256 does not match blob signature");
       });
 
-      try {
-        await probot.receive(event);
-        throw new Error("Should have thrown");
-      } catch (e) {
-        expect(logTarget.entries.length).toBe(1);
-        expect(logTarget.entries[0].level).toBe(50); // 50 is the error level in pino
-        expect(logTarget.entries[0].msg).toBe(
-          "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
-        );
-      }
+      await expect(probot.receive(event)).rejects.toThrow();
+      expect(logTarget.entries.length).toBe(1);
+      expect(logTarget.entries[0].level).toBe(50); // 50 is the error level in pino
+      expect(logTarget.entries[0].msg).toBe(
+        "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
+      );
     });
 
     it("responds with the correct error if webhook secret is not found", async () => {
@@ -205,16 +204,12 @@ describe("Probot", () => {
         throw new Error("No X-Hub-Signature-256 found on request");
       });
 
-      try {
-        await probot.receive(event);
-        throw new Error("Should have thrown");
-      } catch (e) {
-        expect(logTarget.entries.length).toBe(1);
-        expect(logTarget.entries[0].level).toBe(50); // 50 is the error level in pino
-        expect(logTarget.entries[0].msg).toBe(
-          "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
-        );
-      }
+      await expect(probot.receive(event)).rejects.toThrow();
+      expect(logTarget.entries.length).toBe(1);
+      expect(logTarget.entries[0].level).toBe(50); // 50 is the error level in pino
+      expect(logTarget.entries[0].msg).toBe(
+        "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
+      );
     });
 
     it("responds with the correct error if webhook secret is wrong", async () => {
@@ -231,16 +226,12 @@ describe("Probot", () => {
         );
       });
 
-      try {
-        await probot.receive(event);
-        throw new Error("Should have thrown");
-      } catch (e) {
-        expect(logTarget.entries.length).toBe(1);
-        expect(logTarget.entries[0].level).toBe(50); // 50 is the error level in pino
-        expect(logTarget.entries[0].msg).toBe(
-          "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
-        );
-      }
+      await expect(probot.receive(event)).rejects.toThrow();
+      expect(logTarget.entries.length).toBe(1);
+      expect(logTarget.entries[0].level).toBe(50); // 50 is the error level in pino
+      expect(logTarget.entries[0].msg).toBe(
+        "Go to https://github.com/settings/apps/YOUR_APP and verify that the Webhook secret matches the value of the WEBHOOK_SECRET environment variable.",
+      );
     });
 
     it("responds with the correct error if the PEM file is missing", async () => {
@@ -257,16 +248,12 @@ describe("Probot", () => {
         );
       });
 
-      try {
-        await probot.receive(event);
-        throw new Error("Should have thrown");
-      } catch (e) {
-        expect(logTarget.entries.length).toBe(1);
-        expect(logTarget.entries[0].level).toBe(50); // 50 is the error level in pino
-        expect(logTarget.entries[0].msg).toBe(
-          "Your private key (a .pem file or PRIVATE_KEY environment variable) or APP_ID is incorrect. Go to https://github.com/settings/apps/YOUR_APP, verify that APP_ID is set correctly, and generate a new PEM file if necessary.",
-        );
-      }
+      await expect(probot.receive(event)).rejects.toThrow();
+      expect(logTarget.entries.length).toBe(1);
+      expect(logTarget.entries[0].level).toBe(50); // 50 is the error level in pino
+      expect(logTarget.entries[0].msg).toBe(
+        "Your private key (a .pem file or PRIVATE_KEY environment variable) or APP_ID is incorrect. Go to https://github.com/settings/apps/YOUR_APP, verify that APP_ID is set correctly, and generate a new PEM file if necessary.",
+      );
     });
 
     it("responds with the correct error if the jwt could not be decoded", async () => {
@@ -283,16 +270,27 @@ describe("Probot", () => {
         );
       });
 
-      try {
-        await probot.receive(event);
-        throw new Error("Should have thrown");
-      } catch (e) {
-        expect(logTarget.entries.length).toBe(1);
-        expect(logTarget.entries[0].level).toBe(50); // 50 is the error level in pino
-        expect(logTarget.entries[0].msg).toBe(
-          "Your private key (a .pem file or PRIVATE_KEY environment variable) or APP_ID is incorrect. Go to https://github.com/settings/apps/YOUR_APP, verify that APP_ID is set correctly, and generate a new PEM file if necessary.",
-        );
-      }
+      await expect(probot.receive(event)).rejects.toThrow();
+      expect(logTarget.entries.length).toBe(1);
+      expect(logTarget.entries[0].level).toBe(50); // 50 is the error level in pino
+      expect(logTarget.entries[0].msg).toBe(
+        "Your private key (a .pem file or PRIVATE_KEY environment variable) or APP_ID is incorrect. Go to https://github.com/settings/apps/YOUR_APP, verify that APP_ID is set correctly, and generate a new PEM file if necessary.",
+      );
+    });
+
+    it("registers onAny and onError handlers after initialization", async () => {
+      const probot = new Probot({ githubToken: "faketoken" });
+      await probot.ready();
+      const onAny = vi.spyOn(probot.webhooks, "onAny");
+      const onError = vi.spyOn(probot.webhooks, "onError");
+      const anyHandler = vi.fn();
+      const errorHandler = vi.fn();
+
+      probot.onAny(anyHandler);
+      probot.onError(errorHandler);
+
+      expect(onAny).toHaveBeenCalledWith(anyHandler);
+      expect(onError).toHaveBeenCalledWith(errorHandler);
     });
   });
 
@@ -305,7 +303,7 @@ describe("Probot", () => {
         );
       };
 
-      new Probot({
+      await new Probot({
         appId,
         privateKey,
         baseUrl: "https://notreallygithub.com/api/v3",
@@ -320,7 +318,7 @@ describe("Probot", () => {
         );
       };
 
-      new Probot({
+      await new Probot({
         appId,
         privateKey,
         Octokit: ProbotOctokit.defaults({
@@ -339,7 +337,7 @@ describe("Probot", () => {
         );
       };
 
-      new Probot({
+      await new Probot({
         appId,
         privateKey,
         baseUrl: "http://notreallygithub.com/api/v3",
@@ -427,6 +425,8 @@ describe("Probot", () => {
 
       expect(spyCalls[0][0] instanceof Context).toBe(true);
       expect(spyCalls[0][0].payload).toBe(event.payload);
+      expect(probot.webhooks).toBeDefined();
+      expect(probot.webhookPath).toBe("/api/github/webhooks");
     });
 
     it("calls callback with same action", async () => {
@@ -491,6 +491,31 @@ describe("Probot", () => {
 
       await probot.receive(event);
       expect(callCount).toBe(1);
+    });
+
+    it("calls an onError callback for handler errors", async () => {
+      const probot = new Probot({
+        appId,
+        privateKey,
+        log: pino({ enabled: false }),
+      });
+      let errorCount = 0;
+
+      probot.onError(() => {
+        errorCount++;
+      });
+      probot.on("pull_request", () => {
+        throw new Error("handler failed");
+      });
+
+      await expect(
+        probot.receive({
+          id: "123-456",
+          name: "pull_request",
+          payload: getPayloadExample("pull_request"),
+        }),
+      ).rejects.toThrow("handler failed");
+      expect(errorCount).toBe(1);
     });
 
     it("calls callback x amount of times when an array of x actions is passed", async () => {
@@ -599,6 +624,7 @@ describe("Probot", () => {
       });
 
       await probot.receive(event);
+      expect(mock.callHistory.done()).toBe(true);
     });
 
     it("returns an unauthenticated client for installation.deleted", async () => {
@@ -636,7 +662,8 @@ describe("Probot", () => {
         await context.octokit.request("/");
       });
 
-      await probot.receive(event).catch(console.log);
+      await probot.receive(event);
+      expect(mock.callHistory.done()).toBe(true);
     });
 
     it("returns an authenticated client for events without an installation", async () => {
@@ -675,7 +702,50 @@ describe("Probot", () => {
         await context.octokit.request("/");
       });
 
-      await probot.receive(event).catch(console.log);
+      await probot.receive(event);
+      expect(mock.callHistory.done()).toBe(true);
+    });
+  });
+
+  describe("load", () => {
+    it("loads an array of application functions", async () => {
+      const probot = new Probot({ appId, privateKey });
+      const calls: string[] = [];
+
+      await probot.load([
+        async () => {
+          calls.push("first");
+        },
+        async () => {
+          calls.push("second");
+        },
+      ]);
+
+      expect(calls).toEqual(["first", "second"]);
+    });
+
+    it("requires a server when an app registers a handler", async () => {
+      const probot = new Probot({ appId, privateKey });
+
+      await expect(
+        probot.load((_app, options) => {
+          options.addHandler(() => true);
+        }),
+      ).rejects.toThrow("No server instance");
+    });
+
+    it("uses the configured server when registering a handler", async () => {
+      const addHandler = vi.fn();
+      const probot = new Probot({
+        appId,
+        privateKey,
+        server: { addHandler } as any,
+      });
+
+      const handler = () => true;
+      await probot.load((_app, options) => options.addHandler!(handler));
+
+      expect(addHandler).toHaveBeenCalledWith(handler);
     });
   });
 
@@ -745,12 +815,7 @@ describe("Probot", () => {
         payload: getPayloadExample("pull_request.opened"),
       };
 
-      try {
-        await probot.receive(event);
-        throw new Error("Should have thrown");
-      } catch (error) {
-        expect((error as Error).message).toBe("error from app");
-      }
+      await expect(probot.receive(event)).rejects.toThrow("error from app");
     });
 
     it("passes logger to webhooks", async () => {

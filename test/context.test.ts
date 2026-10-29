@@ -8,7 +8,7 @@ import type {
 } from "@octokit/webhooks";
 import WebhookExamples from "@octokit/webhooks-examples";
 import fetchMock from "fetch-mock";
-import { describe, expect, test, it } from "vitest";
+import { describe, expect, test, it, vi } from "vitest";
 
 import { Context } from "../src/index.js";
 import { ProbotOctokit } from "../src/octokit/probot-octokit.js";
@@ -79,6 +79,31 @@ describe("Context", () => {
 
   it("inherits the payload", () => {
     expect(context.payload).toBe(event.payload);
+  });
+
+  it("adds the delivery hook only once per Octokit instance", () => {
+    type RequestOptions = { headers: Record<string, string> };
+    let requestHook: ((options: RequestOptions) => void) | undefined;
+    const before = vi.fn(
+      (_name: string, hook: (options: RequestOptions) => void) => {
+        requestHook = hook;
+      },
+    );
+    const octokit = { hook: { before } };
+
+    new Context({ ...event, id: "delivery-id" }, octokit as any, {} as any);
+    new Context(
+      { ...event, id: "second-delivery-id" },
+      octokit as any,
+      {} as any,
+    );
+
+    expect(before).toHaveBeenCalledTimes(1);
+    if (!requestHook) throw new Error("request hook was not registered");
+
+    const options: RequestOptions = { headers: {} };
+    requestHook(options);
+    expect(options.headers["x-github-delivery"]).toBe("delivery-id");
   });
 
   describe("repo", () => {
@@ -168,14 +193,9 @@ describe("Context", () => {
         octokit as any,
         {} as any,
       );
-      try {
-        context.repo();
-        throw new Error("Should have thrown");
-      } catch (e) {
-        expect((e as Error).message).toBe(
-          "context.repo() is not supported for this webhook event.",
-        );
-      }
+      expect(() => context.repo()).toThrow(
+        "context.repo() is not supported for this webhook event.",
+      );
     });
   });
 
@@ -224,6 +244,25 @@ describe("Context", () => {
       expect(issue.owner).toBe("muahaha");
       expect(issue.issue_number).toBe(5);
       expect(issue.repo).toBe("Hello-World");
+    });
+
+    it("uses the event number when no issue or pull request is present", () => {
+      const context = new Context(
+        {
+          id: "123",
+          name: "push",
+          payload: {
+            ...pushEventPayload,
+            issue: undefined,
+            pull_request: undefined,
+            number: 7,
+          },
+        } as any,
+        { hook: { before: () => {} } } as any,
+        {} as any,
+      );
+
+      expect(context.issue().issue_number).toBe(7);
     });
   });
 
@@ -276,6 +315,43 @@ describe("Context", () => {
       expect(pullRequest.owner).toBe("muahaha");
       expect(pullRequest.pull_number).toBe(5);
       expect(pullRequest.repo).toBe("Hello-World");
+    });
+
+    it("uses an issue number when given an issue payload", () => {
+      const context = new Context(
+        {
+          id: "123",
+          name: "pull_request",
+          payload: {
+            ...pullRequestEventPayload,
+            pull_request: undefined,
+            issue: { number: 8 },
+          },
+        } as any,
+        { hook: { before: () => {} } } as any,
+        {} as any,
+      );
+
+      expect(context.pullRequest().pull_number).toBe(8);
+    });
+
+    it("uses the event number when no issue or pull request is present", () => {
+      const context = new Context(
+        {
+          id: "123",
+          name: "pull_request",
+          payload: {
+            ...pullRequestEventPayload,
+            issue: undefined,
+            pull_request: undefined,
+            number: 9,
+          },
+        } as any,
+        { hook: { before: () => {} } } as any,
+        {} as any,
+      );
+
+      expect(context.pullRequest().pull_number).toBe(9);
     });
   });
 

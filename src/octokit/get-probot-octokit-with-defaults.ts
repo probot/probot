@@ -73,9 +73,7 @@ export async function getProbotOctokitWithDefaults(
     defaultOptions.baseUrl = options.baseUrl;
   }
 
-  if (octokitThrottleOptions) {
-    defaultOptions.throttle = octokitThrottleOptions;
-  }
+  defaultOptions.throttle = octokitThrottleOptions;
 
   return options.Octokit.defaults((instanceOptions: OctokitOptions) => {
     const options = Object.assign({}, defaultOptions, instanceOptions, {

@@ -13,7 +13,7 @@ declare global {
        * By default, logs are formatted for readability in development. You can
        * set this to `json` in order to disable the formatting.
        */
-      LOG_FORMAT?: "json" | "pretty" | undefined;
+      LOG_FORMAT?: "" | "json" | "pretty" | undefined;
 
       /**
        * The verbosity of logs to show when running your app, which can be

@@ -1,6 +1,6 @@
-import type { RequestError } from "@octokit/types";
 import fetchMock from "fetch-mock";
-import { describe, expect, it, test } from "vitest";
+import { pino } from "pino";
+import { describe, expect, it, test, vi } from "vitest";
 
 import { ProbotOctokit } from "../src/octokit/probot-octokit.js";
 import type { OctokitOptions } from "../src/types.js";
@@ -44,19 +44,21 @@ describe("ProbotOctokit", () => {
       },
     });
 
+    const log = pino({ level: "silent" });
+    const debug = vi.spyOn(log, "debug");
     const octokit = new ProbotOctokit({
       ...defaultOptions,
+      log,
       request: {
         fetch: mock.fetchHandler,
       },
     });
 
-    try {
-      await octokit.request("/");
-      throw new Error("Should have thrown");
-    } catch (error) {
-      expect((error as RequestError).status).toBe(500);
-    }
+    await expect(octokit.request("/")).rejects.toMatchObject({ status: 500 });
+    expect(debug).toHaveBeenCalledWith(
+      {},
+      "GitHub request: GET https://api.github.com/ - 500",
+    );
   });
 
   test("with retry enabled retries failed requests", async () => {

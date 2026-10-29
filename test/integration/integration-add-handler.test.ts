@@ -24,6 +24,27 @@ import { detectRuntime } from "../../src/helpers/detect-runtime.js";
 
 const APP_ID = "123";
 const WEBHOOK_SECRET = "secret";
+
+function closeServer(server: ReturnType<typeof createServer>): Promise<void> {
+  if (!server.listening) return Promise.resolve();
+  return new Promise((resolve, reject) => {
+    server.close((error) => (error ? reject(error) : resolve()));
+  });
+}
+
+function listenServer(
+  server: ReturnType<typeof createServer>,
+  port: number,
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const onError = (error: Error) => reject(error);
+    server.once("error", onError);
+    server.listen(port, () => {
+      server.removeListener("error", onError);
+      resolve();
+    });
+  });
+}
 const PRIVATE_KEY = `-----BEGIN RSA PRIVATE KEY-----
 MIIEpAIBAAKCAQEA1c7+9z5Pad7OejecsQ0bu3aozN3tihPmljnnudb9G3HECdnH
 lWu2/a1gB9JW5TBQ+AVpum9Okx7KfqkfBKL9mcHgSL0yWMdjMfNOqNtrQqKlN4kE
@@ -107,8 +128,11 @@ describe("run", () => {
       },
     );
 
-    expect(hasAddHandler).toBe(true);
-    await server.stop();
+    try {
+      expect(hasAddHandler).toBe(true);
+    } finally {
+      await server.stop();
+    }
   });
 
   it("should work with express", async () => {
@@ -135,14 +159,16 @@ describe("run", () => {
       },
     );
 
-    const response = await fetch(
-      `http://${server.host}:${server.port}/hello-world`,
-    );
+    try {
+      const response = await fetch(
+        `http://${server.host}:${server.port}/hello-world`,
+      );
 
-    expect(response.status).toBe(200);
-    expect(await response.text()).toBe('{"hello":"world"}');
-
-    await server.stop();
+      expect(response.status).toBe(200);
+      expect(await response.text()).toBe('{"hello":"world"}');
+    } finally {
+      await server.stop();
+    }
   });
 
   it(
@@ -178,14 +204,16 @@ describe("run", () => {
         },
       );
 
-      const response = await fetch(
-        `http://${server.host}:${server.port}/hello-world`,
-      );
+      try {
+        const response = await fetch(
+          `http://${server.host}:${server.port}/hello-world`,
+        );
 
-      expect(response.status).toBe(200);
-      expect(await response.text()).toBe('{"hello":"world"}');
-
-      await server.stop();
+        expect(response.status).toBe(200);
+        expect(await response.text()).toBe('{"hello":"world"}');
+      } finally {
+        await server.stop();
+      }
     },
   );
 });
@@ -215,21 +243,23 @@ describe("createNodeMiddleware", () => {
 
     const server = createServer(middleware);
 
-    await new Promise<void>((resolve) => server.listen(port, resolve));
+    await listenServer(server, port);
 
-    let { address: host } = server.address() as {
-      port: number;
-      address: string;
-    };
+    try {
+      let { address: host } = server.address() as {
+        port: number;
+        address: string;
+      };
 
-    host = getPrintableHost(host);
+      host = getPrintableHost(host);
 
-    const response = await fetch(`http://${host}:${port}/hello-world`);
+      const response = await fetch(`http://${host}:${port}/hello-world`);
 
-    expect(response.status).toBe(200);
-    expect(await response.text()).toBe('{"hello":"world"}');
-
-    server.close();
+      expect(response.status).toBe(200);
+      expect(await response.text()).toBe('{"hello":"world"}');
+    } finally {
+      await closeServer(server);
+    }
   });
 
   [
@@ -293,58 +323,43 @@ describe("createNodeMiddleware", () => {
         expressApp.use(middleware);
       }
 
-      let server: ReturnType<typeof createServer>;
+      const server = createServer(expressApp);
+      try {
+        await listenServer(server, port);
 
-      await new Promise<void>((resolve, reject) => {
-        server = expressApp.listen(port, (err) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve();
-          }
-        });
-      });
+        let { address: host } = server.address() as {
+          port: number;
+          address: string;
+        };
 
-      let { address: host } = server!.address() as {
-        port: number;
-        address: string;
-      };
+        host = getPrintableHost(host);
 
-      host = getPrintableHost(host);
+        const pushEvent = JSON.stringify(pushEventPayload);
 
-      const pushEvent = JSON.stringify(pushEventPayload);
-
-      const webhookResponse = await fetch(
-        `http://${host}:${port}/api/github/webhooks`,
-        {
-          method: "POST",
-          body: pushEvent,
-          headers: {
-            "content-type": "application/json",
-            "x-github-event": "push",
-            "x-github-delivery": "123",
-            "x-hub-signature-256": await sign("secret", pushEvent),
+        const webhookResponse = await fetch(
+          `http://${host}:${port}/api/github/webhooks`,
+          {
+            method: "POST",
+            body: pushEvent,
+            headers: {
+              "content-type": "application/json",
+              "x-github-event": "push",
+              "x-github-delivery": "123",
+              "x-hub-signature-256": await sign("secret", pushEvent),
+            },
           },
-        },
-      );
+        );
 
-      expect(webhookResponse.status).toBe(200);
-      expect(await webhookResponse.text()).toBe("ok\n");
+        expect(webhookResponse.status).toBe(200);
+        expect(await webhookResponse.text()).toBe("ok\n");
 
-      const response = await fetch(`http://${host}:${port}/hello-world`);
+        const response = await fetch(`http://${host}:${port}/hello-world`);
 
-      expect(response.status).toBe(200);
-      expect(await response.text()).toBe('{"hello":"world"}');
-
-      await new Promise<void>((resolve, reject) => {
-        server!.close((err) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve();
-          }
-        });
-      });
+        expect(response.status).toBe(200);
+        expect(await response.text()).toBe('{"hello":"world"}');
+      } finally {
+        await closeServer(server);
+      }
     });
   });
 
@@ -381,21 +396,23 @@ describe("createNodeMiddleware", () => {
 
       const server = createServer(middleware);
 
-      await new Promise<void>((resolve) => server.listen(port, resolve));
+      await listenServer(server, port);
 
-      let { address: host } = server.address() as {
-        port: number;
-        address: string;
-      };
+      try {
+        let { address: host } = server.address() as {
+          port: number;
+          address: string;
+        };
 
-      host = getPrintableHost(host);
+        host = getPrintableHost(host);
 
-      const response = await fetch(`http://${host}:${port}/hello-world`);
+        const response = await fetch(`http://${host}:${port}/hello-world`);
 
-      expect(response.status).toBe(200);
-      expect(await response.text()).toBe('{"hello":"world"}');
-
-      server.close();
+        expect(response.status).toBe(200);
+        expect(await response.text()).toBe('{"hello":"world"}');
+      } finally {
+        await closeServer(server);
+      }
     },
   );
 
@@ -441,32 +458,34 @@ describe("createNodeMiddleware", () => {
 
       fastify.post("/api/github/webhooks", wrappedMiddleware);
 
-      const address = await fastify.listen({
-        port,
-      });
+      try {
+        const address = await fastify.listen({
+          port,
+        });
 
-      const response = await fetch(`${address}/hello-world`);
+        const response = await fetch(`${address}/hello-world`);
 
-      expect(response.status).toBe(200);
-      expect(await response.text()).toBe('{"hello":"world"}');
+        expect(response.status).toBe(200);
+        expect(await response.text()).toBe('{"hello":"world"}');
 
-      const pushEvent = JSON.stringify(pushEventPayload);
+        const pushEvent = JSON.stringify(pushEventPayload);
 
-      const webhookResponse = await fetch(`${address}/api/github/webhooks`, {
-        method: "POST",
-        body: pushEvent,
-        headers: {
-          "content-type": "application/json",
-          "x-github-event": "push",
-          "x-github-delivery": "123",
-          "x-hub-signature-256": await sign("secret", pushEvent),
-        },
-      });
+        const webhookResponse = await fetch(`${address}/api/github/webhooks`, {
+          method: "POST",
+          body: pushEvent,
+          headers: {
+            "content-type": "application/json",
+            "x-github-event": "push",
+            "x-github-delivery": "123",
+            "x-hub-signature-256": await sign("secret", pushEvent),
+          },
+        });
 
-      expect(webhookResponse.status).toBe(200);
-      expect(await webhookResponse.text()).toBe("ok\n");
-
-      await fastify.close();
+        expect(webhookResponse.status).toBe(200);
+        expect(await webhookResponse.text()).toBe("ok\n");
+      } finally {
+        await fastify.close();
+      }
     },
   );
 });

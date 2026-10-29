@@ -23,6 +23,7 @@
     "test:coverage": "vitest run --coverage",
     "test:dev": "vitest --ui --coverage",
     "test:redis": "npm run redis:start && REDIS_URL=127.0.0.1 vitest run --testTimeout 10000 ; npm run redis:stop",
+    "typecheck": "tsc -p tsconfig.typecheck.json",
     "doc": "typedoc --options .typedoc.json --plugin .typedoc/typedoc_ga.mjs"
   },
   "files": [

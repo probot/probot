@@ -50,7 +50,7 @@ export function createProbot({
   const envOptions: Options = {
     logLevel: envWithDefaults.LOG_LEVEL as LogLevel,
     appId: Number(envWithDefaults.APP_ID),
-    privateKey: (privateKey && privateKey.toString()) || undefined,
+    privateKey: privateKey ? privateKey.toString() : undefined,
     secret: envWithDefaults.WEBHOOK_SECRET,
     redisConfig: envWithDefaults.REDIS_URL,
     webhookPath: envWithDefaults.WEBHOOK_PATH,

@@ -29,7 +29,7 @@ type SetupFactoryOptions = StripUndefined<
   };
 
 export const setupAppFactory = (options: SetupFactoryOptions) => {
-  const { host, port, log, request, SmeeClient } = options || {};
+  const { host, port, log, request, SmeeClient } = options;
 
   return async function setupApp(): Promise<Handler> {
     const setup: ManifestCreation = new ManifestCreation({
@@ -206,8 +206,7 @@ function getBaseUrl(req: IncomingMessage): string {
     req.headers["x-forwarded-proto"] || (req.socket as TLSSocket)?.encrypted
       ? "https"
       : "http";
-  const protocol =
-    typeof protocols === "string" ? protocols.split(",")[0] : protocols[0];
+  const protocol = protocols.split(",")[0];
   const host = req.headers["x-forwarded-host"] || req.headers.host;
   const baseUrl = `${protocol}://${host}`;
   return baseUrl;

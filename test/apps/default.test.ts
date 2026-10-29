@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 
 import { pino } from "pino";
 import getPort from "get-port";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 
 import { Probot, Server } from "../../src/index.js";
 import { defaultApp as defaultAppHandler } from "../../src/apps/default.js";
@@ -14,6 +14,13 @@ import { MockLoggerTarget } from "../utils.js";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 describe("default app", () => {
+  const servers: Server[] = [];
+
+  afterEach(async () => {
+    await Promise.all(servers.map((server) => server.stop()));
+    servers.length = 0;
+  });
+
   async function instantiateServer(cwd = process.cwd()) {
     const server = new Server({
       Probot: Probot.defaults({
@@ -26,6 +33,7 @@ describe("default app", () => {
     });
 
     await server.loadHandlerFactory(defaultAppHandler);
+    servers.push(server);
 
     return server;
   }
@@ -41,7 +49,6 @@ describe("default app", () => {
       );
 
       expect(response.status).toBe(200);
-      await server.stop();
     });
 
     describe("get info from package.json", () => {
@@ -64,8 +71,6 @@ describe("default app", () => {
             version: "0.0.0-development",
           }),
         );
-
-        await server.stop();
       });
 
       it("returns the correct HTML without values", async () => {
@@ -78,8 +83,6 @@ describe("default app", () => {
         );
         expect(response.status).toBe(200);
         expect(await response.text()).toBe(probotView({}));
-
-        await server.stop();
       });
     });
   });
@@ -96,8 +99,16 @@ describe("default app", () => {
 
       expect(response.status).toBe(302);
       expect(response.headers.get("location")).toBe("/probot");
-
-      await server.stop();
     });
+  });
+
+  it.each([
+    ["POST /probot", { method: "POST", url: "/probot" }],
+    ["GET without a URL", { method: "GET" }],
+    ["GET /unknown", { method: "GET", url: "/unknown" }],
+  ])("returns false for unsupported requests: %s", (_name, request) => {
+    const handler = defaultAppHandler({} as any, { cwd: __dirname } as any);
+
+    expect(handler(request as any, {} as any)).toBe(false);
   });
 });

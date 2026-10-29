@@ -109,21 +109,22 @@ export async function run(
 
   let server: Server;
 
-  if (!appId || !privateKey) {
-    if (isProduction()) {
-      if (!appId) {
-        throw new Error(
-          "App ID is missing, and is required to run in production mode. " +
-            "To resolve, ensure the APP_ID environment variable is set.",
-        );
-      } else if (!privateKey) {
-        throw new Error(
-          "Certificate is missing, and is required to run in production mode. " +
-            "To resolve, ensure either the PRIVATE_KEY or PRIVATE_KEY_PATH environment variable is set and contains a valid certificate",
-        );
-      }
+  if (isProduction()) {
+    if (!appId) {
+      throw new Error(
+        "App ID is missing, and is required to run in production mode. " +
+          "To resolve, ensure the APP_ID environment variable is set.",
+      );
     }
+    if (!privateKey) {
+      throw new Error(
+        "Certificate is missing, and is required to run in production mode. " +
+          "To resolve, ensure either the PRIVATE_KEY or PRIVATE_KEY_PATH environment variable is set and contains a valid certificate",
+      );
+    }
+  }
 
+  if (!appId || !privateKey) {
     // Workaround for setup (#1512)
     // When probot is started for the first time, it gets into a setup mode
     // where `appId` and `privateKey` are not present. The setup mode gets

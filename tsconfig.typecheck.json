@@ -1,0 +1,23 @@
+{
+  "extends": "@octokit/tsconfig",
+  "compilerOptions": {
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "pretty": true,
+    "sourceMap": false,
+    "outDir": "./lib",
+    "skipLibCheck": true,
+    "noImplicitAny": true,
+    "declaration": true,
+    "allowJs": true,
+    "lib": ["es2023"],
+    "noEmit": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "erasableSyntaxOnly": true,
+    "rootDir": ".",
+    "types": ["node"]
+  },
+  "include": ["src/**/*", "test/**/*"],
+  "compileOnSave": false
+}

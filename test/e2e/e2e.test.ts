@@ -124,9 +124,8 @@ describe("end-to-end-tests", () => {
       forceKillAfterDelay: 1,
     });
 
-    probotProcess.catch(() => {});
-
     await new Promise<void>((resolve, reject) => {
+      probotProcess.catch(reject);
       probotProcess.stdout?.on("data", (data) => {
         const line = data.toString().trim();
         if (

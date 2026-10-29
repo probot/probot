@@ -22,7 +22,7 @@ test("probotView > providing description", () => {
   ).toMatchSnapshot();
 });
 
-test("probotView > providing description", () => {
+test("probotView > providing version", () => {
   expect(
     probotView({
       version: "1.0.0",

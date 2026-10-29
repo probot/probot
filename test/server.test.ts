@@ -1,5 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { IncomingMessage, ServerResponse } from "node:http";
+import {
+  Server as NodeServer,
+  type IncomingMessage,
+  type ServerResponse,
+} from "node:http";
 import { pino } from "pino";
 import { sign } from "@octokit/webhooks-methods";
 import getPort from "get-port";
@@ -371,6 +375,58 @@ describe("Server", () => {
         );
       } finally {
         await blocker.stop();
+      }
+    });
+
+    it("logs and rethrows non-port server errors", async () => {
+      const logTarget = new MockLoggerTarget();
+      const server = new Server({
+        Probot: Probot.defaults({ appId, privateKey }),
+        log: pino(logTarget),
+        host: "256.256.256.256",
+        port: await getPort(),
+      });
+
+      const error = await server.start().then(
+        () => new Error("server unexpectedly started"),
+        (error: NodeJS.ErrnoException) => error,
+      );
+      expect(error).toMatchObject({ code: expect.any(String) });
+      expect((error as NodeJS.ErrnoException).code).not.toBe("EADDRINUSE");
+      expect(logTarget.entries.at(-1)).toEqual(
+        expect.objectContaining({
+          level: 50,
+          err: expect.objectContaining({
+            code: (error as NodeJS.ErrnoException).code,
+            message: error.message,
+          }),
+        }),
+      );
+    });
+
+    it("rejects when closing the HTTP server fails", async () => {
+      const server = new Server({
+        Probot: Probot.defaults({ appId, privateKey }),
+        log: pino({ level: "silent" }),
+        port: await getPort(),
+      });
+      await server.start();
+
+      const closeError = new Error("close failed");
+      const close = vi
+        .spyOn(NodeServer.prototype, "close")
+        .mockImplementation(function (
+          this: NodeServer,
+          callback?: (error?: Error) => void,
+        ) {
+          callback?.(closeError);
+          return this;
+        });
+
+      try {
+        await expect(server.stop()).rejects.toThrow(closeError);
+      } finally {
+        close.mockRestore();
       }
     });
 

@@ -372,6 +372,7 @@ describe("Setup app", () => {
         expect(updateEnvCalls[1].PRIVATE_KEY).toBe('"pem"');
         expect(updateEnvCalls[1].WEBHOOK_SECRET).toBe("webhook_secret");
         expect(exec).toHaveBeenCalledWith("refresh", expect.any(Function));
+        exec.mock.calls[0][1](null);
       } finally {
         if (previousProjectDomain === undefined) {
           delete process.env.PROJECT_DOMAIN;

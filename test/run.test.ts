@@ -240,6 +240,24 @@ describe("run", () => {
       expect(logTarget.entries[0].msg).toBe("test");
       expect(logTarget.entries[0].name).toBe("probot");
     });
+
+    it("accepts valid credentials in production", async () => {
+      const port = await getPort();
+      const previousNodeEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = "production";
+
+      try {
+        const server = await run(() => {}, {
+          env: { ...defaultEnv, PORT: port.toString() },
+          log: pino({ level: "silent" }),
+          updateEnv,
+        });
+        await server.stop();
+      } finally {
+        if (previousNodeEnv === undefined) delete process.env.NODE_ENV;
+        else process.env.NODE_ENV = previousNodeEnv;
+      }
+    });
   });
 
   describe("webhooks", () => {

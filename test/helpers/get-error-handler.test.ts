@@ -14,6 +14,7 @@ describe("getErrorHandler", () => {
 
     handleError(new Error("x-hub-signature-256 is invalid"));
     handleError(new Error("invalid PEM"));
+    handleError(new Error());
     handleError(
       Object.assign(new Error("other error"), {
         event: { id: "delivery-id" } as unknown as EmitterWebhookEvent,
@@ -31,6 +32,6 @@ describe("getErrorHandler", () => {
       name: "event",
       id: "delivery-id",
     });
-    expect(eventLog.error).toHaveBeenCalledTimes(2);
+    expect(eventLog.error).toHaveBeenCalledTimes(3);
   });
 });

@@ -48,7 +48,7 @@ describe("ManifestCreation", () => {
     const tempCwd = fs.mkdtempSync(path.join(os.tmpdir(), "probot-manifest-"));
     process.chdir(tempCwd);
 
-    return new ManifestCreation()
+    return new ManifestCreation({})
       .createWebhookChannel({ SmeeClient })
       .then((url) => {
         expect(url).toBe("https://smee.io/1234ab1234");

@@ -1,3 +1,5 @@
+import { mkdtempSync, rmSync } from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -112,6 +114,28 @@ describe("readCliOptions", () => {
       readCliOptions(["--private-key", "/path/that/does/not/exist.pem"])
         .privateKey,
     ).toBeUndefined();
+  });
+
+  it("returns no private key when no key is configured or discoverable", () => {
+    const previousCwd = process.cwd();
+    const previousPrivateKeyPath = process.env.PRIVATE_KEY_PATH;
+    const directory = mkdtempSync(
+      path.join(os.tmpdir(), "probot-cli-options-"),
+    );
+
+    try {
+      process.chdir(directory);
+      delete process.env.PRIVATE_KEY_PATH;
+      expect(readCliOptions([]).privateKey).toBeUndefined();
+    } finally {
+      process.chdir(previousCwd);
+      if (previousPrivateKeyPath === undefined) {
+        delete process.env.PRIVATE_KEY_PATH;
+      } else {
+        process.env.PRIVATE_KEY_PATH = previousPrivateKeyPath;
+      }
+      rmSync(directory, { recursive: true, force: true });
+    }
   });
 
   it("loads a private key from the CLI option", () => {

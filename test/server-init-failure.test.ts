@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import getPort from "get-port";
 import pino from "pino";
 
@@ -9,6 +9,10 @@ vi.mock("../src/helpers/get-log.js", () => ({ getLog }));
 import { Server } from "../src/server/server.js";
 
 describe("Server initialization without a logger", () => {
+  beforeEach(() => {
+    getLog.mockReset();
+  });
+
   it("initializes successfully with a logger loaded on demand", async () => {
     const log = pino({ level: "silent" });
     getLog.mockResolvedValueOnce(log);
@@ -26,10 +30,12 @@ describe("Server initialization without a logger", () => {
       port: await getPort(),
     });
 
-    await server.start();
-    await server.stop();
-
-    expect(getLog).toHaveBeenCalledTimes(1);
+    try {
+      await server.start();
+      expect(getLog).toHaveBeenCalledTimes(1);
+    } finally {
+      await server.stop();
+    }
   });
 
   it("reports logger initialization failures to stderr", async () => {

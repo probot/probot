@@ -53,4 +53,12 @@ describe("resolver", () => {
 
     expect(module).toBe(42);
   });
+
+  it("returns the module when its marker has no nested default", async () => {
+    const module = await resolveAppFunction("foo", {
+      resolver: () => "data:text/javascript,export default {__esModule: true}",
+    });
+
+    expect(module).toEqual({ __esModule: true });
+  });
 });

@@ -99,26 +99,27 @@ describe("smee-client", () => {
         webhookPath: "/",
       });
 
-      await server.load(app);
+      try {
+        await server.load(app);
+        await server.start();
 
-      await server.start();
+        const body = JSON.stringify(pushEvent);
 
-      const body = JSON.stringify(pushEvent);
+        await fetch(`${WEBHOOK_PROXY_URL}/`, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "x-github-event": "push",
+            "x-github-delivery": "1",
+            "x-hub-signature-256": await sign(WEBHOOK_SECRET, body),
+          },
+          body,
+        });
 
-      await fetch(`${WEBHOOK_PROXY_URL}/`, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          "x-github-event": "push",
-          "x-github-delivery": "1",
-          "x-hub-signature-256": await sign(WEBHOOK_SECRET, body),
-        },
-        body,
-      });
-
-      await eventPromise.promise;
-
-      await server.stop();
+        await eventPromise.promise;
+      } finally {
+        await server.stop();
+      }
     },
   );
 });

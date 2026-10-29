@@ -14,7 +14,10 @@ export const resolveAppFunction = async (
 
   const { default: mod } = await import(appFnPath);
   // mod.default gets exported by transpiled TypeScript code
-  return mod.__esModule && mod.default ? mod.default : mod;
+  if (mod.__esModule) {
+    return mod.default || mod;
+  }
+  return mod;
 };
 export interface ResolveOptions {
   basedir?: string;

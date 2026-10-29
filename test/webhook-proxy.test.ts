@@ -45,9 +45,26 @@ function sse(
   });
 }
 
+async function withTimeout<T>(
+  promise: Promise<T>,
+  message: string,
+  timeout = 3000,
+): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      promise,
+      new Promise<T>((_, reject) => {
+        timer = setTimeout(() => reject(new Error(message)), timeout);
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
 describe("webhook-proxy", () => {
   let emit: Awaited<ReturnType<typeof sse>>;
-  let proxy: EventSource;
 
   test("with a valid proxy server forwards events to server", async () => {
     const readyPromise = createDeferredPromise<void>();
@@ -67,7 +84,12 @@ describe("webhook-proxy", () => {
       },
     );
 
-    server.listen(port, async () => {
+    let proxy: EventSource | undefined;
+    try {
+      await new Promise<void>((resolve, reject) => {
+        server.once("error", reject);
+        server.listen(port, resolve);
+      });
       let { address: targetHost, port: targetPort } =
         server.address() as AddressInfo;
 
@@ -111,24 +133,35 @@ describe("webhook-proxy", () => {
       })) as EventSource;
 
       if (!proxy) {
-        readyPromise.reject(new Error("proxy is undefined"));
-        return;
+        throw new Error("proxy is undefined");
       }
 
       readyPromise.resolve();
-    });
+      await withTimeout(
+        readyPromise.promise,
+        "Timed out waiting for the webhook proxy to become ready",
+      );
 
-    await readyPromise.promise;
+      if (!emit) {
+        throw new Error("Webhook proxy SSE connection was not established");
+      }
+      emit({
+        body: { action: "foo" },
+        "x-github-event": "test",
+      });
 
-    emit({
-      body: { action: "foo" },
-      "x-github-event": "test",
-    });
-
-    await finishedPromise.promise;
-
-    server.close();
-    proxy.close();
+      await withTimeout(
+        finishedPromise.promise,
+        "Timed out waiting for the webhook proxy event delivery",
+      );
+    } finally {
+      proxy?.close();
+      if (server.listening) {
+        await new Promise<void>((resolve, reject) =>
+          server.close((error) => (error ? reject(error) : resolve())),
+        );
+      }
+    }
   });
 
   test("logs an error when the proxy server is not found", async () => {

@@ -366,11 +366,11 @@ describe("Context", () => {
       const context = new Context(event, octokit, {} as any);
 
       let customMergeCalled = false;
-      const customMerge = (): any[] => {
+      const customMerge = () => {
         customMergeCalled = true;
-        return [];
+        return () => [];
       };
-      await context.config("test-file.yml", {}, { arrayMerge: customMerge });
+      await context.config("test-file.yml", {}, { mergeArray: customMerge });
       expect(customMergeCalled).toBe(true);
     });
 

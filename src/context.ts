@@ -1,5 +1,5 @@
 import path from "node:path";
-import merge from "deepmerge";
+import deepmerge, { type Options as MergeOptions } from "@fastify/deepmerge";
 
 import type {
   EmitterWebhookEvent as WebhookEvent,
@@ -8,7 +8,7 @@ import type {
 import type { Logger } from "pino";
 import type { ProbotOctokit } from "./octokit/probot-octokit.js";
 
-export type MergeOptions = merge.Options;
+export type { MergeOptions };
 
 /** Repo owner type, either string or never depending on the context */
 type RepoOwnerType<T extends WebhookEvents> =
@@ -234,7 +234,7 @@ export class Context<Event extends WebhookEvents = WebhookEvents> {
    *
    * @param fileName - Name of the YAML file in the `.github` directory
    * @param defaultConfig - An object of default config options
-   * @param deepMergeOptions - Controls merging configs (from the [deepmerge](https://github.com/TehShrike/deepmerge) module)
+   * @param deepMergeOptions - Controls how configuration files are merged
    * @return Configuration object read from the file
    */
   public async config<T>(
@@ -245,9 +245,9 @@ export class Context<Event extends WebhookEvents = WebhookEvents> {
     const params = this.repo({
       path: path.posix.join(".github", fileName),
       defaults(configs: Record<string, unknown>[]) {
-        const result = merge.all(
-          [defaultConfig || {}, ...configs],
-          deepMergeOptions,
+        const result = deepmerge({ ...deepMergeOptions, all: true })(
+          defaultConfig || {},
+          ...configs,
         );
 
         return result as Record<string, unknown>;

@@ -39,7 +39,9 @@ const defaultOptions = {
   },
   userAgent: `probot/${VERSION}`,
 };
-export const ProbotOctokit = Octokit.plugin(
+export const PROBOT_OCTOKIT_DEFAULTS = Symbol("probot octokit defaults");
+
+const ProbotOctokitBase = Octokit.plugin(
   throttling,
   retry,
   paginateRest,
@@ -59,5 +61,31 @@ export const ProbotOctokit = Octokit.plugin(
 
   return options;
 });
+
+const octokitDefaults = Octokit.defaults;
+(
+  ProbotOctokitBase as typeof ProbotOctokitBase & {
+    defaults: typeof Octokit.defaults;
+  }
+).defaults = function (defaults) {
+  const Constructor = octokitDefaults.call(this, defaults);
+
+  if (typeof defaults !== "function") {
+    Object.defineProperty(Constructor, PROBOT_OCTOKIT_DEFAULTS, {
+      value: {
+        ...(
+          this as unknown as typeof ProbotOctokitBase & {
+            [PROBOT_OCTOKIT_DEFAULTS]?: OctokitOptions;
+          }
+        )[PROBOT_OCTOKIT_DEFAULTS],
+        ...defaults,
+      },
+    });
+  }
+
+  return Constructor;
+} as typeof Octokit.defaults;
+
+export const ProbotOctokit = ProbotOctokitBase;
 
 export type ProbotOctokit = InstanceType<typeof ProbotOctokit>;

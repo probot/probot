@@ -16,11 +16,18 @@ import { describe, expect, it } from "vitest";
 import {
   createNodeMiddleware,
   createProbot,
-  run,
+  run as probotRun,
   type ApplicationFunction,
 } from "../../src/index.js";
 import { getPrintableHost } from "../../src/helpers/get-printable-host.js";
 import { detectRuntime } from "../../src/helpers/detect-runtime.js";
+import { MockSmeeClient } from "../utils.js";
+
+const run: typeof probotRun = (app, options) =>
+  probotRun(app, {
+    ...options,
+    loadSmeeClient: async () => ({ SmeeClient: MockSmeeClient }),
+  });
 
 const APP_ID = "123";
 const WEBHOOK_SECRET = "secret";

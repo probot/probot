@@ -9,6 +9,7 @@ import type {
   StripUndefined,
 } from "./types.js";
 import type { ProbotOctokit } from "./octokit/probot-octokit.js";
+import type { SmeeClientModule } from "./helpers/webhook-proxy.js";
 import { setupAppFactory } from "./apps/setup.js";
 import { getLog } from "./helpers/get-log.js";
 import { readCliOptions } from "./bin/read-cli-options.js";
@@ -27,6 +28,7 @@ type AdditionalOptions = {
   log?: Logger;
   updateEnv?: typeof updateEnv;
   SmeeClient?: { createChannel: () => Promise<string | undefined> };
+  loadSmeeClient?: () => Promise<SmeeClientModule>;
 };
 
 /**
@@ -100,7 +102,7 @@ export async function run(
       >
     >
   > &
-    Pick<ServerOptions, "webhookProxy">;
+    Pick<ServerOptions, "webhookProxy" | "loadSmeeClient">;
 
   const serverOptions: ServerOptionsLocal = {
     host,
@@ -108,6 +110,7 @@ export async function run(
     webhookPath,
     webhookProxy,
     log,
+    loadSmeeClient: additionalOptions?.loadSmeeClient,
     Probot: Probot.defaults(probotOptions),
   };
 

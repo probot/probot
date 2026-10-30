@@ -47,6 +47,7 @@ type State = {
   request?: RequestRequestOptions | undefined;
   webhookPath: string;
   webhookProxy?: string | undefined;
+  loadSmeeClient?: ServerOptions["loadSmeeClient"];
   eventSource: EventSource | undefined;
   httpLogger?: ReturnType<typeof httpLogger>;
   handlers: Handler[];
@@ -72,6 +73,7 @@ export class Server {
       host: options.host || "localhost",
       webhookPath: options.webhookPath || defaultWebhookPath,
       webhookProxy: options.webhookProxy,
+      loadSmeeClient: options.loadSmeeClient,
       eventSource: undefined,
       request: options.request,
       ProbotBase: options.Probot,
@@ -224,6 +226,7 @@ export class Server {
         path: this.#state.webhookPath,
         logger: this.#state.log!,
         url: this.#state.webhookProxy,
+        loadSmeeClient: this.#state.loadSmeeClient,
       });
     }
 

@@ -18,6 +18,7 @@ describe("run SIGINT handling", () => {
     const info = vi.spyOn(console, "info").mockImplementation(() => {});
     const server = await run(() => {}, {
       env: {
+        WEBHOOK_PROXY_URL: "",
         APP_ID: "1",
         PRIVATE_KEY_PATH: privateKeyPath,
         PORT: String(await getPort()),
@@ -55,6 +56,7 @@ describe("run SIGINT handling", () => {
     const error = vi.spyOn(console, "error").mockImplementation(() => {});
     const server = await run(() => {}, {
       env: {
+        WEBHOOK_PROXY_URL: "",
         APP_ID: "1",
         PRIVATE_KEY_PATH: privateKeyPath,
         PORT: String(await getPort()),

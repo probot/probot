@@ -8,14 +8,20 @@ import getPort from "get-port";
 import { pino } from "pino";
 import { describe, expect, it, vi } from "vitest";
 
-import { type Probot, run } from "../src/index.js";
-import { MockLoggerTarget } from "./utils.js";
+import { type Probot, run as probotRun } from "../src/index.js";
+import { MockLoggerTarget, MockSmeeClient } from "./utils.js";
 
 import WebhookExamples, {
   type WebhookDefinition,
 } from "@octokit/webhooks-examples";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const run: typeof probotRun = (app, options) =>
+  probotRun(app, {
+    ...options,
+    loadSmeeClient: async () => ({ SmeeClient: MockSmeeClient }),
+  });
 
 const defaultEnv: NodeJS.ProcessEnv = {
   APP_ID: "1",

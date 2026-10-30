@@ -58,7 +58,7 @@ describe("run with package-config apps", () => {
         String(await getPort()),
         "cli-app.js",
       ],
-      { env: {}, log: pino({ level: "silent" }) },
+      { env: { WEBHOOK_PROXY_URL: "" }, log: pino({ level: "silent" }) },
     );
 
     try {

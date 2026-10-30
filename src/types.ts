@@ -8,6 +8,7 @@ import type { RedisOptions } from "ioredis";
 import type { Logger } from "pino";
 import type { Options as LoggingOptions } from "pino-http";
 import type { GetLogOptions } from "./helpers/get-log.js";
+import type { SmeeClientModule } from "./helpers/webhook-proxy.js";
 
 import type { Context } from "./context.js";
 import type { Probot } from "./probot.js";
@@ -86,6 +87,7 @@ export type ServerOptions = {
   host?: string | undefined;
   webhookPath?: string | undefined;
   webhookProxy?: string | undefined;
+  loadSmeeClient?: (() => Promise<SmeeClientModule>) | undefined;
 
   enablePing?: boolean | undefined;
   enableNotFound?: boolean | undefined;

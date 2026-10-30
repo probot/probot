@@ -118,6 +118,7 @@ describe("end-to-end-tests", () => {
         GHE_PROTOCOL: "http",
         LOG_LEVEL: "trace",
         WEBHOOK_PATH: "/",
+        WEBHOOK_PROXY_URL: "",
       },
       stdio: "pipe",
       cancelSignal: probotProcessAbortController.signal,

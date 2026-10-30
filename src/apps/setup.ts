@@ -1,6 +1,7 @@
 import type { IncomingMessage } from "node:http";
 import { exec } from "node:child_process";
 import { parse as parseQuery } from "node:querystring";
+import { randomBytes } from "node:crypto";
 
 import type { Logger } from "pino";
 
@@ -33,6 +34,8 @@ export const setupAppFactory = (options: SetupFactoryOptions) => {
   const env = options.env || process.env;
   const applyEnv =
     options.updateEnv || ((values: Env) => updateEnv(values, { env }));
+
+  const setupToken = env.PROBOT_SETUP_TOKEN || randomBytes(32).toString("hex");
 
   return async function setupApp(): Promise<Handler> {
     const setup: ManifestCreation = new ManifestCreation({
@@ -80,23 +83,30 @@ export const setupAppFactory = (options: SetupFactoryOptions) => {
         if (path === "/probot") {
           const baseUrl = getBaseUrl(req);
           const manifest = setup.getManifest({ pkg, baseUrl });
-          const createAppUrl = setup.createAppUrl;
-          // Pass the manifest to be POST'd
+          const createAppUrl = new URL(setup.createAppUrl);
+          createAppUrl.searchParams.set("state", setupToken);
           res.writeHead(200, { "content-type": "text/html" }).end(
             setupView({
               name: pkg.name,
               version: pkg.version,
               description: pkg.description,
-              createAppUrl,
+              createAppUrl: createAppUrl.toString(),
               manifest,
             }),
           );
           return true;
         }
         if (path === "/probot/setup") {
-          const { code } =
+          const { code, state } =
             // @ts-expect-error query could be set by a framework, e.g. express
             req.query || parseQuery(query);
+
+          if (state !== setupToken) {
+            res
+              .writeHead(403, { "content-type": "text/plain" })
+              .end("state missing or invalid");
+            return true;
+          }
 
           if (!code || typeof code !== "string" || code.length === 0) {
             res
@@ -132,6 +142,7 @@ export const setupAppFactory = (options: SetupFactoryOptions) => {
           res
             .writeHead(200, {
               "content-type": "text/html",
+              "set-cookie": `probot_setup_token=${setupToken}; Path=/probot; HttpOnly; SameSite=Strict`,
             })
             .end(importViewRendered);
           return true;
@@ -146,6 +157,16 @@ export const setupAppFactory = (options: SetupFactoryOptions) => {
 
       if (req.method === "POST") {
         if (path === "/probot/import") {
+          const cookieToken = getCookie(
+            req.headers?.cookie,
+            "probot_setup_token",
+          );
+          if (cookieToken !== setupToken) {
+            res
+              .writeHead(403, { "content-type": "text/plain" })
+              .end("setup token missing or invalid, reload /probot/import");
+            return true;
+          }
           const { appId, pem, webhook_secret } = JSON.parse(
             await getPayload(req),
           );
@@ -174,6 +195,14 @@ export const setupAppFactory = (options: SetupFactoryOptions) => {
     return setupHandler;
   };
 };
+
+function getCookie(header: string | undefined, name: string) {
+  for (const pair of header?.split(";") ?? []) {
+    const [key, ...value] = pair.trim().split("=");
+    if (key === name) return value.join("=");
+  }
+  return undefined;
+}
 
 function printWelcomeMessage(
   log: Logger,

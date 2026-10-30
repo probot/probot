@@ -68,7 +68,7 @@ describe("setup app defaults", () => {
           method: "POST",
           url: "/probot/other",
           body: "{}",
-        } as unknown as IncomingMessage,
+        } as IncomingMessage,
         response,
       ),
     ).resolves.toBe(false);
@@ -86,6 +86,7 @@ describe("setup app defaults", () => {
       response,
     );
     const renderedView = response.end.mock.calls.at(-1)?.[0] as string;
+    const state = /\?state=([0-9a-f]{64})"/.exec(renderedView)?.[1];
     expect(renderedView).toContain('"url":"https://forwarded.example.com/"');
     expect(renderedView).toContain(
       '"redirect_url":"https://forwarded.example.com/probot/setup"',
@@ -97,7 +98,7 @@ describe("setup app defaults", () => {
     await handler(
       {
         method: "GET",
-        url: "/probot/setup?code=123",
+        url: `/probot/setup?code=123&state=${state}`,
         headers: { host: "example.com" },
         socket: { encrypted: false },
       } as unknown as IncomingMessage,
@@ -114,15 +115,21 @@ describe("setup app defaults", () => {
     process.chdir(tempCwd);
     try {
       await handlerWithoutUpdateEnv(
+        { method: "GET", url: "/probot/import" } as IncomingMessage,
+        response,
+      );
+      const setCookie = response.writeHead.mock.calls.at(-1)?.[1]["set-cookie"];
+      await handlerWithoutUpdateEnv(
         {
           method: "POST",
           url: "/probot/import",
+          headers: { cookie: setCookie.split(";")[0] },
           body: JSON.stringify({
             appId: "1",
             pem: "pem",
             webhook_secret: "secret",
           }),
-        } as unknown as IncomingMessage,
+        } as IncomingMessage,
         response,
       );
       expect(fs.readFileSync(path.join(tempCwd, ".env"), "utf8")).toContain(

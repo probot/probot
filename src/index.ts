@@ -135,8 +135,6 @@ declare global {
 
       NO_SMEE_SETUP?: "true" | undefined;
 
-      PROJECT_DOMAIN?: string | undefined;
-
       NODE_ENV?: string | undefined;
     }
   }

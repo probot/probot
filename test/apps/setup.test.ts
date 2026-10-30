@@ -249,7 +249,7 @@ describe("Setup app", () => {
   });
 
   describe("GET /probot/setup", () => {
-    it("logs the restart message outside Glitch", async () => {
+    it("logs the restart message", async () => {
       const mock = fetchMock
         .createInstance()
         .postOnce("https://api.github.com/app-manifests/123/conversions", {
@@ -346,7 +346,6 @@ describe("Setup app", () => {
 
       await server.start();
 
-      env.PROJECT_DOMAIN = "example-project";
       exec.mockImplementation(
         (_command: string, callback: (error: Error | null) => void) =>
           callback(new Error("refresh failed")),

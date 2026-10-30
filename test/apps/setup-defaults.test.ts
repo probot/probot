@@ -18,7 +18,6 @@ describe("setup app defaults", () => {
       ...process.env,
       NO_SMEE_SETUP: "true",
       WEBHOOK_PROXY_URL: undefined,
-      PROJECT_DOMAIN: undefined,
       GHE_HOST: undefined,
       GHE_PROTOCOL: undefined,
     };

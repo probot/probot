@@ -195,7 +195,7 @@ describe("receive", () => {
   it("exits when receiving the event fails", async () => {
     const exit = vi
       .spyOn(process, "exit")
-      .mockImplementation(() => undefined as never);
+      .mockImplementation((() => {}) as typeof process.exit);
     receiveEvent.mockRejectedValueOnce(new Error("event failed"));
 
     await receive([

@@ -99,6 +99,20 @@ describe("readCliOptions", () => {
     });
   });
 
+  it("allows CLI logging options to override invalid environment values", () => {
+    const invalidEnv = {
+      LOG_LEVEL: "invalid",
+      LOG_FORMAT: "invalid",
+    } as unknown as NodeJS.ProcessEnv;
+
+    expect(
+      readCliOptions(
+        ["node", "probot", "--log-level", "info", "--log-format", "json"],
+        invalidEnv,
+      ),
+    ).toMatchObject({ logLevel: "info", logFormat: "json" });
+  });
+
   it("continues when the private key path is invalid", () => {
     expect(
       readCliOptions(["--private-key", "/path/that/does/not/exist.pem"])

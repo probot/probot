@@ -16,6 +16,7 @@ import { getAuthenticatedOctokit } from "./octokit/get-authenticated-octokit.js"
 import { getLog } from "./helpers/get-log.js";
 import { getProbotOctokitWithDefaults } from "./octokit/get-probot-octokit-with-defaults.js";
 import { getWebhooks } from "./octokit/get-webhooks.js";
+import { requireValue } from "./helpers/require-value.js";
 import { ProbotOctokit } from "./octokit/probot-octokit.js";
 import { VERSION } from "./version.js";
 import type {
@@ -30,8 +31,6 @@ import {
   type Server,
 } from "./server/server.js";
 
-export type Constructor<T = any> = new (...args: any[]) => T;
-
 const UNINITIALIZED = 0b00;
 const INITIALIZING = 0b01;
 const INITIALIZED = 0b10;
@@ -41,9 +40,13 @@ type InitializationState =
   | typeof INITIALIZING
   | typeof INITIALIZED;
 
-type OnHandler = ["on", any, any];
-type OnAnyHandler = ["onAny", any];
-type OnErrorHandler = ["onError", any];
+type OnHandler = [
+  "on",
+  Parameters<ProbotWebhooks["on"]>[1],
+  Parameters<ProbotWebhooks["on"]>[0],
+];
+type OnAnyHandler = ["onAny", Parameters<ProbotWebhooks["onAny"]>[0]];
+type OnErrorHandler = ["onError", Parameters<ProbotWebhooks["onError"]>[0]];
 
 export type State = {
   initializationState: InitializationState;
@@ -54,10 +57,10 @@ export type State = {
   webhooks: ProbotWebhooks | null;
   log: Logger | null;
   getLog: NonNullable<Options["getLog"]>;
-  logFormat?: "pretty" | "json";
+  logFormat?: NonNullable<Options["logFormat"]>;
   logLevelInString?: boolean;
   sentryDsn?: string | undefined;
-  logLevel?: "trace" | "debug" | "info" | "warn" | "error" | "fatal";
+  logLevel?: NonNullable<Options["logLevel"]>;
   logMessageKey?: string | undefined;
   appId?: number | undefined;
   privateKey?: string | undefined;
@@ -74,22 +77,14 @@ export type State = {
 };
 
 export class Probot {
-  static defaults<S extends Constructor>(
-    this: S,
-    defaults: Options,
-  ): {
-    new (...args: any[]): {
-      [x: string]: any;
-    };
-  } & S {
-    const ProbotWithDefaults = class extends this {
-      constructor(...args: any[]) {
-        const options = args[0] || {};
+  static defaults<S extends typeof Probot>(this: S, defaults: Options): S {
+    const ProbotWithDefaults = class extends (this as unknown as typeof Probot) {
+      constructor(options: Options = {}) {
         super(Object.assign({}, defaults, options));
       }
     };
 
-    return ProbotWithDefaults;
+    return ProbotWithDefaults as S;
   }
 
   #state: State;
@@ -120,7 +115,7 @@ export class Probot {
       logMessageKey: options.logMessageKey,
       sentryDsn: options.sentryDsn,
       githubToken: options.githubToken,
-      appId: Number.parseInt(options.appId as string, 10),
+      appId: Number.parseInt(String(options.appId), 10),
       privateKey: options.privateKey,
       host: options.host,
       port: options.port,
@@ -221,10 +216,15 @@ export class Probot {
   > {
     await this.#initialize();
 
-    return createNodeMiddleware(this.#state.webhooks!, {
-      log: log || this.#state.log!,
-      path: path || this.#state.webhookPath,
-    });
+    return createNodeMiddleware(
+      requireValue(this.#state.webhooks, "Probot webhooks are not initialized"),
+      {
+        log:
+          log ||
+          requireValue(this.#state.log, "Probot logger is not initialized"),
+        path: path || this.#state.webhookPath,
+      },
+    );
   }
 
   public async auth(
@@ -233,41 +233,46 @@ export class Probot {
     await this.#initialize();
 
     return await getAuthenticatedOctokit({
-      log: this.#state.log!,
-      octokit: this.#state.octokit!,
+      log: requireValue(this.#state.log, "Probot logger is not initialized"),
+      octokit: requireValue(
+        this.#state.octokit,
+        "Probot Octokit is not initialized",
+      ),
       installationId,
     });
   }
 
   public async load(
     appFn: ApplicationFunction | ApplicationFunction[],
-    options: ApplicationFunctionOptions = {
-      cwd: process.cwd(),
-    } as ApplicationFunctionOptions,
+    options: Partial<ApplicationFunctionOptions> = {},
   ): Promise<void> {
     await this.#state.initializedPromise.promise;
 
-    if (typeof options.addHandler !== "function") {
-      options.addHandler = this.#state.server
-        ? this.#state.server.addHandler.bind(this.#state.server)
-        : () => {
-            throw new Error("No server instance");
-          };
-    }
+    const applicationOptions: ApplicationFunctionOptions = {
+      ...options,
+      cwd: options.cwd || process.cwd(),
+      addHandler:
+        options.addHandler ||
+        (this.#state.server
+          ? this.#state.server.addHandler.bind(this.#state.server)
+          : () => {
+              throw new Error("No server instance");
+            }),
+    };
 
     if (Array.isArray(appFn)) {
       for (const fn of appFn) {
-        await this.load(fn, options);
+        await this.load(fn, applicationOptions);
       }
       return;
     }
 
-    await appFn(this, options);
+    await appFn(this, applicationOptions);
     return;
   }
 
   get log(): Logger {
-    return this.#state.log!;
+    return requireValue(this.#state.log, "Probot logger is not initialized");
   }
 
   public on: ProbotWebhooks["on"] = (eventName, callback) => {
@@ -284,11 +289,18 @@ export class Probot {
     }
 
     if (this.#state.initializationState !== INITIALIZED) {
-      this.#state.initEventListeners.push(["on", callback, eventName]);
+      this.#state.initEventListeners.push([
+        "on",
+        callback as Parameters<ProbotWebhooks["on"]>[1],
+        eventName,
+      ]);
       return;
     }
 
-    this.#state.webhooks!.on(eventName, callback);
+    requireValue(
+      this.#state.webhooks,
+      "Probot webhooks are not initialized",
+    ).on(eventName, callback);
   };
 
   public onAny: ProbotWebhooks["onAny"] = (callback) => {
@@ -296,7 +308,10 @@ export class Probot {
       this.#state.initEventListeners.push(["onAny", callback]);
       return;
     }
-    this.#state.webhooks!.onAny(callback);
+    requireValue(
+      this.#state.webhooks,
+      "Probot webhooks are not initialized",
+    ).onAny(callback);
   };
 
   public onError: ProbotWebhooks["onError"] = (callback) => {
@@ -304,7 +319,10 @@ export class Probot {
       this.#state.initEventListeners.push(["onError", callback]);
       return;
     }
-    this.#state.webhooks!.onError(callback);
+    requireValue(
+      this.#state.webhooks,
+      "Probot webhooks are not initialized",
+    ).onError(callback);
   };
 
   public async ready(): Promise<this> {
@@ -315,8 +333,14 @@ export class Probot {
   public async receive(event: WebhookEvent): Promise<void> {
     await this.#state.initializedPromise.promise;
 
-    this.#state.log!.debug({ event }, "Webhook received");
-    await this.#state.webhooks!.receive(event);
+    requireValue(this.#state.log, "Probot logger is not initialized").debug(
+      { event },
+      "Webhook received",
+    );
+    await requireValue(
+      this.#state.webhooks,
+      "Probot webhooks are not initialized",
+    ).receive(event);
     return;
   }
 
@@ -329,7 +353,10 @@ export class Probot {
   }
 
   get webhooks(): ProbotWebhooks {
-    return this.#state.webhooks!;
+    return requireValue(
+      this.#state.webhooks,
+      "Probot webhooks are not initialized",
+    );
   }
 
   get webhookPath(): string {

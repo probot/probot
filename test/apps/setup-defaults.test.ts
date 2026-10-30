@@ -1,3 +1,4 @@
+import type { IncomingMessage, ServerResponse } from "node:http";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -33,17 +34,23 @@ describe("setup app defaults", () => {
       port: 3000,
       log: pino({ level: "silent" }),
       env,
-    } as any)();
+    })();
     const response = {
       writeHead: vi.fn(() => response),
       end: vi.fn(),
-    } as any;
+    } as unknown as ServerResponse & {
+      writeHead: ReturnType<typeof vi.fn>;
+      end: ReturnType<typeof vi.fn>;
+    };
 
-    await expect(handler({ method: "GET" } as any, response)).resolves.toBe(
-      false,
-    );
     await expect(
-      handlerWithoutUpdateEnv({ method: "GET" } as any, response),
+      handler({ method: "GET" } as unknown as IncomingMessage, response),
+    ).resolves.toBe(false);
+    await expect(
+      handlerWithoutUpdateEnv(
+        { method: "GET" } as unknown as IncomingMessage,
+        response,
+      ),
     ).resolves.toBe(false);
     await handler(
       {
@@ -51,13 +58,17 @@ describe("setup app defaults", () => {
         url: "/probot",
         headers: { host: "example.com" },
         socket: { encrypted: false },
-      } as any,
+      } as unknown as IncomingMessage,
       response,
     );
 
     await expect(
       handlerWithoutUpdateEnv(
-        { method: "POST", url: "/probot/other", body: "{}" } as any,
+        {
+          method: "POST",
+          url: "/probot/other",
+          body: "{}",
+        } as unknown as IncomingMessage,
         response,
       ),
     ).resolves.toBe(false);
@@ -71,7 +82,7 @@ describe("setup app defaults", () => {
           "x-forwarded-host": "forwarded.example.com",
         },
         socket: { encrypted: false },
-      } as any,
+      } as unknown as IncomingMessage,
       response,
     );
     const renderedView = response.end.mock.calls.at(-1)?.[0] as string;
@@ -89,7 +100,7 @@ describe("setup app defaults", () => {
         url: "/probot/setup?code=123",
         headers: { host: "example.com" },
         socket: { encrypted: false },
-      } as any,
+      } as unknown as IncomingMessage,
       response,
     );
 
@@ -111,7 +122,7 @@ describe("setup app defaults", () => {
             pem: "pem",
             webhook_secret: "secret",
           }),
-        } as any,
+        } as unknown as IncomingMessage,
         response,
       );
       expect(fs.readFileSync(path.join(tempCwd, ".env"), "utf8")).toContain(
@@ -133,7 +144,10 @@ describe("setup app defaults", () => {
     })();
 
     await expect(
-      handler({ method: "GET", url: "/not-found" } as any, {} as any),
+      handler(
+        { method: "GET", url: "/not-found" } as IncomingMessage,
+        {} as ServerResponse,
+      ),
     ).resolves.toBe(false);
   });
 });

@@ -12,8 +12,19 @@ import { afterEach, describe, expect, test } from "vitest";
 import { httpLogger } from "../../../src/server/handlers/http-logger.js";
 import { getPayload } from "../../../src/helpers/get-payload.js";
 import { MockLoggerTarget } from "../../utils.js";
+import type { LogEntry } from "../../utils.js";
 
 describe("logging", () => {
+  type HttpLogEntry = LogEntry & {
+    req: {
+      id: string;
+      headers: Record<string, string>;
+      url: string;
+    };
+    responseTime?: number;
+    err?: { message: string };
+  };
+
   const servers: ReturnType<typeof createServer>[] = [];
 
   afterEach(async () => {
@@ -32,7 +43,7 @@ describe("logging", () => {
     servers.length = 0;
   });
 
-  function instantiateServer(output: string[], options = {} as Options) {
+  function instantiateServer(output: HttpLogEntry[], options = {} as Options) {
     const logger = pino(new MockLoggerTarget(output));
     const loggerMiddleware = httpLogger(logger, options);
 
@@ -68,7 +79,7 @@ describe("logging", () => {
   }
 
   test("logs requests and responses", async () => {
-    const output: any[] = [];
+    const output: HttpLogEntry[] = [];
     const server = instantiateServer(output);
 
     const port = await getPort();
@@ -101,7 +112,7 @@ describe("logging", () => {
   });
 
   test("uses supplied X-Request-ID", async () => {
-    const output: any[] = [];
+    const output: HttpLogEntry[] = [];
     const server = instantiateServer(output);
 
     const port = await getPort();
@@ -122,7 +133,7 @@ describe("logging", () => {
   });
 
   test("uses X-GitHub-Delivery", async () => {
-    const output: any[] = [];
+    const output: HttpLogEntry[] = [];
     const server = instantiateServer(output);
 
     const port = await getPort();
@@ -144,7 +155,7 @@ describe("logging", () => {
   });
 
   test("sets ignorePaths option to ignore logging", async () => {
-    const output: any[] = [];
+    const output: HttpLogEntry[] = [];
     const server = instantiateServer(output, {
       autoLogging: {
         ignore: (req) => ["/"].includes(req.url!),
@@ -168,7 +179,7 @@ describe("logging", () => {
   });
 
   test("uses the error message for failed responses", async () => {
-    const output: any[] = [];
+    const output: HttpLogEntry[] = [];
     const server = instantiateServer(output);
     const port = await getPort();
 
@@ -180,6 +191,6 @@ describe("logging", () => {
 
     expect(response.status).toBe(500);
     expect(output[0].msg).toMatch(/^GET \/error 500 - \d+ms$/u);
-    expect(output[0].err.message).toBe("request failed");
+    expect(output[0].err!.message).toBe("request failed");
   });
 });

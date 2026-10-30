@@ -15,7 +15,7 @@ describe("probotRequestLogging", () => {
         },
       },
       log: { debug },
-    } as any;
+    } as unknown as Parameters<typeof probotRequestLogging>[0];
 
     probotRequestLogging(octokit);
     const errorHandler = errorHook.mock.calls[0][1];

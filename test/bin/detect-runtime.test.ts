@@ -1,6 +1,9 @@
 import { describe, it, expect } from "vitest";
 
-import { detectRuntime } from "../../src/helpers/detect-runtime.js";
+import {
+  detectRuntime,
+  type GlobalThis,
+} from "../../src/helpers/detect-runtime.js";
 
 describe("detectRuntime", () => {
   it("returns 'node' if node is detected", () => {
@@ -41,7 +44,7 @@ describe("detectRuntime", () => {
   [{}, null, { process: null }, { process: { versions: null } }].forEach(
     (value) => {
       it(`throws an error if runtime cannot be detected - ${JSON.stringify(value)}`, () => {
-        expect(() => detectRuntime(value as any)).toThrow(
+        expect(() => detectRuntime(value as unknown as GlobalThis)).toThrow(
           "Unable to detect runtime",
         );
       });

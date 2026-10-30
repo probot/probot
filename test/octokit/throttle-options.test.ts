@@ -133,4 +133,14 @@ describe("getOctokitThrottleOptions", () => {
 
     await options.connection!.disconnect(false);
   });
+
+  it("accepts Redis options objects", async () => {
+    const options = await getOctokitThrottleOptions({
+      log: createLogger(),
+      redisConfig: {},
+    });
+
+    expect(options.connection).toBeDefined();
+    await options.connection!.disconnect(false);
+  });
 });

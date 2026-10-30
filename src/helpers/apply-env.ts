@@ -4,7 +4,7 @@ interface ApplyEnvOptions {
   path?: string;
 }
 
-export function applyEnv(options = {} as ApplyEnvOptions): void {
+export function applyEnv(options: ApplyEnvOptions = {}): void {
   const env = loadEnv(options);
   Object.assign(process.env, env);
 }

@@ -2,6 +2,7 @@ import type {
   EmitterWebhookEvent as WebhookEvent,
   EmitterWebhookEventName,
 } from "@octokit/webhooks";
+import type { Octokit } from "@octokit/core";
 import webhookExamples, {
   type WebhookDefinition,
 } from "@octokit/webhooks-examples";
@@ -11,6 +12,11 @@ import { pino } from "pino";
 import { describe, expect, it, vi } from "vitest";
 
 import { Probot, ProbotOctokit, Context } from "../src/index.js";
+import type {
+  OctokitOptions,
+  Options as ProbotOptions,
+  ProbotWebhooks,
+} from "../src/types.js";
 
 import { MockLoggerTarget } from "./utils.js";
 
@@ -120,7 +126,7 @@ describe("Probot", () => {
     });
 
     it("shouldn't overwrite `options.throttle` passed to `{Octokit: ProbotOctokit.defaults(options)}`", async () => {
-      const pluginCalls: any[] = [];
+      const pluginCalls: OctokitOptions[] = [];
       const MyOctokit = ProbotOctokit.plugin((_octokit, options) => {
         pluginCalls.push(options);
       }).defaults({
@@ -349,7 +355,10 @@ describe("Probot", () => {
     "options.redisConfig as string",
     () => {
       it("sets throttle options", async () => {
-        const pluginCalls: any[] = [];
+        const pluginCalls: {
+          _octokit: Octokit;
+          options: OctokitOptions;
+        }[] = [];
         const probot = new Probot({
           githubToken: "faketoken",
           redisConfig: process.env.REDIS_URL,
@@ -378,7 +387,10 @@ describe("Probot", () => {
           host: process.env.REDIS_URL,
         };
 
-        const pluginCalls: any[] = [];
+        const pluginCalls: {
+          _octokit: Octokit;
+          options: OctokitOptions;
+        }[] = [];
         const probot = new Probot({
           githubToken: "faketoken",
           redisConfig,
@@ -412,9 +424,9 @@ describe("Probot", () => {
         payload: getPayloadExample("pull_request"),
       };
 
-      const spyCalls: any[] = [];
+      const spyCalls: unknown[][] = [];
 
-      const spy = (...args: any[]) => {
+      const spy: Parameters<ProbotWebhooks["on"]>[1] = (...args) => {
         spyCalls.push(args);
       };
       probot.on("pull_request", spy);
@@ -423,8 +435,9 @@ describe("Probot", () => {
       await probot.receive(event);
       expect(spyCalls.length).toBe(1);
 
-      expect(spyCalls[0][0] instanceof Context).toBe(true);
-      expect(spyCalls[0][0].payload).toBe(event.payload);
+      const context = spyCalls[0][0] as Context;
+      expect(context).toBeInstanceOf(Context);
+      expect(context.payload).toBe(event.payload);
       expect(probot.webhooks).toBeDefined();
       expect(probot.webhookPath).toBe("/api/github/webhooks");
     });
@@ -739,7 +752,7 @@ describe("Probot", () => {
       const probot = new Probot({
         appId,
         privateKey,
-        server: { addHandler } as any,
+        server: { addHandler } as unknown as ProbotOptions["server"],
       });
 
       const handler = () => true;

@@ -1,5 +1,5 @@
 import { getPrivateKey } from "@probot/get-private-key";
-import type { Options as PinoOptions, LogLevel } from "@probot/pino";
+import type { Options as PinoOptions } from "@probot/pino";
 
 export function readEnvOptions(env = process.env) {
   let privateKey;
@@ -28,7 +28,7 @@ export function readEnvOptions(env = process.env) {
     secret: env.WEBHOOK_SECRET,
     webhookPath: env.WEBHOOK_PATH,
     webhookProxy: env.WEBHOOK_PROXY_URL,
-    logLevel: env.LOG_LEVEL as LogLevel,
+    logLevel: env.LOG_LEVEL,
     logFormat: logFormat,
     logLevelInString: env.LOG_LEVEL_IN_STRING === "true",
     logMessageKey: env.LOG_MESSAGE_KEY,

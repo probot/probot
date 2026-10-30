@@ -1,8 +1,9 @@
 import { describe, expect, test } from "vitest";
 import { pino } from "pino";
+import type { RequestParameters } from "@octokit/types";
 
 import { createProbot, Probot } from "../src/index.js";
-import { MockLoggerTarget } from "./utils.js";
+import { MockLoggerTarget, type LogEntry } from "./utils.js";
 
 const env = {
   APP_ID: "1",
@@ -104,6 +105,70 @@ describe("createProbot", () => {
     expect(probot.log.level).toBe("debug");
   });
 
+  test("validates log format and level from the environment", async () => {
+    const probot = createProbot({
+      env: {
+        ...env,
+        LOG_LEVEL: "info",
+        LOG_FORMAT: "json",
+      },
+    });
+
+    await probot.ready();
+    expect(probot.log.level).toBe("info");
+  });
+
+  test("normalizes an empty log format from the environment", async () => {
+    let logOptions;
+    const probot = createProbot({
+      env: { ...env, LOG_FORMAT: "" },
+      defaults: {
+        getLog: async (options) => {
+          logOptions = options;
+          return pino({ level: "silent" });
+        },
+      },
+    });
+
+    await probot.ready();
+    expect(logOptions).toEqual(
+      expect.objectContaining({ logFormat: "pretty" }),
+    );
+  });
+
+  test("normalizes an empty production log format to JSON", async () => {
+    let logOptions;
+    const probot = createProbot({
+      env: { ...env, NODE_ENV: "production", LOG_FORMAT: "" },
+      defaults: {
+        getLog: async (options) => {
+          logOptions = options;
+          return pino({ level: "silent" });
+        },
+      },
+    });
+
+    await probot.ready();
+    expect(logOptions).toEqual(expect.objectContaining({ logFormat: "json" }));
+  });
+
+  test("supports a silent log level from the environment", async () => {
+    const probot = createProbot({
+      env: { ...env, LOG_LEVEL: "silent" },
+    });
+
+    await probot.ready();
+    expect(probot.log.level).toBe("silent");
+  });
+
+  test("allows log settings to be absent from the environment", () => {
+    const probot = createProbot({
+      env: { ...env, LOG_LEVEL: undefined, LOG_FORMAT: undefined },
+    });
+
+    expect(probot).toBeInstanceOf(Probot);
+  });
+
   test("defaults, overrides", async () => {
     const probot = createProbot({
       env,
@@ -126,7 +191,7 @@ describe("createProbot", () => {
       },
       defaults: {
         request: {
-          fetch: (url: string, options: any) => {
+          fetch: (url: string, options: RequestParameters) => {
             requests.push(url);
             if (
               url ===
@@ -160,7 +225,7 @@ describe("createProbot", () => {
   });
 
   test("passes the logger to the authenticated Octokit client", async () => {
-    const entries: any[] = [];
+    const entries: LogEntry[] = [];
     const probot = createProbot({
       env,
       defaults: { log: pino(new MockLoggerTarget(entries)) },
@@ -184,6 +249,22 @@ describe("createProbot", () => {
         LOG_LEVEL: "fatal",
       },
       overrides: { logLevel: "trace" },
+    });
+
+    await probot.ready();
+    expect(probot.log.level).toBe("trace");
+  });
+
+  test("valid overrides replace invalid environment log settings", async () => {
+    const invalidEnv = {
+      ...env,
+      LOG_LEVEL: "invalid",
+      LOG_FORMAT: "invalid",
+    } as unknown as NodeJS.ProcessEnv;
+
+    const probot = createProbot({
+      env: invalidEnv,
+      overrides: { logLevel: "trace", logFormat: "json" },
     });
 
     await probot.ready();

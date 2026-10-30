@@ -1,4 +1,5 @@
 import { Octokit } from "@octokit/core";
+import type { OctokitOptions } from "@octokit/core";
 import { enterpriseCompatibility } from "@octokit/plugin-enterprise-compatibility";
 import type { RequestOptions } from "@octokit/types";
 import { paginateRest } from "@octokit/plugin-paginate-rest";
@@ -10,7 +11,6 @@ import { createProbotAuth } from "octokit-auth-probot";
 
 import { probotRequestLogging } from "./octokit-plugin-probot-request-logging.js";
 import { VERSION } from "../version.js";
-import type { Constructor } from "../probot.js";
 
 const defaultOptions = {
   authStrategy: createProbotAuth,
@@ -39,13 +39,7 @@ const defaultOptions = {
   },
   userAgent: `probot/${VERSION}`,
 };
-export const ProbotOctokit: typeof Octokit &
-  Constructor<
-    ReturnType<typeof retry> &
-      ReturnType<typeof paginateRest> &
-      ReturnType<typeof restEndpointMethods> &
-      ReturnType<typeof config>
-  > = Octokit.plugin(
+export const ProbotOctokit = Octokit.plugin(
   throttling,
   retry,
   paginateRest,
@@ -53,13 +47,13 @@ export const ProbotOctokit: typeof Octokit &
   enterpriseCompatibility,
   probotRequestLogging,
   config,
-).defaults((instanceOptions: any) => {
+).defaults((instanceOptions: OctokitOptions) => {
   // merge throttle options deeply
   const options = {
     ...defaultOptions,
     ...instanceOptions,
     ...{
-      throttle: { ...defaultOptions.throttle, ...instanceOptions?.throttle },
+      throttle: { ...defaultOptions.throttle, ...instanceOptions.throttle },
     },
   };
 

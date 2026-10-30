@@ -5,6 +5,7 @@ import { randomUUID as uuidv4 } from "node:crypto";
 import { parseArgs } from "node:util";
 
 import { validateEventName } from "@octokit/webhooks";
+import type { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
 import { getPrivateKey } from "@probot/get-private-key";
 import { applyEnv } from "../helpers/apply-env.js";
 
@@ -123,7 +124,7 @@ export async function receive(args: string[]) {
     return;
   }
 
-  validateEventName(event);
+  validateEventName(event, { onUnknownEventName: "throw" });
   validateLogLevel(logLevel);
   validateLogFormat(logFormat);
 
@@ -179,8 +180,14 @@ export async function receive(args: string[]) {
 
   log.debug({ event }, "Receiving event");
 
-  probot.receive({ name: event as any, payload, id: uuidv4() }).catch(() => {
-    // Process must exist non-zero to indicate that the action failed to run
-    process.exit(1);
-  });
+  probot
+    .receive({
+      name: event,
+      payload,
+      id: uuidv4(),
+    } as unknown as WebhookEvent)
+    .catch(() => {
+      // Process must exist non-zero to indicate that the action failed to run
+      process.exit(1);
+    });
 }

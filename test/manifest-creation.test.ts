@@ -45,7 +45,7 @@ describe("ManifestCreation", () => {
     ),
   );
 
-  let SmeeClientCreateChannelCalls: any[] = [];
+  let SmeeClientCreateChannelCalls: string[] = [];
 
   const SmeeClient = {
     createChannel: () => {
@@ -110,7 +110,7 @@ describe("ManifestCreation", () => {
           SmeeClient: {
             createChannel: () => Promise.reject(new Error("offline")),
           },
-          log: { warn } as any,
+          log: { warn },
         }),
       ).resolves.toBeUndefined();
       expect(warn).toHaveBeenCalledWith(
@@ -126,7 +126,7 @@ describe("ManifestCreation", () => {
       await expect(
         setup.createWebhookChannel({
           SmeeClient: undefined,
-          log: { warn } as any,
+          log: { warn },
         }),
       ).resolves.toBeUndefined();
 
@@ -275,9 +275,9 @@ describe("ManifestCreation", () => {
       const appYaml =
         "name: cool-app\ndescription: A description for a cool app";
 
-      const readFileSync: typeof fs.readFileSync = () => {
-        return appYaml as any;
-      };
+      const readFileSync = (() => {
+        return appYaml;
+      }) as unknown as typeof fs.readFileSync;
 
       // checks that getManifest returns the correct JSON.stringified manifest
       expect(
@@ -306,12 +306,12 @@ describe("ManifestCreation", () => {
 
     test("preserves an explicitly false public value", () => {
       reset();
-      const readFileSync: typeof fs.readFileSync = () =>
-        "public: false\nname: example" as any;
+      const readFileSync = (() =>
+        "public: false\nname: example") as unknown as typeof fs.readFileSync;
 
       const manifest = JSON.parse(
         setup.getManifest({
-          pkg: { name: "example", description: "description" } as any,
+          pkg: { name: "example", description: "description" },
           baseUrl: "http://localhost:3000",
           readFileSync,
         }),
@@ -320,5 +320,62 @@ describe("ManifestCreation", () => {
       expect(manifest.name).toBe("example");
       expect(manifest.public).toBe(false);
     });
+
+    test("ignores a non-object app.yml value", () => {
+      reset();
+      const readFileSync = (() =>
+        "not a manifest object") as unknown as typeof fs.readFileSync;
+
+      expect(
+        setup.getManifest({
+          pkg,
+          baseUrl: "localhost://3000",
+          readFileSync,
+        }),
+      ).toBe(
+        '{"description":"A framework for building GitHub Apps to automate and improve your workflow","hook_attributes":{"url":"localhost://3000/"},"name":"probot","public":true,"redirect_url":"localhost://3000/probot/setup","url":"https://probot.github.io","version":"v1"}',
+      );
+    });
+
+    test("ignores app.yml objects with invalid manifest fields", () => {
+      reset();
+      const readFileSync = (() =>
+        "name: 42\npublic: maybe") as unknown as typeof fs.readFileSync;
+
+      expect(
+        setup.getManifest({
+          pkg,
+          baseUrl: "localhost://3000",
+          readFileSync,
+        }),
+      ).toContain('"name":"probot"');
+    });
+
+    test("keeps valid manifest fields when another field is invalid", () => {
+      reset();
+      const readFileSync = (() =>
+        "name: custom-app\nurl: https://custom.example\npublic: maybe") as unknown as typeof fs.readFileSync;
+
+      const manifest = JSON.parse(
+        setup.getManifest({ pkg, baseUrl: "localhost://3000", readFileSync }),
+      );
+
+      expect(manifest.name).toBe("custom-app");
+      expect(manifest.url).toBe("https://custom.example");
+      expect(manifest.public).toBe(true);
+    });
+
+    test.each(["url: 42", "description: 42", "public: maybe"])(
+      "ignores invalid %s",
+      (appYaml) => {
+        reset();
+        const readFileSync = (() =>
+          appYaml) as unknown as typeof fs.readFileSync;
+
+        expect(
+          setup.getManifest({ pkg, baseUrl: "localhost://3000", readFileSync }),
+        ).toContain('"name":"probot"');
+      },
+    );
   });
 });

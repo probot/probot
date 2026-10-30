@@ -9,6 +9,8 @@ import type { Logger } from "pino";
 import type { Options as LoggingOptions } from "pino-http";
 import type { GetLogOptions } from "./helpers/get-log.js";
 import type { SmeeClientModule } from "./helpers/webhook-proxy.js";
+import type { LogFormat } from "./helpers/validate-log-format.js";
+import type { LogLevel } from "./helpers/validate-log-level.js";
 
 import type { Context } from "./context.js";
 import type { Probot } from "./probot.js";
@@ -28,15 +30,8 @@ export interface Options {
   getLog?: ((options?: GetLogOptions) => Promise<Logger>) | undefined;
   redisConfig?: RedisOptions | string | undefined;
   secret?: string | undefined;
-  logLevel?:
-    | "trace"
-    | "debug"
-    | "info"
-    | "warn"
-    | "error"
-    | "fatal"
-    | undefined;
-  logFormat?: "json" | "pretty" | undefined;
+  logLevel?: LogLevel | undefined;
+  logFormat?: LogFormat | undefined;
   logLevelInString?: boolean | undefined;
   logMessageKey?: string | undefined;
   sentryDsn?: string | undefined;

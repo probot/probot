@@ -5,7 +5,7 @@ import type { ApplicationFunction } from "../types.js";
 type ImportMetaResolve = (specifier: string, parent?: string) => string;
 export const resolveAppFunction = async (
   appFnId: string,
-  opts = {} as ResolveOptions,
+  opts: ResolveOptions = {},
 ): Promise<ApplicationFunction> => {
   // These are mostly to ease testing
   const basedir = process.cwd();

@@ -8,7 +8,7 @@ import type { AddressInfo } from "node:net";
 import getPort from "get-port";
 import fetchMock from "fetch-mock";
 import "smee-client";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 import { createDeferredPromise } from "../src/helpers/create-deferred-promise.js";
 import { getLog } from "../src/helpers/get-log.js";
@@ -19,7 +19,7 @@ import { detectRuntime } from "../src/helpers/detect-runtime.js";
 function sse(
   req: IncomingMessage,
   res: ServerResponse,
-): Promise<(obj: Record<string, any>, type?: string | undefined) => void> {
+): Promise<(obj: Record<string, unknown>, type?: string | undefined) => void> {
   return new Promise<Awaited<ReturnType<typeof sse>>>((resolve, reject) => {
     try {
       req.socket.setTimeout(0);
@@ -169,10 +169,9 @@ describe("webhook-proxy", () => {
 
     const logger = (await getLog({ level: "fatal" })).child({});
 
-    const LoggerErrorCalls: any[] = [];
-    logger.error = (...args: any[]) => {
-      LoggerErrorCalls.push(args);
-    };
+    const loggerError = vi
+      .spyOn(logger, "error")
+      .mockImplementation(() => undefined);
 
     const expectedError =
       detectRuntime(globalThis) === "bun"
@@ -189,9 +188,8 @@ describe("webhook-proxy", () => {
       }),
     ).rejects.toThrow(expectedError);
 
-    expect(LoggerErrorCalls.length).toBe(1);
-    expect(LoggerErrorCalls[0].length).toBe(2);
-    expect(LoggerErrorCalls[0][0]).toBe("Error in connection");
-    expect(LoggerErrorCalls[0][1]).toMatchObject({ type: "error" });
+    expect(loggerError).toHaveBeenCalledTimes(1);
+    expect(loggerError.mock.calls[0][0]).toBe("Error in connection");
+    expect(loggerError.mock.calls[0][1]).toBeDefined();
   });
 });

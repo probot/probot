@@ -26,6 +26,10 @@ describe("validateLogLevel", () => {
     validateLogLevel("fatal");
   });
 
+  it("validates 'silent'", () => {
+    validateLogLevel("silent");
+  });
+
   it("throws on invalid log level data type", () => {
     expect(() => validateLogLevel(1)).toThrow("Invalid log level");
   });

@@ -1,9 +1,20 @@
-const validLevels = ["trace", "debug", "info", "warn", "error", "fatal"];
+const validLevels = [
+  "trace",
+  "debug",
+  "info",
+  "warn",
+  "error",
+  "fatal",
+  "silent",
+] as const;
 
-export function validateLogLevel(
-  value: unknown,
-): asserts value is "trace" | "debug" | "info" | "warn" | "error" | "fatal" {
-  if (typeof value !== "string" || !validLevels.includes(value as string)) {
+export type LogLevel = (typeof validLevels)[number];
+
+export function validateLogLevel(value: unknown): asserts value is LogLevel {
+  if (
+    typeof value !== "string" ||
+    !validLevels.some((level) => level === value)
+  ) {
     throw new Error(`Invalid log level`);
   }
 }

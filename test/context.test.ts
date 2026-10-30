@@ -8,6 +8,7 @@ import type {
 } from "@octokit/webhooks";
 import WebhookExamples from "@octokit/webhooks-examples";
 import fetchMock from "fetch-mock";
+import { pino } from "pino";
 import { describe, expect, test, it, vi } from "vitest";
 
 import { Context } from "../src/index.js";
@@ -61,6 +62,7 @@ const pullRequestEventPayload = (
 ).examples[0] as WebhookEvent<"pull_request">["payload"];
 
 describe("Context", () => {
+  const log = pino({ level: "silent" });
   const event: WebhookEvent<"push"> = {
     id: "0",
     name: "push",
@@ -73,8 +75,8 @@ describe("Context", () => {
   };
   let context: Context<"push"> = new Context<"push">(
     event,
-    octokit as any,
-    {} as any,
+    octokit as unknown as ProbotOctokit,
+    log,
   );
 
   it("inherits the payload", () => {
@@ -91,11 +93,15 @@ describe("Context", () => {
     );
     const octokit = { hook: { before } };
 
-    new Context({ ...event, id: "delivery-id" }, octokit as any, {} as any);
+    new Context(
+      { ...event, id: "delivery-id" },
+      octokit as unknown as ProbotOctokit,
+      log,
+    );
     new Context(
       { ...event, id: "second-delivery-id" },
-      octokit as any,
-      {} as any,
+      octokit as unknown as ProbotOctokit,
+      log,
     );
 
     expect(before).toHaveBeenCalledTimes(1);
@@ -119,8 +125,8 @@ describe("Context", () => {
         hook: {
           before: () => {},
         },
-      } as any,
-      {} as any,
+      } as unknown as ProbotOctokit,
+      log,
     );
 
     it("returns attributes from repository payload", () => {
@@ -166,7 +172,11 @@ describe("Context", () => {
         },
       };
 
-      const context = new Context<"push">(pushEvent, octokit as any, {} as any);
+      const context = new Context<"push">(
+        pushEvent,
+        octokit as unknown as ProbotOctokit,
+        log,
+      );
 
       const repository = context.repo();
 
@@ -180,7 +190,11 @@ describe("Context", () => {
       const event = {
         id: "123",
         name: "push",
-        payload: { ...pushEventPayload, repository: undefined as any },
+        payload: {
+          ...pushEventPayload,
+          repository:
+            undefined as unknown as typeof pushEventPayload.repository,
+        },
       };
       const octokit = {
         hook: {
@@ -190,8 +204,8 @@ describe("Context", () => {
 
       const context = new Context<"push">(
         event as WebhookEvent<"push">,
-        octokit as any,
-        {} as any,
+        octokit as unknown as ProbotOctokit,
+        log,
       );
       expect(() => context.repo()).toThrow(
         "context.repo() is not supported for this webhook event.",
@@ -210,8 +224,8 @@ describe("Context", () => {
         hook: {
           before: () => {},
         },
-      } as any,
-      {} as any,
+      } as unknown as ProbotOctokit,
+      log,
     );
 
     it("returns attributes from repository payload", () => {
@@ -257,9 +271,9 @@ describe("Context", () => {
             pull_request: undefined,
             number: 7,
           },
-        } as any,
-        { hook: { before: () => {} } } as any,
-        {} as any,
+        } as unknown as WebhookEvent<"push">,
+        { hook: { before: () => {} } } as unknown as ProbotOctokit,
+        log,
       );
 
       expect(context.issue().issue_number).toBe(7);
@@ -278,8 +292,8 @@ describe("Context", () => {
         hook: {
           before: () => {},
         },
-      } as any,
-      {} as any,
+      } as unknown as ProbotOctokit,
+      log,
     );
 
     it("returns attributes from repository payload", () => {
@@ -327,9 +341,9 @@ describe("Context", () => {
             pull_request: undefined,
             issue: { number: 8 },
           },
-        } as any,
-        { hook: { before: () => {} } } as any,
-        {} as any,
+        } as unknown as WebhookEvent<"pull_request">,
+        { hook: { before: () => {} } } as unknown as ProbotOctokit,
+        log,
       );
 
       expect(context.pullRequest().pull_number).toBe(8);
@@ -346,9 +360,9 @@ describe("Context", () => {
             pull_request: undefined,
             number: 9,
           },
-        } as any,
-        { hook: { before: () => {} } } as any,
-        {} as any,
+        } as unknown as WebhookEvent<"pull_request">,
+        { hook: { before: () => {} } } as unknown as ProbotOctokit,
+        log,
       );
 
       expect(context.pullRequest().pull_number).toBe(9);
@@ -376,15 +390,17 @@ describe("Context", () => {
           fetch: mock.fetchHandler,
         },
       });
-      const context = new Context(event, octokit, {} as any);
+      const context = new Context(event, octokit, log);
 
-      const config = await context.config("test-file.yml");
+      const config =
+        await context.config<Record<string, number>>("test-file.yml");
 
       expect(typeof config).toBe("object");
-      expect(Object.keys(config as any).length).toBe(3);
-      expect((config as any).foo).toBe(5);
-      expect((config as any).bar).toBe(7);
-      expect((config as any).baz).toBe(11);
+      if (!config) throw new Error("Expected configuration");
+      expect(Object.keys(config).length).toBe(3);
+      expect(config.foo).toBe(5);
+      expect(config.bar).toBe(7);
+      expect(config.baz).toBe(11);
     });
 
     it("returns null when the file and base repository are missing", async () => {
@@ -415,7 +431,7 @@ describe("Context", () => {
           fetch: mock.fetchHandler,
         },
       });
-      const context = new Context(event, octokit, {} as any);
+      const context = new Context(event, octokit, log);
 
       expect(await context.config("test-file.yml")).toBe(null);
     });
@@ -439,7 +455,7 @@ describe("Context", () => {
           fetch: mock.fetchHandler,
         },
       });
-      const context = new Context(event, octokit, {} as any);
+      const context = new Context(event, octokit, log);
 
       let customMergeCalled = false;
       const customMerge = () => {
@@ -464,7 +480,7 @@ describe("Context", () => {
           fetch: mock.fetchHandler,
         },
       });
-      const context = new Context(event, octokit, {} as any);
+      const context = new Context(event, octokit, log);
       await context.config("test-file.yml");
     });
   });
@@ -477,7 +493,7 @@ describe("Context", () => {
           before: () => {},
         },
       };
-      context = new Context(event, octokit as any, {} as any);
+      context = new Context(event, octokit as unknown as ProbotOctokit, log);
 
       expect(context.isBot).toBe(true);
     });
@@ -489,7 +505,7 @@ describe("Context", () => {
           before: () => {},
         },
       };
-      context = new Context(event, octokit as any, {} as any);
+      context = new Context(event, octokit as unknown as ProbotOctokit, log);
 
       expect(context.isBot).toBe(false);
     });

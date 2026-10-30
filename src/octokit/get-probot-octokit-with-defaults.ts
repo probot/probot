@@ -5,7 +5,7 @@ import type { Logger } from "pino";
 import type { Lru } from "toad-cache";
 
 import type { OctokitOptions } from "../types.js";
-import { ProbotOctokit } from "./probot-octokit.js";
+import { PROBOT_OCTOKIT_DEFAULTS, ProbotOctokit } from "./probot-octokit.js";
 import { getOctokitThrottleOptions } from "./get-octokit-throttle-options.js";
 
 type Options = {
@@ -19,6 +19,13 @@ type Options = {
   baseUrl?: string | undefined;
   request?: RequestRequestOptions | undefined;
 };
+
+export function mergeThrottleOptions(
+  runtimeOptions: NonNullable<OctokitOptions["throttle"]>,
+  explicitOptions?: OctokitOptions["throttle"],
+): NonNullable<OctokitOptions["throttle"]> {
+  return { ...runtimeOptions, ...explicitOptions };
+}
 
 /**
  * Returns an Octokit instance with default settings for authentication. If
@@ -73,7 +80,22 @@ export async function getProbotOctokitWithDefaults(
     defaultOptions.baseUrl = options.baseUrl;
   }
 
-  defaultOptions.throttle = octokitThrottleOptions;
+  // ProbotOctokit already provides the built-in throttling handlers. Only add
+  // the resolved options here when Redis-backed throttling was requested;
+  // otherwise this extra defaults layer would overwrite explicit options from
+  // `ProbotOctokit.defaults(...)` (for example, `{ enabled: false }` in tests).
+  if (options.redisConfig) {
+    const explicitDefaults = (
+      options.Octokit as typeof ProbotOctokit & {
+        [PROBOT_OCTOKIT_DEFAULTS]?: OctokitOptions;
+      }
+    )[PROBOT_OCTOKIT_DEFAULTS];
+
+    defaultOptions.throttle = mergeThrottleOptions(
+      octokitThrottleOptions,
+      explicitDefaults?.throttle,
+    );
+  }
 
   return options.Octokit.defaults((instanceOptions: OctokitOptions) => {
     const options = Object.assign({}, defaultOptions, instanceOptions, {

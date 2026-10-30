@@ -125,7 +125,7 @@ describe("Probot", () => {
       new Probot({ githubToken: "faketoken" });
     });
 
-    it("shouldn't overwrite `options.throttle` passed to `{Octokit: ProbotOctokit.defaults(options)}`", async () => {
+    it("preserves `options.throttle` passed to `{Octokit: ProbotOctokit.defaults(options)}`", async () => {
       const pluginCalls: OctokitOptions[] = [];
       const MyOctokit = ProbotOctokit.plugin((_octokit, options) => {
         pluginCalls.push(options);
@@ -141,7 +141,7 @@ describe("Probot", () => {
 
       await probot.ready();
       expect(pluginCalls.length).toBe(1);
-      expect(pluginCalls[0].throttle?.enabled).toBe(true);
+      expect(pluginCalls[0].throttle?.enabled).toBe(false);
     });
 
     it("sets version", async () => {

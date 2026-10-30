@@ -55,7 +55,7 @@ export type ProbotWebhooks = Webhooks<SimplifiedObject>;
 
 export type ApplicationFunctionOptions = {
   cwd: string;
-  addHandler: (handler: Handler) => void;
+  addHandler: (handler: Handler | MiddlewareHandler) => void;
   [key: string]: unknown;
 };
 
@@ -72,6 +72,13 @@ export type ApplicationFunction = (
 export type Handler = (
   req: IncomingMessage,
   res: ServerResponse,
+) => void | boolean | Promise<void | boolean>;
+
+/** A framework middleware function accepted by addHandler (e.g. Express/Fastify). */
+export type MiddlewareHandler = (
+  req: any,
+  res: any,
+  next?: any,
 ) => void | boolean | Promise<void | boolean>;
 
 export type ServerOptions = {

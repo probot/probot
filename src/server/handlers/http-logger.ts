@@ -7,10 +7,11 @@ import type { Logger } from "pino";
 export function httpLogger(
   logger: Logger,
   options?: Options,
-): HttpLogger<IncomingMessage, ServerResponse, string> {
+): HttpLogger<IncomingMessage, ServerResponse> {
+  // pino-http augments `http`, while the public API uses the equivalent `node:http` types.
   return pinoHttp({
     ...options,
-    logger: logger.child({ name: "http" }) as Logger<string>,
+    logger: logger.child({ name: "http" }),
     customSuccessMessage(req, res) {
       const responseTime = Date.now() - res[startTime];
       return `${req.method} ${req.url} ${res.statusCode} - ${responseTime}ms`;
@@ -23,5 +24,5 @@ export function httpLogger(
       req.headers["x-request-id"] ||
       req.headers["x-github-delivery"] ||
       uuidv4(),
-  });
+  }) as unknown as HttpLogger<IncomingMessage, ServerResponse>;
 }

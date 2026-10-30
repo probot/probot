@@ -341,7 +341,11 @@ describe("createNodeMiddleware", () => {
         expressApp.use(middleware);
       }
 
-      const server = createServer(expressApp);
+      // Express 5's callable type is not assignable to Node 26's stricter
+      // RequestListener type, although it is compatible at runtime.
+      const server = createServer(
+        expressApp as unknown as Parameters<typeof createServer>[0],
+      );
       try {
         await listenServer(server, port);
 

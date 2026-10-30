@@ -9,10 +9,11 @@ describe("getErrorHandler", () => {
     const log = {
       error: vi.fn(),
       child: vi.fn(() => eventLog),
-    } as any;
+    } as unknown as Parameters<typeof getErrorHandler>[0];
     const handleError = getErrorHandler(log);
 
     handleError(new Error("x-hub-signature-256 is invalid"));
+    handleError({ message: "x-hub-signature-256 is invalid" } as Error);
     handleError(new Error("invalid PEM"));
     handleError(new Error());
     handleError(
@@ -22,16 +23,26 @@ describe("getErrorHandler", () => {
     );
     handleError(new Error("another other error"));
     handleError(
+      Object.assign(new AggregateError(["plain error"]), {
+        event: { id: "delivery-id" } as unknown as EmitterWebhookEvent,
+      }) as Error & { event?: EmitterWebhookEvent },
+    );
+    handleError(
+      Object.assign(new AggregateError([""]), {
+        event: { id: "delivery-id" } as unknown as EmitterWebhookEvent,
+      }) as Error & { event?: EmitterWebhookEvent },
+    );
+    handleError(
       Object.assign(new AggregateError([new Error("json web token")]), {
         event: { id: "delivery-id" } as unknown as EmitterWebhookEvent,
       }) as Error & { event?: EmitterWebhookEvent },
     );
 
-    expect(log.error).toHaveBeenCalledTimes(3);
+    expect(log.error).toHaveBeenCalledTimes(4);
     expect(log.child).toHaveBeenCalledWith({
       name: "event",
       id: "delivery-id",
     });
-    expect(eventLog.error).toHaveBeenCalledTimes(3);
+    expect(eventLog.error).toHaveBeenCalledTimes(5);
   });
 });

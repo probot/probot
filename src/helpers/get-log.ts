@@ -15,7 +15,8 @@
  * ```
  */
 import pino, { type Logger, type LoggerOptions } from "pino";
-import { getTransformStream, type Options, type LogLevel } from "@probot/pino";
+import { getTransformStream, type Options } from "@probot/pino";
+import type { LogLevel } from "./validate-log-level.js";
 
 export type GetLogOptions = {
   level?: LogLevel | undefined;

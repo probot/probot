@@ -4,7 +4,7 @@ import type { AddressInfo } from "node:net";
 import type { RequestRequestOptions } from "@octokit/types";
 import type { Logger } from "pino";
 
-import type { Probot } from "../probot.js";
+import { Probot } from "../probot.js";
 import { VERSION } from "../version.js";
 import type {
   ApplicationFunction,
@@ -21,6 +21,7 @@ import { createWebhookProxy } from "../helpers/webhook-proxy.js";
 import { getPrintableHost } from "../helpers/get-printable-host.js";
 import { getRuntimeName } from "../helpers/get-runtime-name.js";
 import { getRuntimeVersion } from "../helpers/get-runtime-version.js";
+import { requireValue } from "../helpers/require-value.js";
 
 import { httpLogger } from "./handlers/http-logger.js";
 import { notFoundHandler } from "./handlers/not-found.js";
@@ -32,6 +33,28 @@ import { getLog } from "../helpers/get-log.js";
 export const defaultWebhookPath = "/api/github/webhooks";
 export const defaultWebhookSecret = "development";
 
+function isAddressInfo(address: unknown): address is AddressInfo {
+  if (typeof address !== "object" || address === null) {
+    return false;
+  }
+
+  const candidate = address as Record<string, unknown>;
+  return (
+    typeof candidate.port === "number" &&
+    typeof candidate.address === "string" &&
+    (typeof candidate.family === "string" ||
+      typeof candidate.family === "number")
+  );
+}
+
+export function validateAddressInfo(address: unknown): AddressInfo {
+  if (!isAddressInfo(address)) {
+    throw new Error("Unable to determine the server address");
+  }
+
+  return address;
+}
+
 type State = {
   initializeRan: boolean;
   initializationPromise: DeferredPromise<void>;
@@ -41,7 +64,7 @@ type State = {
   host: string;
   log?: Logger | undefined;
   getLog: NonNullable<ServerOptions["getLog"]>;
-  loggingOptions?: Record<string, unknown>;
+  loggingOptions?: NonNullable<ServerOptions["loggingOptions"]>;
   probot: Probot | null;
   ProbotBase: typeof Probot;
   request?: RequestRequestOptions | undefined;
@@ -60,7 +83,7 @@ type State = {
 export class Server {
   #state: State;
 
-  constructor(options: ServerOptions = {} as ServerOptions) {
+  constructor(options: ServerOptions = { Probot }) {
     this.#state = {
       initializeRan: false,
       initializationPromise: createDeferredPromise<void>(),
@@ -76,7 +99,7 @@ export class Server {
       loadSmeeClient: options.loadSmeeClient,
       eventSource: undefined,
       request: options.request,
-      ProbotBase: options.Probot,
+      ProbotBase: options.Probot || Probot,
       addedHandlers: [],
       handlers: [],
       enablePing: options.enablePing ?? true,
@@ -85,7 +108,10 @@ export class Server {
     };
 
     this.#state.httpServer.on("request", async (req, res) => {
-      this.#state.httpLogger!(req, res);
+      requireValue(
+        this.#state.httpLogger,
+        "Server HTTP logger is not initialized",
+      )(req, res);
 
       try {
         for (const handler of this.#state.handlers) {
@@ -94,7 +120,9 @@ export class Server {
           }
         }
       } catch (e) {
-        this.#state.log!.error(e);
+        requireValue(this.#state.log, "Server logger is not initialized").error(
+          e,
+        );
         res.writeHead(500).end();
         return true;
       }
@@ -139,12 +167,15 @@ export class Server {
   public async loadHandlerFactory(appFn: HandlerFactory) {
     await this.#initialize();
 
-    const handler = await appFn(this.#state.probot!, {
-      cwd: this.#state.cwd,
-      addHandler: (handler: Handler) => {
-        this.addHandler(handler as unknown as Handler);
+    const handler = await appFn(
+      requireValue(this.#state.probot, "Probot is not initialized"),
+      {
+        cwd: this.#state.cwd,
+        addHandler: (handler: Handler) => {
+          this.addHandler(handler);
+        },
       },
-    });
+    );
 
     this.addHandler(handler);
   }
@@ -152,10 +183,10 @@ export class Server {
   public async load(appFn: ApplicationFunction) {
     await this.#initialize();
 
-    await appFn(this.#state.probot!, {
+    await appFn(requireValue(this.#state.probot, "Probot is not initialized"), {
       cwd: this.#state.cwd,
       addHandler: (handler: Handler) => {
-        this.addHandler(handler as unknown as Handler);
+        this.addHandler(handler);
       },
     });
   }
@@ -173,7 +204,12 @@ export class Server {
       this.#state.handlers.unshift(pingHandler);
     }
 
-    this.#state.handlers.unshift(await this.#state.probot!.getNodeMiddleware());
+    this.#state.handlers.unshift(
+      await requireValue(
+        this.#state.probot,
+        "Probot is not initialized",
+      ).getNodeMiddleware(),
+    );
 
     this.#state.handlers.push(...this.#state.addedHandlers);
 
@@ -184,7 +220,7 @@ export class Server {
     const runtimeName = getRuntimeName(globalThis);
     const runtimeVersion = getRuntimeVersion(globalThis);
 
-    this.#state.log!.info(
+    requireValue(this.#state.log, "Server logger is not initialized").info(
       `Running Probot v${VERSION} (${runtimeName}: ${runtimeVersion})`,
     );
     const printableHost = getPrintableHost(this.#state.host);
@@ -193,7 +229,9 @@ export class Server {
       const server = this.#state.httpServer.listen(
         { port: this.#state.port, host: this.#state.host },
         () => {
-          const { port, address, family } = server.address() as AddressInfo;
+          const { port, address, family } = validateAddressInfo(
+            server.address(),
+          );
 
           this.#state.port = port;
           this.#state.host = address;
@@ -202,7 +240,10 @@ export class Server {
             this.#state.host = `[${address}]`;
           }
 
-          this.#state.log!.info(`Listening on http://${printableHost}:${port}`);
+          requireValue(
+            this.#state.log,
+            "Server logger is not initialized",
+          ).info(`Listening on http://${printableHost}:${port}`);
           resolve(server);
         },
       );
@@ -214,7 +255,9 @@ export class Server {
           });
         }
 
-        this.#state.log!.error(error);
+        requireValue(this.#state.log, "Server logger is not initialized").error(
+          error,
+        );
         reject(error);
       });
     });
@@ -224,7 +267,10 @@ export class Server {
         host: this.#state.host,
         port: this.#state.port,
         path: this.#state.webhookPath,
-        logger: this.#state.log!,
+        logger: requireValue(
+          this.#state.log,
+          "Server logger is not initialized",
+        ),
         url: this.#state.webhookProxy,
         loadSmeeClient: this.#state.loadSmeeClient,
       });

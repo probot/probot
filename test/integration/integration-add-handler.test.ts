@@ -7,7 +7,11 @@ import type {
 import { sign } from "@octokit/webhooks-methods";
 import WebhookExamples from "@octokit/webhooks-examples";
 
-import express from "express";
+import express, {
+  type NextFunction,
+  type Request,
+  type Response,
+} from "express";
 import Fastify, { type FastifyReply, type FastifyRequest } from "fastify";
 
 import getPort from "get-port";
@@ -297,19 +301,26 @@ describe("createNodeMiddleware", () => {
         }),
       });
 
-      const asyncHelloWorldRouteHandler = async (_req: any, res: any) => {
+      const asyncHelloWorldRouteHandler = async (
+        _req: Request,
+        res: Response,
+      ) => {
         await new Promise((resolve) => setTimeout(resolve, 50));
         res.status(200).send({ hello: "world" });
       };
 
-      const cbHelloWorldRouteHandler = (_req: any, res: any, next: any) => {
+      const cbHelloWorldRouteHandler = (
+        _req: Request,
+        res: Response,
+        next: NextFunction,
+      ) => {
         new Promise((resolve) => setTimeout(resolve, 50)).then(() => {
           res.status(200).send({ hello: "world" });
           next();
         });
       };
 
-      const plainHelloWorldRouteHandler = (_req: any, res: any) => {
+      const plainHelloWorldRouteHandler = (_req: Request, res: Response) => {
         new Promise((resolve) => setTimeout(resolve, 50)).then(() => {
           res.status(200).send({ hello: "world" });
         });

@@ -3,13 +3,17 @@ import {
   type IncomingMessage,
   type ServerResponse,
 } from "node:http";
+import type { AddressInfo } from "node:net";
 
 import { pino } from "pino";
 import { sign } from "@octokit/webhooks-methods";
 import { describe, expect, test, vi } from "vitest";
 
 import { createNodeMiddleware, createProbot, Probot } from "../src/index.js";
-import type { ApplicationFunction } from "../src/types.js";
+import type {
+  ApplicationFunction,
+  ApplicationFunctionOptions,
+} from "../src/types.js";
 import WebhookExamples, {
   type WebhookDefinition,
 } from "@octokit/webhooks-examples";
@@ -52,8 +56,8 @@ const pushEvent = (
 
 describe("createNodeMiddleware", () => {
   test("with createProbot", async () => {
-    const onPushCalls: any[] = [];
-    const onPush = (event: any) => {
+    const onPushCalls: { name: string }[] = [];
+    const onPush = (event: { name: string }) => {
       onPushCalls.push(event);
     };
 
@@ -77,7 +81,7 @@ describe("createNodeMiddleware", () => {
 
     await new Promise<void>((resolve) => server.listen(resolve));
 
-    const port = (server.address() as any).port;
+    const port = (server.address() as AddressInfo).port;
 
     const body = JSON.stringify(pushEvent);
 
@@ -103,8 +107,8 @@ describe("createNodeMiddleware", () => {
   });
 
   test("with createProbot and setting the webhookPath via WEBHOOK_PATH to the root", async () => {
-    const onPushCalls: any[] = [];
-    const onPush = (event: any) => {
+    const onPushCalls: { name: string }[] = [];
+    const onPush = (event: { name: string }) => {
       onPushCalls.push(event);
     };
 
@@ -129,7 +133,7 @@ describe("createNodeMiddleware", () => {
 
     await new Promise<void>((resolve) => server.listen(resolve));
 
-    const port = (server.address() as any).port;
+    const port = (server.address() as AddressInfo).port;
 
     const body = JSON.stringify(pushEvent);
 
@@ -155,8 +159,8 @@ describe("createNodeMiddleware", () => {
   });
 
   test("with createProbot and setting the webhookPath to the root via the deprecated webhooksPath", async () => {
-    const onPushCalls: any[] = [];
-    const onPush = (event: any) => {
+    const onPushCalls: { name: string }[] = [];
+    const onPush = (event: { name: string }) => {
       onPushCalls.push(event);
     };
 
@@ -181,7 +185,7 @@ describe("createNodeMiddleware", () => {
 
     await new Promise<void>((resolve) => server.listen(resolve));
 
-    const port = (server.address() as any).port;
+    const port = (server.address() as AddressInfo).port;
 
     const body = JSON.stringify(pushEvent);
 
@@ -240,17 +244,23 @@ describe("createNodeMiddleware", () => {
     const middleware = await createNodeMiddleware(() => {}, {
       probot: {
         log,
-        load: async (_app: ApplicationFunction, options: any) => {
+        load: async (
+          _app: ApplicationFunction,
+          options: ApplicationFunctionOptions,
+        ) => {
           options.addHandler(() => {
             throw error;
           });
         },
         getNodeMiddleware: async () => async () => false,
-      } as any,
+      } as unknown as Probot,
     });
 
     await expect(
-      middleware({} as IncomingMessage, { writeHead } as any),
+      middleware(
+        {} as IncomingMessage,
+        { writeHead } as unknown as ServerResponse,
+      ),
     ).resolves.toBe(true);
     expect(log.error).toHaveBeenCalledWith(error);
     expect(writeHead).toHaveBeenCalledWith(500);

@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import getPort from "get-port";
 import pino from "pino";
+import { Probot } from "../src/probot.js";
 import { Server } from "../src/server/server.js";
 
 const getLog = vi.fn();
@@ -14,16 +15,8 @@ describe("Server initialization without a logger", () => {
     const log = pino({ level: "silent" });
     getLog.mockResolvedValueOnce(log);
 
-    class ReadyProbot {
-      async ready(): Promise<void> {}
-
-      async getNodeMiddleware(): Promise<() => boolean> {
-        return () => false;
-      }
-    }
-
     const server = new Server({
-      Probot: ReadyProbot as any,
+      Probot: Probot.defaults({ appId: 1, privateKey: "dummy" }),
       port: await getPort(),
       getLog,
     });
@@ -42,7 +35,10 @@ describe("Server initialization without a logger", () => {
     const consoleError = vi
       .spyOn(console, "error")
       .mockImplementation(() => {});
-    const server = new Server({ getLog } as any);
+    const server = new Server({
+      Probot: Probot.defaults({ appId: 1, privateKey: "dummy" }),
+      getLog,
+    });
 
     try {
       await expect(server.start()).rejects.toThrow(error);

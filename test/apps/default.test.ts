@@ -1,3 +1,4 @@
+import type { IncomingMessage, ServerResponse } from "node:http";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -107,8 +108,13 @@ describe("default app", () => {
     ["GET without a URL", { method: "GET" }],
     ["GET /unknown", { method: "GET", url: "/unknown" }],
   ])("returns false for unsupported requests: %s", (_name, request) => {
-    const handler = defaultAppHandler({} as any, { cwd: __dirname } as any);
+    const handler = defaultAppHandler(
+      new (Probot.defaults({ appId: 1, privateKey: "private key" }))(),
+      { cwd: __dirname, addHandler: () => {} },
+    );
 
-    expect(handler(request as any, {} as any)).toBe(false);
+    expect(handler(request as IncomingMessage, {} as ServerResponse)).toBe(
+      false,
+    );
   });
 });

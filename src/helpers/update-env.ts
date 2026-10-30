@@ -27,8 +27,9 @@ export function updateEnv(values: Env, options: UpdateEnvOptions = {}): Env {
     values,
   );
 
-  const contents = (Object.keys(env) as Uppercase<string>[])
-    .map((key) => format(key, env[key]!))
+  const contents = Object.entries(env)
+    .filter((entry): entry is [string, string] => entry[1] !== undefined)
+    .map(([key, value]) => format(key, value))
     .join("\n");
 
   // Write to file

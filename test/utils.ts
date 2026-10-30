@@ -1,27 +1,35 @@
 import { Writable } from "node:stream";
 
-export class MockLoggerTarget extends Writable {
-  private target: any[];
+export type LogEntry = {
+  msg: string;
+  level?: number;
+  name?: string;
+  id?: string;
+  [key: string]: unknown;
+};
 
-  constructor(target = [] as any[]) {
+export class MockLoggerTarget extends Writable {
+  private target: LogEntry[];
+
+  constructor(target: LogEntry[] = []) {
     super({ objectMode: true });
     this.target = target;
   }
 
   _write(
-    object: any,
+    object: unknown,
     _encoding: BufferEncoding,
     done: (error?: Error | null) => void,
   ): void {
     try {
-      this.target.push(JSON.parse(object));
+      this.target.push(JSON.parse(String(object)) as LogEntry);
       done();
     } catch (error) {
       done(error as Error);
     }
   }
 
-  get entries(): any[] {
+  get entries(): LogEntry[] {
     return this.target;
   }
 }

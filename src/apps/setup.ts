@@ -1,5 +1,4 @@
 import type { IncomingMessage } from "node:http";
-import type { TLSSocket } from "node:tls";
 import { exec } from "node:child_process";
 import { parse as parseQuery } from "node:querystring";
 
@@ -207,11 +206,19 @@ function printRestartMessage(log: Logger) {
   log.info("");
 }
 
-function getBaseUrl(req: IncomingMessage): string {
+type RequestLike = Pick<IncomingMessage, "headers"> & {
+  socket?: unknown;
+};
+
+function getBaseUrl(req: RequestLike): string {
+  const socket = req.socket;
+  const encrypted =
+    typeof socket === "object" &&
+    socket !== null &&
+    "encrypted" in socket &&
+    socket.encrypted === true;
   const protocols =
-    req.headers["x-forwarded-proto"] || (req.socket as TLSSocket)?.encrypted
-      ? "https"
-      : "http";
+    req.headers["x-forwarded-proto"] || encrypted ? "https" : "http";
   const protocol = protocols.split(",")[0];
   const host = req.headers["x-forwarded-host"] || req.headers.host;
   const baseUrl = `${protocol}://${host}`;

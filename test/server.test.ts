@@ -12,6 +12,7 @@ import WebhookExamples, {
 } from "@octokit/webhooks-examples";
 
 import { Server, Probot } from "../src/index.js";
+import { validateAddressInfo } from "../src/server/server.js";
 import { detectRuntime } from "../src/helpers/detect-runtime.js";
 import { MockLoggerTarget } from "./utils.js";
 
@@ -68,6 +69,32 @@ const pushEvent = (
 ).examples[0];
 
 describe("Server", () => {
+  it("validates server address information", () => {
+    expect(
+      validateAddressInfo({ port: 3000, address: "127.0.0.1", family: "IPv4" }),
+    ).toEqual({ port: 3000, address: "127.0.0.1", family: "IPv4" });
+
+    for (const address of [
+      null,
+      "127.0.0.1",
+      { port: "3000", address: "127.0.0.1", family: "IPv4" },
+      { port: 3000, address: 127001, family: "IPv4" },
+      { port: 3000, address: "127.0.0.1", family: {} },
+    ]) {
+      expect(() => validateAddressInfo(address)).toThrow(
+        "Unable to determine the server address",
+      );
+    }
+  });
+
+  it("uses the default Probot constructor when it is omitted", () => {
+    const server = new Server({
+      Probot: undefined as unknown as typeof Probot,
+    });
+
+    expect(server).toBeInstanceOf(Server);
+  });
+
   it("exposes its version", () => {
     const server = new Server();
 

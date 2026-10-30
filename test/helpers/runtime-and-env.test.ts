@@ -56,7 +56,7 @@ describe("loadEnv", () => {
   });
 
   it("uses the default path when options are null", () => {
-    expect(loadEnv(null as any)).toBeTypeOf("object");
+    expect(loadEnv(null)).toBeTypeOf("object");
   });
 
   it("parses an existing env file", () => {

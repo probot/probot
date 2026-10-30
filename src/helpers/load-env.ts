@@ -7,13 +7,13 @@ interface LoadEnvOptions {
   path?: string;
 }
 
-export function loadEnv(options = {} as LoadEnvOptions): Env {
+export function loadEnv(options: LoadEnvOptions | null = {}): Env {
   const { path = pathJoin(process.cwd(), ".env") } = options || {};
 
   try {
     return parseEnv(readFileSync(path, "utf-8"));
-  } catch (err: any) {
-    if (err.code !== "ENOENT") {
+  } catch (err: unknown) {
+    if (!(err instanceof Error && "code" in err && err.code === "ENOENT")) {
       throw err;
     }
   }

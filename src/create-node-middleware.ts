@@ -8,6 +8,11 @@ import type {
 import { createProbot } from "./create-probot.js";
 
 const noop = () => {};
+type CreateNodeMiddlewareOptions = {
+  probot?: MiddlewareOptions["probot"];
+  webhooksPath?: string;
+  [key: string]: unknown;
+};
 
 /**
  * Create a Node/Express middleware.
@@ -37,7 +42,7 @@ const noop = () => {};
  */
 export async function createNodeMiddleware(
   appFn: ApplicationFunction,
-  { probot = createProbot(), webhooksPath } = {} as MiddlewareOptions,
+  { probot = createProbot(), webhooksPath }: CreateNodeMiddlewareOptions = {},
 ): Promise<
   (
     request: IncomingMessage,

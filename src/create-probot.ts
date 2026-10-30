@@ -1,9 +1,10 @@
-import type { LogLevel, Options as PinoOptions } from "@probot/pino";
 import { getPrivateKey } from "@probot/get-private-key";
 
 import type { Env, Options } from "./types.js";
 import { Probot } from "./probot.js";
 import { defaultWebhookPath } from "./server/server.js";
+import { validateLogFormat } from "./helpers/validate-log-format.js";
+import { validateLogLevel } from "./helpers/validate-log-level.js";
 
 type CreateProbotOptions = {
   overrides?: Options;
@@ -47,8 +48,16 @@ export function createProbot({
 
   const envWithDefaults = { ...DEFAULTS, ...env };
 
-  const envOptions: Options = {
-    logLevel: envWithDefaults.LOG_LEVEL as LogLevel,
+  const envLogFormat =
+    envWithDefaults.LOG_FORMAT === ""
+      ? envWithDefaults.NODE_ENV === "production"
+        ? "json"
+        : "pretty"
+      : envWithDefaults.LOG_FORMAT;
+
+  const envOptions = {
+    logLevel: envWithDefaults.LOG_LEVEL,
+    logFormat: envLogFormat,
     appId: Number(envWithDefaults.APP_ID),
     privateKey: privateKey ? privateKey.toString() : undefined,
     secret: envWithDefaults.WEBHOOK_SECRET,
@@ -67,13 +76,21 @@ export function createProbot({
     ...overrides,
   };
 
+  const { logLevel, logFormat } = probotOptions;
+  if (logLevel !== undefined) {
+    validateLogLevel(logLevel);
+  }
+  if (logFormat !== undefined) {
+    validateLogFormat(logFormat);
+  }
+
   return new Probot({
     log: probotOptions.log,
-    logLevel: probotOptions.logLevel,
-    logFormat: envWithDefaults.LOG_FORMAT as PinoOptions["logFormat"],
     logLevelInString: envWithDefaults.LOG_LEVEL_IN_STRING === "true",
     logMessageKey: envWithDefaults.LOG_MESSAGE_KEY,
     sentryDsn: envWithDefaults.SENTRY_DSN,
     ...probotOptions,
+    logLevel,
+    logFormat,
   });
 }

@@ -13,6 +13,7 @@ export type SmeeClientConstructor = new (options: SmeeClientOptions) => {
 };
 
 export type SmeeClientModule = { SmeeClient?: SmeeClientConstructor };
+type LoadedSmeeClient = SmeeClientConstructor | SmeeClientModule;
 
 let SmeeClient: SmeeClientConstructor | undefined;
 
@@ -21,13 +22,19 @@ export const createWebhookProxy = async (
 ): Promise<EventSource | undefined> => {
   let SmeeClientConstructor: SmeeClientConstructor | undefined;
   try {
-    SmeeClientConstructor = opts.loadSmeeClient
-      ? (await opts.loadSmeeClient()).SmeeClient
-      : (SmeeClient ??= (
-          await npxImport<SmeeClientModule>("smee-client@5.0.0", {
-            onlyPackageRunner: true,
-          })
-        ).SmeeClient);
+    const loaded: LoadedSmeeClient | undefined =
+      opts.smeeClient ||
+      (opts.loadSmeeClient
+        ? (await opts.loadSmeeClient()).SmeeClient
+        : (SmeeClient ??= (
+            await npxImport<SmeeClientModule>("smee-client@5.0.0", {
+              onlyPackageRunner: true,
+            })
+          ).SmeeClient));
+    SmeeClientConstructor =
+      typeof loaded === "function"
+        ? loaded
+        : (loaded as SmeeClientModule | undefined)?.SmeeClient;
   } catch {
     opts.logger.warn(
       "Run `npm install --save-dev smee-client` to proxy webhooks to localhost.",
@@ -56,5 +63,6 @@ export interface WebhookProxyOptions {
   host: string;
   logger: Logger;
   fetch?: Function | undefined;
+  smeeClient?: SmeeClientConstructor | undefined;
   loadSmeeClient?: (() => Promise<SmeeClientModule>) | undefined;
 }

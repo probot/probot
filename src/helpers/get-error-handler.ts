@@ -1,19 +1,23 @@
 import type { Logger } from "pino";
-import type {
-  WebhookError,
-  EmitterWebhookEvent as WebhookEvent,
-} from "@octokit/webhooks";
+import type { EmitterWebhookEvent as WebhookEvent } from "@octokit/webhooks";
 
 export function getErrorHandler(log: Logger) {
   return (error: Error & { event?: WebhookEvent }) => {
-    const errors = (
-      error instanceof AggregateError ? error.errors : [error]
-    ) as WebhookError[];
+    const errors = error instanceof AggregateError ? error.errors : [error];
 
     const event = error.event;
 
     for (const error of errors) {
-      const errMessage = (error.message || "").toLowerCase();
+      const errMessage = (
+        error instanceof Error
+          ? error.message
+          : typeof error === "object" &&
+              error !== null &&
+              "message" in error &&
+              typeof error.message === "string"
+            ? error.message
+            : String(error) || ""
+      ).toLowerCase();
 
       if (errMessage.includes("x-hub-signature-256")) {
         log.error(

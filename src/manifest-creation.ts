@@ -11,6 +11,15 @@ import { ProbotOctokit } from "./octokit/probot-octokit.js";
 import { loadPackageJson } from "./helpers/load-package-json.js";
 import { updateEnv } from "./helpers/update-env.js";
 
+type SmeeClient = {
+  createChannel: () => string | Promise<string | undefined>;
+};
+type SmeeClientModule = { SmeeClient: SmeeClient };
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
 export class ManifestCreation {
   #updateEnv: typeof updateEnv;
   #env: Env;
@@ -29,18 +38,22 @@ export class ManifestCreation {
     return loadPackageJson();
   }
 
-  public async createWebhookChannel(
-    { SmeeClient: SmeeClientParam, log = console } = {} as {
-      SmeeClient: any;
-      log?: Logger | undefined;
-    },
-  ): Promise<string | undefined> {
-    let SmeeClient: any;
+  public async createWebhookChannel({
+    SmeeClient: SmeeClientParam,
+    log = console,
+  }: {
+    SmeeClient?: SmeeClient | undefined;
+    log?: Pick<Logger, "warn"> | undefined;
+  } = {}): Promise<string | undefined> {
+    let SmeeClient: SmeeClient;
     try {
       SmeeClient =
         SmeeClientParam ||
-        (await npxImport("smee-client@5.0.0", { onlyPackageRunner: true }))
-          .SmeeClient;
+        (
+          await npxImport<SmeeClientModule>("smee-client@5.0.0", {
+            onlyPackageRunner: true,
+          })
+        ).SmeeClient;
     } catch {
       log.warn("SmeeClient is not available");
       return void 0;
@@ -68,10 +81,24 @@ export class ManifestCreation {
 
     try {
       const file = readFileSync(path.join(process.cwd(), "app.yml"), "utf8");
-      manifest = yaml.parse(file) as Manifest;
+      const parsed: unknown = yaml.parse(file);
+      if (isRecord(parsed)) {
+        const parsedManifest: Partial<Manifest> = {};
+        if (typeof parsed.name === "string") parsedManifest.name = parsed.name;
+        if (typeof parsed.url === "string") parsedManifest.url = parsed.url;
+        if (typeof parsed.description === "string") {
+          parsedManifest.description = parsed.description;
+        }
+        if (typeof parsed.public === "boolean") {
+          parsedManifest.public = parsed.public;
+        }
+        manifest = parsedManifest;
+      }
     } catch (error) {
       // App config does not exist, which is ok.
-      if ((error as Error & { code?: string }).code !== "ENOENT") {
+      if (
+        !(error instanceof Error && "code" in error && error.code === "ENOENT")
+      ) {
         throw error;
       }
     }
@@ -82,7 +109,7 @@ export class ManifestCreation {
         url: this.#env.WEBHOOK_PROXY_URL || `${baseUrl}/`,
       },
       name: this.#env.PROJECT_DOMAIN || manifest.name || pkg.name,
-      public: manifest.public || true,
+      public: typeof manifest.public === "boolean" ? manifest.public : true,
       redirect_url: `${baseUrl}/probot/setup`,
       // TODO: add setup url
       // setup_url:`${baseUrl}/probot/success`,

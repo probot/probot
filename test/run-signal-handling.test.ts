@@ -14,7 +14,7 @@ describe("run SIGINT handling", () => {
     const on = vi.spyOn(process, "on");
     const exit = vi
       .spyOn(process, "exit")
-      .mockImplementation(() => undefined as never);
+      .mockImplementation((() => {}) as typeof process.exit);
     const info = vi.spyOn(console, "info").mockImplementation(() => {});
     const server = await run(() => {}, {
       env: {
@@ -38,7 +38,7 @@ describe("run SIGINT handling", () => {
     } finally {
       const handler = on.mock.calls.find(([event]) => event === "SIGINT")?.[1];
       if (handler) {
-        process.removeListener("SIGINT", handler as (...args: any[]) => void);
+        process.removeListener("SIGINT", handler as NodeJS.SignalsListener);
       }
       on.mockRestore();
       exit.mockRestore();
@@ -51,7 +51,7 @@ describe("run SIGINT handling", () => {
     const on = vi.spyOn(process, "on");
     const exit = vi
       .spyOn(process, "exit")
-      .mockImplementation(() => undefined as never);
+      .mockImplementation((() => {}) as typeof process.exit);
     const info = vi.spyOn(console, "info").mockImplementation(() => {});
     const error = vi.spyOn(console, "error").mockImplementation(() => {});
     const server = await run(() => {}, {
@@ -82,7 +82,7 @@ describe("run SIGINT handling", () => {
     } finally {
       const handler = on.mock.calls.find(([event]) => event === "SIGINT")?.[1];
       if (handler) {
-        process.removeListener("SIGINT", handler as (...args: any[]) => void);
+        process.removeListener("SIGINT", handler as NodeJS.SignalsListener);
       }
       stop.mockRestore();
       on.mockRestore();

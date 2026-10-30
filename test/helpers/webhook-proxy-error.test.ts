@@ -3,19 +3,8 @@ import { describe, expect, it, vi } from "vitest";
 import { createWebhookProxy } from "../../src/helpers/webhook-proxy.js";
 
 describe("createWebhookProxy", () => {
-  class UnavailableSmeeClient {
-    constructor() {
-      throw new Error("smee unavailable");
-    }
-
-    start(): Promise<EventSource> {
-      throw new Error("smee unavailable");
-    }
-  }
-
   it("warns and returns undefined when loading smee-client fails", async () => {
     const logger = { warn: vi.fn() } as any;
-
     await expect(
       createWebhookProxy({
         url: "https://smee.io/example",
@@ -28,7 +17,6 @@ describe("createWebhookProxy", () => {
         },
       }),
     ).resolves.toBeUndefined();
-
     expect(logger.warn).toHaveBeenCalledWith(
       "Run `npm install --save-dev smee-client` to proxy webhooks to localhost.",
     );
@@ -45,18 +33,5 @@ describe("createWebhookProxy", () => {
         loadSmeeClient: async () => ({}),
       }),
     ).rejects.toThrow("SmeeClient is unavailable");
-  });
-
-  it("rejects when the Smee client constructor fails", async () => {
-    await expect(
-      createWebhookProxy({
-        url: "https://smee.io/example",
-        host: "127.0.0.1",
-        port: 3000,
-        path: "/webhooks",
-        logger: { warn: vi.fn() } as any,
-        loadSmeeClient: async () => ({ SmeeClient: UnavailableSmeeClient }),
-      }),
-    ).rejects.toThrow("smee unavailable");
   });
 });

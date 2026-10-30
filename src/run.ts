@@ -21,6 +21,7 @@ import { isProduction } from "./helpers/is-production.js";
 import { updateEnv } from "./helpers/update-env.js";
 import { Probot } from "./probot.js";
 import { applyEnv } from "./helpers/apply-env.js";
+import { validateLogLevel } from "./helpers/validate-log-level.js";
 
 type AdditionalOptions = {
   env?: Env;
@@ -37,12 +38,12 @@ type AdditionalOptions = {
  */
 export async function run(
   appFnOrArgv: ApplicationFunction | string[],
-  additionalOptions?: AdditionalOptions,
+  additionalOptions: AdditionalOptions = {},
 ): Promise<Server> {
   applyEnv();
   const env: Env = {
     ...process.env,
-    ...additionalOptions?.env,
+    ...additionalOptions.env,
   };
 
   const envOptions = readEnvOptions(env);
@@ -75,8 +76,12 @@ export async function run(
     args,
   } = { ...envOptions, ...cliOptions };
 
+  if (level !== undefined) {
+    validateLogLevel(level);
+  }
+
   const log =
-    additionalOptions?.log ||
+    additionalOptions.log ||
     (await getLog({
       level,
       logFormat,
@@ -92,7 +97,7 @@ export async function run(
     secret,
     baseUrl,
     log,
-    Octokit: additionalOptions?.Octokit || undefined,
+    Octokit: additionalOptions.Octokit || undefined,
   };
 
   type ServerOptionsLocal = StripUndefined<
@@ -151,11 +156,11 @@ export async function run(
       host: server.host,
       port: server.port,
       log: serverOptions.log.child({ name: "setup" }),
-      ...(additionalOptions?.updateEnv
+      ...(additionalOptions.updateEnv
         ? { updateEnv: additionalOptions.updateEnv }
         : {}),
       env,
-      SmeeClient: additionalOptions?.SmeeClient,
+      SmeeClient: additionalOptions.SmeeClient,
     });
 
     await server.loadHandlerFactory(setupAppHandler);
@@ -205,7 +210,7 @@ export async function run(
       console.info("Server stopped");
       process.exit(0);
     } catch (e) {
-      console.error({ err: e as Error }, "Error while stopping server");
+      console.error({ err: e }, "Error while stopping server");
       process.exit(1);
     }
   });

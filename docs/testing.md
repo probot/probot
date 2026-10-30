@@ -26,7 +26,7 @@ describe("My Probot app", () => {
     probot = new Probot({
       githubToken: "test",
       // Disable throttling & retrying requests for easier testing
-      Octokit: ProbotOctokit.defaults((instanceOptions: any) => {
+      Octokit: ProbotOctokit.defaults((instanceOptions) => {
         return {
           ...instanceOptions,
           retry: { enabled: false },

@@ -1,9 +1,12 @@
-const validFormats = ["pretty", "json"];
+const validFormats = ["pretty", "json"] as const;
 
-export function validateLogFormat(
-  value: unknown,
-): asserts value is "pretty" | "json" {
-  if (typeof value !== "string" || !validFormats.includes(value as string)) {
+export type LogFormat = (typeof validFormats)[number];
+
+export function validateLogFormat(value: unknown): asserts value is LogFormat {
+  if (
+    typeof value !== "string" ||
+    !validFormats.some((format) => format === value)
+  ) {
     throw new Error(`Invalid log format`);
   }
 }

@@ -1,3 +1,4 @@
+import type { IncomingMessage, ServerResponse } from "node:http";
 import fetchMock from "fetch-mock";
 import pino from "pino";
 import getPort from "get-port";
@@ -65,7 +66,7 @@ describe("Setup app", () => {
     return env;
   }
 
-  let SmeeClientCreateChannelCalls: any[] = [];
+  let SmeeClientCreateChannelCalls: string[] = [];
   const SmeeClient = {
     createChannel: async () => {
       SmeeClientCreateChannelCalls.push("createChannel");
@@ -88,7 +89,10 @@ describe("Setup app", () => {
     })();
 
     await expect(
-      handler({ method: "GET", url: "/not-found" } as any, {} as any),
+      handler(
+        { method: "GET", url: "/not-found" } as unknown as IncomingMessage,
+        {} as unknown as ServerResponse,
+      ),
     ).resolves.toBe(false);
   });
 
@@ -136,7 +140,7 @@ describe("Setup app", () => {
       ];
 
       const infoLogs = logTarget.entries
-        .filter((output: any) => output.level === pino.levels.values.info)
+        .filter((output) => output.level === pino.levels.values.info)
         .map((o) => o.msg);
 
       expect(infoLogs.length).toBe(expMsgs.length);
@@ -186,7 +190,7 @@ describe("Setup app", () => {
       const expMsg = `Please follow the instructions at http://${server.host}:${server.port} to configure .env.`;
 
       const infoLogs = logTarget.entries
-        .filter((output: any) => output.level === pino.levels.values.info)
+        .filter((output) => output.level === pino.levels.values.info)
         .map((o) => o.msg);
 
       expect(infoLogs[5]).toBe(expMsg);
@@ -266,8 +270,11 @@ describe("Setup app", () => {
       const writeHead = vi.fn(() => ({ end }));
 
       const handled = await handler(
-        { method: "GET", url: "/probot/setup?code=123" } as any,
-        { writeHead } as any,
+        {
+          method: "GET",
+          url: "/probot/setup?code=123",
+        } as unknown as IncomingMessage,
+        { writeHead } as unknown as ServerResponse,
       );
 
       expect(handled).toBe(true);

@@ -3,6 +3,7 @@ import Bottleneck from "bottleneck";
 import type { RedisOptions } from "ioredis";
 import type { Logger } from "pino";
 import type { ThrottlingOptions } from "@octokit/plugin-throttling";
+import type { EndpointDefaults } from "@octokit/types";
 
 type Options = {
   log: Logger;
@@ -15,7 +16,7 @@ export async function getOctokitThrottleOptions(
   const { log, redisConfig } = options;
 
   const throttlingOptions: ThrottlingOptions = {
-    onRateLimit: (retryAfter, options: { [key: string]: any }) => {
+    onRateLimit: (retryAfter, options: Required<EndpointDefaults>) => {
       log.warn(
         `Request quota exhausted for request ${options.method} ${options.url}`,
       );
@@ -27,7 +28,10 @@ export async function getOctokitThrottleOptions(
       }
       return false;
     },
-    onSecondaryRateLimit: (_retryAfter, options: { [key: string]: any }) => {
+    onSecondaryRateLimit: (
+      _retryAfter,
+      options: Required<EndpointDefaults>,
+    ) => {
       // does not retry, only logs a warning
       log.warn(
         `Secondary quota detected for request ${options.method} ${options.url}`,
@@ -52,16 +56,27 @@ export async function getOctokitThrottleOptions(
   return throttlingOptions;
 }
 
-let Redis = null;
+type RedisClient = import("ioredis").Redis;
+type RedisConstructor = {
+  new (options: RedisOptions | string): RedisClient;
+};
+
+let Redis: RedisConstructor | undefined;
 
 async function getRedisClient(redisConfig: RedisOptions | string): Promise<{
-  client: any;
-  Redis: any;
+  client: RedisClient;
+  Redis: RedisConstructor;
 }> {
-  Redis ??= (await npxImport("ioredis@5.10.1", { onlyPackageRunner: true }))
-    .Redis;
+  Redis ??= (
+    await npxImport<{ Redis: RedisConstructor }>("ioredis@5.10.1", {
+      onlyPackageRunner: true,
+    })
+  ).Redis;
   return {
-    client: new Redis(redisConfig),
+    client:
+      typeof redisConfig === "string"
+        ? new Redis(redisConfig)
+        : new Redis(redisConfig),
     Redis,
   };
 }

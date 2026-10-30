@@ -1,9 +1,18 @@
 import fetchMock from "fetch-mock";
 import { pino } from "pino";
 import { describe, expect, it, test, vi } from "vitest";
+import type { RequestParameters } from "@octokit/types";
 
 import { ProbotOctokit } from "../src/octokit/probot-octokit.js";
 import type { OctokitOptions } from "../src/types.js";
+
+type TestRequestOptions = Omit<RequestParameters, "headers"> & {
+  method?: string;
+  headers: Record<string, string>;
+  signal?: unknown;
+  body?: unknown;
+};
+type TestMapFunction = (response: unknown, done: () => void) => unknown[];
 
 describe("ProbotOctokit", () => {
   const defaultOptions: OctokitOptions = {
@@ -62,7 +71,7 @@ describe("ProbotOctokit", () => {
   });
 
   test("with retry enabled retries failed requests", async () => {
-    const fetchCalls: { url: string; options: any }[] = [];
+    const fetchCalls: { url: string; options: TestRequestOptions }[] = [];
 
     const octokit = new ProbotOctokit({
       ...defaultOptions,
@@ -70,7 +79,7 @@ describe("ProbotOctokit", () => {
         enabled: true,
       },
       request: {
-        fetch: (url: string, options: { [key: string]: any }) => {
+        fetch: (url: string, options: TestRequestOptions) => {
           fetchCalls.push({ url, options });
 
           if (fetchCalls.length === 1) {
@@ -102,7 +111,7 @@ describe("ProbotOctokit", () => {
   });
 
   test("with throttling enabled retries requests when being rate limited", async () => {
-    const fetchCalls: { url: string; options: any }[] = [];
+    const fetchCalls: { url: string; options: TestRequestOptions }[] = [];
 
     const octokit = new ProbotOctokit({
       ...defaultOptions,
@@ -117,7 +126,7 @@ describe("ProbotOctokit", () => {
         },
       },
       request: {
-        fetch: (url: string, options: { [key: string]: any }) => {
+        fetch: (url: string, options: TestRequestOptions) => {
           fetchCalls.push({ url, options });
 
           if (fetchCalls.length === 1) {
@@ -157,7 +166,7 @@ describe("ProbotOctokit", () => {
   });
 
   test("with throttling enabled using default onPrimaryRateLimit", async () => {
-    const fetchCalls: { url: string; options: any }[] = [];
+    const fetchCalls: { url: string; options: TestRequestOptions }[] = [];
 
     const octokit = new ProbotOctokit({
       ...defaultOptions,
@@ -175,7 +184,7 @@ describe("ProbotOctokit", () => {
         fallbackSecondaryRateRetryAfter: 1,
       },
       request: {
-        fetch: (url: string, options: { [key: string]: any }) => {
+        fetch: (url: string, options: TestRequestOptions) => {
           fetchCalls.push({ url, options });
 
           if (fetchCalls.length === 1) {
@@ -212,7 +221,7 @@ describe("ProbotOctokit", () => {
   });
 
   test("with throttling enabled retries requests when hitting the secondary rate limiter", async () => {
-    const fetchCalls: { url: string; options: any }[] = [];
+    const fetchCalls: { url: string; options: TestRequestOptions }[] = [];
 
     const octokit = new ProbotOctokit({
       ...defaultOptions,
@@ -227,7 +236,7 @@ describe("ProbotOctokit", () => {
         },
       },
       request: {
-        fetch: (url: string, options: { [key: string]: any }) => {
+        fetch: (url: string, options: TestRequestOptions) => {
           fetchCalls.push({ url, options });
 
           if (fetchCalls.length === 1) {
@@ -265,7 +274,7 @@ describe("ProbotOctokit", () => {
   });
 
   it("with throttling enabled using default onSecondaryRateLimit", async () => {
-    const fetchCalls: { url: string; options: any }[] = [];
+    const fetchCalls: { url: string; options: TestRequestOptions }[] = [];
 
     const logWarnCalls: string[] = [];
     const logWarn = (message: string) => {
@@ -284,7 +293,7 @@ describe("ProbotOctokit", () => {
         fallbackSecondaryRateRetryAfter: 1,
       },
       request: {
-        fetch: async (url: string, options: { [key: string]: any }) => {
+        fetch: async (url: string, options: TestRequestOptions) => {
           fetchCalls.push({ url, options });
 
           if (fetchCalls.length === 1) {
@@ -336,12 +345,12 @@ describe("ProbotOctokit", () => {
   });
 
   it("paginate returns an array of pages", async () => {
-    const fetchCalls: { url: string; options: any }[] = [];
+    const fetchCalls: { url: string; options: TestRequestOptions }[] = [];
 
     const octokit = new ProbotOctokit({
       ...defaultOptions,
       request: {
-        fetch: (url: string, options: { [key: string]: any }) => {
+        fetch: (url: string, options: TestRequestOptions) => {
           const curPage = Number.parseInt(
             new URL(url).searchParams.get("page") || "0",
           );
@@ -362,9 +371,10 @@ describe("ProbotOctokit", () => {
     });
 
     let callCountSpy = 0;
-    const spy: any = () => {
+    const spy = ((response: { data: unknown[] }) => {
       callCountSpy++;
-    };
+      return response.data;
+    }) as TestMapFunction;
     const res = await octokit.paginate(
       octokit.rest.issues.listForRepo.endpoint.merge({
         owner: "JasonEtco",
@@ -397,12 +407,12 @@ describe("ProbotOctokit", () => {
   });
 
   it("paginate stops iterating if the done() function is called in the callback", async () => {
-    const fetchCalls: { url: string; options: any }[] = [];
+    const fetchCalls: { url: string; options: TestRequestOptions }[] = [];
 
     const octokit = new ProbotOctokit({
       ...defaultOptions,
       request: {
-        fetch: (url: string, options: { [key: string]: any }) => {
+        fetch: (url: string, options: TestRequestOptions) => {
           fetchCalls.push({ url, options });
 
           const curPage = Number.parseInt(
@@ -424,10 +434,10 @@ describe("ProbotOctokit", () => {
     });
 
     let callCountSpy = 0;
-    const spy = ((response: any, done: Function) => {
+    const spy = ((response: { data: { id: number }[] }, done: () => void) => {
       callCountSpy++;
       if (response.data[0].id === 2) done();
-    }) as any;
+    }) as TestMapFunction;
     const res = await octokit.paginate(
       octokit.rest.issues.listForRepo.endpoint.merge({
         owner: "JasonEtco",
@@ -458,12 +468,12 @@ describe("ProbotOctokit", () => {
   });
 
   it("paginate maps the responses to data by default", async () => {
-    const fetchCalls: { url: string; options: any }[] = [];
+    const fetchCalls: { url: string; options: TestRequestOptions }[] = [];
 
     const octokit = new ProbotOctokit({
       ...defaultOptions,
       request: {
-        fetch: (url: string, options: { [key: string]: any }) => {
+        fetch: (url: string, options: TestRequestOptions) => {
           fetchCalls.push({ url, options });
 
           const curPage = Number.parseInt(

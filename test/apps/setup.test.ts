@@ -249,7 +249,7 @@ describe("Setup app", () => {
   });
 
   describe("GET /probot/setup", () => {
-    it("logs the restart message outside Glitch", async () => {
+    it("logs the restart message", async () => {
       const mock = fetchMock
         .createInstance()
         .postOnce("https://api.github.com/app-manifests/123/conversions", {
@@ -346,46 +346,34 @@ describe("Setup app", () => {
 
       await server.start();
 
-      env.PROJECT_DOMAIN = "example-project";
-      exec.mockImplementation(
-        (_command: string, callback: (error: Error | null) => void) =>
-          callback(new Error("refresh failed")),
+      const setupResponse = await fetch(
+        `http://${server.host}:${server.port}/probot/setup?code=123&state=${SETUP_TOKEN}`,
+        { method: "GET", redirect: "manual" },
+      );
+      expect(setupResponse.status).toBe(302);
+      expect(setupResponse.headers.get("location")).toBe(
+        "/apps/my-app/installations/new",
       );
 
-      try {
-        const setupResponse = await fetch(
-          `http://${server.host}:${server.port}/probot/setup?code=123&state=${SETUP_TOKEN}`,
-          { method: "GET", redirect: "manual" },
-        );
-        expect(setupResponse.status).toBe(302);
-        expect(setupResponse.headers.get("location")).toBe(
-          "/apps/my-app/installations/new",
-        );
+      expect(await setupResponse.text()).toBe(
+        "Found. Redirecting to /apps/my-app/installations/new",
+      );
 
-        expect(await setupResponse.text()).toBe(
-          "Found. Redirecting to /apps/my-app/installations/new",
-        );
+      expect(updateEnvCalls.length).toBe(2);
 
-        expect(updateEnvCalls.length).toBe(2);
+      expect(Object.keys(updateEnvCalls[0]).length).toBe(1);
+      expect(updateEnvCalls[0].WEBHOOK_PROXY_URL).toBe(
+        "https://smee.io/1234ab1234",
+      );
 
-        expect(Object.keys(updateEnvCalls[0]).length).toBe(1);
-        expect(updateEnvCalls[0].WEBHOOK_PROXY_URL).toBe(
-          "https://smee.io/1234ab1234",
-        );
-
-        expect(Object.keys(updateEnvCalls[1]).length).toBe(5);
-        expect(updateEnvCalls[1].APP_ID).toBe("id");
-        expect(updateEnvCalls[1].GITHUB_CLIENT_ID).toBe("Iv1.8a61f9b3a7aba766");
-        expect(updateEnvCalls[1].GITHUB_CLIENT_SECRET).toBe(
-          "1726be1638095a19edd134c77bde3aa2ece1e5d8",
-        );
-        expect(updateEnvCalls[1].PRIVATE_KEY).toBe('"pem"');
-        expect(updateEnvCalls[1].WEBHOOK_SECRET).toBe("webhook_secret");
-        expect(exec).toHaveBeenCalledWith("refresh", expect.any(Function));
-        exec.mock.calls[0][1](null);
-      } finally {
-        exec.mockReset();
-      }
+      expect(Object.keys(updateEnvCalls[1]).length).toBe(5);
+      expect(updateEnvCalls[1].APP_ID).toBe("id");
+      expect(updateEnvCalls[1].GITHUB_CLIENT_ID).toBe("Iv1.8a61f9b3a7aba766");
+      expect(updateEnvCalls[1].GITHUB_CLIENT_SECRET).toBe(
+        "1726be1638095a19edd134c77bde3aa2ece1e5d8",
+      );
+      expect(updateEnvCalls[1].PRIVATE_KEY).toBe('"pem"');
+      expect(updateEnvCalls[1].WEBHOOK_SECRET).toBe("webhook_secret");
 
       await server.stop();
     });

@@ -9,6 +9,7 @@ import type {
   StripUndefined,
 } from "./types.js";
 import type { ProbotOctokit } from "./octokit/probot-octokit.js";
+import type { SmeeClientModule } from "./helpers/webhook-proxy.js";
 import { setupAppFactory } from "./apps/setup.js";
 import { getLog } from "./helpers/get-log.js";
 import { readCliOptions } from "./bin/read-cli-options.js";
@@ -27,6 +28,7 @@ type AdditionalOptions = {
   log?: Logger;
   updateEnv?: typeof updateEnv;
   SmeeClient?: { createChannel: () => Promise<string | undefined> };
+  loadSmeeClient?: () => Promise<SmeeClientModule>;
 };
 
 /**
@@ -38,10 +40,14 @@ export async function run(
   additionalOptions?: AdditionalOptions,
 ): Promise<Server> {
   applyEnv();
+  const env: Env = {
+    ...process.env,
+    ...additionalOptions?.env,
+  };
 
-  const envOptions = readEnvOptions(additionalOptions?.env);
+  const envOptions = readEnvOptions(env);
   const cliOptions = Array.isArray(appFnOrArgv)
-    ? readCliOptions(appFnOrArgv)
+    ? readCliOptions(appFnOrArgv, env)
     : {};
 
   const {
@@ -96,7 +102,7 @@ export async function run(
       >
     >
   > &
-    Pick<ServerOptions, "webhookProxy">;
+    Pick<ServerOptions, "webhookProxy" | "loadSmeeClient">;
 
   const serverOptions: ServerOptionsLocal = {
     host,
@@ -104,12 +110,13 @@ export async function run(
     webhookPath,
     webhookProxy,
     log,
+    loadSmeeClient: additionalOptions?.loadSmeeClient,
     Probot: Probot.defaults(probotOptions),
   };
 
   let server: Server;
 
-  if (isProduction()) {
+  if (isProduction(env)) {
     if (!appId) {
       throw new Error(
         "App ID is missing, and is required to run in production mode. " +
@@ -144,7 +151,10 @@ export async function run(
       host: server.host,
       port: server.port,
       log: serverOptions.log.child({ name: "setup" }),
-      updateEnv: additionalOptions?.updateEnv || updateEnv,
+      ...(additionalOptions?.updateEnv
+        ? { updateEnv: additionalOptions.updateEnv }
+        : {}),
+      env,
       SmeeClient: additionalOptions?.SmeeClient,
     });
 

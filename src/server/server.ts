@@ -40,12 +40,14 @@ type State = {
   port: number;
   host: string;
   log?: Logger | undefined;
+  getLog: NonNullable<ServerOptions["getLog"]>;
   loggingOptions?: Record<string, unknown>;
   probot: Probot | null;
   ProbotBase: typeof Probot;
   request?: RequestRequestOptions | undefined;
   webhookPath: string;
   webhookProxy?: string | undefined;
+  loadSmeeClient?: ServerOptions["loadSmeeClient"];
   eventSource: EventSource | undefined;
   httpLogger?: ReturnType<typeof httpLogger>;
   handlers: Handler[];
@@ -64,12 +66,14 @@ export class Server {
       initializationPromise: createDeferredPromise<void>(),
       probot: null,
       log: options.log,
+      getLog: options.getLog || getLog,
       httpServer: new HttpServer(),
       cwd: options.cwd || process.cwd(),
       port: options.port || 3000,
       host: options.host || "localhost",
       webhookPath: options.webhookPath || defaultWebhookPath,
       webhookProxy: options.webhookProxy,
+      loadSmeeClient: options.loadSmeeClient,
       eventSource: undefined,
       request: options.request,
       ProbotBase: options.Probot,
@@ -108,7 +112,7 @@ export class Server {
 
     try {
       const log = (this.#state.log = (
-        this.#state.log || (await getLog())
+        this.#state.log || (await this.#state.getLog())
       ).child({ name: "server" }));
 
       await (this.#state.probot = createProbot(this.#state, this, log)).ready();
@@ -222,6 +226,7 @@ export class Server {
         path: this.#state.webhookPath,
         logger: this.#state.log!,
         url: this.#state.webhookProxy,
+        loadSmeeClient: this.#state.loadSmeeClient,
       });
     }
 

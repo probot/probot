@@ -2,7 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import fetchMock from "fetch-mock";
-import { describe, expect, test, vi } from "vitest";
+import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
 
 const { npxImportMock } = vi.hoisted(() => ({
   npxImportMock: vi.fn(),
@@ -12,12 +12,23 @@ vi.mock("npx-import-light", () => ({
   npxImport: npxImportMock,
 }));
 
+afterAll(() => {
+  vi.doUnmock("npx-import-light");
+  vi.resetModules();
+});
+
 import type { Env } from "../src/types.js";
-import { ManifestCreation } from "../src/manifest-creation.js";
 import { loadPackageJson } from "../src/helpers/load-package-json.js";
 
+let ManifestCreation: typeof import("../src/manifest-creation.js").ManifestCreation;
+
+beforeAll(async () => {
+  vi.resetModules();
+  ({ ManifestCreation } = await import("../src/manifest-creation.js"));
+});
+
 describe("ManifestCreation", () => {
-  let setup: ManifestCreation;
+  let setup: InstanceType<typeof ManifestCreation>;
 
   let updateEnvCalls: Env[] = [];
 
@@ -45,6 +56,7 @@ describe("ManifestCreation", () => {
 
   test("uses the default updateEnv implementation", () => {
     const previousCwd = process.cwd();
+    const previousWebhookProxyUrl = process.env.WEBHOOK_PROXY_URL;
     const tempCwd = fs.mkdtempSync(path.join(os.tmpdir(), "probot-manifest-"));
     process.chdir(tempCwd);
 
@@ -59,32 +71,21 @@ describe("ManifestCreation", () => {
       .finally(() => {
         process.chdir(previousCwd);
         fs.rmSync(tempCwd, { recursive: true, force: true });
+        if (previousWebhookProxyUrl === undefined) {
+          delete process.env.WEBHOOK_PROXY_URL;
+        } else {
+          process.env.WEBHOOK_PROXY_URL = previousWebhookProxyUrl;
+        }
       });
   });
 
-  const reset = (env = {} as Env) => {
-    delete process.env.NODE_ENV;
-    delete process.env.PROJECT_DOMAIN;
-    delete process.env.WEBHOOK_PROXY_URL;
-
-    delete process.env.GHE_HOST;
-    delete process.env.GH_ORG;
-    delete process.env.GHE_PROTOCOL;
-
-    delete process.env.APP_ID;
-    delete process.env.PRIVATE_KEY;
-    delete process.env.WEBHOOK_SECRET;
-    delete process.env.GHE_HOST;
-
-    for (const key of Object.keys(env)) {
-      process.env[key] = env[key];
-    }
-
+  const reset = (env: Env = {}) => {
     updateEnvCalls = [];
     SmeeClientCreateChannelCalls = [];
 
     setup = new ManifestCreation({
       updateEnv,
+      env,
     });
   };
 

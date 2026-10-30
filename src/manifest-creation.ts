@@ -6,20 +6,24 @@ import yaml from "yaml";
 import type { RequestParameters } from "@octokit/types";
 import type { Logger } from "pino";
 
-import type { Manifest, OctokitOptions, PackageJson } from "./types.js";
+import type { Env, Manifest, OctokitOptions, PackageJson } from "./types.js";
 import { ProbotOctokit } from "./octokit/probot-octokit.js";
 import { loadPackageJson } from "./helpers/load-package-json.js";
 import { updateEnv } from "./helpers/update-env.js";
 
 export class ManifestCreation {
   #updateEnv: typeof updateEnv;
+  #env: Env;
 
   constructor(
     options: {
       updateEnv?: typeof updateEnv;
+      env?: Env;
     } = { updateEnv },
   ) {
-    this.#updateEnv = options.updateEnv || updateEnv;
+    this.#env = options.env || process.env;
+    this.#updateEnv =
+      options.updateEnv || ((values) => updateEnv(values, { env: this.#env }));
   }
   get pkg() {
     return loadPackageJson();
@@ -75,9 +79,9 @@ export class ManifestCreation {
     const generatedManifest = JSON.stringify({
       description: manifest.description || pkg.description,
       hook_attributes: {
-        url: process.env.WEBHOOK_PROXY_URL || `${baseUrl}/`,
+        url: this.#env.WEBHOOK_PROXY_URL || `${baseUrl}/`,
       },
-      name: process.env.PROJECT_DOMAIN || manifest.name || pkg.name,
+      name: this.#env.PROJECT_DOMAIN || manifest.name || pkg.name,
       public: manifest.public || true,
       redirect_url: `${baseUrl}/probot/setup`,
       // TODO: add setup url
@@ -101,9 +105,9 @@ export class ManifestCreation {
       mediaType: {
         previews: ["fury"], // needed for GHES 2.20 and older
       },
-      ...(process.env.GHE_HOST && {
-        baseUrl: `${process.env.GHE_PROTOCOL || "https"}://${
-          process.env.GHE_HOST
+      ...(this.#env.GHE_HOST && {
+        baseUrl: `${this.#env.GHE_PROTOCOL || "https"}://${
+          this.#env.GHE_HOST
         }/api/v3`,
       }),
     };
@@ -125,9 +129,9 @@ export class ManifestCreation {
   }
 
   get createAppUrl() {
-    const githubHost = process.env.GHE_HOST || `github.com`;
-    return `${process.env.GHE_PROTOCOL || "https"}://${githubHost}${
-      process.env.GH_ORG ? `/organizations/${process.env.GH_ORG}` : ""
+    const githubHost = this.#env.GHE_HOST || `github.com`;
+    return `${this.#env.GHE_PROTOCOL || "https"}://${githubHost}${
+      this.#env.GH_ORG ? `/organizations/${this.#env.GH_ORG}` : ""
     }/settings/apps/new`;
   }
 }

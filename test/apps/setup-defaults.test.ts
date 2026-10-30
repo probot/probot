@@ -9,21 +9,30 @@ import { setupAppFactory } from "../../src/apps/setup.js";
 
 describe("setup app defaults", () => {
   afterEach(() => {
-    vi.unstubAllEnvs();
+    vi.restoreAllMocks();
   });
 
   it("handles missing URLs and forwarded hosts", async () => {
-    vi.stubEnv("NO_SMEE_SETUP", "true");
+    const env: NodeJS.ProcessEnv = {
+      ...process.env,
+      NO_SMEE_SETUP: "true",
+      WEBHOOK_PROXY_URL: undefined,
+      PROJECT_DOMAIN: undefined,
+      GHE_HOST: undefined,
+      GHE_PROTOCOL: undefined,
+    };
     const handler = await setupAppFactory({
       host: "localhost",
       port: 3000,
       log: pino({ level: "silent" }),
       updateEnv: vi.fn(),
+      env,
     })();
     const handlerWithoutUpdateEnv = await setupAppFactory({
       host: "localhost",
       port: 3000,
       log: pino({ level: "silent" }),
+      env,
     } as any)();
     const response = {
       writeHead: vi.fn(() => response),
@@ -112,5 +121,19 @@ describe("setup app defaults", () => {
       process.chdir(previousCwd);
       fs.rmSync(tempCwd, { recursive: true, force: true });
     }
+  });
+
+  it("supports the default process environment when no environment is injected", async () => {
+    const handler = await setupAppFactory({
+      host: "localhost",
+      port: 3000,
+      log: pino({ level: "silent" }),
+      updateEnv: vi.fn(),
+      SmeeClient: { createChannel: async () => undefined },
+    })();
+
+    await expect(
+      handler({ method: "GET", url: "/not-found" } as any, {} as any),
+    ).resolves.toBe(false);
   });
 });

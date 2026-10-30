@@ -1,6 +1,6 @@
 import path from "node:path";
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   getLog: vi.fn(),
@@ -20,6 +20,14 @@ vi.mock("@probot/get-private-key", () => ({
     throw new Error("missing private key");
   }),
 }));
+
+afterAll(() => {
+  vi.doUnmock("../../src/helpers/get-log.js");
+  vi.doUnmock("../../src/helpers/resolve-app-function.js");
+  vi.doUnmock("../../src/probot.js");
+  vi.doUnmock("@probot/get-private-key");
+  vi.resetModules();
+});
 
 import { receive } from "../../src/bin/receive.js";
 

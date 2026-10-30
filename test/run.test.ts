@@ -1,19 +1,27 @@
+import { mkdtempSync, rmSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { tmpdir } from "node:os";
 
 import { sign } from "@octokit/webhooks-methods";
 import getPort from "get-port";
 import { pino } from "pino";
 import { describe, expect, it, vi } from "vitest";
 
-import { type Probot, run } from "../src/index.js";
-import { MockLoggerTarget } from "./utils.js";
+import { type Probot, run as probotRun } from "../src/index.js";
+import { MockLoggerTarget, MockSmeeClient } from "./utils.js";
 
 import WebhookExamples, {
   type WebhookDefinition,
 } from "@octokit/webhooks-examples";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const run: typeof probotRun = (app, options) =>
+  probotRun(app, {
+    ...options,
+    loadSmeeClient: async () => ({ SmeeClient: MockSmeeClient }),
+  });
 
 const defaultEnv: NodeJS.ProcessEnv = {
   APP_ID: "1",
@@ -68,8 +76,47 @@ describe("run", () => {
     });
 
     it("requires an app ID in production", async () => {
-      const previousNodeEnv = process.env.NODE_ENV;
-      process.env.NODE_ENV = "production";
+      await expect(
+        run(() => {}, {
+          env: {
+            PRIVATE_KEY_PATH: defaultEnv.PRIVATE_KEY_PATH,
+            NODE_ENV: "production",
+          },
+          log: pino({ level: "silent" }),
+          updateEnv,
+        }),
+      ).rejects.toThrow(
+        "App ID is missing, and is required to run in production mode.",
+      );
+    });
+
+    it("requires a private key in production", async () => {
+      const consoleError = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+      await expect(
+        run(() => {}, {
+          env: {
+            APP_ID: "1",
+            PRIVATE_KEY_PATH: "/definitely/missing-private-key.pem",
+            NODE_ENV: "production",
+          },
+          log: pino({ level: "silent" }),
+          updateEnv,
+        }),
+      ).rejects.toThrow(
+        "Certificate is missing, and is required to run in production mode.",
+      );
+      expect(consoleError).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: expect.stringContaining("Private key does not exists"),
+        }),
+      );
+      consoleError.mockRestore();
+    });
+
+    it("uses process NODE_ENV when injected environment is partial", async () => {
+      vi.stubEnv("NODE_ENV", "production");
 
       try {
         await expect(
@@ -84,40 +131,7 @@ describe("run", () => {
           "App ID is missing, and is required to run in production mode.",
         );
       } finally {
-        if (previousNodeEnv === undefined) delete process.env.NODE_ENV;
-        else process.env.NODE_ENV = previousNodeEnv;
-      }
-    });
-
-    it("requires a private key in production", async () => {
-      const previousNodeEnv = process.env.NODE_ENV;
-      const consoleError = vi
-        .spyOn(console, "error")
-        .mockImplementation(() => {});
-      process.env.NODE_ENV = "production";
-
-      try {
-        await expect(
-          run(() => {}, {
-            env: {
-              APP_ID: "1",
-              PRIVATE_KEY_PATH: "/definitely/missing-private-key.pem",
-            },
-            log: pino({ level: "silent" }),
-            updateEnv,
-          }),
-        ).rejects.toThrow(
-          "Certificate is missing, and is required to run in production mode.",
-        );
-        expect(consoleError).toHaveBeenCalledWith(
-          expect.objectContaining({
-            message: expect.stringContaining("Private key does not exists"),
-          }),
-        );
-      } finally {
-        consoleError.mockRestore();
-        if (previousNodeEnv === undefined) delete process.env.NODE_ENV;
-        else process.env.NODE_ENV = previousNodeEnv;
+        vi.unstubAllEnvs();
       }
     });
 
@@ -139,6 +153,7 @@ describe("run", () => {
 
     it("runs with an array of strings", async () => {
       const logTarget = new MockLoggerTarget();
+      const port = await getPort();
       const server = await run(
         [
           "node",
@@ -152,6 +167,7 @@ describe("run", () => {
           "info",
         ],
         {
+          env: { ...defaultEnv, PORT: port.toString() },
           updateEnv,
           log: pino(logTarget),
           SmeeClient: { createChannel: async () => "dummy" },
@@ -191,32 +207,77 @@ describe("run", () => {
     });
 
     it("uses default setup dependencies when they are omitted", async () => {
-      const previousNoSmeeSetup = process.env.NO_SMEE_SETUP;
-      process.env.NO_SMEE_SETUP = "true";
       const port = await getPort();
+      const server = await run(() => {}, {
+        env: {
+          LOG_LEVEL: "fatal",
+          NO_SMEE_SETUP: "true",
+          PORT: port.toString(),
+        },
+        log: pino({ level: "silent" }),
+      });
+
+      const response = await fetch(
+        `http://${server.host}:${server.port}/probot`,
+      );
+      expect(response.status).toBe(200);
+      expect(await response.text()).toContain("Welcome to probot");
+
+      await server.stop();
+    });
+
+    it("uses process.env when setup is started without an injected environment", async () => {
+      vi.stubEnv("APP_ID", undefined);
+      vi.stubEnv("PRIVATE_KEY", undefined);
+      vi.stubEnv("PRIVATE_KEY_PATH", undefined);
+      vi.stubEnv("NO_SMEE_SETUP", "true");
+
+      try {
+        const server = await run(() => {}, {
+          log: pino({ level: "silent" }),
+          SmeeClient: { createChannel: async () => "dummy" },
+        });
+
+        await server.stop();
+      } finally {
+        vi.unstubAllEnvs();
+      }
+    });
+
+    it("includes a newly created Smee URL in the setup manifest", async () => {
+      const previousCwd = process.cwd();
+      const tempCwd = mkdtempSync(path.join(tmpdir(), "probot-run-setup-"));
+      process.chdir(tempCwd);
 
       try {
         const server = await run(() => {}, {
           env: {
+            APP_ID: undefined,
+            PRIVATE_KEY: undefined,
+            PRIVATE_KEY_PATH: undefined,
             LOG_LEVEL: "fatal",
-            PORT: port.toString(),
+            NO_SMEE_SETUP: undefined,
+            PORT: String(await getPort()),
+            WEBHOOK_PROXY_URL: undefined,
           },
-          log: pino({ level: "silent" }),
+          SmeeClient: {
+            createChannel: async () => "https://smee.io/generated",
+          },
         });
 
-        const response = await fetch(
-          `http://${server.host}:${server.port}/probot`,
-        );
-        expect(response.status).toBe(200);
-        expect(await response.text()).toContain("Welcome to probot");
-
-        await server.stop();
-      } finally {
-        if (previousNoSmeeSetup === undefined) {
-          delete process.env.NO_SMEE_SETUP;
-        } else {
-          process.env.NO_SMEE_SETUP = previousNoSmeeSetup;
+        try {
+          const response = await fetch(
+            `http://${server.host}:${server.port}/probot`,
+          );
+          expect(await response.text()).toContain(
+            '"hook_attributes":{"url":"https://smee.io/generated"}',
+          );
+        } finally {
+          await server.stop();
         }
+      } finally {
+        process.chdir(previousCwd);
+        rmSync(tempCwd, { recursive: true, force: true });
       }
     });
 
@@ -243,20 +304,12 @@ describe("run", () => {
 
     it("accepts valid credentials in production", async () => {
       const port = await getPort();
-      const previousNodeEnv = process.env.NODE_ENV;
-      process.env.NODE_ENV = "production";
-
-      try {
-        const server = await run(() => {}, {
-          env: { ...defaultEnv, PORT: port.toString() },
-          log: pino({ level: "silent" }),
-          updateEnv,
-        });
-        await server.stop();
-      } finally {
-        if (previousNodeEnv === undefined) delete process.env.NODE_ENV;
-        else process.env.NODE_ENV = previousNodeEnv;
-      }
+      const server = await run(() => {}, {
+        env: { ...defaultEnv, NODE_ENV: "production", PORT: port.toString() },
+        log: pino({ level: "silent" }),
+        updateEnv,
+      });
+      await server.stop();
     });
   });
 

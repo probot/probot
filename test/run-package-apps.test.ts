@@ -3,7 +3,15 @@ import { fileURLToPath } from "node:url";
 
 import getPort from "get-port";
 import { pino } from "pino";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  afterAll,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
 
 const mocks = vi.hoisted(() => ({
   packageConfig: vi.fn(),
@@ -15,7 +23,18 @@ vi.mock("../src/helpers/resolve-app-function.js", () => ({
   resolveAppFunction: mocks.resolveAppFunction,
 }));
 
-import { run } from "../src/run.js";
+afterAll(() => {
+  vi.doUnmock("package-config");
+  vi.doUnmock("../src/helpers/resolve-app-function.js");
+  vi.resetModules();
+});
+
+let run: typeof import("../src/run.js").run;
+
+beforeAll(async () => {
+  vi.resetModules();
+  ({ run } = await import("../src/run.js"));
+});
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const privateKeyPath = path.join(__dirname, "fixtures", "test-private-key.pem");
@@ -39,7 +58,7 @@ describe("run with package-config apps", () => {
         String(await getPort()),
         "cli-app.js",
       ],
-      { log: pino({ level: "silent" }) },
+      { env: { WEBHOOK_PROXY_URL: "" }, log: pino({ level: "silent" }) },
     );
 
     try {

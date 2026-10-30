@@ -25,3 +25,11 @@ export class MockLoggerTarget extends Writable {
     return this.target;
   }
 }
+
+export class MockSmeeClient {
+  constructor(_options: { target: string; fetch?: Function | undefined }) {}
+
+  async start(): Promise<EventSource> {
+    return { close: () => undefined } as EventSource;
+  }
+}

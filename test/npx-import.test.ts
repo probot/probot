@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -17,12 +17,12 @@ const checkForFixedNpxImport = (
   pkg: string,
   version: string,
 ): number => {
-  const files = readdirSync(dir);
+  const files = readdirSync(dir, { withFileTypes: true });
   let matchesFound = 0;
 
   for (let i = 0; i < files.length; i++) {
-    let file = join(dir, files[i]);
-    if (statSync(file).isDirectory()) {
+    const file = join(dir, files[i].name);
+    if (files[i].isDirectory()) {
       matchesFound += checkForFixedNpxImport(file, pkg, version);
     } else {
       if (file.endsWith(".ts")) {

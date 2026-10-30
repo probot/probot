@@ -1,6 +1,6 @@
 import { sign } from "@octokit/webhooks-methods";
 import { ManifestCreation } from "../../src/manifest-creation.js";
-import { describe, it, expect } from "vitest";
+import { afterEach, beforeEach, describe, it, expect } from "vitest";
 import getPort from "get-port";
 import { type ApplicationFunction, Probot, Server } from "../../src/index.js";
 import { pino } from "pino";
@@ -14,6 +14,36 @@ import { createDeferredPromise } from "../../src/helpers/create-deferred-promise
 import { detectRuntime } from "../../src/helpers/detect-runtime.js";
 import { MockLoggerTarget } from "../utils.js";
 
+class InMemorySmeeClient {
+  static active: InMemorySmeeClient | undefined;
+  static createChannel() {
+    return "https://smee.test/channel";
+  }
+
+  readonly #target: string;
+  readonly #fetch: typeof fetch;
+
+  constructor(options: { target: string; fetch?: Function | undefined }) {
+    this.#target = options.target;
+    this.#fetch = (options.fetch as typeof fetch | undefined) || fetch;
+    InMemorySmeeClient.active = this;
+  }
+
+  async start(): Promise<EventSource> {
+    return { close: () => undefined } as EventSource;
+  }
+
+  static async emit(body: unknown, headers: Record<string, string>) {
+    const client = InMemorySmeeClient.active;
+    if (!client) throw new Error("In-memory Smee client is not connected");
+    await client.#fetch(client.#target, {
+      method: "POST",
+      headers: { ...headers, "content-type": "application/json" },
+      body: JSON.stringify(body),
+    });
+  }
+}
+
 const UpdateEnvCalls: Env[] = [];
 const updateEnv = (env: Env) => {
   UpdateEnvCalls.push(env);
@@ -21,7 +51,19 @@ const updateEnv = (env: Env) => {
 };
 
 describe("smee-client", () => {
-  delete process.env.WEBHOOK_PROXY_URL;
+  const previousWebhookProxyUrl = process.env.WEBHOOK_PROXY_URL;
+
+  beforeEach(() => {
+    delete process.env.WEBHOOK_PROXY_URL;
+  });
+
+  afterEach(() => {
+    if (previousWebhookProxyUrl === undefined) {
+      delete process.env.WEBHOOK_PROXY_URL;
+    } else {
+      process.env.WEBHOOK_PROXY_URL = previousWebhookProxyUrl;
+    }
+  });
   const APP_ID = "1";
   const PRIVATE_KEY = `-----BEGIN RSA PRIVATE KEY-----
     MIIEpAIBAAKCAQEA1c7+9z5Pad7OejecsQ0bu3aozN3tihPmljnnudb9G3HECdnH
@@ -70,7 +112,7 @@ describe("smee-client", () => {
 
       const WEBHOOK_PROXY_URL = await new ManifestCreation({
         updateEnv,
-      }).createWebhookChannel();
+      }).createWebhookChannel({ SmeeClient: InMemorySmeeClient });
 
       expect(WEBHOOK_PROXY_URL).toBeDefined();
 
@@ -97,6 +139,7 @@ describe("smee-client", () => {
         port,
         webhookProxy: WEBHOOK_PROXY_URL,
         webhookPath: "/",
+        loadSmeeClient: async () => ({ SmeeClient: InMemorySmeeClient }),
       });
 
       try {
@@ -105,15 +148,10 @@ describe("smee-client", () => {
 
         const body = JSON.stringify(pushEvent);
 
-        await fetch(`${WEBHOOK_PROXY_URL}/`, {
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-            "x-github-event": "push",
-            "x-github-delivery": "1",
-            "x-hub-signature-256": await sign(WEBHOOK_SECRET, body),
-          },
-          body,
+        await InMemorySmeeClient.emit(pushEvent, {
+          "x-github-event": "push",
+          "x-github-delivery": "1",
+          "x-hub-signature-256": await sign(WEBHOOK_SECRET, body),
         });
 
         await eventPromise.promise;

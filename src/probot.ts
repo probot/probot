@@ -53,6 +53,7 @@ export type State = {
   octokit: ProbotOctokit | null;
   webhooks: ProbotWebhooks | null;
   log: Logger | null;
+  getLog: NonNullable<Options["getLog"]>;
   logFormat?: "pretty" | "json";
   logLevelInString?: boolean;
   sentryDsn?: string | undefined;
@@ -112,6 +113,7 @@ export class Probot {
       octokit: null,
       webhooks: null,
       log: options.log || null,
+      getLog: options.getLog || getLog,
       logFormat: options.logFormat || "pretty",
       logLevelInString: options.logLevelInString || false,
       logLevel: options.logLevel || "warn",
@@ -150,9 +152,9 @@ export class Probot {
         1000 * 60 * 59,
       );
 
-      this.#state.log =
+      const log =
         this.#state.log ||
-        (await getLog({
+        (await this.#state.getLog({
           logFormat: this.#state.logFormat,
           logLevelInString: this.#state.logLevelInString,
           level: this.#state.logLevel,
@@ -160,7 +162,7 @@ export class Probot {
           sentryDsn: this.#state.sentryDsn,
         }));
 
-      this.#state.log = this.#state.log.child({ name: "probot" });
+      this.#state.log = log.child({ name: "probot" });
 
       const Octokit = await getProbotOctokitWithDefaults({
         githubToken: this.#state.githubToken,

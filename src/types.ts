@@ -4,7 +4,6 @@ import type {
   EmitterWebhookEvent as WebhookEvent,
   Webhooks,
 } from "@octokit/webhooks";
-import type { RedisOptions } from "ioredis";
 import type { Logger } from "pino";
 import type { Options as LoggingOptions } from "pino-http";
 import type { GetLogOptions } from "./helpers/get-log.js";
@@ -19,6 +18,14 @@ import type { ProbotOctokit } from "./octokit/probot-octokit.js";
 
 export type StripUndefined<T> = {
   [K in keyof T]-?: Exclude<T[K], undefined>;
+};
+
+/** @ts-ignore -- ioredis is optional; preserve this directive in declaration output. */
+type IORedisOptions = import("ioredis").RedisOptions;
+
+// Keep ioredis option types when installed, otherwise accept an options object.
+export type RedisOptions = {
+  [Key in keyof IORedisOptions]: IORedisOptions[Key];
 };
 
 export interface Options {

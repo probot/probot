@@ -7,6 +7,7 @@ import type {
 import type { RedisOptions } from "ioredis";
 import type { Logger } from "pino";
 import type { Options as LoggingOptions } from "pino-http";
+import type { GetLogOptions } from "./helpers/get-log.js";
 
 import type { Context } from "./context.js";
 import type { Probot } from "./probot.js";
@@ -23,6 +24,7 @@ export interface Options {
   appId?: number | string | undefined;
   Octokit?: typeof ProbotOctokit | undefined;
   log?: Logger | undefined;
+  getLog?: ((options?: GetLogOptions) => Promise<Logger>) | undefined;
   redisConfig?: RedisOptions | string | undefined;
   secret?: string | undefined;
   logLevel?:
@@ -79,6 +81,7 @@ export type Handler = (
 export type ServerOptions = {
   cwd?: string | undefined;
   log?: Logger | undefined;
+  getLog?: ((options?: GetLogOptions) => Promise<Logger>) | undefined;
   port?: number | undefined;
   host?: string | undefined;
   webhookPath?: string | undefined;

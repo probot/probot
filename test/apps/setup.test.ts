@@ -1,11 +1,23 @@
 import fetchMock from "fetch-mock";
 import pino from "pino";
 import getPort from "get-port";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
 
 import type { Env } from "../../src/types.js";
 import { Probot, Server } from "../../src/index.js";
-import { setupAppFactory } from "../../src/apps/setup.js";
+let setupAppFactoryImpl: typeof import("../../src/apps/setup.js").setupAppFactory;
+
+const setupAppFactory = (options: Parameters<typeof setupAppFactoryImpl>[0]) =>
+  setupAppFactoryImpl({ ...options, env: options.env ?? {} });
 
 import { importView } from "../../src/views/import.js";
 import { successView } from "../../src/views/success.js";
@@ -16,6 +28,17 @@ import { MockLoggerTarget } from "../utils.js";
 
 const exec = vi.hoisted(() => vi.fn());
 vi.mock("node:child_process", () => ({ exec }));
+
+beforeAll(async () => {
+  vi.resetModules();
+  ({ setupAppFactory: setupAppFactoryImpl } =
+    await import("../../src/apps/setup.js"));
+});
+
+afterAll(() => {
+  vi.doUnmock("node:child_process");
+  vi.resetModules();
+});
 
 describe("Setup app", () => {
   const activeServers = new Set<Server>();
@@ -56,27 +79,17 @@ describe("Setup app", () => {
   };
 
   it("returns false for an unhandled request", async () => {
-    const previousNoSmeeSetup = process.env.NO_SMEE_SETUP;
-    process.env.NO_SMEE_SETUP = "true";
+    const handler = await setupAppFactory({
+      log: pino({ level: "silent" }),
+      host: "localhost",
+      port: 3000,
+      updateEnv,
+      env: { NO_SMEE_SETUP: "true" },
+    })();
 
-    try {
-      const handler = await setupAppFactory({
-        log: pino({ level: "silent" }),
-        host: "localhost",
-        port: 3000,
-        updateEnv,
-      })();
-
-      await expect(
-        handler({ method: "GET", url: "/not-found" } as any, {} as any),
-      ).resolves.toBe(false);
-    } finally {
-      if (previousNoSmeeSetup === undefined) {
-        delete process.env.NO_SMEE_SETUP;
-      } else {
-        process.env.NO_SMEE_SETUP = previousNoSmeeSetup;
-      }
-    }
+    await expect(
+      handler({ method: "GET", url: "/not-found" } as any, {} as any),
+    ).resolves.toBe(false);
   });
 
   describe("logs", () => {
@@ -239,10 +252,6 @@ describe("Setup app", () => {
             webhook_secret: "webhook_secret",
           },
         });
-      const previousProjectDomain = process.env.PROJECT_DOMAIN;
-      const previousNoSmeeSetup = process.env.NO_SMEE_SETUP;
-      delete process.env.PROJECT_DOMAIN;
-      process.env.NO_SMEE_SETUP = "true";
       const logTarget = new MockLoggerTarget();
       const log = pino(logTarget);
       const handler = await setupAppFactory({
@@ -251,39 +260,27 @@ describe("Setup app", () => {
         port: 3000,
         request: { fetch: mock.fetchHandler },
         updateEnv,
+        env: { NO_SMEE_SETUP: "true" },
       })();
       const end = vi.fn();
       const writeHead = vi.fn(() => ({ end }));
 
-      try {
-        const handled = await handler(
-          { method: "GET", url: "/probot/setup?code=123" } as any,
-          { writeHead } as any,
-        );
+      const handled = await handler(
+        { method: "GET", url: "/probot/setup?code=123" } as any,
+        { writeHead } as any,
+      );
 
-        expect(handled).toBe(true);
-        expect(writeHead).toHaveBeenCalledWith(302, {
-          "content-type": "text/plain",
-          location: "/apps/my-app/installations/new",
-        });
-        expect(end).toHaveBeenCalledWith(
-          "Found. Redirecting to /apps/my-app/installations/new",
-        );
-        expect(logTarget.entries.map(({ msg }) => msg)).toContain(
-          "Probot has been set up, please restart the server!",
-        );
-      } finally {
-        if (previousProjectDomain === undefined) {
-          delete process.env.PROJECT_DOMAIN;
-        } else {
-          process.env.PROJECT_DOMAIN = previousProjectDomain;
-        }
-        if (previousNoSmeeSetup === undefined) {
-          delete process.env.NO_SMEE_SETUP;
-        } else {
-          process.env.NO_SMEE_SETUP = previousNoSmeeSetup;
-        }
-      }
+      expect(handled).toBe(true);
+      expect(writeHead).toHaveBeenCalledWith(302, {
+        "content-type": "text/plain",
+        location: "/apps/my-app/installations/new",
+      });
+      expect(end).toHaveBeenCalledWith(
+        "Found. Redirecting to /apps/my-app/installations/new",
+      );
+      expect(logTarget.entries.map(({ msg }) => msg)).toContain(
+        "Probot has been set up, please restart the server!",
+      );
     });
 
     it("returns a redirect", async () => {
@@ -319,6 +316,8 @@ describe("Setup app", () => {
         port: await getPort(),
       });
 
+      const env: NodeJS.ProcessEnv = {};
+
       await server.loadHandlerFactory(
         setupAppFactory({
           log,
@@ -328,14 +327,14 @@ describe("Setup app", () => {
             fetch: mock.fetchHandler,
           },
           updateEnv,
+          env,
           SmeeClient,
         }),
       );
 
       await server.start();
 
-      const previousProjectDomain = process.env.PROJECT_DOMAIN;
-      process.env.PROJECT_DOMAIN = "example-project";
+      env.PROJECT_DOMAIN = "example-project";
       exec.mockImplementation(
         (_command: string, callback: (error: Error | null) => void) =>
           callback(new Error("refresh failed")),
@@ -374,11 +373,6 @@ describe("Setup app", () => {
         expect(exec).toHaveBeenCalledWith("refresh", expect.any(Function));
         exec.mock.calls[0][1](null);
       } finally {
-        if (previousProjectDomain === undefined) {
-          delete process.env.PROJECT_DOMAIN;
-        } else {
-          process.env.PROJECT_DOMAIN = previousProjectDomain;
-        }
         exec.mockReset();
       }
 

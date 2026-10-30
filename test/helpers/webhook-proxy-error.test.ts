@@ -1,9 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("npx-import-light", () => ({
-  npxImport: vi.fn().mockRejectedValue(new Error("smee unavailable")),
-}));
-
 import { createWebhookProxy } from "../../src/helpers/webhook-proxy.js";
 
 describe("createWebhookProxy", () => {
@@ -17,11 +13,29 @@ describe("createWebhookProxy", () => {
         port: 3000,
         path: "/webhooks",
         logger,
+        loadSmeeClient: async () => {
+          throw new Error("smee unavailable");
+        },
       }),
     ).resolves.toBeUndefined();
 
     expect(logger.warn).toHaveBeenCalledWith(
       "Run `npm install --save-dev smee-client` to proxy webhooks to localhost.",
     );
+  });
+
+  it("rejects when the Smee client loader returns no constructor", async () => {
+    const logger = { warn: vi.fn() } as any;
+
+    await expect(
+      createWebhookProxy({
+        url: "https://smee.io/example",
+        host: "127.0.0.1",
+        port: 3000,
+        path: "/webhooks",
+        logger,
+        loadSmeeClient: async () => ({}),
+      }),
+    ).rejects.toThrow("SmeeClient is unavailable");
   });
 });

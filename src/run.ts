@@ -38,10 +38,14 @@ export async function run(
   additionalOptions?: AdditionalOptions,
 ): Promise<Server> {
   applyEnv();
+  const env: Env = {
+    ...process.env,
+    ...additionalOptions?.env,
+  };
 
-  const envOptions = readEnvOptions(additionalOptions?.env);
+  const envOptions = readEnvOptions(env);
   const cliOptions = Array.isArray(appFnOrArgv)
-    ? readCliOptions(appFnOrArgv)
+    ? readCliOptions(appFnOrArgv, env)
     : {};
 
   const {
@@ -109,7 +113,7 @@ export async function run(
 
   let server: Server;
 
-  if (isProduction()) {
+  if (isProduction(env)) {
     if (!appId) {
       throw new Error(
         "App ID is missing, and is required to run in production mode. " +
@@ -144,7 +148,10 @@ export async function run(
       host: server.host,
       port: server.port,
       log: serverOptions.log.child({ name: "setup" }),
-      updateEnv: additionalOptions?.updateEnv || updateEnv,
+      ...(additionalOptions?.updateEnv
+        ? { updateEnv: additionalOptions.updateEnv }
+        : {}),
+      env,
       SmeeClient: additionalOptions?.SmeeClient,
     });
 

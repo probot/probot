@@ -1,10 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 
-const getLog = vi.hoisted(() => vi.fn());
-
-vi.mock("../src/helpers/get-log.js", () => ({ getLog }));
-
 import { Probot } from "../src/probot.js";
+
+const getLog = vi.fn();
 
 describe("Probot initialization failures", () => {
   it("reports failures before a logger is available", async () => {
@@ -15,7 +13,7 @@ describe("Probot initialization failures", () => {
       .mockImplementation(() => {});
 
     try {
-      const probot = new Probot({ githubToken: "token" });
+      const probot = new Probot({ githubToken: "token", getLog });
 
       await expect(probot.ready()).rejects.toThrow(error);
       expect(consoleError).toHaveBeenCalledWith(

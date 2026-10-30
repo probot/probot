@@ -6,42 +6,54 @@ import { describe, it, expect } from "vitest";
 
 import { updateEnv } from "../../src/helpers/update-env.js";
 
-const originalCwd = process.cwd();
-const originalEnv = Object.assign({}, process.env);
-
 describe("update-dotenv", () => {
-  it("creates .env, writes new values, sets process.env", () => {
-    process.chdir(mkdtempSync(pathJoin(tmpdir(), "update-env")));
-    try {
-      updateEnv({ FOO: "bar" });
-      expect(readFileSync(".env", "utf-8")).toBe("FOO=bar");
-      expect(process.env.FOO).toBe("bar");
-    } finally {
-      process.env = originalEnv;
-      process.chdir(originalCwd);
-    }
+  it("creates .env, writes new values, and updates the supplied environment", () => {
+    const path = pathJoin(
+      mkdtempSync(pathJoin(tmpdir(), "update-env")),
+      ".env",
+    );
+    const env: NodeJS.ProcessEnv = {};
+
+    updateEnv({ FOO: "bar" }, { path, env });
+    expect(readFileSync(path, "utf-8")).toBe("FOO=bar");
+    expect(env.FOO).toBe("bar");
   });
 
   it("properly writes multi-line strings", () => {
-    process.chdir(mkdtempSync(pathJoin(tmpdir(), "update-env")));
+    const path = pathJoin(
+      mkdtempSync(pathJoin(tmpdir(), "update-env")),
+      ".env",
+    );
+
+    updateEnv({ FOO: "bar\nbaz" }, { path, env: {} });
+    expect(readFileSync(path, "utf-8")).toBe("FOO=bar\\nbaz");
+  });
+
+  it("updates process.env by default for backwards compatibility", () => {
+    const path = pathJoin(
+      mkdtempSync(pathJoin(tmpdir(), "update-env")),
+      ".env",
+    );
+    const previous = process.env.PROBOT_TEST_UPDATE_ENV;
+
     try {
-      updateEnv({ FOO: "bar\nbaz" });
-      expect(readFileSync(".env", "utf-8")).toBe("FOO=bar\\nbaz");
+      updateEnv({ PROBOT_TEST_UPDATE_ENV: "bar" }, { path });
+      expect(process.env.PROBOT_TEST_UPDATE_ENV).toBe("bar");
     } finally {
-      process.env = originalEnv;
-      process.chdir(originalCwd);
+      if (previous === undefined) delete process.env.PROBOT_TEST_UPDATE_ENV;
+      else process.env.PROBOT_TEST_UPDATE_ENV = previous;
     }
   });
 
   it("appends new variables to existing variables", () => {
-    process.chdir(mkdtempSync(pathJoin(tmpdir(), "update-env")));
-    try {
-      updateEnv({ FIRST: "foo" });
-      updateEnv({ SECOND: "bar" });
-      expect(readFileSync(".env", "utf-8")).toBe("FIRST=foo\nSECOND=bar");
-    } finally {
-      process.env = originalEnv;
-      process.chdir(originalCwd);
-    }
+    const path = pathJoin(
+      mkdtempSync(pathJoin(tmpdir(), "update-env")),
+      ".env",
+    );
+    const env: NodeJS.ProcessEnv = {};
+
+    updateEnv({ FIRST: "foo" }, { path, env });
+    updateEnv({ SECOND: "bar" }, { path, env });
+    expect(readFileSync(path, "utf-8")).toBe("FIRST=foo\nSECOND=bar");
   });
 });

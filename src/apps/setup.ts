@@ -23,6 +23,7 @@ type SetupFactoryOptions = StripUndefined<
 > &
   Pick<ServerOptions, "request"> & {
     updateEnv?: (env: Env) => Env;
+    env?: Env;
     SmeeClient?:
       | { createChannel: () => Promise<string | undefined> }
       | undefined;
@@ -30,23 +31,27 @@ type SetupFactoryOptions = StripUndefined<
 
 export const setupAppFactory = (options: SetupFactoryOptions) => {
   const { host, port, log, request, SmeeClient } = options;
+  const env = options.env || process.env;
+  const applyEnv =
+    options.updateEnv || ((values: Env) => updateEnv(values, { env }));
 
   return async function setupApp(): Promise<Handler> {
     const setup: ManifestCreation = new ManifestCreation({
-      updateEnv: options.updateEnv || updateEnv,
+      updateEnv: applyEnv,
+      env,
     });
 
     const pkg = setup.pkg;
-    const { WEBHOOK_PROXY_URL, GHE_HOST } = process.env;
+    const { WEBHOOK_PROXY_URL, GHE_HOST } = env;
     const GH_HOST = `https://${GHE_HOST ?? "github.com"}`;
 
     // If not on Glitch or Production, create a smee URL
     if (
-      !isProduction() &&
+      !isProduction(env) &&
       !(
-        process.env.PROJECT_DOMAIN ||
-        process.env.WEBHOOK_PROXY_URL ||
-        process.env.NO_SMEE_SETUP === "true"
+        env.PROJECT_DOMAIN ||
+        env.WEBHOOK_PROXY_URL ||
+        env.NO_SMEE_SETUP === "true"
       )
     ) {
       await setup.createWebhookChannel({ SmeeClient, log });
@@ -59,7 +64,7 @@ export const setupAppFactory = (options: SetupFactoryOptions) => {
     });
     const successViewRendered = successView({ name: pkg.name });
 
-    printWelcomeMessage(log, host, port);
+    printWelcomeMessage(log, host, port, env);
 
     const setupHandler: Handler = async (req, res) => {
       const [path, query = ""] = req.url?.split("?") ?? [req.url, ""];
@@ -106,7 +111,7 @@ export const setupAppFactory = (options: SetupFactoryOptions) => {
           });
 
           // If using glitch, restart the app
-          if (process.env.PROJECT_DOMAIN) {
+          if (env.PROJECT_DOMAIN) {
             exec("refresh", (error) => {
               if (error) {
                 log.error(error);
@@ -153,7 +158,7 @@ export const setupAppFactory = (options: SetupFactoryOptions) => {
               .end("appId and/or pem and/or webhook_secret missing");
             return true;
           }
-          (options.updateEnv || updateEnv)({
+          applyEnv({
             APP_ID: appId,
             PRIVATE_KEY: `"${pem}"`,
             WEBHOOK_SECRET: webhook_secret,
@@ -175,11 +180,12 @@ function printWelcomeMessage(
   log: Logger,
   host: string | undefined,
   port: number | undefined,
+  env: Env,
 ) {
   // use glitch env to get correct domain welcome message
   // https://glitch.com/help/project/
   const domain =
-    process.env.PROJECT_DOMAIN || `http://${getPrintableHost(host)}:${port}`;
+    env.PROJECT_DOMAIN || `http://${getPrintableHost(host)}:${port}`;
 
   [
     ``,

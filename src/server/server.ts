@@ -40,6 +40,7 @@ type State = {
   port: number;
   host: string;
   log?: Logger | undefined;
+  getLog: NonNullable<ServerOptions["getLog"]>;
   loggingOptions?: Record<string, unknown>;
   probot: Probot | null;
   ProbotBase: typeof Probot;
@@ -64,6 +65,7 @@ export class Server {
       initializationPromise: createDeferredPromise<void>(),
       probot: null,
       log: options.log,
+      getLog: options.getLog || getLog,
       httpServer: new HttpServer(),
       cwd: options.cwd || process.cwd(),
       port: options.port || 3000,
@@ -108,7 +110,7 @@ export class Server {
 
     try {
       const log = (this.#state.log = (
-        this.#state.log || (await getLog())
+        this.#state.log || (await this.#state.getLog())
       ).child({ name: "server" }));
 
       await (this.#state.probot = createProbot(this.#state, this, log)).ready();

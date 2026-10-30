@@ -1,6 +1,6 @@
 import { sign } from "@octokit/webhooks-methods";
 import { ManifestCreation } from "../../src/manifest-creation.js";
-import { describe, it, expect } from "vitest";
+import { afterEach, beforeEach, describe, it, expect } from "vitest";
 import getPort from "get-port";
 import { type ApplicationFunction, Probot, Server } from "../../src/index.js";
 import { pino } from "pino";
@@ -21,7 +21,19 @@ const updateEnv = (env: Env) => {
 };
 
 describe("smee-client", () => {
-  delete process.env.WEBHOOK_PROXY_URL;
+  const previousWebhookProxyUrl = process.env.WEBHOOK_PROXY_URL;
+
+  beforeEach(() => {
+    delete process.env.WEBHOOK_PROXY_URL;
+  });
+
+  afterEach(() => {
+    if (previousWebhookProxyUrl === undefined) {
+      delete process.env.WEBHOOK_PROXY_URL;
+    } else {
+      process.env.WEBHOOK_PROXY_URL = previousWebhookProxyUrl;
+    }
+  });
   const APP_ID = "1";
   const PRIVATE_KEY = `-----BEGIN RSA PRIVATE KEY-----
     MIIEpAIBAAKCAQEA1c7+9z5Pad7OejecsQ0bu3aozN3tihPmljnnudb9G3HECdnH

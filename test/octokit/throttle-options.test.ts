@@ -1,5 +1,5 @@
 import type { Logger } from "pino";
-import { describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 const { npxImportMock } = vi.hoisted(() => ({
   npxImportMock: vi.fn(),
@@ -9,7 +9,18 @@ vi.mock("npx-import-light", () => ({
   npxImport: npxImportMock,
 }));
 
-import { getOctokitThrottleOptions } from "../../src/octokit/get-octokit-throttle-options.js";
+afterAll(() => {
+  vi.doUnmock("npx-import-light");
+  vi.resetModules();
+});
+
+let getOctokitThrottleOptions: typeof import("../../src/octokit/get-octokit-throttle-options.js").getOctokitThrottleOptions;
+
+beforeAll(async () => {
+  vi.resetModules();
+  ({ getOctokitThrottleOptions } =
+    await import("../../src/octokit/get-octokit-throttle-options.js"));
+});
 
 class RedisClient {
   status = "ready";

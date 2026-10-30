@@ -2,7 +2,7 @@ import { parseArgs } from "node:util";
 import { getPrivateKey } from "@probot/get-private-key";
 import type { Options as PinoOptions } from "@probot/pino";
 
-import type { Options } from "../types.js";
+import type { Env, Options } from "../types.js";
 import { validateLogLevel } from "../helpers/validate-log-level.js";
 import { validateLogFormat } from "../helpers/validate-log-format.js";
 
@@ -31,6 +31,7 @@ Options:
 
 export function readCliOptions(
   args: string[],
+  env: Env = process.env,
 ): Options & PinoOptions & { args: string[] } {
   const { positionals, values } = parseArgs({
     allowPositionals: true,
@@ -43,62 +44,60 @@ export function readCliOptions(
       port: {
         type: "string",
         short: "p",
-        default: String(process.env.PORT || 3000),
+        default: String(env.PORT || 3000),
       },
       host: {
         type: "string",
-        default: process.env.HOST,
+        default: env.HOST,
       },
       "webhook-proxy": {
         type: "string",
-        default: process.env.WEBHOOK_PROXY_URL,
+        default: env.WEBHOOK_PROXY_URL,
       },
       "webhook-path": {
         type: "string",
-        default: process.env.WEBHOOK_PATH,
+        default: env.WEBHOOK_PATH,
       },
       app: {
         type: "string",
-        default: process.env.APP_ID,
+        default: env.APP_ID,
       },
       secret: {
         type: "string",
-        default: process.env.WEBHOOK_SECRET,
+        default: env.WEBHOOK_SECRET,
       },
       "private-key": {
         type: "string",
-        default: process.env.PRIVATE_KEY_PATH,
+        default: env.PRIVATE_KEY_PATH,
       },
       "log-level": {
         type: "string",
-        default: process.env.LOG_LEVEL || "info",
+        default: env.LOG_LEVEL || "info",
       },
       "log-format": {
         type: "string",
-        default: process.env.LOG_FORMAT || "pretty",
+        default: env.LOG_FORMAT || "pretty",
       },
       "log-level-in-string": {
         type: "boolean",
-        default: process.env.LOG_LEVEL_IN_STRING === "true",
+        default: env.LOG_LEVEL_IN_STRING === "true",
       },
       "log-message-key": {
         type: "string",
-        default: process.env.LOG_MESSAGE_KEY || "msg",
+        default: env.LOG_MESSAGE_KEY || "msg",
       },
       "sentry-dsn": {
         type: "string",
-        default: process.env.SENTRY_DSN,
+        default: env.SENTRY_DSN,
       },
       "redis-url": {
         type: "string",
-        default: process.env.REDIS_URL,
+        default: env.REDIS_URL,
       },
       "base-url": {
         type: "string",
-        default: process.env.GHE_HOST
-          ? `${process.env.GHE_PROTOCOL || "https"}://${
-              process.env.GHE_HOST
-            }/api/v3`
+        default: env.GHE_HOST
+          ? `${env.GHE_PROTOCOL || "https"}://${env.GHE_HOST}/api/v3`
           : "https://api.github.com",
       },
     },

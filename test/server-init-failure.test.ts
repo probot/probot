@@ -1,12 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import getPort from "get-port";
 import pino from "pino";
-
-const getLog = vi.hoisted(() => vi.fn());
-
-vi.mock("../src/helpers/get-log.js", () => ({ getLog }));
-
 import { Server } from "../src/server/server.js";
+
+const getLog = vi.fn();
 
 describe("Server initialization without a logger", () => {
   beforeEach(() => {
@@ -28,6 +25,7 @@ describe("Server initialization without a logger", () => {
     const server = new Server({
       Probot: ReadyProbot as any,
       port: await getPort(),
+      getLog,
     });
 
     try {
@@ -44,7 +42,7 @@ describe("Server initialization without a logger", () => {
     const consoleError = vi
       .spyOn(console, "error")
       .mockImplementation(() => {});
-    const server = new Server();
+    const server = new Server({ getLog } as any);
 
     try {
       await expect(server.start()).rejects.toThrow(error);

@@ -9,7 +9,6 @@ import { run } from "../src/run.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const privateKeyPath = path.join(__dirname, "fixtures", "test-private-key.pem");
-
 describe("run SIGINT handling", () => {
   it("stops cleanly on SIGINT", async () => {
     const on = vi.spyOn(process, "on");

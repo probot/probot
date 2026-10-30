@@ -1,5 +1,6 @@
 import { Octokit } from "@octokit/core";
 import type { OctokitOptions } from "@octokit/core";
+import type { Constructor, ReturnTypeOf } from "@octokit/core/types";
 import { enterpriseCompatibility } from "@octokit/plugin-enterprise-compatibility";
 import type { RequestOptions } from "@octokit/types";
 import { paginateRest } from "@octokit/plugin-paginate-rest";
@@ -41,26 +42,43 @@ const defaultOptions = {
 };
 export const PROBOT_OCTOKIT_DEFAULTS = Symbol("probot octokit defaults");
 
-const ProbotOctokitBase = Octokit.plugin(
-  throttling,
-  retry,
-  paginateRest,
-  restEndpointMethods,
-  enterpriseCompatibility,
-  probotRequestLogging,
-  config,
-).defaults((instanceOptions: OctokitOptions) => {
-  // merge throttle options deeply
-  const options = {
-    ...defaultOptions,
-    ...instanceOptions,
-    ...{
-      throttle: { ...defaultOptions.throttle, ...instanceOptions.throttle },
-    },
-  };
+type Simplify<T> = { [K in keyof T]: T[K] };
 
-  return options;
-});
+type ProbotOctokitPlugins = Simplify<
+  ReturnTypeOf<
+    [
+      typeof throttling,
+      typeof retry,
+      typeof paginateRest,
+      typeof restEndpointMethods,
+      typeof enterpriseCompatibility,
+      typeof probotRequestLogging,
+      typeof config,
+    ]
+  >
+>;
+
+const ProbotOctokitBase: typeof Octokit & Constructor<ProbotOctokitPlugins> =
+  Octokit.plugin(
+    throttling,
+    retry,
+    paginateRest,
+    restEndpointMethods,
+    enterpriseCompatibility,
+    probotRequestLogging,
+    config,
+  ).defaults((instanceOptions: OctokitOptions) => {
+    // merge throttle options deeply
+    const options = {
+      ...defaultOptions,
+      ...instanceOptions,
+      ...{
+        throttle: { ...defaultOptions.throttle, ...instanceOptions.throttle },
+      },
+    };
+
+    return options;
+  });
 
 const octokitDefaults = Octokit.defaults;
 (

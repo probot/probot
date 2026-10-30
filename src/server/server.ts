@@ -10,6 +10,7 @@ import type {
   ApplicationFunction,
   Handler,
   HandlerFactory,
+  MiddlewareHandler,
   ServerOptions,
 } from "../types.js";
 
@@ -160,8 +161,8 @@ export class Server {
     return this.#state.initializationPromise.promise;
   }
 
-  public addHandler(handler: Handler) {
-    this.#state.addedHandlers.push(handler);
+  public addHandler(handler: Handler | MiddlewareHandler) {
+    this.#state.addedHandlers.push(handler as Handler);
   }
 
   public async loadHandlerFactory(appFn: HandlerFactory) {
@@ -171,7 +172,7 @@ export class Server {
       requireValue(this.#state.probot, "Probot is not initialized"),
       {
         cwd: this.#state.cwd,
-        addHandler: (handler: Handler) => {
+        addHandler: (handler: Handler | MiddlewareHandler) => {
           this.addHandler(handler);
         },
       },
@@ -185,7 +186,7 @@ export class Server {
 
     await appFn(requireValue(this.#state.probot, "Probot is not initialized"), {
       cwd: this.#state.cwd,
-      addHandler: (handler: Handler) => {
+      addHandler: (handler: Handler | MiddlewareHandler) => {
         this.addHandler(handler);
       },
     });

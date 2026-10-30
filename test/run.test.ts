@@ -115,6 +115,23 @@ describe("run", () => {
       consoleError.mockRestore();
     });
 
+    it("requires a webhook secret in production", async () => {
+      await expect(
+        run(() => {}, {
+          env: {
+            APP_ID: "1",
+            PRIVATE_KEY_PATH: defaultEnv.PRIVATE_KEY_PATH,
+            WEBHOOK_SECRET: undefined,
+            NODE_ENV: "production",
+          },
+          log: pino({ level: "silent" }),
+          updateEnv,
+        }),
+      ).rejects.toThrow(
+        "Webhook secret is missing, and is required to run in production mode.",
+      );
+    });
+
     it("uses process NODE_ENV when injected environment is partial", async () => {
       vi.stubEnv("NODE_ENV", "production");
 

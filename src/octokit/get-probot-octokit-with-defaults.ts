@@ -39,24 +39,23 @@ export function mergeThrottleOptions(
 export async function getProbotOctokitWithDefaults(
   options: Options,
 ): Promise<typeof ProbotOctokit> {
+  const authRequest = request.defaults({
+    ...(options.baseUrl ? { baseUrl: options.baseUrl } : {}),
+    request: {
+      fetch: options.request?.fetch,
+    },
+  });
+
   const authOptions = options.githubToken
     ? {
         token: options.githubToken,
-        request: request.defaults({
-          request: {
-            fetch: options.request?.fetch,
-          },
-        }),
+        request: authRequest,
       }
     : {
         cache: options.cache,
         appId: options.appId,
         privateKey: options.privateKey,
-        request: request.defaults({
-          request: {
-            fetch: options.request?.fetch,
-          },
-        }),
+        request: authRequest,
       };
 
   const log = options.log.child({ name: "octokit" });

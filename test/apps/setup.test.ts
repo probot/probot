@@ -17,8 +17,13 @@ import type { Env } from "../../src/types.js";
 import { Probot, Server } from "../../src/index.js";
 let setupAppFactoryImpl: typeof import("../../src/apps/setup.js").setupAppFactory;
 
+const SETUP_TOKEN = "test-setup-token";
+
 const setupAppFactory = (options: Parameters<typeof setupAppFactoryImpl>[0]) =>
-  setupAppFactoryImpl({ ...options, env: options.env ?? {} });
+  setupAppFactoryImpl({
+    ...options,
+    env: options.env ?? { PROBOT_SETUP_TOKEN: SETUP_TOKEN },
+  });
 
 import { importView } from "../../src/views/import.js";
 import { successView } from "../../src/views/success.js";
@@ -85,7 +90,7 @@ describe("Setup app", () => {
       host: "localhost",
       port: 3000,
       updateEnv,
-      env: { NO_SMEE_SETUP: "true" },
+      env: { NO_SMEE_SETUP: "true", PROBOT_SETUP_TOKEN: SETUP_TOKEN },
     })();
 
     await expect(
@@ -264,7 +269,7 @@ describe("Setup app", () => {
         port: 3000,
         request: { fetch: mock.fetchHandler },
         updateEnv,
-        env: { NO_SMEE_SETUP: "true" },
+        env: { NO_SMEE_SETUP: "true", PROBOT_SETUP_TOKEN: SETUP_TOKEN },
       })();
       const end = vi.fn();
       const writeHead = vi.fn(() => ({ end }));
@@ -272,7 +277,7 @@ describe("Setup app", () => {
       const handled = await handler(
         {
           method: "GET",
-          url: "/probot/setup?code=123",
+          url: `/probot/setup?code=123&state=${SETUP_TOKEN}`,
         } as unknown as IncomingMessage,
         { writeHead } as unknown as ServerResponse,
       );
@@ -323,7 +328,7 @@ describe("Setup app", () => {
         port: await getPort(),
       });
 
-      const env: NodeJS.ProcessEnv = {};
+      const env: NodeJS.ProcessEnv = { PROBOT_SETUP_TOKEN: SETUP_TOKEN };
 
       await server.loadHandlerFactory(
         setupAppFactory({
@@ -349,10 +354,9 @@ describe("Setup app", () => {
 
       try {
         const setupResponse = await fetch(
-          `http://${server.host}:${server.port}/probot/setup?code=123`,
+          `http://${server.host}:${server.port}/probot/setup?code=123&state=${SETUP_TOKEN}`,
           { method: "GET", redirect: "manual" },
         );
-
         expect(setupResponse.status).toBe(302);
         expect(setupResponse.headers.get("location")).toBe(
           "/apps/my-app/installations/new",
@@ -415,7 +419,7 @@ describe("Setup app", () => {
       await server.start();
 
       const setupResponse = await fetch(
-        `http://${server.host}:${server.port}/probot/setup`,
+        `http://${server.host}:${server.port}/probot/setup?state=${SETUP_TOKEN}`,
       );
 
       expect(setupResponse.status).toBe(400);
@@ -453,7 +457,7 @@ describe("Setup app", () => {
       await server.start();
 
       const setupResponse = await fetch(
-        `http://${server.host}:${server.port}/probot/setup?code=`,
+        `http://${server.host}:${server.port}/probot/setup?code=&state=${SETUP_TOKEN}`,
       );
 
       expect(setupResponse.status).toBe(400);
@@ -549,6 +553,7 @@ describe("Setup app", () => {
           method: "POST",
           headers: {
             "content-type": "application/json",
+            cookie: `probot_setup_token=${SETUP_TOKEN}`,
           },
           body,
         },
@@ -611,6 +616,7 @@ describe("Setup app", () => {
           method: "POST",
           headers: {
             "content-type": "application/json",
+            cookie: `probot_setup_token=${SETUP_TOKEN}`,
           },
           body,
         },
@@ -622,6 +628,169 @@ describe("Setup app", () => {
       );
 
       await server.stop();
+    });
+  });
+
+  describe("setup token", () => {
+    const createHandler = async (
+      options: Partial<Parameters<typeof setupAppFactory>[0]> = {},
+    ) =>
+      setupAppFactory({
+        log: pino({ level: "silent" }),
+        host: "localhost",
+        port: 3000,
+        updateEnv,
+        env: { NO_SMEE_SETUP: "true", PROBOT_SETUP_TOKEN: SETUP_TOKEN },
+        ...options,
+      })();
+
+    const call = async (
+      handler: Awaited<ReturnType<typeof createHandler>>,
+      req: Record<string, unknown>,
+    ) => {
+      const end = vi.fn((_body?: string) => {});
+      const writeHead = vi.fn(
+        (_status: number, _headers?: Record<string, string>) => ({ end }),
+      );
+      const handled = await handler(
+        { headers: { host: "localhost:3000" }, ...req } as IncomingMessage,
+        { writeHead, end } as unknown as ServerResponse,
+      );
+      return { handled, writeHead, end };
+    };
+
+    const postImport = (
+      handler: Awaited<ReturnType<typeof createHandler>>,
+      cookie?: string,
+    ) =>
+      call(handler, {
+        method: "POST",
+        url: "/probot/import",
+        headers: cookie ? { cookie } : {},
+        body: JSON.stringify({ appId: "1", pem: "pem", webhook_secret: "s" }),
+      });
+
+    const conversionMock = () =>
+      fetchMock
+        .createInstance()
+        .post("https://api.github.com/app-manifests/123/conversions", {
+          status: 201,
+          body: {
+            html_url: "/apps/my-app",
+            id: "id",
+            pem: "pem",
+            webhook_secret: "webhook_secret",
+          },
+        });
+
+    beforeEach(reset);
+
+    it("passes the token to GitHub as state", async () => {
+      const { end } = await call(await createHandler(), {
+        method: "GET",
+        url: "/probot",
+      });
+
+      expect(end.mock.calls[0][0]).toContain(
+        `action="https://github.com/settings/apps/new?state=${SETUP_TOKEN}"`,
+      );
+    });
+
+    it("generates a random token when none is provided", async () => {
+      const getState = async (setupToken?: string) => {
+        const handler = await setupAppFactory({
+          log: pino({ level: "silent" }),
+          host: "localhost",
+          port: 3000,
+          updateEnv,
+          env: {
+            NO_SMEE_SETUP: "true",
+            ...(setupToken === undefined
+              ? {}
+              : { PROBOT_SETUP_TOKEN: setupToken }),
+          },
+        })();
+        const { end } = await call(handler, { method: "GET", url: "/probot" });
+        return /\?state=([^"]*)"/.exec(end.mock.calls[0][0] ?? "")?.[1];
+      };
+
+      const first = await getState();
+      const second = await getState("");
+
+      expect(first).toMatch(/^[0-9a-f]{64}$/);
+      expect(second).toMatch(/^[0-9a-f]{64}$/);
+      expect(first).not.toBe(second);
+    });
+
+    it.each([
+      ["missing", "/probot/setup?code=123"],
+      ["wrong", "/probot/setup?code=123&state=wrong"],
+      ["duplicated", `/probot/setup?code=123&state=${SETUP_TOKEN}&state=x`],
+    ])("rejects a %s state on /probot/setup", async (_, url) => {
+      const mock = conversionMock();
+      const { handled, writeHead, end } = await call(
+        await createHandler({ request: { fetch: mock.fetchHandler } }),
+        { method: "GET", url },
+      );
+
+      expect(handled).toBe(true);
+      expect(writeHead).toHaveBeenCalledWith(403, {
+        "content-type": "text/plain",
+      });
+      expect(end).toHaveBeenCalledWith("state missing or invalid");
+      expect(mock.callHistory.calls()).toHaveLength(0);
+      expect(updateEnvCalls).toHaveLength(0);
+    });
+
+    it("sets the token cookie on GET /probot/import", async () => {
+      const { writeHead } = await call(await createHandler(), {
+        method: "GET",
+        url: "/probot/import",
+      });
+
+      expect(writeHead).toHaveBeenCalledWith(200, {
+        "content-type": "text/html",
+        "set-cookie": `probot_setup_token=${SETUP_TOKEN}; Path=/probot; HttpOnly; SameSite=Strict`,
+      });
+    });
+
+    it.each([
+      ["missing", undefined],
+      ["wrong", "probot_setup_token=wrong"],
+      ["empty", "probot_setup_token="],
+      ["prefixed", `xprobot_setup_token=${SETUP_TOKEN}`],
+    ])("rejects a %s cookie on POST /probot/import", async (_, cookie) => {
+      const { handled, writeHead } = await postImport(
+        await createHandler(),
+        cookie,
+      );
+
+      expect(handled).toBe(true);
+      expect(writeHead).toHaveBeenCalledWith(403, {
+        "content-type": "text/plain",
+      });
+      expect(updateEnvCalls).toHaveLength(0);
+    });
+
+    it("accepts the token cookie among other cookies", async () => {
+      const { writeHead } = await postImport(
+        await createHandler(),
+        `other=1; probot_setup_token=${SETUP_TOKEN}; another=2`,
+      );
+
+      expect(writeHead).not.toHaveBeenCalled();
+      expect(updateEnvCalls).toEqual([
+        { APP_ID: "1", PRIVATE_KEY: '"pem"', WEBHOOK_SECRET: "s" },
+      ]);
+    });
+
+    it("does not handle other POST requests", async () => {
+      const { handled } = await call(await createHandler(), {
+        method: "POST",
+        url: "/probot/other",
+      });
+
+      expect(handled).toBe(false);
     });
   });
 

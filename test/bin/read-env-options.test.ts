@@ -38,6 +38,21 @@ describe("readEnvOptions", () => {
     });
   });
 
+  it.each(["not-a-number", "-1", "65536"])(
+    "rejects invalid PORT values: %s",
+    (port) => {
+      expect(() => readEnvOptions({ PORT: port })).toThrow(
+        "port must be an integer between 1 and 65535",
+      );
+    },
+  );
+
+  it("rejects an invalid APP_ID value", () => {
+    expect(() => readEnvOptions({ APP_ID: "123abc" })).toThrow(
+      "app ID must be a positive integer",
+    );
+  });
+
   it("maps an explicit JSON log format", () => {
     expect(readEnvOptions({ LOG_FORMAT: "json" }).logFormat).toBe("json");
   });

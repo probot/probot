@@ -143,6 +143,9 @@ describe("receive", () => {
     expect(warning).toHaveBeenCalledWith(
       expect.stringContaining("No token specified"),
     );
+    expect(mocks.Probot).toHaveBeenCalledWith(
+      expect.objectContaining({ privateKey: undefined }),
+    );
   });
 
   it("uses HTTPS for GitHub Enterprise when no protocol is configured", async () => {

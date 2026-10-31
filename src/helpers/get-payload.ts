@@ -52,12 +52,25 @@ export function getPayloadFromRequestStream(
   // We need to load the payload from the request (normal case of Node.js server)
   return new Promise((resolve, reject) => {
     const data: Uint8Array[] = [];
+    let settled = false;
 
-    request.on("error", (error: Error) =>
-      reject(new AggregateError([error], error.message)),
-    );
-    request.on("data", data.push.bind(data));
+    const rejectRequest = (message: string, cause?: Error) => {
+      if (settled) return;
+      settled = true;
+      data.length = 0;
+      const error = cause || new Error(message);
+      reject(new AggregateError([error], error.message));
+    };
+
+    request.on("error", (error: Error) => rejectRequest(error.message, error));
+    request.on("aborted", () => rejectRequest("request aborted"));
+    request.on("close", () => rejectRequest("request close"));
+    request.on("data", (chunk: Uint8Array) => {
+      if (!settled) data.push(chunk);
+    });
     request.on("end", () => {
+      if (settled) return;
+      settled = true;
       const result = concatUint8Array(data);
       queueMicrotask(() => resolve(result));
     });

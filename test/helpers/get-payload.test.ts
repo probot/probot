@@ -59,6 +59,24 @@ describe("getPayload", () => {
 });
 
 describe("getPayloadFromRequestStream", () => {
+  it.each(["aborted", "close"])(
+    "rejects when the request emits %s before ending",
+    async (event) => {
+      const request = new PassThrough();
+      const result = getPayloadFromRequestStream(
+        request as unknown as IncomingMessage,
+      );
+      request.emit(event);
+      const timeout = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("request did not settle")), 100),
+      );
+
+      await expect(Promise.race([result, timeout])).rejects.toMatchObject({
+        message: `request ${event}`,
+      });
+    },
+  );
+
   it("rejects when the request emits an error", async () => {
     const request = new PassThrough();
     const result = getPayloadFromRequestStream(

@@ -115,6 +115,16 @@ describe("Probot", () => {
       );
     });
 
+    it.each(["123abc", -1])("rejects invalid app IDs: %s", (invalidAppId) => {
+      expect(
+        () =>
+          new Probot({
+            appId: invalidAppId as unknown as number,
+            privateKey,
+          }),
+      ).toThrow("appId option must be a positive integer");
+    });
+
     it('{ appId, privateKey" }', () => {
       // probot with appId/privateKey
       new Probot({ appId, privateKey });

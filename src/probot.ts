@@ -95,6 +95,11 @@ export class Probot {
         throw new Error("appId option is required");
       }
 
+      const appId = Number(options.appId);
+      if (!Number.isSafeInteger(appId) || appId <= 0) {
+        throw new Error("appId option must be a positive integer");
+      }
+
       if (!options.privateKey) {
         throw new Error("privateKey option is required");
       }

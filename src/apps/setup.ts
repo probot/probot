@@ -167,9 +167,20 @@ export const setupAppFactory = (options: SetupFactoryOptions) => {
               .end("setup token missing or invalid, reload /probot/import");
             return true;
           }
-          const { appId, pem, webhook_secret } = JSON.parse(
-            await getPayload(req),
-          );
+          let payload: {
+            appId?: string;
+            pem?: string;
+            webhook_secret?: string;
+          };
+          try {
+            payload = JSON.parse(await getPayload(req));
+          } catch {
+            res
+              .writeHead(400, { "content-type": "text/plain" })
+              .end("invalid JSON");
+            return true;
+          }
+          const { appId, pem, webhook_secret } = payload;
           if (!appId || !pem || !webhook_secret) {
             res
               .writeHead(400, {

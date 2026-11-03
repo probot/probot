@@ -19,11 +19,25 @@ export function readEnvOptions(env = process.env) {
         ? "json"
         : "pretty";
 
+  const port =
+    env.PORT === undefined || env.PORT === "" ? 3000 : Number(env.PORT);
+  if (!Number.isInteger(port) || port < 1 || port > 65535) {
+    throw new Error("port must be an integer between 1 and 65535");
+  }
+
+  const appId =
+    env.APP_ID === undefined || env.APP_ID === ""
+      ? undefined
+      : Number(env.APP_ID);
+  if (appId !== undefined && (!Number.isSafeInteger(appId) || appId <= 0)) {
+    throw new Error("app ID must be a positive integer");
+  }
+
   return {
     args: [],
     privateKey: (privateKey && privateKey.toString()) || undefined,
-    appId: Number(env.APP_ID),
-    port: Number(env.PORT) || 3000,
+    appId,
+    port,
     host: env.HOST,
     secret: env.WEBHOOK_SECRET,
     webhookPath: env.WEBHOOK_PATH,

@@ -99,6 +99,15 @@ describe("readCliOptions", () => {
     });
   });
 
+  it.each(["not-a-number", "65536"])(
+    "rejects invalid CLI ports: %s",
+    (port) => {
+      expect(() => readCliOptions(["--port", port])).toThrow(
+        "port must be an integer between 1 and 65535",
+      );
+    },
+  );
+
   it("allows CLI logging options to override invalid environment values", () => {
     const invalidEnv = {
       LOG_LEVEL: "invalid",

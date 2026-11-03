@@ -119,6 +119,11 @@ export function readCliOptions(
       getPrivateKey({ filepath: values["private-key"] }) || undefined;
   } catch {}
 
+  const port = Number(values.port);
+  if (!Number.isInteger(port) || port < 1 || port > 65535) {
+    throw new Error("port must be an integer between 1 and 65535");
+  }
+
   return {
     privateKey,
     appId: values["app"],
@@ -126,7 +131,7 @@ export function readCliOptions(
     args: positionals,
     baseUrl: values["base-url"],
     host: values.host,
-    port: Number(values.port),
+    port,
     secret: values.secret,
     webhookPath: values["webhook-path"],
     webhookProxy: values["webhook-proxy"],

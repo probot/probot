@@ -29,6 +29,24 @@ describe("resolver", () => {
     expect(stubResolverCalls[0][1]).toBe(basedir);
   });
 
+  it("resolves modules relative to the supplied basedir", async () => {
+    const stubResolverCalls: [string, string][] = [];
+    const stubResolver = (specifier: string, parent?: string): string => {
+      stubResolverCalls.push([specifier, parent!]);
+      return stubAppFnPath;
+    };
+    const customBasedir = "/tmp/probot-app";
+
+    await resolveAppFunction("foo", {
+      basedir: customBasedir,
+      resolver: stubResolver,
+    });
+
+    expect(stubResolverCalls[0][1]).toBe(
+      pathToFileURL(customBasedir).href + "/",
+    );
+  });
+
   it("loads module transpiled from TypeScript (https://github.com/probot/probot/issues/1447)", async () => {
     const stubResolverCalls: [string, string][] = [];
     const stubResolver = (specifier: string, parent?: string): string => {

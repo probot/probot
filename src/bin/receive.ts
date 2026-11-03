@@ -161,7 +161,7 @@ export async function receive(args: string[]) {
 
   const probot = new Probot({
     appId,
-    privateKey: String(privateKey),
+    privateKey: privateKey || undefined,
     githubToken: githubToken,
     log,
     baseUrl: baseUrl,

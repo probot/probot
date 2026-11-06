@@ -134,6 +134,12 @@ export async function run(
           "To resolve, ensure either the PRIVATE_KEY or PRIVATE_KEY_PATH environment variable is set and contains a valid certificate",
       );
     }
+    if (!secret) {
+      throw new Error(
+        "Webhook secret is missing, and is required to run in production mode. " +
+          "To resolve, ensure the WEBHOOK_SECRET environment variable is set.",
+      );
+    }
   }
 
   if (!appId || !privateKey) {

@@ -1,5 +1,4 @@
 import type { IncomingMessage } from "node:http";
-import { exec } from "node:child_process";
 import { parse as parseQuery } from "node:querystring";
 import { randomBytes } from "node:crypto";
 
@@ -47,14 +46,10 @@ export const setupAppFactory = (options: SetupFactoryOptions) => {
     const { WEBHOOK_PROXY_URL, GHE_HOST } = env;
     const GH_HOST = `https://${GHE_HOST ?? "github.com"}`;
 
-    // If not on Glitch or Production, create a smee URL
+    // If not on Production and no WEBHOOK_PROXY_URL is set, create a smee URL
     if (
-      !isProduction(env) &&
-      !(
-        env.PROJECT_DOMAIN ||
-        env.WEBHOOK_PROXY_URL ||
-        env.NO_SMEE_SETUP === "true"
-      )
+      !isProduction() &&
+      !(env.WEBHOOK_PROXY_URL || env.NO_SMEE_SETUP === "true")
     ) {
       await setup.createWebhookChannel({ SmeeClient, log });
     }
@@ -66,7 +61,7 @@ export const setupAppFactory = (options: SetupFactoryOptions) => {
     });
     const successViewRendered = successView({ name: pkg.name });
 
-    printWelcomeMessage(log, host, port, env);
+    printWelcomeMessage(log, host, port);
 
     const setupHandler: Handler = async (req, res) => {
       const [path, query = ""] = req.url?.split("?") ?? [req.url, ""];
@@ -119,16 +114,7 @@ export const setupAppFactory = (options: SetupFactoryOptions) => {
             request: request || {},
           });
 
-          // If using glitch, restart the app
-          if (env.PROJECT_DOMAIN) {
-            exec("refresh", (error) => {
-              if (error) {
-                log.error(error);
-              }
-            });
-          } else {
-            printRestartMessage(log);
-          }
+          printRestartMessage(log);
 
           res
             .writeHead(302, {
@@ -208,12 +194,8 @@ function printWelcomeMessage(
   log: Logger,
   host: string | undefined,
   port: number | undefined,
-  env: Env,
 ) {
-  // use glitch env to get correct domain welcome message
-  // https://glitch.com/help/project/
-  const domain =
-    env.PROJECT_DOMAIN || `http://${getPrintableHost(host)}:${port}`;
+  const domain = `http://${getPrintableHost(host)}:${port}`;
 
   [
     ``,

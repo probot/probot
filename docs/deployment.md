@@ -18,6 +18,7 @@ Every app can either be deployed stand-alone, or combined with other apps in one
   - [As node app](#as-node-app)
     - [Heroku](#heroku)
     - [Render](#render)
+    - [Prisma Compute](#prisma-compute)
   - [As serverless function](#as-serverless-function)
     - [AWS Lambda](#aws-lambda)
     - [Azure Functions](#azure-functions)
@@ -128,6 +129,42 @@ Probot runs like any other Node app on [Render](https://render.com/). After [cre
 1.  Go back to your [app settings page](https://github.com/settings/apps) and update the **Webhook URL** to the URL of your Render deployment, including the default webhook path, e.g. `https://your-app.onrender.com/api/github/webhooks`.
 
 1.  Your app should be up and running! To verify that your app is receiving webhook data, check the "Logs" tab in the Render dashboard.
+
+#### Prisma Compute
+
+[Prisma Compute](https://www.prisma.io/compute) runs your app on [Bun](https://bun.sh) from a single bundled file, so you start Probot with `run()` instead of the `probot` binary. After [creating the GitHub App](#register-the-github-app):
+
+1.  Follow [Deploy your first app](https://www.prisma.io/docs/prisma-compute/deploy#start-from-scratch) to install the Prisma CLI, sign in, and add the `src/service.ts`, `module.ts` and `prisma.config.ts` files that declare your app. The commands below assume that `module.ts` names the app `my-probot-app`.
+
+1.  Instead of the `src/server.ts` from that guide, create `src/server.js`. It starts Probot on the host and port that Compute sends requests to:
+
+        import { run } from "probot";
+        import app from "../app.js";
+        import service from "./service.ts";
+
+        await run(app, {
+          env: { HOST: "0.0.0.0", PORT: String(service.port()) },
+        });
+
+1.  Create the Compute project and configure it before the first deploy, because a deployment reads its variables when it is created. Replace the `APP_ID` and `WEBHOOK_SECRET` with the values for those variables, and set the path for the `PRIVATE_KEY`:
+
+        $ npx prisma project create my-probot-app
+        $ npx prisma project env add APP_ID=aaa --role production
+        $ npx prisma project env add WEBHOOK_SECRET=bbb --role production
+        $ PRIVATE_KEY="$(cat ~/Downloads/*.private-key.pem)" npx prisma project env add PRIVATE_KEY --role production
+
+1.  Bundle the app and deploy it:
+
+        $ bun build src/server.js --target=bun --outfile dist/server.mjs
+        $ npx prisma deploy
+        ...
+        my-probot-app.web: https://abc123.fra.prisma.build
+
+1.  Go back to your [app settings page](https://github.com/settings/apps) and update the **Webhook URL** to the URL of your deployment, including the default webhook path, e.g. `https://abc123.fra.prisma.build/api/github/webhooks`.
+
+1.  Your app should be up and running! To verify that your app is receiving webhook data, you can tail your app's logs:
+
+        $ npx prisma service logs my-probot-app.web --follow
 
 ### As serverless function
 

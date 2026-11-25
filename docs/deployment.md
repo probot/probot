@@ -151,7 +151,7 @@ Probot runs like any other Node app on [Render](https://render.com/). After [cre
         $ npx prisma project create my-probot-app
         $ npx prisma project env add APP_ID=aaa --role production
         $ npx prisma project env add WEBHOOK_SECRET=bbb --role production
-        $ PRIVATE_KEY="$(cat ~/Downloads/*.private-key.pem)" npx prisma project env add PRIVATE_KEY --role production
+        $ PRIVATE_KEY="$(cat ~/Downloads/my-probot-app.2026-11-24.private-key.pem)" npx prisma project env add PRIVATE_KEY --role production
 
 1.  Bundle the app and deploy it:
 

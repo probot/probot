@@ -66,6 +66,20 @@ describe("createProbot", () => {
     expect(probot instanceof Probot).toBe(true);
   });
 
+  test("preserves credentials supplied through defaults when the environment is empty", () => {
+    expect(() =>
+      createProbot({
+        env: {},
+        defaults: {
+          appId: 123,
+          privateKey: "private key",
+          secret: "secret",
+          log: pino({ level: "silent" }),
+        },
+      }),
+    ).not.toThrow();
+  });
+
   test("uses HTTPS by default for GitHub Enterprise", async () => {
     const probot = createProbot({
       env: {

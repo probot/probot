@@ -670,6 +670,20 @@ describe("Setup app", () => {
         body: JSON.stringify({ appId: "1", pem: "pem", webhook_secret: "s" }),
       });
 
+    it("returns 400 for malformed JSON on POST /probot/import", async () => {
+      const { writeHead, end } = await call(await createHandler(), {
+        method: "POST",
+        url: "/probot/import",
+        headers: { cookie: `probot_setup_token=${SETUP_TOKEN}` },
+        body: "{malformed",
+      });
+
+      expect(writeHead).toHaveBeenCalledWith(400, {
+        "content-type": "text/plain",
+      });
+      expect(end).toHaveBeenCalledWith("invalid JSON");
+    });
+
     const conversionMock = () =>
       fetchMock
         .createInstance()

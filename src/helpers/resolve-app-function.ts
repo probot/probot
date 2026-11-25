@@ -8,7 +8,7 @@ export const resolveAppFunction = async (
   opts: ResolveOptions = {},
 ): Promise<ApplicationFunction> => {
   // These are mostly to ease testing
-  const basedir = process.cwd();
+  const basedir = opts.basedir ?? process.cwd();
   const resolver = opts.resolver || resolve;
   const appFnPath = resolver(appFnId, pathToFileURL(basedir).href + "/");
 
